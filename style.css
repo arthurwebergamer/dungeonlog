@@ -2979,3 +2979,57 @@
     --spr-slash-lendario: url("data:image/png;base64,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");
   }
 
+
+/* --- Módulo style #21 --- */
+/* Redesign compacto do menu de Config: linhas com icone circular a
+   esquerda (padrao inspirado no Habitica), subtitulo menor com
+   ellipsis, e rotulo de secao (.edsec) mais discreto. Regras aditivas
+   escopadas em .cfgOverlay -- nao mexe nas regras .cfgrow/.cfgtxt/
+   .edsec ja existentes (Modulo/secao acima), so ganha na cascata por
+   especificidade (2 classes vence 1) e por vir depois no arquivo. */
+.cfgOverlay .cfgrow{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:13px 2px;
+}
+.cfgOverlay .cfgrow.cfgcol{
+  align-items:flex-start;
+  flex-direction:column;
+}
+.cfgOverlay .cfgicone{
+  flex:0 0 34px;
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  background:rgba(255,255,255,.07);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--gold, #d4af37);
+}
+.cfgOverlay .cfgicone svg{ width:18px; height:18px; }
+.cfgOverlay .cfgtxt{ flex:1; min-width:0; }
+.cfgOverlay .cfgtxt b{
+  display:block;
+  font-size:15px;
+  font-weight:600;
+  line-height:1.2;
+}
+.cfgOverlay .cfgtxt span{
+  display:block;
+  font-size:12px;
+  opacity:.5;
+  margin-top:1px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.cfgOverlay .edsec{
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.07em;
+  text-transform:uppercase;
+  opacity:.4;
+  margin:20px 2px 4px;
+}

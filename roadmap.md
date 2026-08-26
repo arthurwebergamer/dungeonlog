@@ -7922,3 +7922,12 @@ não foi testado fora do ambiente local. Recomendado publicar os três
 arquivos juntos no Netlify e confirmar que o app abre normal antes de
 considerar essa divisão finalizada.
 
+
+**Confirmado pelo usuário em 26/08:** abrir `index.html` sozinho, sem
+`style.css`/`assets.js` ao lado, quebra o `#mobSprite` da arena —
+aparece uma silhueta roxa no lugar do monstro (sem `assets.js`, o array
+`MONSTROS` não existe; sem `style.css`, `.mob-sprite` fica sem estilo
+nenhum). Confirma exatamente o risco que este item já tinha sinalizado
+como não testado — os 3 arquivos precisam sempre ser publicados juntos
+(Netlify ou qualquer outro host), nunca o `index.html` isolado.
+

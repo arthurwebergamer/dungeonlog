@@ -1,6 +1,13 @@
 # Questlog — Roadmap
 
-> Versão do arquivo: `questlog-4-125-remove-vigia.html`
+> Versão do arquivo: `questlog-4-127-split-assets.html`
+>
+> **Nota:** item novo (não numerado no roadmap de features, é
+> infraestrutura de projeto) — arquivo único dividido em
+> `index.html` + `style.css` + `assets.js` pra economizar tokens nas
+> sessões de implementação. Ver seção 70. **Ainda não testado em
+> aparelho real / publicado no Netlify** — próximo passo antes de
+> considerar fechado.
 >
 > **Nota:** item 39 novo — Config reestruturado, tela principal vira
 > lista enxuta (texto + seta), Herói/Aparência/Preferências migram pra
@@ -7820,4 +7827,98 @@ estado exato pós-limpeza de código morto. Recomendado Jean confirmar
 visualmente essa build final no aparelho antes de considerar fechado,
 já que a limpeza mexeu em código (removeu funções/CSS) depois do
 último vídeo aprovado.
+
+## 70. Divisão do arquivo único em `index.html` + `style.css` + `assets.js` (v4.127)
+
+**Motivação:** arquivo único vinha ficando pesado (10.361 linhas / 553KB)
+por causa de dois blocos de conteúdo que não são lógica de jogo — CSS
+espalhado em 37 blocos `<style>` e os catálogos `MONSTROS`/`HEROIS`/
+`ITENS` com sprites em base64 embutido. Objetivo: extrair esses dois
+blocos pra arquivos próprios e economizar tokens nas próximas sessões
+de implementação, sem tocar em nenhuma lógica de jogo.
+
+### O que foi feito
+
+**`style.css` (novo arquivo, 2.981 linhas / 250KB):**
+Consolidados **todos os 37 blocos `<style>`** do arquivo original — 17
+que ficavam no `<head>` e **20 que estavam espalhados pelo corpo**,
+colados dentro dos módulos autônomos (editor de tarefa, vida do herói,
+equipamento visível, atributos evoluíveis, histórico, conquistas, SFX,
+bestiário, tela de login, etc. — os blocos marcados nos comentários
+como "bloco autônomo, cole antes de `</body>`"). Cada bloco original
+ficou marcado por comentário (`/* ===== Bloco style #N ===== */`) pra
+rastrear a origem se precisar depurar.
+
+No HTML, os 37 blocos foram substituídos por uma única
+`<link rel="stylesheet" href="style.css">`, inserida no `<head>` no
+lugar do primeiro bloco (linha 19 do arquivo original).
+
+**`assets.js` (novo arquivo, 187 linhas / 108KB):**
+Os três catálogos de dados extraídos como estavam, sem nenhuma
+alteração de conteúdo:
+- `MONSTROS` (13 monstros, sprites base64)
+- `HEROIS` (7 heróis, sprites base64)
+- `ITENS` (~50 itens, array compacto sem sprite próprio —
+  `[id, nome, tipo, raridade, preco, atk, def]`)
+
+No HTML, os três `const` foram removidos dos blocos `<script>` onde
+viviam e substituídos por `<script src="assets.js"></script>`,
+inserido **antes do primeiro `<script>` inline** (scripts clássicos
+executam em ordem de aparição no documento, então isso garante que
+`MONSTROS`/`HEROIS`/`ITENS` já existem no escopo global quando
+`heroiAtual()`, `desenharHeroi()` e o módulo de inventário rodam).
+
+### Resultado
+
+| Arquivo | Linhas | Tamanho |
+|---|---|---|
+| `index.html` original (tudo junto) | 10.361 | 553 KB |
+| `index.html` final (só estrutura + lógica) | 8.299 | 387 KB |
+| `style.css` | 2.981 | 250 KB |
+| `assets.js` | 187 | 108 KB |
+
+**Nota de expectativa:** o usuário estranhou o HTML final ainda ter
+~8.300 linhas — esperava uma redução mais parecida com o número de
+linhas removidas. Explicado que linha não é a métrica certa aqui: cada
+sprite base64 era uma única linha gigante, então a extração dos
+catálogos cortou pouca contagem de linha (~183) mas bastante peso real
+(~108KB). O que sobrou no HTML é lógica de jogo genuína (39 blocos
+`<script>` — economia, combate, inventário, loja, conquistas,
+bestiário, editor de tarefas, autenticação Firebase) que **não foi
+tocada nem cortada**, só o CSS e os dados estáticos saíram.
+
+### Não feito nesta sessão (decisão consciente, não pendência)
+
+Cogitado ir além e separar os 39 blocos `<script>` em arquivos JS
+próprios por módulo (`combate.js`, `inventario.js`, `loja.js`...), o
+que reduziria a contagem de linha do HTML de forma mais visível. **Não
+feito** porque, diferente do CSS e dos catálogos (dados estáticos
+óbvios pra isolar), os blocos de script são interdependentes por
+escopo — muitos módulos dependem de `const`/`let` declarados em blocos
+anteriores dentro do mesmo arquivo (arquitetura já documentada no
+roadmap: "por isso vive no mesmo `<script>` — const não atravessa
+blocos separados"). Mapear essas dependências pra dividir sem quebrar
+nada é uma refatoração de risco bem maior que a extração de CSS/dados,
+e não foi pedida. Se o usuário quiser esse próximo nível de divisão,
+tratar como sessão dedicada, com o mesmo cuidado de mapeamento de
+dependências usado historicamente pra outras refatorações de risco
+neste projeto.
+
+### Validação
+
+`node --check` limpo nos 39 blocos `<script>` clássicos restantes no
+HTML pós-extração (o bloco `type="module"` não entra nessa checagem
+específica). Balanço de tags conferido: `<div>` 360/360, `<svg>` 46/46,
+zero `<style>` remanescente no HTML. Confirmado por `grep` que os três
+`const` (`MONSTROS`, `HEROIS`, `ITENS`) não existem mais em lugar
+nenhum do HTML. Arquivo termina corretamente em `</body></html>`.
+
+**Não validado nesta sessão:** teste em aparelho real do
+`index.html` novo carregando `style.css` e `assets.js` via `<link>`/
+`<script src>` — a extração foi só estrutural (mesmo conteúdo, arquivos
+diferentes), mas o comportamento de carregamento de arquivo externo
+(caminho relativo, CORS se aplicável no Netlify, ordem de carregamento)
+não foi testado fora do ambiente local. Recomendado publicar os três
+arquivos juntos no Netlify e confirmar que o app abre normal antes de
+considerar essa divisão finalizada.
 

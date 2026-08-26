@@ -3720,6 +3720,11 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       b.className = 'temaswatch' + (t.id === atual ? ' sel' : '');
       b.style.background = t.cor;
       b.title = t.nome;
+      // v4.123 (pedido do usuario: cards maiores tipo o seletor de tema
+      // do Skyllion, em vez de bolinha de 36px). Label vira filho real
+      // em vez de so tooltip -- soh de leitura, nao muda logica de
+      // selecao (escolherTema/onclick continuam iguais).
+      b.innerHTML = '<span class="temaLabel">' + t.nome + '</span>';
       b.onclick = () => escolherTema(t.id);
       g.appendChild(b);
     });

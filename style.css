@@ -3033,3 +3033,58 @@
   opacity:.4;
   margin:20px 2px 4px;
 }
+
+/* --- Módulo style #22 --- */
+/* Sub-telas Herói e Aparência (Config): cards maiores, usando mais da
+   tela -- pedido do usuario comparando com o seletor de tema do
+   Skyllion (cards grandes com preview + nome, nao bolinha pequena).
+   Escopado por ID (#gradeHeroisConfig / #temaGrid) de proposito: tanto
+   .grade/.opcao quanto .temaswatch sao reaproveitados em outro lugar
+   do app (#gradeHerois no onboarding usa a mesma .grade/.opcao) -- so
+   o container de Config muda de layout, o resto do app continua igual. */
+
+#gradeHeroisConfig.grade{
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+}
+#gradeHeroisConfig .opcao{
+  padding:16px 4px;
+  border-radius:16px;
+}
+#gradeHeroisConfig .opcao img{
+  width:64px;
+  height:64px;
+}
+
+#temaGrid.temagrid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+#temaGrid .temaswatch{
+  width:auto;
+  height:92px;
+  border-radius:16px;
+  border:2px solid var(--line);
+  cursor:pointer;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  padding-bottom:10px;
+  box-sizing:border-box;
+  transition:transform .12s;
+}
+#temaGrid .temaswatch:active{ transform:scale(.96) }
+#temaGrid .temaswatch.sel{
+  border-color:var(--text);
+  box-shadow:0 0 0 3px var(--accent);
+}
+#temaGrid .temaLabel{
+  font-family:'Outfit',sans-serif;
+  font-size:12px;
+  font-weight:600;
+  color:rgba(0,0,0,.65);
+  background:rgba(255,255,255,.82);
+  padding:3px 10px;
+  border-radius:20px;
+}

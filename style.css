@@ -1847,3 +1847,1135 @@
     --spr-slash-lendario: url("data:image/png;base64,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");
   }
 
+
+/* ===== Blocos de módulos autônomos (extraídos do corpo do HTML) ===== */
+
+/* --- Módulo style #1 --- */
+#viewLoja{padding:14px 14px 8px}
+
+  .lojatopo{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+  .lojatopo .saldo{margin-top:0}
+
+  .lojatabs{display:flex;gap:6px}
+  .lojatabs button{font-family:'Outfit',sans-serif;font-size:11.5px;font-weight:600;color:var(--dim);
+        background:var(--panel-3);border:1px solid var(--line);border-radius:999px;padding:5px 12px;cursor:pointer}
+  .lojatabs button.on{color:var(--bg);background:var(--accent);border-color:var(--accent)}
+
+  .lojalista{display:flex;flex-direction:column;gap:8px}
+  .lrow{display:flex;align-items:center;gap:11px;background:var(--panel-3);border:1px solid var(--line);
+        border-radius:12px;padding:9px 11px;position:relative}
+  .lrow.oferta{border-color:var(--gold);box-shadow:0 0 10px rgba(242,201,76,.14)}
+  .lrow.trava{opacity:.5}
+  .lrow.esgotado{opacity:.38}
+  .lrow .lbox{width:46px;height:46px;border-radius:10px;background:var(--poco);border:1px solid var(--line);
+        display:flex;align-items:center;justify-content:center;flex:none}
+  .lrow .linfo{flex:1;min-width:0}
+  .lname{font-family:'Outfit',sans-serif;font-size:13.5px;font-weight:600;color:var(--text);
+         white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .lmeta{font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;text-transform:uppercase;
+         letter-spacing:.05em;margin-top:2px}
+  .lbonus{font-family:'Outfit',sans-serif;font-size:11px;color:var(--dim);margin-top:3px}
+  .lbonus b{color:var(--muted);font-weight:600}
+  .lacao{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+  .lpreco{font-family:'Outfit',sans-serif;font-size:12.5px;font-weight:700;color:var(--gold);
+          font-variant-numeric:tabular-nums;white-space:nowrap}
+  .lpreco s{color:var(--dim);font-weight:500;font-size:10.5px;margin-right:4px}
+  .lpreco .lmoeda{width:11px;height:11px;margin-left:3px;vertical-align:-1px}
+  .lbtn{font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;padding:6px 14px;border-radius:9px;
+        border:1px solid var(--accent);background:var(--accent);color:var(--bg);cursor:pointer;white-space:nowrap}
+  .lbtn.sec{background:var(--poco);border-color:var(--line);color:var(--muted)}
+  .lbtn.off{background:var(--poco);border-color:var(--line);color:var(--dim);cursor:default}
+  .lflag{position:absolute;top:-7px;left:11px;font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;
+         text-transform:uppercase;letter-spacing:.08em;background:var(--gold);color:var(--bg);
+         border-radius:999px;padding:2px 7px}
+  .lqtd{font-family:'Outfit',sans-serif;font-size:11px;color:var(--dim);font-weight:600}
+  .lbulk{margin-top:12px;width:100%;font-family:'Outfit',sans-serif;font-size:12.5px;font-weight:600;
+         padding:10px;border-radius:11px;border:1px dashed var(--line);background:var(--poco);
+         color:var(--gold);cursor:pointer}
+  .lnota{font-family:'Outfit',sans-serif;font-size:11.5px;color:var(--dim);text-align:center;
+         margin:14px 0 4px;line-height:1.5}
+
+/* --- Módulo style #2 --- */
+/* ============ TAREFAS: botoes maiores + dificuldade ============ */
+
+  /* botao "+ Adicionar": area de toque de 44px, minimo recomendado no celular */
+  .thead .add{
+    padding:11px 18px !important;
+    font-size:14.5px !important;
+    font-weight:600 !important;
+    border-radius:11px !important;
+    min-height:44px !important;
+  }
+  .thead .add:active{transform:scale(.96)}
+
+  /* botao de apagar: era 16px e so aparecia no :hover — no celular nao existe hover */
+  .task .del{
+    width:36px !important;
+    height:36px !important;
+    min-width:36px !important;
+    margin-left:auto !important;
+    padding:0 !important;
+    font-size:21px !important;
+    line-height:1 !important;
+    border-radius:10px !important;
+    color:var(--dim) !important;
+    background:rgba(255,255,255,.045) !important;
+    opacity:1 !important;              /* sempre visivel */
+    display:grid; place-items:center;
+    transition:background .15s, color .15s, transform .1s;
+  }
+  .task .del:active{
+    background:rgba(242,87,129,.20) !important;
+    color:var(--perigo) !important;
+    transform:scale(.9);
+  }
+  .task:hover .del{opacity:1 !important}
+
+  .task{padding:13px 12px 13px 14px !important}
+  .task .box{width:24px !important;height:24px !important;border-width:2px !important}
+
+  /* --- linha de meta abaixo do titulo --- */
+  .tinfo{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
+  .tmeta{display:flex;align-items:center;gap:8px}
+
+  /* --- losangos de dificuldade --- */
+  .difpip{display:inline-flex;gap:3px;align-items:center}
+  .difpip i{
+    width:6px;height:6px;
+    background:currentColor;
+    transform:rotate(45deg);
+    border-radius:1px;
+    display:block;
+  }
+  .task[data-dif="trivial"] .difpip{color:#7E8BA3}
+  .task[data-dif="facil"]   .difpip{color:var(--verde)}
+  .task[data-dif="media"]   .difpip{color:var(--accent)}
+  .task[data-dif="dificil"] .difpip{color:var(--perigo)}
+
+  /* --- seletor no composer --- */
+  .difwrap{display:flex;flex-direction:column;gap:7px}
+  .diflabel{
+    font-family:'Outfit',sans-serif;font-size:11.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--dim);
+  }
+  .difs{display:flex;gap:6px}
+  .dif{
+    flex:1;min-height:56px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+    background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:8px 4px;cursor:pointer;transition:.15s;
+    color:var(--dim);
+  }
+  .dif .difnome{
+    font-family:'Outfit',sans-serif;font-size:11.5px;font-weight:500;
+    color:var(--muted);line-height:1;
+  }
+  .dif.on{background:var(--accent-dim);border-color:var(--accent)}
+  .dif.on .difnome{color:var(--accent);font-weight:600}
+  .dif:active{transform:scale(.96)}
+
+  .dif[data-dif="trivial"].on{color:#7E8BA3}
+  .dif[data-dif="facil"].on  {color:var(--verde)}
+  .dif[data-dif="media"].on  {color:var(--accent)}
+  .dif[data-dif="dificil"].on{color:var(--perigo)}
+  .dif[data-dif="trivial"].on .difnome{color:#7E8BA3}
+  .dif[data-dif="facil"].on   .difnome{color:var(--verde)}
+  .dif[data-dif="dificil"].on .difnome{color:var(--perigo)}
+
+  /* --- "vezes por dia": mesmo rotulo do difwrap, stepper proprio --- */
+  .vezeswrap{display:flex;flex-direction:column;gap:7px}
+  .vezesrow{display:flex;align-items:center;gap:12px}
+  .vezesbtn{
+    width:40px;height:40px;flex:none;border-radius:10px;
+    background:var(--panel);border:1px solid var(--line);color:var(--text);
+    font-family:'Outfit',sans-serif;font-size:18px;font-weight:600;line-height:1;
+    cursor:pointer;transition:.15s;
+  }
+  .vezesbtn:active{transform:scale(.94)}
+  .vezesbtn:disabled{opacity:.35;cursor:default}
+  .vezesnum{
+    flex:1;text-align:center;font-family:'Outfit',sans-serif;
+    font-size:15px;font-weight:600;color:var(--text);
+  }
+  .vezesnum b{font-family:'Outfit',sans-serif;font-size:20px;font-weight:700;margin-right:5px}
+
+  /* --- opcoes avancadas: disclosure + color picker livre por tarefa --- */
+  .advtoggle{
+    width:100%;text-align:left;background:none;border:none;padding:6px 0;
+    font-family:'Outfit',sans-serif;font-size:12.5px;font-weight:600;
+    color:var(--dim);letter-spacing:.02em;cursor:pointer;
+    display:flex;align-items:center;justify-content:space-between;
+  }
+  .advchevron{transition:transform .18s;font-size:11px}
+  .advtoggle.on .advchevron{transform:rotate(180deg)}
+  .advpanel{
+    max-height:0;overflow:hidden;opacity:0;
+    transition:max-height .22s ease, opacity .18s;
+  }
+  .advpanel.on{max-height:190px;opacity:1}
+  .advcolorrow{display:flex;flex-direction:column;gap:9px;padding:8px 0 4px}
+  .advcolorpick{display:flex;align-items:center;gap:9px}
+  .advswatch{
+    width:40px;height:40px;flex:none;border-radius:9px;
+    border:1px solid var(--line);background:var(--accent);
+  }
+  .advhex{
+    flex:1;min-width:0;height:40px;padding:0 12px;border-radius:9px;
+    border:1px solid var(--line);background:var(--panel);color:var(--text);
+    font-family:'Outfit',sans-serif;font-size:14px;letter-spacing:.03em;
+  }
+  .advhex:focus{outline:none;border-color:var(--accent)}
+  .advswatches{display:flex;flex-wrap:wrap;gap:8px}
+  .advpreset{
+    width:28px;height:28px;flex:none;border-radius:8px;cursor:pointer;
+    border:2px solid transparent;transition:transform .1s,border-color .12s;
+  }
+  .advpreset:active{transform:scale(.9)}
+  .advpreset.on{border-color:var(--text)}
+  .advreset{
+    background:var(--panel);border:1px solid var(--line);border-radius:9px;
+    color:var(--muted);font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;
+    padding:0 12px;height:40px;cursor:pointer;
+  }
+  .advreset:active{transform:scale(.97)}
+
+/* --- Módulo style #3 --- */
+/* --- caixa de concluir e botao de apagar, em area de toque real --- */
+  .task .box{
+    width:42px !important; height:42px !important;
+    min-width:42px !important;
+    border-radius:12px !important;
+    border:2px solid var(--dim) !important;
+    display:grid !important; place-items:center;
+    transition:background .16s, border-color .16s, transform .1s;
+  }
+  .task .box svg{width:20px;height:20px}
+  .task .box:active{transform:scale(.9)}
+  .task.done .box{background:var(--verde,#63C99A) !important;border-color:var(--verde,#63C99A) !important;color:var(--bg) !important}
+
+  .task .del{
+    width:42px !important; height:42px !important;
+    min-width:42px !important;
+    font-size:23px !important;
+    border-radius:12px !important;
+  }
+
+  .task{gap:13px !important;padding:12px !important}
+  .task .tinfo{cursor:pointer}
+
+  /* --- folha do editor --- */
+  .edov{
+    position:fixed; inset:0; z-index:80;
+    background:rgba(10,7,18,.68);
+    backdrop-filter:blur(3px);
+    display:none; align-items:flex-end; justify-content:center;
+  }
+  .edov.on{display:flex}
+
+  .edsheet{
+    position:relative;
+    width:100%; max-width:430px;
+    background:var(--panel-2); border-top:1px solid var(--line);
+    border-radius:20px 20px 0 0;
+    padding:8px 16px calc(18px + env(safe-area-inset-bottom));
+    max-height:88vh; overflow-y:auto;
+    animation:edsobe .22s cubic-bezier(.2,.9,.3,1);
+  }
+  @keyframes edsobe{from{transform:translateY(100%)}to{transform:translateY(0)}}
+
+  .edpuxador{width:38px;height:4px;border-radius:2px;background:var(--line);margin:6px auto 14px}
+
+  .edfechar{
+    position:absolute; top:10px; right:12px; width:32px; height:32px;
+    background:transparent; border:none; border-radius:50%;
+    color:var(--dim); font-size:22px; line-height:1; cursor:pointer;
+    display:grid; place-items:center;
+  }
+  .edfechar:active{background:rgba(255,255,255,.08)}
+
+  .edtitulo{
+    font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;
+    letter-spacing:.07em;text-transform:uppercase;color:var(--dim);
+    margin-bottom:10px;
+  }
+  .edcampo{
+    width:100%; background:var(--panel); color:var(--text);
+    border:1px solid var(--line); border-radius:11px;
+    padding:13px 13px; font-family:'Outfit',sans-serif; font-size:15px;
+    outline:none; margin-bottom:16px;
+  }
+  .edcampo:focus{border-color:var(--accent)}
+
+  .edsec{
+    font-family:'Outfit',sans-serif;font-size:11.5px;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--dim);
+    margin-bottom:7px;
+  }
+  .edbloco{margin-bottom:16px}
+  .edbloco .days{margin-top:6px}
+
+  .edacoes{display:flex;gap:9px;margin-top:4px}
+  .edsalvar{
+    flex:1; background:var(--accent); color:var(--bg); border:none;
+    border-radius:12px; padding:14px;
+    font-family:'Outfit',sans-serif; font-size:15px; font-weight:600; cursor:pointer;
+  }
+  .edexcluir{
+    width:54px; background:transparent; border:1px solid rgba(244,87,129,.35);
+    border-radius:12px; color:var(--perigo); font-size:21px; cursor:pointer;
+    display:grid; place-items:center;
+  }
+  .edexcluir:active{background:rgba(244,87,129,.15)}
+  .edsalvar:active,.edexcluir:active{transform:scale(.97)}
+
+  /* botao destrutivo de largura cheia, pra folhas de confirmacao com texto
+     (diferente de .edexcluir, que e so pra icone unico tipo "x", 54px fixo) */
+  .edperigo{
+    flex:1; background:var(--perigo); color:#2A0E16; border:none;
+    border-radius:12px; padding:14px;
+    font-family:'Outfit',sans-serif; font-size:15px; font-weight:600; cursor:pointer;
+  }
+  .edperigo:active{transform:scale(.97)}
+
+/* --- Módulo style #4 --- */
+/* dentro da folha o composer perde a caixa propria, senao fica caixa dentro de caixa */
+  #addOverlay .composer{
+    margin-top:0 !important;
+    background:transparent !important;
+    border:none !important;
+    border-radius:0 !important;
+    padding:0 !important;
+  }
+  #addOverlay .composer input{font-size:15px;padding:13px}
+  #addOverlay .cbtn{padding:14px;font-size:15px;border-radius:12px;margin-top:4px}
+
+/* --- Módulo style #5 --- */
+.xpwrap .hprow{margin-bottom:5px}
+  .xpwrap .hpbar{margin-bottom:12px}
+  .xpwrap .hpfill{
+    background:var(--perigo) !important;
+    transition:width .45s cubic-bezier(.4,1.2,.5,1), background .3s;
+  }
+  .xpwrap .hpfill.baixa{background:var(--perigo2) !important}
+  .xpnum.hpnum{color:var(--perigo) !important}
+  .xpnum.hpnum.baixa{color:var(--perigo2) !important}
+  .hpdano{animation:hptremor .4s ease}
+  @keyframes hptremor{
+    0%,100%{transform:translateX(0)}
+    20%{transform:translateX(-4px)} 45%{transform:translateX(4px)}
+    70%{transform:translateX(-2px)}
+  }
+  @media (prefers-reduced-motion:reduce){ .hpdano{animation:none} }
+
+/* --- Módulo style #6 --- */
+/* ============ AVISOS NO TOPO ============ */
+  /* Nao existe faixa livre dentro da arena: a vida do monstro fica em y=77,
+     os sprites de y=88 a 175 e o nome do monstro de y=191 a 216. O unico vao
+     real da tela e o miolo da topbar — o selo de nivel acaba em x=88 e as
+     moedas ficam a direita. Dai a largura maxima estreita: alargar volta a
+     cobrir o nivel ou o contador de moedas. */
+  .toast{
+    bottom:auto !important;
+    top:calc(9px + env(safe-area-inset-top)) !important;
+    transform:translate(-50%, -12px) !important;
+    z-index:90;                        /* as folhas modais ficam em 80 */
+    max-width:min(62vw, 236px);
+    padding:9px 14px !important;
+    line-height:1.35;
+    box-shadow:0 6px 20px rgba(0,0,0,.5);
+  }
+  .toast.on{transform:translate(-50%, 0) !important}
+
+/* --- Módulo style #7 --- */
+/* a aura usa ::after porque o ::before do .hero-sprite ja e o halo de tocha */
+  .hero-sprite::after{
+    content:'';position:absolute;inset:-14%;border-radius:50%;
+    background:radial-gradient(circle, var(--aura,transparent) 0%, transparent 62%);
+    opacity:0;transition:opacity .45s, background .45s;
+    pointer-events:none;z-index:0;
+  }
+  .hero-sprite.temAura::after{opacity:.85;animation:auraPulso 3.2s ease-in-out infinite}
+  @keyframes auraPulso{0%,100%{opacity:.55}50%{opacity:.95}}
+
+  /* EQUIPAMENTOS: faixa horizontal no topo do .xpwrap, acima da barra de Vida.
+     Saiu de cima do sprite (badges absolutos) porque as caixas tampavam o
+     heroi e brigavam por espaco com a arena. Vive dentro de .xpwrap, que ja
+     esta em blocosTarefas — some sozinho ao trocar de aba, sem gancho novo. */
+  .eqrow{margin-bottom:12px}
+  .eqrow[hidden]{display:none}
+  .eqbadges{
+    display:flex;flex-wrap:wrap;gap:6px;align-items:center;
+    margin-top:5px;pointer-events:none;
+  }
+  .eqb{
+    width:30px;height:30px;border-radius:7px;flex:none;
+    display:grid;place-items:center;
+    background:rgba(0,0,0,.4);
+    border:1px solid var(--cor,var(--line));
+    box-shadow:0 0 6px -1px var(--cor,transparent);
+  }
+  .eqb .pxi{opacity:.95}
+
+  /* arma em destaque: 2-3x maior que os demais, moldura mais grossa e brilho
+     mais forte reaproveitando a mesma var(--cor) por raridade do item —
+     item 19 do roadmap ("badge maior + moldura por raridade") */
+  .eqb.eqb-arma{
+    width:52px;height:52px;border-radius:10px;
+    border-width:2px;
+    box-shadow:0 0 12px -1px var(--cor,transparent), 0 0 0 1px var(--cor,transparent) inset;
+  }
+
+  @media (max-width:345px){
+    .eqbadges{gap:4px}
+    .eqb{width:26px;height:26px}
+    .eqb.eqb-arma{width:44px;height:44px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .hero-sprite.temAura::after{animation:none}
+  }
+
+/* --- Módulo style #8 --- */
+.perfilhero{background:var(--panel-2);border:1px solid var(--line);border-radius:14px;
+              padding:16px;margin-bottom:14px;text-align:center}
+  .perfilheroLinha{display:flex;align-items:center;gap:16px;text-align:left}
+  .perfilheroLinha .hero-sprite{flex:none}
+  .perfilheroInfo{flex:1;min-width:0}
+  .perfilnome{font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;margin-bottom:10px}
+  .perfilhero .bar{margin-bottom:6px}
+  .perfilhero .xpnum{display:block}
+  /* .xpwrap/.hprow/.hpbar sao reaproveitados do cabecalho da Arena (mesmo
+     par hpfill/hpnum, so troca de id) -- aqui dentro do card .perfilhero
+     zera o padding/borda pensados pro contexto da Arena, ja que o card
+     do Perfil ja tem sua propria borda/padding. */
+  .perfilhero .xpwrap{padding:0;border-bottom:none;margin-top:2px}
+
+  .statgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+  .statcard{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;
+            padding:12px;display:flex;flex-direction:column;gap:4px}
+  .statlabel{font-family:'Outfit',sans-serif;font-size:11px;color:var(--dim)}
+  .statval{font-family:'Silkscreen',monospace;font-size:14px;color:var(--accent)}
+
+/* --- Módulo style #9 --- */
+/* .perfiltabs/.pcfg/.perfilpane.oculto removidos daqui -- a fileira de
+     pills (Atributos/Conquistas/Bestiário/engrenagem) deixou de existir
+     (item 18 do roadmap: Perfil virou rolagem unica, sem sub-abas). A
+     engrenagem agora mora no vhead (ver .vheadCfgBtn abaixo). */
+  .vheadDireita{display:flex;align-items:center;gap:10px}
+  .vheadCfgBtn{width:34px;height:34px;flex:none;display:grid;place-items:center;
+    background:var(--panel-3);border:1px solid var(--line);border-radius:10px;
+    color:var(--muted);cursor:pointer}
+  .vheadCfgBtn svg{width:17px;height:17px}
+  .vheadCfgBtn:active{background:var(--accent-dim);color:var(--accent)}
+
+  /* previas (Historico/Conquistas/Bestiario) reaproveitam .cfgrow, que ja
+     existia pra Config -- mesmo visual, zero CSS novo pra elas.
+     .prevfaixa reaproveita classes visuais que ja existiam em outros
+     modulos (.caldia/.calvitoria/.calfuga do Historico, .conqcaticone
+     das Conquistas, .bestimg do Bestiario) -- so a faixa horizontal em
+     si e nova. */
+  .cfgrowtopo{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .prevfaixa{display:flex;gap:6px;margin-top:10px;min-height:32px}
+  .prevfaixa .caldia{width:32px;height:32px;aspect-ratio:unset;flex:none}
+  .prevconqicone{width:30px;height:30px;flex:none;border-radius:50%;display:flex;
+                  align-items:center;justify-content:center;background:var(--pv-cor);color:#1A1526}
+  .prevconqicone svg{width:15px;height:15px}
+  .prevbestimg{width:32px;height:32px;flex:none;object-fit:contain;image-rendering:pixelated;
+               border-radius:8px;background:var(--panel-3);padding:3px;box-sizing:border-box}
+  .prevvazio{font-family:'Outfit',sans-serif;font-size:11.5px;color:var(--dim);
+             display:flex;align-items:center}
+
+  /* overlay de Config -- mesmo padrao de histOverlay/grimOverlay, z-index
+     um degrau abaixo (69 vs 70) de proposito: se o usuario abrir o
+     Historico de dentro do Config, o Historico precisa pintar por cima. */
+  .cfgOverlay{position:fixed;inset:0;z-index:69;background:var(--bg);display:none;
+    flex-direction:column;overflow:hidden}
+  .cfgOverlay.on{display:flex}
+  .cfgovhead{display:flex;align-items:center;gap:10px;flex:none;
+    padding:calc(14px + env(safe-area-inset-top)) 16px 10px;
+    border-bottom:1px solid var(--line)}
+  .cfgovhead .vtitle{font-family:'Outfit',sans-serif;font-size:16px;font-weight:600;color:var(--text)}
+  .cfgvoltar{width:36px;height:36px;flex:none;display:grid;place-items:center;
+    background:transparent;border:none;border-radius:50%;color:var(--text);cursor:pointer}
+  .cfgvoltar:active{background:rgba(255,255,255,.08)}
+  .cfgovcorpo{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
+    padding:16px 16px calc(16px + env(safe-area-inset-bottom))}
+  .cfgovcorpo .edsec{margin:18px 0 8px}
+  .cfgovcorpo .edsec:first-child{margin-top:0}
+
+  .cfgrow{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;
+          padding:12px 13px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .cfgrow.cfgcol{flex-direction:column;align-items:stretch}
+  /* item 39: linhas-resumo da tela principal de Config que abrem sub-tela */
+  .cfgrow.cfglink{cursor:pointer}
+  .cfgrow.cfglink:active{background:var(--panel-3)}
+  .cfgseta{width:18px;height:18px;flex:none;color:var(--dim)}
+  .cfgtxt{display:flex;flex-direction:column;gap:2px}
+  .cfgtxt b{font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;color:var(--text)}
+  .cfgtxt span{font-family:'Outfit',sans-serif;font-size:11.5px;color:var(--dim)}
+  .cfgbtn{font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;color:var(--accent);
+          background:transparent;border:1px solid var(--accent-dim);border-radius:8px;padding:7px 12px;
+          cursor:pointer;flex:none}
+  .cfgbtn:hover{background:var(--accent-dim)}
+  .cfgbtn.perigo{color:var(--blood);border-color:var(--blood)}
+  .cfgbtn.perigo:hover{background:rgba(229,107,107,.12)}
+
+  /* switch liga/desliga (item 39: substitui o botao Vibrar/Som do
+     Feedback tatil por um toggle -- ver JS "CONFIG — PREFERENCIA DE
+     FEEDBACK NO CLIQUE"). Estrutura: trilho (.swch) + bolinha
+     (.swch-bolinha) que desliza via transform quando .on entra. */
+  .swch{width:46px;height:26px;flex:none;border-radius:999px;border:none;cursor:pointer;
+        background:var(--line);padding:3px;display:flex;align-items:center;
+        transition:background .15s ease}
+  .swch.on{background:var(--accent)}
+  .swch-bolinha{width:20px;height:20px;border-radius:50%;background:#FFF;
+        transition:transform .15s ease}
+  .swch.on .swch-bolinha{transform:translateX(20px)}
+
+  .cfgcol .grade{margin:10px 0 0;grid-template-columns:repeat(4,1fr)}
+
+  .temagrid{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+  .temaswatch{width:36px;height:36px;border-radius:50%;border:2px solid transparent;cursor:pointer;flex:none}
+  .temaswatch.sel{border-color:var(--text)}
+
+  /* paletas — so custom properties, sem redesenho de layout */
+  :root[data-tema="meianoite"]{
+    --bg:#161A20; --panel:#1E232B; --panel-2:#272D37; --line:#374050;
+    --text:#EDF0F4; --muted:#96A1B0; --dim:#65707E;
+    --accent:#5AB4EC; --accent-dim:#153A52; --gold:#F5BE4A; --blood:#EC6A62;
+    --panel-3:#313A48; --poco:#12161B; --sel-bg:#2D3846; --mobname:#8FD0F0;
+    --arena-1:#23303F; --arena-2:#1B2530; --arena-3:#131A22;
+    --xp2:#7FE0E8;
+  }
+  :root[data-tema="pergaminho"]{
+    --bg:#0F1216; --panel:#0F1216; --panel-2:#151A20; --line:#232A33;
+    --text:#E6E9ED; --muted:#8A93A0; --dim:#5A6470;
+    --accent:#C9A961; --accent-dim:#3A2F18; --gold:#C9A961; --blood:#9E3B3B;
+    --panel-3:#1D2318; --poco:#0A0C0F; --sel-bg:#242A1B; --mobname:#D9A05B;
+    --arena-1:#2A2415; --arena-2:#1E1A10; --arena-3:#14110A;
+    --xp2:#C9A961;
+  }
+  /* item 25 do roadmap — spec fechada em sessao de brainstorm (21/08) */
+  /* v4.133 (pedido do usuario, comparando com Habitica real): primeira
+     tentativa (--bg #0A0A0A -> #141414) foi tao sutil que na tela real
+     nao fez diferenca perceptivel -- usuario testou o arquivo certo,
+     tema certo, e continuou "muito escuro". v4.134: recalibrado de
+     forma bem mais agressiva, mirando a MESMA FAIXA de luminancia que
+     o Habitica usa de verdade no screenshot de referencia (cinza-carvao,
+     no bg #0A0A0A para #141414 estava mais que 3x mais escuro que o Habitica;
+     agora --bg ~#282828, na faixa certa. Continua 100% grayscale (R=G=B
+     em todo valor) -- decisao do item 25 preservada, nao reintroduz cor,
+     so aumenta o quanto de cinza. --accent continua #FFFFFF e COR_RAR
+     (raridade de item) nao e tocado, fora do sistema de tema. */
+  :root[data-tema="grafite"]{
+    --bg:#282828; --panel:#323232; --panel-2:#3D3D3D; --panel-3:#494949;
+    --line:#5C5C5C; --text:#FAFAFA; --muted:#C2C2C2; --dim:#909090;
+    --accent:#FFFFFF; --accent-dim:#4A4A4A;
+    --gold:#E8E8E8; --blood:#B8B8B8; --mobname:#E0E0E0; --sel-bg:#4A4A4A; --poco:#1C1C1C;
+    --arena-1:#454545; --arena-2:#383838; --arena-3:#2C2C2C; --xp2:#EDEDED;
+  }
+  :root[data-tema="floresta"]{
+    --bg:#0E1712; --panel:#0E1712; --panel-2:#16241C; --panel-3:#1E3226;
+    --line:#2C4838; --text:#E9F2EC; --muted:#8FAA9A; --dim:#5C7A68;
+    --accent:#4ADE80; --accent-dim:#164D2E;
+    --gold:#A3D977; --blood:#6B9B7A; --mobname:#7FE8A0; --sel-bg:#1D3828; --poco:#0A120D;
+    --arena-1:#1A2E20; --arena-2:#132419; --arena-3:#0D1A11; --xp2:#A3D977;
+  }
+
+/* --- Módulo style #10 --- */
+.baubg{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:95;
+         opacity:0;pointer-events:none;transition:opacity .22s}
+  .baubg.on{opacity:1;pointer-events:auto}
+
+  .baupop{position:fixed;left:50%;top:50%;z-index:96;
+          transform:translate(-50%,-50%) scale(.9);opacity:0;pointer-events:none;
+          transition:transform .25s cubic-bezier(.2,.9,.3,1.2), opacity .22s;
+          background:var(--panel-2);border:1px solid var(--line);border-radius:18px;
+          padding:24px 20px 20px;width:min(300px, calc(100% - 56px));text-align:center}
+  .baupop.on{transform:translate(-50%,-50%) scale(1);opacity:1;pointer-events:auto}
+
+  .bauicone{width:68px;height:68px;margin:0 auto 8px;
+            display:flex;align-items:center;justify-content:center}
+  .bauicone.abriu{animation:bauPulo .4s ease}
+  @keyframes bauPulo{0%{transform:scale(1)}45%{transform:scale(1.2) rotate(-4deg)}100%{transform:scale(1)}}
+
+  .baulabel{font-family:'Silkscreen',monospace;font-size:11px;color:var(--accent);
+            letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px}
+
+  .bauitens{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+  .baucard{display:flex;align-items:center;gap:10px;background:var(--panel-2);
+           border:1px solid var(--line);border-radius:10px;padding:8px 10px;
+           text-align:left;opacity:0;transform:translateY(6px);
+           animation:baucardIn .32s ease forwards}
+  @keyframes baucardIn{to{opacity:1;transform:translateY(0)}}
+  .baubox{width:34px;height:34px;border-radius:8px;background:var(--poco);flex:none;
+          display:flex;align-items:center;justify-content:center}
+  .bautxt{flex:1;min-width:0}
+  .baunome{font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;color:var(--text);
+           overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .bauraridade{font-family:'Outfit',sans-serif;font-size:10.5px;font-weight:700;
+               text-transform:uppercase;letter-spacing:.05em;margin-top:1px}
+
+  .bauok{width:100%;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;
+         padding:11px;border-radius:11px;border:none;background:var(--accent);
+         color:var(--bg);cursor:pointer}
+
+  .lvlpop{position:fixed;left:50%;top:50%;z-index:96;
+          transform:translate(-50%,-50%) scale(.9);opacity:0;pointer-events:none;
+          transition:transform .25s cubic-bezier(.2,.9,.3,1.2), opacity .22s;
+          background:var(--panel-2);border:1px solid var(--gold);border-radius:18px;
+          padding:26px 22px 20px;width:min(280px, calc(100% - 56px));text-align:center;
+          box-shadow:0 0 26px -8px var(--gold)}
+  .lvlpop.on{transform:translate(-50%,-50%) scale(1);opacity:1;pointer-events:auto}
+  .lvllabel{font-family:'Silkscreen',monospace;font-size:11px;color:var(--muted);
+            letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px}
+  .lvlnum{font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:700;
+          color:var(--gold);line-height:1;margin-bottom:4px}
+  .lvlnum.pulou{animation:lvlPulo .45s ease}
+  @keyframes lvlPulo{0%{transform:scale(1)}50%{transform:scale(1.25)}100%{transform:scale(1)}}
+  .lvlvida{font-family:'Outfit',sans-serif;font-size:12.5px;color:var(--muted);margin-bottom:16px}
+  .lvlvida b{color:var(--text);font-weight:700}
+  .lvlok{width:100%;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;
+         padding:11px;border-radius:11px;border:none;background:var(--accent);
+         color:var(--bg);cursor:pointer}
+
+  .quedapop{position:fixed;left:50%;top:50%;z-index:96;
+            transform:translate(-50%,-50%) scale(.9);opacity:0;pointer-events:none;
+            transition:transform .25s cubic-bezier(.2,.9,.3,1.2), opacity .22s;
+            background:var(--panel-2);border:1px solid var(--perigo);border-radius:18px;
+            padding:26px 22px 20px;width:min(280px, calc(100% - 56px));text-align:center;
+            box-shadow:0 0 26px -8px var(--perigo)}
+  .quedapop.on{transform:translate(-50%,-50%) scale(1);opacity:1;pointer-events:auto}
+  .quedaicone{width:56px;height:56px;margin:0 auto 10px;
+              display:flex;align-items:center;justify-content:center}
+  .quedaicone img{width:56px;height:56px;image-rendering:pixelated;
+                   filter:grayscale(1) brightness(.8)}
+  .quedalabel{font-family:'Silkscreen',monospace;font-size:11px;color:var(--perigo);
+              letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px}
+  .quedatitulo{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:23px;
+               font-weight:600;color:var(--text);line-height:1.2;margin-bottom:10px}
+  .quedaperda{font-family:'Outfit',sans-serif;font-size:12.5px;color:var(--muted);
+              margin-bottom:16px}
+  .quedaperda b{color:var(--gold);font-weight:700}
+  .quedaok{width:100%;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;
+           padding:11px;border-radius:11px;border:none;background:var(--accent);
+           color:var(--bg);cursor:pointer}
+
+/* --- Módulo style #11 --- */
+.atributospontos{margin-top:14px}
+  .atrhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .atrhead b{font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;color:var(--text)}
+  .atrpill{font-family:'Silkscreen',monospace;font-size:11px;color:var(--bg);
+           background:var(--accent);padding:4px 10px;border-radius:999px}
+
+  /* cartao por atributo -- fechado (previa) por padrao: so icone/nome/valor,
+     cor do atributo (--atr-cor) so como acento no icone, nao fundo inteiro
+     (era chapado demais, pedido explicito do usuario pra ficar mais discreto).
+     Corpo com descricao + botao de investir fica escondido ate tocar na
+     barra, revelado via classe .aberto (ver JS logo abaixo). */
+  .atrcard{border-radius:14px;overflow:hidden;background:var(--panel-2);
+           border:1px solid var(--line);margin-bottom:10px}
+  .atrcard.trava{opacity:.55}
+  .atrbarra{display:flex;align-items:center;gap:10px;padding:12px 13px;
+            cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .atricone{width:18px;height:18px;flex:none;color:var(--atr-cor)}
+  .atrnome{font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;flex:1;color:var(--text)}
+  .atrvalor{font-family:'Silkscreen',monospace;font-size:14px;color:var(--atr-cor)}
+  .atrchevron{width:16px;height:16px;flex:none;color:var(--dim);transition:transform .2s ease}
+  .atrcard.aberto .atrchevron{transform:rotate(180deg)}
+  .atrcorpo{display:flex;align-items:center;justify-content:space-between;gap:10px;
+            padding:0 13px;max-height:0;overflow:hidden;
+            transition:max-height .22s ease,padding .22s ease}
+  .atrcard.aberto .atrcorpo{max-height:80px;padding:0 13px 13px}
+  .atrdesc{font-family:'Outfit',sans-serif;font-size:11.5px;color:var(--dim)}
+  .atrmais{width:34px;height:34px;flex:none;border-radius:10px;border:1px solid var(--accent-dim);
+           background:transparent;color:var(--accent);font-size:18px;font-weight:600;cursor:pointer;
+           font-family:'Outfit',sans-serif;line-height:1}
+  .atrmais:hover{background:var(--accent-dim)}
+  .atrmais:disabled{opacity:.35;cursor:not-allowed;background:transparent}
+
+/* --- Módulo style #12 --- */
+.lvlitem{display:flex;align-items:center;gap:10px;margin:12px 0;padding:10px 12px;
+    background:#1F1930;border:1px solid #332A4D;border-radius:12px}
+  .lvlitembox{width:40px;height:40px;flex:none;display:flex;align-items:center;justify-content:center}
+  .lvlitemtxt{font-family:'Outfit',sans-serif;font-size:12.5px;color:#B3A8D4;line-height:1.35}
+  .lvlitemtxt b{color:#5AE0D8}
+
+  .grimOverlay{position:fixed;inset:0;z-index:70;background:#15111F;display:none;
+    flex-direction:column;overflow:hidden}
+  .grimOverlay.on{display:flex}
+  .grimHead{display:flex;align-items:center;justify-content:space-between;
+    padding:16px 16px 10px;border-bottom:1px solid #332A4D;flex:none}
+  .grimHead h2{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:600;
+    font-size:22px;color:#EFEAFB;margin:0}
+  .grimFechar{width:40px;height:40px;border-radius:10px;background:#201A32;border:1px solid #332A4D;
+    color:#EFEAFB;font-size:20px;line-height:1;cursor:pointer;flex:none}
+  .grimSub{padding:8px 16px;font-family:'Outfit',sans-serif;font-size:12px;color:#7C7196;flex:none}
+  .grimScroll{flex:1;overflow-y:auto;padding:6px 16px 24px}
+  .grimGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  @media(min-width:420px){ .grimGrid{grid-template-columns:repeat(5,1fr)} }
+  .grimcel{aspect-ratio:1;border-radius:10px;background:#201A32;border:1px solid #332A4D;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:4px;overflow:hidden}
+  .grimcel.grimok{cursor:pointer}
+  .grimcel .grimrar{font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;
+    text-transform:uppercase;letter-spacing:.03em}
+  .grimsilhueta{filter:brightness(0);opacity:.32}
+
+/* --- Módulo style #13 --- */
+.conqcat{margin-bottom:32px}
+
+  .conqcabecalho{display:flex;align-items:center;gap:11px;margin-bottom:16px}
+  .conqcaticone{width:34px;height:34px;flex:none;border-radius:50%;display:flex;align-items:center;
+                justify-content:center;background:var(--conqcat-cor);color:#1A1526}
+  .conqcaticone svg{width:18px;height:18px}
+  .conqcattxt{flex:1;min-width:0}
+  .conqcatnome{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--conqcat-cor)}
+  .conqcatsub{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+
+  /* CONQUISTAS V2 -- lista plana (Minhas conquistas / Não desbloqueadas), sem
+     arvore/tiers visiveis. Reaproveita .edsec (rotulo de secao, ja usado
+     em Config) pros dois cabecalhos. */
+  .conqv2item{display:flex;align-items:center;gap:12px;padding:11px 2px;
+              border-bottom:1px solid var(--line)}
+  .conqv2item:last-child{border-bottom:none}
+  .conqv2icone{width:42px;height:42px;flex:none;border-radius:11px;display:flex;
+               align-items:center;justify-content:center;background:var(--pv-cor)}
+  .conqv2icone svg{width:21px;height:21px;color:#1A1526}
+  .conqv2icone .conqv2img{width:22px;height:22px;image-rendering:pixelated;flex:none}
+  .conqv2item.trancado .conqv2icone{background:var(--panel-3);filter:grayscale(1);opacity:.55}
+  .conqv2item.trancado .conqv2icone svg{color:var(--dim)}
+  .conqv2txt{flex:1;min-width:0}
+  .conqv2nome{font-family:'Outfit',sans-serif;font-size:13.5px;font-weight:700;color:var(--text)}
+  .conqv2item.trancado .conqv2nome{color:var(--muted)}
+  .conqv2desc{font-family:'Outfit',sans-serif;font-size:11.5px;color:var(--dim);margin-top:2px}
+  .conqv2data{font-family:'Silkscreen',monospace;font-size:9.5px;color:var(--dim);flex:none;white-space:nowrap}
+  .conqcatcontagem{font-family:'Silkscreen',monospace;font-size:13px;letter-spacing:.02em;color:var(--muted);flex:none}
+  .conqcatcontagem b{color:var(--conqcat-cor)}
+
+  .conqtrilha{position:relative;padding-left:38px}
+
+  .conqmarco{position:relative;padding-bottom:20px}
+  .conqmarco:last-child{padding-bottom:0}
+  .conqmarco::before{content:'';position:absolute;left:-25px;top:26px;bottom:-2px;width:2px;background:var(--line)}
+  .conqmarco:last-child::before{display:none}
+  .conqmarco.feito::before,.conqmarco.pendente::before{background:var(--conqcat-cor)}
+
+  .conqno{position:absolute;left:-38px;top:0;width:26px;height:26px;border-radius:50%;
+          display:flex;align-items:center;justify-content:center;flex:none;
+          background:var(--panel-2);border:2px solid var(--line)}
+  .conqno svg{width:12px;height:12px;color:var(--dim);opacity:.5}
+  .conqmarco.feito .conqno{border-color:var(--conqcat-cor);background:var(--conqcat-cor)}
+  .conqmarco.feito .conqno svg{color:#1A1526;width:13px;height:13px;opacity:1}
+  .conqmarco.atual .conqno{border-color:var(--conqcat-cor)}
+  .conqmarco.pendente .conqno{border-color:var(--conqcat-cor);background:var(--conqcat-cor);
+                               animation:conqPulsa 1.6s ease-in-out infinite}
+  .conqmarco.pendente .conqno svg{color:#1A1526;width:14px;height:14px;opacity:1}
+  @keyframes conqPulsa{
+    0%,100%{box-shadow:0 0 0 0 color-mix(in srgb, var(--conqcat-cor) 45%, transparent)}
+    50%{box-shadow:0 0 0 6px color-mix(in srgb, var(--conqcat-cor) 0%, transparent)}
+  }
+
+  .conqcorpo{padding-top:1px}
+  .conqmnome{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--text);letter-spacing:.01em}
+  .conqmarco.bloq .conqmnome{color:var(--muted)}
+  .conqreq{font-family:'Outfit',sans-serif;font-size:12px;color:var(--muted);margin-top:2px;line-height:1.4}
+  .conqmarco.bloq .conqreq{color:var(--dim)}
+  .conqfracao{font-family:'Silkscreen',monospace;font-size:13px;letter-spacing:.02em;color:var(--conqcat-cor);margin-top:6px;display:inline-block}
+
+  .conqxpprevia{font-family:'Outfit',sans-serif;font-size:11px;color:var(--dim);margin-top:5px;display:inline-block}
+  .conqxpfeito{font-family:'Outfit',sans-serif;font-size:11px;color:var(--conqcat-cor);margin-top:5px;display:inline-block}
+  .conqreceber{margin-top:8px;font-family:'Outfit',sans-serif;font-size:12.5px;font-weight:700;
+               padding:8px 14px;border-radius:999px;border:none;cursor:pointer;
+               background:var(--conqcat-cor);color:#1A1526}
+
+  .conqtudo{display:block;width:100%;margin-bottom:18px;padding:13px;border:none;border-radius:14px;
+            cursor:pointer;background:var(--accent);color:var(--bg);
+            font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;text-align:center}
+
+  /* balaozinho de notificacao -- injetado via JS em cima do botao da
+     sub-aba Conquistas e do botao "Perfil" da nav inferior */
+  .conqbadge{position:absolute;top:2px;right:8px;min-width:16px;height:16px;padding:0 4px;
+             border-radius:999px;background:var(--perigo,#F45781);color:#fff;
+             font-family:'Silkscreen',monospace;font-size:9px;
+             display:none;align-items:center;justify-content:center;
+             box-shadow:0 0 0 2px var(--panel-2)}
+
+/* --- Módulo style #14 --- */
+.bestsub{font-family:'Outfit',sans-serif;font-size:12px;color:var(--dim);margin-bottom:10px}
+  .bestgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .bestcel{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;
+           padding:8px 4px 6px;display:flex;flex-direction:column;align-items:center;gap:4px}
+  .bestimg{width:36px;height:36px;image-rendering:pixelated;object-fit:contain}
+  .bestimg.bestsilhueta{filter:brightness(0);opacity:.32}
+  .bestnome{font-family:'Outfit',sans-serif;font-size:8.5px;font-weight:600;color:var(--muted);
+            text-align:center;line-height:1.2;max-width:100%;overflow:hidden;
+            text-overflow:ellipsis;white-space:nowrap}
+
+/* --- Módulo style #15 --- */
+.histOverlay{position:fixed;inset:0;z-index:70;background:var(--bg);display:none;
+    flex-direction:column;overflow:hidden}
+  .histOverlay.on{display:flex}
+  .histHead{display:flex;align-items:center;justify-content:space-between;
+    padding:16px 16px 10px;border-bottom:1px solid var(--line);flex:none}
+  .histHead h2{font-family:'Outfit',sans-serif;font-weight:700;font-size:18px;color:var(--text);margin:0}
+  .histFechar{width:40px;height:40px;border-radius:10px;background:var(--panel-2);
+    border:1px solid var(--line);color:var(--text);font-size:20px;line-height:1;cursor:pointer;flex:none}
+  .histScroll{flex:1;overflow-y:auto;padding:16px}
+
+  .calnav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .calnav button{width:36px;height:36px;border-radius:10px;border:1px solid var(--line);
+                 background:var(--panel-2);color:var(--text);font-size:18px;cursor:pointer;
+                 font-family:'Outfit',sans-serif;line-height:1}
+  .calnav button:hover{background:var(--accent-dim)}
+  .calnav span{font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;color:var(--text);
+               text-transform:capitalize}
+
+  .caldiassemana{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:6px}
+  .caldiassemana span{font-family:'Outfit',sans-serif;font-size:10px;font-weight:600;
+                       color:var(--dim);text-align:center}
+
+  .calgrade{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:14px}
+  .caldia{aspect-ratio:1;border-radius:8px;background:var(--panel-2);border:1px solid var(--line);
+          display:flex;align-items:center;justify-content:center;position:relative;
+          font-family:'Outfit',sans-serif;font-size:11px;color:var(--muted)}
+  .caldia.calvazio{background:transparent;border-color:transparent}
+  .caldia.calhoje{border-color:var(--accent);border-width:2px}
+  .caldia.calvitoria{background:rgba(99,201,154,.18);border-color:var(--verde);color:var(--text)}
+  .caldia.calfuga{background:rgba(244,87,129,.16);border-color:var(--perigo);color:var(--text)}
+  .caldia.calsemtarefa{background:var(--panel-3);border-color:var(--line);color:var(--dim)}
+
+  .callegenda{display:flex;gap:14px;flex-wrap:wrap;font-family:'Outfit',sans-serif;
+              font-size:11px;color:var(--dim)}
+  .callegenda span{display:flex;align-items:center;gap:5px}
+  .calponto{width:9px;height:9px;border-radius:50%;flex:none}
+  .calponto.calvitoria{background:var(--verde)}
+  .calponto.calfuga{background:var(--perigo)}
+  .calponto.calsemtarefa{background:var(--dim)}
+
+/* --- Módulo style #16 --- */
+/* fundo = tijolo pixel (padrao de alvenaria, ver pintarParede() no
+     script abaixo) + o sprite fixo do Grimorio Proibido flutuando ao lado
+     do titulo, so de enfeite. */
+  .intro.loginBg{background-color:#0B0710}
+  .loginSprite{margin:0 auto 4px;animation:respira 2.4s ease-in-out infinite}
+
+  /* cada elemento do formulario se destaca sozinho em cima do tijolo
+     (campo com fundo solido + icone, botao Entrar preenchido, sombra
+     de texto nos labels/links) */
+  #passoLogin .titulo{text-shadow:0 2px 10px rgba(0,0,0,.85)}
+  #passoLogin .campo label{text-shadow:0 1px 4px rgba(0,0,0,.85)}
+  .campoIcone{position:relative}
+  .campoIc{position:absolute;left:14px;bottom:13px;width:20px;height:20px;color:var(--dim);pointer-events:none}
+  .campoIc svg{width:100%;height:100%}
+  .campoIcone input{padding-left:44px !important}
+  .campoStatus{position:absolute;right:14px;bottom:13px;width:20px;height:20px;pointer-events:none;display:none}
+  .campoStatus svg{width:100%;height:100%}
+  .campoStatus .icOk,.campoStatus .icErro{display:none}
+  .campoStatus.ok{display:block;color:#4ADE80}
+  .campoStatus.ok .icOk{display:block}
+  .campoStatus.erro{display:block;color:var(--perigo)}
+  .campoStatus.erro .icErro{display:block}
+  #loginSenha, #loginSenhaConfirmar{padding-right:40px !important}
+
+  /* botao Entrar: o onboarding padrao usa contorno vazado (ver regra
+     global .primario mais acima no arquivo), mas em cima do tijolo
+     isso some -- aqui, so dentro do login, ele fica preenchido/solido */
+  #passoLogin .primario{background:var(--accent) !important;color:#14101c !important;
+                         border:none !important;text-transform:none !important;letter-spacing:normal !important;
+                         font-size:15px !important;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.45)}
+  #passoLogin .primario:hover{background:var(--accent) !important;filter:brightness(1.08)}
+  #passoLogin .secundario,#passoLogin .loginLink,#passoLogin .loginRodape,#passoLogin .loginDivisor{
+    text-shadow:0 1px 4px rgba(0,0,0,.85)}
+
+  .loginTopBtns{position:fixed;top:calc(14px + env(safe-area-inset-top));right:14px;
+                display:flex;gap:8px;z-index:90}
+  .miniBtn{width:34px;height:34px;border-radius:50%;background:rgba(21,17,32,.72);
+           border:1px solid var(--line);color:var(--muted);display:grid;place-items:center;
+           cursor:pointer;backdrop-filter:blur(2px);transition:border-color .15s,color .15s}
+  .miniBtn:hover{border-color:var(--accent-dim);color:var(--accent)}
+  .miniBtn svg{width:17px;height:17px}
+
+  #passoLogin .marca{margin-bottom:2px}
+  .loginModo{font-size:14px;color:var(--dim);text-shadow:0 1px 4px rgba(0,0,0,.85);
+             transition:opacity .15s}
+  .loginDivisor{display:flex;align-items:center;gap:10px;color:var(--dim);font-size:12px}
+  .loginDivisor::before,.loginDivisor::after{content:'';flex:1;height:1px;background:var(--line)}
+  .loginGoogleBtn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;
+                  background:#fff;color:#1A1526;border:none;border-radius:11px;padding:13px;
+                  font-family:'Outfit',sans-serif;font-size:14.5px;font-weight:600;cursor:pointer}
+  .loginGoogleBtn svg{width:18px;height:18px}
+  .loginLinha{display:flex;justify-content:space-between;align-items:center}
+  .loginLink{background:none;border:none;color:var(--accent);font-family:'Outfit',sans-serif;
+             font-size:12.5px;cursor:pointer;padding:4px 0}
+  .loginRodape{text-align:center;font-size:13px;color:var(--dim)}
+  .loginSenhaErro{font-size:12px;color:var(--perigo);margin-top:-8px}
+
+  #passoBoasVindas{align-items:center;text-align:center;gap:28px}
+  #passoBoasVindas .marca{gap:6px}
+  .boasVindasRotulo{font-size:14px;color:var(--dim);text-shadow:0 1px 4px rgba(0,0,0,.85)}
+  #boasVindasNome{font-size:30px;font-family:'Outfit',sans-serif;font-weight:700;
+                  letter-spacing:normal;text-shadow:0 2px 10px rgba(0,0,0,.85)}
+  #passoBoasVindas .primario{width:100%}
+
+  /* v4.124 (item 34 do roadmap): trava de verificacao de email */
+  /* v4.129 (tela estava poluida): .verificarBloco junta a mensagem
+     principal + aviso de spam com gap apertado (sao relacionados,
+     devem ler como uma unidade mais discreta que o CTA). O gap GRANDE
+     (22px, no #passoVerificarEmail) fica ENTRE os grupos, nao dentro
+     deles -- e isso que cria a hierarquia.
+     v4.132 (poluida de novo, botao "Ja confirmei"/"Verificar agora"
+     removido): a checagem virou 100% automatica (poll a cada 4s, ver
+     confirmarSeVerificado/confirmarSeVerificadoOverlay no bloco
+     Firebase) -- sobrou so "Reenviar email" (agora .primario, e o
+     unico CTA que resta) e "Email errado? Corrigir" (link isolado). */
+  #passoVerificarEmail{align-items:center;text-align:center;gap:22px}
+  #passoVerificarEmail .marca{gap:6px}
+  .verificarBloco{display:flex;flex-direction:column;gap:6px}
+  .verificarTexto{font-size:14px;color:var(--dim);line-height:1.5;
+                   text-shadow:0 1px 4px rgba(0,0,0,.85)}
+  .verificarSpamAviso{font-size:12px;color:var(--dim);opacity:.6}
+  #verificarEmailAlvo{font-weight:600;color:var(--fg,#fff)}
+  #passoVerificarEmail .primario{width:100%}
+
+  /* v4.124: overlay de bloqueio pro caminho "silencioso" (ja tem save
+     local, #passoLogin nem existe no DOM) -- standalone, fixed, nao
+     depende de #intro/.off. Reaproveita as mesmas classes .primario/
+     .verificarBloco ja definidas acima. */
+  #bloqueioVerificacaoEmail{position:fixed;inset:0;z-index:9999;
+    background:var(--bg);display:flex;flex-direction:column;
+    align-items:center;justify-content:center;text-align:center;
+    gap:22px;padding:32px}
+  #bloqueioVerificacaoEmail .titulo{font-size:22px}
+  #bloqueioVerificacaoEmail .primario,
+  #bloqueioVerificacaoEmail .verificarBloco{width:100%;max-width:340px}
+
+/* --- Módulo style #17 --- */
+.carrosselTopo{display:flex;align-items:center;justify-content:space-between}
+  .carrosselTopoLado{flex:1;display:flex}
+  .carrosselTopoEsq{justify-content:flex-start}
+  .carrosselTopoDir{justify-content:flex-end}
+  .carrosselVoltar{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.06);
+                    border:none;color:var(--text);display:grid;place-items:center;cursor:pointer;
+                    visibility:hidden;flex:none}
+  .carrosselVoltar.visivel{visibility:visible}
+  .carrosselVoltar svg{width:18px;height:18px}
+  .carrosselDots{display:flex;gap:7px;flex:none}
+  .carrosselDot{width:7px;height:7px;border-radius:50%;background:var(--line)}
+  .carrosselDot.on{background:var(--accent)}
+  /* v4.117 (item 42-h do roadmap): .carrosselPular removido -- botao
+     "Pular" tirado do topo do carrossel (pedido do usuario). O link
+     "Ja tem conta?" (abaixo) continua sozinho no lado direito do topo. */
+  /* v4.116 (item 42-e do roadmap): login deixou de ser um passo
+     numerado do carrossel -- vira um "desvio" opcional, acessivel a
+     qualquer momento por este link discreto no topo (persiste em
+     TODOS os slides, ao contrario de Pular que some a partir do
+     slide 4). Ver irParaLogin()/voltarDoLoginCarrossel() mais abaixo. */
+  .carrosselEntrarLink{background:none;border:none;color:var(--accent);font-family:'Outfit',sans-serif;
+                        font-size:12px;letter-spacing:.02em;cursor:pointer;padding:8px;flex:none;
+                        text-decoration:underline;text-underline-offset:2px}
+  .carrosselEntrarLink:hover{filter:brightness(1.2)}
+
+  /* fixed;inset:0 tira o splash do fluxo do .card -- ele nao fica preso
+     no max-width:400px/padding que .card usa pro resto do onboarding.
+     z-index avaliado dentro do stacking context de #intro (que ja tem
+     position:fixed + z-index proprio), entao basta ficar acima de tudo
+     o que #intro contem -- nao precisa disputar com o resto da pagina. */
+  #passoSplash{position:fixed;inset:0;z-index:1;
+               background-image:radial-gradient(120% 70% at 50% 0%, color-mix(in srgb, var(--arena-1) 42%, transparent) 0%, color-mix(in srgb, var(--bg) 55%, transparent) 65%), url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAKCAYAAADVTVykAAABfElEQVR4nJ2TwU7CQBCGvxKMQeCEXojGlMvWIw/AnfIOwh0egYfwpIneQJ4Bn4L22r10SeCoJ0CDJVkvdNPWgsT/srM738x0Z6fWZDKpPwyHdLpdlFK0222yklIyHY3o9HoHmVMUBAFvr6+49/copXBdl6KUkkW0JgxDGo0GUspfgUIInnefKKWwbTuXOUWO4/ASbZjP56ZWAeD6rILrugcD/1vwUJ5kBwsAH6sVUkqEEMbheR6e5xm7tNXYtp3LJLnkmrUBSludqmXd1mp1nQCuKpVUgN5/YJ5q1SrW3l5EGwBuzsosok1qjfW+XgPwdW6Z82K33wdg9PREr9//c8iklIwfH+kOBoRhePTpYn46HnPXagH8yl2Mjcty+eggxhJCUKtWT2Jjfrq38wa4kNz8dZv4RstofRIb84toc7CrpgPL3WcuoLVO7X3fB20Zn2VZeWHpHEd8pgPZ6QSYzWamqO/7ADSbTUrfmiAIcBzHsNm/ITn9F5ncSd8PSsnXJX9WpAwAAAAASUVORK5CYII=");
+               background-size:cover, 130px 41px;
+               background-repeat:no-repeat, repeat;
+               background-position:center, center;
+               align-items:center;justify-content:center}
+  .carrosselImgWrap{display:flex;justify-content:center;align-items:center;min-height:96px}
+  .carrosselImgGrande{width:168px;height:168px;image-rendering:pixelated}
+  .carrosselGrupo{gap:12px}
+  .carrosselImgMini{width:72px;height:72px;image-rendering:pixelated}
+
+  /* trio escalonado do slide 1 (marca) -- igual a foto de referencia:
+     sprite do meio maior/na frente, laterais menores/atras, um pouco
+     mais baixos, sobrepondo o do meio. align-items:flex-end + tamanhos
+     diferentes ja produz o efeito "meio mais alto" sem precisar de
+     posicionamento absoluto nem numeros de offset vertical manuais. */
+  .carrosselTrioLogo{display:flex;justify-content:center;align-items:flex-end;margin:12px 0}
+  .carrosselTrioLogo img{image-rendering:pixelated;position:relative}
+  .carrosselTrioLogo .ctlCentro{width:160px;height:160px;z-index:2}
+  .carrosselTrioLogo .ctlLado{width:100px;height:100px;z-index:1}
+  .carrosselTrioLogo .ctlEsq{margin-right:-28px}
+  .carrosselTrioLogo .ctlDir{margin-left:-28px}
+  /* topo (voltar/dots/pular) agora é UM SÓ elemento fixo, fora dos
+     slides que deslizam -- antes cada slide carregava seu próprio topo,
+     e durante a transição (~300ms) os dois ficavam visíveis ao mesmo
+     tempo, mostrando dots/Pular duplicados cruzando a tela (bug visto
+     em screenshot real, capturado no meio de uma transição). Agora
+     #passoCarrosselTudo (o .passo de fora) contém o topo fixo + o
+     .carrosselPalco (position:relative, só ele é o "viewport" que os
+     slides absolutos preenchem) -- só o palco anima, o topo fica
+     parado, igual no vídeo de referência. */
+  /* #passoCarrosselTudo precisa do proprio flex:1 -- antes, quando os
+     slides eram filhos DIRETOS do .card, o flex:1 de cada slide bastava
+     pra consumir o espaco livre (.card{justify-content:center} so
+     entra em jogo com o que sobra DEPOIS do flex-grow ser resolvido).
+     Agora existe 1 nivel a mais (.card > #passoCarrosselTudo >
+     .carrosselPalco > .carrosselSlide) -- sem propagar flex:1 aqui
+     tambem, o wrapper externo fica do tamanho do proprio conteudo (so
+     a altura do topo), e .carrosselPalco{flex:1} nao tem sobra nenhuma
+     pra crescer -- vira altura 0, e o conteudo do slide (position:
+     absolute;inset:0 relativo a uma caixa de 0px) vaza visualmente pra
+     cima do topo sem que ninguem perceba olhando só o print (survivor
+     bug: cliques no topo eram capturados pelo slide por baixo -- só
+     apareceu tentando clicar de verdade via automação, não em screenshot). */
+  #passoCarrosselTudo.on{flex:1}
+  .carrosselPalco{position:relative;flex:1}
+  .carrosselSlide{position:absolute;inset:0;display:none;flex-direction:column;
+                   justify-content:center;gap:18px}
+  .carrosselSlide.on{display:flex;touch-action:pan-y}
+  .carrosselMeio{flex:1;display:flex;flex-direction:column;justify-content:center;gap:18px}
+
+  /* legibilidade da descricao reportada como ruim (itálico serifado
+     pequeno e apagado) -- escopado só no carrossel via .carrosselMeio,
+     não mexe no .lema global (login/passo1 usam a mesma classe e não
+     foram tocados). Tira o itálico (principal vilão de legibilidade em
+     corpo de texto pequeno), sobe tamanho/peso/contraste. */
+  .carrosselMeio .lema{
+    font-style:normal;font-size:17.5px;font-weight:400;
+    color:var(--text);line-height:1.6;max-width:300px;margin:0 auto
+  }
+  .carrosselTarefasDemo{display:flex;flex-direction:column;gap:8px;margin-top:14px;width:100%}
+  /* .task/.box/.tinfo/.label/.tmeta/.difpip/.repeat/.del/.done sao o
+     componente REAL da lista de tarefas (ver linha ~1714, render()) --
+     zero CSS novo pra eles, só herdam o que ja existe. Os botoes .del
+     e .box aqui nao tem onclick nenhum (tabindex="-1" pra nao roubar
+     foco de teclado tambem) -- é só mostra, decorativo. */
+
+  /* v4.117 (item 42-f do roadmap): slide de transicao entre EVOLUA e
+     Nome -- prosa centralizada, sem .marca/.titulo (a referencia nao
+     tem cabecalho nessa tela, só a frase). Cursor piscando (::after)
+     fica visivel enquanto o typewriter roda (iniciarTypewriter, no
+     script abaixo) e junto com o texto quando ja terminou -- decisao
+     de nao esconder o cursor no fim, pra nao precisar de mais uma
+     classe/estado só pra isso. */
+  .carrosselTransicao{display:flex;align-items:center;justify-content:center;min-height:120px}
+  .carrosselTransicaoTexto{
+    font-family:'Cormorant Garamond',serif;font-style:italic;font-size:25px;
+    color:var(--text);line-height:1.6;text-align:center;max-width:300px;margin:0 auto
+  }
+  .carrosselTransicaoTexto::after{
+    content:'';display:inline-block;width:2px;height:1em;margin-left:3px;
+    background:var(--accent);vertical-align:text-bottom;animation:carrosselCursorPisca .9s step-end infinite
+  }
+  @keyframes carrosselCursorPisca{0%,100%{opacity:1}50%{opacity:0}}
+
+/* --- Módulo style #18 --- */
+.somBtn{background:none;border:none;padding:4px;margin:0;cursor:pointer;
+          color:var(--dim);display:flex;align-items:center;justify-content:center;flex:none}
+  .somBtn svg{width:18px;height:18px}
+  .somBtn.mudo{color:var(--perigo)}
+
+/* --- Módulo style #19 --- */
+/* === Sprite Slash (pack "Pixel_Art_Animations_-_Slashes") ===
+     Decisao de escopo (chat de animacoes de combate): so 'corte' e 'impacto'
+     ganham sprite animado -- sao as unicas categorias com golpe fisico
+     compativel com um arco de slash. perfuracao/distancia/arcano continuam
+     com os efeitos CSS existentes (estocada, projetil e particulas magicas
+     nao combinam com o movimento de slash). */
+  .fx-sprite-slash{
+    position:absolute;width:64px;height:64px;pointer-events:none;z-index:7;
+    background-repeat:no-repeat;image-rendering:pixelated;
+    transform:translate(-50%,-50%) scale(var(--escala-slash,1));
+  }
+  /* cor do sprite = raridade da arma (nao categoria). Estilo de movimento
+     agora varia por raridade tambem, pra dar variedade visual: Slash 2
+     (comum/incomum, 7 frames, rajada mais angulosa) / Slash 3 (raro/epico,
+     9 frames, crescente fino) / Slash 1 (lendario, 9 frames, arco largo). */
+  /* TESTE: todas as 5 raridades usando o MESMO estilo/tamanho do raro/epico
+     (Slash 3, 9 frames), so a cor muda -- pra comparar lado a lado se
+     "raridade maior = mais poderoso" fica mais claro so pela cor, sem
+     diferenca de sprite/escala extra por classe. */
+  .fx-sprite-slash.comum{
+    background-image:var(--spr-slash-comum);
+    background-size:576px 64px;
+    filter:grayscale(1) brightness(2.4); /* Slash3/color5 ciano -> branco, bate com COR_RAR[0] */
+    animation:fxSpriteSlash9Fixo .42s steps(9) forwards;
+  }
+  .fx-sprite-slash.incomum{
+    background-image:var(--spr-slash-incomum);
+    background-size:576px 64px;
+    /* Slash3/color1 verde nativo, ja bate com COR_RAR[1] #63C99A */
+    animation:fxSpriteSlash9Fixo .42s steps(9) forwards;
+  }
+  .fx-sprite-slash.raro{
+    background-image:var(--spr-slash-raro);
+    background-size:576px 64px;
+    /* Slash3/color5 ciano sem filtro (nativo), aproxima COR_RAR[2] #5AA9F2 */
+    animation:fxSpriteSlash9Fixo .42s steps(9) forwards;
+  }
+  .fx-sprite-slash.epico{
+    background-image:var(--spr-slash-epico);
+    background-size:576px 64px;
+    filter:hue-rotate(44deg) saturate(1.3) brightness(1.1); /* Slash3/color3 -> roxo, bate com COR_RAR[3] #B57BE8 */
+    animation:fxSpriteSlash9Fixo .42s steps(9) forwards;
+  }
+  .fx-sprite-slash.lendario{
+    background-image:var(--spr-slash-lendario);
+    background-size:576px 64px;
+    /* Slash3/color4 laranja nativo, bate com COR_RAR[4] #F2A65A */
+    animation:fxSpriteSlash9Fixo .42s steps(9) forwards;
+  }
+  @keyframes fxSpriteSlash9{
+    0%{background-position:0 0;opacity:0;
+       transform:translate(-50%,-50%) scale(var(--escala-slash,1)) translate(-20px,-20px) rotate(-35deg)}
+    8%{opacity:1}
+    100%{background-position:-576px 0;opacity:1;
+       transform:translate(-50%,-50%) scale(var(--escala-slash,1)) translate(20px,20px) rotate(35deg)}
+  }
+  @keyframes fxSpriteSlash7{
+    0%{background-position:0 0;opacity:0;
+       transform:translate(-50%,-50%) scale(var(--escala-slash,1)) translate(-20px,-20px) rotate(-35deg)}
+    8%{opacity:1}
+    100%{background-position:-448px 0;opacity:1;
+       transform:translate(-50%,-50%) scale(var(--escala-slash,1)) translate(20px,20px) rotate(35deg)}
+  }
+  /* comum/incomum: sem deslocamento -- fica parado no centro do mob. Arte do
+     Slash 2 concentra o desenho ~7px abaixo do centro do quadro 64x64, entao
+     desloca -7px em Y pra recentralizar. Escala extra (+30%) pra compensar
+     a falta de movimento. */
+  @keyframes fxSpriteSlash7Fixo{
+    0%{background-position:0 0;opacity:0;
+       transform:translate(-50%,-50%) scale(calc(var(--escala-slash,1) * 1.3)) translateY(-7px) rotate(25deg)}
+    8%{opacity:1}
+    100%{background-position:-448px 0;opacity:1;
+       transform:translate(-50%,-50%) scale(calc(var(--escala-slash,1) * 1.3)) translateY(-7px) rotate(25deg)}
+  }
+  /* lendario: Slash 1 ja fica quase centrado (desvio pequeno), so escala extra. */
+  @keyframes fxSpriteSlash9FixoLendario{
+    0%{background-position:0 0;opacity:0;
+       transform:translate(-50%,-50%) scale(calc(var(--escala-slash,1) * 1.3)) translate(-6px,-2px) rotate(25deg)}
+    8%{opacity:1}
+    100%{background-position:-576px 0;opacity:1;
+       transform:translate(-50%,-50%) scale(calc(var(--escala-slash,1) * 1.3)) translate(-6px,-2px) rotate(25deg)}
+  }
+  /* raro/epico: sem deslocamento diagonal -- fica parado no centro do mob,
+     so troca de frame (pedido explicito do usuario, testar como fica). */
+  /* raro/epico: recentralizado (a arte do Slash 3 concentra o desenho na
+     metade de cima do quadro 64x64, por isso parecia deslocado pra cima --
+     compensa com translateY) e escala extra (+35%) so pra esses dois. */
+  /* correcao de centro (translateY) precisa vir DEPOIS de scale() na lista --
+     assim o deslocamento escala junto com o tamanho em vez de ficar fixo em
+     px (bug: aumentar a escala sem isso faz o desenho "subir" de novo,
+     porque o offset fixo passa a ser proporcionalmente menor). */
+  @keyframes fxSpriteSlash9Fixo{
+    0%{background-position:0 0;opacity:0;
+       transform:translate(-50%,-50%) scale(calc(var(--escala-slash,1) * 1.5)) translateY(12.5px) rotate(25deg)}
+    8%{opacity:1}
+    100%{background-position:-576px 0;opacity:1;
+       transform:translate(-50%,-50%) scale(calc(var(--escala-slash,1) * 1.5)) translateY(12.5px) rotate(25deg)}
+  }
+
+/* --- Módulo style #20 --- */
+:root{
+    --spr-slash-comum: url("data:image/png;base64,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");
+    --spr-slash-incomum: url("data:image/png;base64,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");
+    --spr-slash-raro: url("data:image/png;base64,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");
+    --spr-slash-epico: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAkAAAABACAYAAADyBcgfAAAPlElEQVR42u2dTWwTZxrHnzeqd4EG14kloAdSVxGhJ+ew1RgRpPYCgUMEWtYHO3AnErcwtxy5DbkhtdcVxD54uwJFWiBcqLRBeERXig+rJcjaEA6hkcYJbgq0XuXdg+d1Xg/jj3zMV+b/kyx/zJffGdvz8/M87zuMc04AAAAAAGGiB7sAAAAAABAgAAAAAAAIEAAAAAAABAgAAAAAAAIEAAAAAAABAgAAAACAAAEAAAAA+IdPsAsAANvlCit3O2tuDzaX3e4Cd/mgl222kpEe57cxbUc40XYAIEAAgD3jDDPkp00jkqpKvGleTTfYdtatKnG6WHTuvaeV9ifZgl5uiM+F5MDobrb1oLScM7fZlQgV9LJjbdZ0o6t5E7SeSSuDY9Lxy3QSQlWJj/3yofbFw9LybSKiJYrl/faZvZ/a1eKTbaZN79V7dPJzDyBAAIA9YJ63zkDP0xqNsM2GzKhKnBMRXSqudRQhsZzTWGUgQeu20vNdqdpvt/xEMlppNV1Mk9dV0Mu5JYp1lKCEh8dUiI+mU6aFLLU6fnxLkmKnhRAV9PKs30SoGwlUlfikOe/nNpNv2Lx2K/FZ5GsiovTJ6Ky5bNdSZP3D4CQuRT+3FfVE1A8CBECgeEN9ba9Dc4yvmafMrRPOvVRdhE4VW55I6TIZrrVBSNw4q+RkWRFSU5/e00LyNkzx6bGdJkROyNCF5MCoiAbN8P6WJ4gEc769VsZZxVZ8bObv/tpDzMgQxTJChGZ4f0cRckN+V+eireVoKjKp6cbnYh+szkXtoj62kaBV816n2jdK+v2PQmrUm7WOIqRSTWzflc/9EsXaSXBOmi9jvpaXH3crT52EP0Hrnvx27UACs+ZjX6SzIUAA+F+QmkRohG2SphukKnF6liLeToLcwk582knPjmSD1WVqIhmtmBL0aJxVcu0kyE3upfpyGm02xKddZK8bYRHLb7W/LkLjrELdSJBXHDlXvaW1lh4xT0NmEp9Fvl56W3suIj9EREtva8/F8urN2i0iIiX9fix9MjrbjQh5iRAfi+gwSZiyneRJSLIkSdyUp2yAfrpk0ZHfd3aX64IAARBmERISRESkpuKeSVBBL+cSLSM+DkVdGiJkptfYsucSdC/Vl5Pqe7bdfuv8I2zzIynaan8sd2e49/rVhY0RP8pPq4iPLD1NUZS3tefiPvFZ5GuR+qIpulGg92NiuSWqp9K0qfikXyXIKj9ExKyiI0eGGvvAXmyYFDlhSxST1+93Ecrt8focbS8ECIAgiRAnOkZbIuSlBH0c9XEWWYRENMhLCboz3DuvlYzTey1+87yHRtgmqUq8HgVgW4J1dWHj9J3h3nk/SZCSfv9En4t+00582kWFiIjoXHVa1AupSnylIUNCuF9UxwovqqSkyXfRoASt5yyprqxVeJYolrGL/IgUlrzMEsWyrURHTPdx1CdIkSoIEABBFCE5GuSFBLktPyNsszk15LEE3Rnunf++VHVEfrbaWBcfIUKabmRG2CZd5f6RICX9/oleOPiN3bSO0tNiXpVqdORcdVpV4iviNakw+nP1Zu2WNhUhP0iQnfzYRIPslrOmMrm5DFF9aISm77MsPT6UoFZpKkfTVxAgAALMMVqzj/IEQIJ6D0Timm7wbk/+rYpzJ5LRitwLrNX6rK/LEuT2cRtnlcz3tLkt+bG2/1oy+lQ8FiJlXZ+IBGm6kVGVeP5aMvr08IHIKzVFpJWMzJ3hqKcS1E5+7KJB1l5eArmnmBCh1bnopHbOaEiQkB1tKj5JU3Sj8KI6pk1FPZWgVvJjLXy2yo4Z4bHKTFYWoXZYtsN88FOW3cNoUK7FOiFAAOwn7KSg0fOrCxmSJYiIfFMYbde+dqIiT5sYbl1PJKJA4n5LgtyLAm319jK6br+qxPOkEBX08iwR0Qzvz8/ThrTO9UakQE3Vxw7SdCMj2ijWc/hA5FVBL8+mlcExIUP3Un25S8U11/9la1ORSe1t9TlRawES0pM+GZ1V56LTUi8vy5xReb0rRPWU11JdfG4dOVed1qbiojB6WpuKTIp5vJYgO/mx9vhqF62xTpNkSYgRt5McizT5Lfqz4x5fbrcJAgSAR9gMdtgkDZfJoHne01aEhAQRM1wdC8WE2f1jtXZfJyJ6UFp+1O1KRZGzkCE5LSSnwpojQQOjM5JUOMX55MB1TW9f9yPafy0ZffqwtHz7UrHHPKnZDofU1LNrhtbyphTNXhseuP59qXp6nvfQPK1l6nVBgw2RMk+EuXupOLkpQaKre6sUV0N8lPiKerP27cfC0+Y70ZCZg9NEB0mbiqwUPouMFV5UzW0L4Tk4rU1FJr2SIDnSI0TFLFYWx5J10duroxAREQtA3Y/d80DUAkGAAPAIa7RGNcf4af75MzqK0Bvqo8tkNFJh5G5YvEmCrPIjxKfb6Mw4q+TEMheSA6MTyWhFFiFZguRI0MRwfVkno0AFvZxJK4OviOh0O/lRlXi+oJdnry705FtJTydmeH9+hjby42w9o6YGx0REiJiRUZVBEiNGJ2g9e6nYkxtnlVm3usgXXlTHVm2KnoX8qDsQn/ZCVJcd9WbtFqWrJAuPWRB9i/ZwJOkuRUWO8PAOErPbbWU79ALzQ62N7+t9IEAABEiImqSogwjJqRIPYETER9imbdRnO1LSNC9bzskiJLrB20WEvis5HwWSoz+d5GevZKQuQmv5cbY+q6YGxzQyMppuZK4lo0+XKJZL0Hr2znDv08NK35iIHjl+8n9bs019HTlXnV6di95Q90B8WkSGponoiYhCFV5Ux9Ino7PaVOQGEbnZRT4n5EeKCOWdkJ8upcor8cgGWX6IcDV4AHwvRaeKxMzLYdAI22xZPD3Pe8RAidyDt8p2Kz92MjTD+7NiXWL9QvTke+uI1E5w+EDklSxgTsuPVYQuFdeyCVrPEtULpxO0nl2iWK6eZlvLjLNKxoXj3DLttToXveH0xvXCwW8LL6pjIvojHnuF3NMrYIMVhjryAwECIKAi1EqCvEaIyl7Ij1WEHpSWHz0oLT+SJahRCG0+b3XNMTdwUn6sIiR6kKWVwTEhROOskj2fHLjuRluttT9uyY8sQeKxtUeZF3gxUrOZEuMEIEAAhEmEWkmQSI2ZPZRc/3Gc4f3ZKwsb8b2UH3ndQoRkCbKm/czxiZyKAmVbRX+EnLixn68ubIxcS0afarqROZ8cuC7ER+5O7yDTNvK34rpwSumurS7ykUmXNp+Vu7h7Efkxt+l1j89AR3+IUAMEAsT9VMdZOBFRQS/n7/LBfRuOPlUkpqbinJjhy/+AThYiz/D+LLHl3ERyYFTuLi8iQhPD7rdXRH92WvC8Ex6Wlm+r9YLsRq8wL+rAjpyrTqtzUU+6oYsu8UJ8xACJ5HJBNAguiACBwKDpRuO2WHxNi8XXpOkGXyy+5ovF17ybsVn2kwQRfTyY4g88vu/bbhcJku8d/sfbhFeF5zO8P//Lh9oXIgpERHRnuPfptWR03mX5W/HysyCiP6YMuZWGy9kNcOghOY+2Gfg/mRAgEGg8GPvGV233sOeXLyTI5c2KtEPjNs972KXiWtaLq7Q/LC3flkeUJnItDeav74EZCfJiQESfFD5nCUCAAAhjFCjMWEeY9rIQ2gMJzMvS87C0fNvN7Svp9z/6SYLMh0h/AQgQCA/32aHQtl1V4r7sEeaSADRFgeZ5D3lxbTAvsUaBrBEhJ6mPB+SjPz/uFUEDCBAA3lPQy/mw7wORBgurCFn3Q8gkMC89zoX5+LuYAkPKaZ+AXmBg33CRvwtdNOhUkRgx4jbyE4r02Azvz94d7h11K/V1L9Xnvz8BpfLt88mB6+eHyZXojzYVqX+2zPo7s+dVmAi1aEKAAPDTPz8lTov0LtT74A31+T4CtBL7sun5sSN/rJva4n/2ZP1hS3/JPCwt33ZrIESfM0kO1wGZQ2xkifzQAcOb97BfhhmBAAGwDwRQyM8xWqOREO4D68VXgTNcLPr+LaIIGnQNaoAA2AeIUaDNa1L55n2txL5s3D56z6u/0ZvV33a9jQel5Ue9ByL/ldJgoarRSCuDjTqgwwciI/g2AAABAiHjPjskrsociBPg0aGjjdtuERGgH3icNN3wpP5Hlp1W0uM0M7w/E8bP/vnkwHW3u8EDEHSQAgNgH3GZBW8cJD70FRHtrhZI040/qUr8pwQrL4bxuEs1QHl8CwDoDkSAQOAJ0+CHnQjzyNgbH2pfOnkdsiBIEL4BAECA9iWM1mxvQ49rnNEaZ7TGw7ZP0spgRj75+2Ro+tCwF+muvagFmkhGK2EvgJZrgQAAnUEKbB/w8uzGliOFkIs8+F3gjw4dpZ8Xf97Rsppu0BuK02Vm0ClOzI1PwV//1U9EL+nY+vr2ZCcWc+T9XFnY6B8P8YVBkP4CYPsgAhRwTjzu5eZ96Nq+wH5vDEh2nx0K7ajQ87yHLjPD9fTXkU9O+GYf3Ev1/RTm9BcAYPsgAgQCS1oZzGi6QRfJHAyx+C67FLIowLMU8RG9fgmIoF8clQ99taNC6AvJgdGCXn5E5Oxg0L/qxz3dP/+gJ+0mN7q/X6RB/DgAAAHa/4j018uzG6FOfxX0cn6Y/hC69p8qEv1AcXqWCn5bdlIHNM4quSuc+on2b/Sng/gQEWUI6S8AIEBh4sTjXv7y7AadeNwr1wGFjqHUcSL+OnTpj2cp4ppeT315Ff35c2S7UZfmrPtf/vdp0/MZlmw8/lR53XFtBarQOKvk08pg02tOkOWvPTnOXXywIT8AQIDCRZijPwvs99x9qqe/whr9uVRcozf1awGFtvz3QnJgtPdAJI5fAwAABCgkhD36I+p/ghz9OfPy380vbGMQQ1WJ8xF9ky6TEWj5+dsnvxLRx5Ggbtj4UDMgPwAACFB45Sd0//4TtJ7T9PrjsEZ/zMEfPTv2f6/tLs2UY80FxbZ1Lnq57SrIH5fjBgBAgJxn6HFNfsoXz0ZYmA9eWAuflyiWucjf0VDqOC0W34Wx6zOnEKe9TPlBl3cAQHgECCeArehPWNufoPXcEsVoKHW8ftFPdihU7VeVOPfqYqcAALCfYJwH5+oJZgSoIT+LZyPhOlj1K363lT9Offu2/VdYObdEsYyqtL/ieYLW6S73/1goZ7Z/4dKuxf+fHNkhAABoR9AiQGEP/Ye6/d3IT5DYgaQg8gMAAHsVVAhSBAiEmzPM6EoAgxIBAgAAAAECAAAAAHANXAwVAAAAABAgAAAAAAAIEAAAAAAABAgAAAAAAAIEAAAAAAABAgAAAACAAAEAAAAAQIAAAAAAACBAAAAAAAAQIAAAAAAACBAAAAAAAAQIAAAAAGBn/B/kPKHKmAyo7gAAAABJRU5ErkJggg==");
+    --spr-slash-lendario: url("data:image/png;base64,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");
+  }
+

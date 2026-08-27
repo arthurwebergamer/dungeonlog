@@ -3068,15 +3068,18 @@
   height:64px;
 }
 
+#cfgTemaCard{
+  padding:12px 8px 14px;
+}
 #temaGrid.temagrid{
   display:grid;
   grid-template-columns:repeat(2,1fr);
-  gap:14px;
+  gap:12px;
 }
 #temaGrid .temaswatch{
   width:auto;
   height:auto;
-  aspect-ratio:1 / 1.05;
+  aspect-ratio:1 / 1.35;
   border-radius:20px;
   border:2px solid var(--line);
   cursor:pointer;

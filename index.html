@@ -3717,16 +3717,17 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     if (!g) return;
     const atual = document.documentElement.getAttribute('data-tema') || 'padrao';
     g.innerHTML = '';
+    // v4.126 (2a tentativa: o card grande tipo Skyllion nao ficou bom --
+    // pedido do usuario pra tentar algo diferente. Virou lista de linhas
+    // (bolinha de cor + nome + check quando selecionado), mesmo padrao
+    // visual do resto de Config em vez de um grid de blocos isolado.
     TEMAS.forEach(t => {
       const b = document.createElement('div');
-      b.className = 'temaswatch' + (t.id === atual ? ' sel' : '');
-      b.style.background = t.cor;
-      b.title = t.nome;
-      // v4.123 (pedido do usuario: cards maiores tipo o seletor de tema
-      // do Skyllion, em vez de bolinha de 36px). Label vira filho real
-      // em vez de so tooltip -- soh de leitura, nao muda logica de
-      // selecao (escolherTema/onclick continuam iguais).
-      b.innerHTML = '<span class="temaLabel">' + t.nome + '</span>';
+      b.className = 'temalinha' + (t.id === atual ? ' sel' : '');
+      b.innerHTML =
+        '<span class="temaDot" style="background:' + t.cor + '"></span>' +
+        '<span class="temaNome">' + t.nome + '</span>' +
+        '<svg class="temaCheck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
       b.onclick = () => escolherTema(t.id);
       g.appendChild(b);
     });

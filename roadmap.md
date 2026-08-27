@@ -23,14 +23,21 @@ de Config.
 Escopado por ID pra não afetar `#gradeHerois` (grid do onboarding, que
 reaproveita a mesma classe `.grade`/`.opcao`).
 
-**3. Sub-tela Aparência — cards de tema bem maiores**
-`#temaGrid`: 5 bolinhas de 36px → grid 2 colunas, cards retangulares
-grandes (`aspect-ratio: 1/1.9`, cantos com `border-radius: 10px` —
-ajustado depois de uma passagem por 24px que ficou "redondo demais").
-Cada card mostra a cor do tema preenchendo o card inteiro + nome como
-pill branco na parte de baixo. Referência trazida pelo usuário (print
-de outro app) — não copiado literal, só usado como parâmetro de
-proporção/densidade.
+**3. Sub-tela Aparência — seletor de tema redesenhado**
+Passou por 2 tentativas. **1ª (descartada):** `#temaGrid` virou grid
+2 colunas de cards grandes (`aspect-ratio` crescente até 1/1.9,
+`border-radius` ajustado de 20px→24px→10px tentando acertar o
+tom) — referência trazida pelo usuário (print de outro app) pra
+parâmetro de proporção/densidade, não cópia literal. **Resultado:**
+usuário não gostou ("quadradão", destoava do resto da tela).
+**2ª (aprovada, versão final):** virou **lista de linhas** — bolinha
+de cor (30px) + nome do tema + ícone de check que só aparece quando
+selecionado (`opacity`/`transform` no `.sel`), com divisória fina
+entre linhas e feedback de toque (`:active`) igual ao resto de
+Config. Mesmo padrão visual do app em vez de um bloco isolado.
+`pintarTemaGrid()` reescrita: markup trocou de `<div class="temaswatch">`
+com cor no `background` inline pra `<div class="temalinha">` com
+`.temaDot`/`.temaNome`/`.temaCheck` como filhos.
 
 **4. Histórico — botão "Abrir" trocado por seta**
 Era o único item da lista com padrão diferente (botão de texto em vez
@@ -87,12 +94,14 @@ tema sem depender da cor de `--accent`.
   array `TEMAS[]` e `CICLO_TEMAS` atualizados, 3 fallbacks de tema, id
   novo `cfgTemaCard` no card que envolve `#temaGrid`.
 - `style.css`: módulos novos **#21** (ícones + layout compacto da tela
-  principal), **#22** (grids maiores de Herói/Aparência), **#23** (fix
-  do switch). Comentário de deprecated nas duas cópias do bloco
-  `[data-tema="floresta"]` (o arquivo tem conteúdo duplicado
-  pré-existente — módulos #1-20 se repetem a partir de "Módulo style
-  #1"; ambas as cópias foram atualizadas por consistência, embora só a
-  última prevaleça na cascata).
+  principal), **#22** (grid maior de Herói + lista de temas — passou
+  por uma versão intermediária de grid de cards, substituída na mesma
+  sessão pela lista final), **#23** (fix do switch). Comentário de
+  deprecated nas duas cópias do bloco `[data-tema="floresta"]` (o
+  arquivo tem conteúdo duplicado pré-existente — módulos #1-20 se
+  repetem a partir de "Módulo style #1"; ambas as cópias foram
+  atualizadas por consistência, embora só a última prevaleça na
+  cascata).
 
 ### Validado nesta sessão
 
@@ -108,9 +117,5 @@ tema sem depender da cor de `--accent`.
 - **Nada disso foi testado em aparelho real ainda** — só validado
   estruturalmente (sintaxe/balanceamento). Prioridade pro próximo
   ciclo de teste em device.
-- Conferir o pill de nome dentro do card de tema em cada um dos 4
-  temas restantes (contraste do texto escuro sobre pill branco
-  translúcido deve segurar bem em qualquer cor de fundo, mas não
-  visto ao vivo).
 - Quem tinha `'floresta'` salvo no `localStorage` de teste anterior
   simplesmente não vê mais essa opção — não quebra, só some da lista.

@@ -1716,6 +1716,12 @@ const blocosTarefas = ['.arena', '.xpwrap', '.tasks'].map(s => document.querySel
 function mostrarAba(nome){
   abaAtual = nome;
 
+  // flutuante .fixo (venda/uso de item) e position:fixed no body, nao
+  // dentro do conteudo da aba -- se o usuario troca de aba enquanto ele
+  // ainda esta subindo, fica "pairando" preso no mesmo pixel da tela por
+  // cima da aba nova. Some qualquer um pendente ao trocar de aba.
+  document.querySelectorAll('.dmg-float.fixo').forEach(el => el.remove());
+
   // fecha o formulario de nova tarefa ao sair da aba
   if (nome !== 'tarefas') composer.classList.remove('on');
 
@@ -1856,9 +1862,10 @@ function equipar(id){
   aviso(equipado[it.tipo] === id ? 'EQUIPADO' : 'DESEQUIPADO');
 }
 
-function usarItem(id){
+function usarItem(id, elOrigem){
   const it = item(id);
   if (it.tipo !== 'cons') return;
+  const ponto = pontoDeElemento(elOrigem); // captura ANTES do render (senao elemento desconecta do DOM)
   if (it.x) xpTotal += it.x;
   if (it.m) moedas += it.m;
   if (it.h && window.vidaHeroi && typeof window.vidaHeroi.set === 'function'){
@@ -1866,19 +1873,25 @@ function usarItem(id){
     window.vidaHeroi.set(novaVida);
   }
   tirarItem(id, 1);
-  persistir(); render(); renderInventario(); fecharFicha();
-  aviso(it.h ? '+'+it.h+' HP' : (it.x ? '+'+it.x+' XP' : '+'+it.m+' MOEDAS'), !it.x && !it.h);
+  persistir(); render(); renderInventario();
+  const textoGanho = it.h ? ('+' + it.h + ' HP') : (it.x ? ('+' + it.x + ' XP') : ('+' + it.m + ' MOEDAS'));
+  if (ponto) flutuanteFixo(ponto, '<span class="dmg-xp">' + textoGanho + '</span>');
+  else aviso(textoGanho, !it.x && !it.h);
+  fecharFicha();
 }
 
-function venderItem(id){
+function venderItem(id, elOrigem){
   const it = item(id);
   if (it.tipo === 'chave') return;   // itens-chave (ex: Grimório) nunca sao vendaveis
+  const ponto = pontoDeElemento(elOrigem); // captura ANTES do render
   SLOTS.forEach(s => { if (equipado[s] === id) equipado[s] = null; });
   const preco = precoVenda(it);
   moedas += preco;
   tirarItem(id, 1);
-  persistir(); render(); renderInventario(); fecharFicha();
-  aviso('VENDIDO  +'+preco+' MOEDAS', true);
+  persistir(); render(); renderInventario();
+  if (ponto) flutuanteFixo(ponto, '<span class="dmg-moeda">+' + preco + ' ' + COIN_SVG + '</span>');
+  else aviso('VENDIDO  +'+preco+' MOEDAS', true);
+  fecharFicha();
 }
 
 function persistir(){ if (typeof jaComecou !== 'undefined' && jaComecou) salvar(); }
@@ -2038,8 +2051,8 @@ function abrirFicha(id){
     b.onclick = () => {
       const a = b.dataset.a;
       if (a === 'eq') equipar(id);
-      else if (a === 'usar') usarItem(id);
-      else if (a === 'vender') venderItem(id);
+      else if (a === 'usar') usarItem(id, ficha.querySelector('.ibox') || b);
+      else if (a === 'vender') venderItem(id, ficha.querySelector('.ibox') || b);
       else if (a === 'abrir'){
         fecharFicha();
         if (typeof window.abrirCatalogoGrimorio === 'function') window.abrirCatalogoGrimorio();
@@ -2492,7 +2505,7 @@ function montarVenda(grid){
   });
 
   grid.querySelectorAll('[data-v]').forEach(b => {
-    b.onclick = () => { venderItem(+b.dataset.v); renderLoja(); };
+    b.onclick = () => { const icone = b.closest('.lrow')?.querySelector('.lbox'); venderItem(+b.dataset.v, icone || b); renderLoja(); };
   });
 
   const tesouros = inventario.filter(s => item(s.id).tipo === 'tesouro');

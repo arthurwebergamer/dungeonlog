@@ -2,6 +2,11 @@
 
 > Versão do arquivo: `index.html` + `style.css` + `assets.js` (repositório GitHub, ver item de infraestrutura abaixo)
 >
+> **Nota:** item 40 novo — número flutuante de XP/moeda na Arena
+> (estilo "damage number" positivo), substituindo o toast de texto só
+> nessa tela. Reaproveita infraestrutura existente (`COIN_SVG`,
+> `moedasCaindo`/origem no centro do monstro) — spec fechada.
+>
 > **Nota:** item 39 *(pronto)* — Config reestruturado, foi bem além do
 > escopo original a pedido do usuário (temas renomeados, Floresta
 > removido, grids maiores, vibração completa). ⚠️ Achado: `style.css`
@@ -804,6 +809,13 @@ Sobrepor um ícone de espada na mão de um sprite feito para outro fim normalmen
     - **Confirmado pelo usuário: design do Config está finalizado** — não é mais "pronto, mas ainda ajustando visual", é ponto final na parte de design deste item. Só falta o teste em aparelho real (ver abaixo), que é validação, não mais iteração de decisão.
     - **Validado:** balanceamento de tags a cada edição, `node --check` nos 42 blocos (0 erros), `style.css` parseado com lib real (não regex), 0 erros.
     - **Não testado em aparelho real ainda** — prioridade pro próximo ciclo de teste, junto com o resto que já está na mesma fila (pill de nome do tema em contraste, usuário com `'floresta'` salvo no `localStorage` simplesmente não vê mais a opção, não quebra).
+
+40. [ ] **Número flutuante de XP/moeda na Arena, substituindo o toast de texto nessa tela (levantado em sessão de brainstorm, 27/08).** Hoje ganhar XP/moeda ao concluir tarefa dispara só `aviso('+10 XP   +5 MOEDAS')` — texto puro no toast genérico do topo (`#toast`), mesmo elemento usado pra qualquer aviso do app, sem nada visual na Arena em si.
+    - **Referência do usuário:** clássico "damage number" de RPG, só que positivo — texto sobe flutuando de cima do monstro e desvanece, em vez de aparecer só como notificação no topo.
+    - **Infraestrutura já existe, reaproveitar em vez de criar do zero:** já tem `COIN_SVG` (moeda pixel art embutida, mesma usada no contador do topbar) e `moedasCaindo(qtd)` — sistema de partícula que já spawna elementos a partir do centro do `#mobSprite` (calculado via `getBoundingClientRect`), com `@keyframes coinFall` (translate + scale + rotate + fade). É pra "moedas físicas caindo", não pra texto — mas a lógica de origem/posicionamento é exatamente a que este item precisa, só trocar o conteúdo do elemento (moeda→texto) e a keyframe (queda→subida).
+    - **Proposta de conteúdo:** `+10 [ícone moeda] · +10 XP` — um elemento só, nascendo no mesmo ponto de origem que `moedasCaindo` já calcula, subindo ~40-60px enquanto o `opacity` vai de 1→0, reaproveitando o padrão `position:absolute` + `@keyframes` já estabelecido (`coinFall` como referência de estrutura, não os valores exatos — esse sobe, aquele cai).
+    - **Escopo de convivência com o toast, decisão fechada:** o flutuante **substitui** `aviso()` especificamente nas telas de Tarefas/Arena — nas outras telas do app, o toast de texto continua exatamente como está, sem mudança.
+    - Ainda não iniciado. Não bloqueia lançamento.
 
 ---
 

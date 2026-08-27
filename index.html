@@ -850,6 +850,7 @@ let xpTotal = 0, moedas = 0, derrotadoEm = null, jaComecou = false;
 function monstroJaCaiu(){ return derrotadoEm === isoAtual(); }
 let nomeHeroi = 'Aventureiro';
 let ultimoGanho = 0;
+let _vitoriaCelebrada = false; // pedido do usuario (27/08): tela de vitoria "muito simples" -- controla o disparo unico do efeito de celebracao, ver celebrarVitoria()
 
 // --- inventario ---
 let inventario = [];   // [{id:indiceNoCatalogo, q:quantidade}]
@@ -1090,7 +1091,13 @@ function render(){
   document.querySelector('.arena').classList.toggle('venceu', venceu);
   document.getElementById('mobinfo').classList.toggle('off', venceu || total === 0);
   document.getElementById('vitoria').classList.toggle('on', venceu);
-  if (venceu) document.getElementById('ganhoTxt').textContent = '+' + ultimoGanho;
+  if (venceu && !_vitoriaCelebrada){
+    _vitoriaCelebrada = true;
+    celebrarVitoria(ultimoGanho);
+  } else if (!venceu){
+    _vitoriaCelebrada = false;
+    document.getElementById('ganhoTxt').textContent = '+' + ultimoGanho;
+  }
 
   const p = progresso();
   document.getElementById('lvl').textContent = 'Nível ' + romano(p.nivel);
@@ -1156,6 +1163,54 @@ function numeroFlutuante(xpGanho, moedasGanhas){
     + '<span class="dmg-xp">+' + xpGanho + ' XP</span>';
   arena.appendChild(el);
   setTimeout(() => el.remove(), 1600);
+}
+
+// item pedido pelo usuario (27/08): tela "DIA VENCIDO" muito simples --
+// disparado 1x por vitoria (ver flag _vitoriaCelebrada em render()), nunca
+// a cada re-render enquanto o dia ja estiver vencido.
+const SPARK_SVG = '<svg viewBox="0 0 8 8" shape-rendering="crispEdges"><rect x="3" y="0" width="2" height="2" fill="#F2C94C"/><rect x="3" y="6" width="2" height="2" fill="#F2C94C"/><rect x="0" y="3" width="2" height="2" fill="#F2C94C"/><rect x="6" y="3" width="2" height="2" fill="#F2C94C"/><rect x="3" y="3" width="2" height="2" fill="#FFF8E1"/></svg>';
+
+function celebrarVitoria(ganho){
+  const arena = document.querySelector('.arena');
+  const alvo = document.getElementById('vitoria');
+  if (!arena || !alvo) return;
+
+  // burst de faiscas radiando da faixa "DIA VENCIDO" -- mesma tecnica de
+  // origem/posicionamento de moedasCaindo/numeroFlutuante (getBoundingClientRect
+  // relativo a .arena), mas espalhando em circulo em vez de cair/subir reto
+  const arenaRect = arena.getBoundingClientRect();
+  const alvoRect = alvo.getBoundingClientRect();
+  const originX = alvoRect.left - arenaRect.left + alvoRect.width / 2;
+  const originY = alvoRect.top - arenaRect.top + alvoRect.height / 2;
+  const N = 7;
+  for (let i = 0; i < N; i++){
+    const ang = (Math.PI * 2 * i / N) + (Math.random() * 0.5 - 0.25);
+    const dist = 32 + Math.random() * 16;
+    const s = document.createElement('div');
+    s.className = 'vitoria-spark';
+    s.style.left = originX + 'px';
+    s.style.top = originY + 'px';
+    s.style.setProperty('--sx', (Math.cos(ang) * dist).toFixed(0) + 'px');
+    s.style.setProperty('--sy', (Math.sin(ang) * dist).toFixed(0) + 'px');
+    s.style.animationDelay = (i * 25) + 'ms';
+    s.innerHTML = SPARK_SVG;
+    arena.appendChild(s);
+    setTimeout(() => s.remove(), 750 + i * 25);
+  }
+
+  // contagem progressiva do numero de moedas em vez de aparecer estatico --
+  // duracao curta o bastante pra nao atrasar a leitura, mas perceptivel
+  const elTxt = document.getElementById('ganhoTxt');
+  if (!elTxt) return;
+  const DURACAO = 500;
+  const inicio = performance.now();
+  function passo(agora){
+    const t = Math.min(1, (agora - inicio) / DURACAO);
+    const valor = Math.round(ganho * (1 - Math.pow(1 - t, 3))); // ease-out cubico
+    elTxt.textContent = '+' + valor;
+    if (t < 1) requestAnimationFrame(passo);
+  }
+  requestAnimationFrame(passo);
 }
 
 function alternar(i){
@@ -5540,13 +5595,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     function linha(item, data){
       const desc = resolver(item.req, ctx);
       const dataHtml = data ? '<span class="conqv2data">' + formatarDataBR(data) + '</span>' : '';
-      const iconeHtml = item.img
-        ? '<img class="conqv2img" src="' + item.img + '" alt="">'
-        : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + item.icone + '</svg>';
       return '<div class="conqv2item' + (data ? '' : ' trancado') + '">' +
-        '<div class="conqv2icone" style="--pv-cor:' + item.cor + '">' +
-          iconeHtml +
-        '</div>' +
         '<div class="conqv2txt"><div class="conqv2nome">' + item.nome + '</div>' +
         '<div class="conqv2desc">' + desc + '</div></div>' +
         dataHtml +

@@ -1132,6 +1132,30 @@ function moedasCaindo(qtd){
   }
 }
 
+// item 40 do roadmap: numero flutuante de XP/moeda na Arena, "damage
+// number" positivo -- substitui aviso() de texto so nas 2 chamadas de
+// Tarefas/Arena (tarefa concluida com/sem meta parcial), demais aviso()
+// do app continuam intocados. Reaproveita EXATAMENTE o calculo de origem
+// que moedasCaindo ja usa (centro do #mobSprite via getBoundingClientRect)
+// -- so troca o conteudo (texto em vez de moeda) e a keyframe (sobe em vez
+// de cair, ver dmgFloat no style.css).
+function numeroFlutuante(xpGanho, moedasGanhas){
+  const arena = document.querySelector('.arena');
+  const mob = document.getElementById('mobSprite');
+  const arenaRect = arena.getBoundingClientRect();
+  const mobRect = mob.getBoundingClientRect();
+  const originX = mobRect.left - arenaRect.left + mobRect.width / 2;
+  const originY = mobRect.top - arenaRect.top + mobRect.height / 2;
+
+  const el = document.createElement('div');
+  el.className = 'dmg-float';
+  el.style.left = originX + 'px';
+  el.style.top = originY + 'px';
+  el.innerHTML = '+' + moedasGanhas + ' ' + COIN_SVG + ' · +' + xpGanho + ' XP';
+  arena.appendChild(el);
+  setTimeout(() => el.remove(), 1000);
+}
+
 function alternar(i){
   const t = tarefas[i];
 
@@ -1161,7 +1185,7 @@ function alternar(i){
       xpTotal += xpGanho;
       moedas += moedasGanhas;
       render();
-      aviso('+' + xpGanho + ' XP   +' + moedasGanhas + ' MOEDAS   (' + t.vezesN + '/' + meta + ')');
+      numeroFlutuante(xpGanho, moedasGanhas);
       return false;
     }
   }
@@ -1212,7 +1236,7 @@ function alternar(i){
   if (subiuNivel){
     if (typeof mostrarNivelUp === 'function') mostrarNivelUp(nivelDepois);
   }
-  else aviso('+' + xpGanho + ' XP   +' + moedasGanhas + ' MOEDAS');
+  else numeroFlutuante(xpGanho, moedasGanhas);
   return true;
 }
 

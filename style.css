@@ -3100,3 +3100,14 @@
   padding:3px 10px;
   border-radius:20px;
 }
+
+/* --- Módulo style #23 --- */
+/* Fix: no tema Escuro (--accent:#FFFFFF), o switch ligado (trilho
+   branco) + a bolinha (#FFF fixo) ficavam brancos os dois, sem
+   contraste nenhum ("muito branco", print do usuario). Sombra sutil
+   na bolinha resolve pra qualquer tema, sem depender de --accent nao
+   ser branco -- nao mexe no .swch/.swch.on original (Modulo acima),
+   so adiciona definicao visual em cima do que ja existe. */
+.swch-bolinha{
+  box-shadow:0 1px 3px rgba(0,0,0,.35), 0 0 0 1px rgba(0,0,0,.12);
+}

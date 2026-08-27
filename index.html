@@ -497,13 +497,13 @@
         <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
       </div>
 
-      <div class="cfgrow">
+      <div class="cfgrow cfglink" id="cfgHistorico">
         <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></span>
         <div class="cfgtxt">
           <b>Histórico</b>
           <span>Calendário de vitórias, fugas e dias sem tarefa</span>
         </div>
-        <button class="cfgbtn" id="cfgHistorico">Abrir</button>
+        <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
       </div>
     </div>
   </div>
@@ -6024,6 +6024,36 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // botao "+ Adicionar" -- abre/fecha a folha de nova tarefa
   const addbtn = document.getElementById('addbtn');
   if (addbtn) addbtn.addEventListener('click', () => window.feedbackClique('clique', 10));
+})();
+</script>
+
+<!-- =====================================================================
+     SFX/VIBRACAO — MENU DE CONFIG (linhas e botoes)  —  bloco autonomo,
+     cole antes de </body>
+
+     O bloco "VIBRACAO (item 17...)" logo acima documenta um escopo
+     FECHADO -- por isso este bloco NOVO fica separado em vez de somar
+     ids naquela lista. Cobre o que faltava dentro de #cfgOverlay:
+     as 4 linhas cfglink (Herói/Aparência/Preferências/Histórico) e os
+     botoes .cfgbtn (Sair/Criar conta/Apagar tudo) -- delegado num só
+     listener no overlay pra pegar qualquer linha nova que apareça ali
+     no futuro sem precisar editar isto de novo.
+
+     O switch (#cfgFeedbackBtn, .swch) fica de fora de proposito: ele
+     ja tem o proprio feedbackClique() no bloco "CONFIG — PREFERENCIA
+     DE FEEDBACK NO CLIQUE", so ao LIGAR (nao ao desligar) -- somar o
+     delegado aqui duplicaria a vibracao no ligar e vibraria errado no
+     desligar.
+     ===================================================================== -->
+<script>
+(function(){
+  if (typeof window.feedbackClique !== 'function') return;
+  const cfg = document.getElementById('cfgOverlay');
+  if (!cfg) return;
+  cfg.addEventListener('click', e => {
+    if (e.target.closest('.swch')) return;
+    if (e.target.closest('.cfgrow.cfglink, .cfgbtn')) window.feedbackClique('clique', 10);
+  });
 })();
 </script>
 

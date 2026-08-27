@@ -497,13 +497,13 @@
         <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
       </div>
 
-      <div class="cfgrow">
+      <div class="cfgrow cfglink" id="cfgHistorico">
         <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></span>
         <div class="cfgtxt">
           <b>Histórico</b>
           <span>Calendário de vitórias, fugas e dias sem tarefa</span>
         </div>
-        <button class="cfgbtn" id="cfgHistorico">Abrir</button>
+        <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
       </div>
     </div>
   </div>
@@ -551,7 +551,7 @@
       <span class="vtitle">Aparência</span>
     </div>
     <div class="cfgovcorpo">
-      <div class="cfgrow cfgcol">
+      <div class="cfgrow cfgcol" id="cfgTemaCard">
         <div class="cfgtxt">
           <b>Tema</b>
           <span>Paleta de cores do app</span>
@@ -3398,9 +3398,9 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 
     const rTema = document.getElementById('cfgAparenciaResumo');
     if (rTema && typeof TEMAS !== 'undefined'){
-      const atual = document.documentElement.getAttribute('data-tema') || 'grafite';
+      const atual = document.documentElement.getAttribute('data-tema') || 'padrao';
       const t = TEMAS.find(tt => tt.id === atual);
-      rTema.textContent = t ? t.nome : 'Grafite';
+      rTema.textContent = t ? t.nome : 'Laranja';
     }
 
     const rPref = document.getElementById('cfgPrefsResumo');
@@ -3694,16 +3694,18 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 
   /* ---------- temas ---------- */
   const TEMAS = [
-    {id:'padrao',     nome:'Crepúsculo', cor:'#F2A65A'},
-    {id:'meianoite',  nome:'Meia-noite', cor:'#5AB4EC'},
-    {id:'pergaminho', nome:'Pergaminho', cor:'#C9A961'},
-    {id:'grafite',    nome:'Grafite',    cor:'#FFFFFF'},
-    {id:'floresta',   nome:'Floresta',   cor:'#4ADE80'}
+    {id:'padrao',     nome:'Laranja', cor:'#F2A65A'},
+    {id:'meianoite',  nome:'Azul',    cor:'#5AB4EC'},
+    {id:'pergaminho', nome:'Dourado', cor:'#C9A961'},
+    {id:'grafite',    nome:'Escuro',  cor:'#8B8B93'}
   ];
   const CHAVE_TEMA = 'questlog.tema.v1';
 
   function temaSalvo(){
-    try { return localStorage.getItem(CHAVE_TEMA) || 'grafite'; } catch(e){ return 'grafite'; }
+    // v4.124: tema padrao voltou a ser laranja (item de identidade
+    // visual, pedido explicito do usuario) -- antes o fallback sem
+    // localStorage era 'grafite'.
+    try { return localStorage.getItem(CHAVE_TEMA) || 'padrao'; } catch(e){ return 'padrao'; }
   }
   function escolherTema(id){
     document.documentElement.setAttribute('data-tema', id);
@@ -3713,13 +3715,18 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   function pintarTemaGrid(){
     const g = document.getElementById('temaGrid');
     if (!g) return;
-    const atual = document.documentElement.getAttribute('data-tema') || 'grafite';
+    const atual = document.documentElement.getAttribute('data-tema') || 'padrao';
     g.innerHTML = '';
     TEMAS.forEach(t => {
       const b = document.createElement('div');
       b.className = 'temaswatch' + (t.id === atual ? ' sel' : '');
       b.style.background = t.cor;
       b.title = t.nome;
+      // v4.123 (pedido do usuario: cards maiores tipo o seletor de tema
+      // do Skyllion, em vez de bolinha de 36px). Label vira filho real
+      // em vez de so tooltip -- soh de leitura, nao muda logica de
+      // selecao (escolherTema/onclick continuam iguais).
+      b.innerHTML = '<span class="temaLabel">' + t.nome + '</span>';
       b.onclick = () => escolherTema(t.id);
       g.appendChild(b);
     });
@@ -6021,6 +6028,36 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 </script>
 
 <!-- =====================================================================
+     SFX/VIBRACAO — MENU DE CONFIG (linhas e botoes)  —  bloco autonomo,
+     cole antes de </body>
+
+     O bloco "VIBRACAO (item 17...)" logo acima documenta um escopo
+     FECHADO -- por isso este bloco NOVO fica separado em vez de somar
+     ids naquela lista. Cobre o que faltava dentro de #cfgOverlay:
+     as 4 linhas cfglink (Herói/Aparência/Preferências/Histórico) e os
+     botoes .cfgbtn (Sair/Criar conta/Apagar tudo) -- delegado num só
+     listener no overlay pra pegar qualquer linha nova que apareça ali
+     no futuro sem precisar editar isto de novo.
+
+     O switch (#cfgFeedbackBtn, .swch) fica de fora de proposito: ele
+     ja tem o proprio feedbackClique() no bloco "CONFIG — PREFERENCIA
+     DE FEEDBACK NO CLIQUE", so ao LIGAR (nao ao desligar) -- somar o
+     delegado aqui duplicaria a vibracao no ligar e vibraria errado no
+     desligar.
+     ===================================================================== -->
+<script>
+(function(){
+  if (typeof window.feedbackClique !== 'function') return;
+  const cfg = document.getElementById('cfgOverlay');
+  if (!cfg) return;
+  cfg.addEventListener('click', e => {
+    if (e.target.closest('.swch')) return;
+    if (e.target.closest('.cfgrow.cfglink, .cfgbtn')) window.feedbackClique('clique', 10);
+  });
+})();
+</script>
+
+<!-- =====================================================================
      PERFIL — BESTIÁRIO  —  bloco autonomo, cole antes de </body>
 
      Decisao ja fechada no roadmap (secao 4, item 3 da lista da aba Perfil):
@@ -6456,10 +6493,10 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
   // ---------- botao tema (reaproveita a MESMA chave do sistema de temas
   // do Perfil > Config -- so a UI e nova, a logica/estado e a mesma) ----------
-  const CICLO_TEMAS = ['padrao', 'meianoite', 'pergaminho', 'grafite', 'floresta'];
+  const CICLO_TEMAS = ['padrao', 'meianoite', 'pergaminho', 'grafite'];
   document.getElementById('temaMiniBtn').onclick = () => {
     let atual;
-    try { atual = localStorage.getItem('questlog.tema.v1') || 'grafite'; } catch(e){ atual = 'grafite'; }
+    try { atual = localStorage.getItem('questlog.tema.v1') || 'padrao'; } catch(e){ atual = 'padrao'; }
     const prox = CICLO_TEMAS[(CICLO_TEMAS.indexOf(atual) + 1) % CICLO_TEMAS.length];
     document.documentElement.setAttribute('data-tema', prox);
     try { localStorage.setItem('questlog.tema.v1', prox); } catch(e){}

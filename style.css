@@ -1241,6 +1241,12 @@
     --gold:#E8E8E8; --blood:#B8B8B8; --mobname:#E0E0E0; --sel-bg:#4A4A4A; --poco:#1C1C1C;
     --arena-1:#454545; --arena-2:#383838; --arena-3:#2C2C2C; --xp2:#EDEDED;
   }
+  /* DEPRECATED (v4.124): tema Floresta removido da lista visivel no
+     Aparencia > Tema (item de identidade visual -- decisao do usuario
+     de manter laranja como tema/cor de marca, sem verde na paleta de
+     escolha). As variaveis continuam aqui, so nao aparecem mais em
+     TEMAS[] (index.html) nem em CICLO_TEMAS -- ninguem aponta pra
+     [data-tema="floresta"] no momento. */
   :root[data-tema="floresta"]{
     --bg:#0E1712; --panel:#0E1712; --panel-2:#16241C; --panel-3:#1E3226;
     --line:#2C4838; --text:#E9F2EC; --muted:#8FAA9A; --dim:#5C7A68;
@@ -2373,6 +2379,12 @@
     --gold:#E8E8E8; --blood:#B8B8B8; --mobname:#E0E0E0; --sel-bg:#4A4A4A; --poco:#1C1C1C;
     --arena-1:#454545; --arena-2:#383838; --arena-3:#2C2C2C; --xp2:#EDEDED;
   }
+  /* DEPRECATED (v4.124): tema Floresta removido da lista visivel no
+     Aparencia > Tema (item de identidade visual -- decisao do usuario
+     de manter laranja como tema/cor de marca, sem verde na paleta de
+     escolha). As variaveis continuam aqui, so nao aparecem mais em
+     TEMAS[] (index.html) nem em CICLO_TEMAS -- ninguem aponta pra
+     [data-tema="floresta"] no momento. */
   :root[data-tema="floresta"]{
     --bg:#0E1712; --panel:#0E1712; --panel-2:#16241C; --panel-3:#1E3226;
     --line:#2C4838; --text:#E9F2EC; --muted:#8FAA9A; --dim:#5C7A68;
@@ -3032,4 +3044,74 @@
   text-transform:uppercase;
   opacity:.4;
   margin:20px 2px 4px;
+}
+
+/* --- Módulo style #22 --- */
+/* Sub-telas Herói e Aparência (Config): cards maiores, usando mais da
+   tela -- pedido do usuario comparando com o seletor de tema do
+   Skyllion (cards grandes com preview + nome, nao bolinha pequena).
+   Escopado por ID (#gradeHeroisConfig / #temaGrid) de proposito: tanto
+   .grade/.opcao quanto .temaswatch sao reaproveitados em outro lugar
+   do app (#gradeHerois no onboarding usa a mesma .grade/.opcao) -- so
+   o container de Config muda de layout, o resto do app continua igual. */
+
+#gradeHeroisConfig.grade{
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+}
+#gradeHeroisConfig .opcao{
+  padding:16px 4px;
+  border-radius:16px;
+}
+#gradeHeroisConfig .opcao img{
+  width:64px;
+  height:64px;
+}
+
+#cfgTemaCard{
+  padding:12px 8px 14px;
+}
+#temaGrid.temagrid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+#temaGrid .temaswatch{
+  width:auto;
+  height:auto;
+  aspect-ratio:1 / 1.9;
+  border-radius:10px;
+  border:2px solid var(--line);
+  cursor:pointer;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  padding-bottom:20px;
+  box-sizing:border-box;
+  transition:transform .12s;
+}
+#temaGrid .temaswatch:active{ transform:scale(.96) }
+#temaGrid .temaswatch.sel{
+  border-color:var(--text);
+  box-shadow:0 0 0 3px var(--accent);
+}
+#temaGrid .temaLabel{
+  font-family:'Outfit',sans-serif;
+  font-size:14px;
+  font-weight:600;
+  color:rgba(0,0,0,.65);
+  background:rgba(255,255,255,.82);
+  padding:5px 14px;
+  border-radius:20px;
+}
+
+/* --- Módulo style #23 --- */
+/* Fix: no tema Escuro (--accent:#FFFFFF), o switch ligado (trilho
+   branco) + a bolinha (#FFF fixo) ficavam brancos os dois, sem
+   contraste nenhum ("muito branco", print do usuario). Sombra sutil
+   na bolinha resolve pra qualquer tema, sem depender de --accent nao
+   ser branco -- nao mexe no .swch/.swch.on original (Modulo acima),
+   so adiciona definicao visual em cima do que ja existe. */
+.swch-bolinha{
+  box-shadow:0 1px 3px rgba(0,0,0,.35), 0 0 0 1px rgba(0,0,0,.12);
 }

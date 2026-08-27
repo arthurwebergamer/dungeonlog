@@ -1251,7 +1251,15 @@ function verificarVitoriaAoExcluir(){
 }
 
 let timer;
+// TESTE (pedido do usuario, 27/08): desativa TODOS os toasts do app pra
+// ver no aparelho real se fazem falta ou nao, depois do numero flutuante
+// (item 40) ja cobrir o caso mais frequente (+XP/+moeda por tarefa).
+// REVERTER: trocar 'true' por 'false' nesta linha -- nao apaga nada, so
+// intercepta aviso() antes de tocar no DOM.
+const TOASTS_DESATIVADOS = true;
+
 function aviso(msg, ouro, fuga){
+  if (TOASTS_DESATIVADOS) return; // ver nota de teste acima
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.toggle('gold', !!ouro);

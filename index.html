@@ -3398,9 +3398,9 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 
     const rTema = document.getElementById('cfgAparenciaResumo');
     if (rTema && typeof TEMAS !== 'undefined'){
-      const atual = document.documentElement.getAttribute('data-tema') || 'grafite';
+      const atual = document.documentElement.getAttribute('data-tema') || 'padrao';
       const t = TEMAS.find(tt => tt.id === atual);
-      rTema.textContent = t ? t.nome : 'Grafite';
+      rTema.textContent = t ? t.nome : 'Laranja';
     }
 
     const rPref = document.getElementById('cfgPrefsResumo');
@@ -3694,16 +3694,18 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 
   /* ---------- temas ---------- */
   const TEMAS = [
-    {id:'padrao',     nome:'Crepúsculo', cor:'#F2A65A'},
-    {id:'meianoite',  nome:'Meia-noite', cor:'#5AB4EC'},
-    {id:'pergaminho', nome:'Pergaminho', cor:'#C9A961'},
-    {id:'grafite',    nome:'Grafite',    cor:'#FFFFFF'},
-    {id:'floresta',   nome:'Floresta',   cor:'#4ADE80'}
+    {id:'padrao',     nome:'Laranja', cor:'#F2A65A'},
+    {id:'meianoite',  nome:'Azul',    cor:'#5AB4EC'},
+    {id:'pergaminho', nome:'Dourado', cor:'#C9A961'},
+    {id:'grafite',    nome:'Escuro',  cor:'#8B8B93'}
   ];
   const CHAVE_TEMA = 'questlog.tema.v1';
 
   function temaSalvo(){
-    try { return localStorage.getItem(CHAVE_TEMA) || 'grafite'; } catch(e){ return 'grafite'; }
+    // v4.124: tema padrao voltou a ser laranja (item de identidade
+    // visual, pedido explicito do usuario) -- antes o fallback sem
+    // localStorage era 'grafite'.
+    try { return localStorage.getItem(CHAVE_TEMA) || 'padrao'; } catch(e){ return 'padrao'; }
   }
   function escolherTema(id){
     document.documentElement.setAttribute('data-tema', id);
@@ -3713,7 +3715,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   function pintarTemaGrid(){
     const g = document.getElementById('temaGrid');
     if (!g) return;
-    const atual = document.documentElement.getAttribute('data-tema') || 'grafite';
+    const atual = document.documentElement.getAttribute('data-tema') || 'padrao';
     g.innerHTML = '';
     TEMAS.forEach(t => {
       const b = document.createElement('div');
@@ -6461,10 +6463,10 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
   // ---------- botao tema (reaproveita a MESMA chave do sistema de temas
   // do Perfil > Config -- so a UI e nova, a logica/estado e a mesma) ----------
-  const CICLO_TEMAS = ['padrao', 'meianoite', 'pergaminho', 'grafite', 'floresta'];
+  const CICLO_TEMAS = ['padrao', 'meianoite', 'pergaminho', 'grafite'];
   document.getElementById('temaMiniBtn').onclick = () => {
     let atual;
-    try { atual = localStorage.getItem('questlog.tema.v1') || 'grafite'; } catch(e){ atual = 'grafite'; }
+    try { atual = localStorage.getItem('questlog.tema.v1') || 'padrao'; } catch(e){ atual = 'padrao'; }
     const prox = CICLO_TEMAS[(CICLO_TEMAS.indexOf(atual) + 1) % CICLO_TEMAS.length];
     document.documentElement.setAttribute('data-tema', prox);
     try { localStorage.setItem('questlog.tema.v1', prox); } catch(e){}

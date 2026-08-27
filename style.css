@@ -1241,6 +1241,12 @@
     --gold:#E8E8E8; --blood:#B8B8B8; --mobname:#E0E0E0; --sel-bg:#4A4A4A; --poco:#1C1C1C;
     --arena-1:#454545; --arena-2:#383838; --arena-3:#2C2C2C; --xp2:#EDEDED;
   }
+  /* DEPRECATED (v4.124): tema Floresta removido da lista visivel no
+     Aparencia > Tema (item de identidade visual -- decisao do usuario
+     de manter laranja como tema/cor de marca, sem verde na paleta de
+     escolha). As variaveis continuam aqui, so nao aparecem mais em
+     TEMAS[] (index.html) nem em CICLO_TEMAS -- ninguem aponta pra
+     [data-tema="floresta"] no momento. */
   :root[data-tema="floresta"]{
     --bg:#0E1712; --panel:#0E1712; --panel-2:#16241C; --panel-3:#1E3226;
     --line:#2C4838; --text:#E9F2EC; --muted:#8FAA9A; --dim:#5C7A68;
@@ -2373,6 +2379,12 @@
     --gold:#E8E8E8; --blood:#B8B8B8; --mobname:#E0E0E0; --sel-bg:#4A4A4A; --poco:#1C1C1C;
     --arena-1:#454545; --arena-2:#383838; --arena-3:#2C2C2C; --xp2:#EDEDED;
   }
+  /* DEPRECATED (v4.124): tema Floresta removido da lista visivel no
+     Aparencia > Tema (item de identidade visual -- decisao do usuario
+     de manter laranja como tema/cor de marca, sem verde na paleta de
+     escolha). As variaveis continuam aqui, so nao aparecem mais em
+     TEMAS[] (index.html) nem em CICLO_TEMAS -- ninguem aponta pra
+     [data-tema="floresta"] no momento. */
   :root[data-tema="floresta"]{
     --bg:#0E1712; --panel:#0E1712; --panel-2:#16241C; --panel-3:#1E3226;
     --line:#2C4838; --text:#E9F2EC; --muted:#8FAA9A; --dim:#5C7A68;

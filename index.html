@@ -27,39 +27,39 @@
 
     <div class="passo" id="passo1">
       <div class="marca">
-        <span class="titulo">COMO FUNCIONA</span>
+        <span class="titulo" data-i18n="onb.comoFunciona">COMO FUNCIONA</span>
       </div>
 
       <div class="regras">
         <div class="regra">
           <span class="ic">1</span>
-          <p>Cada tarefa concluída é um <b>golpe</b> no monstro do dia.</p>
+          <p data-i18n="onb.regra1">Cada tarefa concluída é um <b>golpe</b> no monstro do dia.</p>
         </div>
         <div class="regra">
           <span class="ic">2</span>
-          <p>Quanto mais tarefas você tem, <b>mais forte</b> ele fica.</p>
+          <p data-i18n="onb.regra2">Quanto mais tarefas você tem, <b>mais forte</b> ele fica.</p>
         </div>
         <div class="regra">
           <span class="ic">3</span>
-          <p>Derrote ele e ganhe <b>moedas</b> pra comprar equipamento melhor.</p>
+          <p data-i18n="onb.regra3">Derrote ele e ganhe <b>moedas</b> pra comprar equipamento melhor.</p>
         </div>
       </div>
 
-      <button class="primario" id="irPasso2">Continuar</button>
+      <button class="primario" id="irPasso2" data-i18n="acao.continuar">Continuar</button>
     </div>
 
     <div class="passo" id="passo2">
       <div class="campo">
-        <label>Como quer ser chamado?</label>
-        <input id="nomeHeroi" placeholder="Aventureiro" maxlength="18" autocomplete="off">
+        <label data-i18n="onb.comoChamar">Como quer ser chamado?</label>
+        <input id="nomeHeroi" placeholder="Aventureiro" data-i18n-placeholder="onb.placeholderNome" maxlength="18" autocomplete="off">
       </div>
-      <button class="primario" id="irEscolha">Continuar</button>
-      <button class="secundario" id="voltar1">Voltar</button>
+      <button class="primario" id="irEscolha" data-i18n="acao.continuar">Continuar</button>
+      <button class="secundario" id="voltar1" data-i18n="acao.voltar">Voltar</button>
     </div>
 
     <div class="passo" id="passoHeroi">
       <div class="campo">
-        <label>Quem vai enfrentar os monstros?</label>
+        <label data-i18n="onb.quemVaiEnfrentar">Quem vai enfrentar os monstros?</label>
       </div>
 
       <div class="palcoNav">
@@ -78,18 +78,18 @@
 
       <div class="grade" id="gradeHerois"></div>
 
-      <button class="primario" id="irPasso3">Continuar</button>
-      <button class="secundario" id="voltarNome">Voltar</button>
+      <button class="primario" id="irPasso3" data-i18n="acao.continuar">Continuar</button>
+      <button class="secundario" id="voltarNome" data-i18n="acao.voltar">Voltar</button>
     </div>
 
     <div class="passo" id="passo3">
       <div class="campo">
-        <label>Quais tarefas você quer vencer hoje?</label>
-        <input id="primeiraTarefa" placeholder="Ex: estudar 30 minutos" maxlength="60" autocomplete="off">
+        <label data-i18n="onb.quaisTarefas">Quais tarefas você quer vencer hoje?</label>
+        <input id="primeiraTarefa" placeholder="Ex: estudar 30 minutos" data-i18n-placeholder="onb.placeholderTarefa" maxlength="60" autocomplete="off">
       </div>
       <div class="listaini" id="listaIni"></div>
-      <p class="dica">Adicione pelo menos uma. Dá pra criar mais depois, e definir quais se repetem na semana.</p>
-      <button class="primario" id="entrar">Invocar o monstro</button>
+      <p class="dica" data-i18n="onb.dicaAddMais">Adicione pelo menos uma. Dá pra criar mais depois, e definir quais se repetem na semana.</p>
+      <button class="primario" id="entrar" data-i18n="onb.invocarMonstro">Invocar o monstro</button>
     </div>
 
   </div>
@@ -152,13 +152,13 @@
 
   <div class="xpwrap">
     <div class="xprow hprow">
-      <span class="xplabel">Vida</span>
+      <span class="xplabel" data-i18n="jogo.vida">Vida</span>
       <span class="xpnum hpnum" id="hpnum">0 / 0</span>
     </div>
     <div class="bar hpbar"><div class="fill hpfill" id="hpfill"></div></div>
 
     <div class="xprow">
-      <span class="xplabel">Experiência</span>
+      <span class="xplabel" data-i18n="jogo.experiencia">Experiência</span>
       <span class="xpnum" id="xpnum">0 / 100</span>
     </div>
     <div class="bar"><div class="fill" id="fill"></div></div>
@@ -170,23 +170,23 @@
         <div class="ttitle" id="hoje">Tarefas de hoje</div>
         <div class="tcount" id="count">0 de 0 concluídas</div>
       </div>
-      <button class="add" id="addbtn">+ Adicionar</button>
+      <button class="add" id="addbtn" data-i18n="jogo.addTarefa">+ Adicionar</button>
     </div>
     <div class="list" id="list"></div>
 
     <div class="composer" id="composer">
-      <input id="input" placeholder="O que precisa ser feito?" autocomplete="off">
+      <input id="input" placeholder="O que precisa ser feito?" data-i18n-placeholder="jogo.oQuePrecisaSerFeito" autocomplete="off">
       <div class="modes">
-        <button class="mode on" id="modeHoje">Só hoje</button>
-        <button class="mode" id="modeRepete">Repete toda semana</button>
+        <button class="mode on" id="modeHoje" data-i18n="jogo.soHoje">Só hoje</button>
+        <button class="mode" id="modeRepete" data-i18n="jogo.repeteSemana">Repete toda semana</button>
       </div>
 
       <div class="difwrap">
-        <span class="diflabel">Dificuldade</span>
+        <span class="diflabel" data-i18n="jogo.dificuldade">Dificuldade</span>
         <div class="difs" id="difs"></div>
       </div>
       <div class="vezeswrap">
-        <span class="diflabel">Vezes por dia</span>
+        <span class="diflabel" data-i18n="jogo.vezesPorDia">Vezes por dia</span>
         <div class="vezesrow">
           <button class="vezesbtn" id="vezesMenos" type="button" aria-label="Diminuir">−</button>
           <span class="vezesnum" id="vezesNum"><b>1</b>×</span>
@@ -194,32 +194,32 @@
         </div>
       </div>
       <div class="days" id="days">
-        <button class="day" data-d="0">D</button>
-        <button class="day" data-d="1">S</button>
-        <button class="day" data-d="2">T</button>
-        <button class="day" data-d="3">Q</button>
-        <button class="day" data-d="4">Q</button>
-        <button class="day" data-d="5">S</button>
-        <button class="day" data-d="6">S</button>
+        <button class="day" data-d="0" data-i18n="dia.dom">D</button>
+        <button class="day" data-d="1" data-i18n="dia.seg">S</button>
+        <button class="day" data-d="2" data-i18n="dia.ter">T</button>
+        <button class="day" data-d="3" data-i18n="dia.qua">Q</button>
+        <button class="day" data-d="4" data-i18n="dia.qui">Q</button>
+        <button class="day" data-d="5" data-i18n="dia.sex">S</button>
+        <button class="day" data-d="6" data-i18n="dia.sab">S</button>
       </div>
 
       <button type="button" class="advtoggle" id="advToggle">
-        Opções avançadas <span class="advchevron" id="advChevron">▾</span>
+        <span data-i18n="jogo.opcoesAvancadas">Opções avançadas</span> <span class="advchevron" id="advChevron">▾</span>
       </button>
       <div class="advpanel" id="advPanel">
         <div class="advcolorrow">
-          <span class="diflabel">Cor da tarefa</span>
+          <span class="diflabel" data-i18n="jogo.corDaTarefa">Cor da tarefa</span>
           <div class="advcolorpick">
             <span class="advswatch" id="corBoxSwatch"></span>
             <input type="text" class="advhex" id="corBoxHex" placeholder="#F2A65A"
                    maxlength="7" autocomplete="off" autocapitalize="off" spellcheck="false">
-            <button type="button" class="advreset" id="corBoxReset">Sem cor</button>
+            <button type="button" class="advreset" id="corBoxReset" data-i18n="jogo.semCor">Sem cor</button>
           </div>
           <div class="advswatches" id="corBoxSwatches"></div>
         </div>
       </div>
 
-      <button class="cbtn" id="save">Criar tarefa</button>
+      <button class="cbtn" id="save" data-i18n="jogo.criarTarefa">Criar tarefa</button>
     </div>
   </div>
 
@@ -705,12 +705,36 @@ function hexValido(v){
 
 /* ---------- dificuldade ---------- */
 const DIFS = [
-  { id:'trivial', nome:'Trivial', pips:1, eco:'difTrivial' },
-  { id:'facil',   nome:'Fácil',   pips:2, eco:'difFacil'   },
-  { id:'media',   nome:'Média',   pips:3, eco:'difMedia'   },
-  { id:'dificil', nome:'Difícil', pips:4, eco:'difDificil' },
+  { id:'trivial', nome:'Trivial', nome_pt:'Trivial', nome_en:'Trivial', pips:1, eco:'difTrivial' },
+  { id:'facil',   nome:'Fácil',   nome_pt:'Fácil',   nome_en:'Easy',    pips:2, eco:'difFacil'   },
+  { id:'media',   nome:'Média',   nome_pt:'Média',   nome_en:'Medium',  pips:3, eco:'difMedia'   },
+  { id:'dificil', nome:'Difícil', nome_pt:'Difícil', nome_en:'Hard',    pips:4, eco:'difDificil' },
 ];
 const DIF_PADRAO = 'media';                       // tarefas antigas nao tem o campo
+
+// item 46 do roadmap: aplica o idioma salvo nos dados que MONSTROS/
+// HEROIS/DIFS já carregam (nome_en adicionado direto nos arrays em
+// assets.js/aqui). Muta os objetos NO LUGAR em vez de recriar os
+// arrays -- toda referência que o resto do arquivo já guarda
+// (MONSTROS[i], HEROIS[i], objetos de DIFS) continua válida, só o
+// campo .nome muda de valor. Roda 1x aqui no boot (antes de qualquer
+// render) e de novo sempre que o idioma mudar (ver window.definirIdioma
+// no módulo I18N — IDIOMA, fim do arquivo).
+function aplicarIdiomaDados(){
+  let lang = 'pt';
+  try { lang = localStorage.getItem('questlog.idioma.v1') || 'pt'; } catch(e){}
+  const usarEn = lang === 'en';
+  [MONSTROS, HEROIS].forEach(arr => {
+    arr.forEach(o => {
+      if (!o.nome_pt) o.nome_pt = o.nome; // guarda o original na 1a passada
+      o.nome = usarEn ? (o.nome_en || o.nome_pt) : o.nome_pt;
+    });
+  });
+  DIFS.forEach(d => { d.nome = usarEn ? d.nome_en : d.nome_pt; });
+}
+aplicarIdiomaDados();
+window.aplicarIdiomaDados = aplicarIdiomaDados;
+
 function difDe(t){                                 // sempre devolve um id valido
   const id = t && t.dif;
   return DIFS.some(d => d.id === id) ? id : DIF_PADRAO;
@@ -768,7 +792,17 @@ function simularEconomia(dias, tarefasDia){
   return {xp, nivel, moedas: mo};
 }
 const NOMES_DIA = ['domingo','segunda','terça','quarta','quinta','sexta','sábado'];
+const NOMES_DIA_EN = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+// item 46 do roadmap: le o idioma direto do localStorage, mesmo padrao
+// de item()/aplicarIdiomaDados() -- nao depende de window.t()/modulo
+// I18N (fim do arquivo), que ainda nao existe no primeiro render() do
+// boot (chamado logo no fim deste mesmo script, linha ~1810).
+function idiomaApp(){
+  try { return localStorage.getItem('questlog.idioma.v1') || 'pt'; } catch(e){ return 'pt'; }
+}
+function nomeDiaLocal(i){ return idiomaApp() === 'en' ? NOMES_DIA_EN[i] : NOMES_DIA[i]; }
 const SIGLAS = ['dom','seg','ter','qua','qui','sex','sáb'];
+const SIGLAS_EN = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
 /* ---------- DATA EFETIVA DO APP ------------------------------------------
    Historico deste bloco, porque o mesmo sintoma ja voltou duas vezes por
@@ -879,9 +913,11 @@ function progresso(){
   return { nivel, resto, meta:xpNecessario(nivel) };
 }
 function rotulo(t){
-  if (t.tipo === 'hoje') return 'só hoje';
-  if (t.dias.length === 7) return 'todo dia';
-  return t.dias.slice().sort().map(d => SIGLAS[d]).join(', ');
+  const en = idiomaApp() === 'en';
+  if (t.tipo === 'hoje') return en ? 'today only' : 'só hoje';
+  if (t.dias.length === 7) return en ? 'every day' : 'todo dia';
+  const siglas = en ? SIGLAS_EN : SIGLAS;
+  return t.dias.slice().sort().map(d => siglas[d]).join(', ');
 }
 
 let heroiEscolhido = 0;
@@ -980,18 +1016,18 @@ function render(){
   const lista = document.getElementById('list');
   lista.innerHTML = '';
 
-  document.getElementById('hoje').textContent = 'Tarefas de ' + NOMES_DIA[diaDaSemana()];
+  document.getElementById('hoje').textContent = (idiomaApp() === 'en' ? 'Tasks for ' : 'Tarefas de ') + nomeDiaLocal(diaDaSemana());
 
   if (doDia.length === 0){
-    lista.innerHTML = '<div class="empty">' + monstroDoDia().nome + ' está à espreita.<br>Adicione tarefas para encarar.</div>';
+    lista.innerHTML = '<div class="empty">' + monstroDoDia().nome + (idiomaApp() === 'en' ? ' is lurking.<br>Add tasks to face it.' : ' está à espreita.<br>Adicione tarefas para encarar.') + '</div>';
   }
 
   const pendentes = doDia.filter(t => !feitaHoje(t));
 
   if (doDia.length > 0 && pendentes.length === 0){
     lista.innerHTML = monstroJaCaiu()
-      ? '<div class="empty">Tudo concluído.<br>O monstro de hoje foi derrotado.</div>'
-      : '<div class="empty">Nenhuma tarefa pendente por aqui.</div>';
+      ? '<div class="empty">' + (idiomaApp() === 'en' ? 'All done.<br>Today\'s monster has been defeated.' : 'Tudo concluído.<br>O monstro de hoje foi derrotado.') + '</div>'
+      : '<div class="empty">' + (idiomaApp() === 'en' ? 'No pending tasks here.' : 'Nenhuma tarefa pendente por aqui.') + '</div>';
   }
 
   // ordem estavel: tarefa sem "ordem" (antiga ou recem-criada) mantem a posicao atual
@@ -1059,7 +1095,9 @@ function render(){
 
   const feitas = doDia.filter(feitaHoje).length;
   const total = doDia.length;
-  document.getElementById('count').textContent = feitas + ' de ' + total + ' concluídas';
+  document.getElementById('count').textContent = idiomaApp() === 'en'
+    ? (feitas + ' of ' + total + ' completed')
+    : (feitas + ' de ' + total + ' concluídas');
 
   // vida do monstro: contador persistido (modulo separado, no fim do
   // arquivo), NAO recalculado da lista ao vivo -- excluir tarefa nao pode
@@ -1100,11 +1138,11 @@ function render(){
   }
 
   const p = progresso();
-  document.getElementById('lvl').textContent = 'Nível ' + romano(p.nivel);
+  document.getElementById('lvl').textContent = (idiomaApp() === 'en' ? 'Level ' : 'Nível ') + romano(p.nivel);
   document.getElementById('xpnum').textContent = p.resto + ' / ' + p.meta;
   document.getElementById('fill').style.width = Math.round((p.resto/p.meta)*100) + '%';
   document.getElementById('coinnum').textContent = moedas;
-  document.getElementById('nomeTopo').textContent = nomeHeroi || 'Aventureiro';
+  document.getElementById('nomeTopo').textContent = nomeHeroi || (idiomaApp() === 'en' ? 'Adventurer' : 'Aventureiro');
 
   if (jaComecou) salvar();
 }
@@ -1569,8 +1607,8 @@ document.getElementById('debugbtn').onclick = () => {
     avancarDia();                       // persiste o novo dia
     document.getElementById('mobSprite').classList.remove('fugiu');
     render();
-    if (escapou) aviso(nomeFujao.toUpperCase() + ' FUGIU', false, true);
-    else aviso('AVANCOU PARA ' + NOMES_DIA[diaDaSemana()].toUpperCase());
+    if (escapou) aviso(nomeFujao.toUpperCase() + (idiomaApp() === 'en' ? ' FLED' : ' FUGIU'), false, true);
+    else aviso((idiomaApp() === 'en' ? 'ADVANCED TO ' : 'AVANCOU PARA ') + nomeDiaLocal(diaDaSemana()).toUpperCase());
   };
 
   if (escapou){
@@ -1779,20 +1817,59 @@ render();
 
 const SHEET_COLS = 16, SHEET_ROWS = 9;
 const RARIDADES = ['Comum','Incomum','Raro','Épico','Lendário','Único'];
+const RARIDADES_PT = RARIDADES.slice();
+const RARIDADES_EN = ['Common','Uncommon','Rare','Epic','Legendary','Unique'];
 const COR_RAR   = ['#8779A8','#63C99A','#5AA9F2','#B57BE8','#F2A65A','#5AE0D8'];
 // mesma cor ja usada nos cards de atributo (--atr-cor, "PERFIL — ATRIBUTOS")
 const COR_ATR  = {fortuna:'#F2A65A', foco:'#5AA9F2', vigor:'#E5698A'};
+const NOME_ATR_PT = {fortuna:'Fortuna', foco:'Foco', vigor:'Vigor'};
+const NOME_ATR_EN = {fortuna:'Fortune', foco:'Focus', vigor:'Vigor'};
 const NOME_ATR = {fortuna:'Fortuna', foco:'Foco', vigor:'Vigor'};
 window.RARIDADES = RARIDADES;
 window.COR_RAR = COR_RAR;
+const NOME_TIPO_PT = {arma:'Arma',armadura:'Armadura',elmo:'Elmo',escudo:'Escudo',acess:'Acessório',cons:'Consumível',tesouro:'Tesouro',chave:'Item-chave'};
+const NOME_TIPO_EN = {arma:'Weapon',armadura:'Armor',elmo:'Helmet',escudo:'Shield',acess:'Accessory',cons:'Consumable',tesouro:'Treasure',chave:'Key Item'};
 const NOME_TIPO = {arma:'Arma',armadura:'Armadura',elmo:'Elmo',escudo:'Escudo',acess:'Acessório',cons:'Consumível',tesouro:'Tesouro',chave:'Item-chave'};
 const SLOTS = ['arma','armadura','elmo','escudo','acess'];
 const EQUIPAVEL = id => SLOTS.includes(item(id).tipo);
 
-// ITENS: [spriteIdx, nome, tipo, raridade, valor, bonusMoedas, bonusXp, cura, morto]
+// item 46 do roadmap: extensao de window.aplicarIdiomaDados (definida
+// no script principal, antes de RARIDADES/NOME_TIPO/NOME_ATR
+// existirem) -- wrap, nao reescrita, mesmo padrao ja usado no resto do
+// arquivo pra estender uma funcao top-level de outro <script>.
+(function(){
+  const _base = window.aplicarIdiomaDados;
+  function aplicarIdiomaDadosExt(){
+    if (typeof _base === 'function') _base();
+    let lang = 'pt';
+    try { lang = localStorage.getItem('questlog.idioma.v1') || 'pt'; } catch(e){}
+    const usarEn = lang === 'en';
+    for (let i = 0; i < RARIDADES_PT.length; i++) RARIDADES[i] = usarEn ? RARIDADES_EN[i] : RARIDADES_PT[i];
+    Object.keys(NOME_TIPO_PT).forEach(k => { NOME_TIPO[k] = usarEn ? NOME_TIPO_EN[k] : NOME_TIPO_PT[k]; });
+    Object.keys(NOME_ATR_PT).forEach(k => { NOME_ATR[k] = usarEn ? NOME_ATR_EN[k] : NOME_ATR_PT[k]; });
+  }
+  aplicarIdiomaDadosExt();
+  window.aplicarIdiomaDados = aplicarIdiomaDadosExt;
+})();
+
+
+// ITENS: [spriteIdx, nome, tipo, raridade, valor, bonusMoedas, bonusXp, cura, morto, nome_en]
+// Todas as 106 entradas foram normalizadas pra largura fixa de 10
+// campos nesta sessão (item 46 do roadmap) -- ANTES nome_en tinha sido
+// inserido como "sempre o último elemento", o que colidia com a
+// posição do `morto` em itens que já usavam o campo `cura` (8 campos
+// originais): a[8] virava a string do nome em inglês em vez do
+// booleano de morto, e `!!a[8]` lia "true" pra qualquer item com
+// tradução. Bug real, pego só em teste funcional (`node`, não leitura
+// de código) comparando item(63) [Poção de Vida] antes/depois -- ver
+// roadmap. Corrigido normalizando o array pra sempre 10 posições
+// (h:0, morto:false quando ausentes no dado original).
 function item(id){
   const a = ITENS[id];
-  return {id, sp:a[0], nome:a[1], tipo:a[2], rar:a[3], val:a[4], m:a[5], x:a[6], h:a[7]||0, morto:!!a[8]};
+  let lang = 'pt';
+  try { lang = localStorage.getItem('questlog.idioma.v1') || 'pt'; } catch(e){}
+  const usarEn = lang === 'en' && typeof a[9] === 'string';
+  return {id, sp:a[0], nome: usarEn ? a[9] : a[1], tipo:a[2], rar:a[3], val:a[4], m:a[5], x:a[6], h:a[7]||0, morto:!!a[8]};
 }
 
 function estiloSprite(sp, s){
@@ -3325,7 +3402,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       vidaHeroi.checarVirada();
 
     if (typeof aviso === 'function')
-      aviso('NOVO DIA: ' + NOMES_DIA[diaDaSemana()].toUpperCase());
+      aviso((typeof idiomaApp === 'function' && idiomaApp() === 'en' ? 'NEW DAY: ' : 'NOVO DIA: ') + (typeof nomeDiaLocal === 'function' ? nomeDiaLocal(diaDaSemana()) : NOMES_DIA[diaDaSemana()]).toUpperCase());
   }
 
   // o app voltou pra frente (aba, multitarefa do celular, bfcache)
@@ -3574,7 +3651,10 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     if (rTema && typeof TEMAS !== 'undefined'){
       const atual = document.documentElement.getAttribute('data-tema') || 'padrao';
       const t = TEMAS.find(tt => tt.id === atual);
-      rTema.textContent = t ? t.nome : 'Laranja';
+      let langAtual = 'pt';
+      try { langAtual = localStorage.getItem('questlog.idioma.v1') || 'pt'; } catch(e){}
+      const nomeTema = t ? (langAtual === 'en' ? (t.nome_en || t.nome) : t.nome) : 'Laranja';
+      rTema.textContent = nomeTema;
     }
 
     const rPref = document.getElementById('cfgPrefsResumo');
@@ -3868,10 +3948,10 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 
   /* ---------- temas ---------- */
   const TEMAS = [
-    {id:'padrao',     nome:'Laranja', cor:'#F2A65A'},
-    {id:'meianoite',  nome:'Azul',    cor:'#5AB4EC'},
-    {id:'pergaminho', nome:'Dourado', cor:'#C9A961'},
-    {id:'grafite',    nome:'Escuro',  cor:'#8B8B93'}
+    {id:'padrao',     nome:'Laranja', nome_en:'Orange', cor:'#F2A65A'},
+    {id:'meianoite',  nome:'Azul',    nome_en:'Blue',   cor:'#5AB4EC'},
+    {id:'pergaminho', nome:'Dourado', nome_en:'Gold',   cor:'#C9A961'},
+    {id:'grafite',    nome:'Escuro',  nome_en:'Dark',   cor:'#8B8B93'}
   ];
   const CHAVE_TEMA = 'questlog.tema.v1';
 
@@ -3898,9 +3978,12 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     TEMAS.forEach(t => {
       const b = document.createElement('div');
       b.className = 'temalinha' + (t.id === atual ? ' sel' : '');
+      let langAtual = 'pt';
+      try { langAtual = localStorage.getItem('questlog.idioma.v1') || 'pt'; } catch(e){}
+      const nomeTema = langAtual === 'en' ? (t.nome_en || t.nome) : t.nome;
       b.innerHTML =
         '<span class="temaDot" style="background:' + t.cor + '"></span>' +
-        '<span class="temaNome">' + t.nome + '</span>' +
+        '<span class="temaNome">' + nomeTema + '</span>' +
         '<svg class="temaCheck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
       b.onclick = () => escolherTema(t.id);
       g.appendChild(b);
@@ -5117,78 +5200,89 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 (function(){
   const CATEGORIAS = [
     {
-      id:'sequencia', nome:'Sequência Diária', sub:'disciplina', cor:'#E5698A',
+      id:'sequencia', nome:'Sequência Diária', nome_en:'Daily Streak', sub:'disciplina', sub_en:'discipline', cor:'#E5698A',
       icone:'<path d="M12 22c4 0 7-2.7 7-6.8 0-3-2-5-3.3-7.2-.3 1.6-1.2 2.7-2.2 2.7-1.4 0-1.3-2-1.5-3.2C11.4 5.4 9 3 9 3c.6 3-1.4 4.6-2.7 6.7C5.2 11.5 5 13.2 5 15.2 5 19.3 8 22 12 22z"/>',
       tiers:[
-        { meta:1,  nome:'Primeiro Passo',       req:'Vença 1 dia seguido',   valor: ctx => ctx.melhorSequencia, xp:15 },
-        { meta:5,  nome:'Pegando o Jeito',       req:'Vença 5 dias seguidos', valor: ctx => ctx.melhorSequencia, xp:35 },
-        { meta:15, nome:'Consistência',          req:'Vença 15 dias seguidos', valor: ctx => ctx.melhorSequencia, xp:70 },
-        { meta:30, nome:'Um Mês Sem Falhar',     req:'Vença 30 dias seguidos', valor: ctx => ctx.melhorSequencia, xp:120 },
-        { meta:45, nome:'Rotina de Ferro',       req:'Vença 45 dias seguidos', valor: ctx => ctx.melhorSequencia, xp:180 },
-        { meta:60, nome:'Disciplina Absoluta',   req:'Vença 60 dias seguidos', valor: ctx => ctx.melhorSequencia, xp:250 }
+        { meta:1,  nome:'Primeiro Passo',     nome_en:'First Step',       req:'Vença 1 dia seguido',    req_en:'Win 1 day in a row',    valor: ctx => ctx.melhorSequencia, xp:15 },
+        { meta:5,  nome:'Pegando o Jeito',    nome_en:'Getting the Hang', req:'Vença 5 dias seguidos',  req_en:'Win 5 days in a row',   valor: ctx => ctx.melhorSequencia, xp:35 },
+        { meta:15, nome:'Consistência',       nome_en:'Consistency',      req:'Vença 15 dias seguidos', req_en:'Win 15 days in a row',  valor: ctx => ctx.melhorSequencia, xp:70 },
+        { meta:30, nome:'Um Mês Sem Falhar',  nome_en:'A Flawless Month', req:'Vença 30 dias seguidos', req_en:'Win 30 days in a row',  valor: ctx => ctx.melhorSequencia, xp:120 },
+        { meta:45, nome:'Rotina de Ferro',    nome_en:'Iron Routine',     req:'Vença 45 dias seguidos', req_en:'Win 45 days in a row',  valor: ctx => ctx.melhorSequencia, xp:180 },
+        { meta:60, nome:'Disciplina Absoluta', nome_en:'Absolute Discipline', req:'Vença 60 dias seguidos', req_en:'Win 60 days in a row', valor: ctx => ctx.melhorSequencia, xp:250 }
       ]
     },
     {
-      id:'monstros', nome:'Matar Monstros', sub:'caçada', cor:'#B57BE8',
+      id:'monstros', nome:'Matar Monstros', nome_en:'Slay Monsters', sub:'caçada', sub_en:'the hunt', cor:'#B57BE8',
       icone:'<path d="M6 3h12l3 5-9 13L3 8z"/><path d="M3 8h18"/><path d="M9 3l3 5 3-5"/>',
       tiers:[
-        { meta:1,   nome:'Primeiro Sangue',        req:'Derrote seu 1º monstro', valor: ctx => ctx.totalMortos, xp:15 },
-        { meta:5,   nome:'Caçador Novato',          req:'Derrote 5 monstros',     valor: ctx => ctx.totalMortos, xp:30 },
-        { meta:10,  nome:'Exterminador',            req:'Derrote 10 monstros',    valor: ctx => ctx.totalMortos, xp:50 },
-        { meta:20,  nome:'Flagelo dos Monstros',    req:'Derrote 20 monstros',    valor: ctx => ctx.totalMortos, xp:80 },
-        { meta:30,  nome:'Predador',                req:'Derrote 30 monstros',    valor: ctx => ctx.totalMortos, xp:110 },
-        { meta:45,  nome:'Terror da Masmorra',      req:'Derrote 45 monstros',    valor: ctx => ctx.totalMortos, xp:150 },
-        { meta:60,  nome:'Lenda da Caçada',         req:'Derrote 60 monstros',    valor: ctx => ctx.totalMortos, xp:190 },
-        { meta:80,  nome:'Extermínio em Massa',     req:'Derrote 80 monstros',    valor: ctx => ctx.totalMortos, xp:230 },
-        { meta:100, nome:'Centúria',                req:'Derrote 100 monstros',   valor: ctx => ctx.totalMortos, xp:270 },
-        { meta:ctx => ctx.totalMonstrosCatalogo, nome:'Bestiário Completo',
+        { meta:1,   nome:'Primeiro Sangue',     nome_en:'First Blood',        req:'Derrote seu 1º monstro', req_en:'Defeat your 1st monster', valor: ctx => ctx.totalMortos, xp:15 },
+        { meta:5,   nome:'Caçador Novato',      nome_en:'Novice Hunter',      req:'Derrote 5 monstros',     req_en:'Defeat 5 monsters',     valor: ctx => ctx.totalMortos, xp:30 },
+        { meta:10,  nome:'Exterminador',        nome_en:'Exterminator',       req:'Derrote 10 monstros',    req_en:'Defeat 10 monsters',    valor: ctx => ctx.totalMortos, xp:50 },
+        { meta:20,  nome:'Flagelo dos Monstros', nome_en:'Scourge of Monsters', req:'Derrote 20 monstros',  req_en:'Defeat 20 monsters',    valor: ctx => ctx.totalMortos, xp:80 },
+        { meta:30,  nome:'Predador',            nome_en:'Predator',           req:'Derrote 30 monstros',    req_en:'Defeat 30 monsters',    valor: ctx => ctx.totalMortos, xp:110 },
+        { meta:45,  nome:'Terror da Masmorra',  nome_en:'Terror of the Dungeon', req:'Derrote 45 monstros', req_en:'Defeat 45 monsters',    valor: ctx => ctx.totalMortos, xp:150 },
+        { meta:60,  nome:'Lenda da Caçada',     nome_en:'Legend of the Hunt', req:'Derrote 60 monstros',    req_en:'Defeat 60 monsters',    valor: ctx => ctx.totalMortos, xp:190 },
+        { meta:80,  nome:'Extermínio em Massa', nome_en:'Mass Extermination', req:'Derrote 80 monstros',    req_en:'Defeat 80 monsters',    valor: ctx => ctx.totalMortos, xp:230 },
+        { meta:100, nome:'Centúria',            nome_en:'Century',            req:'Derrote 100 monstros',   req_en:'Defeat 100 monsters',   valor: ctx => ctx.totalMortos, xp:270 },
+        { meta:ctx => ctx.totalMonstrosCatalogo, nome:'Bestiário Completo', nome_en:'Complete Bestiary',
           req: ctx => 'Derrote todos os ' + ctx.totalMonstrosCatalogo + ' monstros ao menos 1x',
+          req_en: ctx => 'Defeat all ' + ctx.totalMonstrosCatalogo + ' monsters at least once',
           valor: ctx => ctx.distintosMortos, xp:320 }
       ]
     },
     {
-      id:'nivel', nome:'Subir de Nível', sub:'ascensão', cor:'#F2C94C',
+      id:'nivel', nome:'Subir de Nível', nome_en:'Level Up', sub:'ascensão', sub_en:'ascension', cor:'#F2C94C',
       icone:'<path d="M12 2.5l2.9 6.6 7.1.7-5.4 4.8 1.6 7-6.2-3.8-6.2 3.8 1.6-7-5.4-4.8 7.1-.7z"/>',
       tiers:[
-        { meta:2,  nome:'Início da Jornada', req:'Alcance o nível II',  valor: ctx => ctx.nivel, xp:15 },
-        { meta:5,  nome:'Aventureiro',       req:'Alcance o nível V',   valor: ctx => ctx.nivel, xp:40 },
-        { meta:10, nome:'Veterano',          req:'Alcance o nível X',   valor: ctx => ctx.nivel, xp:70 },
-        { meta:15, nome:'Experiente',        req:'Alcance o nível XV',  valor: ctx => ctx.nivel, xp:100 },
-        { meta:20, nome:'Campeão',           req:'Alcance o nível XX',  valor: ctx => ctx.nivel, xp:140 },
-        { meta:30, nome:'Mestre',            req:'Alcance o nível XXX', valor: ctx => ctx.nivel, xp:190 },
-        { meta:40, nome:'Lenda Viva',        req:'Alcance o nível XL',  valor: ctx => ctx.nivel, xp:250 },
-        { meta:50, nome:'Ascensão',          req:'Alcance o nível L',   valor: ctx => ctx.nivel, xp:320 }
+        { meta:2,  nome:'Início da Jornada', nome_en:'Journey Begins', req:'Alcance o nível II',  req_en:'Reach level II',  valor: ctx => ctx.nivel, xp:15 },
+        { meta:5,  nome:'Aventureiro',       nome_en:'Adventurer',     req:'Alcance o nível V',   req_en:'Reach level V',   valor: ctx => ctx.nivel, xp:40 },
+        { meta:10, nome:'Veterano',          nome_en:'Veteran',        req:'Alcance o nível X',   req_en:'Reach level X',   valor: ctx => ctx.nivel, xp:70 },
+        { meta:15, nome:'Experiente',        nome_en:'Experienced',    req:'Alcance o nível XV',  req_en:'Reach level XV',  valor: ctx => ctx.nivel, xp:100 },
+        { meta:20, nome:'Campeão',           nome_en:'Champion',       req:'Alcance o nível XX',  req_en:'Reach level XX',  valor: ctx => ctx.nivel, xp:140 },
+        { meta:30, nome:'Mestre',            nome_en:'Master',         req:'Alcance o nível XXX', req_en:'Reach level XXX', valor: ctx => ctx.nivel, xp:190 },
+        { meta:40, nome:'Lenda Viva',        nome_en:'Living Legend',  req:'Alcance o nível XL',  req_en:'Reach level XL',  valor: ctx => ctx.nivel, xp:250 },
+        { meta:50, nome:'Ascensão',          nome_en:'Ascension',      req:'Alcance o nível L',   req_en:'Reach level L',   valor: ctx => ctx.nivel, xp:320 }
       ]
     },
     {
-      id:'tarefas', nome:'Conclua Tarefas', sub:'produtividade', cor:'#63C99A',
+      id:'tarefas', nome:'Conclua Tarefas', nome_en:'Complete Tasks', sub:'produtividade', sub_en:'productivity', cor:'#63C99A',
       icone:'<path d="M20 6L9 17l-5-5"/>',
       tiers:[
-        { meta:1,  nome:'Primeira Vitória',   req:'Conclua sua 1ª tarefa', valor: ctx => ctx.tarefasConcluidas, xp:15 },
-        { meta:10, nome:'Ganhando Ritmo',     req:'Conclua 10 tarefas',    valor: ctx => ctx.tarefasConcluidas, xp:40 },
-        { meta:20, nome:'Produtivo',          req:'Conclua 20 tarefas',    valor: ctx => ctx.tarefasConcluidas, xp:75 },
-        { meta:30, nome:'Incansável',         req:'Conclua 30 tarefas',    valor: ctx => ctx.tarefasConcluidas, xp:120 },
-        { meta:40, nome:'Máquina de Fazer',   req:'Conclua 40 tarefas',    valor: ctx => ctx.tarefasConcluidas, xp:170 },
-        { meta:50, nome:'Imparável',          req:'Conclua 50 tarefas',    valor: ctx => ctx.tarefasConcluidas, xp:230 }
+        { meta:1,  nome:'Primeira Vitória', nome_en:'First Win',       req:'Conclua sua 1ª tarefa', req_en:'Complete your 1st task', valor: ctx => ctx.tarefasConcluidas, xp:15 },
+        { meta:10, nome:'Ganhando Ritmo',   nome_en:'Gaining Momentum', req:'Conclua 10 tarefas',   req_en:'Complete 10 tasks',      valor: ctx => ctx.tarefasConcluidas, xp:40 },
+        { meta:20, nome:'Produtivo',        nome_en:'Productive',      req:'Conclua 20 tarefas',    req_en:'Complete 20 tasks',      valor: ctx => ctx.tarefasConcluidas, xp:75 },
+        { meta:30, nome:'Incansável',       nome_en:'Tireless',        req:'Conclua 30 tarefas',    req_en:'Complete 30 tasks',      valor: ctx => ctx.tarefasConcluidas, xp:120 },
+        { meta:40, nome:'Máquina de Fazer', nome_en:'Getting-Things-Done Machine', req:'Conclua 40 tarefas', req_en:'Complete 40 tasks', valor: ctx => ctx.tarefasConcluidas, xp:170 },
+        { meta:50, nome:'Imparável',        nome_en:'Unstoppable',     req:'Conclua 50 tarefas',    req_en:'Complete 50 tasks',      valor: ctx => ctx.tarefasConcluidas, xp:230 }
       ]
     },
     {
-      id:'itens', nome:'Obter Itens', sub:'grimório', cor:'#5AA9F2',
+      id:'itens', nome:'Obter Itens', nome_en:'Obtain Items', sub:'grimório', sub_en:'grimoire', cor:'#5AA9F2',
       icone:'<path d="M4 5.5C4 4.1 5.6 3 7.5 3H12v17H7.5C5.6 20 4 19.4 4 18V5.5z"/><path d="M20 5.5C20 4.1 18.4 3 16.5 3H12v17h4.5c1.9 0 3.5-.6 3.5-2V5.5z"/>',
       tiers:[
-        { meta:1,   nome:'Primeira Descoberta',        req:'Obtenha seu 1º item',                 valor: ctx => ctx.itensVistos, xp:15 },
-        { meta:6,   nome:'Colecionador de Raridades',  req:'Obtenha um item de cada raridade',    valor: ctx => ctx.raridadesObtidas, xp:60 },
-        { meta:1,   nome:'O Livro Proibido',           req:'Obtenha o Grimório',                  valor: ctx => ctx.temGrimorio ? 1 : 0, xp:50 },
-        { meta:10,  nome:'Iniciante do Catálogo',      req:'Descubra 10 itens distintos',         valor: ctx => ctx.itensVistos, xp:40 },
-        { meta:20,  nome:'Explorador',                 req:'Descubra 20 itens distintos',         valor: ctx => ctx.itensVistos, xp:80 },
-        { meta:30,  nome:'Garimpeiro',                 req:'Descubra 30 itens distintos',         valor: ctx => ctx.itensVistos, xp:120 },
-        { meta:40,  nome:'Especialista',                req:'Descubra 40 itens distintos',        valor: ctx => ctx.itensVistos, xp:160 },
-        { meta:50,  nome:'Metade do Caminho',          req:'Descubra 50 itens distintos',         valor: ctx => ctx.itensVistos, xp:200 },
-        { meta:ctx => ctx.totalItensCatalogo, nome:'Mestre do Grimório',
-          req: ctx => 'Descubra todos os ' + ctx.totalItensCatalogo + ' itens', valor: ctx => ctx.itensVistos, xp:300 }
+        { meta:1,   nome:'Primeira Descoberta',       nome_en:'First Discovery',    req:'Obtenha seu 1º item',              req_en:'Obtain your 1st item',            valor: ctx => ctx.itensVistos, xp:15 },
+        { meta:6,   nome:'Colecionador de Raridades', nome_en:'Rarity Collector',   req:'Obtenha um item de cada raridade', req_en:'Obtain one item of each rarity',  valor: ctx => ctx.raridadesObtidas, xp:60 },
+        { meta:1,   nome:'O Livro Proibido',          nome_en:'The Forbidden Book', req:'Obtenha o Grimório',               req_en:'Obtain the Grimoire',             valor: ctx => ctx.temGrimorio ? 1 : 0, xp:50 },
+        { meta:10,  nome:'Iniciante do Catálogo',     nome_en:'Catalog Novice',     req:'Descubra 10 itens distintos',      req_en:'Discover 10 distinct items',      valor: ctx => ctx.itensVistos, xp:40 },
+        { meta:20,  nome:'Explorador',                nome_en:'Explorer',           req:'Descubra 20 itens distintos',      req_en:'Discover 20 distinct items',      valor: ctx => ctx.itensVistos, xp:80 },
+        { meta:30,  nome:'Garimpeiro',                nome_en:'Prospector',         req:'Descubra 30 itens distintos',      req_en:'Discover 30 distinct items',      valor: ctx => ctx.itensVistos, xp:120 },
+        { meta:40,  nome:'Especialista',               nome_en:'Specialist',         req:'Descubra 40 itens distintos',     req_en:'Discover 40 distinct items',      valor: ctx => ctx.itensVistos, xp:160 },
+        { meta:50,  nome:'Metade do Caminho',         nome_en:'Halfway There',      req:'Descubra 50 itens distintos',      req_en:'Discover 50 distinct items',      valor: ctx => ctx.itensVistos, xp:200 },
+        { meta:ctx => ctx.totalItensCatalogo, nome:'Mestre do Grimório', nome_en:'Grimoire Master',
+          req: ctx => 'Descubra todos os ' + ctx.totalItensCatalogo + ' itens',
+          req_en: ctx => 'Discover all ' + ctx.totalItensCatalogo + ' items',
+          valor: ctx => ctx.itensVistos, xp:300 }
       ]
     }
   ];
+
+  // item 46 do roadmap: le o idioma direto do localStorage (mesma
+  // chave que o resto do app) -- funcao local, nao precisa de window.t()
+  // pra algo tao simples usado só dentro deste módulo.
+  function idiomaConquistas(){
+    try { return localStorage.getItem('questlog.idioma.v1') || 'pt'; } catch(e){ return 'pt'; }
+  }
+
 
   // id estavel por marco -- usado como chave de resgate persistida
   // (questlog.conquistasResgatadas.v1). Depende SO da posicao no array:
@@ -5305,10 +5399,12 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     let concluidas = 0;
     let achouAtual = false;
     let tiersHtml = '';
+    const emIngles = idiomaConquistas() === 'en';
 
     cat.tiers.forEach(t => {
       const meta = resolver(t.meta, ctx);
-      const req = resolver(t.req, ctx);
+      const req = emIngles ? resolver(t.req_en || t.req, ctx) : resolver(t.req, ctx);
+      const nomeMarco = emIngles ? (t.nome_en || t.nome) : t.nome;
       const valorAtual = t.valor(ctx);
       const feito = valorAtual >= meta;
       const jaResgatado = resgatados.has(t.id);
@@ -5332,18 +5428,18 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       // recompensa: preview (bloq/atual) ou botao de coleta (pendente)
       let recompensa;
       if (estado === 'pendente'){
-        recompensa = '<button class="conqreceber" data-resgatar="' + t.id + '">Receber · +' + t.xp + ' XP</button>';
+        recompensa = '<button class="conqreceber" data-resgatar="' + t.id + '">' + (emIngles ? 'Claim · +' : 'Receber · +') + t.xp + ' XP</button>';
       } else if (estado === 'feito'){
-        recompensa = '<span class="conqxpfeito">+' + t.xp + ' XP recebido</span>';
+        recompensa = '<span class="conqxpfeito">' + (emIngles ? '+' + t.xp + ' XP claimed' : '+' + t.xp + ' XP recebido') + '</span>';
       } else {
-        recompensa = '<span class="conqxpprevia">Recompensa: +' + t.xp + ' XP</span>';
+        recompensa = '<span class="conqxpprevia">' + (emIngles ? 'Reward: +' + t.xp + ' XP' : 'Recompensa: +' + t.xp + ' XP') + '</span>';
       }
 
       tiersHtml += ''
         + '<div class="conqmarco ' + estado + '">'
         +   '<div class="conqno"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + iconeMarco + '</svg></div>'
         +   '<div class="conqcorpo">'
-        +     '<div class="conqmnome">' + t.nome + '</div>'
+        +     '<div class="conqmnome">' + nomeMarco + '</div>'
         +     '<div class="conqreq">' + req + '</div>'
         +     fracao
         +     recompensa
@@ -5356,8 +5452,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       +   '<div class="conqcabecalho">'
       +     '<div class="conqcaticone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + cat.icone + '</svg></div>'
       +     '<div class="conqcattxt">'
-      +       '<div class="conqcatnome">' + cat.nome + '</div>'
-      +       '<div class="conqcatsub">' + cat.sub + '</div>'
+      +       '<div class="conqcatnome">' + (emIngles ? (cat.nome_en || cat.nome) : cat.nome) + '</div>'
+      +       '<div class="conqcatsub">' + (emIngles ? (cat.sub_en || cat.sub) : cat.sub) + '</div>'
       +     '</div>'
       +     '<div class="conqcatcontagem"><b>' + concluidas + '</b>/' + cat.tiers.length + '</div>'
       +   '</div>'
@@ -5624,7 +5720,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     const cat = CATEGORIAS.find(c => c.id === catId);
     const tier = cat ? cat.tiers.find(t => t.id === id) : null;
     if (!cat || !tier) return null;
-    return { id, nome: tier.nome, req: tier.req, meta: tier.meta, valor: tier.valor,
+    return { id, nome: tier.nome, nome_en: tier.nome_en, req: tier.req, req_en: tier.req_en, meta: tier.meta, valor: tier.valor,
              cor: cat.cor, icone: cat.icone, img: null };
   }).filter(Boolean);
 
@@ -5656,7 +5752,9 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       if (valor >= meta){
         desbloqueios[item.id] = (typeof isoAtual === 'function') ? isoAtual() : new Date().toISOString().slice(0, 10);
         mudou = true;
-        if (typeof aviso === 'function') aviso('Conquista: ' + item.nome, true);
+        const emIngles = idiomaConquistas() === 'en';
+        const nomeMostrar = emIngles ? (item.nome_en || item.nome) : item.nome;
+        if (typeof aviso === 'function') aviso((emIngles ? 'Achievement: ' : 'Conquista: ') + nomeMostrar, true);
       }
     });
     if (mudou) persistirDesbloqueiosV2(desbloqueios);
@@ -5678,23 +5776,25 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     feitas.sort((a, b) => b.data.localeCompare(a.data)); // mais recente primeiro
 
     function linha(item, data){
-      const desc = resolver(item.req, ctx);
+      const emIngles = idiomaConquistas() === 'en';
+      const desc = emIngles ? resolver(item.req_en || item.req, ctx) : resolver(item.req, ctx);
+      const nomeMostrar = emIngles ? (item.nome_en || item.nome) : item.nome;
       const dataHtml = data ? '<span class="conqv2data">' + formatarDataBR(data) + '</span>' : '';
       return '<div class="conqv2item' + (data ? '' : ' trancado') + '">' +
-        '<div class="conqv2txt"><div class="conqv2nome">' + item.nome + '</div>' +
+        '<div class="conqv2txt"><div class="conqv2nome">' + nomeMostrar + '</div>' +
         '<div class="conqv2desc">' + desc + '</div></div>' +
         dataHtml +
       '</div>';
     }
 
-    let html = '<div class="edsec">Minhas conquistas</div>';
+    let html = '<div class="edsec">' + (idiomaConquistas() === 'en' ? 'My achievements' : 'Minhas conquistas') + '</div>';
     html += feitas.length
       ? feitas.map(f => linha(f.item, f.data)).join('')
-      : '<div class="prevvazio">Nenhuma ainda -- continue jogando!</div>';
-    html += '<div class="edsec">Não desbloqueadas</div>';
+      : '<div class="prevvazio">' + (idiomaConquistas() === 'en' ? 'None yet -- keep playing!' : 'Nenhuma ainda -- continue jogando!') + '</div>';
+    html += '<div class="edsec">' + (idiomaConquistas() === 'en' ? 'Not unlocked' : 'Não desbloqueadas') + '</div>';
     html += faltam.length
       ? faltam.map(item => linha(item, null)).join('')
-      : '<div class="prevvazio">Você desbloqueou todas!</div>';
+      : '<div class="prevvazio">' + (idiomaConquistas() === 'en' ? 'You unlocked them all!' : 'Você desbloqueou todas!') + '</div>';
     alvo.innerHTML = html;
   }
   window.renderConquistasV2 = renderConquistasV2;
@@ -5732,7 +5832,9 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       .slice(0, n)
       .map(id => {
         const item = CONQUISTAS_V2.find(c => c.id === id);
-        return item ? { nome: item.nome, cor: item.cor, icone: item.icone } : null;
+        if (!item) return null;
+        const nomeMostrar = idiomaConquistas() === 'en' ? (item.nome_en || item.nome) : item.nome;
+        return { nome: nomeMostrar, cor: item.cor, icone: item.icone };
       })
       .filter(Boolean);
   };
@@ -8519,19 +8621,23 @@ window.mostrarNivelUp = function(nivel, aoFechar){
      window.definirIdioma(lang) salva e reaplica. Mesmo padrao ja
      comprovado do sistema de temas (questlog.tema.v1).
 
-     Escopo desta sessao: ARQUITETURA + o slide de idioma em si (nav +
-     slide, prova de que o mecanismo funciona ponta a ponta). Tradução
-     completa de diálogos/itens/monstros (~79 pontos de texto cru, ~100
-     itens, 63 monstros) fica pra sessão dedicada, por decisão explícita
-     do usuário registrada no roadmap ("deixa o texto pra sessão de
-     implementação") -- trocar cada ponto de texto cru por t('chave')
-     é a parte grande, toca praticamente todo módulo do arquivo, não
-     cabe misturado com o resto desta entrega.
+     Cobertura desta rodada (pedido explicito do usuario: traduzir o
+     app inteiro, nao so a arquitetura): nav, onboarding completo,
+     Arena/Tarefas (render principal, composer, dias da semana),
+     Conquistas (5 categorias + 39 marcos + V2), os 106 itens do
+     catalogo, os 63 monstros, os 8 herois, dificuldades, raridades,
+     tipos de item, atributos, temas. Itens/monstros: campo extra na
+     propria linha do array (nome_en), NUNCA tabela paralela --
+     decisao de seguranca ja registrada no roadmap, mesmo motivo do
+     bug de posicao real que ja aconteceu neste projeto (Pocao de Mana/
+     Vigor, item 16).
 
-     Itens/monstros, quando entrarem: campo extra na própria linha do
-     array (ex: nome_en), NUNCA tabela paralela -- decisão de segurança
-     já registrada no roadmap, mesmo motivo do bug de posição real que
-     já aconteceu neste projeto (Poção de Mana/Vigor, item 16).
+     Ainda fora desta rodada (registrado no roadmap, nao esquecido):
+     Loja/Inventario/Config/Bestiario/Historico em detalhe, os
+     dialogos do tutorial (item 12) e boa parte dos ~41 toasts
+     restantes de aviso() fora do fluxo principal -- window.t()/
+     data-i18n ja existem prontos pra essas sessoes seguintes
+     incrementarem sem mexer em arquitetura de novo.
 ====================================================================== -->
 <script>
 (function(){
@@ -8543,12 +8649,49 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'nav.tarefas':    { pt:'Tarefas',    en:'Tasks' },
     'nav.inventario': { pt:'Inventário', en:'Inventory' },
     'nav.loja':       { pt:'Loja',       en:'Shop' },
-    'nav.perfil':     { pt:'Perfil',     en:'Profile' }
+    'nav.perfil':     { pt:'Perfil',     en:'Profile' },
+
+    'acao.continuar': { pt:'Continuar', en:'Continue' },
+    'acao.voltar':    { pt:'Voltar',    en:'Back' },
+
+    'onb.comoFunciona':      { pt:'COMO FUNCIONA', en:'HOW IT WORKS' },
+    'onb.regra1':            { pt:'Cada tarefa concluída é um <b>golpe</b> no monstro do dia.', en:'Every task you complete is a <b>hit</b> on today\'s monster.' },
+    'onb.regra2':            { pt:'Quanto mais tarefas você tem, <b>mais forte</b> ele fica.', en:'The more tasks you have, the <b>stronger</b> it gets.' },
+    'onb.regra3':            { pt:'Derrote ele e ganhe <b>moedas</b> pra comprar equipamento melhor.', en:'Defeat it and earn <b>coins</b> to buy better gear.' },
+    'onb.comoChamar':        { pt:'Como quer ser chamado?', en:'What should we call you?' },
+    'onb.placeholderNome':   { pt:'Aventureiro', en:'Adventurer' },
+    'onb.quemVaiEnfrentar':  { pt:'Quem vai enfrentar os monstros?', en:'Who will face the monsters?' },
+    'onb.quaisTarefas':      { pt:'Quais tarefas você quer vencer hoje?', en:'Which tasks do you want to beat today?' },
+    'onb.placeholderTarefa': { pt:'Ex: estudar 30 minutos', en:'E.g.: study for 30 minutes' },
+    'onb.dicaAddMais':       { pt:'Adicione pelo menos uma. Dá pra criar mais depois, e definir quais se repetem na semana.', en:'Add at least one. You can create more later, and choose which repeat during the week.' },
+    'onb.invocarMonstro':    { pt:'Invocar o monstro', en:'Summon the monster' },
+
+    'jogo.vida':             { pt:'Vida', en:'Health' },
+    'jogo.experiencia':      { pt:'Experiência', en:'Experience' },
+    'jogo.addTarefa':        { pt:'+ Adicionar', en:'+ Add' },
+    'jogo.oQuePrecisaSerFeito': { pt:'O que precisa ser feito?', en:'What needs to be done?' },
+    'jogo.soHoje':           { pt:'Só hoje', en:'Today only' },
+    'jogo.repeteSemana':     { pt:'Repete toda semana', en:'Repeats weekly' },
+    'jogo.dificuldade':      { pt:'Dificuldade', en:'Difficulty' },
+    'jogo.vezesPorDia':      { pt:'Vezes por dia', en:'Times per day' },
+    'jogo.opcoesAvancadas':  { pt:'Opções avançadas', en:'Advanced options' },
+    'jogo.corDaTarefa':      { pt:'Cor da tarefa', en:'Task color' },
+    'jogo.semCor':           { pt:'Sem cor', en:'No color' },
+    'jogo.criarTarefa':      { pt:'Criar tarefa', en:'Create task' },
+
+    'dia.dom': { pt:'D', en:'S' },
+    'dia.seg': { pt:'S', en:'M' },
+    'dia.ter': { pt:'T', en:'T' },
+    'dia.qua': { pt:'Q', en:'W' },
+    'dia.qui': { pt:'Q', en:'T' },
+    'dia.sex': { pt:'S', en:'F' },
+    'dia.sab': { pt:'S', en:'S' }
   };
 
   function idiomaSalvo(){
     try { return localStorage.getItem(CHAVE_IDIOMA) || 'pt'; } catch(e){ return 'pt'; }
   }
+  window.idiomaAtual = idiomaSalvo;
 
   // window.t('chave') -- único ponto de leitura de texto traduzido.
   // Chave sem entrada no dicionário devolve a própria chave (nunca
@@ -8561,20 +8704,27 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   }
   window.t = t;
 
-  // Varre todo elemento marcado com data-i18n e substitui o texto pela
-  // tradução da chave. Convenção: um atributo por elemento, sem mexer
-  // em innerHTML (evita perder handlers/filhos por engano).
+  // Varre todo elemento marcado com data-i18n (texto) ou
+  // data-i18n-placeholder (atributo placeholder de input) e substitui
+  // pela tradução da chave. Convenção: um atributo por elemento, sem
+  // mexer em innerHTML (evita perder handlers/filhos por engano).
   function aplicarIdioma(){
     document.querySelectorAll('[data-i18n]').forEach(el => {
       el.textContent = t(el.dataset.i18n);
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+      el.placeholder = t(el.dataset.i18nPlaceholder);
     });
   }
   window.aplicarIdioma = aplicarIdioma;
 
   // window.definirIdioma(lang) -- chamado pelos 2 botões do slide de
   // idioma no carrossel (ver bloco TELA DE LOGIN / SPLASH + CARROSSEL).
-  // Salva a preferência, marca visualmente qual opção está selecionada
-  // e reaplica a tradução em tudo que já está marcado com data-i18n.
+  // Salva a preferência, marca visualmente qual opção está selecionada,
+  // reaplica a tradução estática (data-i18n) E os dados que dependem de
+  // idioma (nome de item/monstro/herói/dificuldade/raridade/tema/
+  // atributo, via window.aplicarIdiomaDados -- ver script principal),
+  // depois força um re-render pra quem já estiver com uma tela aberta.
   window.definirIdioma = function(lang){
     if (lang !== 'pt' && lang !== 'en') return;
     try { localStorage.setItem(CHAVE_IDIOMA, lang); } catch(e){}
@@ -8582,6 +8732,14 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       b.classList.toggle('on', b.dataset.lang === lang);
     });
     aplicarIdioma();
+    if (typeof window.aplicarIdiomaDados === 'function') window.aplicarIdiomaDados();
+    // refresh defensivo das telas que já podem estar renderizadas --
+    // typeof-guard em cada uma porque nem toda sessão de jogo passou
+    // por todo módulo (ex: quem nunca abriu o Perfil não tem
+    // renderConquistas definido ainda nesse ponto do arquivo).
+    ['render','renderInventario','renderLoja','renderConquistasV2','renderBestiario','desenharHeroi']
+      .forEach(fn => { if (typeof window[fn] === 'function') window[fn](); });
+    if (typeof window.pintarTemaGrid === 'function') window.pintarTemaGrid();
   };
 
   // Wire dos 2 botões do slide de idioma (só existem no DOM se o
@@ -8592,10 +8750,16 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   const btnEn = document.getElementById('idiomaOpEn');
   if (btnPt) btnPt.onclick = () => window.definirIdioma('pt');
   if (btnEn) btnEn.onclick = () => window.definirIdioma('en');
+  // marca visualmente a opção já salva, caso o jogador reabra o slide
+  // (voltar no carrossel) depois de já ter escolhido antes
+  document.querySelectorAll('.idiomaOpcao').forEach(b => {
+    b.classList.toggle('on', b.dataset.lang === idiomaSalvo());
+  });
 
   aplicarIdioma(); // aplica a preferência já salva assim que o app carrega (ex: quem já escolheu antes)
 })();
 </script>
+
 
 </body>
 </html>

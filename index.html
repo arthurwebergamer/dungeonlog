@@ -1151,7 +1151,9 @@ function numeroFlutuante(xpGanho, moedasGanhas){
   el.className = 'dmg-float';
   el.style.left = originX + 'px';
   el.style.top = originY + 'px';
-  el.innerHTML = '+' + moedasGanhas + ' ' + COIN_SVG + ' · +' + xpGanho + ' XP';
+  el.innerHTML = '<span class="dmg-moeda">+' + moedasGanhas + ' ' + COIN_SVG + '</span>'
+    + '<span class="dmg-sep">·</span>'
+    + '<span class="dmg-xp">+' + xpGanho + ' XP</span>';
   arena.appendChild(el);
   setTimeout(() => el.remove(), 1600);
 }

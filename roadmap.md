@@ -2,6 +2,14 @@
 
 > Versão do arquivo: `index.html` + `style.css` + `assets.js` (repositório GitHub, ver item de infraestrutura abaixo)
 >
+> **Nota:** item 46 novo — item 13d finalmente decidido. Botão de
+> idioma sai do login (que não é mais hub principal), ganha slide
+> próprio no carrossel. Escopo confirmado: tradução PT/EN completa
+> (UI + diálogos + ~100 itens + 63 monstros), não só interface. Zero
+> camada de tradução existe hoje — arquitetura registrada (dicionário
+> central, campo por linha nos arrays, nunca tabela paralela). Texto em
+> si fica pra sessão de implementação, por decisão do usuário.
+>
 > **Nota:** item 40 novo — número flutuante de XP/moeda na Arena
 > (estilo "damage number" positivo), substituindo o toast de texto só
 > nessa tela. Reaproveita infraestrutura existente (`COIN_SVG`,
@@ -862,6 +870,18 @@ Sobrepor um ícone de espada na mão de um sprite feito para outro fim normalmen
     - **Estado final:** `usarItem(id, elOrigem)`/`venderItem(id, elOrigem)` capturam a posição via `pontoDeElemento(elOrigem)` **antes** de qualquer `render()`/`renderInventario()` (padrão já estabelecido no item 44 pro bug da Loja); origem é o quadradinho real do grid ou do slot equipado (`fichaOrigemEl`), não mais nada dentro da ficha; ficha fecha instantâneo, sem delay; `mostrarAba()` limpa flutuante pendente ao trocar de aba. Venda avulsa na Loja (fora da ficha, lista de Tesouros) não precisou de nenhuma mudança — já usava o ícone certo (`.lbox`) da própria linha desde o item 44.
     - **Lição pra próximas vezes:** quando um elemento "sempre aparece no mesmo lugar independente do dado que ele mostra", é sinal de estar pegando a posição do **container/modal** em vez do **conteúdo real** — vale suspeitar disso antes de qualquer outra hipótese quando o sintoma for literalmente "sempre no mesmo lugar" (diferente de "no lugar errado uma vez" ou "cortado na borda").
     - **Confirmado com o usuário (28/08):** o item 45 registrado no roadmap-do-item-44 original propunha Vender como **moedinhas se espalhando** (`moedasCaindo()`, igual à Arena) — o que ficou implementado foi **flutuante de texto**, igual usar poção. Perguntado direto, o usuário confirmou que foi **mudança de ideia dele, não desvio da implementação** — flutuante de texto pra vender está correto e final, não uma pendência.
+
+46. [ ] **Botões de idioma/tema saem do login, idioma ganha slide próprio no carrossel — i18n completo (UI + diálogos + itens/monstros) vira projeto de verdade, não fix rápido (levantado em sessão de brainstorm, 28/08).** Item 13d, aberto desde o início desta sessão de brainstorm, finalmente decidido.
+    - **Achado ao investigar:** botão de idioma hoje chama `window.aviso('Idioma: em breve')` — com `TOASTS_DESATIVADOS = true` (item 41, ainda ativo), esse aviso também está mudo. Clicar em "Idioma" hoje não faz literalmente nada visível, nem o "em breve" que devia aparecer.
+    - **Decisão de arquitetura, motivada pelo carrossel ter virado a porta de entrada principal (item 29) e login ter virado desvio opcional:** os controles rápidos de `idiomaBtn`/`temaMiniBtn` (linha ~6516, mini-botões grudados na tela de login) **saem de lá** — não fazem mais sentido numa tela que não é mais o hub principal. Tema já tem casa própria completa (Config → Aparência, item 39) — remover o botão de ciclo do login não perde nada, só duplicava. **Idioma ganha um slide próprio no carrossel de onboarding** (mesmo padrão `.passo`/`mostrarPasso()` do item 29), com escolha real entre Português e Inglês, salva em `localStorage` (mesmo padrão de `questlog.tema.v1`).
+    - **Escopo da tradução, decidido explicitamente com o usuário — é tudo, não só interface:** UI completa (menus, botões, telas), diálogos (módulo do item 12, escrito com cuidado de tom em 1ª pessoa — precisa tradução com o mesmo cuidado, não literal palavra-por-palavra), **e os ~100 itens + 63 monstros**. Confirmado no código: **não existe nenhuma camada de tradução hoje** — 79 pontos entre `textContent`/`innerHTML` com texto cru espalhado direto no HTML/JS, sem dicionário centralizado nenhum.
+    - **Arquitetura proposta, mesmo padrão comprovado do sistema de temas:**
+      1. Dicionário central novo — objeto `TRADUCOES`, cada chave com `{pt:'...', en:'...'}`.
+      2. Função helper `t('chave')` — lê preferência salva, devolve o texto certo.
+      3. Trocar os ~79 pontos de texto cru pra chamar `t('chave')` — é a parte grande, toca praticamente todo módulo do arquivo.
+      4. **Itens/monstros: campo extra na própria linha do array (ex: `nome_en`), não tabela paralela** — decisão deliberada por segurança. Já existe histórico real de bug de posição em array neste projeto (Poção de Mana/Vigor, ver item 16) — campo andando junto da linha nunca desalinha, tabela separada correria o mesmo risco de novo.
+    - **Decisão explícita do usuário: não adiantar o texto da tradução agora** ("deixa o texto pra sessão de implementação") — só a arquitetura fica registrada aqui. Texto e código devem andar juntos numa sessão só, com validação real.
+    - Ainda não iniciado. Maior escopo entre os itens ainda em aberto na fila — considerar sessão dedicada, não encaixar de raspão.
 
 ---
 

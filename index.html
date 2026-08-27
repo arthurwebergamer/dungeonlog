@@ -1175,7 +1175,7 @@ function numeroFlutuante(xpGanho, moedasGanhas){
 function pontoDeElemento(el){
   if (!el) return null;
   const r = el.getBoundingClientRect();
-  return { x: r.left + r.width / 2, y: r.top };
+  return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
 }
 
 function flutuanteFixo(origem, conteudoHtml, largo){

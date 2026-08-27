@@ -1203,9 +1203,9 @@ function flutuanteFixo(origem, conteudoHtml, largo){
   setTimeout(() => el.remove(), 1600);
 }
 
-// pedido do usuario (27/08): so o nome do item/atributo leva a cor
-// (raridade ou cor do atributo), o resto da frase fica na cor padrao de
-// texto (reaproveita .dmg-xp, ja existente e ja com var(--text)).
+// NAO USADA ATUALMENTE (27/08) -- estava em equipar()/comprar()/investir(),
+// revertido a pedido do usuario ("nao ficou bom"). Mantida no arquivo por
+// ser utilitaria generica (nome+cor), pode voltar a ser util no futuro.
 function notificarFlutuante(origem, prefixo, nome, cor){
   flutuanteFixo(origem, '<span class="dmg-xp">' + prefixo + '</span> <span style="color:' + cor + '">' + nome + '</span>', true);
 }
@@ -1852,15 +1852,12 @@ function multMoedas(){ return 1 + bonusEquip().m / 100; }
 function multXP(){ return 1 + bonusEquip().x / 100; }
 
 /* ---------- acoes ---------- */
-function equipar(id, elOrigem){
+function equipar(id){
   const it = item(id);
   if (!EQUIPAVEL(id)) return;
-  const ponto = pontoDeElemento(elOrigem); // captura ANTES do render, ver nota em flutuanteFixo()
   equipado[it.tipo] = (equipado[it.tipo] === id) ? null : id;
   persistir(); renderInventario(); fecharFicha();
-  const equipou = equipado[it.tipo] === id;
-  if (ponto) notificarFlutuante(ponto, equipou ? 'Você equipou' : 'Você desequipou', it.nome, COR_RAR[it.rar]);
-  else aviso(equipou ? 'EQUIPADO' : 'DESEQUIPADO');
+  aviso(equipado[it.tipo] === id ? 'EQUIPADO' : 'DESEQUIPADO');
 }
 
 function usarItem(id, elOrigem){
@@ -2049,9 +2046,9 @@ function abrirFicha(id){
   ficha.querySelectorAll('[data-a]').forEach(b => {
     b.onclick = () => {
       const a = b.dataset.a;
-      if (a === 'eq') equipar(id, b);
+      if (a === 'eq') equipar(id);
       else if (a === 'usar') usarItem(id, b);
-      else if (a === 'vender') venderItem(id, b);
+      else if (a === 'vender') venderItem(id, ficha.querySelector('.ibox') || b);
       else if (a === 'abrir'){
         fecharFicha();
         if (typeof window.abrirCatalogoGrimorio === 'function') window.abrirCatalogoGrimorio();
@@ -2330,7 +2327,7 @@ function garantirEstoque(){
 }
 
 /* ---------- compra ---------- */
-function comprar(i, elOrigem){
+function comprar(i){
   garantirEstoque();
   const s = lojaEstoque[i];
   if (!s || lojaVendidos.indexOf(i) >= 0) return;
@@ -2342,8 +2339,6 @@ function comprar(i, elOrigem){
   if (progresso().nivel < nivelExigido){ aviso('EXIGE NIVEL ' + romano(nivelExigido)); return; }
   if (moedas < preco){ aviso('MOEDAS INSUFICIENTES'); return; }
 
-  const ponto = pontoDeElemento(elOrigem); // captura ANTES de renderLoja(), ver nota em flutuanteFixo()
-
   moedas -= preco;
   darItem(s.id, 1);
   lojaVendidos.push(i);
@@ -2353,8 +2348,7 @@ function comprar(i, elOrigem){
   render();
   renderLoja();
   if (typeof renderInventario === 'function') renderInventario();
-  if (ponto) notificarFlutuante(ponto, 'Você comprou', it.nome, COR_RAR[it.rar]);
-  else aviso('COMPROU ' + it.nome.toUpperCase(), true);
+  aviso('COMPROU ' + it.nome.toUpperCase(), true);
 }
 
 /* ---------- venda em lote de tesouros ---------- */
@@ -2458,7 +2452,7 @@ function montarCompra(grid){
   });
 
   grid.querySelectorAll('[data-c]').forEach(b => {
-    b.onclick = () => comprar(+b.dataset.c, b);
+    b.onclick = () => comprar(+b.dataset.c);
   });
 
   const nota = document.createElement('div');
@@ -2507,7 +2501,7 @@ function montarVenda(grid){
   });
 
   grid.querySelectorAll('[data-v]').forEach(b => {
-    b.onclick = () => { venderItem(+b.dataset.v, b); renderLoja(); };
+    b.onclick = () => { const icone = b.closest('.lrow')?.querySelector('.lbox'); venderItem(+b.dataset.v, icone || b); renderLoja(); };
   });
 
   const tesouros = inventario.filter(s => item(s.id).tipo === 'tesouro');
@@ -4237,7 +4231,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     return false;
   }
 
-  function investir(atr, elOrigem){
+  function investir(atr){
     if (pontosDisponiveis() <= 0) return;
     if (noTeto(atr)){
       if (typeof window.aviso === 'function') window.aviso('Esse atributo já está no teto máximo');
@@ -4247,10 +4241,6 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     window.tocarSom?.('investir'); // SFX: investir() vive presa na IIFE do modulo Atributos -- sem binding global pro clique real do botao, editado direto
     salvarAtrib();
     renderAtributosPontos();
-    if (elOrigem && typeof window.notificarFlutuante === 'function'
-        && typeof NOME_ATR !== 'undefined' && typeof COR_ATR !== 'undefined'){
-      window.notificarFlutuante(elOrigem, 'Você melhorou', NOME_ATR[atr], COR_ATR[atr]);
-    }
   }
 
   function renderAtributosPontos(){
@@ -4274,11 +4264,11 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   }
 
   const bFortuna = document.getElementById('atrMaisFortuna');
-  if (bFortuna) bFortuna.onclick = () => investir('fortuna', bFortuna);
+  if (bFortuna) bFortuna.onclick = () => investir('fortuna');
   const bFoco = document.getElementById('atrMaisFoco');
-  if (bFoco) bFoco.onclick = () => investir('foco', bFoco);
+  if (bFoco) bFoco.onclick = () => investir('foco');
   const bVigor = document.getElementById('atrMaisVigor');
-  if (bVigor) bVigor.onclick = () => investir('vigor', bVigor);
+  if (bVigor) bVigor.onclick = () => investir('vigor');
 
   // atualiza sempre que render() roda (toda tarefa marcada, virada de dia,
   // compra etc.) -- NAO da pra depender de window.renderPerfil aqui: aquela

@@ -1180,6 +1180,14 @@ function flutuanteFixo(elOrigem, conteudoHtml){
   setTimeout(() => el.remove(), 1600);
 }
 
+// pedido do usuario (27/08): equipar/desequipar, comprar, melhorar atributo
+// -- mesmo flutuante, so texto com cor dinamica (raridade do item ou cor
+// do atributo). Atalho fino sobre flutuanteFixo() pra nao repetir o wrap
+// de span em cada call site.
+function notificarFlutuante(elOrigem, texto, cor){
+  flutuanteFixo(elOrigem, '<span style="color:' + cor + '">' + texto + '</span>');
+}
+
 // item pedido pelo usuario (27/08): tela "DIA VENCIDO" muito simples --
 // disparado 1x por vitoria (ver flag _vitoriaCelebrada em render()), nunca
 // a cada re-render enquanto o dia ja estiver vencido. Feedback do baú
@@ -1748,6 +1756,9 @@ render();
 const SHEET_COLS = 16, SHEET_ROWS = 9;
 const RARIDADES = ['Comum','Incomum','Raro','Épico','Lendário','Único'];
 const COR_RAR   = ['#8779A8','#63C99A','#5AA9F2','#B57BE8','#F2A65A','#5AE0D8'];
+// mesma cor ja usada nos cards de atributo (--atr-cor, "PERFIL — ATRIBUTOS")
+const COR_ATR  = {fortuna:'#F2A65A', foco:'#5AA9F2', vigor:'#E5698A'};
+const NOME_ATR = {fortuna:'Fortuna', foco:'Foco', vigor:'Vigor'};
 window.RARIDADES = RARIDADES;
 window.COR_RAR = COR_RAR;
 const NOME_TIPO = {arma:'Arma',armadura:'Armadura',elmo:'Elmo',escudo:'Escudo',acess:'Acessório',cons:'Consumível',tesouro:'Tesouro',chave:'Item-chave'};
@@ -1819,12 +1830,14 @@ function multMoedas(){ return 1 + bonusEquip().m / 100; }
 function multXP(){ return 1 + bonusEquip().x / 100; }
 
 /* ---------- acoes ---------- */
-function equipar(id){
+function equipar(id, elOrigem){
   const it = item(id);
   if (!EQUIPAVEL(id)) return;
   equipado[it.tipo] = (equipado[it.tipo] === id) ? null : id;
   persistir(); renderInventario(); fecharFicha();
-  aviso(equipado[it.tipo] === id ? 'EQUIPADO' : 'DESEQUIPADO');
+  const equipou = equipado[it.tipo] === id;
+  if (elOrigem) notificarFlutuante(elOrigem, equipou ? 'EQUIPADO' : 'DESEQUIPADO', COR_RAR[it.rar]);
+  else aviso(equipou ? 'EQUIPADO' : 'DESEQUIPADO');
 }
 
 function usarItem(id, elOrigem){
@@ -1844,7 +1857,7 @@ function usarItem(id, elOrigem){
   fecharFicha();
 }
 
-function venderItem(id){
+function venderItem(id, elOrigem){
   const it = item(id);
   if (it.tipo === 'chave') return;   // itens-chave (ex: Grimório) nunca sao vendaveis
   SLOTS.forEach(s => { if (equipado[s] === id) equipado[s] = null; });
@@ -1852,7 +1865,8 @@ function venderItem(id){
   moedas += preco;
   tirarItem(id, 1);
   persistir(); render(); renderInventario(); fecharFicha();
-  aviso('VENDIDO  +'+preco+' MOEDAS', true);
+  if (elOrigem) flutuanteFixo(elOrigem, '<span class="dmg-moeda">+' + preco + ' ' + COIN_SVG + '</span>');
+  else aviso('VENDIDO  +'+preco+' MOEDAS', true);
 }
 
 function persistir(){ if (typeof jaComecou !== 'undefined' && jaComecou) salvar(); }
@@ -2011,9 +2025,9 @@ function abrirFicha(id){
   ficha.querySelectorAll('[data-a]').forEach(b => {
     b.onclick = () => {
       const a = b.dataset.a;
-      if (a === 'eq') equipar(id);
+      if (a === 'eq') equipar(id, b);
       else if (a === 'usar') usarItem(id, b);
-      else if (a === 'vender') venderItem(id);
+      else if (a === 'vender') venderItem(id, b);
       else if (a === 'abrir'){
         fecharFicha();
         if (typeof window.abrirCatalogoGrimorio === 'function') window.abrirCatalogoGrimorio();
@@ -2292,7 +2306,7 @@ function garantirEstoque(){
 }
 
 /* ---------- compra ---------- */
-function comprar(i){
+function comprar(i, elOrigem){
   garantirEstoque();
   const s = lojaEstoque[i];
   if (!s || lojaVendidos.indexOf(i) >= 0) return;
@@ -2313,7 +2327,8 @@ function comprar(i){
   render();
   renderLoja();
   if (typeof renderInventario === 'function') renderInventario();
-  aviso('COMPROU ' + it.nome.toUpperCase(), true);
+  if (elOrigem) notificarFlutuante(elOrigem, 'Você comprou ' + it.nome, COR_RAR[it.rar]);
+  else aviso('COMPROU ' + it.nome.toUpperCase(), true);
 }
 
 /* ---------- venda em lote de tesouros ---------- */
@@ -2417,7 +2432,7 @@ function montarCompra(grid){
   });
 
   grid.querySelectorAll('[data-c]').forEach(b => {
-    b.onclick = () => comprar(+b.dataset.c);
+    b.onclick = () => comprar(+b.dataset.c, b);
   });
 
   const nota = document.createElement('div');
@@ -2466,7 +2481,7 @@ function montarVenda(grid){
   });
 
   grid.querySelectorAll('[data-v]').forEach(b => {
-    b.onclick = () => { venderItem(+b.dataset.v); renderLoja(); };
+    b.onclick = () => { venderItem(+b.dataset.v, b); renderLoja(); };
   });
 
   const tesouros = inventario.filter(s => item(s.id).tipo === 'tesouro');
@@ -4196,7 +4211,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     return false;
   }
 
-  function investir(atr){
+  function investir(atr, elOrigem){
     if (pontosDisponiveis() <= 0) return;
     if (noTeto(atr)){
       if (typeof window.aviso === 'function') window.aviso('Esse atributo já está no teto máximo');
@@ -4206,6 +4221,10 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     window.tocarSom?.('investir'); // SFX: investir() vive presa na IIFE do modulo Atributos -- sem binding global pro clique real do botao, editado direto
     salvarAtrib();
     renderAtributosPontos();
+    if (elOrigem && typeof window.notificarFlutuante === 'function'
+        && typeof NOME_ATR !== 'undefined' && typeof COR_ATR !== 'undefined'){
+      window.notificarFlutuante(elOrigem, 'Você melhorou ' + NOME_ATR[atr], COR_ATR[atr]);
+    }
   }
 
   function renderAtributosPontos(){
@@ -4229,11 +4248,11 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   }
 
   const bFortuna = document.getElementById('atrMaisFortuna');
-  if (bFortuna) bFortuna.onclick = () => investir('fortuna');
+  if (bFortuna) bFortuna.onclick = () => investir('fortuna', bFortuna);
   const bFoco = document.getElementById('atrMaisFoco');
-  if (bFoco) bFoco.onclick = () => investir('foco');
+  if (bFoco) bFoco.onclick = () => investir('foco', bFoco);
   const bVigor = document.getElementById('atrMaisVigor');
-  if (bVigor) bVigor.onclick = () => investir('vigor');
+  if (bVigor) bVigor.onclick = () => investir('vigor', bVigor);
 
   // atualiza sempre que render() roda (toda tarefa marcada, virada de dia,
   // compra etc.) -- NAO da pra depender de window.renderPerfil aqui: aquela

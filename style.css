@@ -58,14 +58,15 @@
      origem/posicionamento de .coin-drop (left/top absolutos calculados
      em JS a partir do centro do #mobSprite) -- so troca queda por subida */
   .dmg-float{position:absolute;left:0;top:0;pointer-events:none;
-    animation:dmgFloat 1s ease-out forwards;
+    animation:dmgFloat 1.6s ease-out forwards;
     display:flex;align-items:center;gap:3px;white-space:nowrap;
     font-family:'Silkscreen',monospace;font-size:13px;font-weight:700;
     color:var(--accent,#F2A65A);text-shadow:0 1px 2px rgba(0,0,0,.6)}
   .dmg-float svg{width:13px;height:13px;image-rendering:pixelated;flex-shrink:0}
   @keyframes dmgFloat{
     0%{transform:translate(-50%,-50%) scale(.8);opacity:0}
-    15%{transform:translate(-50%,-60%) scale(1);opacity:1}
+    10%{transform:translate(-50%,-60%) scale(1);opacity:1}
+    70%{transform:translate(-50%,calc(-50% - 40px)) scale(1);opacity:1}
     100%{transform:translate(-50%,calc(-50% - 55px)) scale(1);opacity:0}
   }
   .vs{font-family:'Outfit',sans-serif;font-size:11px;font-weight:500;color:var(--dim);padding-bottom:30px;letter-spacing:1px}

@@ -2047,7 +2047,7 @@ function abrirFicha(id){
     b.onclick = () => {
       const a = b.dataset.a;
       if (a === 'eq') equipar(id);
-      else if (a === 'usar') usarItem(id, b);
+      else if (a === 'usar') usarItem(id, ficha.querySelector('.ibox') || b);
       else if (a === 'vender') venderItem(id, ficha.querySelector('.ibox') || b);
       else if (a === 'abrir'){
         fecharFicha();

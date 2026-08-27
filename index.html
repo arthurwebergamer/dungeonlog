@@ -1860,7 +1860,7 @@ function equipar(id, elOrigem){
   equipado[it.tipo] = (equipado[it.tipo] === id) ? null : id;
   persistir(); renderInventario(); fecharFicha();
   const equipou = equipado[it.tipo] === id;
-  if (ponto) notificarFlutuante(ponto, equipou ? 'EQUIPADO' : 'DESEQUIPADO', COR_RAR[it.rar]);
+  if (ponto) notificarFlutuante(ponto, (equipou ? 'Você equipou ' : 'Você desequipou ') + it.nome, COR_RAR[it.rar]);
   else aviso(equipou ? 'EQUIPADO' : 'DESEQUIPADO');
 }
 

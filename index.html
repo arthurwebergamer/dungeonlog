@@ -1166,26 +1166,49 @@ function numeroFlutuante(xpGanho, moedasGanhas){
 }
 
 // pedido do usuario (27/08): mesmo flutuante da Arena, reaproveitado fora
-// dela (Inventario, ao usar pocao) -- generico, recebe qualquer elemento
-// de origem (ex: o botao "Usar" clicado) e o HTML de conteudo pronto.
-function flutuanteFixo(elOrigem, conteudoHtml){
-  if (!elOrigem) return;
-  const r = elOrigem.getBoundingClientRect();
+// dela (Inventario/Loja/Atributos) -- generico. Aceita ou um elemento vivo
+// (mede a posicao na hora) ou um ponto {x,y} ja capturado antes -- use o
+// ponto sempre que a chamada acontecer DEPOIS de render()/renderLoja(),
+// que reconstroem o grid via innerHTML e desconectam o elemento original
+// do DOM (getBoundingClientRect vira {0,0,0,0} nesse caso -- bug real
+// reportado: comprar/vender na Loja nao mostrava nada).
+function pontoDeElemento(el){
+  if (!el) return null;
+  const r = el.getBoundingClientRect();
+  return { x: r.left + r.width / 2, y: r.top };
+}
+
+function flutuanteFixo(origem, conteudoHtml, largo){
+  if (!origem) return;
+  const p = (origem instanceof Element) ? pontoDeElemento(origem) : origem;
+  if (!p) return;
+
   const el = document.createElement('div');
-  el.className = 'dmg-float fixo';
-  el.style.left = (r.left + r.width / 2) + 'px';
-  el.style.top = r.top + 'px';
+  el.className = 'dmg-float fixo' + (largo ? ' msg' : '');
+  el.style.left = p.x + 'px';
+  el.style.top = p.y + 'px';
   el.innerHTML = conteudoHtml;
   document.body.appendChild(el);
+
+  // trava dentro da tela: mede a largura real ja renderizada e reposiciona
+  // se estourar borda esquerda/direita -- corrige texto longo tipo "Voce
+  // melhorou Fortuna" cortado pra fora quando o botao fica perto da borda
+  const margem = 10;
+  const meia = el.offsetWidth / 2;
+  let cx = p.x;
+  if (cx - meia < margem) cx = margem + meia;
+  if (cx + meia > window.innerWidth - margem) cx = window.innerWidth - margem - meia;
+  if (cx !== p.x) el.style.left = cx + 'px';
+
   setTimeout(() => el.remove(), 1600);
 }
 
 // pedido do usuario (27/08): equipar/desequipar, comprar, melhorar atributo
 // -- mesmo flutuante, so texto com cor dinamica (raridade do item ou cor
-// do atributo). Atalho fino sobre flutuanteFixo() pra nao repetir o wrap
-// de span em cada call site.
-function notificarFlutuante(elOrigem, texto, cor){
-  flutuanteFixo(elOrigem, '<span style="color:' + cor + '">' + texto + '</span>');
+// do atributo). Sempre "largo" (quebra linha) pois mensagens podem ser
+// longas ("Voce comprou Espada Longa de Ferro"), diferente do numero curto.
+function notificarFlutuante(origem, texto, cor){
+  flutuanteFixo(origem, '<span style="color:' + cor + '">' + texto + '</span>', true);
 }
 
 // item pedido pelo usuario (27/08): tela "DIA VENCIDO" muito simples --
@@ -1833,10 +1856,11 @@ function multXP(){ return 1 + bonusEquip().x / 100; }
 function equipar(id, elOrigem){
   const it = item(id);
   if (!EQUIPAVEL(id)) return;
+  const ponto = pontoDeElemento(elOrigem); // captura ANTES do render, ver nota em flutuanteFixo()
   equipado[it.tipo] = (equipado[it.tipo] === id) ? null : id;
   persistir(); renderInventario(); fecharFicha();
   const equipou = equipado[it.tipo] === id;
-  if (elOrigem) notificarFlutuante(elOrigem, equipou ? 'EQUIPADO' : 'DESEQUIPADO', COR_RAR[it.rar]);
+  if (ponto) notificarFlutuante(ponto, equipou ? 'EQUIPADO' : 'DESEQUIPADO', COR_RAR[it.rar]);
   else aviso(equipou ? 'EQUIPADO' : 'DESEQUIPADO');
 }
 
@@ -1860,12 +1884,13 @@ function usarItem(id, elOrigem){
 function venderItem(id, elOrigem){
   const it = item(id);
   if (it.tipo === 'chave') return;   // itens-chave (ex: Grimório) nunca sao vendaveis
+  const ponto = pontoDeElemento(elOrigem); // captura ANTES do render, ver nota em flutuanteFixo()
   SLOTS.forEach(s => { if (equipado[s] === id) equipado[s] = null; });
   const preco = precoVenda(it);
   moedas += preco;
   tirarItem(id, 1);
   persistir(); render(); renderInventario(); fecharFicha();
-  if (elOrigem) flutuanteFixo(elOrigem, '<span class="dmg-moeda">+' + preco + ' ' + COIN_SVG + '</span>');
+  if (ponto) flutuanteFixo(ponto, '<span class="dmg-moeda">+' + preco + ' ' + COIN_SVG + '</span>');
   else aviso('VENDIDO  +'+preco+' MOEDAS', true);
 }
 
@@ -2318,6 +2343,8 @@ function comprar(i, elOrigem){
   if (progresso().nivel < nivelExigido){ aviso('EXIGE NIVEL ' + romano(nivelExigido)); return; }
   if (moedas < preco){ aviso('MOEDAS INSUFICIENTES'); return; }
 
+  const ponto = pontoDeElemento(elOrigem); // captura ANTES de renderLoja(), ver nota em flutuanteFixo()
+
   moedas -= preco;
   darItem(s.id, 1);
   lojaVendidos.push(i);
@@ -2327,7 +2354,7 @@ function comprar(i, elOrigem){
   render();
   renderLoja();
   if (typeof renderInventario === 'function') renderInventario();
-  if (elOrigem) notificarFlutuante(elOrigem, 'Você comprou ' + it.nome, COR_RAR[it.rar]);
+  if (ponto) notificarFlutuante(ponto, 'Você comprou ' + it.nome, COR_RAR[it.rar]);
   else aviso('COMPROU ' + it.nome.toUpperCase(), true);
 }
 

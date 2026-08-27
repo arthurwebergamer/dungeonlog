@@ -67,6 +67,12 @@
      position:fixed com coordenadas de viewport, empilhada acima de
      overlays/fichas (z-index 200) pois a ficha fecha logo em seguida */
   .dmg-float.fixo{position:fixed;z-index:200}
+  /* pedido do usuario (27/08): mensagens tipo "Voce comprou X"/"Voce
+     melhorou Fortuna" podem ser longas -- sem isso, nowrap fazia o texto
+     estourar pra fora da tela quando o botao de origem ficava perto da
+     borda (bug reportado: "ficou cortado, saiu pra fora") */
+  .dmg-float.msg{white-space:normal;text-align:center;max-width:200px;
+    line-height:1.35;gap:0}
   .dmg-float svg{width:13px;height:13px;image-rendering:pixelated;flex-shrink:0}
   /* moeda em --gold (mesma cor de .coins no topbar e .toast.gold), XP em
      cor neutra (mesma familia de .xpnum) -- app ja diferencia os dois

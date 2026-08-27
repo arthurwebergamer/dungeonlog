@@ -1165,13 +1165,15 @@ function numeroFlutuante(xpGanho, moedasGanhas){
   setTimeout(() => el.remove(), 1600);
 }
 
-// pedido do usuario (27/08): mesmo flutuante da Arena, reaproveitado fora
-// dela (Inventario/Loja/Atributos) -- generico. Aceita ou um elemento vivo
-// (mede a posicao na hora) ou um ponto {x,y} ja capturado antes -- use o
-// ponto sempre que a chamada acontecer DEPOIS de render()/renderLoja(),
-// que reconstroem o grid via innerHTML e desconectam o elemento original
-// do DOM (getBoundingClientRect vira {0,0,0,0} nesse caso -- bug real
-// reportado: comprar/vender na Loja nao mostrava nada).
+// NAO USADAS ATUALMENTE (27/08) -- pontoDeElemento/flutuanteFixo eram usadas
+// por usarItem()/venderItem() (Inventario/Loja) e antes disso por
+// equipar()/comprar()/investir(), tudo revertido a pedido do usuario apos
+// varios problemas de posicionamento/timing no fluxo desses flutuantes
+// (ver historico no roadmap, itens 44 e correcoes seguintes). O numero
+// flutuante da Arena (numeroFlutuante, logo acima) e o unico que continua
+// ativo -- usa sua propria logica de posicionamento (.arena como
+// container relativo), nao depende destas funcoes. Mantidas no arquivo,
+// nao apagadas, por serem utilitarias genericas que podem servir de novo.
 function pontoDeElemento(el){
   if (!el) return null;
   const r = el.getBoundingClientRect();
@@ -1190,9 +1192,6 @@ function flutuanteFixo(origem, conteudoHtml, largo){
   el.innerHTML = conteudoHtml;
   document.body.appendChild(el);
 
-  // trava dentro da tela: mede a largura real ja renderizada e reposiciona
-  // se estourar borda esquerda/direita -- corrige texto longo tipo "Voce
-  // melhorou Fortuna" cortado pra fora quando o botao fica perto da borda
   const margem = 10;
   const meia = el.offsetWidth / 2;
   let cx = p.x;
@@ -1203,9 +1202,6 @@ function flutuanteFixo(origem, conteudoHtml, largo){
   setTimeout(() => el.remove(), 1600);
 }
 
-// NAO USADA ATUALMENTE (27/08) -- estava em equipar()/comprar()/investir(),
-// revertido a pedido do usuario ("nao ficou bom"). Mantida no arquivo por
-// ser utilitaria generica (nome+cor), pode voltar a ser util no futuro.
 function notificarFlutuante(origem, prefixo, nome, cor){
   flutuanteFixo(origem, '<span class="dmg-xp">' + prefixo + '</span> <span style="color:' + cor + '">' + nome + '</span>', true);
 }
@@ -1720,14 +1716,6 @@ const blocosTarefas = ['.arena', '.xpwrap', '.tasks'].map(s => document.querySel
 function mostrarAba(nome){
   abaAtual = nome;
 
-  // pedido do usuario (27/08, achado em gravacao de tela): flutuante .fixo
-  // (venda/uso de item) e position:fixed no body, nao dentro do conteudo da
-  // aba -- se o usuario troca de aba enquanto ele ainda esta subindo, fica
-  // "pairando" preso no mesmo pixel da tela por cima da aba nova, sem
-  // relacao nenhuma com o item que originou. Some qualquer um pendente ao
-  // trocar de aba, em vez de deixar terminar sozinho.
-  document.querySelectorAll('.dmg-float.fixo').forEach(el => el.remove());
-
   // fecha o formulario de nova tarefa ao sair da aba
   if (nome !== 'tarefas') composer.classList.remove('on');
 
@@ -1868,10 +1856,9 @@ function equipar(id){
   aviso(equipado[it.tipo] === id ? 'EQUIPADO' : 'DESEQUIPADO');
 }
 
-function usarItem(id, elOrigem){
+function usarItem(id){
   const it = item(id);
   if (it.tipo !== 'cons') return;
-  const ponto = pontoDeElemento(elOrigem); // captura ANTES do render, mesmo padrao de venderItem()
   if (it.x) xpTotal += it.x;
   if (it.m) moedas += it.m;
   if (it.h && window.vidaHeroi && typeof window.vidaHeroi.set === 'function'){
@@ -1879,30 +1866,19 @@ function usarItem(id, elOrigem){
     window.vidaHeroi.set(novaVida);
   }
   tirarItem(id, 1);
-  persistir(); render(); renderInventario();
-  const textoGanho = it.h ? ('+' + it.h + ' HP') : (it.x ? ('+' + it.x + ' XP') : ('+' + it.m + ' MOEDAS'));
-  if (ponto) flutuanteFixo(ponto, '<span class="dmg-xp">' + textoGanho + '</span>');
-  else aviso(textoGanho, !it.x && !it.h);
-  // atraso proposital (pedido do usuario, achado em gravacao de tela): a
-  // ficha desliza pra fora em .22s (ver .isheet no CSS), enquanto o
-  // flutuante dura 1.6s -- sem esse atraso, o item ja tinha sumido da tela
-  // bem antes da moeda/xp terminar de subir, parecendo vir "do nada"
-  setTimeout(fecharFicha, 150);
+  persistir(); render(); renderInventario(); fecharFicha();
+  aviso(it.h ? '+'+it.h+' HP' : (it.x ? '+'+it.x+' XP' : '+'+it.m+' MOEDAS'), !it.x && !it.h);
 }
 
-function venderItem(id, elOrigem){
+function venderItem(id){
   const it = item(id);
   if (it.tipo === 'chave') return;   // itens-chave (ex: Grimório) nunca sao vendaveis
-  const ponto = pontoDeElemento(elOrigem); // captura ANTES do render, ver nota em flutuanteFixo()
   SLOTS.forEach(s => { if (equipado[s] === id) equipado[s] = null; });
   const preco = precoVenda(it);
   moedas += preco;
   tirarItem(id, 1);
-  persistir(); render(); renderInventario();
-  if (ponto) flutuanteFixo(ponto, '<span class="dmg-moeda">+' + preco + ' ' + COIN_SVG + '</span>');
-  else aviso('VENDIDO  +'+preco+' MOEDAS', true);
-  // mesmo atraso proposital de usarItem() logo acima -- ver comentario la
-  setTimeout(fecharFicha, 150);
+  persistir(); render(); renderInventario(); fecharFicha();
+  aviso('VENDIDO  +'+preco+' MOEDAS', true);
 }
 
 function persistir(){ if (typeof jaComecou !== 'undefined' && jaComecou) salvar(); }
@@ -2062,8 +2038,8 @@ function abrirFicha(id){
     b.onclick = () => {
       const a = b.dataset.a;
       if (a === 'eq') equipar(id);
-      else if (a === 'usar') usarItem(id, ficha.querySelector('.ibox') || b);
-      else if (a === 'vender') venderItem(id, ficha.querySelector('.ibox') || b);
+      else if (a === 'usar') usarItem(id);
+      else if (a === 'vender') venderItem(id);
       else if (a === 'abrir'){
         fecharFicha();
         if (typeof window.abrirCatalogoGrimorio === 'function') window.abrirCatalogoGrimorio();
@@ -2516,7 +2492,7 @@ function montarVenda(grid){
   });
 
   grid.querySelectorAll('[data-v]').forEach(b => {
-    b.onclick = () => { const icone = b.closest('.lrow')?.querySelector('.lbox'); venderItem(+b.dataset.v, icone || b); renderLoja(); };
+    b.onclick = () => { venderItem(+b.dataset.v); renderLoja(); };
   });
 
   const tesouros = inventario.filter(s => item(s.id).tipo === 'tesouro');

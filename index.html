@@ -1165,6 +1165,21 @@ function numeroFlutuante(xpGanho, moedasGanhas){
   setTimeout(() => el.remove(), 1600);
 }
 
+// pedido do usuario (27/08): mesmo flutuante da Arena, reaproveitado fora
+// dela (Inventario, ao usar pocao) -- generico, recebe qualquer elemento
+// de origem (ex: o botao "Usar" clicado) e o HTML de conteudo pronto.
+function flutuanteFixo(elOrigem, conteudoHtml){
+  if (!elOrigem) return;
+  const r = elOrigem.getBoundingClientRect();
+  const el = document.createElement('div');
+  el.className = 'dmg-float fixo';
+  el.style.left = (r.left + r.width / 2) + 'px';
+  el.style.top = r.top + 'px';
+  el.innerHTML = conteudoHtml;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1600);
+}
+
 // item pedido pelo usuario (27/08): tela "DIA VENCIDO" muito simples --
 // disparado 1x por vitoria (ver flag _vitoriaCelebrada em render()), nunca
 // a cada re-render enquanto o dia ja estiver vencido. Feedback do baú
@@ -1812,7 +1827,7 @@ function equipar(id){
   aviso(equipado[it.tipo] === id ? 'EQUIPADO' : 'DESEQUIPADO');
 }
 
-function usarItem(id){
+function usarItem(id, elOrigem){
   const it = item(id);
   if (it.tipo !== 'cons') return;
   if (it.x) xpTotal += it.x;
@@ -1822,8 +1837,11 @@ function usarItem(id){
     window.vidaHeroi.set(novaVida);
   }
   tirarItem(id, 1);
-  persistir(); render(); renderInventario(); fecharFicha();
-  aviso(it.h ? '+'+it.h+' HP' : (it.x ? '+'+it.x+' XP' : '+'+it.m+' MOEDAS'), !it.x && !it.h);
+  persistir(); render(); renderInventario();
+  const textoGanho = it.h ? ('+' + it.h + ' HP') : (it.x ? ('+' + it.x + ' XP') : ('+' + it.m + ' MOEDAS'));
+  if (elOrigem) flutuanteFixo(elOrigem, '<span class="dmg-xp">' + textoGanho + '</span>');
+  else aviso(textoGanho, !it.x && !it.h);
+  fecharFicha();
 }
 
 function venderItem(id){
@@ -1994,7 +2012,7 @@ function abrirFicha(id){
     b.onclick = () => {
       const a = b.dataset.a;
       if (a === 'eq') equipar(id);
-      else if (a === 'usar') usarItem(id);
+      else if (a === 'usar') usarItem(id, b);
       else if (a === 'vender') venderItem(id);
       else if (a === 'abrir'){
         fecharFicha();

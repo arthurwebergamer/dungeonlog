@@ -1203,12 +1203,11 @@ function flutuanteFixo(origem, conteudoHtml, largo){
   setTimeout(() => el.remove(), 1600);
 }
 
-// pedido do usuario (27/08): equipar/desequipar, comprar, melhorar atributo
-// -- mesmo flutuante, so texto com cor dinamica (raridade do item ou cor
-// do atributo). Sempre "largo" (quebra linha) pois mensagens podem ser
-// longas ("Voce comprou Espada Longa de Ferro"), diferente do numero curto.
-function notificarFlutuante(origem, texto, cor){
-  flutuanteFixo(origem, '<span style="color:' + cor + '">' + texto + '</span>', true);
+// pedido do usuario (27/08): so o nome do item/atributo leva a cor
+// (raridade ou cor do atributo), o resto da frase fica na cor padrao de
+// texto (reaproveita .dmg-xp, ja existente e ja com var(--text)).
+function notificarFlutuante(origem, prefixo, nome, cor){
+  flutuanteFixo(origem, '<span class="dmg-xp">' + prefixo + '</span> <span style="color:' + cor + '">' + nome + '</span>', true);
 }
 
 // item pedido pelo usuario (27/08): tela "DIA VENCIDO" muito simples --
@@ -1860,7 +1859,7 @@ function equipar(id, elOrigem){
   equipado[it.tipo] = (equipado[it.tipo] === id) ? null : id;
   persistir(); renderInventario(); fecharFicha();
   const equipou = equipado[it.tipo] === id;
-  if (ponto) notificarFlutuante(ponto, (equipou ? 'Você equipou ' : 'Você desequipou ') + it.nome, COR_RAR[it.rar]);
+  if (ponto) notificarFlutuante(ponto, equipou ? 'Você equipou' : 'Você desequipou', it.nome, COR_RAR[it.rar]);
   else aviso(equipou ? 'EQUIPADO' : 'DESEQUIPADO');
 }
 
@@ -2354,7 +2353,7 @@ function comprar(i, elOrigem){
   render();
   renderLoja();
   if (typeof renderInventario === 'function') renderInventario();
-  if (ponto) notificarFlutuante(ponto, 'Você comprou ' + it.nome, COR_RAR[it.rar]);
+  if (ponto) notificarFlutuante(ponto, 'Você comprou', it.nome, COR_RAR[it.rar]);
   else aviso('COMPROU ' + it.nome.toUpperCase(), true);
 }
 
@@ -4250,7 +4249,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     renderAtributosPontos();
     if (elOrigem && typeof window.notificarFlutuante === 'function'
         && typeof NOME_ATR !== 'undefined' && typeof COR_ATR !== 'undefined'){
-      window.notificarFlutuante(elOrigem, 'Você melhorou ' + NOME_ATR[atr], COR_ATR[atr]);
+      window.notificarFlutuante(elOrigem, 'Você melhorou', NOME_ATR[atr], COR_ATR[atr]);
     }
   }
 

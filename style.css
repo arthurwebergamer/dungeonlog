@@ -3071,18 +3071,19 @@
 #temaGrid.temagrid{
   display:grid;
   grid-template-columns:repeat(2,1fr);
-  gap:12px;
+  gap:14px;
 }
 #temaGrid .temaswatch{
   width:auto;
-  height:92px;
-  border-radius:16px;
+  height:auto;
+  aspect-ratio:1 / 1.05;
+  border-radius:20px;
   border:2px solid var(--line);
   cursor:pointer;
   display:flex;
   align-items:flex-end;
   justify-content:center;
-  padding-bottom:10px;
+  padding-bottom:16px;
   box-sizing:border-box;
   transition:transform .12s;
 }
@@ -3093,11 +3094,11 @@
 }
 #temaGrid .temaLabel{
   font-family:'Outfit',sans-serif;
-  font-size:12px;
+  font-size:14px;
   font-weight:600;
   color:rgba(0,0,0,.65);
   background:rgba(255,255,255,.82);
-  padding:3px 10px;
+  padding:5px 14px;
   border-radius:20px;
 }
 

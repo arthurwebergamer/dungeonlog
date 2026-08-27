@@ -3069,40 +3069,54 @@
 }
 
 #cfgTemaCard{
-  padding:12px 8px 14px;
+  padding:12px 13px;
 }
 #temaGrid.temagrid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:12px;
-}
-#temaGrid .temaswatch{
-  width:auto;
-  height:auto;
-  aspect-ratio:1 / 1.9;
-  border-radius:10px;
-  border:2px solid var(--line);
-  cursor:pointer;
   display:flex;
-  align-items:flex-end;
-  justify-content:center;
-  padding-bottom:20px;
+  flex-direction:column;
+  gap:2px;
+}
+.temalinha{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  padding:12px 4px;
+  cursor:pointer;
+  border-bottom:1px solid var(--line);
+  transition:background .12s;
+}
+.temalinha:last-child{ border-bottom:none }
+.temalinha:active{ background:var(--panel-3) }
+.temaDot{
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  flex:none;
+  border:2px solid var(--line);
   box-sizing:border-box;
-  transition:transform .12s;
 }
-#temaGrid .temaswatch:active{ transform:scale(.96) }
-#temaGrid .temaswatch.sel{
-  border-color:var(--text);
-  box-shadow:0 0 0 3px var(--accent);
-}
-#temaGrid .temaLabel{
+.temaNome{
+  flex:1;
   font-family:'Outfit',sans-serif;
   font-size:14px;
   font-weight:600;
-  color:rgba(0,0,0,.65);
-  background:rgba(255,255,255,.82);
-  padding:5px 14px;
-  border-radius:20px;
+  color:var(--text);
+}
+.temaCheck{
+  width:20px;
+  height:20px;
+  flex:none;
+  color:var(--accent);
+  opacity:0;
+  transform:scale(.6);
+  transition:opacity .12s, transform .12s;
+}
+.temalinha.sel .temaCheck{
+  opacity:1;
+  transform:scale(1);
+}
+.temalinha.sel .temaDot{
+  border-color:var(--text);
 }
 
 /* --- Módulo style #23 --- */

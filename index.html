@@ -1936,6 +1936,13 @@ Object.keys(SPRITE_SLOT).forEach(k => {
 
 const ROTULO_SLOT = {arma:'arma',armadura:'peito',elmo:'elmo',escudo:'escudo',acess:'acess.'};
 
+// rastreia qual quadradinho do grid (ou slot equipado) abriu a ficha atual
+// -- a ficha em si e um painel modal que sempre aparece no mesmo lugar da
+// tela, entao o icone DENTRO dela (.ibox) tambem fica sempre no mesmo
+// lugar, nao importa qual item foi clicado. A origem certa do flutuante e
+// o icone real no grid, capturado aqui antes da ficha abrir por cima.
+let fichaOrigemEl = null;
+
 function renderInventario(){
   const grid = document.getElementById('invGrid');
   const vazio = document.getElementById('invVazio');
@@ -1962,7 +1969,7 @@ function renderInventario(){
     d.className = 'eslot' + (tem ? ' cheio r'+item(id).rar : '');
     d.innerHTML = tem ? spriteHTML(item(id).sp, 34) : ICONE_SLOT[s];
     d.innerHTML += '<span class="etag">'+ROTULO_SLOT[s]+'</span>';
-    d.onclick = () => { if (tem) abrirFicha(id); };
+    d.onclick = () => { if (tem){ fichaOrigemEl = d; abrirFicha(id); } };
     row.appendChild(d);
   });
 
@@ -1986,7 +1993,7 @@ function renderInventario(){
     c.innerHTML = spriteHTML(it.sp, 32);
     if (s.q > 1) c.innerHTML += '<span class="qtd">'+s.q+'</span>';
     if (SLOTS.some(k => equipado[k] === s.id)) c.innerHTML += '<span class="eq"></span>';
-    c.onclick = () => abrirFicha(s.id);
+    c.onclick = () => { fichaOrigemEl = c; abrirFicha(s.id); };
     grid.appendChild(c);
   });
 
@@ -2051,8 +2058,8 @@ function abrirFicha(id){
     b.onclick = () => {
       const a = b.dataset.a;
       if (a === 'eq') equipar(id);
-      else if (a === 'usar') usarItem(id, ficha.querySelector('.ibox') || b);
-      else if (a === 'vender') venderItem(id, ficha.querySelector('.ibox') || b);
+      else if (a === 'usar') usarItem(id, fichaOrigemEl || ficha.querySelector('.ibox') || b);
+      else if (a === 'vender') venderItem(id, fichaOrigemEl || ficha.querySelector('.ibox') || b);
       else if (a === 'abrir'){
         fecharFicha();
         if (typeof window.abrirCatalogoGrimorio === 'function') window.abrirCatalogoGrimorio();

@@ -1720,6 +1720,14 @@ const blocosTarefas = ['.arena', '.xpwrap', '.tasks'].map(s => document.querySel
 function mostrarAba(nome){
   abaAtual = nome;
 
+  // pedido do usuario (27/08, achado em gravacao de tela): flutuante .fixo
+  // (venda/uso de item) e position:fixed no body, nao dentro do conteudo da
+  // aba -- se o usuario troca de aba enquanto ele ainda esta subindo, fica
+  // "pairando" preso no mesmo pixel da tela por cima da aba nova, sem
+  // relacao nenhuma com o item que originou. Some qualquer um pendente ao
+  // trocar de aba, em vez de deixar terminar sozinho.
+  document.querySelectorAll('.dmg-float.fixo').forEach(el => el.remove());
+
   // fecha o formulario de nova tarefa ao sair da aba
   if (nome !== 'tarefas') composer.classList.remove('on');
 
@@ -1874,7 +1882,11 @@ function usarItem(id, elOrigem){
   const textoGanho = it.h ? ('+' + it.h + ' HP') : (it.x ? ('+' + it.x + ' XP') : ('+' + it.m + ' MOEDAS'));
   if (elOrigem) flutuanteFixo(elOrigem, '<span class="dmg-xp">' + textoGanho + '</span>');
   else aviso(textoGanho, !it.x && !it.h);
-  fecharFicha();
+  // atraso proposital (pedido do usuario, achado em gravacao de tela): a
+  // ficha desliza pra fora em .22s (ver .isheet no CSS), enquanto o
+  // flutuante dura 1.6s -- sem esse atraso, o item ja tinha sumido da tela
+  // bem antes da moeda/xp terminar de subir, parecendo vir "do nada"
+  setTimeout(fecharFicha, 350);
 }
 
 function venderItem(id, elOrigem){
@@ -1885,9 +1897,11 @@ function venderItem(id, elOrigem){
   const preco = precoVenda(it);
   moedas += preco;
   tirarItem(id, 1);
-  persistir(); render(); renderInventario(); fecharFicha();
+  persistir(); render(); renderInventario();
   if (ponto) flutuanteFixo(ponto, '<span class="dmg-moeda">+' + preco + ' ' + COIN_SVG + '</span>');
   else aviso('VENDIDO  +'+preco+' MOEDAS', true);
+  // mesmo atraso proposital de usarItem() logo acima -- ver comentario la
+  setTimeout(fecharFicha, 350);
 }
 
 function persistir(){ if (typeof jaComecou !== 'undefined' && jaComecou) salvar(); }

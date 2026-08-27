@@ -84,12 +84,29 @@
   .arena.venceu .fighter.mob{width:0;overflow:hidden}
   .vitoria{display:none;flex-direction:column;align-items:center;gap:5px;margin-top:2px}
   .vitoria.on{display:flex;animation:subir .4s ease-out}
-  .vitoria.on .faixa{animation:faixaGlow 1.6s ease-in-out .4s infinite}
-  @keyframes faixaGlow{
-    0%,100%{text-shadow:none}
-    50%{text-shadow:0 0 9px var(--gold)}
+  .vitoria.on .faixa{animation:faixaPunch .5s ease-out .35s both}
+  @keyframes faixaPunch{
+    0%{transform:scale(1);text-shadow:none}
+    40%{transform:scale(1.28);text-shadow:0 0 14px var(--gold)}
+    100%{transform:scale(1);text-shadow:0 0 6px var(--gold)}
   }
-  .vitoria .faixa{font-family:'Silkscreen',monospace;font-size:11px;color:var(--accent);letter-spacing:1px}
+  /* baú: base fixa + tampa que gira ao abrir, dispara 1x por vitoria (JS
+     adiciona .aberto em celebrarVitoria(), remove quando o dia reseta) */
+  .vitoriaBau{position:relative;width:34px;height:34px;margin-bottom:1px}
+  .vitoriaBau svg{position:absolute;width:100%;height:100%;image-rendering:pixelated}
+  .bauBase{z-index:1}
+  .bauTampa{z-index:2;transform-origin:50% 78%;transition:transform .4s cubic-bezier(.34,1.56,.64,1)}
+  .vitoriaBau.aberto .bauTampa{transform:rotate(-42deg) translateY(-2px)}
+  .bauFlash{position:absolute;left:50%;top:45%;width:6px;height:6px;border-radius:50%;
+    background:radial-gradient(circle, #FFF6D8 0%, var(--gold) 45%, transparent 72%);
+    transform:translate(-50%,-50%) scale(0);opacity:0;pointer-events:none}
+  .vitoriaBau.aberto .bauFlash{animation:bauFlash .6s ease-out .3s both}
+  @keyframes bauFlash{
+    0%{transform:translate(-50%,-50%) scale(0);opacity:0}
+    35%{transform:translate(-50%,-50%) scale(7);opacity:.85}
+    100%{transform:translate(-50%,-50%) scale(11);opacity:0}
+  }
+  .vitoria .faixa{font-family:'Silkscreen',monospace;font-size:11px;color:var(--accent);letter-spacing:1px;display:inline-block}
   .vitoria .ganho{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--gold)}
   .vitoria .ganho svg{width:12px;height:12px;image-rendering:pixelated}
   /* item pedido pelo usuario: burst de faiscas radiando da faixa DIA
@@ -1178,11 +1195,15 @@
      das Conquistas, .bestimg do Bestiario) -- so a faixa horizontal em
      si e nova. */
   .cfgrowtopo{display:flex;align-items:center;justify-content:space-between;gap:10px}
-  .prevfaixa{display:flex;gap:6px;margin-top:10px;min-height:32px}
+  .prevfaixa{display:flex;gap:6px;margin-top:10px;min-height:32px;
+             overflow-x:auto;-webkit-overflow-scrolling:touch}
   .prevfaixa .caldia{width:32px;height:32px;aspect-ratio:unset;flex:none}
-  .prevconqicone{width:30px;height:30px;flex:none;border-radius:50%;display:flex;
-                  align-items:center;justify-content:center;background:var(--pv-cor);color:#1A1526}
-  .prevconqicone svg{width:15px;height:15px}
+  /* pedido do usuario: previa de conquistas so com texto, sem icone --
+     chip com cor da conquista na borda/texto em vez de circulo preenchido */
+  .prevconqchip{flex:none;display:flex;align-items:center;height:30px;padding:0 11px;
+                border-radius:14px;background:var(--panel-3);border:1px solid var(--pv-cor);
+                font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;
+                color:var(--pv-cor);white-space:nowrap}
   .prevbestimg{width:32px;height:32px;flex:none;object-fit:contain;image-rendering:pixelated;
                border-radius:8px;background:var(--panel-3);padding:3px;box-sizing:border-box}
   .prevvazio{font-family:'Outfit',sans-serif;font-size:11.5px;color:var(--dim);
@@ -2310,11 +2331,15 @@
      das Conquistas, .bestimg do Bestiario) -- so a faixa horizontal em
      si e nova. */
   .cfgrowtopo{display:flex;align-items:center;justify-content:space-between;gap:10px}
-  .prevfaixa{display:flex;gap:6px;margin-top:10px;min-height:32px}
+  .prevfaixa{display:flex;gap:6px;margin-top:10px;min-height:32px;
+             overflow-x:auto;-webkit-overflow-scrolling:touch}
   .prevfaixa .caldia{width:32px;height:32px;aspect-ratio:unset;flex:none}
-  .prevconqicone{width:30px;height:30px;flex:none;border-radius:50%;display:flex;
-                  align-items:center;justify-content:center;background:var(--pv-cor);color:#1A1526}
-  .prevconqicone svg{width:15px;height:15px}
+  /* pedido do usuario: previa de conquistas so com texto, sem icone --
+     chip com cor da conquista na borda/texto em vez de circulo preenchido */
+  .prevconqchip{flex:none;display:flex;align-items:center;height:30px;padding:0 11px;
+                border-radius:14px;background:var(--panel-3);border:1px solid var(--pv-cor);
+                font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;
+                color:var(--pv-cor);white-space:nowrap}
   .prevbestimg{width:32px;height:32px;flex:none;object-fit:contain;image-rendering:pixelated;
                border-radius:8px;background:var(--panel-3);padding:3px;box-sizing:border-box}
   .prevvazio{font-family:'Outfit',sans-serif;font-size:11.5px;color:var(--dim);

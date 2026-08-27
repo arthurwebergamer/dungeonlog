@@ -137,6 +137,22 @@
     </div>
 
     <div class="vitoria" id="vitoria">
+      <div class="vitoriaBau" id="vitoriaBau">
+        <div class="bauFlash"></div>
+        <svg viewBox="0 0 16 16" shape-rendering="crispEdges" class="bauBase">
+          <rect x="2" y="7" width="12" height="6" fill="#8B5A2B"/>
+          <rect x="2" y="11" width="12" height="2" fill="#6B4423"/>
+          <rect x="2" y="7" width="2" height="6" fill="#F2C94C"/>
+          <rect x="12" y="7" width="2" height="6" fill="#F2C94C"/>
+          <rect x="7" y="9" width="2" height="3" fill="#F2C94C"/>
+        </svg>
+        <svg viewBox="0 0 16 16" shape-rendering="crispEdges" class="bauTampa">
+          <rect x="4" y="3" width="8" height="1" fill="#A56B36"/>
+          <rect x="2" y="4" width="12" height="3" fill="#A56B36"/>
+          <rect x="2" y="5" width="12" height="1" fill="#F2C94C"/>
+          <rect x="2" y="6" width="12" height="1" fill="#6B4423"/>
+        </svg>
+      </div>
       <span class="faixa">DIA VENCIDO</span>
       <span class="ganho">
         <svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="5" y="2" width="6" height="1" fill="#F2C94C"/><rect x="3" y="3" width="10" height="2" fill="#F2C94C"/><rect x="2" y="5" width="12" height="6" fill="#F2C94C"/><rect x="3" y="11" width="10" height="2" fill="#F2C94C"/><rect x="5" y="13" width="6" height="1" fill="#F2C94C"/><rect x="6" y="5" width="2" height="6" fill="#B8942E"/></svg>
@@ -1097,6 +1113,8 @@ function render(){
   } else if (!venceu){
     _vitoriaCelebrada = false;
     document.getElementById('ganhoTxt').textContent = '+' + ultimoGanho;
+    const bau = document.getElementById('vitoriaBau');
+    if (bau) bau.classList.remove('aberto');
   }
 
   const p = progresso();
@@ -1174,6 +1192,9 @@ function celebrarVitoria(ganho){
   const arena = document.querySelector('.arena');
   const alvo = document.getElementById('vitoria');
   if (!arena || !alvo) return;
+
+  const bau = document.getElementById('vitoriaBau');
+  if (bau) bau.classList.add('aberto');
 
   // burst de faiscas radiando da faixa "DIA VENCIDO" -- mesma tecnica de
   // origem/posicionamento de moedasCaindo/numeroFlutuante (getBoundingClientRect
@@ -3695,10 +3716,10 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       } else {
         recentes.forEach(c => {
           const ic = document.createElement('div');
-          ic.className = 'prevconqicone';
+          ic.className = 'prevconqchip';
           ic.style.setProperty('--pv-cor', c.cor);
           ic.title = c.nome;
-          ic.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + c.icone + '</svg>';
+          ic.textContent = c.nome;
           faixaConq.appendChild(ic);
         });
       }

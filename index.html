@@ -605,19 +605,19 @@
 <div class="nav" id="nav">
     <button class="on" data-aba="tarefas">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4a1 1 0 00-1 1v14a1 1 0 001 1h16a1 1 0 001-1V5a1 1 0 00-1-1zm-9.3 12.2l-3.4-3.4 1.4-1.4 2 2 4.6-4.6 1.4 1.4-6 6z"/></svg>
-      Tarefas
+      <span data-i18n="nav.tarefas">Tarefas</span>
     </button>
     <button data-aba="inventario">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l1 12H4L5 8z"/><path d="M9 8V6a3 3 0 016 0v2"/></svg>
-      Inventário
+      <span data-i18n="nav.inventario">Inventário</span>
     </button>
     <button data-aba="loja">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.6"/><circle cx="18" cy="20" r="1.6"/><path d="M2 3h3l2.6 12.4a2 2 0 002 1.6h8.2a2 2 0 002-1.6L21.5 7H6"/></svg>
-      Loja
+      <span data-i18n="nav.loja">Loja</span>
     </button>
     <button data-aba="perfil">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v5a5 5 0 01-10 0V4z"/><path d="M17 5.5h2.5a2.5 2.5 0 01-2.5 4"/><path d="M7 5.5H4.5a2.5 2.5 0 002.5 4"/><path d="M12 14v3"/><path d="M8.5 20h7"/><path d="M10 17h4l.8 3H9.2l.8-3z"/></svg>
-      Perfil
+      <span data-i18n="nav.perfil">Perfil</span>
     </button>
   </div>
 
@@ -6512,19 +6512,6 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
   card.insertAdjacentHTML('afterbegin', `
     <div class="passo on" id="passoLogin">
-      <div class="loginTopBtns">
-        <button class="miniBtn" id="idiomaBtn" title="Idioma">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
-            <circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.7-3.8-9s1.3-6.4 3.8-9z"/>
-          </svg>
-        </button>
-        <button class="miniBtn" id="temaMiniBtn" title="Tema">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
-            <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>
-          </svg>
-        </button>
-      </div>
-
       <div class="marca">
         <span class="titulo">QUESTLOG</span>
         <p class="loginModo" id="loginModo">Entre na sua conta</p>
@@ -6655,21 +6642,10 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     }
   }
 
-  // ---------- botao idioma (ainda nao funcional, so o gancho visual) ----------
-  document.getElementById('idiomaBtn').onclick = () => {
-    if (typeof window.aviso === 'function') window.aviso('Idioma: em breve');
-  };
-
-  // ---------- botao tema (reaproveita a MESMA chave do sistema de temas
-  // do Perfil > Config -- so a UI e nova, a logica/estado e a mesma) ----------
-  const CICLO_TEMAS = ['padrao', 'meianoite', 'pergaminho', 'grafite'];
-  document.getElementById('temaMiniBtn').onclick = () => {
-    let atual;
-    try { atual = localStorage.getItem('questlog.tema.v1') || 'padrao'; } catch(e){ atual = 'padrao'; }
-    const prox = CICLO_TEMAS[(CICLO_TEMAS.indexOf(atual) + 1) % CICLO_TEMAS.length];
-    document.documentElement.setAttribute('data-tema', prox);
-    try { localStorage.setItem('questlog.tema.v1', prox); } catch(e){}
-  };
+  // ---------- botoes de idioma/tema saíram do login (item 46 do roadmap)
+  // -- idioma agora tem slide próprio no carrossel (ver bloco I18N —
+  // IDIOMA mais abaixo), tema já vive em Perfil > Config > Aparência
+  // desde o item 39. Removido daqui pra não duplicar. ----------
 
   // ---------- sair do login sem conta ----------
   // Antes de v4.47, esta tela so aparecia pra quem NUNCA tinha save local
@@ -6917,8 +6893,14 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // e Nome -- pedido do usuario ("falta um dialogo entre evolua e a
   // tela de nome"). Empurra nome/heroi/tarefas +1 na numeracao (login
   // continua fora da contagem, e um desvio, nao muda).
-  //   1 QUESTLOG · 2 BATALHA · 3 EVOLUA · 4 transicao
-  //   5 nome · 6 heroi · 7 tarefas   (login: fora da numeracao)
+  //   1 QUESTLOG · 2 BATALHA · 3 EVOLUA · 4 idioma · 5 transicao
+  //   6 nome · 7 heroi · 8 tarefas   (login: fora da numeracao)
+  // v4.13x (item 46 do roadmap): slide de idioma novo, entre EVOLUA e a
+  // transicao -- empurra transicao/nome/heroi/tarefas +1 na numeracao,
+  // mesmo padrao ja usado quando a transicao (item 42-f) entrou entre
+  // EVOLUA e nome. Escolha de idioma so troca a preferencia salva (ver
+  // bloco I18N -- IDIOMA mais abaixo); nao ha texto novo pra traduzir
+  // nesta sessao (decisao fechada em brainstorm: so a arquitetura agora).
   const SLIDES = [
     { dataSlide:1, next:2, tipo:'trioLogo', idxs:[0, 32, 5], titulo:'QUESTLOG',
       texto:'Suas tarefas do dia viram uma batalha. Complete tarefas, evolua seu herói, vença monstros.',
@@ -6929,13 +6911,16 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     { dataSlide:3, next:4, tipo:'heroi', idx:1, titulo:'EVOLUA',
       texto:'Ganhe XP, moedas e itens conforme joga. Da raridade Comum até Lendário.',
       botao:'Continuar', layout:'imagemPrimeiro' },
-    { dataSlide:4, next:5, tipo:'transicao',
+    { dataSlide:4, next:5, tipo:'idioma', titulo:'IDIOMA · LANGUAGE',
+      texto:'Escolha o idioma do app. Dá pra trocar depois em Perfil.',
+      botao:'Continuar', layout:'idiomaEscolha' },
+    { dataSlide:5, next:6, tipo:'transicao',
       texto:'Antes de começar, vamos te conhecer melhor...',
       botao:'Continuar', layout:'textoSolo' }
   ];
-  const SLIDE_TRANSICAO = 4; // usado pra disparar o typewriter (ver iniciarTypewriter, mais abaixo)
-  const SLIDE_NOME = 5; // usado pra bloquear arraste sem nome preenchido (ver pegarVizinho, mais abaixo)
-  const TOTAL_SLIDES = 7;
+  const SLIDE_TRANSICAO = 5; // usado pra disparar o typewriter (ver iniciarTypewriter, mais abaixo)
+  const SLIDE_NOME = 6; // usado pra bloquear arraste sem nome preenchido (ver pegarVizinho, mais abaixo)
+  const TOTAL_SLIDES = 8;
 
   function imagemSlide(s){
     if (s.tipo === 'logo'){
@@ -7021,6 +7006,22 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     </div>
   `;
 
+  // v4.13x (item 46 do roadmap): 2 botões simples, mesmo padrão visual
+  // de outros pares de escolha do app (ex: toggle Entrar/Cadastro do
+  // login) -- não é <select>/<input type="radio">, é clique direto que
+  // já persiste (ver bloco I18N — IDIOMA mais abaixo). "pt" começa
+  // marcado porque é o idioma padrão hoje (ver definirIdioma()).
+  const htmlIdiomaEscolha = `
+    <div class="carrosselIdiomaEscolha">
+      <button class="idiomaOpcao on" id="idiomaOpPt" data-lang="pt" type="button">
+        <span class="idiomaOpcaoNome">Português</span>
+      </button>
+      <button class="idiomaOpcao" id="idiomaOpEn" data-lang="en" type="button">
+        <span class="idiomaOpcaoNome">English</span>
+      </button>
+    </div>
+  `;
+
   const htmlSlides = SLIDES.map((s, i) => {
     const blocoImagem = imagemSlide(s);
     const blocoMarca = `
@@ -7044,6 +7045,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     const corpo = s.layout === 'marcaPrimeiro' ? (blocoMarca + blocoImagem)
                 : s.layout === 'comTarefasDemo' ? (blocoImagem + blocoMarca + htmlTarefasDemo)
                 : s.layout === 'textoSolo' ? blocoTransicao
+                : s.layout === 'idiomaEscolha' ? (blocoMarca + htmlIdiomaEscolha)
                 : (blocoImagem + blocoMarca); // 'imagemPrimeiro' e fallback
 
     return `
@@ -7089,9 +7091,9 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // wrap-not-rewrite) mas nunca mais reparentado/ganha data-slide,
   // entao nunca aparece.
   [
-    ['passo2', 5],      // nome
-    ['passoHeroi', 6],
-    ['passo3', 7]       // tarefas
+    ['passo2', 6],      // nome
+    ['passoHeroi', 7],
+    ['passo3', 8]       // tarefas
   ].forEach(([id, n]) => {
     const el = document.getElementById(id);
     if (!el) return;
@@ -7305,7 +7307,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // chama render(), continua igual. #irPasso2 (botao de dentro do
   // slide de regras) NAO e mais rewireado aqui -- o slide saiu do
   // carrossel (v4.115), o botao nunca mais fica visivel.
-  document.getElementById('voltar1').onclick = () => irPara(4);    // nome -> volta pra transição
+  document.getElementById('voltar1').onclick = () => irPara(5);    // nome -> volta pra transição
   document.getElementById('irEscolha').onclick = () => {
     const campo = document.getElementById('nomeHeroi');
     const n = campo.value.trim();
@@ -7317,12 +7319,12 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     }
     nomeHeroi = n; // let top-level, visivel entre scripts classic -- mesma variavel que heroiAtual()/salvar() usam
     if (typeof montarGrade === 'function') montarGrade();
-    irPara(6);                                                     // nome -> heroi
+    irPara(7);                                                     // nome -> heroi
   };
-  document.getElementById('voltarNome').onclick = () => irPara(5); // heroi -> volta pro nome
+  document.getElementById('voltarNome').onclick = () => irPara(6); // heroi -> volta pro nome
   document.getElementById('irPasso3').onclick = () => {
     if (typeof desenharHeroi === 'function') desenharHeroi();
-    irPara(7);                                                     // heroi -> tarefas
+    irPara(8);                                                     // heroi -> tarefas
     const campoTarefa = document.getElementById('primeiraTarefa');
     if (campoTarefa) campoTarefa.focus();
   };
@@ -7862,19 +7864,20 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           if (typeof window.render === 'function') window.render();
         } else {
           // conta nova, sem save -- fecha boas-vindas e pula DIRETO pro
-          // slide 4 (transicao "vamos te conhecer melhor...", ver
-          // SLIDE_TRANSICAO no bloco do carrossel), nao mais de volta
-          // pro slide de ONDE A PESSOA VEIO. v4.130 (pedido do usuario):
-          // quem acabou de criar conta ja viu o motivo de usar o app
-          // (senao nao teria se cadastrado) -- fazer reassistir
-          // QUESTLOG/BATALHA/EVOLUA de novo (caso tenha aberto o login
-          // logo no slide 1) e atrito sem propósito. irParaCarrossel(4)
-          // e window.irParaCarrossel, exposto pelo modulo do carrossel
-          // pra uso exatamente assim. Fundo NAO e limpo aqui -- so
-          // limpa de verdade quando #entrar (fim do slide Tarefas)
-          // chamar render().
+          // slide de transicao ("vamos te conhecer melhor...", ver
+          // SLIDE_TRANSICAO no bloco do carrossel -- era o slide 4, virou
+          // o 5 no item 46, quando o slide de idioma entrou entre EVOLUA
+          // e a transicao), nao mais de volta pro slide de ONDE A PESSOA
+          // VEIO. v4.130 (pedido do usuario): quem acabou de criar conta
+          // ja viu o motivo de usar o app (senao nao teria se cadastrado)
+          // -- fazer reassistir QUESTLOG/BATALHA/EVOLUA/IDIOMA de novo
+          // (caso tenha aberto o login logo no slide 1) e atrito sem
+          // propósito. irParaCarrossel(5) e window.irParaCarrossel,
+          // exposto pelo modulo do carrossel pra uso exatamente assim.
+          // Fundo NAO e limpo aqui -- so limpa de verdade quando #entrar
+          // (fim do slide Tarefas) chamar render().
           document.getElementById('passoBoasVindas').classList.remove('on');
-          if (typeof window.irParaCarrossel === 'function') window.irParaCarrossel(4);
+          if (typeof window.irParaCarrossel === 'function') window.irParaCarrossel(5);
           else if (typeof window.voltarDoLoginCarrossel === 'function') window.voltarDoLoginCarrossel(); // fallback defensivo, nao deveria disparar
         }
       }
@@ -8504,6 +8507,93 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       console.error('efeito de golpe por categoria falhou:', e);
     }
   };
+})();
+</script>
+
+<!-- =====================================================================
+     I18N — IDIOMA  —  bloco autonomo, cole antes de </body>
+     Item 46 do roadmap (item 13d finalmente decidido). Arquitetura
+     fechada em sessao de brainstorm: dicionario central TRADUCOES
+     ({pt,en} por chave), helper window.t('chave') le a preferencia
+     salva (questlog.idioma.v1) e devolve o texto certo,
+     window.definirIdioma(lang) salva e reaplica. Mesmo padrao ja
+     comprovado do sistema de temas (questlog.tema.v1).
+
+     Escopo desta sessao: ARQUITETURA + o slide de idioma em si (nav +
+     slide, prova de que o mecanismo funciona ponta a ponta). Tradução
+     completa de diálogos/itens/monstros (~79 pontos de texto cru, ~100
+     itens, 63 monstros) fica pra sessão dedicada, por decisão explícita
+     do usuário registrada no roadmap ("deixa o texto pra sessão de
+     implementação") -- trocar cada ponto de texto cru por t('chave')
+     é a parte grande, toca praticamente todo módulo do arquivo, não
+     cabe misturado com o resto desta entrega.
+
+     Itens/monstros, quando entrarem: campo extra na própria linha do
+     array (ex: nome_en), NUNCA tabela paralela -- decisão de segurança
+     já registrada no roadmap, mesmo motivo do bug de posição real que
+     já aconteceu neste projeto (Poção de Mana/Vigor, item 16).
+====================================================================== -->
+<script>
+(function(){
+  const CHAVE_IDIOMA = 'questlog.idioma.v1';
+
+  // Dicionário central. Cada chave = {pt, en}. Cresce por sessão futura,
+  // nunca precisa reescrever as entradas já existentes (append-only).
+  const TRADUCOES = {
+    'nav.tarefas':    { pt:'Tarefas',    en:'Tasks' },
+    'nav.inventario': { pt:'Inventário', en:'Inventory' },
+    'nav.loja':       { pt:'Loja',       en:'Shop' },
+    'nav.perfil':     { pt:'Perfil',     en:'Profile' }
+  };
+
+  function idiomaSalvo(){
+    try { return localStorage.getItem(CHAVE_IDIOMA) || 'pt'; } catch(e){ return 'pt'; }
+  }
+
+  // window.t('chave') -- único ponto de leitura de texto traduzido.
+  // Chave sem entrada no dicionário devolve a própria chave (nunca
+  // quebra a tela, só fica visivelmente "sem tradução" -- fácil de
+  // notar e corrigir, ao contrário de undefined/erro).
+  function t(chave){
+    const entrada = TRADUCOES[chave];
+    if (!entrada) return chave;
+    return entrada[idiomaSalvo()] || entrada.pt || chave;
+  }
+  window.t = t;
+
+  // Varre todo elemento marcado com data-i18n e substitui o texto pela
+  // tradução da chave. Convenção: um atributo por elemento, sem mexer
+  // em innerHTML (evita perder handlers/filhos por engano).
+  function aplicarIdioma(){
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      el.textContent = t(el.dataset.i18n);
+    });
+  }
+  window.aplicarIdioma = aplicarIdioma;
+
+  // window.definirIdioma(lang) -- chamado pelos 2 botões do slide de
+  // idioma no carrossel (ver bloco TELA DE LOGIN / SPLASH + CARROSSEL).
+  // Salva a preferência, marca visualmente qual opção está selecionada
+  // e reaplica a tradução em tudo que já está marcado com data-i18n.
+  window.definirIdioma = function(lang){
+    if (lang !== 'pt' && lang !== 'en') return;
+    try { localStorage.setItem(CHAVE_IDIOMA, lang); } catch(e){}
+    document.querySelectorAll('.idiomaOpcao').forEach(b => {
+      b.classList.toggle('on', b.dataset.lang === lang);
+    });
+    aplicarIdioma();
+  };
+
+  // Wire dos 2 botões do slide de idioma (só existem no DOM se o
+  // carrossel foi montado -- quem já tem save local pula onboarding
+  // inteiro, então os botões simplesmente não existem nesse caso, os
+  // guards abaixo cobrem isso sem lançar erro).
+  const btnPt = document.getElementById('idiomaOpPt');
+  const btnEn = document.getElementById('idiomaOpEn');
+  if (btnPt) btnPt.onclick = () => window.definirIdioma('pt');
+  if (btnEn) btnEn.onclick = () => window.definirIdioma('en');
+
+  aplicarIdioma(); // aplica a preferência já salva assim que o app carrega (ex: quem já escolheu antes)
 })();
 </script>
 

@@ -3173,3 +3173,31 @@
 .swch-bolinha{
   box-shadow:0 1px 3px rgba(0,0,0,.35), 0 0 0 1px rgba(0,0,0,.12);
 }
+
+/* --- Módulo style #24: I18N — slide de idioma (item 46 do roadmap) ---
+   2 botões lado a lado, mesma pill de opção que outros toggles do app
+   (ex: temalinha de Aparência), sem introduzir token de cor novo. */
+.carrosselIdiomaEscolha{
+  display:flex;
+  gap:12px;
+  margin-top:22px;
+  width:100%;
+}
+.idiomaOpcao{
+  flex:1;
+  padding:14px 10px;
+  border-radius:14px;
+  border:1.5px solid var(--line);
+  background:var(--panel-2);
+  color:var(--dim);
+  font-family:'Outfit',sans-serif;
+  font-size:14.5px;
+  font-weight:600;
+  cursor:pointer;
+  transition:border-color .15s, color .15s, background .15s;
+}
+.idiomaOpcao.on{
+  border-color:var(--accent);
+  color:var(--text);
+  background:color-mix(in srgb, var(--accent) 14%, var(--panel-2));
+}

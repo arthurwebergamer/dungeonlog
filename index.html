@@ -1871,6 +1871,7 @@ function equipar(id){
 function usarItem(id, elOrigem){
   const it = item(id);
   if (it.tipo !== 'cons') return;
+  const ponto = pontoDeElemento(elOrigem); // captura ANTES do render, mesmo padrao de venderItem()
   if (it.x) xpTotal += it.x;
   if (it.m) moedas += it.m;
   if (it.h && window.vidaHeroi && typeof window.vidaHeroi.set === 'function'){
@@ -1880,13 +1881,13 @@ function usarItem(id, elOrigem){
   tirarItem(id, 1);
   persistir(); render(); renderInventario();
   const textoGanho = it.h ? ('+' + it.h + ' HP') : (it.x ? ('+' + it.x + ' XP') : ('+' + it.m + ' MOEDAS'));
-  if (elOrigem) flutuanteFixo(elOrigem, '<span class="dmg-xp">' + textoGanho + '</span>');
+  if (ponto) flutuanteFixo(ponto, '<span class="dmg-xp">' + textoGanho + '</span>');
   else aviso(textoGanho, !it.x && !it.h);
   // atraso proposital (pedido do usuario, achado em gravacao de tela): a
   // ficha desliza pra fora em .22s (ver .isheet no CSS), enquanto o
   // flutuante dura 1.6s -- sem esse atraso, o item ja tinha sumido da tela
   // bem antes da moeda/xp terminar de subir, parecendo vir "do nada"
-  setTimeout(fecharFicha, 350);
+  setTimeout(fecharFicha, 150);
 }
 
 function venderItem(id, elOrigem){
@@ -1901,7 +1902,7 @@ function venderItem(id, elOrigem){
   if (ponto) flutuanteFixo(ponto, '<span class="dmg-moeda">+' + preco + ' ' + COIN_SVG + '</span>');
   else aviso('VENDIDO  +'+preco+' MOEDAS', true);
   // mesmo atraso proposital de usarItem() logo acima -- ver comentario la
-  setTimeout(fecharFicha, 350);
+  setTimeout(fecharFicha, 150);
 }
 
 function persistir(){ if (typeof jaComecou !== 'undefined' && jaComecou) salvar(); }

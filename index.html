@@ -850,6 +850,7 @@ let xpTotal = 0, moedas = 0, derrotadoEm = null, jaComecou = false;
 function monstroJaCaiu(){ return derrotadoEm === isoAtual(); }
 let nomeHeroi = 'Aventureiro';
 let ultimoGanho = 0;
+let _vitoriaCelebrada = false; // pedido do usuario (27/08): tela de vitoria "muito simples" -- controla o disparo unico do efeito de celebracao, ver celebrarVitoria()
 
 // --- inventario ---
 let inventario = [];   // [{id:indiceNoCatalogo, q:quantidade}]
@@ -1090,7 +1091,13 @@ function render(){
   document.querySelector('.arena').classList.toggle('venceu', venceu);
   document.getElementById('mobinfo').classList.toggle('off', venceu || total === 0);
   document.getElementById('vitoria').classList.toggle('on', venceu);
-  if (venceu) document.getElementById('ganhoTxt').textContent = '+' + ultimoGanho;
+  if (venceu && !_vitoriaCelebrada){
+    _vitoriaCelebrada = true;
+    celebrarVitoria(ultimoGanho);
+  } else if (!venceu){
+    _vitoriaCelebrada = false;
+    document.getElementById('ganhoTxt').textContent = '+' + ultimoGanho;
+  }
 
   const p = progresso();
   document.getElementById('lvl').textContent = 'Nível ' + romano(p.nivel);
@@ -1132,6 +1139,146 @@ function moedasCaindo(qtd){
   }
 }
 
+// item 40 do roadmap: numero flutuante de XP/moeda na Arena, "damage
+// number" positivo -- substitui aviso() de texto so nas 2 chamadas de
+// Tarefas/Arena (tarefa concluida com/sem meta parcial), demais aviso()
+// do app continuam intocados. Reaproveita EXATAMENTE o calculo de origem
+// que moedasCaindo ja usa (centro do #mobSprite via getBoundingClientRect)
+// -- so troca o conteudo (texto em vez de moeda) e a keyframe (sobe em vez
+// de cair, ver dmgFloat no style.css).
+function numeroFlutuante(xpGanho, moedasGanhas){
+  const arena = document.querySelector('.arena');
+  const mob = document.getElementById('mobSprite');
+  const arenaRect = arena.getBoundingClientRect();
+  const mobRect = mob.getBoundingClientRect();
+  const originX = mobRect.left - arenaRect.left + mobRect.width / 2;
+  const originY = mobRect.top - arenaRect.top + mobRect.height / 2;
+
+  const el = document.createElement('div');
+  el.className = 'dmg-float';
+  el.style.left = originX + 'px';
+  el.style.top = originY + 'px';
+  el.innerHTML = '<span class="dmg-moeda">+' + moedasGanhas + ' ' + COIN_SVG + '</span>'
+    + '<span class="dmg-sep">·</span>'
+    + '<span class="dmg-xp">+' + xpGanho + ' XP</span>';
+  arena.appendChild(el);
+  setTimeout(() => el.remove(), 1600);
+}
+
+// pedido do usuario (27/08): mesmo flutuante da Arena, reaproveitado fora
+// dela (Inventario/Loja/Atributos) -- generico. Aceita ou um elemento vivo
+// (mede a posicao na hora) ou um ponto {x,y} ja capturado antes -- use o
+// ponto sempre que a chamada acontecer DEPOIS de render()/renderLoja(),
+// que reconstroem o grid via innerHTML e desconectam o elemento original
+// do DOM (getBoundingClientRect vira {0,0,0,0} nesse caso -- bug real
+// reportado: comprar/vender na Loja nao mostrava nada).
+function pontoDeElemento(el){
+  if (!el) return null;
+  const r = el.getBoundingClientRect();
+  return { x: r.left + r.width / 2, y: r.top };
+}
+
+function flutuanteFixo(origem, conteudoHtml, largo){
+  if (!origem) return;
+  const p = (origem instanceof Element) ? pontoDeElemento(origem) : origem;
+  if (!p) return;
+
+  const el = document.createElement('div');
+  el.className = 'dmg-float fixo' + (largo ? ' msg' : '');
+  el.style.left = p.x + 'px';
+  el.style.top = p.y + 'px';
+  el.innerHTML = conteudoHtml;
+  document.body.appendChild(el);
+
+  // trava dentro da tela: mede a largura real ja renderizada e reposiciona
+  // se estourar borda esquerda/direita -- corrige texto longo tipo "Voce
+  // melhorou Fortuna" cortado pra fora quando o botao fica perto da borda
+  const margem = 10;
+  const meia = el.offsetWidth / 2;
+  let cx = p.x;
+  if (cx - meia < margem) cx = margem + meia;
+  if (cx + meia > window.innerWidth - margem) cx = window.innerWidth - margem - meia;
+  if (cx !== p.x) el.style.left = cx + 'px';
+
+  setTimeout(() => el.remove(), 1600);
+}
+
+// pedido do usuario (27/08): so o nome do item/atributo leva a cor
+// (raridade ou cor do atributo), o resto da frase fica na cor padrao de
+// texto (reaproveita .dmg-xp, ja existente e ja com var(--text)).
+function notificarFlutuante(origem, prefixo, nome, cor){
+  flutuanteFixo(origem, '<span class="dmg-xp">' + prefixo + '</span> <span style="color:' + cor + '">' + nome + '</span>', true);
+}
+
+// item pedido pelo usuario (27/08): tela "DIA VENCIDO" muito simples --
+// disparado 1x por vitoria (ver flag _vitoriaCelebrada em render()), nunca
+// a cada re-render enquanto o dia ja estiver vencido. Feedback do baú
+// reaproveita o MESMO sistema do numeroFlutuante() (+XP/+moeda): flutuante
+// que sobe do centro do monstro e some, nao um icone estatico no banner.
+const SPARK_SVG = '<svg viewBox="0 0 8 8" shape-rendering="crispEdges"><rect x="3" y="0" width="2" height="2" fill="#F2C94C"/><rect x="3" y="6" width="2" height="2" fill="#F2C94C"/><rect x="0" y="3" width="2" height="2" fill="#F2C94C"/><rect x="6" y="3" width="2" height="2" fill="#F2C94C"/><rect x="3" y="3" width="2" height="2" fill="#FFF8E1"/></svg>';
+const CHEST_SVG = '<svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="2" y="7" width="12" height="6" fill="#8B5A2B"/><rect x="2" y="11" width="12" height="2" fill="#6B4423"/><rect x="2" y="7" width="2" height="6" fill="#F2C94C"/><rect x="12" y="7" width="2" height="6" fill="#F2C94C"/><rect x="7" y="9" width="2" height="3" fill="#F2C94C"/><rect x="4" y="3" width="8" height="1" fill="#A56B36"/><rect x="2" y="4" width="12" height="3" fill="#A56B36"/><rect x="2" y="5" width="12" height="1" fill="#F2C94C"/><rect x="2" y="6" width="12" height="1" fill="#6B4423"/></svg>';
+
+function celebrarVitoria(ganho){
+  const arena = document.querySelector('.arena');
+  const alvo = document.getElementById('vitoria');
+  if (!arena || !alvo) return;
+
+  // flutuante do bau, mesma origem/tecnica de numeroFlutuante() (centro
+  // do #mobSprite, classe .dmg-float ja existente, mesmo tempo de vida)
+  const mob = document.getElementById('mobSprite');
+  if (mob){
+    const arenaRect = arena.getBoundingClientRect();
+    const mobRect = mob.getBoundingClientRect();
+    const originX = mobRect.left - arenaRect.left + mobRect.width / 2;
+    const originY = mobRect.top - arenaRect.top + mobRect.height / 2;
+    const elBau = document.createElement('div');
+    elBau.className = 'dmg-float';
+    elBau.style.left = originX + 'px';
+    elBau.style.top = originY + 'px';
+    elBau.innerHTML = '<span class="dmg-moeda">' + CHEST_SVG + '</span>'
+      + '<span class="dmg-xp">DIA VENCIDO!</span>';
+    arena.appendChild(elBau);
+    setTimeout(() => elBau.remove(), 1600);
+  }
+
+  // burst de faiscas radiando da faixa "DIA VENCIDO" -- mesma tecnica de
+  // origem/posicionamento de moedasCaindo/numeroFlutuante (getBoundingClientRect
+  // relativo a .arena), mas espalhando em circulo em vez de cair/subir reto
+  const arenaRect = arena.getBoundingClientRect();
+  const alvoRect = alvo.getBoundingClientRect();
+  const originX = alvoRect.left - arenaRect.left + alvoRect.width / 2;
+  const originY = alvoRect.top - arenaRect.top + alvoRect.height / 2;
+  const N = 7;
+  for (let i = 0; i < N; i++){
+    const ang = (Math.PI * 2 * i / N) + (Math.random() * 0.5 - 0.25);
+    const dist = 32 + Math.random() * 16;
+    const s = document.createElement('div');
+    s.className = 'vitoria-spark';
+    s.style.left = originX + 'px';
+    s.style.top = originY + 'px';
+    s.style.setProperty('--sx', (Math.cos(ang) * dist).toFixed(0) + 'px');
+    s.style.setProperty('--sy', (Math.sin(ang) * dist).toFixed(0) + 'px');
+    s.style.animationDelay = (i * 25) + 'ms';
+    s.innerHTML = SPARK_SVG;
+    arena.appendChild(s);
+    setTimeout(() => s.remove(), 750 + i * 25);
+  }
+
+  // contagem progressiva do numero de moedas em vez de aparecer estatico --
+  // duracao curta o bastante pra nao atrasar a leitura, mas perceptivel
+  const elTxt = document.getElementById('ganhoTxt');
+  if (!elTxt) return;
+  const DURACAO = 500;
+  const inicio = performance.now();
+  function passo(agora){
+    const t = Math.min(1, (agora - inicio) / DURACAO);
+    const valor = Math.round(ganho * (1 - Math.pow(1 - t, 3))); // ease-out cubico
+    elTxt.textContent = '+' + valor;
+    if (t < 1) requestAnimationFrame(passo);
+  }
+  requestAnimationFrame(passo);
+}
+
 function alternar(i){
   const t = tarefas[i];
 
@@ -1161,7 +1308,7 @@ function alternar(i){
       xpTotal += xpGanho;
       moedas += moedasGanhas;
       render();
-      aviso('+' + xpGanho + ' XP   +' + moedasGanhas + ' MOEDAS   (' + t.vezesN + '/' + meta + ')');
+      numeroFlutuante(xpGanho, moedasGanhas);
       return false;
     }
   }
@@ -1212,7 +1359,7 @@ function alternar(i){
   if (subiuNivel){
     if (typeof mostrarNivelUp === 'function') mostrarNivelUp(nivelDepois);
   }
-  else aviso('+' + xpGanho + ' XP   +' + moedasGanhas + ' MOEDAS');
+  else numeroFlutuante(xpGanho, moedasGanhas);
   return true;
 }
 
@@ -1225,7 +1372,15 @@ function verificarVitoriaAoExcluir(){
 }
 
 let timer;
+// TESTE (pedido do usuario, 27/08): desativa TODOS os toasts do app pra
+// ver no aparelho real se fazem falta ou nao, depois do numero flutuante
+// (item 40) ja cobrir o caso mais frequente (+XP/+moeda por tarefa).
+// REVERTER: trocar 'true' por 'false' nesta linha -- nao apaga nada, so
+// intercepta aviso() antes de tocar no DOM.
+const TOASTS_DESATIVADOS = true;
+
 function aviso(msg, ouro, fuga){
+  if (TOASTS_DESATIVADOS) return; // ver nota de teste acima
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.toggle('gold', !!ouro);
@@ -1623,6 +1778,9 @@ render();
 const SHEET_COLS = 16, SHEET_ROWS = 9;
 const RARIDADES = ['Comum','Incomum','Raro','Épico','Lendário','Único'];
 const COR_RAR   = ['#8779A8','#63C99A','#5AA9F2','#B57BE8','#F2A65A','#5AE0D8'];
+// mesma cor ja usada nos cards de atributo (--atr-cor, "PERFIL — ATRIBUTOS")
+const COR_ATR  = {fortuna:'#F2A65A', foco:'#5AA9F2', vigor:'#E5698A'};
+const NOME_ATR = {fortuna:'Fortuna', foco:'Foco', vigor:'Vigor'};
 window.RARIDADES = RARIDADES;
 window.COR_RAR = COR_RAR;
 const NOME_TIPO = {arma:'Arma',armadura:'Armadura',elmo:'Elmo',escudo:'Escudo',acess:'Acessório',cons:'Consumível',tesouro:'Tesouro',chave:'Item-chave'};
@@ -1694,15 +1852,18 @@ function multMoedas(){ return 1 + bonusEquip().m / 100; }
 function multXP(){ return 1 + bonusEquip().x / 100; }
 
 /* ---------- acoes ---------- */
-function equipar(id){
+function equipar(id, elOrigem){
   const it = item(id);
   if (!EQUIPAVEL(id)) return;
+  const ponto = pontoDeElemento(elOrigem); // captura ANTES do render, ver nota em flutuanteFixo()
   equipado[it.tipo] = (equipado[it.tipo] === id) ? null : id;
   persistir(); renderInventario(); fecharFicha();
-  aviso(equipado[it.tipo] === id ? 'EQUIPADO' : 'DESEQUIPADO');
+  const equipou = equipado[it.tipo] === id;
+  if (ponto) notificarFlutuante(ponto, equipou ? 'Você equipou' : 'Você desequipou', it.nome, COR_RAR[it.rar]);
+  else aviso(equipou ? 'EQUIPADO' : 'DESEQUIPADO');
 }
 
-function usarItem(id){
+function usarItem(id, elOrigem){
   const it = item(id);
   if (it.tipo !== 'cons') return;
   if (it.x) xpTotal += it.x;
@@ -1712,19 +1873,24 @@ function usarItem(id){
     window.vidaHeroi.set(novaVida);
   }
   tirarItem(id, 1);
-  persistir(); render(); renderInventario(); fecharFicha();
-  aviso(it.h ? '+'+it.h+' HP' : (it.x ? '+'+it.x+' XP' : '+'+it.m+' MOEDAS'), !it.x && !it.h);
+  persistir(); render(); renderInventario();
+  const textoGanho = it.h ? ('+' + it.h + ' HP') : (it.x ? ('+' + it.x + ' XP') : ('+' + it.m + ' MOEDAS'));
+  if (elOrigem) flutuanteFixo(elOrigem, '<span class="dmg-xp">' + textoGanho + '</span>');
+  else aviso(textoGanho, !it.x && !it.h);
+  fecharFicha();
 }
 
-function venderItem(id){
+function venderItem(id, elOrigem){
   const it = item(id);
   if (it.tipo === 'chave') return;   // itens-chave (ex: Grimório) nunca sao vendaveis
+  const ponto = pontoDeElemento(elOrigem); // captura ANTES do render, ver nota em flutuanteFixo()
   SLOTS.forEach(s => { if (equipado[s] === id) equipado[s] = null; });
   const preco = precoVenda(it);
   moedas += preco;
   tirarItem(id, 1);
   persistir(); render(); renderInventario(); fecharFicha();
-  aviso('VENDIDO  +'+preco+' MOEDAS', true);
+  if (ponto) flutuanteFixo(ponto, '<span class="dmg-moeda">+' + preco + ' ' + COIN_SVG + '</span>');
+  else aviso('VENDIDO  +'+preco+' MOEDAS', true);
 }
 
 function persistir(){ if (typeof jaComecou !== 'undefined' && jaComecou) salvar(); }
@@ -1883,9 +2049,9 @@ function abrirFicha(id){
   ficha.querySelectorAll('[data-a]').forEach(b => {
     b.onclick = () => {
       const a = b.dataset.a;
-      if (a === 'eq') equipar(id);
-      else if (a === 'usar') usarItem(id);
-      else if (a === 'vender') venderItem(id);
+      if (a === 'eq') equipar(id, b);
+      else if (a === 'usar') usarItem(id, b);
+      else if (a === 'vender') venderItem(id, b);
       else if (a === 'abrir'){
         fecharFicha();
         if (typeof window.abrirCatalogoGrimorio === 'function') window.abrirCatalogoGrimorio();
@@ -2164,7 +2330,7 @@ function garantirEstoque(){
 }
 
 /* ---------- compra ---------- */
-function comprar(i){
+function comprar(i, elOrigem){
   garantirEstoque();
   const s = lojaEstoque[i];
   if (!s || lojaVendidos.indexOf(i) >= 0) return;
@@ -2176,6 +2342,8 @@ function comprar(i){
   if (progresso().nivel < nivelExigido){ aviso('EXIGE NIVEL ' + romano(nivelExigido)); return; }
   if (moedas < preco){ aviso('MOEDAS INSUFICIENTES'); return; }
 
+  const ponto = pontoDeElemento(elOrigem); // captura ANTES de renderLoja(), ver nota em flutuanteFixo()
+
   moedas -= preco;
   darItem(s.id, 1);
   lojaVendidos.push(i);
@@ -2185,7 +2353,8 @@ function comprar(i){
   render();
   renderLoja();
   if (typeof renderInventario === 'function') renderInventario();
-  aviso('COMPROU ' + it.nome.toUpperCase(), true);
+  if (ponto) notificarFlutuante(ponto, 'Você comprou', it.nome, COR_RAR[it.rar]);
+  else aviso('COMPROU ' + it.nome.toUpperCase(), true);
 }
 
 /* ---------- venda em lote de tesouros ---------- */
@@ -2289,7 +2458,7 @@ function montarCompra(grid){
   });
 
   grid.querySelectorAll('[data-c]').forEach(b => {
-    b.onclick = () => comprar(+b.dataset.c);
+    b.onclick = () => comprar(+b.dataset.c, b);
   });
 
   const nota = document.createElement('div');
@@ -2338,7 +2507,7 @@ function montarVenda(grid){
   });
 
   grid.querySelectorAll('[data-v]').forEach(b => {
-    b.onclick = () => { venderItem(+b.dataset.v); renderLoja(); };
+    b.onclick = () => { venderItem(+b.dataset.v, b); renderLoja(); };
   });
 
   const tesouros = inventario.filter(s => item(s.id).tipo === 'tesouro');
@@ -3606,10 +3775,10 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       } else {
         recentes.forEach(c => {
           const ic = document.createElement('div');
-          ic.className = 'prevconqicone';
+          ic.className = 'prevconqchip';
           ic.style.setProperty('--pv-cor', c.cor);
           ic.title = c.nome;
-          ic.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + c.icone + '</svg>';
+          ic.textContent = c.nome;
           faixaConq.appendChild(ic);
         });
       }
@@ -4068,7 +4237,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     return false;
   }
 
-  function investir(atr){
+  function investir(atr, elOrigem){
     if (pontosDisponiveis() <= 0) return;
     if (noTeto(atr)){
       if (typeof window.aviso === 'function') window.aviso('Esse atributo já está no teto máximo');
@@ -4078,6 +4247,10 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     window.tocarSom?.('investir'); // SFX: investir() vive presa na IIFE do modulo Atributos -- sem binding global pro clique real do botao, editado direto
     salvarAtrib();
     renderAtributosPontos();
+    if (elOrigem && typeof window.notificarFlutuante === 'function'
+        && typeof NOME_ATR !== 'undefined' && typeof COR_ATR !== 'undefined'){
+      window.notificarFlutuante(elOrigem, 'Você melhorou', NOME_ATR[atr], COR_ATR[atr]);
+    }
   }
 
   function renderAtributosPontos(){
@@ -4101,11 +4274,11 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   }
 
   const bFortuna = document.getElementById('atrMaisFortuna');
-  if (bFortuna) bFortuna.onclick = () => investir('fortuna');
+  if (bFortuna) bFortuna.onclick = () => investir('fortuna', bFortuna);
   const bFoco = document.getElementById('atrMaisFoco');
-  if (bFoco) bFoco.onclick = () => investir('foco');
+  if (bFoco) bFoco.onclick = () => investir('foco', bFoco);
   const bVigor = document.getElementById('atrMaisVigor');
-  if (bVigor) bVigor.onclick = () => investir('vigor');
+  if (bVigor) bVigor.onclick = () => investir('vigor', bVigor);
 
   // atualiza sempre que render() roda (toda tarefa marcada, virada de dia,
   // compra etc.) -- NAO da pra depender de window.renderPerfil aqui: aquela
@@ -5506,13 +5679,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     function linha(item, data){
       const desc = resolver(item.req, ctx);
       const dataHtml = data ? '<span class="conqv2data">' + formatarDataBR(data) + '</span>' : '';
-      const iconeHtml = item.img
-        ? '<img class="conqv2img" src="' + item.img + '" alt="">'
-        : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + item.icone + '</svg>';
       return '<div class="conqv2item' + (data ? '' : ' trancado') + '">' +
-        '<div class="conqv2icone" style="--pv-cor:' + item.cor + '">' +
-          iconeHtml +
-        '</div>' +
         '<div class="conqv2txt"><div class="conqv2nome">' + item.nome + '</div>' +
         '<div class="conqv2desc">' + desc + '</div></div>' +
         dataHtml +

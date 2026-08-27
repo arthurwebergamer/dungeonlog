@@ -54,6 +54,38 @@
     0%{transform:translate(-50%,-50%) scale(1) rotate(0deg);opacity:1}
     100%{transform:translate(calc(-50% + var(--dx)),64px) scale(.65) rotate(180deg);opacity:0}
   }
+  /* item 40 do roadmap: "damage number" positivo, mesma tecnica de
+     origem/posicionamento de .coin-drop (left/top absolutos calculados
+     em JS a partir do centro do #mobSprite) -- so troca queda por subida */
+  .dmg-float{position:absolute;left:0;top:0;pointer-events:none;
+    animation:dmgFloat 1.6s ease-out forwards;
+    display:flex;align-items:center;gap:3px;white-space:nowrap;
+    font-family:'Silkscreen',monospace;font-size:13px;font-weight:700;
+    text-shadow:0 1px 2px rgba(0,0,0,.6)}
+  /* variante pra fora da Arena (Inventario, e qualquer outra tela sem
+     .arena como container relativo) -- mesma animacao, so troca pra
+     position:fixed com coordenadas de viewport, empilhada acima de
+     overlays/fichas (z-index 200) pois a ficha fecha logo em seguida */
+  .dmg-float.fixo{position:fixed;z-index:200}
+  /* pedido do usuario (27/08): mensagens tipo "Voce comprou X"/"Voce
+     melhorou Fortuna" podem ser longas -- sem isso, nowrap fazia o texto
+     estourar pra fora da tela quando o botao de origem ficava perto da
+     borda (bug reportado: "ficou cortado, saiu pra fora") */
+  .dmg-float.msg{display:block;white-space:normal;text-align:center;max-width:190px;
+    line-height:1.4;font-size:10.5px;font-weight:600;letter-spacing:.02em}
+  .dmg-float svg{width:13px;height:13px;image-rendering:pixelated;flex-shrink:0}
+  /* moeda em --gold (mesma cor de .coins no topbar e .toast.gold), XP em
+     cor neutra (mesma familia de .xpnum) -- app ja diferencia os dois
+     assim em todo outro lugar, uma cor unica pra tudo quebrava esse padrao */
+  .dmg-float .dmg-moeda{color:var(--gold)}
+  .dmg-float .dmg-sep{color:var(--muted);font-weight:500}
+  .dmg-float .dmg-xp{color:var(--text)}
+  @keyframes dmgFloat{
+    0%{transform:translate(-50%,-50%) scale(.8);opacity:0}
+    10%{transform:translate(-50%,-60%) scale(1);opacity:1}
+    70%{transform:translate(-50%,calc(-50% - 40px)) scale(1);opacity:1}
+    100%{transform:translate(-50%,calc(-50% - 55px)) scale(1);opacity:0}
+  }
   .vs{font-family:'Outfit',sans-serif;font-size:11px;font-weight:500;color:var(--dim);padding-bottom:30px;letter-spacing:1px}
   .mobinfo{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;transition:opacity .3s}
   .mobinfo.off{opacity:0}
@@ -63,9 +95,25 @@
   .arena.venceu .fighter.mob{width:0;overflow:hidden}
   .vitoria{display:none;flex-direction:column;align-items:center;gap:5px;margin-top:2px}
   .vitoria.on{display:flex;animation:subir .4s ease-out}
-  .vitoria .faixa{font-family:'Silkscreen',monospace;font-size:11px;color:var(--accent);letter-spacing:1px}
+  .vitoria.on .faixa{animation:faixaPunch .5s ease-out .35s both}
+  @keyframes faixaPunch{
+    0%{transform:scale(1);text-shadow:none}
+    40%{transform:scale(1.28);text-shadow:0 0 14px var(--gold)}
+    100%{transform:scale(1);text-shadow:0 0 6px var(--gold)}
+  }
+  .vitoria .faixa{font-family:'Silkscreen',monospace;font-size:11px;color:var(--accent);letter-spacing:1px;display:inline-block}
   .vitoria .ganho{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--gold)}
   .vitoria .ganho svg{width:12px;height:12px;image-rendering:pixelated}
+  /* item pedido pelo usuario: burst de faiscas radiando da faixa DIA
+     VENCIDO, mesma tecnica posicional de .coin-drop/.dmg-float */
+  .vitoria-spark{position:absolute;left:0;top:0;width:8px;height:8px;pointer-events:none;
+    animation:vitoriaSpark .65s ease-out forwards}
+  .vitoria-spark svg{width:100%;height:100%;image-rendering:pixelated}
+  @keyframes vitoriaSpark{
+    0%{transform:translate(-50%,-50%) scale(.3);opacity:0}
+    25%{transform:translate(-50%,-50%) scale(1);opacity:1}
+    100%{transform:translate(calc(-50% + var(--sx)),calc(-50% + var(--sy))) scale(.25);opacity:0}
+  }
   @keyframes subir{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
   .mobname{font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;color:var(--blood)}
   .mobhp{font-family:'Outfit',sans-serif;font-size:16px;font-weight:600;color:var(--text);
@@ -1142,11 +1190,15 @@
      das Conquistas, .bestimg do Bestiario) -- so a faixa horizontal em
      si e nova. */
   .cfgrowtopo{display:flex;align-items:center;justify-content:space-between;gap:10px}
-  .prevfaixa{display:flex;gap:6px;margin-top:10px;min-height:32px}
+  .prevfaixa{display:flex;gap:6px;margin-top:10px;min-height:32px;
+             overflow-x:auto;-webkit-overflow-scrolling:touch}
   .prevfaixa .caldia{width:32px;height:32px;aspect-ratio:unset;flex:none}
-  .prevconqicone{width:30px;height:30px;flex:none;border-radius:50%;display:flex;
-                  align-items:center;justify-content:center;background:var(--pv-cor);color:#1A1526}
-  .prevconqicone svg{width:15px;height:15px}
+  /* pedido do usuario: previa de conquistas so com texto, sem icone --
+     chip com cor da conquista na borda/texto em vez de circulo preenchido */
+  .prevconqchip{flex:none;display:flex;align-items:center;height:30px;padding:0 11px;
+                border-radius:14px;background:var(--panel-3);border:1px solid var(--pv-cor);
+                font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;
+                color:var(--pv-cor);white-space:nowrap}
   .prevbestimg{width:32px;height:32px;flex:none;object-fit:contain;image-rendering:pixelated;
                border-radius:8px;background:var(--panel-3);padding:3px;box-sizing:border-box}
   .prevvazio{font-family:'Outfit',sans-serif;font-size:11.5px;color:var(--dim);
@@ -1411,12 +1463,6 @@
   .conqv2item{display:flex;align-items:center;gap:12px;padding:11px 2px;
               border-bottom:1px solid var(--line)}
   .conqv2item:last-child{border-bottom:none}
-  .conqv2icone{width:42px;height:42px;flex:none;border-radius:11px;display:flex;
-               align-items:center;justify-content:center;background:var(--pv-cor)}
-  .conqv2icone svg{width:21px;height:21px;color:#1A1526}
-  .conqv2icone .conqv2img{width:22px;height:22px;image-rendering:pixelated;flex:none}
-  .conqv2item.trancado .conqv2icone{background:var(--panel-3);filter:grayscale(1);opacity:.55}
-  .conqv2item.trancado .conqv2icone svg{color:var(--dim)}
   .conqv2txt{flex:1;min-width:0}
   .conqv2nome{font-family:'Outfit',sans-serif;font-size:13.5px;font-weight:700;color:var(--text)}
   .conqv2item.trancado .conqv2nome{color:var(--muted)}
@@ -2280,11 +2326,15 @@
      das Conquistas, .bestimg do Bestiario) -- so a faixa horizontal em
      si e nova. */
   .cfgrowtopo{display:flex;align-items:center;justify-content:space-between;gap:10px}
-  .prevfaixa{display:flex;gap:6px;margin-top:10px;min-height:32px}
+  .prevfaixa{display:flex;gap:6px;margin-top:10px;min-height:32px;
+             overflow-x:auto;-webkit-overflow-scrolling:touch}
   .prevfaixa .caldia{width:32px;height:32px;aspect-ratio:unset;flex:none}
-  .prevconqicone{width:30px;height:30px;flex:none;border-radius:50%;display:flex;
-                  align-items:center;justify-content:center;background:var(--pv-cor);color:#1A1526}
-  .prevconqicone svg{width:15px;height:15px}
+  /* pedido do usuario: previa de conquistas so com texto, sem icone --
+     chip com cor da conquista na borda/texto em vez de circulo preenchido */
+  .prevconqchip{flex:none;display:flex;align-items:center;height:30px;padding:0 11px;
+                border-radius:14px;background:var(--panel-3);border:1px solid var(--pv-cor);
+                font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;
+                color:var(--pv-cor);white-space:nowrap}
   .prevbestimg{width:32px;height:32px;flex:none;object-fit:contain;image-rendering:pixelated;
                border-radius:8px;background:var(--panel-3);padding:3px;box-sizing:border-box}
   .prevvazio{font-family:'Outfit',sans-serif;font-size:11.5px;color:var(--dim);
@@ -2549,12 +2599,6 @@
   .conqv2item{display:flex;align-items:center;gap:12px;padding:11px 2px;
               border-bottom:1px solid var(--line)}
   .conqv2item:last-child{border-bottom:none}
-  .conqv2icone{width:42px;height:42px;flex:none;border-radius:11px;display:flex;
-               align-items:center;justify-content:center;background:var(--pv-cor)}
-  .conqv2icone svg{width:21px;height:21px;color:#1A1526}
-  .conqv2icone .conqv2img{width:22px;height:22px;image-rendering:pixelated;flex:none}
-  .conqv2item.trancado .conqv2icone{background:var(--panel-3);filter:grayscale(1);opacity:.55}
-  .conqv2item.trancado .conqv2icone svg{color:var(--dim)}
   .conqv2txt{flex:1;min-width:0}
   .conqv2nome{font-family:'Outfit',sans-serif;font-size:13.5px;font-weight:700;color:var(--text)}
   .conqv2item.trancado .conqv2nome{color:var(--muted)}

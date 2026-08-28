@@ -21,8 +21,14 @@
 <script>
   // item 49 do roadmap (pedido do usuario): detecta o idioma do
   // dispositivo/navegador e usa como padrao ANTES do jogador escolher
-  // qualquer coisa -- portugues (qualquer variante: pt-BR, pt-PT etc)
-  // vira 'pt', qualquer outro idioma vira 'en'. So grava se ainda NAO
+  // qualquer coisa -- item 51 do roadmap (ajuste do usuario sobre o
+  // item 49): so vira 'pt' quando o aparelho for ESPECIFICAMENTE
+  // pt-BR -- qualquer outra variante de portugues (pt-PT, pt-AO etc)
+  // ou qualquer outro idioma vira 'en'. Print real do usuario mostrou
+  // um Pixel em portugues abrindo o app em portugues -- decisao
+  // consciente de restringir: o publico-alvo brasileiro e o unico que
+  // deve ver PT por padrao, o resto do mundo (incluindo outros paises
+  // de lingua portuguesa) ve EN por padrao. So grava se ainda NAO
   // existe preferencia salva (questlog.idioma.v1) -- uma vez que o
   // jogador escolhe explicitamente (slide de idioma no carrossel, ou
   // Config > Preferencias > Idioma, item 47), essa escolha manual
@@ -35,7 +41,10 @@
   // o modulo I18N no fim do arquivo, etc) ja encontrem o valor certo
   // desde a primeira leitura -- nenhum deles precisou mudar, todos ja
   // tinham fallback pra 'pt' que so importa se ESTE bloco falhar
-  // (localStorage bloqueado, por exemplo).
+  // (localStorage bloqueado, por exemplo) -- por isso o fallback do
+  // resto do arquivo continua 'pt' mesmo com o padrao real sendo 'en'
+  // agora: aquele fallback e so pra quando ESTE bloco nao roda (raro),
+  // nao e o comportamento padrao de verdade.
   (function(){
     try {
       if (localStorage.getItem('questlog.idioma.v1')) return; // ja escolhido antes, nunca sobrescreve
@@ -43,7 +52,7 @@
         ? navigator.languages
         : [navigator.language || navigator.userLanguage || ''];
       const primeiro = (idiomasNavegador[0] || '').toLowerCase();
-      const idioma = primeiro.indexOf('pt') === 0 ? 'pt' : 'en';
+      const idioma = primeiro.indexOf('pt-br') === 0 ? 'pt' : 'en';
       localStorage.setItem('questlog.idioma.v1', idioma);
     } catch(e){
       // localStorage indisponivel (modo privado restritivo, por
@@ -9143,15 +9152,61 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // typewriter vai ler mais adiante ficaria desatualizado sem isso.
     // O botão "Continuar" do próprio slide de idioma também é
     // atualizado na hora, já que está visível nesse instante.
+    //
+    // item 50 do roadmap (bug real reportado pelo usuário): faltava
+    // atualizar TAMBÉM o botão "Continuar" do slide de transição em si
+    // (carrosselBtn5) -- só o botão do slide de idioma (carrosselBtn4)
+    // estava sendo tratado. Sintoma exato reportado: escolher English
+    // no slide de idioma e o botão do PRÓXIMO slide continuava
+    // "Continuar" em vez de virar "Continue". Cobre também o caso raro
+    // de o typewriter já ter digitado o texto (jogador voltou e trocou
+    // de idioma de novo) -- nesse caso o texto já visível na tela
+    // também é substituído direto, não só o data-texto pra próxima vez.
     const en = lang === 'en';
     const elTransicao = document.getElementById('carrosselTransicaoTexto');
-    if (elTransicao && !window.__questlogTypewriterFoi){
-      elTransicao.dataset.texto = en
+    if (elTransicao){
+      const textoTransicao = en
         ? 'Before we start, let\'s get to know you better...'
         : 'Antes de começar, vamos te conhecer melhor...';
+      elTransicao.dataset.texto = textoTransicao;
+      if (window.__questlogTypewriterFoi) elTransicao.textContent = textoTransicao;
     }
     const btnContinuarIdioma = document.getElementById('carrosselBtn4');
     if (btnContinuarIdioma) btnContinuarIdioma.textContent = en ? 'Continue' : 'Continuar';
+    const btnContinuarTransicao = document.getElementById('carrosselBtn5');
+    if (btnContinuarTransicao) btnContinuarTransicao.textContent = en ? 'Continue' : 'Continuar';
+
+    // mesmo bug, mesma causa raiz: se o jogador voltar pros slides 1-3
+    // (seta/dots do carrossel) depois de escolher idioma no slide 4,
+    // titulo/texto/botao desses 3 tambem tinham ficado presos no
+    // idioma do load da pagina. SLIDES/txtSlide() vivem numa IIFE
+    // diferente (a do carrossel) e não são acessíveis aqui -- por isso
+    // duplicado como par PT/EN direto, mesmo padrão já usado em vários
+    // outros pontos do arquivo (ex: idiomaApp() e nomeDiaLocal()).
+    const SLIDES_1A3 = [
+      { n:1, titulo:'QUESTLOG', titulo_en:'QUESTLOG',
+        texto:'Suas tarefas do dia viram uma batalha. Complete tarefas, evolua seu herói, vença monstros.',
+        texto_en:'Your daily tasks become a battle. Complete tasks, level up your hero, defeat monsters.',
+        botao:'Começar', botao_en:'Get started' },
+      { n:2, titulo:'BATALHA', titulo_en:'BATTLE',
+        texto:'Todo dia aparece um monstro. Ele só morre se você terminar suas tarefas.',
+        texto_en:'A monster shows up every day. It only dies if you finish your tasks.',
+        botao:'Continuar', botao_en:'Continue' },
+      { n:3, titulo:'EVOLUA', titulo_en:'LEVEL UP',
+        texto:'Ganhe XP, moedas e itens conforme joga. Da raridade Comum até Lendário.',
+        texto_en:'Earn XP, coins and items as you play. From Common rarity all the way to Legendary.',
+        botao:'Continuar', botao_en:'Continue' }
+    ];
+    SLIDES_1A3.forEach(s => {
+      const raiz = document.getElementById('passoCarrossel' + s.n);
+      if (!raiz) return;
+      const elTitulo = raiz.querySelector('.titulo');
+      const elLema = raiz.querySelector('.lema');
+      if (elTitulo) elTitulo.textContent = en ? s.titulo_en : s.titulo;
+      if (elLema) elLema.textContent = en ? s.texto_en : s.texto;
+      const btn = document.getElementById('carrosselBtn' + s.n);
+      if (btn) btn.textContent = en ? s.botao_en : s.botao;
+    });
   };
 
   // Wire dos 2 botões do slide de idioma (só existem no DOM se o

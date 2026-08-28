@@ -1103,6 +1103,15 @@ function render(){
   const lista = document.getElementById('list');
   lista.innerHTML = '';
 
+  // Botao "+ Adicionar" tambem desabilita quando o monstro ja caiu -- nao
+  // so o "Criar tarefa" de dentro da composer (ver atualizarEstadoSave()).
+  // Roda a cada render() pra cobrir a virada automatica do dia (watchdog),
+  // nao so o clique manual. window.atualizarEstadoSave e definida mais
+  // abaixo no mesmo <script>, hoisted (function declaration).
+  const addBtnEl = document.getElementById('addbtn');
+  if (addBtnEl) addBtnEl.disabled = typeof monstroJaCaiu === 'function' && monstroJaCaiu();
+  if (typeof atualizarEstadoSave === 'function') atualizarEstadoSave();
+
   document.getElementById('hoje').textContent = (idiomaApp() === 'en' ? 'Tasks for ' : 'Tarefas de ') + nomeDiaLocal(diaDaSemana());
 
   if (doDia.length === 0){
@@ -1519,21 +1528,43 @@ const btnRepete = document.getElementById('modeRepete');
 let modo = 'hoje';
 let diasEscolhidos = [];
 
+const btnSave = document.getElementById('save');
+
+// Validacao proativa: desabilita "Criar tarefa" em vez de depender de aviso()
+// (aviso() fica mudo com TOASTS_DESATIVADOS=true, ver linha ~1500-1504 -- um
+// clique em Criar nesse estado nao dava nenhum feedback visual). 3 casos
+// cobertos por um unico ponto de controle, decisao explicita do usuario de
+// manter a solucao a mais simples possivel: nao reabrir o toast, so impedir
+// a acao invalida de acontecer.
+function atualizarEstadoSave(){
+  if (!btnSave) return;
+  const semTexto = input.value.trim().length === 0;
+  const semDia = modo === 'repete' && diasEscolhidos.length === 0;
+  const diaVencido = typeof monstroJaCaiu === 'function' && monstroJaCaiu();
+  btnSave.disabled = semTexto || semDia || diaVencido;
+}
+window.atualizarEstadoSave = atualizarEstadoSave;
+
+input.addEventListener('input', atualizarEstadoSave);
+
 btnHoje.onclick = () => {
   modo = 'hoje';
   btnHoje.classList.add('on'); btnRepete.classList.remove('on');
   daysEl.classList.remove('on');
+  atualizarEstadoSave();
 };
 btnRepete.onclick = () => {
   modo = 'repete';
   btnRepete.classList.add('on'); btnHoje.classList.remove('on');
   daysEl.classList.add('on');
+  atualizarEstadoSave();
 };
 daysEl.querySelectorAll('.day').forEach(b => {
   b.onclick = () => {
     const d = Number(b.dataset.d);
     if (diasEscolhidos.includes(d)) { diasEscolhidos = diasEscolhidos.filter(x => x !== d); b.classList.remove('on'); }
     else { diasEscolhidos.push(d); b.classList.add('on'); }
+    atualizarEstadoSave();
   };
 });
 
@@ -1550,14 +1581,18 @@ document.getElementById('addbtn').onclick = () => {
       pintarVezes();
     }
     if (typeof resetAdvColor === 'function') resetAdvColor();
+    atualizarEstadoSave();
   }
 };
 
 function criar(){
-  if (monstroJaCaiu()){ aviso(idiomaApp() === 'en' ? 'TODAY\'S MONSTER ALREADY FELL' : 'MONSTRO DE HOJE JA CAIU'); return; }
+  // Guardas mantidas por seguranca (defesa em profundidade -- ex.: chamada
+  // futura fora do clique do botao), mas na pratica o botao ja vem
+  // desabilitado antes de qualquer uma dessas condicoes ser possivel.
+  if (monstroJaCaiu()) return;
   const texto = input.value.trim();
   if (!texto) return;
-  if (modo === 'repete' && diasEscolhidos.length === 0){ aviso(idiomaApp() === 'en' ? 'CHOOSE THE DAYS' : 'ESCOLHA OS DIAS'); return; }
+  if (modo === 'repete' && diasEscolhidos.length === 0) return;
 
   if (modo === 'hoje') tarefas.push({ texto, tipo:'hoje', data:isoAtual(), feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined });
   else tarefas.push({ texto, tipo:'repete', dias:[...diasEscolhidos], feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined });
@@ -1569,9 +1604,11 @@ function criar(){
   render();
   window.tocarSom?.('tarefa'); // SFX: o wrap de window.criar nao funciona aqui -- "save.onclick = criar" (linha abaixo) copia a REFERENCIA da funcao original no load, antes do gancho existir; editado direto, mesma logica de ferir()/investir()
   aviso(idiomaApp() === 'en' ? 'TASK ADDED' : 'TAREFA ADICIONADA');
+  atualizarEstadoSave();
 }
 
-document.getElementById('save').onclick = criar;
+btnSave.onclick = criar;
+atualizarEstadoSave(); // estado inicial ao carregar a pagina
 
 /* ---------- seletor de vezes por dia ---------- */
 let vezesEscolhida = 1;

@@ -3216,3 +3216,22 @@
   font-size:22px;
   line-height:1;
 }
+
+/* ---------------------------------------------------------------------
+   Estado :disabled em #save e #addbtn -- validacao proativa de criar
+   tarefa (ver index.html, atualizarEstadoSave()). Bloco novo no fim do
+   arquivo, de proposito: style.css tem os modulos 1-20 duplicados
+   inteiros (achado documentado, causa raiz nao investigada ainda -- ver
+   roadmap.md item 39), so a ultima regra da cascata vence. Um bloco novo
+   aqui no fim sempre vence, sem precisar editar as duas copias. */
+#save:disabled,
+#addbtn:disabled{
+  opacity:.4;
+  cursor:not-allowed;
+  filter:none;
+}
+#save:disabled:hover,
+#addbtn:disabled:hover{
+  background:inherit;
+  filter:none;
+}

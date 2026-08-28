@@ -541,14 +541,12 @@
         <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
       </div>
 
-      <div class="cfgrow cfglink" id="cfgHistorico">
-        <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></span>
-        <div class="cfgtxt">
-          <b data-i18n="perfil.historico">Histórico</b>
-          <span data-i18n="cfg.historicoDesc">Calendário de vitórias, fugas e dias sem tarefa</span>
-        </div>
-        <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
-      </div>
+      <!-- Card "Histórico" removido daqui (pedido do usuário, sessão de
+           brainstorm) -- já existe em Perfil, prévia própria com botão
+           "Ver tudo" (#verHistoricoBtn), que já chama window.abrirHistorico().
+           Duplicava a mesma função por dois caminhos diferentes. A função
+           abrirHistorico() e o overlay #histOverlay não mudaram em nada --
+           só esse atalho extra saiu. -->
     </div>
   </div>
 
@@ -4565,12 +4563,20 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
         : (disp + (disp === 1 ? ' disponível' : ' disponíveis'));
     }
 
+    // Sinal unificado nos 3 (sempre "+N%") -- antes Fortuna usava "+",
+    // Foco nao usava sinal nenhum e Vigor usava "-" (porque reduz dano),
+    // o que lia como "3 tipos diferentes de efeito" numa mesma tela
+    // (pedido do usuario pra simplificar, ver roadmap). Os 3 sao a mesma
+    // coisa conceitualmente -- quanto ja foi investido -- entao os 3
+    // ganham o mesmo sinal, sempre positivo. O SIGNIFICADO de cada um
+    // (o que aquele % realmente faz) continua explicado no texto de
+    // atrdesc, visivel ao expandir o card -- nao precisou mudar.
     const elFortuna = document.getElementById('atrFortunaValor');
     if (elFortuna) elFortuna.textContent = '+' + Math.round(bonusFortuna() * 100) + '%';
     const elFoco = document.getElementById('atrFocoValor');
-    if (elFoco) elFoco.textContent = Math.round(descontoFoco() * 100) + '%';
+    if (elFoco) elFoco.textContent = '+' + Math.round(descontoFoco() * 100) + '%';
     const elVigor = document.getElementById('atrVigorValor');
-    if (elVigor) elVigor.textContent = '-' + Math.round(perdaoVigor() * 100) + '%';
+    if (elVigor) elVigor.textContent = '+' + Math.round(perdaoVigor() * 100) + '%';
 
     const bFortuna = document.getElementById('atrMaisFortuna');
     if (bFortuna) bFortuna.disabled = disp <= 0 || noTeto('fortuna');
@@ -6856,9 +6862,12 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     renderHistorico();
   };
 
-  // abre/fecha o overlay -- gatilho agora e o botao "Histórico" dentro
-  // de Perfil > Config, nao mais uma sub-aba propria (ver nota grande
-  // no topo do bloco sobre o motivo da mudanca)
+  // abre/fecha o overlay -- gatilho e so o botao "Ver tudo" da previa em
+  // Perfil (#verHistoricoBtn, ver bloco de previas mais acima). O card
+  // "Historico" que existia dentro de Config foi removido (pedido do
+  // usuario, duplicava o mesmo caminho) -- #cfgHistorico nao existe mais
+  // no HTML, entao btnAbrir fica null aqui, o que e esperado; o guard
+  // "if (btnAbrir)" abaixo ja cobre isso sem erro.
   const overlay = document.getElementById('histOverlay');
   const btnAbrir = document.getElementById('cfgHistorico');
   const btnFechar = document.getElementById('histFechar');

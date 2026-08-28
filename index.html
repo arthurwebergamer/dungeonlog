@@ -137,7 +137,7 @@
     </div>
 
     <div class="vitoria" id="vitoria">
-      <span class="faixa">DIA VENCIDO</span>
+      <span class="faixa" data-i18n="jogo.diaVencido">DIA VENCIDO</span>
       <span class="ganho">
         <svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="5" y="2" width="6" height="1" fill="#F2C94C"/><rect x="3" y="3" width="10" height="2" fill="#F2C94C"/><rect x="2" y="5" width="12" height="6" fill="#F2C94C"/><rect x="3" y="11" width="10" height="2" fill="#F2C94C"/><rect x="5" y="13" width="6" height="1" fill="#F2C94C"/><rect x="6" y="5" width="2" height="6" fill="#B8942E"/></svg>
         <span id="ganhoTxt"></span>
@@ -225,38 +225,38 @@
 
   <div class="view" id="viewInventario">
     <div class="vhead">
-      <span class="vtitle">Inventário</span>
+      <span class="vtitle" data-i18n="inv.titulo">Inventário</span>
       <span class="vsub" id="invSub">0 itens</span>
     </div>
 
     <div class="equipbox" id="equipbox">
       <div class="equiprow" id="equiprow"></div>
       <div class="bonusline">
-        <span class="bm">Moedas <b id="bMoedas">+0%</b></span>
+        <span class="bm"><span data-i18n="inv.moedas">Moedas</span> <b id="bMoedas">+0%</b></span>
         <span class="bx">XP <b id="bXp">+0%</b></span>
       </div>
     </div>
 
     <div class="invfiltros" id="invFiltros">
-      <button class="on" data-f="tudo">Tudo</button>
-      <button data-f="equip">Equipamento</button>
-      <button data-f="cons">Consumíveis</button>
-      <button data-f="tesouro">Tesouros</button>
-      <button data-f="chave">Item-chave</button>
+      <button class="on" data-f="tudo" data-i18n="inv.filtroTudo">Tudo</button>
+      <button data-f="equip" data-i18n="inv.filtroEquip">Equipamento</button>
+      <button data-f="cons" data-i18n="inv.filtroCons">Consumíveis</button>
+      <button data-f="tesouro" data-i18n="inv.filtroTesouro">Tesouros</button>
+      <button data-f="chave" data-i18n="inv.filtroChave">Item-chave</button>
     </div>
 
     <div class="invgrid" id="invGrid"></div>
 
     <div class="vazio" id="invVazio">
       <svg class="vicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l1 12H4L5 8z"/><path d="M9 8V6a3 3 0 016 0v2"/></svg>
-      <b>Mochila vazia</b>
-      <p>Derrote o monstro do dia para receber espólio. Quanto mais tarefas no dia, melhor o saque.</p>
+      <b data-i18n="inv.mochilaVazia">Mochila vazia</b>
+      <p data-i18n="inv.mochilaVaziaDesc">Derrote o monstro do dia para receber espólio. Quanto mais tarefas no dia, melhor o saque.</p>
     </div>
   </div>
 
   <div class="view" id="viewPerfil">
     <div class="vhead">
-      <span class="vtitle">Perfil</span>
+      <span class="vtitle" data-i18n="nav.perfil">Perfil</span>
       <div class="vheadDireita">
         <span class="vsub" id="perfilSub">Nível I</span>
         <button class="vheadCfgBtn" id="perfilCfgBtn" aria-label="Configurações">
@@ -273,13 +273,13 @@
             <div class="perfilnome" id="perfilNome">Aventureiro</div>
             <div class="xpwrap">
               <div class="xprow hprow">
-                <span class="xplabel">Vida</span>
+                <span class="xplabel" data-i18n="jogo.vida">Vida</span>
                 <span class="xpnum hpnum" id="perfilHpNum">0 / 0</span>
               </div>
               <div class="bar hpbar"><div class="fill hpfill" id="perfilHpFill"></div></div>
 
               <div class="xprow">
-                <span class="xplabel">Experiência</span>
+                <span class="xplabel" data-i18n="jogo.experiencia">Experiência</span>
                 <span class="xpnum" id="perfilXpNum">0 / 100 XP</span>
               </div>
               <div class="bar"><div class="fill" id="perfilFill"></div></div>
@@ -290,38 +290,38 @@
 
       <div class="statgrid">
         <div class="statcard">
-          <span class="statlabel">Vida máxima</span>
+          <span class="statlabel" data-i18n="perfil.vidaMaxima">Vida máxima</span>
           <span class="statval" id="statVida">—</span>
         </div>
         <div class="statcard">
-          <span class="statlabel">Moedas</span>
+          <span class="statlabel" data-i18n="inv.moedas">Moedas</span>
           <span class="statval" id="statMoedas">—</span>
         </div>
         <div class="statcard">
-          <span class="statlabel">Bônus XP equip.</span>
+          <span class="statlabel" data-i18n="perfil.bonusXpEquip">Bônus XP equip.</span>
           <span class="statval" id="statBonusXp">—</span>
         </div>
         <div class="statcard">
-          <span class="statlabel">Bônus moedas equip.</span>
+          <span class="statlabel" data-i18n="perfil.bonusMoedasEquip">Bônus moedas equip.</span>
           <span class="statval" id="statBonusMoedas">—</span>
         </div>
       </div>
 
       <div class="atributospontos">
         <div class="atrhead">
-          <b>Pontos de atributo</b>
+          <b data-i18n="perfil.pontosDeAtributo">Pontos de atributo</b>
           <span class="atrpill" id="atrDisponiveis">0 disponíveis</span>
         </div>
 
         <div class="atrcard" style="--atr-cor:#F2A65A">
           <div class="atrbarra">
             <svg class="atricone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5l2.9 6.6 7.1.7-5.4 4.8 1.6 7-6.2-3.8-6.2 3.8 1.6-7-5.4-4.8 7.1-.7z"/></svg>
-            <span class="atrnome">Fortuna</span>
+            <span class="atrnome" data-i18n="atr.fortuna">Fortuna</span>
             <span class="atrvalor" id="atrFortunaValor">+0%</span>
             <svg class="atrchevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
           </div>
           <div class="atrcorpo">
-            <span class="atrdesc">chance de raridade no espólio</span>
+            <span class="atrdesc" data-i18n="atr.fortunaDesc">chance de raridade no espólio</span>
             <button class="atrmais" id="atrMaisFortuna" type="button">+</button>
           </div>
         </div>
@@ -329,12 +329,12 @@
         <div class="atrcard" style="--atr-cor:#5AA9F2">
           <div class="atrbarra">
             <svg class="atricone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".8" fill="currentColor"/></svg>
-            <span class="atrnome">Foco</span>
+            <span class="atrnome" data-i18n="atr.foco">Foco</span>
             <span class="atrvalor" id="atrFocoValor">0%</span>
             <svg class="atrchevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
           </div>
           <div class="atrcorpo">
-            <span class="atrdesc">de desconto na loja</span>
+            <span class="atrdesc" data-i18n="atr.focoDesc">de desconto na loja</span>
             <button class="atrmais" id="atrMaisFoco" type="button">+</button>
           </div>
         </div>
@@ -342,12 +342,12 @@
         <div class="atrcard" style="--atr-cor:#E5698A">
           <div class="atrbarra">
             <svg class="atricone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5s-7.5-4.6-9.8-9.3C.9 8 2.4 4.8 5.6 4.1c2-.4 3.9.5 5 2.1a5.5 5.5 0 015-2.1c3.2.7 4.7 3.9 3.4 7.1-2.3 4.7-9.8 9.3-9.8 9.3z"/></svg>
-            <span class="atrnome">Vigor</span>
+            <span class="atrnome" data-i18n="atr.vigor">Vigor</span>
             <span class="atrvalor" id="atrVigorValor">-0%</span>
             <svg class="atrchevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
           </div>
           <div class="atrcorpo">
-            <span class="atrdesc">de perdão no dano por tarefa largada</span>
+            <span class="atrdesc" data-i18n="atr.vigorDesc">de perdão no dano por tarefa largada</span>
             <button class="atrmais" id="atrMaisVigor" type="button">+</button>
           </div>
         </div>
@@ -361,10 +361,10 @@
       <div class="cfgrow cfgcol" id="prevHistorico">
         <div class="cfgrowtopo">
           <div class="cfgtxt">
-            <b>Histórico</b>
+            <b data-i18n="perfil.historico">Histórico</b>
             <span id="prevHistoricoTxt">—</span>
           </div>
-          <button class="cfgbtn" id="verHistoricoBtn">Ver tudo</button>
+          <button class="cfgbtn" id="verHistoricoBtn" data-i18n="acao.verTudo">Ver tudo</button>
         </div>
         <div class="prevfaixa" id="prevHistFaixa"></div>
       </div>
@@ -372,10 +372,10 @@
       <div class="cfgrow cfgcol" id="prevConquistas">
         <div class="cfgrowtopo">
           <div class="cfgtxt">
-            <b>Conquistas</b>
+            <b data-i18n="perfil.conquistas">Conquistas</b>
             <span id="prevConquistasTxt">—</span>
           </div>
-          <button class="cfgbtn" id="verConquistasBtn">Ver todas</button>
+          <button class="cfgbtn" id="verConquistasBtn" data-i18n="acao.verTodas">Ver todas</button>
         </div>
         <div class="prevfaixa" id="prevConquistasFaixa"></div>
       </div>
@@ -383,10 +383,10 @@
       <div class="cfgrow cfgcol" id="prevBestiario">
         <div class="cfgrowtopo">
           <div class="cfgtxt">
-            <b>Bestiário</b>
+            <b data-i18n="perfil.bestiario">Bestiário</b>
             <span id="prevBestiarioTxt">—</span>
           </div>
-          <button class="cfgbtn" id="verBestiarioBtn">Ver tudo</button>
+          <button class="cfgbtn" id="verBestiarioBtn" data-i18n="acao.verTudo">Ver tudo</button>
         </div>
         <div class="prevfaixa" id="prevBestiarioFaixa"></div>
       </div>
@@ -408,7 +408,7 @@
       <button class="cfgvoltar" id="conquistasVoltarBtn" aria-label="Voltar">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
       </button>
-      <span class="vtitle">Conquistas</span>
+      <span class="vtitle" data-i18n="perfil.conquistas">Conquistas</span>
     </div>
     <div class="cfgovcorpo">
       <div id="perfilConquistas"></div>
@@ -420,7 +420,7 @@
       <button class="cfgvoltar" id="bestiarioVoltarBtn" aria-label="Voltar">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
       </button>
-      <span class="vtitle">Bestiário</span>
+      <span class="vtitle" data-i18n="perfil.bestiario">Bestiário</span>
     </div>
     <div class="cfgovcorpo">
       <div class="bestsub" id="bestSub">0 de 63 monstros derrotados</div>
@@ -439,31 +439,31 @@
       <button class="cfgvoltar" id="cfgVoltarBtn" aria-label="Voltar">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
       </button>
-      <span class="vtitle">Configurações</span>
+      <span class="vtitle" data-i18n="cfg.configuracoes">Configurações</span>
     </div>
     <div class="cfgovcorpo">
-      <div class="edsec">Conta</div>
+      <div class="edsec" data-i18n="cfg.conta">Conta</div>
 
       <div class="cfgrow" id="cfgRowConta">
         <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="8" r="4.5"/></svg></span>
         <div class="cfgtxt">
-          <b>Conta</b>
+          <b data-i18n="cfg.conta">Conta</b>
           <span id="cfgContaInfo">Jogando sem conta</span>
         </div>
-        <button class="cfgbtn perigo oculto" id="cfgSairBtn">Sair</button>
-        <button class="cfgbtn" id="cfgEntrarBtn">Criar conta</button>
+        <button class="cfgbtn perigo oculto" id="cfgSairBtn" data-i18n="cfg.sair">Sair</button>
+        <button class="cfgbtn" id="cfgEntrarBtn" data-i18n="cfg.criarConta">Criar conta</button>
       </div>
 
       <div class="cfgrow">
         <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13"/><path d="M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/></svg></span>
         <div class="cfgtxt">
-          <b>Apagar dados</b>
-          <span>Zera nível, moedas, itens e vida. Não tem volta.</span>
+          <b data-i18n="cfg.apagarDados">Apagar dados</b>
+          <span data-i18n="cfg.apagarDadosDesc">Zera nível, moedas, itens e vida. Não tem volta.</span>
         </div>
-        <button class="cfgbtn perigo" id="zerarbtn">Apagar tudo</button>
+        <button class="cfgbtn perigo" id="zerarbtn" data-i18n="cfg.apagarTudo">Apagar tudo</button>
       </div>
 
-      <div class="edsec">App</div>
+      <div class="edsec" data-i18n="cfg.app">App</div>
 
       <!-- item 39 do roadmap: tela principal enxuta (texto + valor atual +
            seta), conteudo pesado (grade de sprites / grid de temas / linha
@@ -473,7 +473,7 @@
       <div class="cfgrow cfglink" id="cfgAbrirHeroi">
         <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 3.5l6 6L9 21H3v-6z"/></svg></span>
         <div class="cfgtxt">
-          <b>Herói</b>
+          <b data-i18n="cfg.heroi">Herói</b>
           <span id="cfgHeroiResumo">Aventureiro</span>
         </div>
         <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
@@ -482,7 +482,7 @@
       <div class="cfgrow cfglink" id="cfgAbrirAparencia">
         <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a9 9 0 1 1 0-18c4.97 0 9 3.5 9 7.5 0 2-1.5 3-3 3h-2a2 2 0 0 0-1.5 3.2c.3.4.5.9.5 1.3 0 1.6-1.3 3-3 3z"/><circle cx="7.5" cy="10.5" r="1.2" fill="currentColor"/><circle cx="12" cy="7.5" r="1.2" fill="currentColor"/><circle cx="16.5" cy="10.5" r="1.2" fill="currentColor"/></svg></span>
         <div class="cfgtxt">
-          <b>Aparência</b>
+          <b data-i18n="cfg.aparencia">Aparência</b>
           <span id="cfgAparenciaResumo">Grafite</span>
         </div>
         <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
@@ -491,7 +491,7 @@
       <div class="cfgrow cfglink" id="cfgAbrirPrefs">
         <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h14M22 18h0"/><circle cx="14" cy="6" r="2"/><circle cx="7" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></span>
         <div class="cfgtxt">
-          <b>Preferências</b>
+          <b data-i18n="cfg.preferencias">Preferências</b>
           <span id="cfgPrefsResumo">Vibrar</span>
         </div>
         <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
@@ -500,8 +500,8 @@
       <div class="cfgrow cfglink" id="cfgHistorico">
         <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></span>
         <div class="cfgtxt">
-          <b>Histórico</b>
-          <span>Calendário de vitórias, fugas e dias sem tarefa</span>
+          <b data-i18n="perfil.historico">Histórico</b>
+          <span data-i18n="cfg.historicoDesc">Calendário de vitórias, fugas e dias sem tarefa</span>
         </div>
         <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
       </div>
@@ -522,21 +522,21 @@
       <button class="cfgvoltar" id="heroiVoltarBtn" aria-label="Voltar">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
       </button>
-      <span class="vtitle">Herói</span>
+      <span class="vtitle" data-i18n="cfg.heroi">Herói</span>
     </div>
     <div class="cfgovcorpo">
       <div class="cfgrow" id="cfgRenomear">
         <div class="cfgtxt">
-          <b>Nome do herói</b>
+          <b data-i18n="cfg.nomeDoHeroi">Nome do herói</b>
           <span id="cfgNomeAtual">Aventureiro</span>
         </div>
-        <button class="cfgbtn">Renomear</button>
+        <button class="cfgbtn" data-i18n="cfg.renomear">Renomear</button>
       </div>
 
       <div class="cfgrow cfgcol">
         <div class="cfgtxt">
-          <b>Sprite do herói</b>
-          <span>Escolha quem enfrenta os monstros</span>
+          <b data-i18n="cfg.spriteDoHeroi">Sprite do herói</b>
+          <span data-i18n="cfg.escolhaQuemEnfrenta">Escolha quem enfrenta os monstros</span>
         </div>
         <div class="grade" id="gradeHeroisConfig"></div>
       </div>
@@ -548,13 +548,13 @@
       <button class="cfgvoltar" id="aparenciaVoltarBtn" aria-label="Voltar">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
       </button>
-      <span class="vtitle">Aparência</span>
+      <span class="vtitle" data-i18n="cfg.aparencia">Aparência</span>
     </div>
     <div class="cfgovcorpo">
       <div class="cfgrow cfgcol" id="cfgTemaCard">
         <div class="cfgtxt">
-          <b>Tema</b>
-          <span>Paleta de cores do app</span>
+          <b data-i18n="cfg.tema">Tema</b>
+          <span data-i18n="cfg.paletaDeCores">Paleta de cores do app</span>
         </div>
         <div class="temagrid" id="temaGrid"></div>
       </div>
@@ -566,13 +566,13 @@
       <button class="cfgvoltar" id="prefsVoltarBtn" aria-label="Voltar">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
       </button>
-      <span class="vtitle">Preferências</span>
+      <span class="vtitle" data-i18n="cfg.preferencias">Preferências</span>
     </div>
     <div class="cfgovcorpo">
       <div class="cfgrow" id="cfgRowFeedback">
         <div class="cfgtxt">
-          <b>Feedback de clique</b>
-          <span>Vibração ou som ao tocar em botões</span>
+          <b data-i18n="cfg.feedbackDeClique">Feedback de clique</b>
+          <span data-i18n="cfg.feedbackDeCliqueDesc">Vibração ou som ao tocar em botões</span>
         </div>
         <button class="swch" id="cfgFeedbackBtn" type="button" role="switch" aria-checked="true" aria-label="Feedback tátil">
           <span class="swch-bolinha"></span>
@@ -583,18 +583,18 @@
 
   <div class="view" id="viewLoja">
     <div class="vhead">
-      <span class="vtitle">Loja</span>
+      <span class="vtitle" data-i18n="nav.loja">Loja</span>
       <span class="vsub" id="lojaSub"></span>
     </div>
 
     <div class="lojatopo">
       <span class="saldo">
         <svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="5" y="2" width="6" height="1" fill="#F2C94C"/><rect x="3" y="3" width="10" height="2" fill="#F2C94C"/><rect x="2" y="5" width="12" height="6" fill="#F2C94C"/><rect x="3" y="11" width="10" height="2" fill="#F2C94C"/><rect x="5" y="13" width="6" height="1" fill="#F2C94C"/><rect x="6" y="5" width="2" height="6" fill="#B8942E"/></svg>
-        <span id="saldoLoja">0</span> moedas
+        <span id="saldoLoja">0</span> <span data-i18n="inv.moedasMinusculo">moedas</span>
       </span>
       <div class="lojatabs" id="lojaTabs">
-        <button class="on" data-l="comprar">Comprar</button>
-        <button data-l="vender">Vender</button>
+        <button class="on" data-l="comprar" data-i18n="loja.comprar">Comprar</button>
+        <button data-l="vender" data-i18n="loja.vender">Vender</button>
       </div>
     </div>
 
@@ -603,6 +603,7 @@
 
   
 <div class="nav" id="nav">
+
     <button class="on" data-aba="tarefas">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4a1 1 0 00-1 1v14a1 1 0 001 1h16a1 1 0 001-1V5a1 1 0 00-1-1zm-9.3 12.2l-3.4-3.4 1.4-1.4 2 2 4.6-4.6 1.4 1.4-6 6z"/></svg>
       <span data-i18n="nav.tarefas">Tarefas</span>
@@ -927,7 +928,7 @@ function heroiAtual(){ return HEROIS[heroiEscolhido] || HEROIS[0]; }
 function desenharHeroi(){
   const el = document.getElementById('heroSprite');
   if (!el) return;
-  el.innerHTML = '<img class="heroimg" src="' + heroiAtual().img + '" alt="herói">' +
+  el.innerHTML = '<img class="heroimg" src="' + heroiAtual().img + '" alt="' + (idiomaApp() === 'en' ? 'hero' : 'herói') + '">' +
                  '<div class="sombra"></div>';
 }
 
@@ -1270,7 +1271,7 @@ function celebrarVitoria(ganho){
     elBau.style.left = originX + 'px';
     elBau.style.top = originY + 'px';
     elBau.innerHTML = '<span class="dmg-moeda">' + CHEST_SVG + '</span>'
-      + '<span class="dmg-xp">DIA VENCIDO!</span>';
+      + '<span class="dmg-xp">' + (idiomaApp() === 'en' ? 'DAY WON!' : 'DIA VENCIDO!') + '</span>';
     arena.appendChild(elBau);
     setTimeout(() => elBau.remove(), 1600);
   }
@@ -1378,7 +1379,7 @@ function alternar(i){
     ultimoGanho = ganho;
     moedasCaindo(Math.max(3, Math.min(10, Math.round(ganho / 6))));
     render();
-    setTimeout(()=>aviso('MONSTRO DERROTADO  +'+ganho+' MOEDAS', true), 350);
+    setTimeout(()=>aviso((idiomaApp() === 'en' ? 'MONSTER DEFEATED  +' : 'MONSTRO DERROTADO  +')+ganho+(idiomaApp() === 'en' ? ' COINS' : ' MOEDAS'), true), 350);
     if (subiuNivel){
       setTimeout(() => {
         if (typeof window.enfileirarPopup === 'function' && typeof mostrarNivelUp === 'function'){
@@ -1467,10 +1468,10 @@ document.getElementById('addbtn').onclick = () => {
 };
 
 function criar(){
-  if (monstroJaCaiu()){ aviso('MONSTRO DE HOJE JA CAIU'); return; }
+  if (monstroJaCaiu()){ aviso(idiomaApp() === 'en' ? 'TODAY\'S MONSTER ALREADY FELL' : 'MONSTRO DE HOJE JA CAIU'); return; }
   const texto = input.value.trim();
   if (!texto) return;
-  if (modo === 'repete' && diasEscolhidos.length === 0){ aviso('ESCOLHA OS DIAS'); return; }
+  if (modo === 'repete' && diasEscolhidos.length === 0){ aviso(idiomaApp() === 'en' ? 'CHOOSE THE DAYS' : 'ESCOLHA OS DIAS'); return; }
 
   if (modo === 'hoje') tarefas.push({ texto, tipo:'hoje', data:isoAtual(), feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined });
   else tarefas.push({ texto, tipo:'repete', dias:[...diasEscolhidos], feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined });
@@ -1481,7 +1482,7 @@ function criar(){
   if (typeof resetAdvColor === 'function') resetAdvColor();
   render();
   window.tocarSom?.('tarefa'); // SFX: o wrap de window.criar nao funciona aqui -- "save.onclick = criar" (linha abaixo) copia a REFERENCIA da funcao original no load, antes do gancho existir; editado direto, mesma logica de ferir()/investir()
-  aviso('TAREFA ADICIONADA');
+  aviso(idiomaApp() === 'en' ? 'TASK ADDED' : 'TAREFA ADICIONADA');
 }
 
 document.getElementById('save').onclick = criar;
@@ -1936,7 +1937,8 @@ function equipar(id){
   if (!EQUIPAVEL(id)) return;
   equipado[it.tipo] = (equipado[it.tipo] === id) ? null : id;
   persistir(); renderInventario(); fecharFicha();
-  aviso(equipado[it.tipo] === id ? 'EQUIPADO' : 'DESEQUIPADO');
+  const en = idiomaApp() === 'en';
+  aviso(equipado[it.tipo] === id ? (en ? 'EQUIPPED' : 'EQUIPADO') : (en ? 'UNEQUIPPED' : 'DESEQUIPADO'));
 }
 
 function usarItem(id, elOrigem){
@@ -1951,7 +1953,8 @@ function usarItem(id, elOrigem){
   }
   tirarItem(id, 1);
   persistir(); render(); renderInventario();
-  const textoGanho = it.h ? ('+' + it.h + ' HP') : (it.x ? ('+' + it.x + ' XP') : ('+' + it.m + ' MOEDAS'));
+  const en = idiomaApp() === 'en';
+  const textoGanho = it.h ? ('+' + it.h + ' HP') : (it.x ? ('+' + it.x + ' XP') : ('+' + it.m + (en ? ' COINS' : ' MOEDAS')));
   if (ponto) flutuanteFixo(ponto, '<span class="dmg-xp">' + textoGanho + '</span>');
   else aviso(textoGanho, !it.x && !it.h);
   fecharFicha();
@@ -1967,7 +1970,7 @@ function venderItem(id, elOrigem){
   tirarItem(id, 1);
   persistir(); render(); renderInventario();
   if (ponto) flutuanteFixo(ponto, '<span class="dmg-moeda">+' + preco + ' ' + COIN_SVG + '</span>');
-  else aviso('VENDIDO  +'+preco+' MOEDAS', true);
+  else aviso((idiomaApp() === 'en' ? 'SOLD  +' : 'VENDIDO  +')+preco+(idiomaApp() === 'en' ? ' COINS' : ' MOEDAS'), true);
   fecharFicha();
 }
 
@@ -2075,7 +2078,7 @@ function renderInventario(){
   });
 
   if (!semNada && visiveis.length === 0){
-    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:22px 0;font-family:Outfit,sans-serif;font-size:13px;color:var(--dim)">Nada nesta categoria.</div>';
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:22px 0;font-family:Outfit,sans-serif;font-size:13px;color:var(--dim)">' + (idiomaApp() === 'en' ? 'Nothing in this category.' : 'Nada nesta categoria.') + '</div>';
   }
 }
 
@@ -2103,24 +2106,25 @@ function abrirFicha(id){
   const slot = inventario[acharSlot(id)];
   const q = slot ? slot.q : 0;
   const estaEquipado = SLOTS.some(k => equipado[k] === id);
+  const en = idiomaApp() === 'en';
 
   const bi = bonusItem(it);
   let bonus = '';
   if (it.tipo === 'cons'){
-    if (bi.x) bonus += '<span>Concede '+bi.x+' XP</span>';
-    if (bi.m) bonus += '<span>Concede '+bi.m+' moedas</span>';
+    if (bi.x) bonus += '<span>' + (en ? 'Grants ' + bi.x + ' XP' : 'Concede '+bi.x+' XP') + '</span>';
+    if (bi.m) bonus += '<span>' + (en ? 'Grants ' + bi.m + ' coins' : 'Concede '+bi.m+' moedas') + '</span>';
   } else if (SLOTS.includes(it.tipo)){
     if (bi.x) bonus += '<span>XP '+(bi.x>0?'+':'')+bi.x+'%</span>';
-    if (bi.m) bonus += '<span>Moedas '+(bi.m>0?'+':'')+bi.m+'%</span>';
+    if (bi.m) bonus += '<span>' + (en ? 'Coins ' : 'Moedas ') + (bi.m>0?'+':'')+bi.m+'%</span>';
   }
-  if (it.tipo !== 'chave') bonus += '<span>Vende por '+precoVenda(it)+' moedas</span>';
-  if (q > 1) bonus += '<span>Quantidade: '+q+'</span>';
+  if (it.tipo !== 'chave') bonus += '<span>' + (en ? 'Sells for ' + precoVenda(it) + ' coins' : 'Vende por '+precoVenda(it)+' moedas') + '</span>';
+  if (q > 1) bonus += '<span>' + (en ? 'Quantity: ' + q : 'Quantidade: '+q) + '</span>';
 
   let acoes = '';
-  if (EQUIPAVEL(id)) acoes += '<button class="prim" data-a="eq">'+(estaEquipado ? 'Desequipar' : 'Equipar')+'</button>';
-  if (it.tipo === 'cons') acoes += '<button class="prim" data-a="usar">Usar</button>';
-  if (it.tipo === 'chave') acoes += '<button class="prim" data-a="abrir">Abrir</button>';
-  if (it.tipo !== 'chave') acoes += '<button data-a="vender">Vender</button>';
+  if (EQUIPAVEL(id)) acoes += '<button class="prim" data-a="eq">'+(estaEquipado ? (en ? 'Unequip' : 'Desequipar') : (en ? 'Equip' : 'Equipar'))+'</button>';
+  if (it.tipo === 'cons') acoes += '<button class="prim" data-a="usar">' + (en ? 'Use' : 'Usar') + '</button>';
+  if (it.tipo === 'chave') acoes += '<button class="prim" data-a="abrir">' + (en ? 'Open' : 'Abrir') + '</button>';
+  if (it.tipo !== 'chave') acoes += '<button data-a="vender">' + (en ? 'Sell' : 'Vender') + '</button>';
 
   ficha.innerHTML =
     '<div class="ihead">'+
@@ -2159,16 +2163,17 @@ function fecharFicha(){
    por isso vive no mesmo <script> — const nao atravessa blocos separados. */
 function abrirFichaGrimorio(id){
   const it = item(id);
+  const en = idiomaApp() === 'en';
   const bi = bonusItem(it);
   let bonus = '';
   if (it.tipo === 'cons'){
-    if (bi.x) bonus += '<span>Concede '+bi.x+' XP</span>';
-    if (bi.m) bonus += '<span>Concede '+bi.m+' moedas</span>';
+    if (bi.x) bonus += '<span>' + (en ? 'Grants ' + bi.x + ' XP' : 'Concede '+bi.x+' XP') + '</span>';
+    if (bi.m) bonus += '<span>' + (en ? 'Grants ' + bi.m + ' coins' : 'Concede '+bi.m+' moedas') + '</span>';
   } else if (SLOTS.includes(it.tipo)){
     if (bi.x) bonus += '<span>XP '+(bi.x>0?'+':'')+bi.x+'%</span>';
-    if (bi.m) bonus += '<span>Moedas '+(bi.m>0?'+':'')+bi.m+'%</span>';
+    if (bi.m) bonus += '<span>' + (en ? 'Coins ' : 'Moedas ') + (bi.m>0?'+':'')+bi.m+'%</span>';
   }
-  if (!bonus) bonus = '<span>Sem bônus de equipamento</span>';
+  if (!bonus) bonus = '<span>' + (en ? 'No equipment bonus' : 'Sem bônus de equipamento') + '</span>';
 
   ficha.innerHTML =
     '<div class="ihead">'+
@@ -2177,7 +2182,7 @@ function abrirFichaGrimorio(id){
       '<div class="imeta" style="color:'+COR_RAR[it.rar]+'">'+RARIDADES[it.rar]+' · '+NOME_TIPO[it.tipo]+'</div></div>'+
     '</div>'+
     '<div class="ibonus">'+bonus+'</div>'+
-    '<div class="iacts"><button data-a="fechar">Fechar</button></div>';
+    '<div class="iacts"><button data-a="fechar">' + (en ? 'Close' : 'Fechar') + '</button></div>';
 
   ficha.querySelectorAll('[data-a]').forEach(b => { b.onclick = fecharFicha; });
 
@@ -2194,6 +2199,7 @@ window.abrirFichaGrimorio = abrirFichaGrimorio;
    só a forma (que já era pública na grade) se repete aqui. */
 function abrirFichaGrimorioOculto(id){
   const it = item(id);
+  const fechar = idiomaApp() === 'en' ? 'Close' : 'Fechar';
   ficha.innerHTML =
     '<div class="ihead">'+
       '<div class="ibox" style="filter:brightness(0);opacity:.32">'+spriteHTML(it.sp, 44)+'</div>'+
@@ -2201,7 +2207,7 @@ function abrirFichaGrimorioOculto(id){
       '<div class="imeta">? · ?</div></div>'+
     '</div>'+
     '<div class="ibonus"><span>?</span></div>'+
-    '<div class="iacts"><button data-a="fechar">Fechar</button></div>';
+    '<div class="iacts"><button data-a="fechar">' + fechar + '</button></div>';
 
   ficha.querySelectorAll('[data-a]').forEach(b => { b.onclick = fecharFicha; });
 
@@ -2238,15 +2244,16 @@ function abrirFichaMonstro(idx){
 
   const vezes = vitorias.length;
   const primeira = vezes ? vitorias.reduce((a, b) => a.data < b.data ? a : b).data : null;
+  const en = idiomaApp() === 'en';
 
   ficha.innerHTML =
     '<div class="ihead">'+
       '<div class="ibox"><img src="'+m.img+'" style="width:44px;height:44px;object-fit:contain"></div>'+
       '<div><div class="iname">'+m.nome+'</div>'+
-      '<div class="imeta">Derrotado '+vezes+(vezes === 1 ? ' vez' : ' vezes')+'</div></div>'+
+      '<div class="imeta">' + (en ? ('Defeated ' + vezes + (vezes === 1 ? ' time' : ' times')) : ('Derrotado '+vezes+(vezes === 1 ? ' vez' : ' vezes'))) + '</div></div>'+
     '</div>'+
-    '<div class="ibonus"><span>Primeira vez: '+formatarDataBR(primeira)+'</span></div>'+
-    '<div class="iacts"><button data-a="fechar">Fechar</button></div>';
+    '<div class="ibonus"><span>' + (en ? 'First time: ' : 'Primeira vez: ') + formatarDataBR(primeira)+'</span></div>'+
+    '<div class="iacts"><button data-a="fechar">' + (en ? 'Close' : 'Fechar') + '</button></div>';
 
   ficha.querySelectorAll('[data-a]').forEach(b => { b.onclick = fecharFicha; });
   fichaBG.classList.add('on');
@@ -2259,6 +2266,7 @@ window.abrirFichaMonstro = abrirFichaMonstro;
    na grade, gancho de curiosidade), nome e stats viram "?". */
 function abrirFichaMonstroOculto(idx){
   const m = MONSTROS[idx];
+  const fechar = idiomaApp() === 'en' ? 'Close' : 'Fechar';
   ficha.innerHTML =
     '<div class="ihead">'+
       '<div class="ibox" style="filter:brightness(0);opacity:.32"><img src="'+m.img+'" style="width:44px;height:44px;object-fit:contain"></div>'+
@@ -2266,7 +2274,7 @@ function abrirFichaMonstroOculto(idx){
       '<div class="imeta">?</div></div>'+
     '</div>'+
     '<div class="ibonus"><span>?</span></div>'+
-    '<div class="iacts"><button data-a="fechar">Fechar</button></div>';
+    '<div class="iacts"><button data-a="fechar">' + fechar + '</button></div>';
 
   ficha.querySelectorAll('[data-a]').forEach(b => { b.onclick = fecharFicha; });
   fichaBG.classList.add('on');
@@ -2423,9 +2431,10 @@ function comprar(i){
   const it = item(s.id);
   const preco = precoLoja(s.id, s.oferta);
   const nivelExigido = nivelMinimo(it.rar);
+  const en = idiomaApp() === 'en';
 
-  if (progresso().nivel < nivelExigido){ aviso('EXIGE NIVEL ' + romano(nivelExigido)); return; }
-  if (moedas < preco){ aviso('MOEDAS INSUFICIENTES'); return; }
+  if (progresso().nivel < nivelExigido){ aviso((en ? 'REQUIRES LEVEL ' : 'EXIGE NIVEL ') + romano(nivelExigido)); return; }
+  if (moedas < preco){ aviso(en ? 'NOT ENOUGH COINS' : 'MOEDAS INSUFICIENTES'); return; }
 
   moedas -= preco;
   darItem(s.id, 1);
@@ -2436,7 +2445,7 @@ function comprar(i){
   render();
   renderLoja();
   if (typeof renderInventario === 'function') renderInventario();
-  aviso('COMPROU ' + it.nome.toUpperCase(), true);
+  aviso((en ? 'BOUGHT ' : 'COMPROU ') + it.nome.toUpperCase(), true);
 }
 
 /* ---------- venda em lote de tesouros ---------- */
@@ -2451,7 +2460,8 @@ function venderTesouros(){
   render();
   renderLoja();
   if (typeof renderInventario === 'function') renderInventario();
-  aviso('VENDEU ' + qtd + ' TESOUROS  +' + total + ' MOEDAS', true);
+  const en = idiomaApp() === 'en';
+  aviso((en ? 'SOLD ' + qtd + ' TREASURES  +' + total + ' COINS' : 'VENDEU ' + qtd + ' TESOUROS  +' + total + ' MOEDAS'), true);
 }
 
 /* ---------- render ---------- */
@@ -2461,16 +2471,17 @@ const MOEDA = '<svg class="lmoeda" viewBox="0 0 16 16" shape-rendering="crispEdg
   '<rect x="5" y="13" width="6" height="1" fill="#F2C94C"/><rect x="6" y="5" width="2" height="6" fill="#B8942E"/></svg>';
 
 function textoBonus(it){
+  const en = idiomaApp() === 'en';
   const b = bonusItem(it);
   if (it.tipo === 'cons'){
     const p = [];
     if (b.x) p.push('<b>+' + b.x + ' XP</b>');
-    if (b.m) p.push('<b>+' + b.m + '</b> moedas');
+    if (b.m) p.push('<b>+' + b.m + '</b> ' + (en ? 'coins' : 'moedas'));
     return p.join(' · ');
   }
   const p = [];
   if (b.x) p.push('XP <b>' + (b.x > 0 ? '+' : '') + b.x + '%</b>');
-  if (b.m) p.push('Moedas <b>' + (b.m > 0 ? '+' : '') + b.m + '%</b>');
+  if (b.m) p.push((en ? 'Coins' : 'Moedas') + ' <b>' + (b.m > 0 ? '+' : '') + b.m + '%</b>');
   return p.join(' · ');
 }
 
@@ -2478,6 +2489,8 @@ function horasAteVirar(){
   const agora = new Date();
   const meiaNoite = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate() + 1);
   const h = Math.ceil((meiaNoite - agora) / 3600000);
+  const en = idiomaApp() === 'en';
+  if (en) return h <= 1 ? 'renews in less than 1h' : 'renews in ' + h + 'h';
   return h <= 1 ? 'renova em menos de 1h' : 'renova em ' + h + 'h';
 }
 
@@ -2485,6 +2498,7 @@ function renderLoja(){
   const grid = document.getElementById('lojaGrid');
   if (!grid) return;
   garantirEstoque();
+  const en = idiomaApp() === 'en';
 
   const saldoEl = document.getElementById('saldoLoja');
   if (saldoEl) saldoEl.textContent = moedas;
@@ -2496,7 +2510,7 @@ function renderLoja(){
   const sub = document.getElementById('lojaSub');
   if (sub) sub.textContent = lojaAba === 'comprar'
     ? horasAteVirar()
-    : (inventario.length ? 'Recompra por ' + Math.round(ECO.taxaVenda * 100) + '% do valor' : '');
+    : (inventario.length ? (en ? 'Repurchase for ' + Math.round(ECO.taxaVenda * 100) + '% of value' : 'Recompra por ' + Math.round(ECO.taxaVenda * 100) + '% do valor') : '');
 
   grid.innerHTML = '';
   if (lojaAba === 'comprar') montarCompra(grid);
@@ -2505,6 +2519,7 @@ function renderLoja(){
 
 function montarCompra(grid){
   const nivel = progresso().nivel;
+  const en = idiomaApp() === 'en';
 
   lojaEstoque.forEach((s, i) => {
     const it = item(s.id);
@@ -2518,16 +2533,16 @@ function montarCompra(grid){
     row.className = 'lrow' + (s.oferta ? ' oferta' : '') + (vendido ? ' esgotado' : travado ? ' trava' : '');
 
     let acao;
-    if (vendido)      acao = '<button class="lbtn off">Esgotado</button>';
-    else if (travado) acao = '<button class="lbtn off">Nível ' + romano(exig) + '</button>';
-    else if (semGrana)acao = '<button class="lbtn off">Sem moedas</button>';
-    else              acao = '<button class="lbtn" data-c="' + i + '">Comprar</button>';
+    if (vendido)      acao = '<button class="lbtn off">' + (en ? 'Sold out' : 'Esgotado') + '</button>';
+    else if (travado) acao = '<button class="lbtn off">' + (en ? 'Level ' : 'Nível ') + romano(exig) + '</button>';
+    else if (semGrana)acao = '<button class="lbtn off">' + (en ? 'No coins' : 'Sem moedas') + '</button>';
+    else              acao = '<button class="lbtn" data-c="' + i + '">' + (en ? 'Buy' : 'Comprar') + '</button>';
 
     const cheio = s.oferta ? '<s>' + precoLoja(s.id, false) + '</s>' : '';
     const bon = textoBonus(it);
 
     row.innerHTML =
-      (s.oferta ? '<span class="lflag">oferta do dia</span>' : '') +
+      (s.oferta ? '<span class="lflag">' + (en ? 'deal of the day' : 'oferta do dia') + '</span>' : '') +
       '<div class="lbox">' + spriteHTML(it.sp, 32) + '</div>' +
       '<div class="linfo">' +
         '<div class="lname">' + it.nome + '</div>' +
@@ -2545,13 +2560,16 @@ function montarCompra(grid){
 
   const nota = document.createElement('div');
   nota.className = 'lnota';
-  nota.textContent = 'O ferreiro troca a prateleira toda meia-noite. Tesouros não se compram — só se vendem.';
+  nota.textContent = en
+    ? 'The blacksmith swaps the shelf every midnight. Treasures can\'t be bought — only sold.'
+    : 'O ferreiro troca a prateleira toda meia-noite. Tesouros não se compram — só se vendem.';
   grid.appendChild(nota);
 }
 
 function montarVenda(grid){
+  const en = idiomaApp() === 'en';
   if (!inventario.length){
-    grid.innerHTML = '<div class="lnota">Mochila vazia. Derrote o monstro do dia para conseguir espólio.</div>';
+    grid.innerHTML = '<div class="lnota">' + (en ? 'Empty bag. Defeat today\'s monster to get loot.' : 'Mochila vazia. Derrote o monstro do dia para conseguir espólio.') + '</div>';
     return;
   }
 
@@ -2565,7 +2583,7 @@ function montarVenda(grid){
   });
 
   if (!lista.length){
-    grid.innerHTML = '<div class="lnota">Só há itens-chave na mochila. Eles não podem ser vendidos.</div>';
+    grid.innerHTML = '<div class="lnota">' + (en ? 'Only key items in the bag. They can\'t be sold.' : 'Só há itens-chave na mochila. Eles não podem ser vendidos.') + '</div>';
     return;
   }
 
@@ -2581,10 +2599,10 @@ function montarVenda(grid){
       '<div class="linfo">' +
         '<div class="lname">' + it.nome + (s.q > 1 ? ' <span class="lqtd">×' + s.q + '</span>' : '') + '</div>' +
         '<div class="lmeta" style="color:' + COR_RAR[it.rar] + '">' + RARIDADES[it.rar] + ' · ' + NOME_TIPO[it.tipo] + '</div>' +
-        (equipado_ ? '<div class="lbonus">em uso — será desequipado</div>' : '') +
+        (equipado_ ? '<div class="lbonus">' + (en ? 'in use — will be unequipped' : 'em uso — será desequipado') + '</div>' : '') +
       '</div>' +
       '<div class="lacao"><span class="lpreco">+' + preco + MOEDA + '</span>' +
-      '<button class="lbtn sec" data-v="' + s.id + '">Vender</button></div>';
+      '<button class="lbtn sec" data-v="' + s.id + '">' + (en ? 'Sell' : 'Vender') + '</button></div>';
     grid.appendChild(row);
   });
 
@@ -2647,17 +2665,17 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   <div class="edsheet" id="edSheet">
     <button type="button" class="edfechar" id="edFechar" aria-label="Fechar">&#215;</button>
     <div class="edpuxador"></div>
-    <div class="edtitulo">Editar tarefa</div>
+    <div class="edtitulo" data-i18n="ed.editarTarefa">Editar tarefa</div>
 
-    <input class="edcampo" id="edTexto" maxlength="80" autocomplete="off" placeholder="O que precisa ser feito?">
+    <input class="edcampo" id="edTexto" maxlength="80" autocomplete="off" placeholder="O que precisa ser feito?" data-i18n-placeholder="jogo.oQuePrecisaSerFeito">
 
     <div class="edbloco">
-      <div class="edsec">Dificuldade</div>
+      <div class="edsec" data-i18n="jogo.dificuldade">Dificuldade</div>
       <div class="difs" id="edDifs"></div>
     </div>
 
     <div class="edbloco">
-      <div class="edsec">Vezes por dia</div>
+      <div class="edsec" data-i18n="jogo.vezesPorDia">Vezes por dia</div>
       <div class="vezesrow">
         <button class="vezesbtn" id="edVezesMenos" type="button" aria-label="Diminuir">−</button>
         <span class="vezesnum" id="edVezesNum"><b>1</b>×</span>
@@ -2666,34 +2684,34 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     </div>
 
     <div class="edbloco">
-      <div class="edsec">Quando</div>
+      <div class="edsec" data-i18n="ed.quando">Quando</div>
       <div class="modes">
-        <button class="mode" id="edModoHoje" type="button">Só hoje</button>
-        <button class="mode" id="edModoRepete" type="button">Repete toda semana</button>
+        <button class="mode" id="edModoHoje" type="button" data-i18n="jogo.soHoje">Só hoje</button>
+        <button class="mode" id="edModoRepete" type="button" data-i18n="jogo.repeteSemana">Repete toda semana</button>
       </div>
       <div class="days" id="edDias">
-        <button class="day" data-d="0" type="button">D</button>
-        <button class="day" data-d="1" type="button">S</button>
-        <button class="day" data-d="2" type="button">T</button>
-        <button class="day" data-d="3" type="button">Q</button>
-        <button class="day" data-d="4" type="button">Q</button>
-        <button class="day" data-d="5" type="button">S</button>
-        <button class="day" data-d="6" type="button">S</button>
+        <button class="day" data-d="0" type="button" data-i18n="dia.dom">D</button>
+        <button class="day" data-d="1" type="button" data-i18n="dia.seg">S</button>
+        <button class="day" data-d="2" type="button" data-i18n="dia.ter">T</button>
+        <button class="day" data-d="3" type="button" data-i18n="dia.qua">Q</button>
+        <button class="day" data-d="4" type="button" data-i18n="dia.qui">Q</button>
+        <button class="day" data-d="5" type="button" data-i18n="dia.sex">S</button>
+        <button class="day" data-d="6" type="button" data-i18n="dia.sab">S</button>
       </div>
     </div>
 
     <div class="edbloco">
       <button type="button" class="advtoggle" id="edAdvToggle">
-        Opções avançadas <span class="advchevron" id="edAdvChevron">▾</span>
+        <span data-i18n="jogo.opcoesAvancadas">Opções avançadas</span> <span class="advchevron" id="edAdvChevron">▾</span>
       </button>
       <div class="advpanel" id="edAdvPanel">
         <div class="advcolorrow">
-          <span class="diflabel">Cor da tarefa</span>
+          <span class="diflabel" data-i18n="jogo.corDaTarefa">Cor da tarefa</span>
           <div class="advcolorpick">
             <span class="advswatch" id="edCorBoxSwatch"></span>
             <input type="text" class="advhex" id="edCorBoxHex" placeholder="#F2A65A"
                    maxlength="7" autocomplete="off" autocapitalize="off" spellcheck="false">
-            <button type="button" class="advreset" id="edCorBoxReset">Sem cor</button>
+            <button type="button" class="advreset" id="edCorBoxReset" data-i18n="jogo.semCor">Sem cor</button>
           </div>
           <div class="advswatches" id="edCorBoxSwatches"></div>
         </div>
@@ -2701,7 +2719,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     </div>
 
     <div class="edacoes">
-      <button class="edsalvar" id="edSalvar" type="button">Salvar alterações</button>
+      <button class="edsalvar" id="edSalvar" type="button" data-i18n="ed.salvarAlteracoes">Salvar alterações</button>
       <button class="edexcluir" id="edExcluir" type="button" aria-label="Excluir tarefa">&#215;</button>
     </div>
   </div>
@@ -2805,8 +2823,9 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     if (!t) { fechar(); return; }
 
     const novo = texto.value.trim();
-    if (!novo){ aviso('O TÍTULO NÃO PODE FICAR VAZIO'); return; }
-    if (modo === 'repete' && dias.length === 0){ aviso('ESCOLHA OS DIAS'); return; }
+    const en = idiomaApp() === 'en';
+    if (!novo){ aviso(en ? 'TITLE CAN\'T BE EMPTY' : 'O TÍTULO NÃO PODE FICAR VAZIO'); return; }
+    if (modo === 'repete' && dias.length === 0){ aviso(en ? 'CHOOSE THE DAYS' : 'ESCOLHA OS DIAS'); return; }
 
     t.texto = novo;
     t.dif   = dif;
@@ -2831,7 +2850,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     fechar();
     render();
     window.tocarSom?.('tarefa'); // SFX: reusa o som de criar() -- edSalvar.onclick vive preso na IIFE do editor, sem binding global vivo pro clique real; editado direto (item 21 do roadmap)
-    aviso('TAREFA ATUALIZADA');
+    aviso(en ? 'TASK UPDATED' : 'TAREFA ATUALIZADA');
   };
 
   document.getElementById('edExcluir').onclick = () => {
@@ -2841,7 +2860,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     fechar();
     render();
     window.tocarSom?.('desequipar'); // SFX: reusa o thud curto/surdo ja catalogado, combina com "remover algo" -- mesma familia de excecao de closure do edSalvar acima (item 21 do roadmap)
-    aviso('TAREFA EXCLUÍDA');
+    aviso(idiomaApp() === 'en' ? 'TASK DELETED' : 'TAREFA EXCLUÍDA');
   };
 
   // chamada pelo render() ao tocar no corpo da linha
@@ -3247,7 +3266,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
         } else {
           quedaNaFila = false;
           if (typeof aviso === 'function')
-            aviso('VOCÊ CAIU  −' + perdidas + ' MOEDAS', false, true);
+            aviso((idiomaApp() === 'en' ? 'YOU FELL  −' : 'VOCÊ CAIU  −') + perdidas + (idiomaApp() === 'en' ? ' COINS' : ' MOEDAS'), false, true);
         }
       }, 420);
       return true;
@@ -3318,9 +3337,12 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       const total = Math.max(1, Math.round(dano));
       setTimeout(() => {
         const morreu = ferir(total);
-        if (!morreu && typeof aviso === 'function')
-          aviso('−' + total + ' DE VIDA POR ' + largadas.length +
-                (largadas.length === 1 ? ' TAREFA LARGADA' : ' TAREFAS LARGADAS'), false, true);
+        if (!morreu && typeof aviso === 'function'){
+          const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
+          aviso(en
+            ? ('−' + total + ' HEALTH FOR ' + largadas.length + (largadas.length === 1 ? ' SKIPPED TASK' : ' SKIPPED TASKS'))
+            : ('−' + total + ' DE VIDA POR ' + largadas.length + (largadas.length === 1 ? ' TAREFA LARGADA' : ' TAREFAS LARGADAS')), false, true);
+        }
       }, 700);
     }
   }
@@ -3543,7 +3565,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   function pintarSpriteNoPerfil(){
     const el = document.getElementById('perfilHeroSprite');
     if (!el || typeof heroiAtual !== 'function') return;
-    el.innerHTML = '<img class="heroimg" src="' + heroiAtual().img + '" alt="herói">' +
+    el.innerHTML = '<img class="heroimg" src="' + heroiAtual().img + '" alt="' + (idiomaApp() === 'en' ? 'hero' : 'herói') + '">' +
                    '<div class="sombra"></div>';
   }
   const _dh = window.desenharHeroi;
@@ -3569,8 +3591,8 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     if (typeof window.pintarSpriteNoPerfil === 'function') window.pintarSpriteNoPerfil();
     if (typeof window.renderPreviewsPerfil === 'function') window.renderPreviewsPerfil();
 
-    document.getElementById('perfilSub').textContent = 'Nível ' + romano(p.nivel);
-    document.getElementById('perfilNome').textContent = (typeof nomeHeroi !== 'undefined' && nomeHeroi) || 'Aventureiro';
+    document.getElementById('perfilSub').textContent = (idiomaApp() === 'en' ? 'Level ' : 'Nível ') + romano(p.nivel);
+    document.getElementById('perfilNome').textContent = (typeof nomeHeroi !== 'undefined' && nomeHeroi) || (idiomaApp() === 'en' ? 'Adventurer' : 'Aventureiro');
     document.getElementById('perfilFill').style.width = Math.round((p.resto / p.meta) * 100) + '%';
     document.getElementById('perfilXpNum').textContent = p.resto + ' / ' + p.meta + ' XP';
 
@@ -3644,23 +3666,27 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   // separada, mais abaixo no arquivo) poder atualizar o resumo de Herói
   // assim que o nome é confirmado, sem esperar fechar a sub-tela.
   function atualizarResumosConfig(){
+    let langAtual = 'pt';
+    try { langAtual = localStorage.getItem('questlog.idioma.v1') || 'pt'; } catch(e){}
+    const emIngles = langAtual === 'en';
+
     const rHeroi = document.getElementById('cfgHeroiResumo');
-    if (rHeroi) rHeroi.textContent = (typeof nomeHeroi !== 'undefined' && nomeHeroi) || 'Aventureiro';
+    if (rHeroi) rHeroi.textContent = (typeof nomeHeroi !== 'undefined' && nomeHeroi) || (emIngles ? 'Adventurer' : 'Aventureiro');
 
     const rTema = document.getElementById('cfgAparenciaResumo');
     if (rTema && typeof TEMAS !== 'undefined'){
       const atual = document.documentElement.getAttribute('data-tema') || 'padrao';
       const t = TEMAS.find(tt => tt.id === atual);
-      let langAtual = 'pt';
-      try { langAtual = localStorage.getItem('questlog.idioma.v1') || 'pt'; } catch(e){}
-      const nomeTema = t ? (langAtual === 'en' ? (t.nome_en || t.nome) : t.nome) : 'Laranja';
+      const nomeTema = t ? (emIngles ? (t.nome_en || t.nome) : t.nome) : 'Laranja';
       rTema.textContent = nomeTema;
     }
 
     const rPref = document.getElementById('cfgPrefsResumo');
     if (rPref){
       const pref = (typeof window.feedbackPreferido === 'function') ? window.feedbackPreferido() : 'vibrar';
-      rPref.textContent = pref === 'vibrar' ? 'Vibrar' : 'Desativado';
+      rPref.textContent = emIngles
+        ? (pref === 'vibrar' ? 'Vibrate' : 'Off')
+        : (pref === 'vibrar' ? 'Vibrar' : 'Desativado');
     }
   }
   window.atualizarResumosConfig = atualizarResumosConfig;
@@ -3796,6 +3822,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
      recalculado toda vez que a aba Perfil abre (chamado de renderPerfil(),
      bloco "PERFIL — ATRIBUTOS" mais abaixo) ---------- */
   function renderPreviewsPerfil(){
+    const en = idiomaApp() === 'en';
     // Historico -- conta vitorias/fugas do mes corrente a partir do
     // historico permanente (window.obterHistorico(), ja exposto)
     const elHist = document.getElementById('prevHistoricoTxt');
@@ -3806,7 +3833,9 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       const doMes = hist.filter(h => typeof h.data === 'string' && h.data.startsWith(prefixoMes));
       const vitorias = doMes.filter(h => h.resultado === 'vitoria').length;
       const fugas = doMes.filter(h => h.resultado === 'fuga').length;
-      elHist.textContent = vitorias + ' vitórias, ' + fugas + ' fugas este mês';
+      elHist.textContent = en
+        ? (vitorias + ' wins, ' + fugas + ' escapes this month')
+        : (vitorias + ' vitórias, ' + fugas + ' fugas este mês');
     }
 
     // faixa dos ultimos 5 dias -- mesma logica de "hoje ao vivo" ja usada
@@ -3843,8 +3872,10 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     if (elConq && typeof window.resumoConquistasPerfil === 'function'){
       const r = window.resumoConquistasPerfil();
       elConq.textContent = r.pendentes > 0
-        ? r.pendentes + (r.pendentes === 1 ? ' conquista pronta pra resgatar!' : ' conquistas prontas pra resgatar!')
-        : r.resgatadas + ' de ' + r.total + ' desbloqueadas';
+        ? (en
+            ? (r.pendentes + (r.pendentes === 1 ? ' achievement ready to claim!' : ' achievements ready to claim!'))
+            : (r.pendentes + (r.pendentes === 1 ? ' conquista pronta pra resgatar!' : ' conquistas prontas pra resgatar!')))
+        : (en ? (r.resgatadas + ' of ' + r.total + ' unlocked') : (r.resgatadas + ' de ' + r.total + ' desbloqueadas'));
     }
 
     // faixa das 5 conquistas resgatadas mais recentes
@@ -3855,7 +3886,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       if (!recentes.length){
         const vazio = document.createElement('span');
         vazio.className = 'prevvazio';
-        vazio.textContent = 'Nenhuma conquista resgatada ainda';
+        vazio.textContent = en ? 'No achievements unlocked yet' : 'Nenhuma conquista resgatada ainda';
         faixaConq.appendChild(vazio);
       } else {
         recentes.forEach(c => {
@@ -4096,12 +4127,13 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   function mostrarBauLoot(ganhos, aoFechar){
     if (!ganhos || !ganhos.length){ if (aoFechar) aoFechar(); return; }
     _aoFecharBau = aoFechar || null;
+    const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
 
     bauPop.innerHTML =
       '<div class="bauicone" id="bauIcone">'+spriteHTML(SP_BAU, 56)+'</div>'+
-      '<div class="baulabel">Baú do Tesouro</div>'+
+      '<div class="baulabel">' + (en ? 'Treasure Chest' : 'Baú do Tesouro') + '</div>'+
       '<div class="bauitens" id="bauItens"></div>'+
-      '<button class="bauok" id="bauOk">Continuar</button>';
+      '<button class="bauok" id="bauOk">' + (en ? 'Continue' : 'Continuar') + '</button>';
 
     document.getElementById('bauOk').onclick = fecharBau;
     bauBG.classList.add('on');
@@ -4156,12 +4188,13 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     _aoFecharLvl = aoFechar || null;
     const vMax = (window.vidaHeroi && typeof window.vidaHeroi.max === 'function')
       ? window.vidaHeroi.max() : null;
+    const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
 
     lvlPop.innerHTML =
-      '<div class="lvllabel">Nível alcançado</div>'+
+      '<div class="lvllabel">' + (en ? 'Level reached' : 'Nível alcançado') + '</div>'+
       '<div class="lvlnum" id="lvlNum">'+romano(nivel)+'</div>'+
-      (vMax !== null ? '<div class="lvlvida">Vida máxima agora: <b>'+vMax+'</b></div>' : '')+
-      '<button class="lvlok" id="lvlOk">Continuar</button>';
+      (vMax !== null ? '<div class="lvlvida">' + (en ? 'Max health now: ' : 'Vida máxima agora: ') + '<b>'+vMax+'</b></div>' : '')+
+      '<button class="lvlok" id="lvlOk">' + (en ? 'Continue' : 'Continuar') + '</button>';
 
     document.getElementById('lvlOk').onclick = fecharLvl;
     lvlBG.classList.add('on');
@@ -4197,13 +4230,14 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 
   function mostrarQueda(perdidas, aoFechar){
     _aoFecharQueda = aoFechar || null;
+    const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
 
     quedaPop.innerHTML =
-      '<div class="quedalabel">Derrota</div>'+
-      '<div class="quedaicone"><img src="'+heroiAtual().img+'" alt="herói caído"></div>'+
-      '<div class="quedatitulo">Você caiu.</div>'+
-      '<div class="quedaperda">Perdeu <b>'+perdidas+' moedas</b> na queda — vida restaurada.</div>'+
-      '<button class="quedaok" id="quedaOk">Levantar</button>';
+      '<div class="quedalabel">' + (en ? 'Defeat' : 'Derrota') + '</div>'+
+      '<div class="quedaicone"><img src="'+heroiAtual().img+'" alt="' + (en ? 'fallen hero' : 'herói caído') + '"></div>'+
+      '<div class="quedatitulo">' + (en ? 'You fell.' : 'Você caiu.') + '</div>'+
+      '<div class="quedaperda">' + (en ? ('Lost <b>'+perdidas+' coins</b> in the fall — health restored.') : ('Perdeu <b>'+perdidas+' moedas</b> na queda — vida restaurada.')) + '</div>'+
+      '<button class="quedaok" id="quedaOk">' + (en ? 'Get up' : 'Levantar') + '</button>';
 
     document.getElementById('quedaOk').onclick = fecharQueda;
     quedaBG.classList.add('on');
@@ -4328,7 +4362,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   function investir(atr){
     if (pontosDisponiveis() <= 0) return;
     if (noTeto(atr)){
-      if (typeof window.aviso === 'function') window.aviso('Esse atributo já está no teto máximo');
+      if (typeof window.aviso === 'function') window.aviso(idiomaApp() === 'en' ? 'This attribute is already at max' : 'Esse atributo já está no teto máximo');
       return;
     }
     gasto[atr]++;
@@ -4340,7 +4374,12 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   function renderAtributosPontos(){
     const disp = Math.max(0, pontosDisponiveis());   // nunca mostra negativo (save orfao de reset incompleto)
     const elDisp = document.getElementById('atrDisponiveis');
-    if (elDisp) elDisp.textContent = disp + (disp === 1 ? ' disponível' : ' disponíveis');
+    if (elDisp){
+      const en = idiomaApp() === 'en';
+      elDisp.textContent = en
+        ? (disp + (disp === 1 ? ' available' : ' available'))
+        : (disp + (disp === 1 ? ' disponível' : ' disponíveis'));
+    }
 
     const elFortuna = document.getElementById('atrFortunaValor');
     if (elFortuna) elFortuna.textContent = '+' + Math.round(bonusFortuna() * 100) + '%';
@@ -4463,6 +4502,35 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     ]
   };
 
+  // item 46 do roadmap: par EN dos diálogos, mesmo cuidado de tom em 1ª
+  // pessoa pedido pelo usuário -- não é tradução literal palavra-por-
+  // palavra, é a mesma fala reescrita naturalmente em inglês.
+  const DIALOGOS_EN = {
+    tarefas: [
+      'This is my daily task list.',
+      'Every task I finish is a hit on the monster, and rewards me with experience and coins.',
+      'By the end of the day, if I finish every task, the monster dies and I get rewards: armor, swords, accessories, and lots of other gear.',
+      'If I can\'t finish them all, the monster hits me back — the damage depends on how many tasks I leave undone.',
+      'Tap a task to mark it done or edit it. Hold a task to reorder the list.'
+    ],
+    inventario: [
+      'This is where I keep everything I\'ve looted from battle: weapons, armor, accessories, and a few rare treasures.',
+      'Equipping a good item boosts my experience or my coins per task.',
+      'Not using an item anymore? I can sell it right here for coins. And there\'s an old book, unlocked at a certain level, that reveals every item I can ever get.'
+    ],
+    loja: [
+      'The shop restocks every day — different items, always with one deal on offer.',
+      'The rarer the item, the pricier it gets — and some only unlock once I reach a certain level.',
+      'My Focus attribute gives me a discount on purchases. And of course, I can also sell what I don\'t use here.'
+    ],
+    perfil: [
+      'This is where I see my attributes, my achievements, and my whole journey\'s progress.',
+      'Every level gives me points to invest in Fortune, which improves my luck on loot, or Focus, which makes the shop cheaper.',
+      'Achievements reward the milestones I reach — and the Bestiary keeps a record of every monster I\'ve faced.',
+      'I can also tweak my experience here, like the theme, check my history of completed days, and a few other things.'
+    ]
+  };
+
   let vistas = {};
   try {
     const bruto = localStorage.getItem(CHAVE_TELAS);
@@ -4582,7 +4650,8 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   }
 
   function mostrarDialogoTela(nome){
-    const linhas = DIALOGOS[nome];
+    const fonte = (typeof idiomaApp === 'function' && idiomaApp() === 'en') ? DIALOGOS_EN : DIALOGOS;
+    const linhas = fonte[nome];
     if (!linhas || !linhas.length) return;
     abaPendente = nome;
     linhasAba = linhas;
@@ -4590,7 +4659,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     const img = (typeof heroiAtual === 'function') ? heroiAtual().img : '';
     document.getElementById('dlgHeroImg').src = img;
     document.getElementById('dlgNome').textContent =
-      (typeof nomeHeroi !== 'undefined' && nomeHeroi) || 'Aventureiro';
+      (typeof nomeHeroi !== 'undefined' && nomeHeroi) || ((typeof idiomaApp === 'function' && idiomaApp() === 'en') ? 'Adventurer' : 'Aventureiro');
     overlay.classList.add('on');
     digitar(linhasAba[0]);
   }
@@ -4598,6 +4667,8 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   let timerPendente = null;
   function agendarDialogoTela(nome){
     if (vistas[nome]) return;
+    const fonte = (typeof idiomaApp === 'function' && idiomaApp() === 'en') ? DIALOGOS_EN : DIALOGOS;
+    if (!fonte[nome] || !fonte[nome].length) return;
     clearTimeout(timerPendente);
     timerPendente = setTimeout(() => mostrarDialogoTela(nome), ATRASO_MS);
   }
@@ -4887,7 +4958,11 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       ]);
     } catch(e){
       console.error('QuestLog: falha ao apagar dados da nuvem — segue apagando so o aparelho', e);
-      if (typeof window.aviso === 'function') window.aviso('Não deu pra apagar da nuvem, mas o aparelho foi limpo', false, true);
+      if (typeof window.aviso === 'function'){
+        let en = false;
+        try { en = (localStorage.getItem('questlog.idioma.v1') || 'pt') === 'en'; } catch(e2){}
+        window.aviso(en ? 'Couldn\'t delete from the cloud, but the device was cleared' : 'Não deu pra apagar da nuvem, mas o aparelho foi limpo', false, true);
+      }
     }
 
     try { localStorage.clear(); } catch(e){}
@@ -4916,7 +4991,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 
 <div class="grimOverlay" id="grimOverlay">
   <div class="grimHead">
-    <h2>Grimório</h2>
+    <h2 data-i18n="grim.titulo">Grimório</h2>
     <button class="grimFechar" id="grimFechar">×</button>
   </div>
   <div class="grimSub" id="grimSub"></div>
@@ -4959,11 +5034,14 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     window.tocarSom?.('grimorio'); // SFX: extra alem do 'levelup' generico que ja toca em toda subida de nivel -- marco especifico de ganhar o Grimorio
     persistir();
     const btn = document.getElementById('lvlOk');
-    if (btn) btn.insertAdjacentHTML('beforebegin',
-      '<div class="lvlitem">'+
-        '<div class="lvlitembox">'+spriteHTML(item(ID_GRIMORIO).sp, 40)+'</div>'+
-        '<div class="lvlitemtxt">Você encontrou<br><b>'+item(ID_GRIMORIO).nome+'</b></div>'+
-      '</div>');
+    if (btn){
+      const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
+      btn.insertAdjacentHTML('beforebegin',
+        '<div class="lvlitem">'+
+          '<div class="lvlitembox">'+spriteHTML(item(ID_GRIMORIO).sp, 40)+'</div>'+
+          '<div class="lvlitemtxt">' + (en ? 'You found' : 'Você encontrou') + '<br><b>'+item(ID_GRIMORIO).nome+'</b></div>'+
+        '</div>');
+    }
   }
 };
 </script>
@@ -5013,9 +5091,13 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       };
       grid.appendChild(c);
     });
-    document.getElementById('grimSub').textContent = vistos.size + ' de ' + idsVivos.length + ' itens descobertos';
+    const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
+    document.getElementById('grimSub').textContent = en
+      ? (vistos.size + ' of ' + idsVivos.length + ' items discovered')
+      : (vistos.size + ' de ' + idsVivos.length + ' itens descobertos');
   }
 
+  window.renderGrimorio = renderGrimorio;
   window.abrirCatalogoGrimorio = function(){
     renderGrimorio();
     document.getElementById('grimOverlay').classList.add('on');
@@ -5525,7 +5607,10 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     }
 
     if (typeof aviso === 'function'){
-      const rotulo = pendentes.length === 1 ? 'conquista' : 'conquistas';
+      const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
+      const rotulo = en
+        ? (pendentes.length === 1 ? 'achievement' : 'achievements')
+        : (pendentes.length === 1 ? 'conquista' : 'conquistas');
       aviso('+' + somaXP + ' XP · ' + pendentes.length + ' ' + rotulo);
     }
 
@@ -6407,8 +6492,14 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     });
 
     const sub = document.getElementById('bestSub');
-    if (sub) sub.textContent = derrotados.size + ' de ' + MONSTROS.length + ' monstros derrotados';
+    if (sub){
+      const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
+      sub.textContent = en
+        ? (derrotados.size + ' of ' + MONSTROS.length + ' monsters defeated')
+        : (derrotados.size + ' de ' + MONSTROS.length + ' monstros derrotados');
+    }
   }
+  window.renderBestiario = renderBestiario;
 
   // hook antigo no botao da extinta #perfilTabs removido daqui (v4.64) --
   // abrirBestiario() (bloco "PERFIL — SUB-ABAS") ja chama renderBestiario()
@@ -6476,7 +6567,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
 <div class="histOverlay" id="histOverlay">
   <div class="histHead">
-    <h2>Histórico</h2>
+    <h2 data-i18n="perfil.historico">Histórico</h2>
     <button class="histFechar" id="histFechar">×</button>
   </div>
   <div class="histScroll">
@@ -6488,9 +6579,9 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     <div class="caldiassemana" id="calDiasSemana"></div>
     <div class="calgrade" id="calGrade"></div>
     <div class="callegenda">
-      <span><i class="calponto calvitoria"></i> vitória</span>
-      <span><i class="calponto calfuga"></i> fuga</span>
-      <span><i class="calponto calsemtarefa"></i> sem tarefa</span>
+      <span><i class="calponto calvitoria"></i> <span data-i18n="hist.vitoria">vitória</span></span>
+      <span><i class="calponto calfuga"></i> <span data-i18n="hist.fuga">fuga</span></span>
+      <span><i class="calponto calsemtarefa"></i> <span data-i18n="hist.semTarefa">sem tarefa</span></span>
     </div>
   </div>
 </div>
@@ -6499,7 +6590,10 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 (function(){
   const NOMES_MES = ['janeiro','fevereiro','março','abril','maio','junho',
                       'julho','agosto','setembro','outubro','novembro','dezembro'];
+  const NOMES_MES_EN = ['January','February','March','April','May','June',
+                         'July','August','September','October','November','December'];
   const DIAS_SEMANA_CURTO = ['D','S','T','Q','Q','S','S'];
+  const DIAS_SEMANA_CURTO_EN = ['S','M','T','W','T','F','S'];
 
   // mes/ano correntes da NAVEGACAO do calendario -- so em memoria, de
   // proposito: sempre abre no mes atual toda vez que o overlay abre,
@@ -6525,11 +6619,15 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     if (!grade || !titulo) return;
     if (calAno === undefined) iniciarNoMesAtual();
 
-    if (diasSemanaEl && !diasSemanaEl.childElementCount){
-      diasSemanaEl.innerHTML = DIAS_SEMANA_CURTO.map(d => '<span>' + d + '</span>').join('');
-    }
+    const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
+    const diasSemana = en ? DIAS_SEMANA_CURTO_EN : DIAS_SEMANA_CURTO;
+    const nomesMes = en ? NOMES_MES_EN : NOMES_MES;
 
-    titulo.textContent = NOMES_MES[calMes] + ' de ' + calAno;
+    // sempre repinta os cabecalhos de dia da semana (nao so na 1a vez) --
+    // precisa refletir troca de idioma em tempo real, igual o resto do app
+    if (diasSemanaEl) diasSemanaEl.innerHTML = diasSemana.map(d => '<span>' + d + '</span>').join('');
+
+    titulo.textContent = en ? (nomesMes[calMes] + ' ' + calAno) : (nomesMes[calMes] + ' de ' + calAno);
 
     const hist = (typeof window.obterHistorico === 'function') ? window.obterHistorico() : [];
     const porData = new Map(hist.map(h => [h.data, h.resultado]));
@@ -6616,18 +6714,18 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     <div class="passo on" id="passoLogin">
       <div class="marca">
         <span class="titulo">QUESTLOG</span>
-        <p class="loginModo" id="loginModo">Entre na sua conta</p>
+        <p class="loginModo" id="loginModo" data-i18n="login.entreNaSuaConta">Entre na sua conta</p>
       </div>
 
       <div class="campo campoIcone">
-        <label>Email</label>
+        <label data-i18n="login.email">Email</label>
         <span class="campoIc">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
         </span>
         <input id="loginEmail" type="email" placeholder="voce@email.com" autocomplete="email">
       </div>
       <div class="campo campoIcone">
-        <label>Senha</label>
+        <label data-i18n="login.senha">Senha</label>
         <span class="campoIc">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
         </span>
@@ -6637,9 +6735,9 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           <svg class="icErro" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 6l12 12M18 6L6 18"/></svg>
         </span>
       </div>
-      <p class="loginSenhaErro" id="loginSenhaErro" style="display:none">Sua senha deve ter pelo menos 6 caracteres e 1 número</p>
+      <p class="loginSenhaErro" id="loginSenhaErro" style="display:none" data-i18n="login.senhaErro">Sua senha deve ter pelo menos 6 caracteres e 1 número</p>
       <div class="campo campoIcone" id="loginCampoConfirmarSenha" style="display:none">
-        <label>Confirmar senha</label>
+        <label data-i18n="login.confirmarSenha">Confirmar senha</label>
         <span class="campoIc">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
         </span>
@@ -6649,16 +6747,16 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           <svg class="icErro" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 6l12 12M18 6L6 18"/></svg>
         </span>
       </div>
-      <p class="loginSenhaErro" id="loginSenhaConfirmarErro" style="display:none">As senhas não coincidem</p>
+      <p class="loginSenhaErro" id="loginSenhaConfirmarErro" style="display:none" data-i18n="login.senhasNaoCoincidem">As senhas não coincidem</p>
 
       <div class="loginLinha" id="loginLinhaSenha">
         <span></span>
-        <button class="loginLink" id="loginEsqueci">Esqueceu a senha?</button>
+        <button class="loginLink" id="loginEsqueci" data-i18n="login.esqueceuSenha">Esqueceu a senha?</button>
       </div>
 
-      <button class="primario" id="loginEntrarBtn">Entrar</button>
+      <button class="primario" id="loginEntrarBtn" data-i18n="login.entrar">Entrar</button>
 
-      <div class="loginDivisor">ou</div>
+      <div class="loginDivisor" data-i18n="login.ou">ou</div>
 
       <button class="loginGoogleBtn" id="loginGoogleBtn">
         <svg viewBox="0 0 48 48">
@@ -6667,22 +6765,22 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           <path fill="#4CAF50" d="M24 45c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 36.4 26.7 37.3 24 37.3c-5.3 0-9.7-3.3-11.3-8l-6.5 5C9.6 40.6 16.2 45 24 45z"/>
           <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.2 4.2-4.1 5.6l6.2 5.2C40.9 36 44 30.5 44 24c0-1.4-.1-2.4-.4-3.5z"/>
         </svg>
-        Entrar com Google
+        <span data-i18n="login.entrarComGoogle">Entrar com Google</span>
       </button>
 
-      <p class="loginRodape" id="loginRodape">Não tem conta? <button class="loginLink" id="loginToggleCadastro" style="padding:0">Cadastre-se agora</button></p>
+      <p class="loginRodape" id="loginRodape"><span data-i18n="login.naoTemConta">Não tem conta?</span> <button class="loginLink" id="loginToggleCadastro" style="padding:0" data-i18n="login.cadastreSeAgora">Cadastre-se agora</button></p>
 
-      <button class="secundario" id="loginContinuarSemConta">Agora não</button>
+      <button class="secundario" id="loginContinuarSemConta" data-i18n="login.agoraNao">Agora não</button>
     </div>
   `);
 
   card.insertAdjacentHTML('afterbegin', `
     <div class="passo" id="passoBoasVindas">
       <div class="marca">
-        <span class="boasVindasRotulo" id="boasVindasRotulo">Bem-vindo de volta</span>
+        <span class="boasVindasRotulo" id="boasVindasRotulo" data-i18n="login.bemVindoDeVolta">Bem-vindo de volta</span>
         <span class="titulo" id="boasVindasNome">Aventureiro</span>
       </div>
-      <button class="primario" id="boasVindasContinuar">Continuar</button>
+      <button class="primario" id="boasVindasContinuar" data-i18n="acao.continuar">Continuar</button>
     </div>
   `);
 
@@ -6698,12 +6796,12 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         <span class="titulo">QUESTLOG</span>
       </div>
       <div class="verificarBloco">
-        <p class="verificarTexto">Confirma seu email pra continuar.<br>
+        <p class="verificarTexto" id="verificarTextoBloco">Confirma seu email pra continuar.<br>
           Mandamos um link pra <span id="verificarEmailAlvo"></span>.</p>
-        <p class="verificarSpamAviso">Não achou? Confere o <b>spam</b>.</p>
+        <p class="verificarSpamAviso" data-i18n="login.confereSpam">Não achou? Confere o <b>spam</b>.</p>
       </div>
-      <button class="primario" id="verificarReenviar">Reenviar email</button>
-      <button class="loginLink" id="verificarEmailErrado">Email errado? Corrigir</button>
+      <button class="primario" id="verificarReenviar" data-i18n="login.reenviarEmail">Reenviar email</button>
+      <button class="loginLink" id="verificarEmailErrado" data-i18n="login.emailErrado">Email errado? Corrigir</button>
     </div>
   `);
 
@@ -6784,13 +6882,15 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   function ligarToggleCadastro(){
     document.getElementById('loginToggleCadastro').onclick = () => {
       modoCadastro = !modoCadastro;
-      document.getElementById('loginEntrarBtn').textContent = modoCadastro ? 'Criar conta' : 'Entrar';
-      document.getElementById('loginModo').textContent = modoCadastro ? 'Crie sua conta' : 'Entre na sua conta';
+      let en = false;
+      try { en = (localStorage.getItem('questlog.idioma.v1') || 'pt') === 'en'; } catch(e){}
+      document.getElementById('loginEntrarBtn').textContent = modoCadastro ? (en ? 'Create account' : 'Criar conta') : (en ? 'Log in' : 'Entrar');
+      document.getElementById('loginModo').textContent = modoCadastro ? (en ? 'Create your account' : 'Crie sua conta') : (en ? 'Log into your account' : 'Entre na sua conta');
       document.getElementById('loginLinhaSenha').style.display = modoCadastro ? 'none' : 'flex';
       document.getElementById('loginCampoConfirmarSenha').style.display = modoCadastro ? 'flex' : 'none';
       document.getElementById('loginRodape').innerHTML = modoCadastro
-        ? 'Já tem conta? <button class="loginLink" id="loginToggleCadastro" style="padding:0">Entrar</button>'
-        : 'Não tem conta? <button class="loginLink" id="loginToggleCadastro" style="padding:0">Cadastre-se agora</button>';
+        ? (en ? 'Already have an account? <button class="loginLink" id="loginToggleCadastro" style="padding:0">Log in</button>' : 'Já tem conta? <button class="loginLink" id="loginToggleCadastro" style="padding:0">Entrar</button>')
+        : (en ? 'Don\'t have an account? <button class="loginLink" id="loginToggleCadastro" style="padding:0">Sign up now</button>' : 'Não tem conta? <button class="loginLink" id="loginToggleCadastro" style="padding:0">Cadastre-se agora</button>');
       if (typeof window.questlogLimparStatusSenha === 'function') window.questlogLimparStatusSenha();
       ligarToggleCadastro(); // religa no novo <button>, o innerHTML acima descartou o antigo
     };
@@ -7000,29 +7100,47 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // v4.13x (item 46 do roadmap): slide de idioma novo, entre EVOLUA e a
   // transicao -- empurra transicao/nome/heroi/tarefas +1 na numeracao,
   // mesmo padrao ja usado quando a transicao (item 42-f) entrou entre
-  // EVOLUA e nome. Escolha de idioma so troca a preferencia salva (ver
-  // bloco I18N -- IDIOMA mais abaixo); nao ha texto novo pra traduzir
-  // nesta sessao (decisao fechada em brainstorm: so a arquitetura agora).
+  // EVOLUA e nome. titulo_en/texto_en/botao_en (pedido do usuario:
+  // traduzir o app inteiro) adicionados nesta rodada -- escolhidos na
+  // hora de montar htmlSlides, mais abaixo, lendo o idioma ja salvo.
   const SLIDES = [
-    { dataSlide:1, next:2, tipo:'trioLogo', idxs:[0, 32, 5], titulo:'QUESTLOG',
+    { dataSlide:1, next:2, tipo:'trioLogo', idxs:[0, 32, 5], titulo:'QUESTLOG', titulo_en:'QUESTLOG',
       texto:'Suas tarefas do dia viram uma batalha. Complete tarefas, evolua seu herói, vença monstros.',
-      botao:'Começar', layout:'marcaPrimeiro' },
-    { dataSlide:2, next:3, tipo:'monstro', idx:22, titulo:'BATALHA',
+      texto_en:'Your daily tasks become a battle. Complete tasks, level up your hero, defeat monsters.',
+      botao:'Começar', botao_en:'Get started', layout:'marcaPrimeiro' },
+    { dataSlide:2, next:3, tipo:'monstro', idx:22, titulo:'BATALHA', titulo_en:'BATTLE',
       texto:'Todo dia aparece um monstro. Ele só morre se você terminar suas tarefas.',
-      botao:'Continuar', layout:'comTarefasDemo' },
-    { dataSlide:3, next:4, tipo:'heroi', idx:1, titulo:'EVOLUA',
+      texto_en:'A monster shows up every day. It only dies if you finish your tasks.',
+      botao:'Continuar', botao_en:'Continue', layout:'comTarefasDemo' },
+    { dataSlide:3, next:4, tipo:'heroi', idx:1, titulo:'EVOLUA', titulo_en:'LEVEL UP',
       texto:'Ganhe XP, moedas e itens conforme joga. Da raridade Comum até Lendário.',
-      botao:'Continuar', layout:'imagemPrimeiro' },
-    { dataSlide:4, next:5, tipo:'idioma', titulo:'IDIOMA · LANGUAGE',
+      texto_en:'Earn XP, coins and items as you play. From Common rarity all the way to Legendary.',
+      botao:'Continuar', botao_en:'Continue', layout:'imagemPrimeiro' },
+    { dataSlide:4, next:5, tipo:'idioma', titulo:'IDIOMA · LANGUAGE', titulo_en:'IDIOMA · LANGUAGE',
       texto:'Escolha o idioma do app. Dá pra trocar depois em Perfil.',
-      botao:'Continuar', layout:'idiomaEscolha' },
+      texto_en:'Choose the app language. You can change it later in Profile.',
+      botao:'Continuar', botao_en:'Continue', layout:'idiomaEscolha' },
     { dataSlide:5, next:6, tipo:'transicao',
       texto:'Antes de começar, vamos te conhecer melhor...',
-      botao:'Continuar', layout:'textoSolo' }
+      texto_en:'Before we start, let\'s get to know you better...',
+      botao:'Continuar', botao_en:'Continue', layout:'textoSolo' }
   ];
   const SLIDE_TRANSICAO = 5; // usado pra disparar o typewriter (ver iniciarTypewriter, mais abaixo)
   const SLIDE_NOME = 6; // usado pra bloquear arraste sem nome preenchido (ver pegarVizinho, mais abaixo)
   const TOTAL_SLIDES = 8;
+
+  // item 46 do roadmap: idioma lido direto do localStorage (mesmo padrao
+  // ja usado no resto do arquivo -- item()/aplicarIdiomaDados()/
+  // idiomaApp()) em vez de esperar o modulo I18N carregar (esse
+  // carrossel roda bem antes dele, no meio do <script> principal).
+  function idiomaCarrossel(){
+    try { return localStorage.getItem('questlog.idioma.v1') || 'pt'; } catch(e){ return 'pt'; }
+  }
+  const CARROSSEL_EN = idiomaCarrossel() === 'en';
+  function txtSlide(s, campo){
+    const campoEn = campo + '_en';
+    return (CARROSSEL_EN && s[campoEn]) ? s[campoEn] : s[campo];
+  }
 
   function imagemSlide(s){
     if (s.tipo === 'logo'){
@@ -7069,7 +7187,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       </div>
       <div class="carrosselDots" id="carrosselDots">${dots(0)}</div>
       <div class="carrosselTopoLado carrosselTopoDir">
-        <button class="carrosselEntrarLink" id="carrosselEntrarLink">Já tem conta?</button>
+        <button class="carrosselEntrarLink" id="carrosselEntrarLink" data-i18n="login.jaTemConta">Já tem conta?</button>
       </div>
     </div>
   `;
@@ -7128,8 +7246,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     const blocoImagem = imagemSlide(s);
     const blocoMarca = `
       <div class="marca">
-        <span class="titulo">${s.titulo}</span>
-        <p class="lema">${s.texto}</p>
+        <span class="titulo">${txtSlide(s, 'titulo')}</span>
+        <p class="lema">${txtSlide(s, 'texto')}</p>
       </div>`;
     // v4.117: slide de transicao nao usa .marca (sem titulo, so prosa
     // centralizada) -- texto vazio no elemento de proposito, o
@@ -7138,7 +7256,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // aparecendo por 1 frame antes do JS rodar.
     const blocoTransicao = `
       <div class="carrosselTransicao">
-        <p class="carrosselTransicaoTexto" id="carrosselTransicaoTexto" data-texto="${s.texto}"></p>
+        <p class="carrosselTransicaoTexto" id="carrosselTransicaoTexto" data-texto="${txtSlide(s, 'texto')}"></p>
       </div>`;
 
     // layout explicito por slide (era baseado em indice/posicao antes
@@ -7153,7 +7271,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     return `
     <div class="carrosselSlide" id="passoCarrossel${s.dataSlide}" data-slide="${s.dataSlide}">
       <div class="carrosselMeio">${corpo}</div>
-      <button class="primario" id="carrosselBtn${s.dataSlide}">${s.botao}</button>
+      <button class="primario" id="carrosselBtn${s.dataSlide}">${txtSlide(s, 'botao')}</button>
     </div>
   `;
   }).join('');
@@ -7701,7 +7819,11 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   if (passoLogin && CONFIG_PENDENTE) {
     ['loginEntrarBtn','loginGoogleBtn','loginEsqueci'].forEach(id => {
       document.getElementById(id).onclick = () => {
-        if (typeof window.aviso === 'function') window.aviso('Configure o firebaseConfig pra testar o login');
+        if (typeof window.aviso === 'function'){
+          let en = false;
+          try { en = (localStorage.getItem('questlog.idioma.v1') || 'pt') === 'en'; } catch(e){}
+          window.aviso(en ? 'Set up firebaseConfig to test login' : 'Configure o firebaseConfig pra testar o login');
+        }
       };
     });
   } else if (!CONFIG_PENDENTE) {
@@ -7874,16 +7996,30 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     function mostrarTelaVerificacao(user){
       const passoVerificarEmail = document.getElementById('passoVerificarEmail');
       document.getElementById('passoLogin').classList.remove('on');
+      // item 46 do roadmap: bloco tem um <span id="verificarEmailAlvo">
+      // aninhado que precisa continuar existindo pro email ser inserido
+      // -- por isso NAO usa data-i18n genérico aqui (aplicarIdioma() usa
+      // innerHTML, que apagaria e recriaria esse span a cada troca de
+      // idioma, perdendo o valor já preenchido). Localizado direto aqui,
+      // no único ponto que monta esse texto.
+      let en = false;
+      try { en = (localStorage.getItem('questlog.idioma.v1') || 'pt') === 'en'; } catch(e){}
+      const bloco = document.getElementById('verificarTextoBloco');
+      if (bloco){
+        bloco.innerHTML = en
+          ? 'Confirm your email to continue.<br>\n          We sent a link to <span id="verificarEmailAlvo"></span>.'
+          : 'Confirma seu email pra continuar.<br>\n          Mandamos um link pra <span id="verificarEmailAlvo"></span>.';
+      }
       document.getElementById('verificarEmailAlvo').textContent = user.email || '';
       passoVerificarEmail.classList.add('on');
 
       document.getElementById('verificarReenviar').onclick = async () => {
         try {
           await sendEmailVerification(user);
-          if (typeof window.aviso === 'function') window.aviso('Email reenviado');
+          if (typeof window.aviso === 'function') window.aviso(en ? 'Email resent' : 'Email reenviado');
         } catch(e){
           console.error('QuestLog/Firebase: reenvio de verificacao falhou', e);
-          if (typeof window.aviso === 'function') window.aviso('Não deu pra reenviar -- espera um pouco e tenta de novo');
+          if (typeof window.aviso === 'function') window.aviso(en ? 'Couldn\'t resend -- wait a bit and try again' : 'Não deu pra reenviar -- espera um pouco e tenta de novo');
         }
       };
 
@@ -7986,8 +8122,13 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
       // mostra a tela de boas-vindas primeiro -- so ai que entra no app
       document.getElementById('passoLogin').classList.remove('on');
-      document.getElementById('boasVindasRotulo').textContent =
-        temSaveLocal ? 'Bem-vindo de volta' : 'Conta criada! Bem-vindo';
+      {
+        let en = false;
+        try { en = (localStorage.getItem('questlog.idioma.v1') || 'pt') === 'en'; } catch(e){}
+        document.getElementById('boasVindasRotulo').textContent = temSaveLocal
+          ? (en ? 'Welcome back' : 'Bem-vindo de volta')
+          : (en ? 'Account created! Welcome' : 'Conta criada! Bem-vindo');
+      }
       document.getElementById('boasVindasNome').textContent = nomeConta;
       document.getElementById('passoBoasVindas').classList.add('on');
 
@@ -8013,26 +8154,30 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // #passoLogin -- aquele DOM simplesmente nao existe neste caminho.
     function bloquearPorEmailNaoVerificado(user, aoConfirmar){
       if (document.getElementById('bloqueioVerificacaoEmail')) return; // ja mostrando
+      let en = false;
+      try { en = (localStorage.getItem('questlog.idioma.v1') || 'pt') === 'en'; } catch(e){}
+      const emailSeguro = (user.email || '').replace(/</g,'');
       document.body.insertAdjacentHTML('beforeend', `
         <div id="bloqueioVerificacaoEmail">
           <span class="titulo">QUESTLOG</span>
           <div class="verificarBloco">
-            <p class="verificarTexto">Confirma seu email pra continuar.<br>
-              Mandamos um link pra <b>${(user.email || '').replace(/</g,'')}</b>.</p>
-            <p class="verificarSpamAviso">Não achou? Confere o <b>spam</b>.</p>
+            <p class="verificarTexto">${en
+              ? ('Confirm your email to continue.<br>\n              We sent a link to <b>' + emailSeguro + '</b>.')
+              : ('Confirma seu email pra continuar.<br>\n              Mandamos um link pra <b>' + emailSeguro + '</b>.')}</p>
+            <p class="verificarSpamAviso">${en ? 'Can\'t find it? Check your <b>spam</b>.' : 'Não achou? Confere o <b>spam</b>.'}</p>
           </div>
-          <button class="primario" id="bloqueioReenviar">Reenviar email</button>
-          <button class="loginLink" id="bloqueioEmailErrado">Email errado? Corrigir</button>
+          <button class="primario" id="bloqueioReenviar">${en ? 'Resend email' : 'Reenviar email'}</button>
+          <button class="loginLink" id="bloqueioEmailErrado">${en ? 'Wrong email? Fix it' : 'Email errado? Corrigir'}</button>
         </div>
       `);
 
       document.getElementById('bloqueioReenviar').onclick = async () => {
         try {
           await sendEmailVerification(user);
-          if (typeof window.aviso === 'function') window.aviso('Email reenviado');
+          if (typeof window.aviso === 'function') window.aviso(en ? 'Email resent' : 'Email reenviado');
         } catch(e){
           console.error('QuestLog/Firebase: reenvio de verificacao falhou', e);
-          if (typeof window.aviso === 'function') window.aviso('Não deu pra reenviar -- espera um pouco e tenta de novo');
+          if (typeof window.aviso === 'function') window.aviso(en ? 'Couldn\'t resend -- wait a bit and try again' : 'Não deu pra reenviar -- espera um pouco e tenta de novo');
         }
       };
 
@@ -8110,6 +8255,16 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // login) quebraria aqui tentando ligar onclick em elemento nulo
     if (passoLogin){
 
+    // item 46 do roadmap: helper local, mesmo padrao de idiomaApp() do
+    // script principal -- duplicado aqui porque este bloco e type=module
+    // (escopo proprio, nao compartilha `function` top-level de scripts
+    // classicos automaticamente do mesmo jeito que dois scripts classicos
+    // compartilham; window.idiomaApp funcionaria, mas ler localStorage
+    // direto e mais robusto contra qualquer ordem de carregamento).
+    function idiomaAuth(){
+      try { return localStorage.getItem('questlog.idioma.v1') || 'pt'; } catch(e){ return 'pt'; }
+    }
+
     // signInWithRedirect foi testado e abandonado nesta sessao: nunca
     // funcionou (nem desktop, nem mobile), sempre getRedirectResult()
     // voltava null (causa exata nao identificada, provavelmente
@@ -8121,15 +8276,16 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       }
       catch(e){
         console.error('QuestLog/Firebase: Google falhou', e);
-        if (typeof window.aviso === 'function') window.aviso('Não deu pra entrar com Google');
+        if (typeof window.aviso === 'function') window.aviso(idiomaAuth() === 'en' ? 'Couldn\'t sign in with Google' : 'Não deu pra entrar com Google');
       }
     };
 
     document.getElementById('loginEntrarBtn').onclick = async () => {
       const email = document.getElementById('loginEmail').value.trim();
       const senha = document.getElementById('loginSenha').value;
+      const en = idiomaAuth() === 'en';
       if (!email || !senha) {
-        if (typeof window.aviso === 'function') window.aviso('Preenche email e senha');
+        if (typeof window.aviso === 'function') window.aviso(en ? 'Fill in email and password' : 'Preenche email e senha');
         return;
       }
 
@@ -8144,11 +8300,11 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       if (window.questlogModoCadastro && window.questlogModoCadastro()){
         const senhaConfirmar = document.getElementById('loginSenhaConfirmar').value;
         if (senha !== senhaConfirmar){
-          if (typeof window.aviso === 'function') window.aviso('As senhas não são iguais');
+          if (typeof window.aviso === 'function') window.aviso(en ? 'Passwords don\'t match' : 'As senhas não são iguais');
           return;
         }
         if (!/^(?=.*[0-9]).{6,}$/.test(senha)){
-          if (typeof window.aviso === 'function') window.aviso('Senha precisa de pelo menos 6 caracteres e 1 número');
+          if (typeof window.aviso === 'function') window.aviso(en ? 'Password needs at least 6 characters and 1 number' : 'Senha precisa de pelo menos 6 caracteres e 1 número');
           return;
         }
       }
@@ -8160,7 +8316,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           // "!contaNova" em aoLogar) -- so dispara o email e avisa.
           try {
             await sendEmailVerification(cred.user);
-            if (typeof window.aviso === 'function') window.aviso('Conta criada! Enviamos um link de confirmação pro seu email.');
+            if (typeof window.aviso === 'function') window.aviso(en ? 'Account created! We sent a confirmation link to your email.' : 'Conta criada! Enviamos um link de confirmação pro seu email.');
           } catch(e){
             console.error('QuestLog/Firebase: envio do email de verificacao falhou', e);
           }
@@ -8169,7 +8325,15 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         }
       } catch(e){
         console.error('QuestLog/Firebase: email/senha falhou', e);
-        const MENSAGENS = {
+        const MENSAGENS = en ? {
+          'auth/email-already-in-use': 'This email already has an account -- switch to "Log in"',
+          'auth/invalid-email': 'Invalid email',
+          'auth/weak-password': 'Password too weak (minimum 6 characters)',
+          'auth/user-not-found': 'No account with this email -- switch to "Sign up"',
+          'auth/wrong-password': 'Wrong password',
+          'auth/invalid-credential': 'Wrong email or password',
+          'auth/too-many-requests': 'Too many attempts -- wait a bit and try again'
+        } : {
           'auth/email-already-in-use': 'Esse email já tem conta -- troca pra "Entrar"',
           'auth/invalid-email': 'Email inválido',
           'auth/weak-password': 'Senha fraca demais (mínimo 6 caracteres)',
@@ -8178,23 +8342,24 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           'auth/invalid-credential': 'Email ou senha incorretos',
           'auth/too-many-requests': 'Muitas tentativas -- espera um pouco e tenta de novo'
         };
-        const msg = MENSAGENS[e && e.code] || 'Não deu pra entrar';
+        const msg = MENSAGENS[e && e.code] || (en ? 'Couldn\'t sign in' : 'Não deu pra entrar');
         if (typeof window.aviso === 'function') window.aviso(msg);
       }
     };
 
     document.getElementById('loginEsqueci').onclick = async () => {
       const email = document.getElementById('loginEmail').value.trim();
+      const en = idiomaAuth() === 'en';
       if (!email) {
-        if (typeof window.aviso === 'function') window.aviso('Digita seu email primeiro');
+        if (typeof window.aviso === 'function') window.aviso(en ? 'Type your email first' : 'Digita seu email primeiro');
         return;
       }
       try {
         await sendPasswordResetEmail(auth, email);
-        if (typeof window.aviso === 'function') window.aviso('Email de recuperação enviado');
+        if (typeof window.aviso === 'function') window.aviso(en ? 'Recovery email sent' : 'Email de recuperação enviado');
       } catch(e){
         console.error('QuestLog/Firebase: recuperar senha falhou', e);
-        if (typeof window.aviso === 'function') window.aviso('Não achei essa conta');
+        if (typeof window.aviso === 'function') window.aviso(en ? 'Couldn\'t find that account' : 'Não achei essa conta');
       }
     };
 
@@ -8303,12 +8468,14 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   function atualizarLinhaConta(){
     let conta = null;
     try { conta = JSON.parse(localStorage.getItem(CHAVE_CONTA)); } catch(e){}
+    let emIngles = false;
+    try { emIngles = (localStorage.getItem('questlog.idioma.v1') || 'pt') === 'en'; } catch(e){}
     if (conta && (conta.nome || conta.email)){
-      info.textContent = 'Logado como ' + (conta.nome || conta.email);
+      info.textContent = (emIngles ? 'Logged in as ' : 'Logado como ') + (conta.nome || conta.email);
       btnSair.classList.remove('oculto');
       btnEntrar.classList.add('oculto');
     } else {
-      info.textContent = 'Jogando sem conta';
+      info.textContent = emIngles ? 'Playing without an account' : 'Jogando sem conta';
       btnSair.classList.add('oculto');
       btnEntrar.classList.remove('oculto');
     }
@@ -8334,8 +8501,10 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
   btnSair.onclick = async () => {
     btnSair.disabled = true;
+    let en = false;
+    try { en = (localStorage.getItem('questlog.idioma.v1') || 'pt') === 'en'; } catch(e){}
     const textoOriginal = btnSair.textContent;
-    btnSair.textContent = 'Saindo…';
+    btnSair.textContent = en ? 'Logging out…' : 'Saindo…';
 
     try {
       if (window.firebaseConfig && window.firebaseConfig.apiKey !== 'COLE_AQUI_SUA_APIKEY'){
@@ -8353,7 +8522,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       }
     } catch(e){
       console.error('QuestLog: falha ao sair da conta na nuvem — desconecta so localmente', e);
-      if (typeof window.aviso === 'function') window.aviso('Não deu pra confirmar com o servidor, mas você foi desconectado aqui');
+      if (typeof window.aviso === 'function') window.aviso(en ? 'Couldn\'t confirm with the server, but you\'ve been signed out here' : 'Não deu pra confirmar com o servidor, mas você foi desconectado aqui');
     }
 
     try {
@@ -8685,7 +8854,91 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'dia.qua': { pt:'Q', en:'W' },
     'dia.qui': { pt:'Q', en:'T' },
     'dia.sex': { pt:'S', en:'F' },
-    'dia.sab': { pt:'S', en:'S' }
+    'dia.sab': { pt:'S', en:'S' },
+
+    'inv.titulo':        { pt:'Inventário', en:'Inventory' },
+    'inv.moedas':        { pt:'Moedas', en:'Coins' },
+    'inv.moedasMinusculo': { pt:'moedas', en:'coins' },
+    'inv.filtroTudo':    { pt:'Tudo', en:'All' },
+    'inv.filtroEquip':   { pt:'Equipamento', en:'Equipment' },
+    'inv.filtroCons':    { pt:'Consumíveis', en:'Consumables' },
+    'inv.filtroTesouro': { pt:'Tesouros', en:'Treasures' },
+    'inv.filtroChave':   { pt:'Item-chave', en:'Key items' },
+    'inv.mochilaVazia':  { pt:'Mochila vazia', en:'Empty bag' },
+    'inv.mochilaVaziaDesc': { pt:'Derrote o monstro do dia para receber espólio. Quanto mais tarefas no dia, melhor o saque.', en:'Defeat today\'s monster to get loot. The more tasks in the day, the better the loot.' },
+
+    'perfil.vidaMaxima':      { pt:'Vida máxima', en:'Max health' },
+    'perfil.bonusXpEquip':    { pt:'Bônus XP equip.', en:'Equip. XP bonus' },
+    'perfil.bonusMoedasEquip':{ pt:'Bônus moedas equip.', en:'Equip. coin bonus' },
+    'perfil.pontosDeAtributo':{ pt:'Pontos de atributo', en:'Attribute points' },
+    'perfil.historico':       { pt:'Histórico', en:'History' },
+    'perfil.conquistas':      { pt:'Conquistas', en:'Achievements' },
+    'perfil.bestiario':       { pt:'Bestiário', en:'Bestiary' },
+
+    'atr.fortuna':     { pt:'Fortuna', en:'Fortune' },
+    'atr.fortunaDesc': { pt:'chance de raridade no espólio', en:'rarity chance on loot' },
+    'atr.foco':        { pt:'Foco', en:'Focus' },
+    'atr.focoDesc':    { pt:'de desconto na loja', en:'shop discount' },
+    'atr.vigor':       { pt:'Vigor', en:'Vigor' },
+    'atr.vigorDesc':   { pt:'de perdão no dano por tarefa largada', en:'forgiveness on damage from skipped tasks' },
+
+    'acao.verTudo':  { pt:'Ver tudo', en:'View all' },
+    'acao.verTodas': { pt:'Ver todas', en:'View all' },
+
+    'cfg.configuracoes':  { pt:'Configurações', en:'Settings' },
+    'cfg.conta':           { pt:'Conta', en:'Account' },
+    'cfg.sair':            { pt:'Sair', en:'Log out' },
+    'cfg.criarConta':      { pt:'Criar conta', en:'Create account' },
+    'cfg.apagarDados':     { pt:'Apagar dados', en:'Delete data' },
+    'cfg.apagarDadosDesc': { pt:'Zera nível, moedas, itens e vida. Não tem volta.', en:'Resets level, coins, items and health. Cannot be undone.' },
+    'cfg.apagarTudo':      { pt:'Apagar tudo', en:'Delete everything' },
+    'cfg.app':             { pt:'App', en:'App' },
+    'cfg.heroi':           { pt:'Herói', en:'Hero' },
+    'cfg.aparencia':       { pt:'Aparência', en:'Appearance' },
+    'cfg.preferencias':    { pt:'Preferências', en:'Preferences' },
+    'cfg.historicoDesc':   { pt:'Calendário de vitórias, fugas e dias sem tarefa', en:'Calendar of wins, escapes and days with no tasks' },
+    'cfg.nomeDoHeroi':     { pt:'Nome do herói', en:'Hero name' },
+    'cfg.renomear':        { pt:'Renomear', en:'Rename' },
+    'cfg.spriteDoHeroi':   { pt:'Sprite do herói', en:'Hero sprite' },
+    'cfg.escolhaQuemEnfrenta': { pt:'Escolha quem enfrenta os monstros', en:'Choose who faces the monsters' },
+    'cfg.tema':            { pt:'Tema', en:'Theme' },
+    'cfg.paletaDeCores':   { pt:'Paleta de cores do app', en:'App color palette' },
+    'cfg.feedbackDeClique':     { pt:'Feedback de clique', en:'Click feedback' },
+    'cfg.feedbackDeCliqueDesc': { pt:'Vibração ou som ao tocar em botões', en:'Vibration or sound when tapping buttons' },
+
+    'loja.comprar': { pt:'Comprar', en:'Buy' },
+    'loja.vender':  { pt:'Vender', en:'Sell' },
+
+    'hist.vitoria':   { pt:'vitória', en:'win' },
+    'hist.fuga':      { pt:'fuga', en:'escape' },
+    'hist.semTarefa': { pt:'sem tarefa', en:'no task' },
+
+    'ed.editarTarefa':      { pt:'Editar tarefa', en:'Edit task' },
+    'ed.quando':            { pt:'Quando', en:'When' },
+    'ed.salvarAlteracoes':  { pt:'Salvar alterações', en:'Save changes' },
+
+    'jogo.diaVencido': { pt:'DIA VENCIDO', en:'DAY WON' },
+
+    'login.entreNaSuaConta':   { pt:'Entre na sua conta', en:'Log into your account' },
+    'login.email':             { pt:'Email', en:'Email' },
+    'login.senha':             { pt:'Senha', en:'Password' },
+    'login.senhaErro':         { pt:'Sua senha deve ter pelo menos 6 caracteres e 1 número', en:'Your password must have at least 6 characters and 1 number' },
+    'login.confirmarSenha':    { pt:'Confirmar senha', en:'Confirm password' },
+    'login.senhasNaoCoincidem':{ pt:'As senhas não coincidem', en:'Passwords don\'t match' },
+    'login.esqueceuSenha':     { pt:'Esqueceu a senha?', en:'Forgot your password?' },
+    'login.entrar':            { pt:'Entrar', en:'Log in' },
+    'login.ou':                { pt:'ou', en:'or' },
+    'login.entrarComGoogle':   { pt:'Entrar com Google', en:'Sign in with Google' },
+    'login.naoTemConta':       { pt:'Não tem conta?', en:'Don\'t have an account?' },
+    'login.cadastreSeAgora':   { pt:'Cadastre-se agora', en:'Sign up now' },
+    'login.agoraNao':          { pt:'Agora não', en:'Not now' },
+    'login.bemVindoDeVolta':   { pt:'Bem-vindo de volta', en:'Welcome back' },
+    'login.confereSpam':       { pt:'Não achou? Confere o <b>spam</b>.', en:'Can\'t find it? Check your <b>spam</b>.' },
+    'login.reenviarEmail':     { pt:'Reenviar email', en:'Resend email' },
+    'login.emailErrado':       { pt:'Email errado? Corrigir', en:'Wrong email? Fix it' },
+    'login.jaTemConta':        { pt:'Já tem conta?', en:'Already have an account?' },
+
+    'grim.titulo': { pt:'Grimório', en:'Grimoire' }
   };
 
   function idiomaSalvo(){
@@ -8710,7 +8963,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // mexer em innerHTML (evita perder handlers/filhos por engano).
   function aplicarIdioma(){
     document.querySelectorAll('[data-i18n]').forEach(el => {
-      el.textContent = t(el.dataset.i18n);
+      el.innerHTML = t(el.dataset.i18n);
     });
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
       el.placeholder = t(el.dataset.i18nPlaceholder);
@@ -8737,9 +8990,26 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // typeof-guard em cada uma porque nem toda sessão de jogo passou
     // por todo módulo (ex: quem nunca abriu o Perfil não tem
     // renderConquistas definido ainda nesse ponto do arquivo).
-    ['render','renderInventario','renderLoja','renderConquistasV2','renderBestiario','desenharHeroi']
+    ['render','renderInventario','renderLoja','renderConquistasV2','renderBestiario','renderHistorico','renderGrimorio','desenharHeroi']
       .forEach(fn => { if (typeof window[fn] === 'function') window[fn](); });
     if (typeof window.pintarTemaGrid === 'function') window.pintarTemaGrid();
+
+    // item 46 do roadmap: o slide de transição (o próximo, logo depois
+    // do de idioma) já teve seu HTML montado no load da página, no
+    // idioma que estava salvo NAQUELE momento -- se o jogador troca de
+    // idioma bem aqui, no meio do onboarding, o data-texto que o
+    // typewriter vai ler mais adiante ficaria desatualizado sem isso.
+    // O botão "Continuar" do próprio slide de idioma também é
+    // atualizado na hora, já que está visível nesse instante.
+    const en = lang === 'en';
+    const elTransicao = document.getElementById('carrosselTransicaoTexto');
+    if (elTransicao && !window.__questlogTypewriterFoi){
+      elTransicao.dataset.texto = en
+        ? 'Before we start, let\'s get to know you better...'
+        : 'Antes de começar, vamos te conhecer melhor...';
+    }
+    const btnContinuarIdioma = document.getElementById('carrosselBtn4');
+    if (btnContinuarIdioma) btnContinuarIdioma.textContent = en ? 'Continue' : 'Continuar';
   };
 
   // Wire dos 2 botões do slide de idioma (só existem no DOM se o

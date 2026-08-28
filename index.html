@@ -5957,10 +5957,28 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
   function atualizarBadges(){
     const n = contarPendentes();
+    const texto = n > 9 ? '9+' : String(n);
     [badgeSubTab, badgeNavPerfil].forEach(el => {
       if (!el) return;
-      if (n > 0){ el.textContent = n > 9 ? '9+' : String(n); el.style.display = 'flex'; }
-      else el.style.display = 'none';
+      if (n > 0){
+        const mudouTexto = el.textContent !== texto;
+        const apareceu = !el.classList.contains('on');
+        el.textContent = texto;
+        el.classList.add('on');
+        // "pop" (bounce de entrada) toca quando o badge estava escondido e
+        // aparece, OU quando ja estava visivel mas o numero mudou (nova
+        // notificacao chegando por cima de uma que ja existia) -- reforca
+        // reflow (offsetWidth) pra poder reiniciar a mesma animacao duas
+        // vezes seguidas, caso contrario o navegador ignora reatribuir a
+        // mesma classe sem um reflow no meio.
+        if (apareceu || mudouTexto){
+          el.classList.remove('pop');
+          void el.offsetWidth;
+          el.classList.add('pop');
+        }
+      } else {
+        el.classList.remove('on', 'pop');
+      }
     });
   }
   // "atualizarBadges();" da primeira pintura NAO fica mais aqui -- ver
@@ -6119,22 +6137,32 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     if (!alvo) return;
     const ctx = montarContexto(true);
     const desbloqueios = obterDesbloqueiosV2();
+    // capturado ANTES de marcar como visto (mais abaixo, no fim desta
+    // funcao) -- usado so pra saber quais itens ganham a tag "NOVO" nesta
+    // renderizacao. Depois de marcado como visto, a mesma conquista nao
+    // mostra mais a tag numa proxima abertura da tela.
+    const vistasAntes = obterVistasV2();
     const feitas = [];
     const faltam = [];
     CONQUISTAS_V2.forEach(item => {
       const data = desbloqueios[item.id];
-      if (data) feitas.push({ item, data });
+      if (data) feitas.push({ item, data, novo: !vistasAntes.has(item.id) });
       else faltam.push(item);
     });
     feitas.sort((a, b) => b.data.localeCompare(a.data)); // mais recente primeiro
 
-    function linha(item, data){
+    function linha(item, data, novo){
       const emIngles = idiomaConquistas() === 'en';
       const desc = emIngles ? resolver(item.req_en || item.req, ctx) : resolver(item.req, ctx);
       const nomeMostrar = emIngles ? (item.nome_en || item.nome) : item.nome;
       const dataHtml = data ? '<span class="conqv2data">' + formatarDataBR(data) + '</span>' : '';
-      return '<div class="conqv2item' + (data ? '' : ' trancado') + '">' +
-        '<div class="conqv2txt"><div class="conqv2nome">' + nomeMostrar + '</div>' +
+      // Tag "NOVO" -- pedido do usuario: mostrar, dentro da propria lista,
+      // exatamente qual conquista gerou a notificacao do balaozinho (nav
+      // Perfil + "Ver todas"). So aparece pra quem foi desbloqueada e
+      // ainda nao tinha sido vista ANTES desta renderizacao.
+      const novoHtml = novo ? '<span class="conqv2novo">' + (emIngles ? 'NEW' : 'NOVO') + '</span>' : '';
+      return '<div class="conqv2item' + (data ? '' : ' trancado') + (novo ? ' conqv2novoitem' : '') + '">' +
+        '<div class="conqv2txt"><div class="conqv2nome">' + nomeMostrar + novoHtml + '</div>' +
         '<div class="conqv2desc">' + desc + '</div></div>' +
         dataHtml +
       '</div>';
@@ -6142,11 +6170,11 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
     let html = '<div class="edsec">' + (idiomaConquistas() === 'en' ? 'My achievements' : 'Minhas conquistas') + '</div>';
     html += feitas.length
-      ? feitas.map(f => linha(f.item, f.data)).join('')
+      ? feitas.map(f => linha(f.item, f.data, f.novo)).join('')
       : '<div class="prevvazio">' + (idiomaConquistas() === 'en' ? 'None yet -- keep playing!' : 'Nenhuma ainda -- continue jogando!') + '</div>';
     html += '<div class="edsec">' + (idiomaConquistas() === 'en' ? 'Not unlocked' : 'Não desbloqueadas') + '</div>';
     html += faltam.length
-      ? faltam.map(item => linha(item, null)).join('')
+      ? faltam.map(item => linha(item, null, false)).join('')
       : '<div class="prevvazio">' + (idiomaConquistas() === 'en' ? 'You unlocked them all!' : 'Você desbloqueou todas!') + '</div>';
     alvo.innerHTML = html;
 

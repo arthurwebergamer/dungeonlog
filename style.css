@@ -3235,3 +3235,66 @@
   background:inherit;
   filter:none;
 }
+
+/* ---------------------------------------------------------------------
+   Badge de notificacao de conquistas (.conqbadge) -- animacao de entrada/
+   saida + tag "NOVO" na lista. Bloco novo no fim do arquivo, mesmo motivo
+   de sempre (style.css tem os modulos 1-20 duplicados, so a ultima regra
+   da cascata vence -- ver nota no bloco anterior).
+
+   display:none/flex nao anima (o navegador troca na hora, sem transicao
+   possivel) -- por isso a base agora fica sempre display:flex, e quem
+   controla visivel/escondido e opacity+scale via classe .on. O JS
+   (atualizarBadges(), bloco "PERFIL — CONQUISTAS") so alterna .on/.pop,
+   nunca mais mexe em style.display. */
+.conqbadge{
+  display:flex !important;
+  transform-origin:center;
+  transform:scale(0);
+  opacity:0;
+  transition:transform .25s cubic-bezier(.34,1.56,.64,1), opacity .18s ease;
+  pointer-events:none;
+}
+.conqbadge.on{
+  transform:scale(1);
+  opacity:1;
+}
+@keyframes conqbadgePop{
+  0%{ transform:scale(.6); }
+  55%{ transform:scale(1.35); }
+  100%{ transform:scale(1); }
+}
+.conqbadge.pop{
+  animation:conqbadgePop .38s cubic-bezier(.34,1.56,.64,1);
+}
+
+/* Tag "NOVO" dentro da lista de Conquistas -- marca exatamente qual item
+   gerou a notificacao do badge (pedido do usuario: "indicar de onde vem
+   essa notificacao"). Some sozinha na proxima vez que a tela abrir,
+   porque nesse momento o item já entra pro set de "vistas" (ver
+   renderConquistasV2()). */
+.conqv2nome{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex-wrap:wrap;
+}
+.conqv2novo{
+  display:inline-flex;
+  align-items:center;
+  height:15px;
+  padding:0 5px;
+  border-radius:999px;
+  background:var(--perigo,#F45781);
+  color:#fff;
+  font-family:'Silkscreen',monospace;
+  font-size:8px;
+  letter-spacing:.03em;
+  line-height:1;
+  animation:conqbadgePop .38s cubic-bezier(.34,1.56,.64,1);
+}
+.conqv2novoitem{
+  border-left:3px solid var(--perigo,#F45781);
+  padding-left:9px !important;
+  border-radius:4px;
+}

@@ -419,7 +419,7 @@
             <b data-i18n="perfil.conquistas">Conquistas</b>
             <span id="prevConquistasTxt">—</span>
           </div>
-          <button class="cfgbtn" id="verConquistasBtn" data-i18n="acao.verTodas">Ver todas</button>
+          <button class="cfgbtn" id="verConquistasBtn"><span data-i18n="acao.verTodas">Ver todas</span></button>
         </div>
         <div class="prevfaixa" id="prevConquistasFaixa"></div>
       </div>
@@ -541,14 +541,12 @@
         <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
       </div>
 
-      <div class="cfgrow cfglink" id="cfgHistorico">
-        <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></span>
-        <div class="cfgtxt">
-          <b data-i18n="perfil.historico">Histórico</b>
-          <span data-i18n="cfg.historicoDesc">Calendário de vitórias, fugas e dias sem tarefa</span>
-        </div>
-        <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
-      </div>
+      <!-- Card "Histórico" removido daqui (pedido do usuário, sessão de
+           brainstorm) -- já existe em Perfil, prévia própria com botão
+           "Ver tudo" (#verHistoricoBtn), que já chama window.abrirHistorico().
+           Duplicava a mesma função por dois caminhos diferentes. A função
+           abrirHistorico() e o overlay #histOverlay não mudaram em nada --
+           só esse atalho extra saiu. -->
     </div>
   </div>
 
@@ -1103,6 +1101,15 @@ function render(){
   const lista = document.getElementById('list');
   lista.innerHTML = '';
 
+  // Botao "+ Adicionar" tambem desabilita quando o monstro ja caiu -- nao
+  // so o "Criar tarefa" de dentro da composer (ver atualizarEstadoSave()).
+  // Roda a cada render() pra cobrir a virada automatica do dia (watchdog),
+  // nao so o clique manual. window.atualizarEstadoSave e definida mais
+  // abaixo no mesmo <script>, hoisted (function declaration).
+  const addBtnEl = document.getElementById('addbtn');
+  if (addBtnEl) addBtnEl.disabled = typeof monstroJaCaiu === 'function' && monstroJaCaiu();
+  if (typeof atualizarEstadoSave === 'function') atualizarEstadoSave();
+
   document.getElementById('hoje').textContent = (idiomaApp() === 'en' ? 'Tasks for ' : 'Tarefas de ') + nomeDiaLocal(diaDaSemana());
 
   if (doDia.length === 0){
@@ -1519,21 +1526,43 @@ const btnRepete = document.getElementById('modeRepete');
 let modo = 'hoje';
 let diasEscolhidos = [];
 
+const btnSave = document.getElementById('save');
+
+// Validacao proativa: desabilita "Criar tarefa" em vez de depender de aviso()
+// (aviso() fica mudo com TOASTS_DESATIVADOS=true, ver linha ~1500-1504 -- um
+// clique em Criar nesse estado nao dava nenhum feedback visual). 3 casos
+// cobertos por um unico ponto de controle, decisao explicita do usuario de
+// manter a solucao a mais simples possivel: nao reabrir o toast, so impedir
+// a acao invalida de acontecer.
+function atualizarEstadoSave(){
+  if (!btnSave) return;
+  const semTexto = input.value.trim().length === 0;
+  const semDia = modo === 'repete' && diasEscolhidos.length === 0;
+  const diaVencido = typeof monstroJaCaiu === 'function' && monstroJaCaiu();
+  btnSave.disabled = semTexto || semDia || diaVencido;
+}
+window.atualizarEstadoSave = atualizarEstadoSave;
+
+input.addEventListener('input', atualizarEstadoSave);
+
 btnHoje.onclick = () => {
   modo = 'hoje';
   btnHoje.classList.add('on'); btnRepete.classList.remove('on');
   daysEl.classList.remove('on');
+  atualizarEstadoSave();
 };
 btnRepete.onclick = () => {
   modo = 'repete';
   btnRepete.classList.add('on'); btnHoje.classList.remove('on');
   daysEl.classList.add('on');
+  atualizarEstadoSave();
 };
 daysEl.querySelectorAll('.day').forEach(b => {
   b.onclick = () => {
     const d = Number(b.dataset.d);
     if (diasEscolhidos.includes(d)) { diasEscolhidos = diasEscolhidos.filter(x => x !== d); b.classList.remove('on'); }
     else { diasEscolhidos.push(d); b.classList.add('on'); }
+    atualizarEstadoSave();
   };
 });
 
@@ -1550,14 +1579,18 @@ document.getElementById('addbtn').onclick = () => {
       pintarVezes();
     }
     if (typeof resetAdvColor === 'function') resetAdvColor();
+    atualizarEstadoSave();
   }
 };
 
 function criar(){
-  if (monstroJaCaiu()){ aviso(idiomaApp() === 'en' ? 'TODAY\'S MONSTER ALREADY FELL' : 'MONSTRO DE HOJE JA CAIU'); return; }
+  // Guardas mantidas por seguranca (defesa em profundidade -- ex.: chamada
+  // futura fora do clique do botao), mas na pratica o botao ja vem
+  // desabilitado antes de qualquer uma dessas condicoes ser possivel.
+  if (monstroJaCaiu()) return;
   const texto = input.value.trim();
   if (!texto) return;
-  if (modo === 'repete' && diasEscolhidos.length === 0){ aviso(idiomaApp() === 'en' ? 'CHOOSE THE DAYS' : 'ESCOLHA OS DIAS'); return; }
+  if (modo === 'repete' && diasEscolhidos.length === 0) return;
 
   if (modo === 'hoje') tarefas.push({ texto, tipo:'hoje', data:isoAtual(), feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined });
   else tarefas.push({ texto, tipo:'repete', dias:[...diasEscolhidos], feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined });
@@ -1569,9 +1602,11 @@ function criar(){
   render();
   window.tocarSom?.('tarefa'); // SFX: o wrap de window.criar nao funciona aqui -- "save.onclick = criar" (linha abaixo) copia a REFERENCIA da funcao original no load, antes do gancho existir; editado direto, mesma logica de ferir()/investir()
   aviso(idiomaApp() === 'en' ? 'TASK ADDED' : 'TAREFA ADICIONADA');
+  atualizarEstadoSave();
 }
 
-document.getElementById('save').onclick = criar;
+btnSave.onclick = criar;
+atualizarEstadoSave(); // estado inicial ao carregar a pagina
 
 /* ---------- seletor de vezes por dia ---------- */
 let vezesEscolhida = 1;
@@ -2976,13 +3011,67 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   const list = document.getElementById('list');
   if (!list) return;
 
-  const LIMIAR_TOQUE = 8;      // px de tolerancia antes de virar "e so um scroll"
+  // 8px era calibrado so testando com mouse (DevTools) -- um dedo de
+  // verdade treme naturalmente ao tentar ficar parado, e 8px e fácil de
+  // estourar sem querer durante os 220ms de espera, cancelando o arrasto
+  // silenciosamente e caindo no modo "so scroll". Suspeita levantada
+  // comparando video de teste no DevTools (mouse, sem tremedeira) contra
+  // video no aparelho real (toque de verdade) -- no aparelho, a tarefa
+  // ficava destacada mas nao descolava da lista de primeira, sugerindo o
+  // arme do drag falhando por causa desse limiar apertado. Aumentado pra
+  // 18px, faixa comum em bibliotecas de touch pra esse tipo de gesto
+  // (segurar-pra-arrastar vs. deslizar-pra-rolar). NAO CONFIRMADO em
+  // aparelho real ainda -- e a hipotese mais bem fundamentada no codigo,
+  // nao uma certeza.
+  const LIMIAR_TOQUE = 18;     // px de tolerancia antes de virar "e so um scroll"
   const ATRASO_LONGPRESS = 220; // ms segurando parado ate armar o arrasto
+
+  // ------------------------------------------------------------------
+  // DEBUG TEMPORARIO DO ARRASTO -- painel fixo no topo mostrando o ciclo
+  // de vida real do gesto (pointerdown/timer/iniciarArrasto/cancel/solta)
+  // com timestamp relativo em ms. Existe so pra diagnosticar por que o
+  // arrasto nao esta engatando num aparelho real especifico -- duas
+  // tentativas anteriores (tap-highlight-color, LIMIAR_TOQUE) nao
+  // resolveram, entao em vez de arriscar um 3o palpite as cegas, este
+  // bloco captura o que REALMENTE acontece no toque real. REMOVER (ou
+  // trocar DEBUG_ARRASTO pra false) depois de diagnosticado -- nao e
+  // feature, e ferramenta de sessao.
+  const DEBUG_ARRASTO = false; // confirmado no aparelho real que o arrasto engata -- painel cumpriu o papel, desligado
+  let dbgT0 = 0, dbgLinhas = [];
+  let dbgPainel = null;
+  function dbgArrasto(msg){
+    if (!DEBUG_ARRASTO) return;
+    if (!dbgPainel){
+      dbgPainel = document.createElement('div');
+      dbgPainel.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;'
+        + 'background:rgba(0,0,0,.88);color:#0f0;font:10px/1.4 monospace;'
+        + 'padding:6px 8px;max-height:38vh;overflow-y:auto;pointer-events:none;'
+        + 'white-space:pre-wrap;border-bottom:2px solid #0f0';
+      document.body.appendChild(dbgPainel);
+    }
+    if (!dbgT0) dbgT0 = performance.now();
+    const t = Math.round(performance.now() - dbgT0);
+    dbgLinhas.push('+' + t + 'ms  ' + msg);
+    if (dbgLinhas.length > 40) dbgLinhas.shift();
+    dbgPainel.textContent = dbgLinhas.join('\n');
+  }
+  // ------------------------------------------------------------------
 
   let dragEl = null, placeholder = null, offX = 0, offY = 0, pid = null;
   let pendente = null;   // { task, startX, startY, timer }
   let ultimoClientY = 0; // usado pelo loop de autoscroll pra saber onde o dedo esta parado
   let alturaBaseCard = 0; // altura do card no instante em que o arrasto comecou, usada como piso do vao elastico
+  // suavizacao do arrasto (pedido do usuario, "travadinho" no aparelho real):
+  // left/top mudando a cada pointermove forcava o navegador a recalcular
+  // layout em todo frame (reflow), que e caro no celular -- dragBaseLeft/
+  // dragBaseTop guardam a posicao fixada UMA VEZ (igual antes), e o
+  // movimento durante o arrasto passa a ser so um transform:translate3d()
+  // por cima (so composicao/GPU, nao aciona reflow). dragAtualTop precisa
+  // ficar num numero por fora do style porque atualizarAlturaElastica()
+  // le a posicao atual do card -- antes lia direto de style.top (que
+  // parou de mudar), agora le esta variavel.
+  let dragBaseLeft = 0, dragBaseTop = 0, dragAtualTop = 0;
+  let dragMoveAgendado = false; // throttle: atualizarAlturaElastica()/atualizarPlaceholder() rodam no maximo 1x por frame, nao a cada pointermove cru (que pode disparar bem mais rapido que 60fps em alguns aparelhos)
 
   const BORDA_AUTOSCROLL = 16;      // px da borda de #list que ja ativa o autoscroll -- so quando a area visivel de tarefas de fato acaba, nao um buffer grande antes disso
   const VELOC_MAX_AUTOSCROLL = 14;  // px por frame quando o dedo esta bem na borda
@@ -3047,7 +3136,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     if (!placeholder || !dragEl) return;
     const phTop = placeholder.getBoundingClientRect().top;
     const phBottomBase = phTop + alturaBaseCard;
-    const dragTop = parseFloat(dragEl.style.top) || 0;
+    const dragTop = dragAtualTop; // antes: parseFloat(dragEl.style.top) -- agora o card se move via transform, style.top fica fixo na posicao base
     const dragBottom = dragTop + alturaBaseCard;
 
     let altura = alturaBaseCard;
@@ -3084,6 +3173,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   }
 
   function iniciarArrasto(task, e){
+    dbgArrasto('iniciarArrasto() rodando -- dragEl vai ser setado, position:fixed aplicado');
     pid = e.pointerId;
     const r = task.getBoundingClientRect();
     offX = e.clientX - r.left; offY = e.clientY - r.top;
@@ -3098,6 +3188,12 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     task.style.position = 'fixed';
     task.style.left = r.left + 'px';
     task.style.top = r.top + 'px';
+    // left/top ficam fixos aqui (so a ancora) -- o movimento durante o
+    // arrasto passa a ser via transform (ver pointermove), muito mais leve
+    // pro navegador que recalcular left/top a cada frame.
+    dragBaseLeft = r.left; dragBaseTop = r.top; dragAtualTop = r.top;
+    task.style.transform = 'translate3d(0,0,0)';
+    task.style.willChange = 'transform';
     task.classList.add('dragging');
     task.setPointerCapture(pid);
     if (navigator.vibrate) navigator.vibrate(12);
@@ -3106,6 +3202,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   }
 
   list.addEventListener('pointerdown', e => {
+    dbgArrasto('pointerdown recebido em .task? ' + !!e.target.closest('.task') + ' (pointerType=' + e.pointerType + ')');
     if (e.target.closest('.del') || e.target.closest('.box')) return;
     const task = e.target.closest('.task');
     if (!task) return;
@@ -3113,20 +3210,39 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     pendente = {
       task, startX, startY, lastY: startY, veloc: 0,
       timer: setTimeout(() => {
+        dbgArrasto('timer de ' + ATRASO_LONGPRESS + 'ms disparou -- chamando iniciarArrasto()');
         if (pendente) iniciarArrasto(task, e);
         pendente = null;
       }, ATRASO_LONGPRESS)
     };
   });
 
+  // roda no maximo 1x por frame (rAF), nao a cada pointermove cru --
+  // atualizarAlturaElastica()/atualizarPlaceholder() leem
+  // getBoundingClientRect() (forcam layout) e podem mexer no DOM
+  // (moverPlaceholderAnimado) -- chamar isso em todo pointermove (que
+  // pode disparar bem mais vezes por segundo que a tela redesenha)
+  // sobrecarrega o navegador e trava a animacao. O movimento do card em
+  // si (transform) continua rodando em todo pointermove, sem throttle --
+  // e barato (so composicao), nao precisa esperar o frame.
+  function agendarAtualizacaoPesada(){
+    if (dragMoveAgendado) return;
+    dragMoveAgendado = true;
+    requestAnimationFrame(() => {
+      dragMoveAgendado = false;
+      atualizarAlturaElastica();
+      atualizarPlaceholder(ultimoClientY);
+    });
+  }
+
   list.addEventListener('pointermove', e => {
     if (dragEl && e.pointerId === pid){
       e.preventDefault();
       ultimoClientY = e.clientY;
-      dragEl.style.left = (e.clientX - offX) + 'px';
-      dragEl.style.top  = (e.clientY - offY) + 'px';
-      atualizarAlturaElastica();
-      atualizarPlaceholder(e.clientY);
+      const nx = e.clientX - offX, ny = e.clientY - offY;
+      dragEl.style.transform = 'translate3d(' + (nx - dragBaseLeft) + 'px,' + (ny - dragBaseTop) + 'px,0)';
+      dragAtualTop = ny;
+      agendarAtualizacaoPesada();
       return;
     }
     if (!pendente) return;
@@ -3134,6 +3250,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     if (pendente.timer && (Math.abs(dx) > LIMIAR_TOQUE || Math.abs(dy) > LIMIAR_TOQUE)){
       // virou scroll, nao arrasto: cancela o long-press mas mantem a pendencia
       // rolando a lista manualmente (touch-action:none tira isso do navegador)
+      dbgArrasto('CANCELADO por movimento -- dx=' + Math.round(dx) + ' dy=' + Math.round(dy) + ' (limiar=' + LIMIAR_TOQUE + 'px)');
       clearTimeout(pendente.timer);
       pendente.timer = null;
     }
@@ -3157,12 +3274,14 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   }
 
   function soltar(e){
+    dbgArrasto('soltar() chamado (tipo=' + e.type + ') -- dragEl existia? ' + !!dragEl);
     if (pendente && !pendente.timer) soltarComoScroll();
     limparPendente();
     if (!dragEl || e.pointerId !== pid) return;
     placeholder.replaceWith(dragEl);
     dragEl.classList.remove('dragging');
     dragEl.style.position = ''; dragEl.style.left = ''; dragEl.style.top = ''; dragEl.style.width = '';
+    dragEl.style.transform = ''; dragEl.style.willChange = '';
     // grava a nova ordem visual direto nas tarefas, pelo data-idx de cada linha
     [...list.querySelectorAll('.task')].forEach((el, i) => {
       const t = tarefas[+el.dataset.idx];
@@ -3173,9 +3292,9 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     setTimeout(() => { dragArmado = false; }, 50);   // deixa o click "fantasma" do soltar morrer antes de reliberar
   }
   list.addEventListener('pointerup', soltar);
-  list.addEventListener('pointercancel', soltar);
+  list.addEventListener('pointercancel', e => { dbgArrasto('!!! pointercancel recebido !!!'); soltar(e); });
   list.addEventListener('pointerup', limparPendente);
-  list.addEventListener('pointerleave', limparPendente);
+  list.addEventListener('pointerleave', e => { dbgArrasto('pointerleave no #list (pendente ainda existia? ' + !!pendente + ')'); limparPendente(); });
 })();
 </script>
 
@@ -3986,27 +4105,14 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
         : (en ? (r.resgatadas + ' of ' + r.total + ' unlocked') : (r.resgatadas + ' de ' + r.total + ' desbloqueadas'));
     }
 
-    // faixa das 5 conquistas resgatadas mais recentes
+    // Faixa das conquistas recentes -- removida a pedido do usuario (nem
+    // texto nem bolinha, nada mesmo). O cabecalho (nome + "X de Y
+    // desbloqueadas" + botao "Ver todas") ja diz o essencial; detalhe
+    // completo fica pra tela cheia. #prevConquistasFaixa so escondida,
+    // nao apagada do HTML, pra nao mexer no restante do layout/CSS que
+    // depende dela existir no DOM.
     const faixaConq = document.getElementById('prevConquistasFaixa');
-    if (faixaConq && typeof window.conquistasRecentesPerfil === 'function'){
-      const recentes = window.conquistasRecentesPerfil(5);
-      faixaConq.innerHTML = '';
-      if (!recentes.length){
-        const vazio = document.createElement('span');
-        vazio.className = 'prevvazio';
-        vazio.textContent = en ? 'No achievements unlocked yet' : 'Nenhuma conquista resgatada ainda';
-        faixaConq.appendChild(vazio);
-      } else {
-        recentes.forEach(c => {
-          const ic = document.createElement('div');
-          ic.className = 'prevconqchip';
-          ic.style.setProperty('--pv-cor', c.cor);
-          ic.title = c.nome;
-          ic.textContent = c.nome;
-          faixaConq.appendChild(ic);
-        });
-      }
-    }
+    if (faixaConq){ faixaConq.innerHTML = ''; faixaConq.style.display = 'none'; }
 
     // Bestiario -- reaproveita renderBestiario() (escreve o texto em
     // #bestSub, que ja mora dentro do overlay) em vez de duplicar a conta
@@ -4528,12 +4634,20 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
         : (disp + (disp === 1 ? ' disponível' : ' disponíveis'));
     }
 
+    // Sinal unificado nos 3 (sempre "+N%") -- antes Fortuna usava "+",
+    // Foco nao usava sinal nenhum e Vigor usava "-" (porque reduz dano),
+    // o que lia como "3 tipos diferentes de efeito" numa mesma tela
+    // (pedido do usuario pra simplificar, ver roadmap). Os 3 sao a mesma
+    // coisa conceitualmente -- quanto ja foi investido -- entao os 3
+    // ganham o mesmo sinal, sempre positivo. O SIGNIFICADO de cada um
+    // (o que aquele % realmente faz) continua explicado no texto de
+    // atrdesc, visivel ao expandir o card -- nao precisou mudar.
     const elFortuna = document.getElementById('atrFortunaValor');
     if (elFortuna) elFortuna.textContent = '+' + Math.round(bonusFortuna() * 100) + '%';
     const elFoco = document.getElementById('atrFocoValor');
-    if (elFoco) elFoco.textContent = Math.round(descontoFoco() * 100) + '%';
+    if (elFoco) elFoco.textContent = '+' + Math.round(descontoFoco() * 100) + '%';
     const elVigor = document.getElementById('atrVigorValor');
-    if (elVigor) elVigor.textContent = '-' + Math.round(perdaoVigor() * 100) + '%';
+    if (elVigor) elVigor.textContent = '+' + Math.round(perdaoVigor() * 100) + '%';
 
     const bFortuna = document.getElementById('atrMaisFortuna');
     if (bFortuna) bFortuna.disabled = disp <= 0 || noTeto('fortuna');
@@ -5730,7 +5844,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
      em lote -- um xpTotal += somaXP so, uma checagem de nivel-antes/depois
      so (nao uma por marco, pra nao empilhar varios popups de level-up se
      o resgate em lote cruzar mais de um nivel de uma vez), um som so. ---------- */
-  function resgatarTodasConquistas(){
+  function resgatarTodasConquistas(ponto){
     const ctx = montarContexto(true);
     const resgatados = resgatadosSet();
     const pendentes = listarPendentes(ctx, resgatados);
@@ -5753,19 +5867,27 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       }
     }
 
-    if (typeof aviso === 'function'){
+    // Confirmacao visivel do resgate -- antes so existia aviso() (toast),
+    // que fica mudo com TOASTS_DESATIVADOS=true (roadmap, item 41): clicar
+    // em "Receber tudo" nao dava nenhum sinal visual de que funcionou.
+    // Reaproveita flutuanteFixo/pontoDeElemento (infra ja existente, ver
+    // notas no topo destas funcoes) -- o ponto de origem precisa ser
+    // capturado ANTES desta funcao rodar, porque renderConquistas() (chamada
+    // no fim) reescreve o innerHTML inteiro do container e desconecta o
+    // botao clicado do DOM (mesmo bug ja documentado pra Loja/Inventario).
+    if (typeof flutuanteFixo === 'function' && ponto){
       const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
       const rotulo = en
-        ? (pendentes.length === 1 ? 'achievement' : 'achievements')
-        : (pendentes.length === 1 ? 'conquista' : 'conquistas');
-      aviso('+' + somaXP + ' XP · ' + pendentes.length + ' ' + rotulo);
+        ? (pendentes.length === 1 ? 'achievement unlocked' : 'achievements unlocked')
+        : (pendentes.length === 1 ? 'conquista desbloqueada' : 'conquistas desbloqueadas');
+      flutuanteFixo(ponto, '<span class="dmg-xp">' + pendentes.length + ' ' + rotulo + ' · +' + somaXP + ' XP</span>', true);
     }
 
     renderConquistas();
   }
   window.resgatarTodasConquistas = resgatarTodasConquistas;
 
-  function resgatarConquista(tierId){
+  function resgatarConquista(tierId, ponto){
     const resgatados = resgatadosSet();
     if (resgatados.has(tierId)) return; // ja resgatado, idempotente
 
@@ -5820,7 +5942,16 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       }
     }
 
-    if (typeof aviso === 'function') aviso('+' + tierAlvo.xp + ' XP');
+    if (typeof flutuanteFixo === 'function' && ponto){
+      const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
+      const nomeMarco = en ? (tierAlvo.nome_en || tierAlvo.nome) : tierAlvo.nome;
+      const rotulo = en ? 'Achievement unlocked' : 'Conquista desbloqueada';
+      flutuanteFixo(ponto,
+        '<span class="dmg-xp">' + rotulo + '</span><br>'
+        + '<span style="color:' + (catAlvo.cor || 'var(--text)') + '">' + nomeMarco + '</span>'
+        + ' <span class="dmg-xp">+' + tierAlvo.xp + ' XP</span>',
+        true);
+    }
 
     renderConquistas();
   }
@@ -5830,22 +5961,55 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   if (alvoConquistas){
     alvoConquistas.addEventListener('click', e => {
       const btnTudo = e.target.closest('[data-resgatar-tudo]');
-      if (btnTudo){ resgatarTodasConquistas(); return; }
+      if (btnTudo){
+        // ponto capturado ANTES de resgatarTodasConquistas(), que reescreve
+        // o innerHTML via renderConquistas() -- pegar depois desconectaria
+        // o botao do DOM (mesma armadilha ja documentada no roadmap pra
+        // Loja/Inventario, ver notas tecnicas "capturar antes de qualquer
+        // render").
+        resgatarTodasConquistas(pontoDeElemento(btnTudo));
+        return;
+      }
       const btn = e.target.closest('[data-resgatar]');
-      if (btn) resgatarConquista(btn.dataset.resgatar);
+      if (btn) resgatarConquista(btn.dataset.resgatar, pontoDeElemento(btn));
     });
   }
 
-  /* ---------- badge de notificacao: contava quantos marcos estavam
-     'pendente' (feito mas ainda nao resgatado) no sistema antigo de
-     categorias. No sistema V2 (v4.69) isso nao existe mais -- desbloqueia
-     sozinho no instante que a condicao bate, sem estado intermediario
-     "feito, aguardando resgate". Corpo trocado por um retorno fixo em vez
-     de apagar a funcao inteira (badgeSubTab/atualizarBadges mais abaixo
-     continuam chamando ela sem saber da mudanca -- 0 fixo so faz o badge
-     nunca aparecer, comportamento correto pro sistema novo). ---------- */
+  /* ---------- badge de notificacao: originalmente contava quantos marcos
+     estavam 'pendente' (feito mas ainda nao resgatado) no sistema V1 de
+     categorias/XP. O V1 parou de ser chamado pela tela real desde a v4.69
+     (ver abrirConquistas() -- so o V2 roda hoje), entao esse conceito de
+     "pendente de resgate" nao existe mais -- V2 desbloqueia sozinho, sem
+     etapa de resgate.
+
+     2 versoes do corpo desta funcao ja existiram aqui (pedido do usuario,
+     sessao de brainstorm):
+     - 1a versao: contava quantas das 17 curadas ainda NAO tinham sido
+       desbloqueadas ("faltam no total"). Testado e corrigido pelo proprio
+       usuario -- nao era a intencao: isso faz a bolinha se comportar como
+       contador de progresso (sempre mostra algo, ate num save zerado),
+       nao como notificacao.
+     - 2a versao (atual): conta quantas foram desbloqueadas E ainda NAO
+       foram vistas (jogador ainda nao abriu a tela de Conquistas depois
+       de destravar). Isso sim e "tem novidade pra ver" -- num save novo,
+       com 0 desbloqueadas, o badge fica em 0 e some, que e o esperado.
+       "Vista" e marcada dentro de renderConquistasV2() (mais abaixo no
+       mesmo bloco), no momento em que a tela realmente abre.
+
+     Depende de CONQUISTAS_V2/obterDesbloqueiosV2/obterVistasV2 (definidas
+     mais abaixo no mesmo bloco/IIFE) -- por isso os typeof guards, e por
+     isso a PRIMEIRA chamada de atualizarBadges() foi movida pra depois
+     daquele bloco (ver nota "primeira pintura do badge" perto de
+     CONQUISTAS_V2). Chamadas seguintes (hook em salvar(), hook em
+     checarDesbloqueiosV2(), hook em renderConquistasV2()) sempre acontecem
+     depois do script inteiro ja ter rodado uma vez, entao nao tem esse
+     risco de TDZ. ---------- */
   function contarPendentes(){
-    return 0;
+    if (typeof CONQUISTAS_V2 === 'undefined' || typeof obterDesbloqueiosV2 !== 'function' ||
+        typeof obterVistasV2 !== 'function') return 0;
+    const desbloqueios = obterDesbloqueiosV2();
+    const vistas = obterVistasV2();
+    return Object.keys(desbloqueios).filter(id => !vistas.has(id)).length;
   }
 
   function criarBadge(botao){
@@ -5864,13 +6028,33 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
   function atualizarBadges(){
     const n = contarPendentes();
+    const texto = n > 9 ? '9+' : String(n);
     [badgeSubTab, badgeNavPerfil].forEach(el => {
       if (!el) return;
-      if (n > 0){ el.textContent = n > 9 ? '9+' : String(n); el.style.display = 'flex'; }
-      else el.style.display = 'none';
+      if (n > 0){
+        const mudouTexto = el.textContent !== texto;
+        const apareceu = !el.classList.contains('on');
+        el.textContent = texto;
+        el.classList.add('on');
+        // "pop" (bounce de entrada) toca quando o badge estava escondido e
+        // aparece, OU quando ja estava visivel mas o numero mudou (nova
+        // notificacao chegando por cima de uma que ja existia) -- reforca
+        // reflow (offsetWidth) pra poder reiniciar a mesma animacao duas
+        // vezes seguidas, caso contrario o navegador ignora reatribuir a
+        // mesma classe sem um reflow no meio.
+        if (apareceu || mudouTexto){
+          el.classList.remove('pop');
+          void el.offsetWidth;
+          el.classList.add('pop');
+        }
+      } else {
+        el.classList.remove('on', 'pop');
+      }
     });
   }
-  atualizarBadges();
+  // "atualizarBadges();" da primeira pintura NAO fica mais aqui -- ver
+  // chamada equivalente logo apos o bloco CONQUISTAS_V2 mais abaixo,
+  // motivo explicado no comentario de contarPendentes() acima.
 
   // recalcula badges em qualquer ponto que muda o jogo o bastante pra
   // afetar conquistas (salvar() e chamado ~15x pelo app inteiro, cobre
@@ -5968,6 +6152,26 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     try { localStorage.setItem(CHAVE_DESBLOQUEIOS_V2, JSON.stringify(obj)); } catch(e){}
   }
 
+  // "vistas": subconjunto de ids desbloqueados que o jogador ja OLHOU (abriu
+  // a tela de Conquistas depois de desbloquear). Separado de "desbloqueios"
+  // de proposito -- desbloqueado != visto. O balaozinho de notificacao
+  // (criarBadge/atualizarBadges, mais acima neste bloco) conta a DIFERENCA
+  // entre os dois: quantas foram desbloqueadas mas ainda nao vistas -- nao
+  // o total que falta desbloquear no jogo inteiro (1a versao desta feature,
+  // corrigida aqui a pedido do usuario: a bolinha deveria avisar "tem
+  // novidade", nao funcionar como contador de progresso).
+  const CHAVE_VISTAS_V2 = 'questlog.conquistasVistasV2.v1';
+  function obterVistasV2(){
+    try {
+      const bruto = localStorage.getItem(CHAVE_VISTAS_V2);
+      const arr = bruto ? JSON.parse(bruto) : [];
+      return new Set(Array.isArray(arr) ? arr : []);
+    } catch(e){ return new Set(); }
+  }
+  function persistirVistasV2(set){
+    try { localStorage.setItem(CHAVE_VISTAS_V2, JSON.stringify([...set])); } catch(e){}
+  }
+
   // roda a cada render() (mesmo gancho que o resto do app ja usa) --
   // confere as 17 metas curadas contra o contexto AO VIVO (comHoje=true,
   // mesmo motivo documentado em resgatarConquista() mais acima: sem isso
@@ -5990,6 +6194,12 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       }
     });
     if (mudou) persistirDesbloqueiosV2(desbloqueios);
+    // Atualiza o balaozinho de notificacao (Perfil na nav + "Ver todas" na
+    // previa) no instante em que uma conquista e desbloqueada -- nao
+    // precisa esperar o proximo salvar(). atualizarBadges() e definida
+    // mais acima no mesmo bloco/IIFE (function declaration, hoisted),
+    // seguro chamar daqui mesmo sendo textualmente anterior.
+    if (typeof atualizarBadges === 'function') atualizarBadges();
   }
 
   function renderConquistasV2(){
@@ -5998,22 +6208,32 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     if (!alvo) return;
     const ctx = montarContexto(true);
     const desbloqueios = obterDesbloqueiosV2();
+    // capturado ANTES de marcar como visto (mais abaixo, no fim desta
+    // funcao) -- usado so pra saber quais itens ganham a tag "NOVO" nesta
+    // renderizacao. Depois de marcado como visto, a mesma conquista nao
+    // mostra mais a tag numa proxima abertura da tela.
+    const vistasAntes = obterVistasV2();
     const feitas = [];
     const faltam = [];
     CONQUISTAS_V2.forEach(item => {
       const data = desbloqueios[item.id];
-      if (data) feitas.push({ item, data });
+      if (data) feitas.push({ item, data, novo: !vistasAntes.has(item.id) });
       else faltam.push(item);
     });
     feitas.sort((a, b) => b.data.localeCompare(a.data)); // mais recente primeiro
 
-    function linha(item, data){
+    function linha(item, data, novo){
       const emIngles = idiomaConquistas() === 'en';
       const desc = emIngles ? resolver(item.req_en || item.req, ctx) : resolver(item.req, ctx);
       const nomeMostrar = emIngles ? (item.nome_en || item.nome) : item.nome;
       const dataHtml = data ? '<span class="conqv2data">' + formatarDataBR(data) + '</span>' : '';
-      return '<div class="conqv2item' + (data ? '' : ' trancado') + '">' +
-        '<div class="conqv2txt"><div class="conqv2nome">' + nomeMostrar + '</div>' +
+      // Tag "NOVO" -- pedido do usuario: mostrar, dentro da propria lista,
+      // exatamente qual conquista gerou a notificacao do balaozinho (nav
+      // Perfil + "Ver todas"). So aparece pra quem foi desbloqueada e
+      // ainda nao tinha sido vista ANTES desta renderizacao.
+      const novoHtml = novo ? '<span class="conqv2novo">' + (emIngles ? 'NEW' : 'NOVO') + '</span>' : '';
+      return '<div class="conqv2item' + (data ? '' : ' trancado') + (novo ? ' conqv2novoitem' : '') + '">' +
+        '<div class="conqv2txt"><div class="conqv2nome">' + nomeMostrar + novoHtml + '</div>' +
         '<div class="conqv2desc">' + desc + '</div></div>' +
         dataHtml +
       '</div>';
@@ -6021,13 +6241,26 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
     let html = '<div class="edsec">' + (idiomaConquistas() === 'en' ? 'My achievements' : 'Minhas conquistas') + '</div>';
     html += feitas.length
-      ? feitas.map(f => linha(f.item, f.data)).join('')
+      ? feitas.map(f => linha(f.item, f.data, f.novo)).join('')
       : '<div class="prevvazio">' + (idiomaConquistas() === 'en' ? 'None yet -- keep playing!' : 'Nenhuma ainda -- continue jogando!') + '</div>';
     html += '<div class="edsec">' + (idiomaConquistas() === 'en' ? 'Not unlocked' : 'Não desbloqueadas') + '</div>';
     html += faltam.length
-      ? faltam.map(item => linha(item, null)).join('')
+      ? faltam.map(item => linha(item, null, false)).join('')
       : '<div class="prevvazio">' + (idiomaConquistas() === 'en' ? 'You unlocked them all!' : 'Você desbloqueou todas!') + '</div>';
     alvo.innerHTML = html;
+
+    // Abrir a tela = "marcar como visto". Tudo que ja esta desbloqueado
+    // entra pro set de vistas agora (mesmo o que ja era visto antes -- Set
+    // ignora duplicata) -- e o balaozinho zera. So grava localStorage se
+    // realmente mudou algo, pra nao escrever a toa toda vez que a tela
+    // reabre sem novidade nenhuma.
+    const vistas = obterVistasV2();
+    let vistasMudou = false;
+    Object.keys(desbloqueios).forEach(id => {
+      if (!vistas.has(id)){ vistas.add(id); vistasMudou = true; }
+    });
+    if (vistasMudou) persistirVistasV2(vistas);
+    if (typeof atualizarBadges === 'function') atualizarBadges();
   }
   window.renderConquistasV2 = renderConquistasV2;
 
@@ -6038,7 +6271,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       checarDesbloqueiosV2();
     };
   }
-  checarDesbloqueiosV2(); // primeira checagem, sem esperar o primeiro render()
+  checarDesbloqueiosV2(); // primeira checagem, sem esperar o primeiro render() -- ja chama atualizarBadges() no proprio fim (ver linha acima), entao a primeira pintura do badge acontece aqui, com CONQUISTAS_V2 ja definida (evita o erro de TDZ que aconteceria se atualizarBadges() rodasse antes deste ponto -- ver comentario em contarPendentes())
 
   // resumo compacto pra previa no Perfil unificado -- reescrito pra ler
   // do sistema V2 (desbloqueios automaticos) em vez do resgatadosSet()
@@ -6819,9 +7052,12 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     renderHistorico();
   };
 
-  // abre/fecha o overlay -- gatilho agora e o botao "Histórico" dentro
-  // de Perfil > Config, nao mais uma sub-aba propria (ver nota grande
-  // no topo do bloco sobre o motivo da mudanca)
+  // abre/fecha o overlay -- gatilho e so o botao "Ver tudo" da previa em
+  // Perfil (#verHistoricoBtn, ver bloco de previas mais acima). O card
+  // "Historico" que existia dentro de Config foi removido (pedido do
+  // usuario, duplicava o mesmo caminho) -- #cfgHistorico nao existe mais
+  // no HTML, entao btnAbrir fica null aqui, o que e esperado; o guard
+  // "if (btnAbrir)" abaixo ja cobre isso sem erro.
   const overlay = document.getElementById('histOverlay');
   const btnAbrir = document.getElementById('cfgHistorico');
   const btnFechar = document.getElementById('histFechar');

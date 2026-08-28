@@ -18,6 +18,41 @@
 <link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=Outfit:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 
+<script>
+  // item 49 do roadmap (pedido do usuario): detecta o idioma do
+  // dispositivo/navegador e usa como padrao ANTES do jogador escolher
+  // qualquer coisa -- portugues (qualquer variante: pt-BR, pt-PT etc)
+  // vira 'pt', qualquer outro idioma vira 'en'. So grava se ainda NAO
+  // existe preferencia salva (questlog.idioma.v1) -- uma vez que o
+  // jogador escolhe explicitamente (slide de idioma no carrossel, ou
+  // Config > Preferencias > Idioma, item 47), essa escolha manual
+  // sempre vence e nunca e sobrescrita por esta deteccao de novo.
+  //
+  // Roda AQUI, dentro de <head>, antes de qualquer outro <script> do
+  // documento (inclusive assets.js) -- e o unico jeito de garantir que
+  // TODOS os pontos do arquivo que leem localStorage.getItem
+  // ('questlog.idioma.v1') (item(), idiomaApp(), aplicarIdiomaDados(),
+  // o modulo I18N no fim do arquivo, etc) ja encontrem o valor certo
+  // desde a primeira leitura -- nenhum deles precisou mudar, todos ja
+  // tinham fallback pra 'pt' que so importa se ESTE bloco falhar
+  // (localStorage bloqueado, por exemplo).
+  (function(){
+    try {
+      if (localStorage.getItem('questlog.idioma.v1')) return; // ja escolhido antes, nunca sobrescreve
+      const idiomasNavegador = (navigator.languages && navigator.languages.length)
+        ? navigator.languages
+        : [navigator.language || navigator.userLanguage || ''];
+      const primeiro = (idiomasNavegador[0] || '').toLowerCase();
+      const idioma = primeiro.indexOf('pt') === 0 ? 'pt' : 'en';
+      localStorage.setItem('questlog.idioma.v1', idioma);
+    } catch(e){
+      // localStorage indisponivel (modo privado restritivo, por
+      // exemplo) -- sem problema, todo o resto do arquivo ja tem
+      // fallback pra 'pt' nesse cenario raro.
+    }
+  })();
+</script>
+
 </head>
 
 <body>
@@ -488,19 +523,6 @@
         <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
       </div>
 
-      <!-- item 47 do roadmap (pedido do usuário): linha "Idioma" nova em
-           Config, mesmo padrão .cfgrow.cfglink de Herói/Aparência/
-           Preferências (item 39). Resumo mostra bandeira + nome do
-           idioma ativo, atualizado em atualizarResumosConfig(). -->
-      <div class="cfgrow cfglink" id="cfgAbrirIdioma">
-        <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.7-3.8-9s1.3-6.4 3.8-9z"/></svg></span>
-        <div class="cfgtxt">
-          <b data-i18n="cfg.idioma">Idioma</b>
-          <span id="cfgIdiomaResumo">🇧🇷 Português</span>
-        </div>
-        <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
-      </div>
-
       <div class="cfgrow cfglink" id="cfgAbrirPrefs">
         <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h14M22 18h0"/><circle cx="14" cy="6" r="2"/><circle cx="7" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></span>
         <div class="cfgtxt">
@@ -574,10 +596,50 @@
     </div>
   </div>
 
+  <div class="cfgOverlay" id="prefsOverlay">
+    <div class="cfgovhead">
+      <button class="cfgvoltar" id="prefsVoltarBtn" aria-label="Voltar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      </button>
+      <span class="vtitle" data-i18n="cfg.preferencias">Preferências</span>
+    </div>
+    <div class="cfgovcorpo">
+      <!-- item 47 do roadmap (ajuste, pedido do usuário): "Idioma" saiu
+           da tela principal de Config (não precisava de destaque de
+           box própria) e passou a morar aqui dentro de Preferências,
+           como mais uma linha -- mesmo padrão .cfgrow.cfglink usado
+           pra Herói/Aparência, abrindo o mesmo idiomaOverlay de antes
+           (nenhuma mudança de JS necessária, só de posição no HTML). -->
+      <div class="cfgrow cfglink" id="cfgAbrirIdioma">
+        <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.7-3.8-9s1.3-6.4 3.8-9z"/></svg></span>
+        <div class="cfgtxt">
+          <b data-i18n="cfg.idioma">Idioma</b>
+          <span id="cfgIdiomaResumo">🇧🇷 Português</span>
+        </div>
+        <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+      </div>
+
+      <div class="cfgrow" id="cfgRowFeedback">
+        <div class="cfgtxt">
+          <b data-i18n="cfg.feedbackDeClique">Feedback de clique</b>
+          <span data-i18n="cfg.feedbackDeCliqueDesc">Vibração ou som ao tocar em botões</span>
+        </div>
+        <button class="swch" id="cfgFeedbackBtn" type="button" role="switch" aria-checked="true" aria-label="Feedback tátil">
+          <span class="swch-bolinha"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- item 47 do roadmap: sub-tela "Idioma", mesmo padrão de overlay
        (.cfgOverlay/.cfgovhead/.cfgovcorpo/.cfgvoltar) e mesmo padrão de
        lista de opção (.temalinha, já usado em Aparência) que o resto de
-       Config já usa -- so troca a bolinha de cor por uma bandeira. -->
+       Config já usa -- so troca a bolinha de cor por uma bandeira.
+       Fica DEPOIS de prefsOverlay no DOM de propósito: mesmo z-index
+       (69), mas agora é aberta de DENTRO de Preferências (ajuste desta
+       sessão, pedido do usuário) -- se viesse antes no documento,
+       prefsOverlay pintaria por cima dela e a tela de Idioma abriria
+       escondida atrás da de Preferências ainda visível. -->
   <div class="cfgOverlay" id="idiomaOverlay">
     <div class="cfgovhead">
       <button class="cfgvoltar" id="idiomaVoltarBtn" aria-label="Voltar">
@@ -592,26 +654,6 @@
           <span data-i18n="cfg.idiomaDesc">Idioma dos textos do app</span>
         </div>
         <div class="temagrid" id="idiomaGrid"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="cfgOverlay" id="prefsOverlay">
-    <div class="cfgovhead">
-      <button class="cfgvoltar" id="prefsVoltarBtn" aria-label="Voltar">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
-      </button>
-      <span class="vtitle" data-i18n="cfg.preferencias">Preferências</span>
-    </div>
-    <div class="cfgovcorpo">
-      <div class="cfgrow" id="cfgRowFeedback">
-        <div class="cfgtxt">
-          <b data-i18n="cfg.feedbackDeClique">Feedback de clique</b>
-          <span data-i18n="cfg.feedbackDeCliqueDesc">Vibração ou som ao tocar em botões</span>
-        </div>
-        <button class="swch" id="cfgFeedbackBtn" type="button" role="switch" aria-checked="true" aria-label="Feedback tátil">
-          <span class="swch-bolinha"></span>
-        </button>
       </div>
     </div>
   </div>
@@ -3710,9 +3752,9 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 
     const rTema = document.getElementById('cfgAparenciaResumo');
     if (rTema && typeof TEMAS !== 'undefined'){
-      const atual = document.documentElement.getAttribute('data-tema') || 'padrao';
+      const atual = document.documentElement.getAttribute('data-tema') || 'grafite';
       const t = TEMAS.find(tt => tt.id === atual);
-      const nomeTema = t ? (emIngles ? (t.nome_en || t.nome) : t.nome) : 'Laranja';
+      const nomeTema = t ? (emIngles ? (t.nome_en || t.nome) : t.nome) : (emIngles ? 'Dark' : 'Escuro');
       rTema.textContent = nomeTema;
     }
 
@@ -4044,10 +4086,12 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   const CHAVE_TEMA = 'questlog.tema.v1';
 
   function temaSalvo(){
-    // v4.124: tema padrao voltou a ser laranja (item de identidade
-    // visual, pedido explicito do usuario) -- antes o fallback sem
-    // localStorage era 'grafite'.
-    try { return localStorage.getItem(CHAVE_TEMA) || 'padrao'; } catch(e){ return 'padrao'; }
+    // item 48 do roadmap: tema padrao volta a ser Grafite (preto e
+    // branco) -- pedido explicito do usuario NESTA sessao, reversao da
+    // decisao v4.124 registrada no comentario acima (que tinha trocado
+    // de Grafite pra Laranja por outro pedido explicito, anterior).
+    // Registrado no roadmap como reversao real, nao silenciosa.
+    try { return localStorage.getItem(CHAVE_TEMA) || 'grafite'; } catch(e){ return 'grafite'; }
   }
   function escolherTema(id){
     document.documentElement.setAttribute('data-tema', id);
@@ -4057,7 +4101,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   function pintarTemaGrid(){
     const g = document.getElementById('temaGrid');
     if (!g) return;
-    const atual = document.documentElement.getAttribute('data-tema') || 'padrao';
+    const atual = document.documentElement.getAttribute('data-tema') || 'grafite';
     g.innerHTML = '';
     // v4.126 (2a tentativa: o card grande tipo Skyllion nao ficou bom --
     // pedido do usuario pra tentar algo diferente. Virou lista de linhas

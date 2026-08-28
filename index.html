@@ -5773,7 +5773,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
      em lote -- um xpTotal += somaXP so, uma checagem de nivel-antes/depois
      so (nao uma por marco, pra nao empilhar varios popups de level-up se
      o resgate em lote cruzar mais de um nivel de uma vez), um som so. ---------- */
-  function resgatarTodasConquistas(){
+  function resgatarTodasConquistas(ponto){
     const ctx = montarContexto(true);
     const resgatados = resgatadosSet();
     const pendentes = listarPendentes(ctx, resgatados);
@@ -5796,19 +5796,27 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       }
     }
 
-    if (typeof aviso === 'function'){
+    // Confirmacao visivel do resgate -- antes so existia aviso() (toast),
+    // que fica mudo com TOASTS_DESATIVADOS=true (roadmap, item 41): clicar
+    // em "Receber tudo" nao dava nenhum sinal visual de que funcionou.
+    // Reaproveita flutuanteFixo/pontoDeElemento (infra ja existente, ver
+    // notas no topo destas funcoes) -- o ponto de origem precisa ser
+    // capturado ANTES desta funcao rodar, porque renderConquistas() (chamada
+    // no fim) reescreve o innerHTML inteiro do container e desconecta o
+    // botao clicado do DOM (mesmo bug ja documentado pra Loja/Inventario).
+    if (typeof flutuanteFixo === 'function' && ponto){
       const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
       const rotulo = en
-        ? (pendentes.length === 1 ? 'achievement' : 'achievements')
-        : (pendentes.length === 1 ? 'conquista' : 'conquistas');
-      aviso('+' + somaXP + ' XP · ' + pendentes.length + ' ' + rotulo);
+        ? (pendentes.length === 1 ? 'achievement unlocked' : 'achievements unlocked')
+        : (pendentes.length === 1 ? 'conquista desbloqueada' : 'conquistas desbloqueadas');
+      flutuanteFixo(ponto, '<span class="dmg-xp">' + pendentes.length + ' ' + rotulo + ' · +' + somaXP + ' XP</span>', true);
     }
 
     renderConquistas();
   }
   window.resgatarTodasConquistas = resgatarTodasConquistas;
 
-  function resgatarConquista(tierId){
+  function resgatarConquista(tierId, ponto){
     const resgatados = resgatadosSet();
     if (resgatados.has(tierId)) return; // ja resgatado, idempotente
 
@@ -5863,7 +5871,16 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       }
     }
 
-    if (typeof aviso === 'function') aviso('+' + tierAlvo.xp + ' XP');
+    if (typeof flutuanteFixo === 'function' && ponto){
+      const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
+      const nomeMarco = en ? (tierAlvo.nome_en || tierAlvo.nome) : tierAlvo.nome;
+      const rotulo = en ? 'Achievement unlocked' : 'Conquista desbloqueada';
+      flutuanteFixo(ponto,
+        '<span class="dmg-xp">' + rotulo + '</span><br>'
+        + '<span style="color:' + (catAlvo.cor || 'var(--text)') + '">' + nomeMarco + '</span>'
+        + ' <span class="dmg-xp">+' + tierAlvo.xp + ' XP</span>',
+        true);
+    }
 
     renderConquistas();
   }
@@ -5873,9 +5890,17 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   if (alvoConquistas){
     alvoConquistas.addEventListener('click', e => {
       const btnTudo = e.target.closest('[data-resgatar-tudo]');
-      if (btnTudo){ resgatarTodasConquistas(); return; }
+      if (btnTudo){
+        // ponto capturado ANTES de resgatarTodasConquistas(), que reescreve
+        // o innerHTML via renderConquistas() -- pegar depois desconectaria
+        // o botao do DOM (mesma armadilha ja documentada no roadmap pra
+        // Loja/Inventario, ver notas tecnicas "capturar antes de qualquer
+        // render").
+        resgatarTodasConquistas(pontoDeElemento(btnTudo));
+        return;
+      }
       const btn = e.target.closest('[data-resgatar]');
-      if (btn) resgatarConquista(btn.dataset.resgatar);
+      if (btn) resgatarConquista(btn.dataset.resgatar, pontoDeElemento(btn));
     });
   }
 

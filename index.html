@@ -3037,7 +3037,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   // bloco captura o que REALMENTE acontece no toque real. REMOVER (ou
   // trocar DEBUG_ARRASTO pra false) depois de diagnosticado -- nao e
   // feature, e ferramenta de sessao.
-  const DEBUG_ARRASTO = false; // confirmado no aparelho real que o arrasto engata -- painel cumpriu o papel, desligado
+  const DEBUG_ARRASTO = true; // religado -- suspeita: arrasto terminando/recomecando sozinho no meio do gesto ("pisca")
   let dbgT0 = 0, dbgLinhas = [];
   let dbgPainel = null;
   function dbgArrasto(msg){

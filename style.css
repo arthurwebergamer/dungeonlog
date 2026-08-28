@@ -3331,3 +3331,22 @@
   background:var(--pv-cor) !important;
   align-self:center !important;
 }
+
+/* ---------------------------------------------------------------------
+   Fix: destaque azul nativo do navegador (tap highlight) aparecendo por
+   cima do card ao segurar pra arrastar tarefa, em vez do efeito proprio
+   do app (placeholder elastico + card flutuante seguindo o dedo). Achado
+   comparando video do DevTools (emulacao de toque por mouse, sem esse
+   highlight) com video do aparelho real (toque de verdade, com o
+   highlight visivel). Causa: -webkit-tap-highlight-color nunca foi
+   setado em .task -- a propriedade ja existe em outros elementos do
+   arquivo (.atrbarra, por exemplo), so ficou faltando aqui, que e
+   justamente o elemento que mais precisa dela (segurar por 220ms pra
+   arrastar e o gesto mais propenso a esse highlight aparecer). Bloco
+   novo no fim do arquivo, mesmo motivo de sempre (modulos 1-20
+   duplicados). Nao mexe em nenhuma logica JS do arrasto (iniciarArrasto/
+   atualizarPlaceholder/atualizarAlturaElastica) -- so tira o efeito
+   visual do navegador que competia com o efeito proprio do app. */
+.task{
+  -webkit-tap-highlight-color:transparent;
+}

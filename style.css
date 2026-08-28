@@ -3298,3 +3298,35 @@
   padding-left:9px !important;
   border-radius:4px;
 }
+
+/* ---------------------------------------------------------------------
+   2 ajustes pedidos pelo usuario (sessao de brainstorm), bloco novo no
+   fim do arquivo -- mesmo motivo de sempre (modulos 1-20 duplicados, so
+   a ultima regra da cascata vence, ver notas anteriores nesta mesma
+   secao final do arquivo).
+
+   1) Badge de notificacao (.conqbadge) subiu pra fora do botao, no
+      canto superior direito, em vez de ficar em cima do texto/icone
+      (top:2px/right:8px original ficava colado por dentro, cobrindo
+      parte do conteudo em botoes pequenos como #verConquistasBtn).
+      Padrao comum de notification-dot: metade fora da borda do botao.
+   2) Chips da previa de conquistas (.prevconqchip) perderam o texto do
+      nome (pedido do usuario -- "mais feio que qualquer outra coisa").
+      Viram bolinha solida na cor da conquista, sem borda/texto. Nome
+      continua acessivel via tooltip (title, ja setado no JS) e por
+      completo na tela "Ver todas". Reduz a previa a um indicador rapido
+      de atividade recente, os detalhes ficam pra tela cheia mesmo. */
+.conqbadge{
+  top:-6px !important;
+  right:-6px !important;
+}
+
+.prevconqchip{
+  width:14px !important;
+  height:14px !important;
+  padding:0 !important;
+  border:none !important;
+  border-radius:50% !important;
+  background:var(--pv-cor) !important;
+  align-self:center !important;
+}

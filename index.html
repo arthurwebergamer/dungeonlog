@@ -4036,8 +4036,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
           const ic = document.createElement('div');
           ic.className = 'prevconqchip';
           ic.style.setProperty('--pv-cor', c.cor);
-          ic.title = c.nome;
-          ic.textContent = c.nome;
+          ic.title = c.nome; // nome ainda acessivel via tooltip -- so o texto visivel saiu, pedido do usuario
           faixaConq.appendChild(ic);
         });
       }

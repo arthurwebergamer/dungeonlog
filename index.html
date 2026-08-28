@@ -5909,21 +5909,36 @@ window.mostrarNivelUp = function(nivel, aoFechar){
      categorias/XP. O V1 parou de ser chamado pela tela real desde a v4.69
      (ver abrirConquistas() -- so o V2 roda hoje), entao esse conceito de
      "pendente de resgate" nao existe mais -- V2 desbloqueia sozinho, sem
-     etapa de resgate. Corpo trocado (pedido do usuario, sessao de
-     brainstorm): agora conta quantas das conquistas curadas do V2 AINDA
-     NAO foram desbloqueadas ("faltam", mesmo dado que renderConquistasV2()
-     ja calcula pra secao "Não desbloqueadas" da tela). Depende de
-     CONQUISTAS_V2/obterDesbloqueiosV2 (definidas mais abaixo no mesmo
-     bloco/IIFE) -- por isso os typeof guards, e por isso a PRIMEIRA
-     chamada de atualizarBadges() foi movida pra depois daquele bloco (ver
-     nota "primeira pintura do badge" perto de CONQUISTAS_V2). Chamadas
-     seguintes (hook em salvar(), hook em checarDesbloqueiosV2()) sempre
-     acontecem depois do script inteiro ja ter rodado uma vez, entao nao
-     tem esse risco. ---------- */
+     etapa de resgate.
+
+     2 versoes do corpo desta funcao ja existiram aqui (pedido do usuario,
+     sessao de brainstorm):
+     - 1a versao: contava quantas das 17 curadas ainda NAO tinham sido
+       desbloqueadas ("faltam no total"). Testado e corrigido pelo proprio
+       usuario -- nao era a intencao: isso faz a bolinha se comportar como
+       contador de progresso (sempre mostra algo, ate num save zerado),
+       nao como notificacao.
+     - 2a versao (atual): conta quantas foram desbloqueadas E ainda NAO
+       foram vistas (jogador ainda nao abriu a tela de Conquistas depois
+       de destravar). Isso sim e "tem novidade pra ver" -- num save novo,
+       com 0 desbloqueadas, o badge fica em 0 e some, que e o esperado.
+       "Vista" e marcada dentro de renderConquistasV2() (mais abaixo no
+       mesmo bloco), no momento em que a tela realmente abre.
+
+     Depende de CONQUISTAS_V2/obterDesbloqueiosV2/obterVistasV2 (definidas
+     mais abaixo no mesmo bloco/IIFE) -- por isso os typeof guards, e por
+     isso a PRIMEIRA chamada de atualizarBadges() foi movida pra depois
+     daquele bloco (ver nota "primeira pintura do badge" perto de
+     CONQUISTAS_V2). Chamadas seguintes (hook em salvar(), hook em
+     checarDesbloqueiosV2(), hook em renderConquistasV2()) sempre acontecem
+     depois do script inteiro ja ter rodado uma vez, entao nao tem esse
+     risco de TDZ. ---------- */
   function contarPendentes(){
-    if (typeof CONQUISTAS_V2 === 'undefined' || typeof obterDesbloqueiosV2 !== 'function') return 0;
+    if (typeof CONQUISTAS_V2 === 'undefined' || typeof obterDesbloqueiosV2 !== 'function' ||
+        typeof obterVistasV2 !== 'function') return 0;
     const desbloqueios = obterDesbloqueiosV2();
-    return CONQUISTAS_V2.filter(item => !desbloqueios[item.id]).length;
+    const vistas = obterVistasV2();
+    return Object.keys(desbloqueios).filter(id => !vistas.has(id)).length;
   }
 
   function criarBadge(botao){
@@ -6048,6 +6063,26 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     try { localStorage.setItem(CHAVE_DESBLOQUEIOS_V2, JSON.stringify(obj)); } catch(e){}
   }
 
+  // "vistas": subconjunto de ids desbloqueados que o jogador ja OLHOU (abriu
+  // a tela de Conquistas depois de desbloquear). Separado de "desbloqueios"
+  // de proposito -- desbloqueado != visto. O balaozinho de notificacao
+  // (criarBadge/atualizarBadges, mais acima neste bloco) conta a DIFERENCA
+  // entre os dois: quantas foram desbloqueadas mas ainda nao vistas -- nao
+  // o total que falta desbloquear no jogo inteiro (1a versao desta feature,
+  // corrigida aqui a pedido do usuario: a bolinha deveria avisar "tem
+  // novidade", nao funcionar como contador de progresso).
+  const CHAVE_VISTAS_V2 = 'questlog.conquistasVistasV2.v1';
+  function obterVistasV2(){
+    try {
+      const bruto = localStorage.getItem(CHAVE_VISTAS_V2);
+      const arr = bruto ? JSON.parse(bruto) : [];
+      return new Set(Array.isArray(arr) ? arr : []);
+    } catch(e){ return new Set(); }
+  }
+  function persistirVistasV2(set){
+    try { localStorage.setItem(CHAVE_VISTAS_V2, JSON.stringify([...set])); } catch(e){}
+  }
+
   // roda a cada render() (mesmo gancho que o resto do app ja usa) --
   // confere as 17 metas curadas contra o contexto AO VIVO (comHoje=true,
   // mesmo motivo documentado em resgatarConquista() mais acima: sem isso
@@ -6114,6 +6149,19 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       ? faltam.map(item => linha(item, null)).join('')
       : '<div class="prevvazio">' + (idiomaConquistas() === 'en' ? 'You unlocked them all!' : 'Você desbloqueou todas!') + '</div>';
     alvo.innerHTML = html;
+
+    // Abrir a tela = "marcar como visto". Tudo que ja esta desbloqueado
+    // entra pro set de vistas agora (mesmo o que ja era visto antes -- Set
+    // ignora duplicata) -- e o balaozinho zera. So grava localStorage se
+    // realmente mudou algo, pra nao escrever a toa toda vez que a tela
+    // reabre sem novidade nenhuma.
+    const vistas = obterVistasV2();
+    let vistasMudou = false;
+    Object.keys(desbloqueios).forEach(id => {
+      if (!vistas.has(id)){ vistas.add(id); vistasMudou = true; }
+    });
+    if (vistasMudou) persistirVistasV2(vistas);
+    if (typeof atualizarBadges === 'function') atualizarBadges();
   }
   window.renderConquistasV2 = renderConquistasV2;
 

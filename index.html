@@ -315,6 +315,7 @@
           <div class="hero-sprite" id="perfilHeroSprite"></div>
           <div class="perfilheroInfo">
             <div class="perfilnome" id="perfilNome">Aventureiro</div>
+            <div class="perfilTitulo" id="perfilTitulo"></div>
             <div class="xpwrap">
               <div class="xprow hprow">
                 <span class="xplabel" data-i18n="jogo.vida">Vida</span>
@@ -3071,7 +3072,6 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   // le a posicao atual do card -- antes lia direto de style.top (que
   // parou de mudar), agora le esta variavel.
   let dragBaseLeft = 0, dragBaseTop = 0, dragAtualTop = 0;
-  let dragMoveAgendado = false; // throttle: atualizarAlturaElastica()/atualizarPlaceholder() rodam no maximo 1x por frame, nao a cada pointermove cru (que pode disparar bem mais rapido que 60fps em alguns aparelhos)
 
   const BORDA_AUTOSCROLL = 16;      // px da borda de #list que ja ativa o autoscroll -- so quando a area visivel de tarefas de fato acaba, nao um buffer grande antes disso
   const VELOC_MAX_AUTOSCROLL = 14;  // px por frame quando o dedo esta bem na borda
@@ -3217,24 +3217,6 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     };
   });
 
-  // roda no maximo 1x por frame (rAF), nao a cada pointermove cru --
-  // atualizarAlturaElastica()/atualizarPlaceholder() leem
-  // getBoundingClientRect() (forcam layout) e podem mexer no DOM
-  // (moverPlaceholderAnimado) -- chamar isso em todo pointermove (que
-  // pode disparar bem mais vezes por segundo que a tela redesenha)
-  // sobrecarrega o navegador e trava a animacao. O movimento do card em
-  // si (transform) continua rodando em todo pointermove, sem throttle --
-  // e barato (so composicao), nao precisa esperar o frame.
-  function agendarAtualizacaoPesada(){
-    if (dragMoveAgendado) return;
-    dragMoveAgendado = true;
-    requestAnimationFrame(() => {
-      dragMoveAgendado = false;
-      atualizarAlturaElastica();
-      atualizarPlaceholder(ultimoClientY);
-    });
-  }
-
   list.addEventListener('pointermove', e => {
     if (dragEl && e.pointerId === pid){
       e.preventDefault();
@@ -3242,7 +3224,8 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       const nx = e.clientX - offX, ny = e.clientY - offY;
       dragEl.style.transform = 'translate3d(' + (nx - dragBaseLeft) + 'px,' + (ny - dragBaseTop) + 'px,0)';
       dragAtualTop = ny;
-      agendarAtualizacaoPesada();
+      atualizarAlturaElastica();
+      atualizarPlaceholder(e.clientY);
       return;
     }
     if (!pendente) return;
@@ -6172,6 +6155,39 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     try { localStorage.setItem(CHAVE_VISTAS_V2, JSON.stringify([...set])); } catch(e){}
   }
 
+  // ---------------------------------------------------------------------
+  // TITULOS -- pedido do usuario (sessao de brainstorm): cada conquista
+  // desbloqueada vira um titulo equipavel, mostrado embaixo do nome do
+  // jogador (#perfilTitulo, no cabecalho do Perfil). So 1 equipado por
+  // vez -- reaproveita 100% o dado que ja existe (CONQUISTAS_V2, nome/
+  // nome_en/cor de cada uma), sem tabela nova. Clicar na estrela de uma
+  // conquista ja desbloqueada equipa; clicar de novo na mesma desequipa
+  // (toggle). Chave propria, separada de desbloqueios/vistas -- e so uma
+  // preferencia de exibicao, nao afeta progresso.
+  const CHAVE_TITULO = 'questlog.tituloEquipado.v1';
+  function obterTituloEquipado(){
+    try { return localStorage.getItem(CHAVE_TITULO) || null; } catch(e){ return null; }
+  }
+  function definirTituloEquipado(id){
+    try {
+      if (id) localStorage.setItem(CHAVE_TITULO, id);
+      else localStorage.removeItem(CHAVE_TITULO);
+    } catch(e){}
+  }
+  function renderTituloPerfil(){
+    const el = document.getElementById('perfilTitulo');
+    if (!el) return;
+    const id = obterTituloEquipado();
+    const item = (id && typeof CONQUISTAS_V2 !== 'undefined') ? CONQUISTAS_V2.find(c => c.id === id) : null;
+    if (!item){ el.textContent = ''; el.style.display = 'none'; return; }
+    const emIngles = idiomaConquistas() === 'en';
+    el.textContent = emIngles ? (item.nome_en || item.nome) : item.nome;
+    el.style.setProperty('--tit-cor', item.cor);
+    el.style.display = 'block';
+  }
+  window.renderTituloPerfil = renderTituloPerfil;
+  // ---------------------------------------------------------------------
+
   // roda a cada render() (mesmo gancho que o resto do app ja usa) --
   // confere as 17 metas curadas contra o contexto AO VIVO (comHoje=true,
   // mesmo motivo documentado em resgatarConquista() mais acima: sem isso
@@ -6208,6 +6224,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     if (!alvo) return;
     const ctx = montarContexto(true);
     const desbloqueios = obterDesbloqueiosV2();
+    const titAtual = obterTituloEquipado(); // qual estrela vem marcada
     // capturado ANTES de marcar como visto (mais abaixo, no fim desta
     // funcao) -- usado so pra saber quais itens ganham a tag "NOVO" nesta
     // renderizacao. Depois de marcado como visto, a mesma conquista nao
@@ -6232,10 +6249,23 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       // Perfil + "Ver todas"). So aparece pra quem foi desbloqueada e
       // ainda nao tinha sido vista ANTES desta renderizacao.
       const novoHtml = novo ? '<span class="conqv2novo">' + (emIngles ? 'NEW' : 'NOVO') + '</span>' : '';
+      // Estrela de equipar como titulo -- so em conquistas ja desbloqueadas
+      // (data truthy). Preenchida (.on) se for o titulo atualmente
+      // equipado. Clique alterna equipar/desequipar (delegado logo abaixo
+      // de renderConquistasV2, ver [data-titulo]).
+      const equipado = data && titAtual === item.id;
+      const estrelaHtml = data
+        ? '<button class="conqv2estrela' + (equipado ? ' on' : '') + '" type="button" '
+          + 'data-titulo="' + item.id + '" '
+          + 'aria-label="' + (emIngles ? 'Set as title' : 'Usar como título') + '" '
+          + 'style="--tit-cor:' + item.cor + '">'
+          + '<svg viewBox="0 0 24 24" fill="' + (equipado ? 'currentColor' : 'none') + '" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5l2.9 6.6 7.1.7-5.4 4.8 1.6 7-6.2-3.8-6.2 3.8 1.6-7-5.4-4.8 7.1-.7z"/></svg>'
+          + '</button>'
+        : '';
       return '<div class="conqv2item' + (data ? '' : ' trancado') + (novo ? ' conqv2novoitem' : '') + '">' +
         '<div class="conqv2txt"><div class="conqv2nome">' + nomeMostrar + novoHtml + '</div>' +
         '<div class="conqv2desc">' + desc + '</div></div>' +
-        dataHtml +
+        dataHtml + estrelaHtml +
       '</div>';
     }
 
@@ -6264,6 +6294,23 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   }
   window.renderConquistasV2 = renderConquistasV2;
 
+  // Clique na estrela: alterna equipar/desequipar aquele titulo. Listener
+  // fica UMA vez no container pai (#perfilConquistas), delegado -- sobrevive
+  // ao innerHTML ser reescrito a cada renderConquistasV2() (mesmo padrao ja
+  // usado no resgate do sistema V1, mais acima neste arquivo).
+  const alvoTitulos = document.getElementById('perfilConquistas');
+  if (alvoTitulos){
+    alvoTitulos.addEventListener('click', e => {
+      const btn = e.target.closest('[data-titulo]');
+      if (!btn) return;
+      const id = btn.dataset.titulo;
+      const atual = obterTituloEquipado();
+      definirTituloEquipado(atual === id ? null : id); // clicar no ja equipado desequipa
+      renderTituloPerfil();
+      renderConquistasV2(); // redesenha pra mover a marcacao da estrela
+    });
+  }
+
   const _renderConqV2 = window.render;
   if (typeof _renderConqV2 === 'function'){
     window.render = function(){
@@ -6272,6 +6319,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     };
   }
   checarDesbloqueiosV2(); // primeira checagem, sem esperar o primeiro render() -- ja chama atualizarBadges() no proprio fim (ver linha acima), entao a primeira pintura do badge acontece aqui, com CONQUISTAS_V2 ja definida (evita o erro de TDZ que aconteceria se atualizarBadges() rodasse antes deste ponto -- ver comentario em contarPendentes())
+  renderTituloPerfil(); // primeira pintura do titulo -- mesmo motivo, so agora que CONQUISTAS_V2 existe
 
   // resumo compacto pra previa no Perfil unificado -- reescrito pra ler
   // do sistema V2 (desbloqueios automaticos) em vez do resgatadosSet()
@@ -9376,7 +9424,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // typeof-guard em cada uma porque nem toda sessão de jogo passou
     // por todo módulo (ex: quem nunca abriu o Perfil não tem
     // renderConquistas definido ainda nesse ponto do arquivo).
-    ['render','renderInventario','renderLoja','renderConquistasV2','renderBestiario','renderHistorico','renderGrimorio','desenharHeroi']
+    ['render','renderInventario','renderLoja','renderConquistasV2','renderBestiario','renderHistorico','renderGrimorio','desenharHeroi','renderTituloPerfil']
       .forEach(fn => { if (typeof window[fn] === 'function') window[fn](); });
     if (typeof window.pintarTemaGrid === 'function') window.pintarTemaGrid();
     if (typeof window.pintarIdiomaGrid === 'function') window.pintarIdiomaGrid();

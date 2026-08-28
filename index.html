@@ -488,6 +488,19 @@
         <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
       </div>
 
+      <!-- item 47 do roadmap (pedido do usuário): linha "Idioma" nova em
+           Config, mesmo padrão .cfgrow.cfglink de Herói/Aparência/
+           Preferências (item 39). Resumo mostra bandeira + nome do
+           idioma ativo, atualizado em atualizarResumosConfig(). -->
+      <div class="cfgrow cfglink" id="cfgAbrirIdioma">
+        <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.7-3.8-9s1.3-6.4 3.8-9z"/></svg></span>
+        <div class="cfgtxt">
+          <b data-i18n="cfg.idioma">Idioma</b>
+          <span id="cfgIdiomaResumo">🇧🇷 Português</span>
+        </div>
+        <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+      </div>
+
       <div class="cfgrow cfglink" id="cfgAbrirPrefs">
         <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h14M22 18h0"/><circle cx="14" cy="6" r="2"/><circle cx="7" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></span>
         <div class="cfgtxt">
@@ -557,6 +570,28 @@
           <span data-i18n="cfg.paletaDeCores">Paleta de cores do app</span>
         </div>
         <div class="temagrid" id="temaGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- item 47 do roadmap: sub-tela "Idioma", mesmo padrão de overlay
+       (.cfgOverlay/.cfgovhead/.cfgovcorpo/.cfgvoltar) e mesmo padrão de
+       lista de opção (.temalinha, já usado em Aparência) que o resto de
+       Config já usa -- so troca a bolinha de cor por uma bandeira. -->
+  <div class="cfgOverlay" id="idiomaOverlay">
+    <div class="cfgovhead">
+      <button class="cfgvoltar" id="idiomaVoltarBtn" aria-label="Voltar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      </button>
+      <span class="vtitle" data-i18n="cfg.idioma">Idioma</span>
+    </div>
+    <div class="cfgovcorpo">
+      <div class="cfgrow cfgcol" id="cfgIdiomaCard">
+        <div class="cfgtxt">
+          <b data-i18n="cfg.idioma">Idioma</b>
+          <span data-i18n="cfg.idiomaDesc">Idioma dos textos do app</span>
+        </div>
+        <div class="temagrid" id="idiomaGrid"></div>
       </div>
     </div>
   </div>
@@ -3681,6 +3716,11 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       rTema.textContent = nomeTema;
     }
 
+    const rIdioma = document.getElementById('cfgIdiomaResumo');
+    if (rIdioma){
+      rIdioma.textContent = emIngles ? '🇺🇸 English' : '🇧🇷 Português';
+    }
+
     const rPref = document.getElementById('cfgPrefsResumo');
     if (rPref){
       const pref = (typeof window.feedbackPreferido === 'function') ? window.feedbackPreferido() : 'vibrar';
@@ -3753,6 +3793,23 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   if (btnAparenciaVoltar) btnAparenciaVoltar.onclick = fecharAparenciaConfig;
   window.abrirAparenciaConfig = abrirAparenciaConfig;
   window.fecharAparenciaConfig = fecharAparenciaConfig;
+
+  /* ---------- Config: sub-tela Idioma (item 47 do roadmap) ---------- */
+  const idiomaOverlay = document.getElementById('idiomaOverlay');
+  function abrirIdiomaConfig(){
+    if (typeof window.pintarIdiomaGrid === 'function') window.pintarIdiomaGrid();
+    if (idiomaOverlay) idiomaOverlay.classList.add('on');
+  }
+  function fecharIdiomaConfig(){
+    if (idiomaOverlay) idiomaOverlay.classList.remove('on');
+    atualizarResumosConfig(); // idioma pode ter mudado dentro da sub-tela
+  }
+  const btnAbrirIdioma = document.getElementById('cfgAbrirIdioma');
+  if (btnAbrirIdioma) btnAbrirIdioma.onclick = abrirIdiomaConfig;
+  const btnIdiomaVoltar = document.getElementById('idiomaVoltarBtn');
+  if (btnIdiomaVoltar) btnIdiomaVoltar.onclick = fecharIdiomaConfig;
+  window.abrirIdiomaConfig = abrirIdiomaConfig;
+  window.fecharIdiomaConfig = fecharIdiomaConfig;
 
   /* ---------- Config: sub-tela Preferências (item 39) ---------- */
   const prefsOverlay = document.getElementById('prefsOverlay');
@@ -4021,8 +4078,45 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     });
   }
 
+  /* ---------- idioma (item 47 do roadmap, pedido do usuario) ---------
+     Mesmo padrao visual de pintarTemaGrid() acima (lista .temalinha,
+     bolinha vira bandeira via .idiomaBandeira). window.definirIdioma()
+     (modulo I18N -- IDIOMA, fim do arquivo) ja faz TUDO que trocar de
+     idioma precisa (salvar, re-traduzir textos, mutar dados, re-render
+     das telas already abertas) -- aqui so falta repintar ESTA lista
+     especifica (o check de selecionado) depois do clique. */
+  const IDIOMAS_CFG = [
+    { id:'pt', bandeira:'🇧🇷', nome:'Português' },
+    { id:'en', bandeira:'🇺🇸', nome:'English' }
+  ];
+  function idiomaSalvoCfg(){
+    try { return localStorage.getItem('questlog.idioma.v1') || 'pt'; } catch(e){ return 'pt'; }
+  }
+  function escolherIdiomaCfg(id){
+    if (typeof window.definirIdioma === 'function') window.definirIdioma(id);
+    pintarIdiomaGrid();
+  }
+  function pintarIdiomaGrid(){
+    const g = document.getElementById('idiomaGrid');
+    if (!g) return;
+    const atual = idiomaSalvoCfg();
+    g.innerHTML = '';
+    IDIOMAS_CFG.forEach(id => {
+      const b = document.createElement('div');
+      b.className = 'temalinha' + (id.id === atual ? ' sel' : '');
+      b.innerHTML =
+        '<span class="idiomaBandeira">' + id.bandeira + '</span>' +
+        '<span class="temaNome">' + id.nome + '</span>' +
+        '<svg class="temaCheck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+      b.onclick = () => escolherIdiomaCfg(id.id);
+      g.appendChild(b);
+    });
+  }
+  window.pintarIdiomaGrid = pintarIdiomaGrid;
+
   // aplica o tema salvo assim que o modulo carrega, sem reescrever a mesma chave
   document.documentElement.setAttribute('data-tema', temaSalvo());
+  window.pintarTemaGrid = pintarTemaGrid; // fix: nunca tinha sido exposta -- window.pintarTemaGrid() no modulo I18N sempre falhava calada (guard typeof) desde que aquele call foi escrito
 })();
 </script>
 
@@ -8938,7 +9032,10 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'login.emailErrado':       { pt:'Email errado? Corrigir', en:'Wrong email? Fix it' },
     'login.jaTemConta':        { pt:'Já tem conta?', en:'Already have an account?' },
 
-    'grim.titulo': { pt:'Grimório', en:'Grimoire' }
+    'grim.titulo': { pt:'Grimório', en:'Grimoire' },
+
+    'cfg.idioma':     { pt:'Idioma', en:'Language' },
+    'cfg.idiomaDesc': { pt:'Idioma dos textos do app', en:'Language of the app\'s text' }
   };
 
   function idiomaSalvo(){
@@ -8993,6 +9090,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     ['render','renderInventario','renderLoja','renderConquistasV2','renderBestiario','renderHistorico','renderGrimorio','desenharHeroi']
       .forEach(fn => { if (typeof window[fn] === 'function') window[fn](); });
     if (typeof window.pintarTemaGrid === 'function') window.pintarTemaGrid();
+    if (typeof window.pintarIdiomaGrid === 'function') window.pintarIdiomaGrid();
 
     // item 46 do roadmap: o slide de transição (o próximo, logo depois
     // do de idioma) já teve seu HTML montado no load da página, no

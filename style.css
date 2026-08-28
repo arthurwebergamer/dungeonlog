@@ -3201,3 +3201,18 @@
   color:var(--text);
   background:color-mix(in srgb, var(--accent) 14%, var(--panel-2));
 }
+
+/* --- Módulo style #25: Idioma em Config (item 47 do roadmap) ---
+   Reaproveita .temalinha/.temaNome/.temaCheck (já usados em Aparência)
+   pra manter a mesma lista de opção -- só troca a bolinha de cor
+   (.temaDot) por uma bandeira emoji, mesmo tamanho de caixa. */
+.idiomaBandeira{
+  width:30px;
+  height:30px;
+  flex:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:22px;
+  line-height:1;
+}

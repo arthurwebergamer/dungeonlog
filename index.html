@@ -3011,7 +3011,19 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   const list = document.getElementById('list');
   if (!list) return;
 
-  const LIMIAR_TOQUE = 8;      // px de tolerancia antes de virar "e so um scroll"
+  // 8px era calibrado so testando com mouse (DevTools) -- um dedo de
+  // verdade treme naturalmente ao tentar ficar parado, e 8px e fácil de
+  // estourar sem querer durante os 220ms de espera, cancelando o arrasto
+  // silenciosamente e caindo no modo "so scroll". Suspeita levantada
+  // comparando video de teste no DevTools (mouse, sem tremedeira) contra
+  // video no aparelho real (toque de verdade) -- no aparelho, a tarefa
+  // ficava destacada mas nao descolava da lista de primeira, sugerindo o
+  // arme do drag falhando por causa desse limiar apertado. Aumentado pra
+  // 18px, faixa comum em bibliotecas de touch pra esse tipo de gesto
+  // (segurar-pra-arrastar vs. deslizar-pra-rolar). NAO CONFIRMADO em
+  // aparelho real ainda -- e a hipotese mais bem fundamentada no codigo,
+  // nao uma certeza.
+  const LIMIAR_TOQUE = 18;     // px de tolerancia antes de virar "e so um scroll"
   const ATRASO_LONGPRESS = 220; // ms segurando parado ate armar o arrasto
 
   let dragEl = null, placeholder = null, offX = 0, offY = 0, pid = null;

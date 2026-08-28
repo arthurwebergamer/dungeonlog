@@ -9171,19 +9171,20 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       elTransicao.dataset.texto = textoTransicao;
       if (window.__questlogTypewriterFoi) elTransicao.textContent = textoTransicao;
     }
-    const btnContinuarIdioma = document.getElementById('carrosselBtn4');
-    if (btnContinuarIdioma) btnContinuarIdioma.textContent = en ? 'Continue' : 'Continuar';
     const btnContinuarTransicao = document.getElementById('carrosselBtn5');
     if (btnContinuarTransicao) btnContinuarTransicao.textContent = en ? 'Continue' : 'Continuar';
 
-    // mesmo bug, mesma causa raiz: se o jogador voltar pros slides 1-3
-    // (seta/dots do carrossel) depois de escolher idioma no slide 4,
-    // titulo/texto/botao desses 3 tambem tinham ficado presos no
-    // idioma do load da pagina. SLIDES/txtSlide() vivem numa IIFE
-    // diferente (a do carrossel) e não são acessíveis aqui -- por isso
-    // duplicado como par PT/EN direto, mesmo padrão já usado em vários
-    // outros pontos do arquivo (ex: idiomaApp() e nomeDiaLocal()).
-    const SLIDES_1A3 = [
+    // item 52 do roadmap (bug real reportado pelo usuário, 2º print):
+    // faltava o slide 4 (o PRÓPRIO slide de idioma) nesta lista -- só o
+    // botão dele (via variável separada, removida aqui) tinha sido
+    // corrigido no item 50; o título "IDIOMA · LANGUAGE" e o texto
+    // "Escolha o idioma do app..." continuavam presos em português
+    // mesmo com o jogador já tendo clicado em "English". Slide 4 entra
+    // na mesma lista consolidada dos slides 1-3 (mesmo bug, mesma causa
+    // raiz: `SLIDES`/`txtSlide()` vivem numa IIFE diferente da de
+    // `definirIdioma()`, textos duplicados aqui como par PT/EN, mesmo
+    // padrão já usado em `idiomaApp()`/`nomeDiaLocal()`).
+    const SLIDES_1A4 = [
       { n:1, titulo:'QUESTLOG', titulo_en:'QUESTLOG',
         texto:'Suas tarefas do dia viram uma batalha. Complete tarefas, evolua seu herói, vença monstros.',
         texto_en:'Your daily tasks become a battle. Complete tasks, level up your hero, defeat monsters.',
@@ -9195,9 +9196,13 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       { n:3, titulo:'EVOLUA', titulo_en:'LEVEL UP',
         texto:'Ganhe XP, moedas e itens conforme joga. Da raridade Comum até Lendário.',
         texto_en:'Earn XP, coins and items as you play. From Common rarity all the way to Legendary.',
+        botao:'Continuar', botao_en:'Continue' },
+      { n:4, titulo:'IDIOMA · LANGUAGE', titulo_en:'IDIOMA · LANGUAGE',
+        texto:'Escolha o idioma do app. Dá pra trocar depois em Perfil.',
+        texto_en:'Choose the app language. You can change it later in Profile.',
         botao:'Continuar', botao_en:'Continue' }
     ];
-    SLIDES_1A3.forEach(s => {
+    SLIDES_1A4.forEach(s => {
       const raiz = document.getElementById('passoCarrossel' + s.n);
       if (!raiz) return;
       const elTitulo = raiz.querySelector('.titulo');

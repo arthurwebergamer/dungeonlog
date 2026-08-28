@@ -3036,7 +3036,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   // bloco captura o que REALMENTE acontece no toque real. REMOVER (ou
   // trocar DEBUG_ARRASTO pra false) depois de diagnosticado -- nao e
   // feature, e ferramenta de sessao.
-  const DEBUG_ARRASTO = true;
+  const DEBUG_ARRASTO = false; // confirmado no aparelho real que o arrasto engata -- painel cumpriu o papel, desligado
   let dbgT0 = 0, dbgLinhas = [];
   let dbgPainel = null;
   function dbgArrasto(msg){
@@ -3061,6 +3061,17 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   let pendente = null;   // { task, startX, startY, timer }
   let ultimoClientY = 0; // usado pelo loop de autoscroll pra saber onde o dedo esta parado
   let alturaBaseCard = 0; // altura do card no instante em que o arrasto comecou, usada como piso do vao elastico
+  // suavizacao do arrasto (pedido do usuario, "travadinho" no aparelho real):
+  // left/top mudando a cada pointermove forcava o navegador a recalcular
+  // layout em todo frame (reflow), que e caro no celular -- dragBaseLeft/
+  // dragBaseTop guardam a posicao fixada UMA VEZ (igual antes), e o
+  // movimento durante o arrasto passa a ser so um transform:translate3d()
+  // por cima (so composicao/GPU, nao aciona reflow). dragAtualTop precisa
+  // ficar num numero por fora do style porque atualizarAlturaElastica()
+  // le a posicao atual do card -- antes lia direto de style.top (que
+  // parou de mudar), agora le esta variavel.
+  let dragBaseLeft = 0, dragBaseTop = 0, dragAtualTop = 0;
+  let dragMoveAgendado = false; // throttle: atualizarAlturaElastica()/atualizarPlaceholder() rodam no maximo 1x por frame, nao a cada pointermove cru (que pode disparar bem mais rapido que 60fps em alguns aparelhos)
 
   const BORDA_AUTOSCROLL = 16;      // px da borda de #list que ja ativa o autoscroll -- so quando a area visivel de tarefas de fato acaba, nao um buffer grande antes disso
   const VELOC_MAX_AUTOSCROLL = 14;  // px por frame quando o dedo esta bem na borda
@@ -3125,7 +3136,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     if (!placeholder || !dragEl) return;
     const phTop = placeholder.getBoundingClientRect().top;
     const phBottomBase = phTop + alturaBaseCard;
-    const dragTop = parseFloat(dragEl.style.top) || 0;
+    const dragTop = dragAtualTop; // antes: parseFloat(dragEl.style.top) -- agora o card se move via transform, style.top fica fixo na posicao base
     const dragBottom = dragTop + alturaBaseCard;
 
     let altura = alturaBaseCard;
@@ -3177,6 +3188,12 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     task.style.position = 'fixed';
     task.style.left = r.left + 'px';
     task.style.top = r.top + 'px';
+    // left/top ficam fixos aqui (so a ancora) -- o movimento durante o
+    // arrasto passa a ser via transform (ver pointermove), muito mais leve
+    // pro navegador que recalcular left/top a cada frame.
+    dragBaseLeft = r.left; dragBaseTop = r.top; dragAtualTop = r.top;
+    task.style.transform = 'translate3d(0,0,0)';
+    task.style.willChange = 'transform';
     task.classList.add('dragging');
     task.setPointerCapture(pid);
     if (navigator.vibrate) navigator.vibrate(12);
@@ -3200,14 +3217,32 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     };
   });
 
+  // roda no maximo 1x por frame (rAF), nao a cada pointermove cru --
+  // atualizarAlturaElastica()/atualizarPlaceholder() leem
+  // getBoundingClientRect() (forcam layout) e podem mexer no DOM
+  // (moverPlaceholderAnimado) -- chamar isso em todo pointermove (que
+  // pode disparar bem mais vezes por segundo que a tela redesenha)
+  // sobrecarrega o navegador e trava a animacao. O movimento do card em
+  // si (transform) continua rodando em todo pointermove, sem throttle --
+  // e barato (so composicao), nao precisa esperar o frame.
+  function agendarAtualizacaoPesada(){
+    if (dragMoveAgendado) return;
+    dragMoveAgendado = true;
+    requestAnimationFrame(() => {
+      dragMoveAgendado = false;
+      atualizarAlturaElastica();
+      atualizarPlaceholder(ultimoClientY);
+    });
+  }
+
   list.addEventListener('pointermove', e => {
     if (dragEl && e.pointerId === pid){
       e.preventDefault();
       ultimoClientY = e.clientY;
-      dragEl.style.left = (e.clientX - offX) + 'px';
-      dragEl.style.top  = (e.clientY - offY) + 'px';
-      atualizarAlturaElastica();
-      atualizarPlaceholder(e.clientY);
+      const nx = e.clientX - offX, ny = e.clientY - offY;
+      dragEl.style.transform = 'translate3d(' + (nx - dragBaseLeft) + 'px,' + (ny - dragBaseTop) + 'px,0)';
+      dragAtualTop = ny;
+      agendarAtualizacaoPesada();
       return;
     }
     if (!pendente) return;
@@ -3246,6 +3281,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     placeholder.replaceWith(dragEl);
     dragEl.classList.remove('dragging');
     dragEl.style.position = ''; dragEl.style.left = ''; dragEl.style.top = ''; dragEl.style.width = '';
+    dragEl.style.transform = ''; dragEl.style.willChange = '';
     // grava a nova ordem visual direto nas tarefas, pelo data-idx de cada linha
     [...list.querySelectorAll('.task')].forEach((el, i) => {
       const t = tarefas[+el.dataset.idx];

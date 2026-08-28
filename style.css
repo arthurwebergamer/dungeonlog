@@ -3310,12 +3310,13 @@
       (top:2px/right:8px original ficava colado por dentro, cobrindo
       parte do conteudo em botoes pequenos como #verConquistasBtn).
       Padrao comum de notification-dot: metade fora da borda do botao.
-   2) Chips da previa de conquistas (.prevconqchip) perderam o texto do
-      nome (pedido do usuario -- "mais feio que qualquer outra coisa").
-      Viram bolinha solida na cor da conquista, sem borda/texto. Nome
-      continua acessivel via tooltip (title, ja setado no JS) e por
-      completo na tela "Ver todas". Reduz a previa a um indicador rapido
-      de atividade recente, os detalhes ficam pra tela cheia mesmo. */
+   2) Chips da previa de conquistas (.prevconqchip): 1a rodada tirou o
+      texto do nome, virou bolinha colorida solida. 2a rodada (pedido do
+      usuario, mesma sessao): nem bolinha -- a faixa inteira parou de ser
+      populada e ficou display:none (JS, funcao que le
+      prevConquistasFaixa). Regra abaixo fica sem nenhum elemento pra
+      aplicar hoje -- mantida sem apagar (convencao append-only do
+      projeto), caso a faixa volte a ser usada no futuro. */
 .conqbadge{
   top:-6px !important;
   right:-6px !important;

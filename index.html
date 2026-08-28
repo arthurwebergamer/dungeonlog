@@ -4021,26 +4021,14 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
         : (en ? (r.resgatadas + ' of ' + r.total + ' unlocked') : (r.resgatadas + ' de ' + r.total + ' desbloqueadas'));
     }
 
-    // faixa das 5 conquistas resgatadas mais recentes
+    // Faixa das conquistas recentes -- removida a pedido do usuario (nem
+    // texto nem bolinha, nada mesmo). O cabecalho (nome + "X de Y
+    // desbloqueadas" + botao "Ver todas") ja diz o essencial; detalhe
+    // completo fica pra tela cheia. #prevConquistasFaixa so escondida,
+    // nao apagada do HTML, pra nao mexer no restante do layout/CSS que
+    // depende dela existir no DOM.
     const faixaConq = document.getElementById('prevConquistasFaixa');
-    if (faixaConq && typeof window.conquistasRecentesPerfil === 'function'){
-      const recentes = window.conquistasRecentesPerfil(5);
-      faixaConq.innerHTML = '';
-      if (!recentes.length){
-        const vazio = document.createElement('span');
-        vazio.className = 'prevvazio';
-        vazio.textContent = en ? 'No achievements unlocked yet' : 'Nenhuma conquista resgatada ainda';
-        faixaConq.appendChild(vazio);
-      } else {
-        recentes.forEach(c => {
-          const ic = document.createElement('div');
-          ic.className = 'prevconqchip';
-          ic.style.setProperty('--pv-cor', c.cor);
-          ic.title = c.nome; // nome ainda acessivel via tooltip -- so o texto visivel saiu, pedido do usuario
-          faixaConq.appendChild(ic);
-        });
-      }
-    }
+    if (faixaConq){ faixaConq.innerHTML = ''; faixaConq.style.display = 'none'; }
 
     // Bestiario -- reaproveita renderBestiario() (escreve o texto em
     // #bestSub, que ja mora dentro do overlay) em vez de duplicar a conta

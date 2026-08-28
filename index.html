@@ -3026,6 +3026,37 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   const LIMIAR_TOQUE = 18;     // px de tolerancia antes de virar "e so um scroll"
   const ATRASO_LONGPRESS = 220; // ms segurando parado ate armar o arrasto
 
+  // ------------------------------------------------------------------
+  // DEBUG TEMPORARIO DO ARRASTO -- painel fixo no topo mostrando o ciclo
+  // de vida real do gesto (pointerdown/timer/iniciarArrasto/cancel/solta)
+  // com timestamp relativo em ms. Existe so pra diagnosticar por que o
+  // arrasto nao esta engatando num aparelho real especifico -- duas
+  // tentativas anteriores (tap-highlight-color, LIMIAR_TOQUE) nao
+  // resolveram, entao em vez de arriscar um 3o palpite as cegas, este
+  // bloco captura o que REALMENTE acontece no toque real. REMOVER (ou
+  // trocar DEBUG_ARRASTO pra false) depois de diagnosticado -- nao e
+  // feature, e ferramenta de sessao.
+  const DEBUG_ARRASTO = true;
+  let dbgT0 = 0, dbgLinhas = [];
+  let dbgPainel = null;
+  function dbgArrasto(msg){
+    if (!DEBUG_ARRASTO) return;
+    if (!dbgPainel){
+      dbgPainel = document.createElement('div');
+      dbgPainel.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;'
+        + 'background:rgba(0,0,0,.88);color:#0f0;font:10px/1.4 monospace;'
+        + 'padding:6px 8px;max-height:38vh;overflow-y:auto;pointer-events:none;'
+        + 'white-space:pre-wrap;border-bottom:2px solid #0f0';
+      document.body.appendChild(dbgPainel);
+    }
+    if (!dbgT0) dbgT0 = performance.now();
+    const t = Math.round(performance.now() - dbgT0);
+    dbgLinhas.push('+' + t + 'ms  ' + msg);
+    if (dbgLinhas.length > 40) dbgLinhas.shift();
+    dbgPainel.textContent = dbgLinhas.join('\n');
+  }
+  // ------------------------------------------------------------------
+
   let dragEl = null, placeholder = null, offX = 0, offY = 0, pid = null;
   let pendente = null;   // { task, startX, startY, timer }
   let ultimoClientY = 0; // usado pelo loop de autoscroll pra saber onde o dedo esta parado
@@ -3131,6 +3162,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   }
 
   function iniciarArrasto(task, e){
+    dbgArrasto('iniciarArrasto() rodando -- dragEl vai ser setado, position:fixed aplicado');
     pid = e.pointerId;
     const r = task.getBoundingClientRect();
     offX = e.clientX - r.left; offY = e.clientY - r.top;
@@ -3153,6 +3185,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   }
 
   list.addEventListener('pointerdown', e => {
+    dbgArrasto('pointerdown recebido em .task? ' + !!e.target.closest('.task') + ' (pointerType=' + e.pointerType + ')');
     if (e.target.closest('.del') || e.target.closest('.box')) return;
     const task = e.target.closest('.task');
     if (!task) return;
@@ -3160,6 +3193,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     pendente = {
       task, startX, startY, lastY: startY, veloc: 0,
       timer: setTimeout(() => {
+        dbgArrasto('timer de ' + ATRASO_LONGPRESS + 'ms disparou -- chamando iniciarArrasto()');
         if (pendente) iniciarArrasto(task, e);
         pendente = null;
       }, ATRASO_LONGPRESS)
@@ -3181,6 +3215,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     if (pendente.timer && (Math.abs(dx) > LIMIAR_TOQUE || Math.abs(dy) > LIMIAR_TOQUE)){
       // virou scroll, nao arrasto: cancela o long-press mas mantem a pendencia
       // rolando a lista manualmente (touch-action:none tira isso do navegador)
+      dbgArrasto('CANCELADO por movimento -- dx=' + Math.round(dx) + ' dy=' + Math.round(dy) + ' (limiar=' + LIMIAR_TOQUE + 'px)');
       clearTimeout(pendente.timer);
       pendente.timer = null;
     }
@@ -3204,6 +3239,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   }
 
   function soltar(e){
+    dbgArrasto('soltar() chamado (tipo=' + e.type + ') -- dragEl existia? ' + !!dragEl);
     if (pendente && !pendente.timer) soltarComoScroll();
     limparPendente();
     if (!dragEl || e.pointerId !== pid) return;
@@ -3220,9 +3256,9 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     setTimeout(() => { dragArmado = false; }, 50);   // deixa o click "fantasma" do soltar morrer antes de reliberar
   }
   list.addEventListener('pointerup', soltar);
-  list.addEventListener('pointercancel', soltar);
+  list.addEventListener('pointercancel', e => { dbgArrasto('!!! pointercancel recebido !!!'); soltar(e); });
   list.addEventListener('pointerup', limparPendente);
-  list.addEventListener('pointerleave', limparPendente);
+  list.addEventListener('pointerleave', e => { dbgArrasto('pointerleave no #list (pendente ainda existia? ' + !!pendente + ')'); limparPendente(); });
 })();
 </script>
 

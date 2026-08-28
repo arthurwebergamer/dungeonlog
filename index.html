@@ -5904,16 +5904,26 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     });
   }
 
-  /* ---------- badge de notificacao: contava quantos marcos estavam
-     'pendente' (feito mas ainda nao resgatado) no sistema antigo de
-     categorias. No sistema V2 (v4.69) isso nao existe mais -- desbloqueia
-     sozinho no instante que a condicao bate, sem estado intermediario
-     "feito, aguardando resgate". Corpo trocado por um retorno fixo em vez
-     de apagar a funcao inteira (badgeSubTab/atualizarBadges mais abaixo
-     continuam chamando ela sem saber da mudanca -- 0 fixo so faz o badge
-     nunca aparecer, comportamento correto pro sistema novo). ---------- */
+  /* ---------- badge de notificacao: originalmente contava quantos marcos
+     estavam 'pendente' (feito mas ainda nao resgatado) no sistema V1 de
+     categorias/XP. O V1 parou de ser chamado pela tela real desde a v4.69
+     (ver abrirConquistas() -- so o V2 roda hoje), entao esse conceito de
+     "pendente de resgate" nao existe mais -- V2 desbloqueia sozinho, sem
+     etapa de resgate. Corpo trocado (pedido do usuario, sessao de
+     brainstorm): agora conta quantas das conquistas curadas do V2 AINDA
+     NAO foram desbloqueadas ("faltam", mesmo dado que renderConquistasV2()
+     ja calcula pra secao "Não desbloqueadas" da tela). Depende de
+     CONQUISTAS_V2/obterDesbloqueiosV2 (definidas mais abaixo no mesmo
+     bloco/IIFE) -- por isso os typeof guards, e por isso a PRIMEIRA
+     chamada de atualizarBadges() foi movida pra depois daquele bloco (ver
+     nota "primeira pintura do badge" perto de CONQUISTAS_V2). Chamadas
+     seguintes (hook em salvar(), hook em checarDesbloqueiosV2()) sempre
+     acontecem depois do script inteiro ja ter rodado uma vez, entao nao
+     tem esse risco. ---------- */
   function contarPendentes(){
-    return 0;
+    if (typeof CONQUISTAS_V2 === 'undefined' || typeof obterDesbloqueiosV2 !== 'function') return 0;
+    const desbloqueios = obterDesbloqueiosV2();
+    return CONQUISTAS_V2.filter(item => !desbloqueios[item.id]).length;
   }
 
   function criarBadge(botao){
@@ -5938,7 +5948,9 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       else el.style.display = 'none';
     });
   }
-  atualizarBadges();
+  // "atualizarBadges();" da primeira pintura NAO fica mais aqui -- ver
+  // chamada equivalente logo apos o bloco CONQUISTAS_V2 mais abaixo,
+  // motivo explicado no comentario de contarPendentes() acima.
 
   // recalcula badges em qualquer ponto que muda o jogo o bastante pra
   // afetar conquistas (salvar() e chamado ~15x pelo app inteiro, cobre
@@ -6058,6 +6070,12 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       }
     });
     if (mudou) persistirDesbloqueiosV2(desbloqueios);
+    // Atualiza o balaozinho de notificacao (Perfil na nav + "Ver todas" na
+    // previa) no instante em que uma conquista e desbloqueada -- nao
+    // precisa esperar o proximo salvar(). atualizarBadges() e definida
+    // mais acima no mesmo bloco/IIFE (function declaration, hoisted),
+    // seguro chamar daqui mesmo sendo textualmente anterior.
+    if (typeof atualizarBadges === 'function') atualizarBadges();
   }
 
   function renderConquistasV2(){
@@ -6106,7 +6124,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       checarDesbloqueiosV2();
     };
   }
-  checarDesbloqueiosV2(); // primeira checagem, sem esperar o primeiro render()
+  checarDesbloqueiosV2(); // primeira checagem, sem esperar o primeiro render() -- ja chama atualizarBadges() no proprio fim (ver linha acima), entao a primeira pintura do badge acontece aqui, com CONQUISTAS_V2 ja definida (evita o erro de TDZ que aconteceria se atualizarBadges() rodasse antes deste ponto -- ver comentario em contarPendentes())
 
   // resumo compacto pra previa no Perfil unificado -- reescrito pra ler
   // do sistema V2 (desbloqueios automaticos) em vez do resgatadosSet()

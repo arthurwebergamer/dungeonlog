@@ -7726,8 +7726,12 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     </div>
   `;
 
+  // htmlSplash NAO e mais inserida no DOM (ver bloco mais abaixo, onde
+  // antes tinha o fecharSplash()) -- pedido do usuario: so a splash
+  // nativa do Android deve aparecer, a splash propria do app foi
+  // removida. Variavel mantida (nao apagada, convencao do projeto) caso
+  // precise reverter no futuro, so parou de ser usada.
   card.insertAdjacentHTML('afterbegin', htmlContainer);
-  card.insertAdjacentHTML('afterbegin', htmlSplash);
 
   const palco = document.getElementById('carrosselPalco');
   const containerCarrossel = document.getElementById('passoCarrosselTudo');
@@ -7907,35 +7911,17 @@ window.mostrarNivelUp = function(nivel, aoFechar){
                                     // botao "Agora nao" (bloco de login)
                                     // e entrarNoApp() (bloco Firebase)
 
-  // splash: some sozinho apos ~1.1s OU no primeiro toque, o que vier
-  // primeiro -- decisao de engenharia (nao pedida explicitamente): dar
-  // uma saida manual evita deixar a pessoa presa numa tela sem botao
-  // se a animacao nao rodar por algum motivo.
-  //
-  // v4.118 (item 42-j do roadmap): "Criar conta"/"Sair" (Config, bloco
-  // CONTA — SAIR/CRIAR CONTA no fim do arquivo) recarregam a pagina
-  // pedindo login direto (window.__questlogForcarLogin, setado perto do
-  // topo do arquivo ao consumir a flag questlog.forcarLogin.v1 do
-  // localStorage). Antes do login virar um desvio dentro do carrossel
-  // (v4.116), isso bastava pra reabrir a tela de login porque ela era a
-  // PRIMEIRA coisa mostrada -- agora, sem esse checkzinho, a pessoa
-  // caia de volta no INICIO do carrossel de marketing (DUNGEONLOG) em vez
-  // de cair direto no login. Pula a espera de 1.1s tambem: nao faz
-  // sentido segurar quem clicou "Criar conta"/"Sair" numa splash.
-  let splashFoi = false;
-  function fecharSplash(){
-    if (splashFoi) return;
-    splashFoi = true;
-    if (typeof window.feedbackClique === 'function') window.feedbackClique('clique', 10);
-    document.getElementById('passoSplash').classList.remove('on');
-    if (window.__questlogForcarLogin){
-      irParaLogin();
-    } else {
-      irPara(1);
-    }
+  // Splash propria removida (pedido do usuario) -- so a nativa do
+  // Android aparece agora, e essa some sozinha assim que o navegador
+  // termina de carregar a pagina (comportamento do proprio sistema, nao
+  // controlado daqui). Entao decide IMEDIATAMENTE pra onde ir, sem
+  // esperar nenhum tempo nem clique -- antes esperava 1.1s ou o toque
+  // na splash propria; nenhum dos dois existe mais.
+  if (window.__questlogForcarLogin){
+    irParaLogin();
+  } else {
+    irPara(1);
   }
-  document.getElementById('passoSplash').addEventListener('click', fecharSplash);
-  setTimeout(fecharSplash, window.__questlogForcarLogin ? 0 : 1100);
 
   SLIDES.forEach(s => {
     const btn = document.getElementById('carrosselBtn' + s.dataSlide);

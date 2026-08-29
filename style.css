@@ -3278,6 +3278,11 @@
   align-items:center;
   gap:6px;
   flex-wrap:wrap;
+  font-size:15.5px !important; /* era 13.5px -- pedido do usuario, mais legivel */
+}
+.conqv2desc{
+  font-size:13px !important; /* era 11.5px */
+  color:var(--muted) !important; /* era --dim, contraste mais baixo -- muted le melhor sem perder a hierarquia visual (ainda mais apagado que o titulo) */
 }
 .conqv2novo{
   display:inline-flex;
@@ -3349,4 +3354,77 @@
    visual do navegador que competia com o efeito proprio do app. */
 .task{
   -webkit-tap-highlight-color:transparent;
+}
+
+/* ---------------------------------------------------------------------
+   Sistema de titulos (pedido do usuario) -- cada conquista desbloqueada
+   pode ser equipada como titulo, mostrado embaixo do nome no cabecalho
+   do Perfil (#perfilTitulo). Bloco novo no fim do arquivo, mesmo motivo
+   de sempre (modulos 1-20 duplicados). */
+
+/* .perfilnome ja tem margin-bottom:10px (modulos duplicados, nao mexido)
+   -- puxa o titulo pra logo abaixo do nome com margin-top negativo, e
+   da o respiro antes do resto do cabecalho (xpwrap) com margin-bottom
+   proprio, em vez de depender do gap que sobrava pro nome sozinho. */
+.perfilTitulo{
+  display:none; /* JS liga via style.display quando ha titulo equipado */
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic;
+  font-weight:600;
+  font-size:13px;
+  color:var(--tit-cor, var(--dim));
+  margin-top:-6px;
+  margin-bottom:8px;
+}
+
+/* estrela de equipar, dentro de cada linha da lista de Conquistas --
+   contorno neutro quando nao equipada, preenchida na cor da categoria
+   quando e o titulo atual (fill/stroke controlados no JS via renderConquistasV2). */
+.conqv2estrela{
+  flex:none;
+  width:28px;
+  height:28px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:transparent;
+  border:none;
+  padding:0;
+  cursor:pointer;
+  color:var(--dim);
+  -webkit-tap-highlight-color:transparent;
+}
+.conqv2estrela svg{
+  width:18px;
+  height:18px;
+}
+.conqv2estrela.on{
+  color:var(--tit-cor, var(--accent));
+}
+.conqv2estrela:active{
+  transform:scale(.88);
+}
+
+/* ---------------------------------------------------------------------
+   Logo do app (portal de pedra) usado em toda tela que mostra o nome
+   "DUNGEONLOG" -- splash, login, verificacao de email (fluxo normal e
+   o overlay de bloqueio silencioso), no lugar do sprite pixel art do
+   Grimorio Proibido que tinha antes. Mesma imagem do icone/manifest, so
+   com fundo tornado transparente. .logoApp e <img>, nao <div
+   class="pxi">, entao precisa de tamanho proprio (nao usa mais
+   background-position do spritesheet) e image-rendering normal (nao
+   pixelated -- e ilustracao lisa, nao pixel art). Bloco novo no fim do
+   arquivo, mesmo motivo de sempre (modulos 1-20 duplicados). Tamanho
+   aumentado a pedido do usuario (era 72px/120px, ficou pequeno). */
+.logoApp{
+  width:104px;
+  height:104px;
+  object-fit:contain;
+  image-rendering:auto;
+  flex:none;
+  animation:none; /* estatico, pedido do usuario -- sobrescreve o "respira" que .loginSprite carrega (sprite pixel art antigo balancava, o logo novo fica parado) */
+}
+#passoSplash .logoApp{
+  width:170px;
+  height:170px;
 }

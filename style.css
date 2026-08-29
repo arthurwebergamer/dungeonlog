@@ -3401,23 +3401,25 @@
 }
 
 /* ---------------------------------------------------------------------
-   Logo do app (portal de pedra) usado em splash e login, no lugar do
-   sprite pixel art do Grimorio Proibido que tinha antes -- pedido do
-   usuario, testando a versao vetorial primeiro (mesma imagem do icone/
-   manifest, so com fundo tornado transparente). .logoApp e <img>, nao
-   <div class="pxi">, entao precisa de tamanho proprio (nao usa mais
+   Logo do app (portal de pedra) usado em toda tela que mostra o nome
+   "DUNGEONLOG" -- splash, login, verificacao de email (fluxo normal e
+   o overlay de bloqueio silencioso), no lugar do sprite pixel art do
+   Grimorio Proibido que tinha antes. Mesma imagem do icone/manifest, so
+   com fundo tornado transparente. .logoApp e <img>, nao <div
+   class="pxi">, entao precisa de tamanho proprio (nao usa mais
    background-position do spritesheet) e image-rendering normal (nao
    pixelated -- e ilustracao lisa, nao pixel art). Bloco novo no fim do
-   arquivo, mesmo motivo de sempre (modulos 1-20 duplicados). */
+   arquivo, mesmo motivo de sempre (modulos 1-20 duplicados). Tamanho
+   aumentado a pedido do usuario (era 72px/120px, ficou pequeno). */
 .logoApp{
-  width:72px;
-  height:72px;
+  width:104px;
+  height:104px;
   object-fit:contain;
   image-rendering:auto;
   flex:none;
   animation:none; /* estatico, pedido do usuario -- sobrescreve o "respira" que .loginSprite carrega (sprite pixel art antigo balancava, o logo novo fica parado) */
 }
 #passoSplash .logoApp{
-  width:120px;
-  height:120px;
+  width:170px;
+  height:170px;
 }

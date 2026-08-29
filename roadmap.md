@@ -8211,3 +8211,59 @@ As 2 imagens `<img>` embutidas (splash e login) decodificadas de volta e compara
 **Não testado em aparelho real** — a ressalva de estilo (vetorial liso ao lado de pixel art no resto do onboarding) só vai ficar clara de verdade num teste visual real, ainda pendente.
  
 
+## 78. Logo do app dentro do onboarding — continuação: halo na splash nativa, expansão pra todas as telas, e reversão final
+
+### Contexto
+Continuação direta do item 77. Usuário mandou vídeo comparando a abertura do próprio app com a do Habitica.
+
+### 78.1 — "2 logos" e halo escuro atrás do logo
+Vídeo mostrou o logo aparecendo **duas vezes** ao abrir o app, e a primeira aparição tinha um círculo escuro visível atrás dele (deveria ser transparente).
+
+**Diagnóstico:** não eram dois logos do app — eram duas camadas diferentes. A primeira é a **splash nativa do Android**, gerada automaticamente pelo sistema a partir do `manifest` (ícone + `background_color`) **antes** da página carregar — isso é padrão de qualquer PWA, não é controlado pelo código, e o ícone ali precisa mesmo ter fundo sólido. A segunda é a splash própria do app (`#passoSplash`, já com fundo transparente, funcionando certo).
+
+O halo era um problema real, mas de outra causa: `background_color` do manifest (`#0E1116`) estava numa cor levemente diferente do fundo real do ícone (`#191919`) — o Android pinta a tela toda com uma cor e desenha o ícone com outra por cima, e essa diferença sutil aparecia como uma borda visível. **Fix:** igualou as duas cores pra `#191919` (`background_color` e `theme_color` do manifest).
+
+### 78.2 — Splash própria removida
+A pedido do usuário, `#passoSplash` parou de ser inserida no DOM — só a splash nativa do Android aparece agora. O app decide na hora (sem esperar timeout nem clique) pra onde ir depois que a página carrega: `irParaLogin()` se veio de "Criar conta"/"Sair", ou `irPara(1)` (início do carrossel) caso contrário. HTML da splash antiga ficou no arquivo, comentado como não usado (convenção do projeto).
+
+### 78.3 — Reconsideração de estilo, e decisão de manter o vetorial
+Usuário perguntou se não seria melhor tirar o logo de dentro do app e deixar só fora (no ícone). Resposta: sim, fazia sentido — voltar pro sprite pixel art do Grimório Proibido resolveria a tensão de estilo (vetorial liso ao lado de pixel art no resto do onboarding) levantada no item 77. Comecei a reverter, mas o usuário decidiu **testar a versão vetorial mesmo assim primeiro** antes de decidir de vez.
+
+### 78.4 — Expansão pra todas as telas com "DUNGEONLOG" + aumento de tamanho
+Usuário pediu pra colocar o logo em **toda tela que tem o texto "DUNGEONLOG" e precisa do logo**, e aumentar o tamanho.
+
+Mapeadas 4 telas com esse texto:
+- `#passoSplash` — já tinha logo (aumentado 120px → 170px)
+- `#passoLogin` — já tinha logo (aumentado 72px → 104px)
+- `#passoVerificarEmail` (fluxo normal de verificação) — não tinha nenhuma imagem, só texto. Logo adicionado.
+- `#bloqueioVerificacaoEmail` (overlay standalone de bloqueio silencioso) — mesma coisa, logo adicionado.
+
+Não tocado: 1º slide do carrossel ("DUNGEONLOG/BATALHA/EVOLUA") — já tinha conteúdo próprio ali (trio de 3 sprites de monstro, decisão de sessão anterior), não uma tela "sem logo".
+
+### 78.5 — Decisão final: reversão completa, só texto
+Depois de ver tudo aplicado, usuário decidiu que não tem problema nenhum deixar só o texto "DUNGEONLOG", sem logo nenhum, em nenhuma das 4 telas. **Revertido por completo** — as 4 ocorrências do `<img class="logoApp">` removidas, sobrando só `<span class="titulo">DUNGEONLOG</span>` em cada tela, exatamente como era antes de qualquer imagem entrar (pré-item 77). CSS da classe `.logoApp` ficou no arquivo sem uso (não apagado, convenção do projeto).
+
+### Validação (repetida a cada rodada)
+`node --check` nos 44 blocos a cada mudança. Hash MD5 das imagens embutidas comparado com a fonte a cada adição (todas bateram). Balanço de `<div>`/`<svg>`/`<img>` conferido a cada rodada — sempre consistente com o número exato de tags adicionadas/removidas.
+
+### Lição
+Essa foi uma decisão de design que oscilou bastante (adicionar → expandir → reverter) — normal em trabalho de UI/branding, mas vale registrar o estado final claro pra não confundir sessões futuras: **hoje as 4 telas de onboarding/login mostram só texto, nenhuma imagem/logo**. Se reabrir essa discussão, o CSS (`.logoApp`) e o histórico de como extrair/tratar a imagem (fundo transparente, halo, etc.) já estão documentados aqui e no item 77 — não precisa refazer esse trabalho do zero.
+
+---
+
+## 79. Legibilidade dos títulos de conquista + bug da seta "Voltar" depois de "Criar conta"
+
+### 79.1 — Legibilidade das conquistas
+Pedido do usuário, sem problema específico relatado — só melhoria. `.conqv2nome` (nome da conquista) foi de 13.5px pra 15.5px. `.conqv2desc` (descrição) foi de 11.5px pra 13px, e trocou de cor `--dim` (contraste baixo) pra `--muted` (contraste melhor, mas ainda mais apagada que o título — mantém a hierarquia visual entre nome e descrição).
+
+### 79.2 — Bug: seta "Voltar" no login levava pro início do carrossel de marketing
+**Relato do usuário:** clicar em "Criar conta" abre a tela de login corretamente, mas a seta de voltar joga de volta pras telas do carrossel (DUNGEONLOG/BATALHA/EVOLUA), o que não deveria acontecer.
+
+**Causa raiz:** "Criar conta"/"Sair" (Config) recarregam a página com uma flag (`questlog.forcarLogin.v1`) que faz o app pular direto pra `irParaLogin()`, **antes de qualquer slide do carrossel ter sido mostrado nessa carga de página**. A função `irParaLogin()` só atualiza `ultimoSlideAntesLogin` (a variável que diz pra onde a seta deve voltar) quando existe um slide `.on` de verdade — nesse caminho não existe nenhum, então a variável ficava presa no valor padrão (`1`), e a seta levava pro slide 1 mesmo sem o usuário nunca ter passado por lá nessa sessão.
+
+**Fix:** `irParaLogin()` passou a aceitar um parâmetro (`semVoltar`). Quando `true`, a seta de voltar fica escondida (`classList.toggle('visivel', !semVoltar)`) em vez de aparecer apontando pra um lugar que não faz sentido. Só a chamada da entrada forçada (`irParaLogin(true)`) usa esse parâmetro — o clique normal em "Já tem conta?" (que abre o login vindo de um slide real do carrossel) continua mostrando a seta normalmente.
+
+**Bug secundário evitado na mesma correção:** o link "Já tem conta?" usava `onclick = irParaLogin` (a função direto, sem wrapper). Nesse formato, o clique passaria o objeto `Event` do navegador como primeiro argumento — que é *truthy*, ativando o "sem voltar" por engano também nesse caso legítimo (onde a seta deveria continuar aparecendo). Corrigido pra `onclick = () => irParaLogin()`, sem repassar o evento.
+
+### Validação
+`node --check` nos 44 blocos. CSS parseado sem erro. Testados os 3 cenários da lógica de `semVoltar` isoladamente em Node (entrada forçada, clique normal via wrapper, e o bug do `Event` sendo passado sem wrapper) — os 3 bateram com o comportamento esperado antes de aplicar a correção final.

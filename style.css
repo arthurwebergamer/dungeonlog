@@ -3350,3 +3350,73 @@
 .task{
   -webkit-tap-highlight-color:transparent;
 }
+
+/* ---------------------------------------------------------------------
+   Sistema de titulos (pedido do usuario) -- cada conquista desbloqueada
+   pode ser equipada como titulo, mostrado embaixo do nome no cabecalho
+   do Perfil (#perfilTitulo). Bloco novo no fim do arquivo, mesmo motivo
+   de sempre (modulos 1-20 duplicados). */
+
+/* .perfilnome ja tem margin-bottom:10px (modulos duplicados, nao mexido)
+   -- puxa o titulo pra logo abaixo do nome com margin-top negativo, e
+   da o respiro antes do resto do cabecalho (xpwrap) com margin-bottom
+   proprio, em vez de depender do gap que sobrava pro nome sozinho. */
+.perfilTitulo{
+  display:none; /* JS liga via style.display quando ha titulo equipado */
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic;
+  font-weight:600;
+  font-size:13px;
+  color:var(--tit-cor, var(--dim));
+  margin-top:-6px;
+  margin-bottom:8px;
+}
+
+/* estrela de equipar, dentro de cada linha da lista de Conquistas --
+   contorno neutro quando nao equipada, preenchida na cor da categoria
+   quando e o titulo atual (fill/stroke controlados no JS via renderConquistasV2). */
+.conqv2estrela{
+  flex:none;
+  width:28px;
+  height:28px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:transparent;
+  border:none;
+  padding:0;
+  cursor:pointer;
+  color:var(--dim);
+  -webkit-tap-highlight-color:transparent;
+}
+.conqv2estrela svg{
+  width:18px;
+  height:18px;
+}
+.conqv2estrela.on{
+  color:var(--tit-cor, var(--accent));
+}
+.conqv2estrela:active{
+  transform:scale(.88);
+}
+
+/* ---------------------------------------------------------------------
+   Logo do app (portal de pedra) usado em splash e login, no lugar do
+   sprite pixel art do Grimorio Proibido que tinha antes -- pedido do
+   usuario, testando a versao vetorial primeiro (mesma imagem do icone/
+   manifest, so com fundo tornado transparente). .logoApp e <img>, nao
+   <div class="pxi">, entao precisa de tamanho proprio (nao usa mais
+   background-position do spritesheet) e image-rendering normal (nao
+   pixelated -- e ilustracao lisa, nao pixel art). Bloco novo no fim do
+   arquivo, mesmo motivo de sempre (modulos 1-20 duplicados). */
+.logoApp{
+  width:72px;
+  height:72px;
+  object-fit:contain;
+  image-rendering:auto;
+  flex:none;
+}
+#passoSplash .logoApp{
+  width:120px;
+  height:120px;
+}

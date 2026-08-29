@@ -7877,7 +7877,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // pra onde voltar (seta Voltar ou o proprio botao "Agora nao" dentro
   // do login). Dots ficam todos apagados enquanto o login esta aberto
   // -- sinaliza visualmente que virou um desvio, nao um passo normal.
-  function irParaLogin(){
+  function irParaLogin(semVoltar){
     if (emTransicao) return;
     const atualEl = palco.querySelector('.carrosselSlide.on');
     if (atualEl && atualEl !== passoLogin){
@@ -7886,7 +7886,14 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     }
     containerCarrossel.classList.add('on');
     document.querySelectorAll('#carrosselDots .carrosselDot').forEach(d => d.classList.remove('on'));
-    document.getElementById('carrosselVoltar').classList.add('visivel');
+    // "Criar conta"/"Sair" (Config) recarregam a pagina e forcam essa
+    // funcao a rodar ANTES de qualquer slide ter sido mostrado -- nesse
+    // caso nao existe nenhum slide de marketing de origem pra voltar (a
+    // variavel ultimoSlideAntesLogin fica presa no valor padrao, 1), e
+    // clicar em "Voltar" jogava a pessoa pro inicio do carrossel de
+    // marketing sem sentido nenhum (bug relatado pelo usuario). Com
+    // semVoltar=true a seta fica escondida por completo.
+    document.getElementById('carrosselVoltar').classList.toggle('visivel', !semVoltar);
     document.getElementById('carrosselEntrarLink').classList.add('oculto');
     if (!atualEl || atualEl === passoLogin){
       passoLogin.classList.add('on');
@@ -7897,7 +7904,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   function voltarDoLoginCarrossel(){
     irPara(ultimoSlideAntesLogin);
   }
-  document.getElementById('carrosselEntrarLink').onclick = irParaLogin;
+  document.getElementById('carrosselEntrarLink').onclick = () => irParaLogin(); // sem argumento de proposito -- se fosse so "= irParaLogin", o clique passaria o Event como 1º parametro (semVoltar), escondendo a seta Voltar por engano aqui (esse caso E legitimo, tem slide de origem de verdade)
   window.voltarDoLoginCarrossel = voltarDoLoginCarrossel; // exposto pro
                                     // botao "Agora nao" (bloco de login)
                                     // e entrarNoApp() (bloco Firebase)
@@ -7909,7 +7916,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // esperar nenhum tempo nem clique -- antes esperava 1.1s ou o toque
   // na splash propria; nenhum dos dois existe mais.
   if (window.__questlogForcarLogin){
-    irParaLogin();
+    irParaLogin(true); // sem seta de voltar -- entrada forcada (Criar conta/Sair), nao existe slide de marketing anterior de verdade nessa recarga da pagina
   } else {
     irPara(1);
   }

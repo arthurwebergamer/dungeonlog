@@ -3278,6 +3278,11 @@
   align-items:center;
   gap:6px;
   flex-wrap:wrap;
+  font-size:15.5px !important; /* era 13.5px -- pedido do usuario, mais legivel */
+}
+.conqv2desc{
+  font-size:13px !important; /* era 11.5px */
+  color:var(--muted) !important; /* era --dim, contraste mais baixo -- muted le melhor sem perder a hierarquia visual (ainda mais apagado que o titulo) */
 }
 .conqv2novo{
   display:inline-flex;

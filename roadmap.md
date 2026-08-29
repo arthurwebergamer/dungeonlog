@@ -8066,3 +8066,148 @@ não foi testado fora do ambiente local. Recomendado publicar os três
 arquivos juntos no Netlify e confirmar que o app abre normal antes de
 considerar essa divisão finalizada.
 
+## 71. Validação proativa de criar tarefa (desabilitar botão em vez de toast)
+ 
+### Origem do pedido
+Usuário queria que a criação de tarefa avisasse de forma mais clara quando algo impedia a ação — sem depender de `aviso()`, que está mudo desde que `TOASTS_DESATIVADOS = true` (item 41). Decisão explícita do usuário: solução mais simples possível.
+ 
+### O que foi feito
+- `#save` ("Criar tarefa") e `#addbtn` ("+ Adicionar") passam a vir **desabilitados proativamente**, cobrindo os 3 casos: monstro já caiu no dia (`monstroJaCaiu()`), título vazio, e "repete" sem nenhum dia da semana marcado.
+- Nova função `atualizarEstadoSave()`, ligada em: digitar no input, trocar hoje/repete, marcar/desmarcar dia, abrir a composer, e a cada `render()` (cobre a virada automática do dia).
+- `criar()` manteve os guards antigos como defesa em profundidade, mas na prática o botão já vem desabilitado antes de qualquer um deles disparar.
+- CSS de `:disabled` pros dois botões adicionado como bloco novo no fim de `style.css` (módulos 1-20 duplicados, bloco novo sempre vence a cascata).
+### Validação
+`node --check` nos 44 blocos, `<div>`/`<svg>` balanceados antes/depois.
+ 
+---
+ 
+## 72. Remoção do card "Histórico" duplicado dentro de Config
+ 
+### Origem do pedido
+Menu de Configurações tinha um card "Histórico" que abria o mesmo overlay que já existe na prévia da tela de Perfil (`#verHistoricoBtn` → `window.abrirHistorico()`).
+ 
+### O que foi feito
+Removido o card `#cfgHistorico` do HTML. A função `abrirHistorico()` continua exposta em `window` e acessível pelo caminho que já existia (prévia em Perfil) — nenhuma lógica duplicada, só um atalho a menos.
+ 
+---
+ 
+## 73. Sinal unificado nos 3 atributos (Fortuna/Foco/Vigor)
+ 
+### Origem do pedido
+Print mostrando os 3 atributos com sinais diferentes na mesma tela: Fortuna `+0%`, Foco `0%` (sem sinal), Vigor `-0%`. Usuário achou confuso — os 3 são conceitualmente a mesma coisa (quanto já foi investido), o "-" do Vigor era só porque ele reduz dano, mas visualmente parecia que o atributo "piorava".
+ 
+### O que foi feito
+Os 3 passam a sempre mostrar `+N%`. Só trocou o texto formatado (`elFortuna.textContent`, `elFoco.textContent`, `elVigor.textContent`) — o significado de cada atributo continua explicado na descrição que aparece ao expandir o card, isso não mudou.
+ 
+---
+ 
+## 74. Sistema de conquistas: notificação de desbloqueio, badge, tag "NOVO", títulos
+ 
+### Contexto importante: dois sistemas de conquista coexistem no arquivo
+Existe um sistema **V1** (categorias com tiers, XP, botão "Receber" — `renderConquistas()`/`resgatarConquista()`) que **parou de ser chamado pela tela real desde a v4.69** (só o V2 roda hoje, ver `abrirConquistas()`), e o sistema **V2** ativo (`renderConquistasV2()`, 17 conquistas curadas, desbloqueio automático sem etapa de resgate).
+ 
+**Armadilha desta sessão:** a primeira tentativa de dar feedback visual ao desbloquear uma conquista (trocar `aviso()` mudo por um flutuante em `resgatarConquista()`/`resgatarTodasConquistas()`) foi implementada e testada com jsdom, mas **não teve efeito nenhum no app real** — porque editou o sistema V1 morto. Lição: **antes de editar uma função de conquistas, confirmar qual sistema (V1 ou V2) está de fato ligado na tela, via `abrirConquistas()`**.
+ 
+### 74.1 — Badge de notificação (bolinha) no nav Perfil + botão "Ver todas"
+- Infraestrutura (`criarBadge()`, `.conqbadge`) já existia no arquivo mas `contarPendentes()` estava fixo em `return 0` (resto do sistema V1).
+- **1ª versão:** contava quantas das 17 conquistas curadas faltavam desbloquear no total. Usuário testou e achou estranho ("por que aparece 9 num save novo?") — o comportamento certo era mostrar **notificação de novidade** (desbloqueado mas ainda não visto), não um contador de progresso permanente.
+- **2ª versão (final):** novo par de chaves — `questlog.conquistasDesbloqueadasV2.v1` (já existia) e `questlog.conquistasVistasV2.v1` (nova). Badge conta a diferença: desbloqueadas menos vistas. Abrir a tela de Conquistas marca tudo que está desbloqueado como visto (dentro de `renderConquistasV2()`).
+- Testado com jsdom carregando o bloco real do arquivo: save novo sem badge, desbloqueio sem abrir a tela mostra a contagem certa, abrir a tela zera, novo desbloqueio soma de novo sem contar o que já foi visto.
+### 74.2 — Bug: badge sumia depois que a tradução rodava
+`aplicarIdioma()` sobrescreve `innerHTML` de qualquer elemento com `data-i18n` — e o `data-i18n` de `#verConquistasBtn` estava direto no `<button>`, não num `<span>` interno (diferente do ícone "Perfil" da nav, que já usava esse padrão). Toda vez que a tradução rodava, apagava o badge (inserido como filho do botão). **Fix:** moveu o `data-i18n` pro `<span>` interno, igual ao padrão já usado na nav.
+ 
+### 74.3 — Animação do badge + tag "NOVO" na lista
+- Badge trocou de `display:none/flex` (não anima) pra classes `.on`/`.pop` controladas por `opacity`+`transform:scale()` via CSS transition — nasce com bounce, some com fade.
+- Cada item desbloqueado-e-ainda-não-visto ganha uma tag "NOVO" na lista (dentro de `renderConquistasV2()`), pra mostrar visualmente de onde vem a notificação do badge.
+### 74.4 — Ajustes finos de posição/visual (pedidos do usuário)
+- Badge estava colado por dentro do botão, cobrindo o texto → movido pra fora (`top:-6px;right:-6px`, metade fora da borda, padrão comum de notification-dot).
+- Faixa de chips na prévia de Perfil (nomes das conquistas recentes) — 1ª rodada tirou o texto (virou bolinha colorida), 2ª rodada removeu a faixa inteira (usuário não queria nada ali, só o cabeçalho "X de Y desbloqueadas" + botão "Ver todas").
+### 74.5 — Sistema de títulos (implementado, pausado a pedido do usuário)
+Cada conquista desbloqueada pode ser equipada como título, mostrado embaixo do nome no cabeçalho de Perfil (`#perfilTitulo`). Estrela clicável em cada linha da lista de conquistas desbloqueadas (`data-titulo`, toggle equipar/desequipar). Chave nova: `questlog.tituloEquipado.v1`. **Implementado e validado (sintaxe + balanço), mas o usuário pediu pra "deixar pra depois" antes de testar no aparelho — feature está no arquivo mas não foi usada/confirmada ainda.**
+ 
+### Validação (em todas as sub-entregas)
+`node --check` nos 44 blocos, `<div>`/`<svg>` balanceados, testes funcionais reais com jsdom carregando o bloco extraído do próprio arquivo (não reimplementação) sempre que a lógica JS mudou.
+ 
+---
+ 
+## 75. Arrasto de tarefas (reordenar lista): trava, suavização, e "pisca" — sessão de diagnóstico
+ 
+### Contexto
+Usuário relatou que o "vão elástico" no arrasto de tarefa (item 68, implementado numa sessão anterior e nunca confirmado em aparelho real) simplesmente não acontecia no celular, mesmo funcionando perfeitamente no DevTools (emulação de toque por mouse).
+ 
+### Tentativas, nessa ordem
+1. **`-webkit-tap-highlight-color` faltando em `.task`** — suspeita de que o destaque azul nativo do navegador (visível no vídeo do aparelho real, ausente no DevTools) competia com o efeito visual do app. Corrigido. **Não resolveu sozinho.**
+2. **`LIMIAR_TOQUE` (8px → 18px)** — hipótese: 8px de tolerância de movimento durante os 220ms de long-press foi calibrado testando só com mouse (sem tremedeira); um dedo real facilmente ultrapassa isso, cancelando o arrasto antes de começar. **Aparentemente ajudou** (combinado com o item 1) — usuário confirmou depois que o arrasto passou a engatar.
+3. **Painel de debug temporário** (`DEBUG_ARRASTO`, flag booleana) — criado depois de 2 tentativas erradas seguidas, pra parar de adivinhar e ver o ciclo de vida real do gesto (`pointerdown`/timer/`iniciarArrasto`/`soltar`/`pointercancel`/`pointerleave`) direto na tela do aparelho, com timestamp relativo. Religado e desligado 2x ao longo da sessão conforme a necessidade. **Fica no arquivo, desligado (`DEBUG_ARRASTO = false`)** — reativar trocando a constante pra `true` se precisar de novo.
+4. **Suavização do arrasto** (usuário relatou "travadinho" depois do arrasto engatar): trocado `dragEl.style.left/top` (força recálculo de layout a cada pointermove) por `transform:translate3d()` (só composição/GPU). Variáveis novas: `dragBaseLeft`/`dragBaseTop` (âncora fixa) e `dragAtualTop` (usada por `atualizarAlturaElastica()` no lugar de reler `style.top`, que parou de mudar).
+5. **REGRESSÃO real:** tentativa de otimizar mais ainda, agrupando `atualizarAlturaElastica()`/`atualizarPlaceholder()` pra rodar no máximo 1x por frame via `requestAnimationFrame` (em vez de a cada pointermove cru). Isso introduziu uma **race condition**: se o usuário soltasse a tarefa antes do frame agendado rodar, a chamada adiada executava com `placeholder` já nulo (zerado por `soltar()`), e `moverPlaceholderAnimado()` quebrava no meio (`list.insertBefore(null, ...)`), deixando `transform` residual preso em vizinhos e a lista instável/rolando sozinha. **Revertido** — voltou a chamar as 2 funções direto e síncrono, mantendo só a otimização do `transform` (que não tinha esse risco). Testado o cenário exato (soltar imediatamente após mover, sem nenhum frame de folga) com jsdom — 8 asserts, sem exceção, sem placeholder órfão.
+6. **"Pisca" durante o arrasto** — investigado com o painel de debug religado. O log mostrou o ciclo `pointerdown → timer 220ms → iniciarArrasto → soltar → pointerleave` rodando limpo, **sem nenhum `pointercancel`**, com gaps de 176-495ms sem toque na tela entre um ciclo e outro. Conclusão: **não era bug** — eram múltiplos toques rápidos (soltar e pegar de novo em sequência), o que visualmente parece "piscar" mas é comportamento correto (contorno aparece/some a cada ciclo de fato completo). Usuário confirmou.
+### Estado final
+Arrasto funcionando: engata, não trava, não cancela sozinho. `LIMIAR_TOQUE = 18`, movimento via `transform`, `DEBUG_ARRASTO = false` (painel pronto pra religar se precisar).
+ 
+### Lição geral desta sessão de diagnóstico
+Duas tentativas de fix "no escuro" (adivinhando pela leitura de vídeo comprimido) não resolveram. O que resolveu de fato foi instrumentar o código com log visível na tela e pedir um novo vídeo — trocar suposição por dado real. Vale repetir esse padrão em bugs futuros que só reproduzem em aparelho real.
+ 
+---
+ 
+## 76. Rebrand QuestLog → Dungeonlog + troca de ícone do app
+ 
+### 76.1 — Nome
+Motivo: "QuestLog" já é usado por pelo menos 5 apps na Play Store.
+ 
+**Trocado** (cosmético, visível pro usuário, zero risco):
+- `<title>`, `apple-mobile-web-app-title`
+- `name`/`short_name` dentro do manifest do PWA (embutido em base64 — decodificado, editado, recodificado)
+- Telas do carrossel de onboarding (`QUESTLOG` → `DUNGEONLOG`, substituição literal do texto maiúsculo, não tocou nas ~110 ocorrências minúsculas `questlog.` que são chaves de `localStorage`)
+**Não tocado** (decisão consciente, não pendência):
+- Prefixo `questlog.` no `localStorage` (~110 chaves) — trocar quebraria o save de quem já está jogando (o app procuraria chaves novas, não acharia nada, pareceria ter resetado). Fica assim pra sempre, é invisível pro jogador.
+- Projeto Firebase (`questlog-d4c11`, authDomain/projectId/storageBucket) — Firebase não permite renomear projeto; trocar exigiria criar um projeto novo do zero e migrar usuários/Firestore. Só vale a pena se um dia importar ter o nome batendo na URL de login/verificação de email.
+### 76.2 — Ícone do app (a maior novela da sessão)
+Fluxo completo, do primeiro escudo até a versão final:
+ 
+1. **Ícone original** (escudo dourado + check laranja, vetorial, fundo `#0E1116`) trocado nos 3 pontos que existem no arquivo: `apple-touch-icon`, `icon` (favicon), e os 2 tamanhos (192x192, 512x512) dentro do manifest embutido em base64.
+2. **Corte no aparelho real** — ícone adaptável do Android só garante a zona segura central (~66% de diâmetro); a imagem original tinha só ~7% de margem no topo. Recalibrado pra ~62% de escala (margem generosa) → usuário achou **pequeno demais** perto de outros apps (Habitica, Skillion) → recalibrado de novo pra ~80% de escala (meio-termo). Padrão que se repetiu em toda imagem nova recebida depois: **sempre simular em máscara circular (pior caso) e medir margem numericamente antes de aplicar**, e não pecar por excesso de cautela na margem — comparar com apps de verdade, não só a teoria.
+3. **Exploração de conceitos alternativos** (usuário pediu algo mais alinhado com a identidade pixel art do resto do app, já que o escudo vetorial não combinava): espada pixel art (rejeitada — Skillion já usa espada), baú de tesouro e caveira/monstro (pixel art, ambos rejeitados sem motivo específico), poção pixel art (bem recebida) e depois **poção vetorial** (usuário notou que nem Habitica nem Skillion usam pixel art no ícone, só no conteúdo interno do app — decisão de manter o ícone vetorial/liso, reservando pixel art pro miolo do app).
+4. **Pivô final: portal/arco de pedra.** Usuário estava desenhando isso no Figma em paralelo. Trajetória:
+   - Primeira versão (só linha, sem cor): tinha rachaduras decorativas nos pilares e a base dividida em 4 segmentos — testado em simulação de 48px/96px, confirmado que os detalhes finos viravam ruído visual nesse tamanho. Usuário simplificou.
+   - Versão colorida (roxo + gema dourada brilhando): boa qualidade, mas o export do Figma trazia cantos arredondados + fundo branco + uma linha de contorno decorativa **já embutidos na própria imagem** — precisou ser limpo (recortar a forma real, substituir os resíduos de branco/contorno pela cor de fundo real) antes de aplicar.
+   - **Aplicada e funcionando** (ficou como opção A).
+5. **Tentativa de versão em escala de cinza** (render com sombreamento mais refinado): rejeitada nessa forma — tinha marca d'água de outra ferramenta de IA visível, resolução baixa (276×270), e sem cor nenhuma (quebrava a paleta dourado/roxo do resto do app).
+6. **SVG vetorizado (Vectorizer.io) do grid de referência original** — trouxe de volta a discussão de cor vs. escala de cinza. Usuário: (a) gerado por IA gratuita, sem problema de uso; (b) sugeriu recortar só o quadrante sem marca d'água em vez de descartar o arquivo inteiro (funcionou — o quadrante do triângulo não tinha a marca, que só estava no quadrante da chave); (c) observou que o tema padrão do app não é preto-e-branco (Laranja é o padrão, Escuro/Grafite é só uma das 5 opções — corrigido, mas o argumento de fundo sobre monocromático ser uma escolha de design válida se manteve).
+   - Tentativa de recolorir automaticamente (mapear luminosidade pra roxo/dourado) **falhou** — script confundiu fundo com gema por causa de como o cairosvg renderizou a transparência, resultado ficou pior que simplesmente usar em cinza. Não insistido.
+   - Limpeza da versão cinza teve a **mesma classe de problema** da versão colorida (cantos arredondados + branco residual + contorno decorativo embutidos), resolvida com a técnica mais robusta: **análise de componente conectado** (`scipy.ndimage.label`) pra achar o maior "blob" de cor real e apagar tudo fora dele, em vez de ajustar limiar de distância manualmente (que precisou de 3-4 rodadas até funcionar de verdade na primeira tentativa).
+   - **Versão final escolhida pelo usuário: cinza**, escala recalibrada pra ~85% (maior possível sem vazar do círculo).
+### Lições técnicas gerais desta sessão de ícone
+- **Nunca aplicar uma imagem de referência (Figma, gerador de IA, vetorizador) direto** — checar sempre: (1) cantos arredondados/fundo branco já embutidos na própria imagem (comum em exports de ferramentas de design), (2) ruído de cor sutil em áreas que parecem sólidas (comum em imagem gerada por IA — a cor "de fundo" varia pixel a pixel mesmo parecendo uma cor só), (3) resolução mínima (idealmente 512px+, nunca menor que o maior tamanho de saída necessário).
+- **Técnica que funciona de verdade pra limpar fundo:** achar o maior componente conectado de pixels distantes da cor de fundo (`scipy.ndimage.label`), não tentar ajustar threshold de distância manualmente.
+- **Validar sempre nos 2 piores casos antes de considerar pronto:** máscara circular (mais agressiva que qualquer launcher real usa) e ampliação do PNG final real (192px, sem suavizar) — várias vezes um problema só apareceu numericamente ou visualmente numa dessas duas checagens, não bastava olhar a imagem grande original.
+- **Calibração de margem de segurança:** não travar só na teoria (66% de zona segura) — comparar com apps de verdade lado a lado. Ícone com margem grande demais parece "capenga"/pequeno; o ideal ficou por volta de 80-85% de preenchimento, testado numericamente pra garantir zero vazamento mesmo no círculo puro.
+### Validação (repetida a cada nova versão de ícone)
+Decodificar os 3 pontos do arquivo de volta (favicon, apple-touch-icon, manifest 192px/512px) e comparar hash MD5 byte a byte com a imagem gerada. `node --check` nos 44 blocos. Teste de vazamento circular numérico (contagem de pixels fora do raio). Nas últimas rodadas, também amplificação do PNG real (192px) sem suavizar, pra pegar ruído que só aparece nesse tamanho específico.
+ 
+---
+ 
+## 77. Logo do app dentro do onboarding (splash + login), no lugar do Grimório
+ 
+### Origem do pedido
+Depois de fechar o ícone (item 76), usuário perguntou se não valeria usar o mesmo logo **dentro** do app — especificamente trocando o sprite pixel art do "Grimório Proibido" (sprite 108, usado até então na tela de splash e na tela de login) pelo logo novo.
+ 
+### Ressalva levantada antes de implementar
+O motivo de o ícone do app ter ficado vetorial/liso (em vez de pixel art) foi justamente pra combinar com ícones de outros apps na tela inicial do celular — mas splash e login são **dentro** do app, onde o resto do onboarding é 100% pixel art (sprites de herói/monstro nos outros slides do carrossel). Usar a versão lisa ali cria a tensão inversa: destoa do resto do app em vez de combinar com o sistema operacional. Sugestão alternativa (fazer uma versão pixel art dedicada) foi oferecida; **usuário optou por testar a versão vetorial mesmo assim primeiro.**
+ 
+### O que foi feito
+- Extraído o PNG 512×512 que já está de fato aplicado como ícone (direto do manifest embutido no próprio arquivo, não regerado do zero — garante 100% de consistência com o ícone real).
+- Fundo tornado transparente (a versão do ícone tem fundo sólido preenchendo o quadrado inteiro, necessário pra ícone adaptável — mas errado pra um elemento flutuando sobre a parede de tijolo do onboarding).
+- **Login** (`#passoLogin`): sprite pixel art antigo (`<div class="pxi loginSprite">`, `estiloSprite(SPRITE_LOGIN, 72)`) trocado por `<img class="loginSprite logoApp">` com o logo em base64, no mesmo lugar (acima do título "DUNGEONLOG" que já existia).
+- **Splash** (`#passoSplash`, primeira tela que abre): antes só mostrava o sprite sozinho, **sem texto nenhum**. Agora mostra o logo + o texto "DUNGEONLOG" embaixo (adicionado — não existia antes), envolvidos num `<div class="marca">` pra reaproveitar o layout em coluna centralizada que o resto do app já usa.
+- Nova classe `.logoApp` (CSS, bloco novo no fim de `style.css`): dimensiona a `<img>` (72px no login, 120px na splash via `#passoSplash .logoApp`), com `image-rendering:auto` (não `pixelated` — é ilustração lisa, não pixel art) e `object-fit:contain`.
+- **Ajuste seguinte (mesmo pedido, turno seguinte):** a classe `.loginSprite` reaproveitada carregava a animação `respira` (balanço vertical, `translateY`) que fazia sentido pro sprite pixel art antigo mas não pro logo novo. Usuário pediu pra ficar estático — `animation:none` adicionado direto na regra `.logoApp` (que already vem depois de `.loginSprite` na cascata, então sobrescreve sem precisar de `!important`).
+### Não tocado (fora do que foi pedido)
+O 1º slide do carrossel de onboarding ("DUNGEONLOG/BATALHA/EVOLUA") não foi tocado — ele usa uma composição de 3 sprites de monstro (`tipo:'trioLogo'`, não o Grimório), e o usuário não pediu mudança ali.
+ 
+### Validação
+As 2 imagens `<img>` embutidas (splash e login) decodificadas de volta e comparadas por hash MD5 com o arquivo gerado — batem exatas. `node --check` nos 44 blocos. Balanço de tags consistente com a troca esperada (`<div>` caiu 1, exatamente o esperado pela troca de `<div class="pxi">` por `<img>` no login). CSS parseado sem erro.
+ 
+**Não testado em aparelho real** — a ressalva de estilo (vetorial liso ao lado de pixel art no resto do onboarding) só vai ficar clara de verdade num teste visual real, ainda pendente.
+ 
+

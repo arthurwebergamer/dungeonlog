@@ -1,6 +1,6 @@
-# Questlog
+# Dungeonlog
 
-O **Questlog** é um aplicativo de produtividade gamificado que transforma a gestão de tarefas diárias em uma aventura de RPG em pixel art.
+O **Dungeonlog** é um aplicativo de produtividade gamificado que transforma a gestão de tarefas diárias em uma aventura de RPG em pixel art.
 
 ## Como funciona?
 - **Gamificação de Rotina:** Complete tarefas diárias para derrotar chefes e evoluir seu herói.

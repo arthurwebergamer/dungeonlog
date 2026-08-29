@@ -3415,6 +3415,7 @@
   object-fit:contain;
   image-rendering:auto;
   flex:none;
+  animation:none; /* estatico, pedido do usuario -- sobrescreve o "respira" que .loginSprite carrega (sprite pixel art antigo balancava, o logo novo fica parado) */
 }
 #passoSplash .logoApp{
   width:120px;

@@ -8358,3 +8358,36 @@ Em `render()`: antes de chamar `celebrarVitoria()`, checa o registro persistido.
 
 ### Validação
 `node --check` nos 42 blocos `<script>` inline. Balanceamento de `<div>`/`<svg>` conferido (desbalanceamento pré-existente em `<script>` confirmado via `git stash` — não relacionado a este fix). Teste funcional em Node simulando os 5 cenários: vitória real → reentrada mesma sessão → segunda reentrada → virada de dia → nova vitória no dia novo. Todos passaram.
+
+## 85. Toggle de debug pelo ícone de moedas
+
+### O que foi pedido
+Um jeito de ligar/desligar tudo que é debug de uma vez, sem precisar mexer em código: 1 clique no ícone/contador de moedas (aba Tarefas) inverte o estado, salvo em `localStorage['questlog.modoDebug.v1']` (boolean, default `false`). Zero feedback visual no próprio ícone — fica indistinguível do normal de propósito. Persiste entre aberturas do app, sem reset automático.
+
+Fora do escopo por definição: `DEBUG_ARRASTO` e flags booleanas fixas no código (não-visuais) continuam exigindo trocar a constante manualmente — são instrumentação de log, não elemento de UI pra esconder/mostrar.
+
+### Implementação — 3 partes
+
+**1. CSS** (`.debugbar`/`.debug-el`): `.debugbar` (já existia, 3 botões de debug) e a nova classe genérica `.debug-el` (pra qualquer painel de debug futuro nascer já compatível) ficam `display:none` por padrão. `body.modo-debug` reverte os dois.
+
+**2. Toggle de UI**: bloco autônomo no fim do `<body>`, ouvindo clique em `.coins`. Lê/grava a chave, aplica/remove a classe `modo-debug` no `<body>`. Expõe `window.modoDebugAtivo()` pra outros blocos consultarem o estado sem duplicar a leitura do `localStorage`.
+
+**3. Silenciador de console**: pedido à parte, mesma sessão — "o log também é debug e tem que desaparecer também". Decisão do usuário: `console.log`, `.warn` e `.error` ficam **todos** mudos por padrão (não só `.log`), incluindo os ~15 `console.error` de falha real do Firebase espalhados pelo arquivo. Instalado como o **primeiro** `<script>` do `<head>`, antes até do bloco de i18n — garante que nada escapa do gate antes dele existir. Consulta o `localStorage` a cada chamada (não cacheia), então ligar/desligar em runtime já muda o comportamento na hora, sem precisar recarregar a página. Guarda as funções originais em `window.__consoleOriginal` como válvula de escape pro devtools.
+
+### Bug real encontrado depois de "pronto": a pílula do item 81 não obedecia o toggle
+Print do usuário mostrou a pílula "☰ log (2)" (`dbgContaPilula`, painel de debug do item 81 — fluxo de login/troca de conta) ainda visível com o toggle desligado.
+
+**Causa raiz:** essa pílula é criada via `document.createElement` e anexada direto no `document.body`, sem nenhuma classe — não era pega pela regra `.debugbar`/`.debug-el`. Mais grave: o painel expandido dela usa `painel.style.display = 'block'/'none'` **inline** via JS, que sempre vence qualquer regra de CSS externa (inline bate qualquer seletor de stylesheet, com ou sem classe). Se o painel fosse deixado aberto e o usuário desligasse o toggle mestre, ele reapareceria sozinho na próxima linha de log.
+
+**Fix:** `_dbgContaRepintar()` agora consulta `window.modoDebugAtivo()` diretamente em JS logo no início — se desligado, força `display:none` na pílula e no painel (se existir) e sai, independente do estado interno de aberto/fechado. `window.__dbgContaAtualizarVisibilidade` exposto como gancho, chamado pelo `aplicar()` do toggle mestre — a pílula reage **na hora do clique** nas moedas, não só na próxima mensagem de log.
+
+### Validação
+`node --check` nos 44 blocos `<script>` inline a cada rodada. Balanceamento de `<div>`/`<svg>`/`<body>`/comentários conferido (dois falsos positivos identificados e corrigidos: texto literal `<script>`/`<head>` dentro de comentários HTML — reescrito pra não usar esses tokens como texto puro, evita confundir ferramentas de extração no futuro). CSS parseado sem erro (`css` npm lib, 1510 regras).
+
+Testes funcionais em jsdom/Node, código real extraído do arquivo:
+- Toggle de UI: 3 cliques (off → on → off) + simulação de "reabertura do app" com estado persistido — todos bateram.
+- Silenciador de console: `log`/`warn`/`error` mudos por padrão, aparecem com 1 clique, mudos nen de novo com o 2º — em tempo real, sem reload.
+- Pílula do item 81: 6 fases, incluindo o cenário do bug (painel aberto quando o mestre desliga) — pílula e painel somem juntos, mesmo sem fechar o painel manualmente antes.
+
+### Lição
+Nem todo elemento de debug obedece CSS: qualquer coisa que manipule `style.display` **inline** via JS (não só classe) precisa ser verificada caso a caso — a regra `.debug-el` sozinha só cobre quem não tem lógica de visibilidade própria em JS. Vale checar isso de novo se aparecer um painel de debug novo no futuro.

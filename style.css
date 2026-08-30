@@ -3435,13 +3435,35 @@
   height:170px;
 }
 
-/* ===== módulo N — Spec 4/4b: baú clicável na Arena (recompensa do dia) ===== */
-.bauArena{ position:relative; width:40px; height:40px; margin:0 auto 6px; cursor:pointer; display:none; }
+/* ===== módulo N — Spec 4/4b: baú clicável na Arena (recompensa do dia) =====
+   Sprites: pack "Treasure Chests" (Mana Seed / Seliel the Shaper, itch.io,
+   uso comercial liberado). Par escolhido: baú dourado/madeira, tier 1 col 1
+   do spritesheet original (32x32, upscale 4x nearest-neighbor no crop). */
+:root{
+  --bau-fechado: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAADZUlEQVR4nO3dMWhTQRzH8ad0EFwyNlQkHYSmQ8ngEHAtonTspEPpkEFQHNrR2TEdBMGhgzjo1FEE0bGQoUMo0gQcGgpixyyCg1hX75/6zuPevZfk9/1s1768/0v64+7l7tJkGQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAmEZXUhd41G5c/N2+3enkHn+0v++0W42fhV7PwvqToPpW7PWE1n/VGyX9G11NeXJMPwIgjgCIW6j6AlZXm077lxljWys1p11rLwadf9w7d9q/Tb2Tk4Fbz1u/kbR+2egBxBEAcQRAXOn3AHbML5odc33s9Rx/Cjt/6D2Jr/5R1NnC0QOIIwDiCIC4yucBrP7ommmb9+XDYdT51+5G1rdrAcNxofXLRg8gjgCIIwDikt8D9M/dMXXLc3zyufgpr29fr9ToAcQRAHEEQNzUzQP4hM71z1v9otEDiCMA4giAuNLvAeweuND9AbF7An3XM+31i0YPII4AiCMA4iqfB7BjYOr9AAs38sfcquuXjR5AHAEQRwDElX4PMBh8d9rNZt1pp16P/+K5nqrrl40eQBwBEEcAxFU+D2DHwFue42PX431jrp0HyLKx02pFVa9+zLfoAcQRAHEEQFzl9wCWbwwOtfb0pdNuetbfVze7TvvNzm6h15MtxT28aPQA4giAOAIgLvk9QGvRnVs/PPjseYRZj4/8rFxnPWz9fWJ/wnmx15Nl+c/fvl69UWQ5D3oAcQRAHAEQV/r/B9h7+zzqfJPvy8N0u+9zf7+7u+G07Zjss7XX9R+UY+fhs6jHh6IHEEcAxBEAcZV/NtCK3TNo2T14y/X6pcf9y/a9/Pf9ffN/Au3z8z2fqtEDiCMA4giAuOTfG9hurFz4j/p/2+1x0PFflzadtm8Mntij+O0gqN7rXi3oeJ/eaMj3BiIdAiCOAIgr/R4gdG69aNfvbOT+/sdh/lpBanbthHsAJEUAxBEAcaWvBcSulx+/eOy0fWsBdq6+7xnjQ9ca7Pnt5xBC9dkPgDIRAHEEQNzM7Qew7BjsM/G9fx6h52c/AGYKARBHAMQlXwt4cN/9stzTwVmh+wPmzXLzpvM3effhY9J69ADiCIA4AiAu+TzA6eDM/ij5fccsu+T1SooeQBwBEEcAAAAAAAAAAAAA5tgftjoJelp9eW0AAAAASUVORK5CYII=");
+  --bau-aberto:  url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAEG0lEQVR4nO3dvYtUVxjH8UnUsCgkU2lUiCso7KwQRgvZP0AE7ZLOLdTCygSLWFqIAcFGC1ErC2OhjSalKGoREBYR39CZBZc4Luz6AspqUMS32ASS53G9l8uZc+bs/L6f7nHu3HPv9cc5Z87cvVOrAQAAAAAAAACAfvZF7Ab27t5p6iXLF5u6PvDB1A9u3TL183vX7faL3rvavt/7ZtVaW69eZ+qZl/N62n7n6QJTP556Yup9B48V7j/Ul1H3juwRAHEEQNz82A2cP3v5n//Xh07tL9z+z5Mn3b/YMXpw8dtK7T+fuGHqFZt3mLre4/abq+32v4zu8buIOk+jBxBHAMQRAHHR5wBeq9U29fBww9TNwde2Hqqbuj4yWKm9mbFHpr7j2vdit+9XDfz1SI0eQBwBEEcAxCWfA7TbD4Pe78fUbrf/sjPgWzRVM6j1T8f80OsRih5AHAEQRwDEJZ8DeH4MLBuDq5q/4WdTNz6z3X8b2LX6a8ePd/V47v3d2zHfowcQRwDEEQBxyecAv53+o9L2ZybDMnpgg61/P3V99g3/9eOovWfvzOSbrh5PrVZ8/qu++jpw/9XQA4gjAOIIgLjkc4D1QyOmvjo+FrU9v87gx/iy7WPz1+PZX62k7dMDiCMA4giAuJ5/FxCbX3fYtuWHStv3O3oAcQRAHAEQl/0cYOHysEN8NfXO1FXH+G63nxt6AHEEQBwBEJfdHCB0zI29v9D2c5sT0AOIIwDiCIC46M8JHBkcMs8ImnjzInaTc5q/J3CsM84zghAPARBHAMQl/5Dsv4/3a/O9/twem18H8NfjytlLKQ+HHkAdARBHAMRlN+AuW7Os14cQ1cTUZK8PwaAHEEcAxBEAcdnNAabvThe+nvscoez4c0MPII4AiCMA4rKbA3i5j/meP97c5wT0AOIIgDgCIC75HKDRWFr4uv++fLqW9xhapuzvAPz1uBLzYGZBDyCOAIgjAOKyXwfI7W/p+g09gDgCII4AiOv5HODArzsrbf/u4hFT+9/2Te3m+Iyp/W8U5Y4eQBwBEEcAxCWfAwwPl/5yX6HbF23tx+AyJ8bqha9vH6m2Py/0/FKjBxBHAMQRAHHJ5wCtVrvwdf+bPWX3D1RdB2h2Xnd1f34O4s+v6vmkRg8gjgCIIwDikj8nMFTo5/TYytYZquI5gYiKAIgjAOKSrwM0vy3+HF7mZmegS0cSR/D5PUp7fvQA4giAOAIgLvkcYOuhg0Hvv334J1Pndk/g97uOhu1vdE/Q+6uiBxBHAMQRAHFz/n6AqvcExsb9AJhTCIA4AiAu+v0AWzZtNPX99mRX7w/oNysb35n/k9PnLkRtjx5AHAEQRwDERV8HuN/+5Ddyos875rJZrldU9ADiCIA4AgAAAAAAAAAAANDHPgJBMP913QAJ8gAAAABJRU5ErkJggg==");
+}
+.fighter{ position:relative; }
+.bauArena{
+  position:absolute; right:-8px; bottom:-6px;
+  width:64px; height:64px; cursor:pointer; display:none;
+  background-image:var(--bau-fechado);
+  background-size:contain; background-repeat:no-repeat; background-position:center;
+  image-rendering:pixelated;
+  filter:drop-shadow(0 2px 3px rgba(0,0,0,.4));
+  animation:bauPulso 1.4s ease-in-out infinite;
+}
 .bauArena.mostrar{ display:block; }
-.bauArena.trancado::after{ content:"🔒"; position:absolute; right:-4px; bottom:-4px; font-size:14px; }
+.bauArena.trancado::after{ content:"🔒"; position:absolute; right:-6px; bottom:-4px; font-size:18px; }
 .bauArena .dica{
   position:absolute; bottom:100%; left:50%; transform:translateX(-50%);
-  white-space:nowrap; background:#000; color:#fff; padding:2px 6px;
-  border-radius:4px; font-size:11px; opacity:0; pointer-events:none; transition:opacity .15s;
+  white-space:nowrap; background:#000; color:#fff; padding:3px 8px;
+  border-radius:4px; font-size:12px; opacity:0; pointer-events:none; transition:opacity .15s;
 }
 .bauArena .dica.on{ opacity:1; }
+/* indicativo de "toque aqui": pulso sutil de escala + brilho, nao anima o
+   sprite em si (isso fica reservado pro momento de abrir) */
+@keyframes bauPulso{
+  0%, 100%{ transform:scale(1); filter:drop-shadow(0 2px 3px rgba(0,0,0,.4)) brightness(1); }
+  50%{ transform:scale(1.08); filter:drop-shadow(0 2px 5px rgba(0,0,0,.5)) brightness(1.15); }
+}

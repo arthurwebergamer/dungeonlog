@@ -2787,10 +2787,9 @@ function atualizarBauArena(){
   el.classList.toggle('mostrar', mostrar);
   if (!mostrar) return;
   el.classList.toggle('trancado', !!(estado.trancado && !estado.aberto));
+  el.classList.toggle('aberto', !!estado.aberto);
   if (!el.dataset.montado){
-    // placeholder: sprite 118 do catalogo (mesmo do popup). Troca pro
-    // pack "Treasure Chests" quando a cor/tier for escolhida (fechado/aberto)
-    el.innerHTML = spriteHTML(118, 40) + '<div class="dica"></div>';
+    el.innerHTML = '<div class="dica"></div>';
     el.onclick = abrirBauArena;
     el.dataset.montado = '1';
   }
@@ -2819,12 +2818,14 @@ function abrirBauArena(){
     }
     tirarItem(chaveId, 1);
     creditarGanhos(estado.ids);
+  }
+
+  const ganhos = estado.ids.map(id => item(id));
+  if (!estado.aberto){
     estado.aberto = true;
     salvarBauDia(estado);
     atualizarBauArena();
   }
-
-  const ganhos = estado.ids.map(id => item(id));
   if (typeof window.enfileirarPopup === 'function' && typeof mostrarBauLoot === 'function'){
     window.enfileirarPopup(prox => mostrarBauLoot(ganhos, prox));
   }

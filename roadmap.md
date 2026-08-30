@@ -8267,3 +8267,61 @@ Pedido do usuário, sem problema específico relatado — só melhoria. `.conqv2
 
 ### Validação
 `node --check` nos 44 blocos. CSS parseado sem erro. Testados os 3 cenários da lógica de `semVoltar` isoladamente em Node (entrada forçada, clique normal via wrapper, e o bug do `Event` sendo passado sem wrapper) — os 3 bateram com o comportamento esperado antes de aplicar a correção final.
+
+## 80. Namespace por conta no localStorage (item 13f) — implementação e 2 bugs reais encontrados testando
+ 
+### O que foi pedido
+Resolver o item 13f: 12 chaves de `localStorage` (atributos, conquistas, histórico, vida do monstro, itens vistos, loja, tarefas concluídas, título equipado) ainda eram compartilhadas entre contas diferentes no mesmo aparelho — só o save principal já tinha esse cuidado.
+ 
+### Implementação
+- Novo helper `chaveConta(chaveBase)`, generalizando o mesmo mecanismo que já existia pro save principal (`chaveSaveAtual()`), reaproveitando a mesma variável `_uidAtivo`. Movido pro topo do arquivo (logo após `assets.js`) porque uma das chaves (`CHAVE_DIA`) precisa dele antes de qualquer login acontecer nesse mesmo `<script>` contínuo.
+- Todas as 12 chaves passaram a usar `window.chaveConta(CHAVE_X)` em vez da chave crua.
+- Migração automática: dado de "convidado" (pré-login) é copiado pro namespace da conta no primeiro login.
+### Bug 1: migração rodava mais de uma vez, vazando dado de uma conta pra outra
+Testado pelo usuário: Conta B herdou uma tarefa que era da Conta A. Causa: a Conta A tinha sido usada **antes** dessa correção existir — os dados dela ficaram nas chaves "sem dono". A migração tratava isso como "resto de convidado" e distribuía pra **toda** conta nova que logasse, não só a primeira. **Fix:** marcador `questlog.legadoMigrado.v1` — a migração roda no máximo 1 vez no total (não 1 vez por conta), e a chave crua é apagada depois de reivindicada (evita que um boot futuro em modo convidado ache o resto de novo).
+ 
+### Bug 2: `carregar()` não resetava nada quando falhava
+Testado pelo usuário: tarefa da Conta A se juntando com tarefa nova da Conta B. Causa: `carregar()` só escrevia as variáveis de estado (`tarefas`, `xpTotal`, etc.) no caminho de sucesso — quando a chave da conta não existia (conta nova, sem save ainda), retornava `false` sem limpar nada, deixando o que sobrou de uma chamada anterior bem-sucedida (de outra conta, ou do boot em modo convidado) parado na memória. **Fix:** nova função `resetarEstadoParaPadrao()`, chamada em todo caminho de falha do `carregar()`.
+ 
+### Bug 3 (relacionado, mesma sessão de teste): corrida entre salvar local e enviar pra nuvem
+Mudança feita pouco antes de "Sair" podia ter o envio pra nuvem cancelado pelo próprio `location.reload()` no meio do caminho (`empurrarNuvem()` é assíncrono e nunca era esperado). **Fix:** "Sair" agora espera o último envio pendente terminar (`window._questlogUltimoPush`) antes de recarregar, com teto de 3s pra não travar o botão se a rede estiver ruim.
+ 
+### Bug 4 (menor, mesma leva): título equipado "não salvava"
+Na real salvava certo — só a exibição embaixo do nome nunca era atualizada depois do login (só pintava no boot inicial e ao clicar na estrela). **Fix:** `renderTituloPerfil()` adicionada no fluxo de entrada pós-login (`entrarNoApp()`).
+ 
+### Validação
+`node --check` nos 44 blocos a cada rodada. Testes funcionais com jsdom/vm carregando o código real extraído do arquivo (não reimplementação) pra cada bug — incluindo simulação completa do cenário relatado (convidado → Conta A → Conta B → volta pra Conta A) reproduzindo e confirmando cada fix.
+ 
+---
+ 
+## 81. Corrida real na inicialização: interação antes do Firebase confirmar a sessão
+ 
+### Contexto
+Depois dos fixes do item 80, usuário ainda relatou perda de tarefa ao alternar contas, "sem padrão claro". Duas rodadas de simulação local não reproduziram o bug — precisou de diagnóstico com dado real do aparelho (mesmo padrão do item 75, arrasto de tarefas): painel de debug visível (pilula recolhida no canto, expande sob toque — v2, a v1 cobria botões do app e foi corrigida a pedido do usuário) instrumentando `aoLogar()`, `aoLogarSilencioso()`, `puxarNuvem()`, `empurrarNuvem()`, `criar()` e o boot.
+ 
+### Causa raiz (confirmada com log real, não suposição)
+Existe uma janela de **9 a 11 segundos** entre a página carregar (mostrando a tela de tarefas na hora, com o que tinha salvo localmente) e o Firebase confirmar de verdade se existe uma sessão de login válida — `onAuthStateChanged` é sempre assíncrono, e o SDK demora pra carregar de um CDN externo. Se o usuário interagisse (criasse tarefa) **dentro dessa janela**, a ação ia parar na chave "sem dono" (`uidAtivo` ainda `null` naquele instante) — quando o Firebase confirmava a conta segundos depois, o app trocava pra chave real e puxava o que já estava na nuvem, fazendo a tarefa recém-criada "sumir" (não apagada — salva no lugar errado, nunca mais visível dali).
+ 
+Print do log que confirmou: `criar() -- tarefa "a" adicionada | uidAtivo=null | chave=questlog.v1` — a criação aconteceu com `uidAtivo` ainda nulo, mesmo a tela já parecendo "pronta".
+ 
+### Fix
+Se existe indício de sessão anterior (`questlog.uidAtivo.v1` já salvo no aparelho), mostra um overlay leve bloqueando interação ("Carregando…", texto trocado de "Confirmando sua conta…" a pedido do usuário) até `aoLogar()`/`aoLogarSilencioso()` confirmarem de verdade — ou no máximo 8s (rede ruim/offline libera e segue local). Quem nunca logou no aparelho não vê overlay nenhum, zero mudança de comportamento pro convidado genuíno.
+ 
+### Validação
+Lógica testada isolada (aparece com conta conhecida, some ao confirmar, idempotente, não aparece pra convidado real). `node --check` nos 44 blocos.
+ 
+---
+ 
+## 82. Performance: paralelizar os imports do Firebase (3 pontos)
+ 
+### Origem
+Usuário perguntou por que outros apps não precisam de tela de "confirmando conta" — motivo real: a arquitetura "convidado primeiro" do Dungeonlog (interação sem login) cria a janela do item 81, que outros apps evitam exigindo login antes de mostrar qualquer coisa. Investigando o porquê dos 9-11s especificamente, achado: os 3 módulos do Firebase (`app`, `auth`, `firestore`) eram importados **sequencialmente** (`await` um atrás do outro) via CDN externo (gstatic.com), em 3 pontos do código (login principal, "Apagar tudo", "Sair") — a espera total era a **soma** das 3 latências de rede, não a do mais lento.
+ 
+### Fix
+Trocado `await import()` sequencial por `Promise.all()` nos 3 pontos — os 3 pedidos disparam ao mesmo tempo, espera total vira só a do mais lento dos três.
+ 
+### Achado à parte (não mexido, só sinalizado)
+`PRAZO_TOLERANCIA_VERIFICACAO_MS = 30 * 1000` com comentário `v4.125-TESTE: 30s (era 10min) -- SO PRA TESTAR O WATCHDOG, reverter antes de publicar` — valor de teste esquecido no código, watchdog de verificação de email tolerando só 30s em vez de 10min. Não corrigido nesta sessão (fora do escopo do que foi pedido) — **fica pendente pra antes do lançamento**.
+ 
+### Validação
+`node --check` nos 44 blocos. Confirmado que não sobrou nenhum `import()` sequencial fora de `Promise.all` (8 imports totais, agrupados em 3 chamadas). Teste isolado do ganho: sequencial somou as 3 latências simuladas (~1050ms), paralelo ficou só com a do mais lento (~400ms).

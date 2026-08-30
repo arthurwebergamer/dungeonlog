@@ -8328,6 +8328,7 @@ Trocado `await import()` sequencial por `Promise.all()` nos 3 pontos — os 3 pe
 
 ---
 
+
 ## 83. Ajuste do overlay do item 81: visual só aparece em rede lenta de verdade
 
 ### Contexto
@@ -8343,4 +8344,17 @@ Segunda versão: removido todo o conteúdo visual, overlay virou um `div` transp
 Limiar alto, pensado especificamente pra separar "caso comum" de "rede lenta de verdade": `LIMIAR_REDE_LENTA_MS = 2500`. Overlay nasce transparente (trava de clique ativa desde o início, síncrona, sem nenhuma mudança na lógica que resolve a corrida do item 81). Só ganha fundo escurecido + blur + cartão "Carregando…" se passar de 2,5s sem `confirmarSessaoResolvida()` disparar — bem acima do tempo normal de confirmação em rede boa, então não aparece no caso comum, mas cobre o cenário de rede ruim antes do teto de 8s (inalterado) liberar o app pra seguir 100% local. Convidado genuíno (`!uidConhecido`) continua sem ver nada, como sempre.
 
 ### Validação
-`node --check` nos 42 blocos `<script>` inline (contagem já refletindo a divisão em `index.html`/`style.css`/`assets.js`, ver item de infraestrutura). Balanceamento de `<div>`/`<svg>` conferido. `dbgConta` instrumentado com linha própria (`'overlay de sessao ficou visivel -- rede lenta (> 2500ms)'`) pra permitir confirmar em campo, via log real do aparelho, se uma
+`node --check` nos 42 blocos `<script>` inline (contagem já refletindo a divisão em `index.html`/`style.css`/`assets.js`, ver item de infraestrutura). Balanceamento de `<div>`/`<svg>` conferido. `dbgConta` instrumentado com linha própria (`'overlay de sessao ficou visivel -- rede lenta (> 2500ms)'`) pra permitir confirmar em campo, via log real do aparelho, se uma eventual reaparição do overlay é rede lenta genuína ou regressão.
+
+## 84. Bug real: celebração "DIA VENCIDO" disparava de novo em qualquer reentrada na Arena
+
+### Contexto
+`_vitoriaCelebrada` (flag que controla o disparo único de `celebrarVitoria()` — flutuante, faíscas e contagem progressiva de moedas) só vivia em memória. Ela some a cada reload/reentrada na Arena (sair e voltar do app, trocar de aba e voltar), mas `derrotadoEm` continua batendo com `isoAtual()` — então `render()` reconhecia `venceu = true` e disparava a celebração inteira de novo, mesmo o dia já tendo sido vencido antes. `ultimoGanho` (valor de moedas mostrado) também nunca foi persistido em lugar nenhum, então o replay indevido acontecia com `+0` moedas.
+
+### Fix
+Nova chave `questlog.celebracaoDiaMostrada.v1`, mesmo padrão de `questlog.hpMonstro.v1` (namespaced por conta via `window.chaveConta()`). Guarda `{dia, ganho}` — não só a data, porque `ultimoGanho` precisa ser restaurado de algum lugar pro estado estático mostrar o valor certo.
+
+Em `render()`: antes de chamar `celebrarVitoria()`, checa o registro persistido. Se `registro.dia === isoAtual()`, é reentrada — sincroniza `_vitoriaCelebrada = true`, restaura `ultimoGanho` do registro e escreve o texto final direto no DOM, sem animação. Só dispara a celebração completa (com gravação da flag) quando não há registro batendo com hoje — ou seja, na vitória real. Reset é automático na virada do dia: o branch `!venceu` (monstro ainda vivo, `isoAtual()` mudou) já limpa a flag, mesmo ciclo que zera `derrotadoEm`/`hpMonstro`.
+
+### Validação
+`node --check` nos 42 blocos `<script>` inline. Balanceamento de `<div>`/`<svg>` conferido (desbalanceamento pré-existente em `<script>` confirmado via `git stash` — não relacionado a este fix). Teste funcional em Node simulando os 5 cenários: vitória real → reentrada mesma sessão → segunda reentrada → virada de dia → nova vitória no dia novo. Todos passaram.

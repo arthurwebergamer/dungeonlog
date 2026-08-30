@@ -217,6 +217,7 @@
 
     <div class="vitoria" id="vitoria">
       <div class="bauArena" id="bauArena"></div>
+      <div class="bauArena bauEspecial" id="bauArenaEspecial"></div>
       <span class="faixa" data-i18n="jogo.diaVencido">DIA VENCIDO</span>
       <span class="ganho">
         <svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="5" y="2" width="6" height="1" fill="#F2C94C"/><rect x="3" y="3" width="10" height="2" fill="#F2C94C"/><rect x="2" y="5" width="12" height="6" fill="#F2C94C"/><rect x="3" y="11" width="10" height="2" fill="#F2C94C"/><rect x="5" y="13" width="6" height="1" fill="#F2C94C"/><rect x="6" y="5" width="2" height="6" fill="#B8942E"/></svg>
@@ -2764,65 +2765,63 @@ window.alternar = function(i){
   const completou = _alternarOrig(i);
   if (derrotadoEm && derrotadoEm !== antes){
     const nTarefas = tarefas.filter(ehDeHoje).length;
+
+    // bau PADRAO: sempre spawna, abre sem chave, credita o loot na hora
+    // (como sempre foi) -- so o POP-UP fica pendente ate o clique (Spec 4)
+    const idsPadrao = darLoot(nTarefas).map(it => it.id);
+
+    // bau ESPECIAL: chance a parte (Spec 4b), NAO substitui o padrao --
+    // os dois podem coexistir, e o especial pode nem sortear. Nao credita
+    // ate destrancar (risco real de perder no fim do dia)
     const media = mediaDifHoje();
-    const trancado = Math.random() < chanceBauTrancado(media);
-    const tier = trancado ? tierBauNecessario(media) : 0;
+    let especial = null;
+    if (Math.random() < chanceBauTrancado(media)){
+      especial = { ids: sortearGanhos(nTarefas), tier: tierBauNecessario(media), aberto: false };
+    }
 
-    // bau comum: credita o loot na hora, como sempre foi -- so o POP-UP
-    // fica pendente ate o clique (Spec 4). Bau trancado: nem credita
-    // ainda -- so ao destrancar (Spec 4b, risco real de perder no fim do dia)
-    const ids = trancado ? sortearGanhos(nTarefas) : darLoot(nTarefas).map(it => it.id);
-
-    salvarBauDia({ dia: derrotadoEm, ids, trancado, tier, aberto: false });
+    salvarBauDia({ dia: derrotadoEm, padrao: { ids: idsPadrao, aberto: false }, especial });
     if (typeof window.atualizarBauArena === 'function') window.atualizarBauArena();
   }
   return completou;
 };
 
 function atualizarBauArena(){
-  const el = document.getElementById('bauArena');
-  if (!el) return;
   const estado = lerBauDia();
-  const mostrar = !!(estado && estado.dia === isoAtual());
-  el.classList.toggle('mostrar', mostrar);
-  if (!mostrar) return;
-  el.classList.toggle('trancado', !!(estado.trancado && !estado.aberto));
-  el.classList.toggle('aberto', !!estado.aberto);
-  if (!el.dataset.montado){
-    el.innerHTML = '<div class="dica"></div>';
-    el.onclick = abrirBauArena;
-    el.dataset.montado = '1';
+  const valido = !!(estado && estado.dia === isoAtual());
+
+  const elP = document.getElementById('bauArena');
+  if (elP){
+    const mostrarP = valido && !!estado.padrao;
+    elP.classList.toggle('mostrar', mostrarP);
+    if (mostrarP){
+      elP.classList.toggle('aberto', !!estado.padrao.aberto);
+      if (!elP.dataset.montado){ elP.onclick = abrirBauPadrao; elP.dataset.montado = '1'; }
+    }
+  }
+
+  const elE = document.getElementById('bauArenaEspecial');
+  if (elE){
+    const mostrarE = valido && !!estado.especial;
+    elE.classList.toggle('mostrar', mostrarE);
+    if (mostrarE){
+      elE.classList.toggle('trancado', !estado.especial.aberto);
+      elE.classList.toggle('aberto', !!estado.especial.aberto);
+      if (!elE.dataset.montado){
+        elE.innerHTML = '<div class="dica"></div>';
+        elE.onclick = abrirBauEspecial;
+        elE.dataset.montado = '1';
+      }
+    }
   }
 }
 window.atualizarBauArena = atualizarBauArena;
 
-function abrirBauArena(){
+function abrirBauPadrao(){
   const estado = lerBauDia();
-  if (!estado || estado.dia !== isoAtual()) return;
-
-  if (estado.trancado && !estado.aberto){
-    const chaveId = chaveParaDestravar(estado.tier);
-    if (chaveId == null){
-      // NAO usa aviso() de proposito: esse toast e silenciado hoje por
-      // TOASTS_DESATIVADOS. Chip proprio do bau, independente dessa flag.
-      const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
-      const el = document.getElementById('bauArena');
-      const dica = el && el.querySelector('.dica');
-      if (dica){
-        dica.textContent = (en ? 'Requires a ' : 'Requer uma ') + RARIDADES[estado.tier] + (en ? ' key or higher' : ' ou superior');
-        dica.classList.add('on');
-        clearTimeout(dica._t);
-        dica._t = setTimeout(() => dica.classList.remove('on'), 1800);
-      }
-      return;
-    }
-    tirarItem(chaveId, 1);
-    creditarGanhos(estado.ids);
-  }
-
-  const ganhos = estado.ids.map(id => item(id));
-  if (!estado.aberto){
-    estado.aberto = true;
+  if (!estado || estado.dia !== isoAtual() || !estado.padrao) return;
+  const ganhos = estado.padrao.ids.map(id => item(id));
+  if (!estado.padrao.aberto){
+    estado.padrao.aberto = true;
     salvarBauDia(estado);
     atualizarBauArena();
   }
@@ -2830,7 +2829,42 @@ function abrirBauArena(){
     window.enfileirarPopup(prox => mostrarBauLoot(ganhos, prox));
   }
 }
-window.abrirBauArena = abrirBauArena;
+window.abrirBauPadrao = abrirBauPadrao;
+
+function abrirBauEspecial(){
+  const estado = lerBauDia();
+  if (!estado || estado.dia !== isoAtual() || !estado.especial) return;
+  const esp = estado.especial;
+
+  if (!esp.aberto){
+    const chaveId = chaveParaDestravar(esp.tier);
+    if (chaveId == null){
+      // NAO usa aviso() de proposito: esse toast e silenciado hoje por
+      // TOASTS_DESATIVADOS. Chip proprio do bau, independente dessa flag.
+      const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
+      const el = document.getElementById('bauArenaEspecial');
+      const dica = el && el.querySelector('.dica');
+      if (dica){
+        dica.textContent = (en ? 'Requires a ' : 'Requer uma ') + RARIDADES[esp.tier] + (en ? ' key or higher' : ' ou superior');
+        dica.classList.add('on');
+        clearTimeout(dica._t);
+        dica._t = setTimeout(() => dica.classList.remove('on'), 1800);
+      }
+      return;
+    }
+    tirarItem(chaveId, 1);
+    creditarGanhos(esp.ids);
+    esp.aberto = true;
+    salvarBauDia(estado);
+    atualizarBauArena();
+  }
+
+  const ganhos = esp.ids.map(id => item(id));
+  if (typeof window.enfileirarPopup === 'function' && typeof mostrarBauLoot === 'function'){
+    window.enfileirarPopup(prox => mostrarBauLoot(ganhos, prox));
+  }
+}
+window.abrirBauEspecial = abrirBauEspecial;
 
 renderInventario();
 

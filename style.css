@@ -3454,6 +3454,7 @@
   animation:bauPulso 1.4s ease-in-out infinite;
 }
 .bauArena.mostrar{ display:block; }
+.bauArena.bauEspecial{ right:-84px; width:56px; height:56px; }
 .bauArena.trancado::after{ content:"🔒"; position:absolute; right:-6px; bottom:-4px; font-size:18px; }
 .bauArena .dica{
   position:absolute; bottom:100%; left:50%; transform:translateX(-50%);

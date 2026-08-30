@@ -1107,9 +1107,9 @@ function salvar(){
 function carregar(){
   try {
     const bruto = localStorage.getItem(chaveSaveAtual());
-    if (!bruto) return false;
+    if (!bruto){ resetarEstadoParaPadrao(); return false; }
     const d = JSON.parse(bruto);
-    if (!d || !d.comecou) return false;
+    if (!d || !d.comecou){ resetarEstadoParaPadrao(); return false; }
     tarefas = Array.isArray(d.tarefas) ? d.tarefas : [];
     xpTotal = Number(d.xpTotal) || 0;
     moedas = Number(d.moedas) || 0;
@@ -1122,8 +1122,35 @@ function carregar(){
     return true;
   } catch(e){
     console.warn('dado salvo invalido, comecando do zero', e);
+    resetarEstadoParaPadrao();
     return false;
   }
+}
+
+// BUG REAL ENCONTRADO E CORRIGIDO (testado pelo usuario em producao, nao
+// suposicao): carregar() SO escrevia as variaveis de estado (tarefas,
+// xpTotal, moedas, inventario, etc.) no caminho de SUCESSO -- quando a
+// chave da conta nao existia (ex: conta B, recem-criada, ainda sem
+// save proprio), a funcao retornava false sem tocar em nada, deixando
+// o que sobrou de uma chamada anterior BEM-SUCEDIDA (com dado de OUTRA
+// conta, ou do modo convidado) parado na memoria. Cadeia exata que
+// reproduziu o bug: Sair -> reload -> boot roda carregar() automatico
+// (linha ~1935) ANTES de qualquer login, nesse momento _uidAtivo ainda
+// e null -> le a chave CRUA (questlog.v1), que ainda tem a tarefa da
+// Conta A (a migracao so COPIA pra dentro da conta, nunca apaga a
+// origem) -> tarefas fica com esse valor na memoria -> usuario loga na
+// Conta B -> carregar() roda nao acha a chave dela -> retorna false SEM
+// LIMPAR tarefas -> usuario cria uma tarefa nova -> as duas (da A e a
+// nova) ficam juntas no array -> salvar() grava as duas no save da B.
+function resetarEstadoParaPadrao(){
+  tarefas = [];
+  xpTotal = 0;
+  moedas = 0;
+  derrotadoEm = null;
+  nomeHeroi = 'Aventureiro';
+  heroiEscolhido = 0;
+  inventario = [];
+  equipado = {arma:null, armadura:null, elmo:null, escudo:null, acess:null};
 }
 
 function render(){
@@ -8547,11 +8574,19 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         try {
           const progressoConvidado = localStorage.getItem('questlog.v1');
           if (progressoConvidado) localStorage.setItem(window.chaveSaveAtual(), progressoConvidado);
+          localStorage.removeItem('questlog.v1');
         } catch(e){}
 
         // item 13f do roadmap: mesma migracao acima, generalizada pras
         // outras 12 chaves que tambem passaram a ser separadas por conta
-        // nesta sessao.
+        // nesta sessao. IMPORTANTE: apaga a chave crua logo depois de
+        // copiar (nao so copia) -- sem isso, um boot futuro em modo
+        // convidado (ex: a janela entre "Sair" e o proximo login, ver
+        // resetarEstadoParaPadrao()/carregar() mais acima no arquivo)
+        // ainda encontrava a chave crua com o dado ja reivindicado e
+        // recarregava ele na memoria, contaminando a proxima conta que
+        // logasse -- foi exatamente o bug relatado pelo usuario com a
+        // tarefa "estudar" aparecendo na Conta B.
         [
           'questlog.atrib.v1',
           'questlog.conquistasDesbloqueadasV2.v1',
@@ -8569,6 +8604,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           try {
             const valorConvidado = localStorage.getItem(chaveBase);
             if (valorConvidado !== null) localStorage.setItem(window.chaveConta(chaveBase), valorConvidado);
+            localStorage.removeItem(chaveBase);
           } catch(e){}
         });
 

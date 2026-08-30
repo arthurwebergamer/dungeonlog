@@ -9851,6 +9851,45 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 })();
 </script>
 
+<!-- =====================================================================
+     TOGGLE DEBUG — clique unico no icone de moedas  —  bloco autonomo,
+     cole antes de </body>
+
+     Persistencia: localStorage['questlog.modoDebug.v1'] (boolean,
+     default false). Efeito: classe .modo-debug no <body> -- CSS decide o
+     que aparece (.debugbar e qualquer .debug-el futuro; ver style.css,
+     perto da linha 216). Zero feedback visual no icone -- fica
+     indistinguivel do normal de proposito.
+
+     DEBUG_ARRASTO e outras flags booleanas fixas no codigo ficam de fora
+     disso: continuam exigindo trocar a constante manualmente, porque sao
+     instrumentacao de log, nao elemento de UI pra esconder/mostrar.
+     ===================================================================== -->
+<script>
+(function(){
+  const CHAVE = 'questlog.modoDebug.v1';
+  const alvo = document.querySelector('.coins');
+  if (!alvo) return;
+
+  function lerModoDebug(){
+    try { return localStorage.getItem(CHAVE) === 'true'; } catch(e){ return false; }
+  }
+
+  function aplicar(ligado){
+    document.body.classList.toggle('modo-debug', ligado);
+  }
+
+  window.modoDebugAtivo = lerModoDebug; // exposto p/ outros blocos consultarem se precisar
+
+  aplicar(lerModoDebug()); // pintura inicial, persiste entre aberturas
+
+  alvo.addEventListener('click', () => {
+    const novo = !lerModoDebug();
+    try { localStorage.setItem(CHAVE, String(novo)); } catch(e){}
+    aplicar(novo);
+  });
+})();
+</script>
 
 </body>
 </html>

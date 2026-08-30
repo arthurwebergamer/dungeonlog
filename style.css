@@ -214,6 +214,12 @@
     .debugbar{position:fixed;bottom:calc(72px + env(safe-area-inset-bottom));left:8px;display:flex;gap:5px;z-index:50}
   .debugbtn{background:rgba(29,34,43,.9);color:var(--dim);border:1px dashed var(--line);border-radius:6px;padding:4px 8px;font-family:'Outfit',sans-serif;font-size:10px;cursor:pointer}
   .debugbtn:hover{color:var(--text);border-color:var(--dim)}
+  /* item: TOGGLE DEBUG (clique nas moedas) -- default escondido; body.modo-debug revela.
+     Regra generica: qualquer painel de debug futuro so precisa nascer com
+     .debug-el (ou ficar dentro de .debugbar) pra herdar esse mesmo comportamento. */
+  .debugbar,.debug-el{display:none}
+  body.modo-debug .debugbar{display:flex}
+  body.modo-debug .debug-el{display:revert}
   .toast.on{opacity:1;transform:translate(-50%,0)}
 
 /* ===== Bloco style #2 ===== */

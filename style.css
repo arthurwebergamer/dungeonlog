@@ -3445,8 +3445,8 @@
 }
 .fighter{ position:relative; }
 .bauArena{
-  position:absolute; right:-8px; bottom:-6px;
-  width:64px; height:64px; cursor:pointer; display:none;
+  position:absolute; right:-52px; bottom:2px;
+  width:72px; height:72px; cursor:pointer; display:none;
   background-image:var(--bau-fechado);
   background-size:contain; background-repeat:no-repeat; background-position:center;
   image-rendering:pixelated;
@@ -3454,7 +3454,8 @@
   animation:bauPulso 1.4s ease-in-out infinite;
 }
 .bauArena.mostrar{ display:block; }
-.bauArena.bauEspecial{ right:-84px; width:56px; height:56px; }
+.bauArena.aberto{ background-image:var(--bau-aberto); animation:none; }
+.bauArena.bauEspecial{ right:-108px; width:60px; height:60px; }
 .bauArena.trancado::after{ content:"🔒"; position:absolute; right:-6px; bottom:-4px; font-size:18px; }
 .bauArena .dica{
   position:absolute; bottom:100%; left:50%; transform:translateX(-50%);

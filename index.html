@@ -1013,11 +1013,21 @@ function chanceBauTrancado(media){
   const f = _fatorDif(media);
   return ECO.chanceBauTrancadoMin + (ECO.chanceBauTrancadoMax - ECO.chanceBauTrancadoMin) * f;
 }
-// tier 0 (Ferro) a 3 (Cristal/Mestra) -- bate com o indice de raridade
-// dos itens tipo "chave" no catalogo
+// tier 0 (Ferro) a 3 (Cristal/Mestra) -- bate com o indice de raridade dos
+// itens tipo "chave" no catalogo. Sorteio PESADO pra cima de proposito: o
+// bau especial ja e raro de aparecer (ver chanceBauTrancado), entao quando
+// aparece ele deveria pedir uma chave que pareça valiosa na maior parte das
+// vezes -- Comum praticamente nao acontece. Dificuldade do dia da um empurrao
+// extra pros tiers altos, mas a base ja pesa pra raridade alta sozinha.
+// Pesos ajustaveis: [Comum, Incomum, Raro, Epico]
+const PESO_TIER_ESPECIAL = [5, 15, 35, 45];
 function tierBauNecessario(media){
-  if (media == null) return 0;
-  return Math.min(3, Math.floor(_fatorDif(media) * 4));
+  const empurrao = media == null ? 0 : _fatorDif(media);
+  const pesos = PESO_TIER_ESPECIAL.map((p, i) => p + empurrao * i * 8);
+  const total = pesos.reduce((a, b) => a + b, 0);
+  let x = Math.random() * total;
+  for (let i = 0; i < pesos.length; i++){ x -= pesos[i]; if (x <= 0) return i; }
+  return pesos.length - 1;
 }
 
 /* ---------- formulas ---------- */
@@ -2247,6 +2257,9 @@ const SHEET_COLS = 16, SHEET_ROWS = 9;
 const RARIDADES = ['Comum','Incomum','Raro','Épico','Lendário','Único'];
 const RARIDADES_PT = RARIDADES.slice();
 const RARIDADES_EN = ['Common','Uncommon','Rare','Epic','Legendary','Unique'];
+// forma feminina, usada quando o substantivo e "chave" (Comum/Incomum sao
+// invariaveis, so os outros mudam) -- Raro fica Rara, Epico fica Epica, etc.
+const RARIDADES_FEM_PT = ['Comum','Incomum','Rara','Épica','Lendária','Única'];
 const COR_RAR   = ['#8779A8','#63C99A','#5AA9F2','#B57BE8','#F2A65A','#5AE0D8'];
 // mesma cor ja usada nos cards de atributo (--atr-cor, "PERFIL — ATRIBUTOS")
 const COR_ATR  = {fortuna:'#F2A65A', foco:'#5AA9F2', vigor:'#E5698A'};
@@ -2878,7 +2891,9 @@ function abrirBauEspecial(){
     const el = document.getElementById('bauArenaEspecial');
     const dica = el && el.querySelector('.dica');
     if (dica){
-      dica.textContent = (en ? 'Requires a ' : 'Requer uma ') + RARIDADES[esp.tier] + (en ? ' key or higher' : ' ou superior');
+      dica.textContent = en
+        ? 'Requires a ' + RARIDADES[esp.tier] + ' key or higher'
+        : 'Requer uma chave ' + RARIDADES_FEM_PT[esp.tier] + ' ou superior';
       dica.classList.add('on');
       clearTimeout(dica._t);
       dica._t = setTimeout(() => dica.classList.remove('on'), 1800);

@@ -3454,8 +3454,8 @@
 }
 .fighter{ position:relative; }
 .bauArena{
-  position:absolute; right:-40px; bottom:2px;
-  width:68px; height:68px; cursor:pointer; display:none;
+  position:absolute; right:-64px; bottom:2px;
+  width:64px; height:64px; cursor:pointer; display:none;
   background-image:var(--bau-fechado);
   background-size:contain; background-repeat:no-repeat; background-position:center;
   image-rendering:pixelated;
@@ -3464,7 +3464,8 @@
 }
 .bauArena.mostrar{ display:block; }
 .bauArena.aberto{ background-image:var(--bau-aberto); animation:none; cursor:default; pointer-events:none; }
-.bauArena.bauEspecial{ right:-112px; }
+/* especial fica do OUTRO lado do herói (esquerda), nao gruda no padrao */
+.bauArena.bauEspecial{ right:auto; left:-64px; }
 .bauArena.bauEspecial.tier0{ background-image:var(--bau-esp-t0-fechado); }
 .bauArena.bauEspecial.tier0.aberto{ background-image:var(--bau-esp-t0-aberto); }
 .bauArena.bauEspecial.tier1{ background-image:var(--bau-esp-t1-fechado); }
@@ -3474,6 +3475,7 @@
 .bauArena.bauEspecial.tier3{ background-image:var(--bau-esp-t3-fechado); }
 .bauArena.bauEspecial.tier3.aberto{ background-image:var(--bau-esp-t3-aberto); }
 .bauArena.trancado::after{ content:"🔒"; position:absolute; right:-6px; bottom:-4px; font-size:18px; }
+.bauArena.bauEspecial.trancado::after{ right:auto; left:-6px; }
 .bauArena .dica{
   position:absolute; bottom:100%; left:50%; transform:translateX(-50%);
   white-space:nowrap; background:#000; color:#fff; padding:3px 8px;

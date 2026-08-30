@@ -2027,6 +2027,46 @@ if (carregar()){
   document.getElementById('intro').classList.add('off');
 }
 window.dbgConta && window.dbgConta('BOOT: depois do carregar() automatico -- tarefas: ' + tarefas.length + ' [' + tarefas.map(t=>t.texto).join(', ') + ']');
+
+// BUG REAL ENCONTRADO E CORRIGIDO (confirmado com log real do usuario,
+// nao suposicao): existe uma janela de 9-11 SEGUNDOS entre a pagina
+// carregar (mostrando a tela de tarefas na hora, com o que tinha salvo
+// localmente) e o Firebase confirmar de verdade se a sessao de login
+// anterior ainda e valida (onAuthStateChanged e sempre assincrono, e o
+// SDK em si demora pra carregar do CDN). Se o usuario criasse uma
+// tarefa NESSA JANELA, ela ia parar na chave "sem dono" (uidAtivo ainda
+// null nesse instante) -- e quando o Firebase confirmava a conta
+// segundos depois, o app trocava pra chave real da conta e puxava o
+// que ja estava salvo na nuvem, fazendo a tarefa recem-criada "sumir"
+// (nao apagada -- so salva no lugar errado, nunca mais visivel dali).
+// Fix: se existe um UID de sessao anterior conhecido (questlog.uidAtivo.v1
+// no localStorage), bloqueia a interacao com um aviso leve ATE o
+// Firebase confirmar de verdade -- login/aoLogarSilencioso chamam
+// window.confirmarSessaoResolvida() assim que sabem a resposta. Teto de
+// 8s pra nao travar pra sempre se a rede estiver ruim/offline (nesse
+// caso, so libera e segue 100% local, igual sempre foi o comportamento
+// de quem nunca logou).
+(function(){
+  let jaResolvido = false;
+  const uidConhecido = (function(){ try { return localStorage.getItem('questlog.uidAtivo.v1'); } catch(e){ return null; } })();
+  if (!uidConhecido) return; // nunca logou neste aparelho -- guest de verdade, sem corrida nenhuma pra evitar
+
+  const overlay = document.createElement('div');
+  overlay.id = 'aguardandoSessaoOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9990;background:rgba(10,8,20,.55);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(2px)';
+  overlay.innerHTML = '<div style="background:var(--panel,#1a1626);color:var(--text,#F5F0E9);padding:16px 22px;border-radius:14px;font-family:Outfit,sans-serif;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.4)">' +
+    (idiomaApp && idiomaApp() === 'en' ? 'Checking your account…' : 'Confirmando sua conta…') + '</div>';
+  document.body.appendChild(overlay);
+
+  window.confirmarSessaoResolvida = function(){
+    if (jaResolvido) return;
+    jaResolvido = true;
+    const el = document.getElementById('aguardandoSessaoOverlay');
+    if (el) el.remove();
+    window.dbgConta && window.dbgConta('overlay de confirmacao de sessao removido');
+  };
+  setTimeout(window.confirmarSessaoResolvida, 8000); // teto de seguranca -- rede ruim/offline nao trava o app pra sempre
+})();
 // "Sair" (modulo CONTA — SAIR, perto do fim do arquivo) pode pedir pra
 // forcar a tela de login de volta mesmo com save local existente --
 // desfaz o .off que acabou de ser aplicado ali em cima, ANTES do modulo
@@ -2037,6 +2077,7 @@ try {
   if (localStorage.getItem('questlog.forcarLogin.v1')){
     localStorage.removeItem('questlog.forcarLogin.v1');
     document.getElementById('intro').classList.remove('off');
+    if (typeof window.confirmarSessaoResolvida === 'function') window.confirmarSessaoResolvida(); // tela de login vai aparecer por cima -- overlay de espera fica redundante
     // v4.118 (item 42-j do roadmap): guarda num global porque a flag do
     // localStorage já foi consumida/removida aqui em cima, mas quem
     // precisa reagir a ela é a IIFE do carrossel, que só roda BEM mais
@@ -8608,6 +8649,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     }
 
     async function aoLogar(user){
+      if (typeof window.confirmarSessaoResolvida === 'function') window.confirmarSessaoResolvida();
       const contaNova = !!(user.metadata &&
         user.metadata.creationTime === user.metadata.lastSignInTime);
 
@@ -8834,6 +8876,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // leitura) precisa ser reconectado toda vez. Ver secao 37 do roadmap
     // pro raciocinio completo dessa escolha.
     async function aoLogarSilencioso(user){
+      if (typeof window.confirmarSessaoResolvida === 'function') window.confirmarSessaoResolvida();
       window.dbgConta && window.dbgConta('!!! aoLogarSilencioso() rodando (NAO aoLogar) -- uid=' + user.uid.slice(0,6) + ' -- ATENCAO: esse caminho NAO chama carregar() nem puxarNuvem(). tarefas na memoria neste instante: ' + (typeof tarefas !== 'undefined' ? tarefas.length : '?') + ' [' + (typeof tarefas !== 'undefined' ? tarefas.map(t=>t.texto).join(', ') : '') + ']');
       const contaNovaOBastante = !!(user.metadata &&
         new Date(user.metadata.creationTime).getTime() > DATA_CORTE_VERIFICACAO_EMAIL);

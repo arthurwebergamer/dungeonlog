@@ -1074,6 +1074,27 @@ let nomeHeroi = 'Aventureiro';
 let ultimoGanho = 0;
 let _vitoriaCelebrada = false; // pedido do usuario (27/08): tela de vitoria "muito simples" -- controla o disparo unico do efeito de celebracao, ver celebrarVitoria()
 
+// fix (30/08): _vitoriaCelebrada sozinha so vive na memoria da aba -- some a
+// cada reload/reentrada na Arena (sair e voltar do app, trocar de aba), e
+// como venceu continua true (derrotadoEm ainda bate com hoje), o render()
+// disparava celebrarVitoria() nesse re-render sem culpa nenhuma do usuario.
+// Persiste a DATA em que a celebracao ja rodou, mesmo padrao de CHAVE_HP
+// (questlog.hpMonstro.v1): reseta sozinho na virada do dia porque a
+// comparacao e sempre contra isoAtual(), sem precisar limpar nada manualmente.
+// guarda {dia, ganho} em vez de so a data: ultimoGanho tambem so vive em
+// memoria (nunca foi salvo em lugar nenhum), entao sem isso o numero de
+// moedas do estado estatico apos reentrada ficaria "+0" ou vazio.
+const CHAVE_CELEBRACAO_DIA = 'questlog.celebracaoDiaMostrada.v1';
+function _lerCelebracaoDiaMostrada(){
+  try { return JSON.parse(localStorage.getItem(window.chaveConta(CHAVE_CELEBRACAO_DIA))); } catch(e){ return null; }
+}
+function _gravarCelebracaoDiaMostrada(iso, ganho){
+  try { localStorage.setItem(window.chaveConta(CHAVE_CELEBRACAO_DIA), JSON.stringify({dia: iso, ganho: ganho})); } catch(e){}
+}
+function _limparCelebracaoDiaMostrada(){
+  try { localStorage.removeItem(window.chaveConta(CHAVE_CELEBRACAO_DIA)); } catch(e){}
+}
+
 // --- inventario ---
 let inventario = [];   // [{id:indiceNoCatalogo, q:quantidade}]
 let equipado = {arma:null, armadura:null, elmo:null, escudo:null, acess:null};
@@ -1342,10 +1363,23 @@ function render(){
   document.getElementById('mobinfo').classList.toggle('off', venceu || total === 0);
   document.getElementById('vitoria').classList.toggle('on', venceu);
   if (venceu && !_vitoriaCelebrada){
-    _vitoriaCelebrada = true;
-    celebrarVitoria(ultimoGanho);
+    // reentrada com o dia ja vencido (reload, troca de aba, etc.): a flag em
+    // memoria voltou pra false, mas o registro gravado bate com hoje -- so
+    // sincroniza o estado como "ja celebrado" e mostra o resultado final
+    // parado, SEM disparar o efeito (flutuante/faiscas/contagem) de novo.
+    const registro = _lerCelebracaoDiaMostrada();
+    if (registro && registro.dia === isoAtual()){
+      _vitoriaCelebrada = true;
+      ultimoGanho = registro.ganho;
+      document.getElementById('ganhoTxt').textContent = '+' + ultimoGanho;
+    } else {
+      _vitoriaCelebrada = true;
+      _gravarCelebracaoDiaMostrada(isoAtual(), ultimoGanho);
+      celebrarVitoria(ultimoGanho);
+    }
   } else if (!venceu){
     _vitoriaCelebrada = false;
+    _limparCelebracaoDiaMostrada();
     document.getElementById('ganhoTxt').textContent = '+' + ultimoGanho;
   }
 

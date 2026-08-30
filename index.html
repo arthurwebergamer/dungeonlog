@@ -755,6 +755,67 @@ window.definirUidAtivo = function(uid){
   } catch(e){}
 };
 
+// ---------------------------------------------------------------------
+// PAINEL DE DEBUG -- fluxo de login/troca de conta. Religado temporario
+// pra investigar o relato do usuario: tarefa recorrente sumindo ao
+// alternar entre contas mesmo depois do fix de carregar()/migracao e do
+// fix de esperar o envio pendente no Sair. Simulacao local nao
+// reproduziu o bug -- precisa de dado real do aparelho. Mesmo padrao
+// que resolveu o bug do arrasto de tarefas nesta mesma sessao: painel
+// visivel em vez de continuar adivinhando. DESLIGAR (DEBUG_CONTA=false)
+// depois de diagnosticar.
+//
+// v2 (mesma sessao, ajuste pedido pelo usuario): a 1a versao crescia ate
+// 40vh conforme o log enchia e cobria botoes de verdade (mesmo com
+// pointer-events:none no PAINEL, a pilula/indicador continuava visivel
+// por cima). Agora comeca RECOLHIDO -- so uma pilula pequena no canto
+// inferior direito ("LOG N"), fora do caminho de qualquer botao normal
+// do app. Toca nela pra abrir o log completo (aí sim ocupa mais espaco,
+// mas so enquanto o usuario pediu pra ver).
+const DEBUG_CONTA = true;
+let _dbgContaT0 = performance.now();
+let _dbgContaLinhas = [];
+let _dbgContaAberto = false;
+function _dbgContaRepintar(){
+  let pilula = document.getElementById('dbgContaPilula');
+  if (!pilula){
+    pilula = document.createElement('button');
+    pilula.id = 'dbgContaPilula';
+    pilula.type = 'button';
+    pilula.style.cssText = 'position:fixed;bottom:8px;right:8px;z-index:99999;background:#001a00;color:#0f0;font:10px monospace;padding:4px 8px;border:1px solid #0f0;border-radius:999px;line-height:1.4';
+    pilula.onclick = () => { _dbgContaAberto = !_dbgContaAberto; _dbgContaRepintar(); };
+    document.body.appendChild(pilula);
+  }
+  pilula.textContent = (_dbgContaAberto ? '✕ fechar' : '☰ log') + ' (' + _dbgContaLinhas.length + ')';
+
+  let painel = document.getElementById('dbgContaPainel');
+  if (_dbgContaAberto){
+    if (!painel){
+      painel = document.createElement('div');
+      painel.id = 'dbgContaPainel';
+      painel.style.cssText = 'position:fixed;bottom:36px;right:8px;left:8px;z-index:99998;background:#001a00;color:#0f0;font:10px monospace;padding:6px;max-height:45vh;overflow-y:auto;white-space:pre-wrap;border:1px solid #0f0;border-radius:8px';
+      document.body.appendChild(painel);
+    }
+    painel.innerHTML = '';
+    _dbgContaLinhas.forEach(l => {
+      const linha = document.createElement('div');
+      linha.textContent = l;
+      painel.appendChild(linha);
+    });
+    painel.style.display = 'block';
+    painel.scrollTop = painel.scrollHeight;
+  } else if (painel){
+    painel.style.display = 'none';
+  }
+}
+function dbgConta(msg){
+  if (!DEBUG_CONTA) return;
+  const t = Math.round(performance.now() - _dbgContaT0);
+  _dbgContaLinhas.push('+' + t + 'ms  ' + msg);
+  _dbgContaRepintar();
+}
+window.dbgConta = dbgConta;
+
 /* =======================================================================
    ECONOMIA  —  ponto unico de balanceamento
    Mexa so aqui para ajustar drop de moedas, XP e forca dos equipamentos.
@@ -1651,6 +1712,7 @@ function criar(){
 
   if (modo === 'hoje') tarefas.push({ texto, tipo:'hoje', data:isoAtual(), feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined });
   else tarefas.push({ texto, tipo:'repete', dias:[...diasEscolhidos], feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined });
+  window.dbgConta && window.dbgConta('criar() -- tarefa "' + texto + '" adicionada | uidAtivo=' + (typeof _uidAtivo!=='undefined'?_uidAtivo:'?') + ' | chave=' + (typeof chaveSaveAtual==='function'?chaveSaveAtual():'?') + ' | tarefas agora: ' + tarefas.length);
 
   input.value = '';
   input.blur();
@@ -1959,10 +2021,52 @@ document.querySelectorAll('#nav button').forEach(b => {
 });
 
 // ---------- inicio ----------
+window.dbgConta && window.dbgConta('BOOT: antes do carregar() automatico -- uidAtivo=' + _uidAtivo + ' | chave=' + chaveSaveAtual());
 if (carregar()){
   jaComecou = true;
   document.getElementById('intro').classList.add('off');
 }
+window.dbgConta && window.dbgConta('BOOT: depois do carregar() automatico -- tarefas: ' + tarefas.length + ' [' + tarefas.map(t=>t.texto).join(', ') + ']');
+
+// BUG REAL ENCONTRADO E CORRIGIDO (confirmado com log real do usuario,
+// nao suposicao): existe uma janela de 9-11 SEGUNDOS entre a pagina
+// carregar (mostrando a tela de tarefas na hora, com o que tinha salvo
+// localmente) e o Firebase confirmar de verdade se a sessao de login
+// anterior ainda e valida (onAuthStateChanged e sempre assincrono, e o
+// SDK em si demora pra carregar do CDN). Se o usuario criasse uma
+// tarefa NESSA JANELA, ela ia parar na chave "sem dono" (uidAtivo ainda
+// null nesse instante) -- e quando o Firebase confirmava a conta
+// segundos depois, o app trocava pra chave real da conta e puxava o
+// que ja estava salvo na nuvem, fazendo a tarefa recem-criada "sumir"
+// (nao apagada -- so salva no lugar errado, nunca mais visivel dali).
+// Fix: se existe um UID de sessao anterior conhecido (questlog.uidAtivo.v1
+// no localStorage), bloqueia a interacao com um aviso leve ATE o
+// Firebase confirmar de verdade -- login/aoLogarSilencioso chamam
+// window.confirmarSessaoResolvida() assim que sabem a resposta. Teto de
+// 8s pra nao travar pra sempre se a rede estiver ruim/offline (nesse
+// caso, so libera e segue 100% local, igual sempre foi o comportamento
+// de quem nunca logou).
+(function(){
+  let jaResolvido = false;
+  const uidConhecido = (function(){ try { return localStorage.getItem('questlog.uidAtivo.v1'); } catch(e){ return null; } })();
+  if (!uidConhecido) return; // nunca logou neste aparelho -- guest de verdade, sem corrida nenhuma pra evitar
+
+  const overlay = document.createElement('div');
+  overlay.id = 'aguardandoSessaoOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9990;background:rgba(10,8,20,.55);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(2px)';
+  overlay.innerHTML = '<div style="background:var(--panel,#1a1626);color:var(--text,#F5F0E9);padding:16px 22px;border-radius:14px;font-family:Outfit,sans-serif;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.4)">' +
+    (idiomaApp && idiomaApp() === 'en' ? 'Loading…' : 'Carregando…') + '</div>';
+  document.body.appendChild(overlay);
+
+  window.confirmarSessaoResolvida = function(){
+    if (jaResolvido) return;
+    jaResolvido = true;
+    const el = document.getElementById('aguardandoSessaoOverlay');
+    if (el) el.remove();
+    window.dbgConta && window.dbgConta('overlay de confirmacao de sessao removido');
+  };
+  setTimeout(window.confirmarSessaoResolvida, 8000); // teto de seguranca -- rede ruim/offline nao trava o app pra sempre
+})();
 // "Sair" (modulo CONTA — SAIR, perto do fim do arquivo) pode pedir pra
 // forcar a tela de login de volta mesmo com save local existente --
 // desfaz o .off que acabou de ser aplicado ali em cima, ANTES do modulo
@@ -1973,6 +2077,7 @@ try {
   if (localStorage.getItem('questlog.forcarLogin.v1')){
     localStorage.removeItem('questlog.forcarLogin.v1');
     document.getElementById('intro').classList.remove('off');
+    if (typeof window.confirmarSessaoResolvida === 'function') window.confirmarSessaoResolvida(); // tela de login vai aparecer por cima -- overlay de espera fica redundante
     // v4.118 (item 42-j do roadmap): guarda num global porque a flag do
     // localStorage já foi consumida/removida aqui em cima, mas quem
     // precisa reagir a ela é a IIFE do carrossel, que só roda BEM mais
@@ -5226,12 +5331,17 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 
   async function apagarDaNuvemSeLogado(){
     if (!window.firebaseConfig || window.firebaseConfig.apiKey === 'COLE_AQUI_SUA_APIKEY') return;
-    const { initializeApp, getApps, getApp } =
-      await import("https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js");
-    const { getAuth, onAuthStateChanged } =
-      await import("https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js");
-    const { getFirestore, doc, deleteDoc } =
-      await import("https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js");
+    // PERFORMANCE: mesmo motivo do modulo de login -- os 3 sao
+    // independentes, Promise.all() em vez de sequencial corta a espera
+    // pra so a do mais lento dos 3, nao a soma.
+    const [modApp, modAuth, modFirestore] = await Promise.all([
+      import("https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js"),
+      import("https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js"),
+      import("https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js")
+    ]);
+    const { initializeApp, getApps, getApp } = modApp;
+    const { getAuth, onAuthStateChanged } = modAuth;
+    const { getFirestore, doc, deleteDoc } = modFirestore;
 
     const app = getApps().length ? getApp() : initializeApp(window.firebaseConfig);
     const auth = getAuth(app);
@@ -8334,14 +8444,28 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         sendPasswordResetEmail, onAuthStateChanged, sendEmailVerification,
         getFirestore, doc, getDoc, setDoc;
     try {
-      ({ initializeApp } = await import("https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js"));
+      // PERFORMANCE: os 3 modulos do Firebase (app/auth/firestore) sao
+      // INDEPENDENTES entre si -- nao precisam ser importados um depois
+      // do outro. Antes esperava sequencial (soma das 3 latencias de
+      // rede, ~9-11s observados em log real, CDN externo em
+      // gstatic.com); Promise.all() dispara os 3 pedidos ao mesmo
+      // tempo, e a espera total vira só a do mais lento dos 3 (nao a
+      // soma). Fecha (parcialmente) a janela de corrida do item
+      // "overlay de confirmacao de sessao" -- a corrida em si continua
+      // protegida por aquele overlay, isso aqui so encolhe o tempo que
+      // ele fica visivel na pratica.
+      const [modApp, modAuth, modFirestore] = await Promise.all([
+        import("https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js"),
+        import("https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js"),
+        import("https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js")
+      ]);
+      ({ initializeApp } = modApp);
       ({
         getAuth, GoogleAuthProvider, signInWithPopup,
         signInWithEmailAndPassword, createUserWithEmailAndPassword,
         sendPasswordResetEmail, onAuthStateChanged, sendEmailVerification
-      } = await import("https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js"));
-      ({ getFirestore, doc, getDoc, setDoc } =
-        await import("https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js"));
+      } = modAuth);
+      ({ getFirestore, doc, getDoc, setDoc } = modFirestore);
     } catch(e){
       console.error('QuestLog/Firebase: falha ao carregar o SDK (CDN bloqueado ou rede offline)', e);
       // sem #passoLogin, nao ha UI de login visivel pra quebrar -- so
@@ -8364,6 +8488,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     async function puxarNuvem(uid){
       const ref = doc(db, 'saves', uid);
       const snap = await getDoc(ref);
+      window.dbgConta && window.dbgConta('puxarNuvem(' + uid.slice(0,6) + ') -- doc existe na nuvem? ' + snap.exists() + (snap.exists() ? (' | tamanho do data: ' + (snap.data().data||'').length) : ''));
       if (snap.exists() && snap.data().data) {
         try { localStorage.setItem(window.chaveSaveAtual(), snap.data().data); } catch(e){}
       }
@@ -8372,10 +8497,13 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     async function empurrarNuvem(uid){
       try {
         const dados = localStorage.getItem(window.chaveSaveAtual()) || '';
+        window.dbgConta && window.dbgConta('empurrarNuvem(' + uid.slice(0,6) + ') INICIOU -- chave lida: ' + window.chaveSaveAtual() + ' | tamanho: ' + dados.length);
         await setDoc(doc(db, 'saves', uid), { data: dados, atualizadoEm: Date.now() });
-      } catch(e){ /* offline: fica so local, tenta de novo no proximo salvar() */ }
+        window.dbgConta && window.dbgConta('empurrarNuvem(' + uid.slice(0,6) + ') TERMINOU com sucesso');
+      } catch(e){
+        window.dbgConta && window.dbgConta('empurrarNuvem(' + uid.slice(0,6) + ') FALHOU: ' + e.message);
+      }
     }
-
     // v4.125: watchdog leve que confere emailVerified a cada 60s DENTRO
     // da sessao ja aberta -- nao depende de fechar/reabrir o app. So
     // instancia o setInterval se: conta e' pos-DATA_CORTE (grandfather
@@ -8429,7 +8557,20 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       if (typeof origSalvar === 'function' && !origSalvar._questlogSyncGancho) {
         window.salvar = function(){
           const r = origSalvar.apply(this, arguments);
-          empurrarNuvem(user.uid);
+          // BUG REAL ENCONTRADO (relatado pelo usuario, "perco tarefa as
+          // vezes ao trocar de conta", sem padrao fixo -- sinal classico
+          // de corrida de rede): empurrarNuvem() e assincrono e NUNCA
+          // era esperado por quem chamava salvar() (a maioria dos
+          // lugares no app chama salvar() sincrono, sem await). Se o
+          // usuario mudasse algo e logo em seguida clicasse "Sair", o
+          // location.reload() do Sair podia interromper esse envio no
+          // meio do caminho (reload cancela requisicao de rede em voo).
+          // A mudanca ficava salva local, mas NUNCA chegava na nuvem --
+          // na proxima vez que aquela conta logasse, puxarNuvem() trazia
+          // a versao ANTIGA de volta, apagando a mudanca mais recente.
+          // Guarda o Promise aqui pra quem for recarregar a pagina
+          // poder esperar ele terminar antes (ver "CONTA — SAIR").
+          window._questlogUltimoPush = empurrarNuvem(user.uid);
           return r;
         };
         window.salvar._questlogSyncGancho = true;
@@ -8527,8 +8668,11 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     }
 
     async function aoLogar(user){
+      if (typeof window.confirmarSessaoResolvida === 'function') window.confirmarSessaoResolvida();
       const contaNova = !!(user.metadata &&
         user.metadata.creationTime === user.metadata.lastSignInTime);
+
+      window.dbgConta && window.dbgConta('aoLogar() rodando -- uid=' + user.uid.slice(0,6) + ' | contaNova=' + contaNova + ' | tarefas na memoria ANTES de tudo: ' + (typeof tarefas !== 'undefined' ? tarefas.length : '?') + ' [' + (typeof tarefas !== 'undefined' ? tarefas.map(t=>t.texto).join(', ') : '') + ']');
 
       // v4.126 (mudanca de decisao pedida pelo usuario, revertendo a
       // escolha original do item 34): agora bloqueia JA NO CADASTRO,
@@ -8613,13 +8757,16 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
       try {
         await puxarNuvem(user.uid);
+        window.dbgConta && window.dbgConta('puxarNuvem() terminou. Chave lida: ' + window.chaveSaveAtual() + ' | bruto no localStorage agora: ' + (localStorage.getItem(window.chaveSaveAtual()) || '').slice(0,200));
       } catch(e){
         console.error('QuestLog/Firebase: puxar da nuvem falhou, login segue so com dados locais', e);
+        window.dbgConta && window.dbgConta('puxarNuvem() FALHOU: ' + e.message);
       }
 
       const nomeConta = reconectarEnvio(user);
 
       const temSaveLocal = typeof window.carregar === 'function' && window.carregar();
+      window.dbgConta && window.dbgConta('carregar() retornou ' + temSaveLocal + ' | tarefas na memoria DEPOIS: ' + (typeof tarefas !== 'undefined' ? tarefas.length : '?') + ' [' + (typeof tarefas !== 'undefined' ? tarefas.map(t=>t.texto).join(', ') : '') + ']');
 
       // finaliza de verdade: some com a tela de login/boas-vindas e
       // entra no app (se ja tinha save) ou no onboarding (conta nova)
@@ -8631,6 +8778,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           intro.style.backgroundImage = '';
           if (typeof window.desenharHeroi === 'function') window.desenharHeroi();
           if (typeof window.render === 'function') window.render();
+          if (typeof window.renderTituloPerfil === 'function') window.renderTituloPerfil();
         } else {
           // conta nova, sem save -- fecha boas-vindas e pula DIRETO pro
           // slide de transicao ("vamos te conhecer melhor...", ver
@@ -8747,6 +8895,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // leitura) precisa ser reconectado toda vez. Ver secao 37 do roadmap
     // pro raciocinio completo dessa escolha.
     async function aoLogarSilencioso(user){
+      if (typeof window.confirmarSessaoResolvida === 'function') window.confirmarSessaoResolvida();
+      window.dbgConta && window.dbgConta('!!! aoLogarSilencioso() rodando (NAO aoLogar) -- uid=' + user.uid.slice(0,6) + ' -- ATENCAO: esse caminho NAO chama carregar() nem puxarNuvem(). tarefas na memoria neste instante: ' + (typeof tarefas !== 'undefined' ? tarefas.length : '?') + ' [' + (typeof tarefas !== 'undefined' ? tarefas.map(t=>t.texto).join(', ') : '') + ']');
       const contaNovaOBastante = !!(user.metadata &&
         new Date(user.metadata.creationTime).getTime() > DATA_CORTE_VERIFICACAO_EMAIL);
       const precisaVerificar = !user.emailVerified && contaNovaOBastante;
@@ -8772,7 +8922,9 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
     onAuthStateChanged(auth, user => {
         if (!user) return;
-        if (passoLogin && passoLogin.classList.contains('on')) {
+        const passoLoginOn = !!(passoLogin && passoLogin.classList.contains('on'));
+        window.dbgConta && window.dbgConta('onAuthStateChanged disparou -- uid=' + user.uid.slice(0,6) + ' | #passoLogin tem .on? ' + passoLoginOn + ' -> vai chamar ' + (passoLoginOn ? 'aoLogar (normal)' : 'aoLogarSilencioso'));
+        if (passoLoginOn) {
           aoLogar(user).catch(e => console.error('QuestLog/Firebase: aoLogar() falhou', e));
         } else {
           aoLogarSilencioso(user).catch(e => console.error('QuestLog/Firebase: aoLogarSilencioso() falhou', e));
@@ -9041,10 +9193,13 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       if (window.firebaseConfig && window.firebaseConfig.apiKey !== 'COLE_AQUI_SUA_APIKEY'){
         await Promise.race([
           (async () => {
-            const { initializeApp, getApps, getApp } =
-              await import("https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js");
-            const { getAuth, signOut } =
-              await import("https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js");
+            // PERFORMANCE: mesmo motivo -- app/auth independentes entre si
+            const [modApp, modAuth] = await Promise.all([
+              import("https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js"),
+              import("https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js")
+            ]);
+            const { initializeApp, getApps, getApp } = modApp;
+            const { getAuth, signOut } = modAuth;
             const app = getApps().length ? getApp() : initializeApp(window.firebaseConfig);
             await signOut(getAuth(app));
           })(),
@@ -9064,6 +9219,30 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       // "if (carregar())" no script principal, perto do topo do arquivo
       localStorage.setItem('questlog.forcarLogin.v1', '1');
     } catch(e){}
+
+    // espera o ultimo envio pra nuvem em andamento terminar (se houver)
+    // antes de recarregar -- ver comentario em reconectarEnvio() (bloco
+    // do login). Sem isso, um salvar() feito pouco antes de clicar
+    // "Sair" podia ter o envio cancelado pelo reload no meio do
+    // caminho, e a mudanca mais recente nunca chegava na nuvem. Teto de
+    // 3s pra nao travar o botao indefinidamente se a rede estiver ruim
+    // ou offline -- nesse caso, so nao espera, o proximo salvar() bem
+    // sucedido tenta de novo (mesmo espirito do teto de 8s ali em cima).
+    try {
+      if (window._questlogUltimoPush){
+        window.dbgConta && window.dbgConta('Sair: existe push pendente, esperando (teto 3s)...');
+        const _inicioEspera = performance.now();
+        await Promise.race([
+          window._questlogUltimoPush,
+          new Promise(res => setTimeout(res, 3000))
+        ]);
+        window.dbgConta && window.dbgConta('Sair: espera terminou apos ' + Math.round(performance.now()-_inicioEspera) + 'ms');
+      } else {
+        window.dbgConta && window.dbgConta('Sair: NENHUM push pendente encontrado (window._questlogUltimoPush vazio)');
+      }
+    } catch(e){}
+
+    window.dbgConta && window.dbgConta('Sair: chamando location.reload() AGORA');
     location.reload();
   };
 })();

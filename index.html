@@ -2051,16 +2051,34 @@ window.dbgConta && window.dbgConta('BOOT: depois do carregar() automatico -- tar
   const uidConhecido = (function(){ try { return localStorage.getItem('questlog.uidAtivo.v1'); } catch(e){ return null; } })();
   if (!uidConhecido) return; // nunca logou neste aparelho -- guest de verdade, sem corrida nenhuma pra evitar
 
+  // v4.126 (item 81 do roadmap): trava de clique nasce JUNTO e sincrona,
+  // igual sempre foi -- zero mudanca na corrida que isso resolve. O que
+  // muda e so o VISUAL: nasce transparente e so pinta fundo/blur/cartao
+  // se a confirmacao nao voltar em ~180ms. Login rapido (cache quente,
+  // rede boa) trava clique do mesmo jeito mas nunca chega a piscar nada
+  // na tela.
   const overlay = document.createElement('div');
   overlay.id = 'aguardandoSessaoOverlay';
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:9990;background:rgba(10,8,20,.55);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(2px)';
-  overlay.innerHTML = '<div style="background:var(--panel,#1a1626);color:var(--text,#F5F0E9);padding:16px 22px;border-radius:14px;font-family:Outfit,sans-serif;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.4)">' +
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9990;display:flex;align-items:center;justify-content:center;background:transparent';
+  overlay.innerHTML = '<div style="background:var(--panel,#1a1626);color:var(--text,#F5F0E9);padding:16px 22px;border-radius:14px;font-family:Outfit,sans-serif;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.4);opacity:0;transition:opacity .12s">' +
     (idiomaApp && idiomaApp() === 'en' ? 'Loading…' : 'Carregando…') + '</div>';
   document.body.appendChild(overlay);
+
+  // so pinta o fundo escurecido/blur e mostra o cartao se a confirmacao
+  // ainda nao chegou depois de 180ms -- cancelado no clearTimeout abaixo
+  // se confirmarSessaoResolvida() ja rodou antes disso.
+  const timerMostrarOverlay = setTimeout(function(){
+    if (jaResolvido) return;
+    overlay.style.background = 'rgba(10,8,20,.55)';
+    overlay.style.backdropFilter = 'blur(2px)';
+    const card = overlay.firstElementChild;
+    if (card) card.style.opacity = '1';
+  }, 180);
 
   window.confirmarSessaoResolvida = function(){
     if (jaResolvido) return;
     jaResolvido = true;
+    clearTimeout(timerMostrarOverlay);
     const el = document.getElementById('aguardandoSessaoOverlay');
     if (el) el.remove();
     window.dbgConta && window.dbgConta('overlay de confirmacao de sessao removido');

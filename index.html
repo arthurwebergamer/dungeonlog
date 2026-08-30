@@ -2051,19 +2051,38 @@ window.dbgConta && window.dbgConta('BOOT: depois do carregar() automatico -- tar
   const uidConhecido = (function(){ try { return localStorage.getItem('questlog.uidAtivo.v1'); } catch(e){ return null; } })();
   if (!uidConhecido) return; // nunca logou neste aparelho -- guest de verdade, sem corrida nenhuma pra evitar
 
-  // v4.126 (item 81 do roadmap): trava de clique nasce JUNTO e sincrona,
-  // igual sempre foi -- zero mudanca na corrida que isso resolve. Decisao
-  // do usuario: o overlay NUNCA fica visivel, em caso nenhum -- so existe
-  // pra bloquear clique/toque enquanto aoLogar()/aoLogarSilencioso() nao
-  // responde. Sem fundo, sem blur, sem cartao "Carregando...".
+  // v4.127 (item 81 do roadmap): trava de clique nasce JUNTO e sincrona,
+  // igual sempre foi -- zero mudanca na corrida que isso resolve. O
+  // overlay comeca 100% invisivel (so bloqueia clique/toque). So ganha
+  // fundo/blur/cartao "Carregando..." se passar de LIMIAR_REDE_LENTA_MS
+  // sem resolver -- valor alto de proposito (bem acima do tempo normal
+  // de aoLogar()/aoLogarSilencioso() em rede boa) pra so aparecer mesmo
+  // em rede ruim/instavel, nunca no caso comum.
+  const LIMIAR_REDE_LENTA_MS = 2500;
+
   const overlay = document.createElement('div');
   overlay.id = 'aguardandoSessaoOverlay';
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:9990;background:transparent';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9990;display:flex;align-items:center;justify-content:center;background:transparent';
+  overlay.innerHTML = '<div style="background:var(--panel,#1a1626);color:var(--text,#F5F0E9);padding:16px 22px;border-radius:14px;font-family:Outfit,sans-serif;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.4);opacity:0;transition:opacity .25s">' +
+    (idiomaApp && idiomaApp() === 'en' ? 'Loading…' : 'Carregando…') + '</div>';
   document.body.appendChild(overlay);
+
+  // so pinta fundo escurecido/blur e mostra o cartao se ainda nao
+  // resolveu depois do limiar de rede lenta -- cancelado no
+  // confirmarSessaoResolvida() se a confirmacao ja veio antes disso.
+  const timerRedeLenta = setTimeout(function(){
+    if (jaResolvido) return;
+    overlay.style.background = 'rgba(10,8,20,.55)';
+    overlay.style.backdropFilter = 'blur(2px)';
+    const card = overlay.firstElementChild;
+    if (card) card.style.opacity = '1';
+    window.dbgConta && window.dbgConta('overlay de sessao ficou visivel -- rede lenta (> ' + LIMIAR_REDE_LENTA_MS + 'ms)');
+  }, LIMIAR_REDE_LENTA_MS);
 
   window.confirmarSessaoResolvida = function(){
     if (jaResolvido) return;
     jaResolvido = true;
+    clearTimeout(timerRedeLenta);
     const el = document.getElementById('aguardandoSessaoOverlay');
     if (el) el.remove();
     window.dbgConta && window.dbgConta('overlay de confirmacao de sessao removido');

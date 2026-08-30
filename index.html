@@ -2055,7 +2055,7 @@ window.dbgConta && window.dbgConta('BOOT: depois do carregar() automatico -- tar
   overlay.id = 'aguardandoSessaoOverlay';
   overlay.style.cssText = 'position:fixed;inset:0;z-index:9990;background:rgba(10,8,20,.55);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(2px)';
   overlay.innerHTML = '<div style="background:var(--panel,#1a1626);color:var(--text,#F5F0E9);padding:16px 22px;border-radius:14px;font-family:Outfit,sans-serif;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.4)">' +
-    (idiomaApp && idiomaApp() === 'en' ? 'Checking your account…' : 'Confirmando sua conta…') + '</div>';
+    (idiomaApp && idiomaApp() === 'en' ? 'Loading…' : 'Carregando…') + '</div>';
   document.body.appendChild(overlay);
 
   window.confirmarSessaoResolvida = function(){

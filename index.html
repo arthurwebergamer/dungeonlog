@@ -2773,33 +2773,50 @@ function lerBauDia(){
 }
 window.lerBauDia = lerBauDia;
 
+// gera o par padrao/especial do dia -- usado tanto no momento real da
+// vitoria (abaixo) quanto no fallback de atualizarBauArena() pra quando
+// o estado ficou pra tras (reload apos vitoria ja registrada antes desse
+// recurso existir, mudanca de schema, etc.)
+function gerarEstadoBauDia(dia, nTarefas){
+  const idsPadrao = darLoot(nTarefas).map(it => it.id);
+  const media = mediaDifHoje();
+  let especial = null;
+  if (Math.random() < chanceBauTrancado(media)){
+    especial = { ids: sortearGanhos(nTarefas), tier: tierBauNecessario(media), aberto: false };
+  }
+  return { dia, padrao: { ids: idsPadrao, aberto: false }, especial };
+}
+
 const _alternarOrig = alternar;
 window.alternar = function(i){
   const antes = derrotadoEm;
   const completou = _alternarOrig(i);
   if (derrotadoEm && derrotadoEm !== antes){
     const nTarefas = tarefas.filter(ehDeHoje).length;
-
-    // bau PADRAO: sempre spawna, abre sem chave, credita o loot na hora
-    // (como sempre foi) -- so o POP-UP fica pendente ate o clique (Spec 4)
-    const idsPadrao = darLoot(nTarefas).map(it => it.id);
-
-    // bau ESPECIAL: chance a parte (Spec 4b), NAO substitui o padrao --
-    // os dois podem coexistir, e o especial pode nem sortear. Nao credita
-    // ate destrancar (risco real de perder no fim do dia)
-    const media = mediaDifHoje();
-    let especial = null;
-    if (Math.random() < chanceBauTrancado(media)){
-      especial = { ids: sortearGanhos(nTarefas), tier: tierBauNecessario(media), aberto: false };
-    }
-
-    salvarBauDia({ dia: derrotadoEm, padrao: { ids: idsPadrao, aberto: false }, especial });
+    // bau PADRAO credita o loot na hora, como sempre foi -- so o POP-UP
+    // fica pendente ate o clique (Spec 4). Bau ESPECIAL (Spec 4b) e chance
+    // a parte, NAO credita ate destrancar (risco real de perder no fim do dia)
+    salvarBauDia(gerarEstadoBauDia(derrotadoEm, nTarefas));
     if (typeof window.atualizarBauArena === 'function') window.atualizarBauArena();
   }
   return completou;
 };
 
+// garante que o bau existe sempre que o dia estiver vencido, mesmo se a
+// transicao em alternar() nunca rodou nessa sessao (dia vencido antes
+// desse recurso existir, ou qualquer outro jeito do momento exato ter
+// passado batido). Sem isso o bau depende 100% de pegar o instante certo
+// da vitoria -- reload sozinho nunca recria o que nao foi salvo.
+function garantirBauDia(){
+  if (typeof monstroJaCaiu !== 'function' || !monstroJaCaiu()) return;
+  const estado = lerBauDia();
+  if (estado && estado.dia === isoAtual()) return;
+  const nTarefas = tarefas.filter(ehDeHoje).length;
+  salvarBauDia(gerarEstadoBauDia(derrotadoEm, nTarefas));
+}
+
 function atualizarBauArena(){
+  garantirBauDia();
   const estado = lerBauDia();
   const valido = !!(estado && estado.dia === isoAtual());
 

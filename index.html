@@ -2837,6 +2837,9 @@ function atualizarBauArena(){
     if (mostrarE){
       elE.classList.toggle('trancado', !estado.especial.aberto);
       elE.classList.toggle('aberto', !!estado.especial.aberto);
+      // tier 0..3 = visual do sprite (mais raro/vistoso quanto maior o tier,
+      // ver comentario no CSS -- .bauEspecial.tierN)
+      for (let t = 0; t < 4; t++) elE.classList.toggle('tier' + t, estado.especial.tier === t);
       if (!elE.dataset.montado){
         elE.innerHTML = '<div class="dica"></div>';
         elE.onclick = abrirBauEspecial;
@@ -2850,12 +2853,11 @@ window.atualizarBauArena = atualizarBauArena;
 function abrirBauPadrao(){
   const estado = lerBauDia();
   if (!estado || estado.dia !== isoAtual() || !estado.padrao) return;
+  if (estado.padrao.aberto) return;   // ja foi aberto, nao clica mais
   const ganhos = estado.padrao.ids.map(id => item(id));
-  if (!estado.padrao.aberto){
-    estado.padrao.aberto = true;
-    salvarBauDia(estado);
-    atualizarBauArena();
-  }
+  estado.padrao.aberto = true;
+  salvarBauDia(estado);
+  atualizarBauArena();
   if (typeof window.enfileirarPopup === 'function' && typeof mostrarBauLoot === 'function'){
     window.enfileirarPopup(prox => mostrarBauLoot(ganhos, prox));
   }
@@ -2866,29 +2868,28 @@ function abrirBauEspecial(){
   const estado = lerBauDia();
   if (!estado || estado.dia !== isoAtual() || !estado.especial) return;
   const esp = estado.especial;
+  if (esp.aberto) return;   // ja foi aberto, nao clica mais
 
-  if (!esp.aberto){
-    const chaveId = chaveParaDestravar(esp.tier);
-    if (chaveId == null){
-      // NAO usa aviso() de proposito: esse toast e silenciado hoje por
-      // TOASTS_DESATIVADOS. Chip proprio do bau, independente dessa flag.
-      const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
-      const el = document.getElementById('bauArenaEspecial');
-      const dica = el && el.querySelector('.dica');
-      if (dica){
-        dica.textContent = (en ? 'Requires a ' : 'Requer uma ') + RARIDADES[esp.tier] + (en ? ' key or higher' : ' ou superior');
-        dica.classList.add('on');
-        clearTimeout(dica._t);
-        dica._t = setTimeout(() => dica.classList.remove('on'), 1800);
-      }
-      return;
+  const chaveId = chaveParaDestravar(esp.tier);
+  if (chaveId == null){
+    // NAO usa aviso() de proposito: esse toast e silenciado hoje por
+    // TOASTS_DESATIVADOS. Chip proprio do bau, independente dessa flag.
+    const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
+    const el = document.getElementById('bauArenaEspecial');
+    const dica = el && el.querySelector('.dica');
+    if (dica){
+      dica.textContent = (en ? 'Requires a ' : 'Requer uma ') + RARIDADES[esp.tier] + (en ? ' key or higher' : ' ou superior');
+      dica.classList.add('on');
+      clearTimeout(dica._t);
+      dica._t = setTimeout(() => dica.classList.remove('on'), 1800);
     }
-    tirarItem(chaveId, 1);
-    creditarGanhos(esp.ids);
-    esp.aberto = true;
-    salvarBauDia(estado);
-    atualizarBauArena();
+    return;
   }
+  tirarItem(chaveId, 1);
+  creditarGanhos(esp.ids);
+  esp.aberto = true;
+  salvarBauDia(estado);
+  atualizarBauArena();
 
   const ganhos = esp.ids.map(id => item(id));
   if (typeof window.enfileirarPopup === 'function' && typeof mostrarBauLoot === 'function'){

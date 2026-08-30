@@ -216,6 +216,7 @@
     </div>
 
     <div class="vitoria" id="vitoria">
+      <div class="bauArena" id="bauArena"></div>
       <span class="faixa" data-i18n="jogo.diaVencido">DIA VENCIDO</span>
       <span class="ganho">
         <svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="5" y="2" width="6" height="1" fill="#F2C94C"/><rect x="3" y="3" width="10" height="2" fill="#F2C94C"/><rect x="2" y="5" width="12" height="6" fill="#F2C94C"/><rect x="3" y="11" width="10" height="2" fill="#F2C94C"/><rect x="5" y="13" width="6" height="1" fill="#F2C94C"/><rect x="6" y="5" width="2" height="6" fill="#B8942E"/></svg>
@@ -914,6 +915,10 @@ const ECO = {
   lootExtraCada:           5,   // +1 item a cada N tarefas do dia
   lootMax:                 3,
 
+  // --- bau trancado (Spec 4b: chave por dificuldade media do dia) ---
+  chanceBauTrancadoMin: 0.15,   // chance minima (dia so com tarefas trivial/facil)
+  chanceBauTrancadoMax: 0.50,   // chance maxima (dia so com tarefas dificil)
+
   // --- niveis ---
   nivelBase:             100,   // XP para sair do nivel I
   nivelIncremento:        60    // XP a mais exigido por nivel
@@ -985,6 +990,33 @@ function multDif(id){
   const d = DIFS.find(x => x.id === id) || DIFS.find(x => x.id === DIF_PADRAO);
   const v = ECO[d.eco];
   return (typeof v === 'number' && v > 0) ? v : 1;
+}
+
+// pips (1 a 4) -- so pro spawn do bau trancado, nao mexe na formula de
+// XP/moedas (essa usa multDif via ECO.dif*, escala diferente de proposito)
+function pipsDe(id){
+  const d = DIFS.find(x => x.id === id) || DIFS.find(x => x.id === DIF_PADRAO);
+  return d.pips;
+}
+// media de dificuldade das tarefas de hoje (1 a 4). null se nao ha tarefa.
+function mediaDifHoje(){
+  const doDia = tarefas.filter(ehDeHoje);
+  if (!doDia.length) return null;
+  const soma = doDia.reduce((a, t) => a + pipsDe(difDe(t)), 0);
+  return soma / doDia.length;
+}
+// 0..1 normalizado a partir da media (1..4)
+function _fatorDif(media){ return Math.max(0, Math.min(1, (media - 1) / 3)); }
+function chanceBauTrancado(media){
+  if (media == null) return 0;
+  const f = _fatorDif(media);
+  return ECO.chanceBauTrancadoMin + (ECO.chanceBauTrancadoMax - ECO.chanceBauTrancadoMin) * f;
+}
+// tier 0 (Ferro) a 3 (Cristal/Mestra) -- bate com o indice de raridade
+// dos itens tipo "chave" no catalogo
+function tierBauNecessario(media){
+  if (media == null) return 0;
+  return Math.min(3, Math.floor(_fatorDif(media) * 4));
 }
 
 /* ---------- formulas ---------- */
@@ -1416,6 +1448,7 @@ function render(){
   document.querySelector('.arena').classList.toggle('venceu', venceu);
   document.getElementById('mobinfo').classList.toggle('off', venceu || total === 0);
   document.getElementById('vitoria').classList.toggle('on', venceu);
+  if (typeof window.atualizarBauArena === 'function') window.atualizarBauArena();
   if (venceu && !_vitoriaCelebrada){
     // reentrada com o dia ja vencido (reload, troca de aba, etc.): a flag em
     // memoria voltou pra false, mas o registro gravado bate com hoje -- so
@@ -2294,6 +2327,16 @@ function tirarItem(id, q){
   }
 }
 
+const ID_GRIMORIO_INV = ITENS.findIndex(a => a[1] === 'Grimório');
+// devolve o id da chave de MENOR tier suficiente que o jogador tem
+// (rar >= tierMin, tipo "chave", nunca o Grimorio). null se nao tiver.
+function chaveParaDestravar(tierMin){
+  const candidatas = inventario
+    .filter(s => s.q > 0 && ITENS[s.id][2] === 'chave' && s.id !== ID_GRIMORIO_INV && ITENS[s.id][3] >= tierMin)
+    .sort((a, b) => ITENS[a.id][3] - ITENS[b.id][3]);
+  return candidatas.length ? candidatas[0].id : null;
+}
+
 function totalItens(){ return inventario.reduce((a,s)=>a+s.q, 0); }
 
 /* Bonus real de um item.
@@ -2395,6 +2438,25 @@ function darLoot(nTarefas){
   persistir();
   if (abaAtual === 'inventario') renderInventario();
   return ganhos;
+}
+
+// mesma logica de darLoot, mas so ESCOLHE os itens -- nao credita no
+// inventario ainda. Usado pelo bau trancado (Spec 4b): o loot so existe
+// de verdade se o jogador destrancar (risco real de perder no fim do dia)
+function sortearGanhos(nTarefas){
+  const sorte = Math.min(1, nTarefas / 10);
+  const qtd = Math.min(ECO.lootMax, ECO.lootBase + Math.floor(nTarefas / ECO.lootExtraCada));
+  const ids = [];
+  for (let i=0;i<qtd;i++) ids.push(sortearItem(sorte));
+  return ids;
+}
+// credita uma lista de ids no inventario (espelha o final de darLoot) --
+// chamado no momento em que o bau trancado e destrancado
+function creditarGanhos(ids){
+  ids.forEach(id => darItem(id, 1));
+  persistir();
+  if (abaAtual === 'inventario') renderInventario();
+  return ids.map(id => item(id));
 }
 
 /* ---------- render ---------- */
@@ -2687,20 +2749,87 @@ document.querySelectorAll('#nav button').forEach(b => {
 });
 
 // loot ao derrotar o monstro do dia
+const CHAVE_BAU_DIA = 'questlog.bauDia.v1';
+function salvarBauDia(estado){
+  try { localStorage.setItem(window.chaveConta(CHAVE_BAU_DIA), JSON.stringify(estado)); } catch(e){}
+}
+function lerBauDia(){
+  try { return JSON.parse(localStorage.getItem(window.chaveConta(CHAVE_BAU_DIA))); } catch(e){ return null; }
+}
+window.lerBauDia = lerBauDia;
+
 const _alternarOrig = alternar;
 window.alternar = function(i){
   const antes = derrotadoEm;
   const completou = _alternarOrig(i);
   if (derrotadoEm && derrotadoEm !== antes){
-    const ganhos = darLoot(tarefas.filter(ehDeHoje).length);
-    setTimeout(() => {
-      if (typeof window.enfileirarPopup === 'function' && typeof mostrarBauLoot === 'function'){
-        window.enfileirarPopup(prox => mostrarBauLoot(ganhos, prox));
-      }
-    }, 1200);
+    const nTarefas = tarefas.filter(ehDeHoje).length;
+    const media = mediaDifHoje();
+    const trancado = Math.random() < chanceBauTrancado(media);
+    const tier = trancado ? tierBauNecessario(media) : 0;
+
+    // bau comum: credita o loot na hora, como sempre foi -- so o POP-UP
+    // fica pendente ate o clique (Spec 4). Bau trancado: nem credita
+    // ainda -- so ao destrancar (Spec 4b, risco real de perder no fim do dia)
+    const ids = trancado ? sortearGanhos(nTarefas) : darLoot(nTarefas).map(it => it.id);
+
+    salvarBauDia({ dia: derrotadoEm, ids, trancado, tier, aberto: false });
+    if (typeof window.atualizarBauArena === 'function') window.atualizarBauArena();
   }
   return completou;
 };
+
+function atualizarBauArena(){
+  const el = document.getElementById('bauArena');
+  if (!el) return;
+  const estado = lerBauDia();
+  const mostrar = !!(estado && estado.dia === isoAtual());
+  el.classList.toggle('mostrar', mostrar);
+  if (!mostrar) return;
+  el.classList.toggle('trancado', !!(estado.trancado && !estado.aberto));
+  if (!el.dataset.montado){
+    // placeholder: sprite 118 do catalogo (mesmo do popup). Troca pro
+    // pack "Treasure Chests" quando a cor/tier for escolhida (fechado/aberto)
+    el.innerHTML = spriteHTML(118, 40) + '<div class="dica"></div>';
+    el.onclick = abrirBauArena;
+    el.dataset.montado = '1';
+  }
+}
+window.atualizarBauArena = atualizarBauArena;
+
+function abrirBauArena(){
+  const estado = lerBauDia();
+  if (!estado || estado.dia !== isoAtual()) return;
+
+  if (estado.trancado && !estado.aberto){
+    const chaveId = chaveParaDestravar(estado.tier);
+    if (chaveId == null){
+      // NAO usa aviso() de proposito: esse toast e silenciado hoje por
+      // TOASTS_DESATIVADOS. Chip proprio do bau, independente dessa flag.
+      const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
+      const el = document.getElementById('bauArena');
+      const dica = el && el.querySelector('.dica');
+      if (dica){
+        dica.textContent = (en ? 'Requires a ' : 'Requer uma ') + RARIDADES[estado.tier] + (en ? ' key or higher' : ' ou superior');
+        dica.classList.add('on');
+        clearTimeout(dica._t);
+        dica._t = setTimeout(() => dica.classList.remove('on'), 1800);
+      }
+      return;
+    }
+    tirarItem(chaveId, 1);
+    creditarGanhos(estado.ids);
+    estado.aberto = true;
+    salvarBauDia(estado);
+    atualizarBauArena();
+  }
+
+  const ganhos = estado.ids.map(id => item(id));
+  if (typeof window.enfileirarPopup === 'function' && typeof mostrarBauLoot === 'function'){
+    window.enfileirarPopup(prox => mostrarBauLoot(ganhos, prox));
+  }
+}
+window.abrirBauArena = abrirBauArena;
 
 renderInventario();
 
@@ -2727,8 +2856,13 @@ renderInventario();
 
 /* ---------- regras ---------- */
 // tesouro fica de fora: ele existe para ser vendido, nao comprado
-const LOJA_TIPOS = ['arma','armadura','elmo','escudo','acess','cons'];
+const LOJA_TIPOS = ['arma','armadura','elmo','escudo','acess','cons','chave'];
 const PESO_LOJA  = [38, 30, 19, 9, 0];   // chance por raridade na prateleira — Lendario (indice 4) so em bau, nunca comprado
+// item-chave especial (Grimorio) nunca pode ser sorteado pra loja -- ele
+// e recompensa de nivel, nao mercadoria (ver ID_GRIMORIO em outro bloco,
+// nao reaproveitado aqui de proposito pra nao criar dependencia de ordem
+// de carregamento entre scripts)
+const ID_GRIMORIO_LOJA = ITENS.findIndex(a => a[1] === 'Grimório');
 
 function nivelMinimo(rar){
   return 1 + rar * Math.max(0, Math.round(ECO.lojaNivelPorRaridade));
@@ -2754,7 +2888,7 @@ function rngLoja(seed){
 
 function montarEstoque(){
   const r = rngLoja(diasCorridos() * 7919 + ((typeof semente === 'number' ? semente : 0) * 104729) + 999);
-  const pool = ITENS.map((_, i) => i).filter(i => LOJA_TIPOS.includes(ITENS[i][2]) && !ITENS[i][8]);
+  const pool = ITENS.map((_, i) => i).filter(i => LOJA_TIPOS.includes(ITENS[i][2]) && !ITENS[i][8] && i !== ID_GRIMORIO_LOJA);
   const vagas = Math.max(1, Math.round(ECO.lojaVagas));
   const total = PESO_LOJA.reduce((a, b) => a + b, 0);
   const ids = [];

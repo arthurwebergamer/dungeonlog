@@ -5331,12 +5331,17 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 
   async function apagarDaNuvemSeLogado(){
     if (!window.firebaseConfig || window.firebaseConfig.apiKey === 'COLE_AQUI_SUA_APIKEY') return;
-    const { initializeApp, getApps, getApp } =
-      await import("https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js");
-    const { getAuth, onAuthStateChanged } =
-      await import("https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js");
-    const { getFirestore, doc, deleteDoc } =
-      await import("https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js");
+    // PERFORMANCE: mesmo motivo do modulo de login -- os 3 sao
+    // independentes, Promise.all() em vez de sequencial corta a espera
+    // pra so a do mais lento dos 3, nao a soma.
+    const [modApp, modAuth, modFirestore] = await Promise.all([
+      import("https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js"),
+      import("https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js"),
+      import("https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js")
+    ]);
+    const { initializeApp, getApps, getApp } = modApp;
+    const { getAuth, onAuthStateChanged } = modAuth;
+    const { getFirestore, doc, deleteDoc } = modFirestore;
 
     const app = getApps().length ? getApp() : initializeApp(window.firebaseConfig);
     const auth = getAuth(app);
@@ -8439,14 +8444,28 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         sendPasswordResetEmail, onAuthStateChanged, sendEmailVerification,
         getFirestore, doc, getDoc, setDoc;
     try {
-      ({ initializeApp } = await import("https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js"));
+      // PERFORMANCE: os 3 modulos do Firebase (app/auth/firestore) sao
+      // INDEPENDENTES entre si -- nao precisam ser importados um depois
+      // do outro. Antes esperava sequencial (soma das 3 latencias de
+      // rede, ~9-11s observados em log real, CDN externo em
+      // gstatic.com); Promise.all() dispara os 3 pedidos ao mesmo
+      // tempo, e a espera total vira só a do mais lento dos 3 (nao a
+      // soma). Fecha (parcialmente) a janela de corrida do item
+      // "overlay de confirmacao de sessao" -- a corrida em si continua
+      // protegida por aquele overlay, isso aqui so encolhe o tempo que
+      // ele fica visivel na pratica.
+      const [modApp, modAuth, modFirestore] = await Promise.all([
+        import("https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js"),
+        import("https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js"),
+        import("https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js")
+      ]);
+      ({ initializeApp } = modApp);
       ({
         getAuth, GoogleAuthProvider, signInWithPopup,
         signInWithEmailAndPassword, createUserWithEmailAndPassword,
         sendPasswordResetEmail, onAuthStateChanged, sendEmailVerification
-      } = await import("https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js"));
-      ({ getFirestore, doc, getDoc, setDoc } =
-        await import("https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js"));
+      } = modAuth);
+      ({ getFirestore, doc, getDoc, setDoc } = modFirestore);
     } catch(e){
       console.error('QuestLog/Firebase: falha ao carregar o SDK (CDN bloqueado ou rede offline)', e);
       // sem #passoLogin, nao ha UI de login visivel pra quebrar -- so
@@ -9174,10 +9193,13 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       if (window.firebaseConfig && window.firebaseConfig.apiKey !== 'COLE_AQUI_SUA_APIKEY'){
         await Promise.race([
           (async () => {
-            const { initializeApp, getApps, getApp } =
-              await import("https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js");
-            const { getAuth, signOut } =
-              await import("https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js");
+            // PERFORMANCE: mesmo motivo -- app/auth independentes entre si
+            const [modApp, modAuth] = await Promise.all([
+              import("https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js"),
+              import("https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js")
+            ]);
+            const { initializeApp, getApps, getApp } = modApp;
+            const { getAuth, signOut } = modAuth;
             const app = getApps().length ? getApp() : initializeApp(window.firebaseConfig);
             await signOut(getAuth(app));
           })(),

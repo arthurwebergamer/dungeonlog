@@ -3473,7 +3473,14 @@
 .bauArena.bauEspecial.tier2.aberto{ background-image:var(--bau-esp-t2-aberto); }
 .bauArena.bauEspecial.tier3{ background-image:var(--bau-esp-t3-fechado); }
 .bauArena.bauEspecial.tier3.aberto{ background-image:var(--bau-esp-t3-aberto); }
-.bauArena.trancado::after{ content:"🔒"; position:absolute; right:-6px; bottom:-4px; font-size:18px; }
+/* cadeado em pixel art -- arco metalico (com um lado sombreado pra dar
+   volume), corpo dourado com sombreamento no canto e fechadura visivel.
+   Mesma paleta do resto do jogo (dourado/bronze das chaves). */
+.bauArena.trancado::after{
+  content:""; position:absolute; right:-6px; bottom:-4px; width:20px; height:20px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Crect x='5' y='0' width='6' height='1' fill='%23D9DEE3'/%3E%3Crect x='5' y='1' width='1' height='5' fill='%23D9DEE3'/%3E%3Crect x='10' y='1' width='1' height='5' fill='%239AA0A8'/%3E%3Crect x='3' y='6' width='10' height='1' fill='%236B4A1F'/%3E%3Crect x='3' y='15' width='10' height='1' fill='%236B4A1F'/%3E%3Crect x='3' y='6' width='1' height='10' fill='%236B4A1F'/%3E%3Crect x='12' y='6' width='1' height='10' fill='%236B4A1F'/%3E%3Crect x='4' y='7' width='8' height='8' fill='%23F2C94C'/%3E%3Crect x='8' y='11' width='4' height='4' fill='%23C9962E'/%3E%3Crect x='7' y='9' width='2' height='2' fill='%234A2F10'/%3E%3Crect x='7' y='11' width='2' height='3' fill='%234A2F10'/%3E%3C/svg%3E");
+  background-size:contain; background-repeat:no-repeat; image-rendering:pixelated;
+}
 .bauArena.bauEspecial.trancado::after{ right:auto; left:-6px; }
 .bauArena .dica{
   position:absolute; bottom:100%; left:50%; transform:translateX(-50%);
@@ -3481,18 +3488,18 @@
   border-radius:4px; font-size:12px; opacity:0; pointer-events:none; transition:opacity .15s;
 }
 .bauArena .dica.on{ opacity:1; }
-/* surge uma vez quando aparece (dia vencido) -- nao fica se mexendo depois,
-   so a entrada. Reaproveita o filter que ja existia no drop-shadow */
+/* surge uma vez quando aparece (dia vencido), depois entra num pulso
+   continuo sutil -- e o que indica "toque aqui" enquanto nao foi aberto */
 @keyframes bauSurge{
   0%{ transform:scale(.35) translateY(8px); opacity:0; }
   70%{ transform:scale(1.14) translateY(-2px); opacity:1; }
   100%{ transform:scale(1) translateY(0); opacity:1; }
 }
-.bauArena.mostrar{ animation:bauSurge .5s cubic-bezier(.34,1.56,.64,1) both; }
-/* cadeado em pixel art (ouro + contorno bronze, mesma paleta do resto do
-   jogo) em vez do emoji 🔒 -- ele nao combinava com o resto da arte */
-.bauArena.trancado::after{
-  content:""; position:absolute; right:-6px; bottom:-4px; width:20px; height:20px;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Crect x='5' y='2' width='6' height='1' fill='%236B4A1F'/%3E%3Crect x='4' y='3' width='1' height='4' fill='%236B4A1F'/%3E%3Crect x='11' y='3' width='1' height='4' fill='%236B4A1F'/%3E%3Crect x='3' y='7' width='10' height='7' fill='%23F2C94C'/%3E%3Crect x='3' y='7' width='10' height='1' fill='%236B4A1F'/%3E%3Crect x='3' y='13' width='10' height='1' fill='%236B4A1F'/%3E%3Crect x='3' y='7' width='1' height='7' fill='%236B4A1F'/%3E%3Crect x='12' y='7' width='1' height='7' fill='%236B4A1F'/%3E%3Crect x='7' y='9' width='2' height='4' fill='%236B4A1F'/%3E%3C/svg%3E");
-  background-size:contain; background-repeat:no-repeat; image-rendering:pixelated;
+@keyframes bauPulso{
+  0%, 100%{ transform:scale(1); filter:drop-shadow(0 2px 3px rgba(0,0,0,.4)) brightness(1); }
+  50%{ transform:scale(1.08); filter:drop-shadow(0 2px 5px rgba(0,0,0,.5)) brightness(1.15); }
+}
+.bauArena.mostrar{
+  animation: bauSurge .5s cubic-bezier(.34,1.56,.64,1) both,
+             bauPulso 1.4s ease-in-out .5s infinite;
 }

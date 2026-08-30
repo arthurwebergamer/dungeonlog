@@ -764,22 +764,55 @@ window.definirUidAtivo = function(uid){
 // que resolveu o bug do arrasto de tarefas nesta mesma sessao: painel
 // visivel em vez de continuar adivinhando. DESLIGAR (DEBUG_CONTA=false)
 // depois de diagnosticar.
+//
+// v2 (mesma sessao, ajuste pedido pelo usuario): a 1a versao crescia ate
+// 40vh conforme o log enchia e cobria botoes de verdade (mesmo com
+// pointer-events:none no PAINEL, a pilula/indicador continuava visivel
+// por cima). Agora comeca RECOLHIDO -- so uma pilula pequena no canto
+// inferior direito ("LOG N"), fora do caminho de qualquer botao normal
+// do app. Toca nela pra abrir o log completo (aí sim ocupa mais espaco,
+// mas so enquanto o usuario pediu pra ver).
 const DEBUG_CONTA = true;
 let _dbgContaT0 = performance.now();
+let _dbgContaLinhas = [];
+let _dbgContaAberto = false;
+function _dbgContaRepintar(){
+  let pilula = document.getElementById('dbgContaPilula');
+  if (!pilula){
+    pilula = document.createElement('button');
+    pilula.id = 'dbgContaPilula';
+    pilula.type = 'button';
+    pilula.style.cssText = 'position:fixed;bottom:8px;right:8px;z-index:99999;background:#001a00;color:#0f0;font:10px monospace;padding:4px 8px;border:1px solid #0f0;border-radius:999px;line-height:1.4';
+    pilula.onclick = () => { _dbgContaAberto = !_dbgContaAberto; _dbgContaRepintar(); };
+    document.body.appendChild(pilula);
+  }
+  pilula.textContent = (_dbgContaAberto ? '✕ fechar' : '☰ log') + ' (' + _dbgContaLinhas.length + ')';
+
+  let painel = document.getElementById('dbgContaPainel');
+  if (_dbgContaAberto){
+    if (!painel){
+      painel = document.createElement('div');
+      painel.id = 'dbgContaPainel';
+      painel.style.cssText = 'position:fixed;bottom:36px;right:8px;left:8px;z-index:99998;background:#001a00;color:#0f0;font:10px monospace;padding:6px;max-height:45vh;overflow-y:auto;white-space:pre-wrap;border:1px solid #0f0;border-radius:8px';
+      document.body.appendChild(painel);
+    }
+    painel.innerHTML = '';
+    _dbgContaLinhas.forEach(l => {
+      const linha = document.createElement('div');
+      linha.textContent = l;
+      painel.appendChild(linha);
+    });
+    painel.style.display = 'block';
+    painel.scrollTop = painel.scrollHeight;
+  } else if (painel){
+    painel.style.display = 'none';
+  }
+}
 function dbgConta(msg){
   if (!DEBUG_CONTA) return;
-  let painel = document.getElementById('dbgContaPainel');
-  if (!painel){
-    painel = document.createElement('div');
-    painel.id = 'dbgContaPainel';
-    painel.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#001a00;color:#0f0;font:10px monospace;padding:6px;max-height:40vh;overflow-y:auto;white-space:pre-wrap;border-bottom:2px solid #0f0;pointer-events:none';
-    document.body.appendChild(painel);
-  }
   const t = Math.round(performance.now() - _dbgContaT0);
-  const linha = document.createElement('div');
-  linha.textContent = '+' + t + 'ms  ' + msg;
-  painel.appendChild(linha);
-  painel.scrollTop = painel.scrollHeight;
+  _dbgContaLinhas.push('+' + t + 'ms  ' + msg);
+  _dbgContaRepintar();
 }
 window.dbgConta = dbgConta;
 

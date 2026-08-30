@@ -8375,7 +8375,6 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         await setDoc(doc(db, 'saves', uid), { data: dados, atualizadoEm: Date.now() });
       } catch(e){ /* offline: fica so local, tenta de novo no proximo salvar() */ }
     }
-
     // v4.125: watchdog leve que confere emailVerified a cada 60s DENTRO
     // da sessao ja aberta -- nao depende de fechar/reabrir o app. So
     // instancia o setInterval se: conta e' pos-DATA_CORTE (grandfather
@@ -8429,7 +8428,20 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       if (typeof origSalvar === 'function' && !origSalvar._questlogSyncGancho) {
         window.salvar = function(){
           const r = origSalvar.apply(this, arguments);
-          empurrarNuvem(user.uid);
+          // BUG REAL ENCONTRADO (relatado pelo usuario, "perco tarefa as
+          // vezes ao trocar de conta", sem padrao fixo -- sinal classico
+          // de corrida de rede): empurrarNuvem() e assincrono e NUNCA
+          // era esperado por quem chamava salvar() (a maioria dos
+          // lugares no app chama salvar() sincrono, sem await). Se o
+          // usuario mudasse algo e logo em seguida clicasse "Sair", o
+          // location.reload() do Sair podia interromper esse envio no
+          // meio do caminho (reload cancela requisicao de rede em voo).
+          // A mudanca ficava salva local, mas NUNCA chegava na nuvem --
+          // na proxima vez que aquela conta logasse, puxarNuvem() trazia
+          // a versao ANTIGA de volta, apagando a mudanca mais recente.
+          // Guarda o Promise aqui pra quem for recarregar a pagina
+          // poder esperar ele terminar antes (ver "CONTA — SAIR").
+          window._questlogUltimoPush = empurrarNuvem(user.uid);
           return r;
         };
         window.salvar._questlogSyncGancho = true;
@@ -8631,6 +8643,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           intro.style.backgroundImage = '';
           if (typeof window.desenharHeroi === 'function') window.desenharHeroi();
           if (typeof window.render === 'function') window.render();
+          if (typeof window.renderTituloPerfil === 'function') window.renderTituloPerfil();
         } else {
           // conta nova, sem save -- fecha boas-vindas e pula DIRETO pro
           // slide de transicao ("vamos te conhecer melhor...", ver
@@ -9064,6 +9077,24 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       // "if (carregar())" no script principal, perto do topo do arquivo
       localStorage.setItem('questlog.forcarLogin.v1', '1');
     } catch(e){}
+
+    // espera o ultimo envio pra nuvem em andamento terminar (se houver)
+    // antes de recarregar -- ver comentario em reconectarEnvio() (bloco
+    // do login). Sem isso, um salvar() feito pouco antes de clicar
+    // "Sair" podia ter o envio cancelado pelo reload no meio do
+    // caminho, e a mudanca mais recente nunca chegava na nuvem. Teto de
+    // 3s pra nao travar o botao indefinidamente se a rede estiver ruim
+    // ou offline -- nesse caso, so nao espera, o proximo salvar() bem
+    // sucedido tenta de novo (mesmo espirito do teto de 8s ali em cima).
+    try {
+      if (window._questlogUltimoPush){
+        await Promise.race([
+          window._questlogUltimoPush,
+          new Promise(res => setTimeout(res, 3000))
+        ]);
+      }
+    } catch(e){}
+
     location.reload();
   };
 })();

@@ -714,6 +714,47 @@
 
 <script src="assets.js"></script>
 <script>
+// ---------- namespace por conta (localStorage) ----------
+// Movido pro topo do arquivo de proposito: CHAVE_DIA/lerOffsetDia(), bem
+// no comeco deste mesmo <script> continuo, ja precisa de chaveConta() --
+// se esse bloco ficasse mais abaixo (como ficava originalmente, perto de
+// chaveSaveAtual()/salvar()), lerOffsetDia() rodaria ANTES dele existir
+// e quebraria com "chaveConta is not a function".
+let _uidAtivo = null;
+try {
+  const uidSalvo = localStorage.getItem('questlog.uidAtivo.v1');
+  if (uidSalvo) _uidAtivo = uidSalvo;
+} catch(e){}
+
+function chaveSaveAtual(){
+  return _uidAtivo ? ('questlog.v1.uid.' + _uidAtivo) : 'questlog.v1';
+}
+window.chaveSaveAtual = chaveSaveAtual;
+
+// item 13f do roadmap: generaliza o mesmo mecanismo de chaveSaveAtual()
+// pras outras 17 chaves de localStorage que ainda eram compartilhadas
+// entre contas no mesmo aparelho (atributos, conquistas, historico, vida
+// do monstro, itens vistos, loja, tarefas concluidas, titulo equipado).
+// Precisa ser FUNCAO (nao const calculada 1x no load), porque login/
+// logout normal NAO recarrega a pagina (definirUidAtivo() roda no meio
+// da mesma sessao ja carregada, ver puxarNuvem()/reconectarEnvio()) --
+// uma constante precalculada ficaria presa no uid de antes do login.
+// idioma/tema/sfx ficam de fora de proposito: sao preferencia do
+// APARELHO, nao da conta (ninguem espera o idioma resetar ao trocar de
+// conta no mesmo celular).
+function chaveConta(chaveBase){
+  return _uidAtivo ? (chaveBase + '.uid.' + _uidAtivo) : chaveBase;
+}
+window.chaveConta = chaveConta;
+
+window.definirUidAtivo = function(uid){
+  _uidAtivo = uid || null;
+  try {
+    if (_uidAtivo) localStorage.setItem('questlog.uidAtivo.v1', _uidAtivo);
+    else localStorage.removeItem('questlog.uidAtivo.v1');
+  } catch(e){}
+};
+
 /* =======================================================================
    ECONOMIA  —  ponto unico de balanceamento
    Mexa so aqui para ajustar drop de moedas, XP e forca dos equipamentos.
@@ -926,23 +967,23 @@ function diffDias(isoA, isoB){                       // A - B, em dias inteiros
 }
 function lerOffsetDia(){
   try {
-    const bruto = localStorage.getItem(CHAVE_DIA);
+    const bruto = localStorage.getItem(window.chaveConta(CHAVE_DIA));
     if (!bruto){ diaOffset = 0; return; }
     const d = JSON.parse(bruto);
     if (!d || typeof d.off !== 'number') throw 0;    // formato antigo (ISO)
     diaOffset = Math.max(0, Math.min(MAX_OFFSET, Math.round(d.off)));
-    if (diaOffset === 0) localStorage.removeItem(CHAVE_DIA);
+    if (diaOffset === 0) localStorage.removeItem(window.chaveConta(CHAVE_DIA));
   } catch(e){
     // v4.3/v4.32 gravavam um ISO aqui. Essa divida acumulada e justamente o
     // bug do dia congelado: descarta e volta pro dia real.
     diaOffset = 0;
-    try { localStorage.removeItem(CHAVE_DIA); } catch(err){}
+    try { localStorage.removeItem(window.chaveConta(CHAVE_DIA)); } catch(err){}
   }
 }
 function gravarOffsetDia(){
   try {
-    if (diaOffset <= 0) localStorage.removeItem(CHAVE_DIA);
-    else localStorage.setItem(CHAVE_DIA, JSON.stringify({off: diaOffset}));
+    if (diaOffset <= 0) localStorage.removeItem(window.chaveConta(CHAVE_DIA));
+    else localStorage.setItem(window.chaveConta(CHAVE_DIA), JSON.stringify({off: diaOffset}));
   } catch(e){}
 }
 function avancarDia(){
@@ -1037,23 +1078,11 @@ function desenharMonstro(){
 }
 
 // ---------- salvamento ----------
-let _uidAtivo = null;
-try {
-  const uidSalvo = localStorage.getItem('questlog.uidAtivo.v1');
-  if (uidSalvo) _uidAtivo = uidSalvo;
-} catch(e){}
-
-function chaveSaveAtual(){
-  return _uidAtivo ? ('questlog.v1.uid.' + _uidAtivo) : 'questlog.v1';
-}
-window.chaveSaveAtual = chaveSaveAtual;
-window.definirUidAtivo = function(uid){
-  _uidAtivo = uid || null;
-  try {
-    if (_uidAtivo) localStorage.setItem('questlog.uidAtivo.v1', _uidAtivo);
-    else localStorage.removeItem('questlog.uidAtivo.v1');
-  } catch(e){}
-};
+// (_uidAtivo, chaveSaveAtual(), chaveConta(), definirUidAtivo() foram
+// movidos pro topo do arquivo -- ver logo apos a abertura deste mesmo
+// <script>. Motivo: CHAVE_DIA/lerOffsetDia(), poucas linhas acima,
+// já precisa de chaveConta() e roda ANTES de onde esse bloco vivia
+// originalmente, nesse mesmo <script> contínuo.)
 
 function salvar(){
   try {
@@ -2515,7 +2544,7 @@ let lojaDia = null, lojaEstoque = [], lojaVendidos = [], lojaAba = 'comprar';
 
 function salvarLoja(){
   try {
-    localStorage.setItem(CHAVE_LOJA, JSON.stringify({
+    localStorage.setItem(window.chaveConta(CHAVE_LOJA), JSON.stringify({
       dia: lojaDia,
       estoque: lojaEstoque.map(s => ({id: s.id, o: s.oferta ? 1 : 0})),
       vendidos: lojaVendidos
@@ -2524,7 +2553,7 @@ function salvarLoja(){
 }
 function carregarLoja(){
   try {
-    const d = JSON.parse(localStorage.getItem(CHAVE_LOJA));
+    const d = JSON.parse(localStorage.getItem(window.chaveConta(CHAVE_LOJA)));
     if (!d) return;
     lojaDia = d.dia || null;
     lojaEstoque = Array.isArray(d.estoque) ? d.estoque.filter(s => ITENS[s.id]).map(s => ({id: s.id, oferta: !!s.o})) : [];
@@ -3339,11 +3368,11 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   }
 
   function gravar(){
-    try { localStorage.setItem(CHAVE_VIDA, JSON.stringify({vida, ultimoDia})); } catch(e){}
+    try { localStorage.setItem(window.chaveConta(CHAVE_VIDA), JSON.stringify({vida, ultimoDia})); } catch(e){}
   }
   function ler(){
     try {
-      const d = JSON.parse(localStorage.getItem(CHAVE_VIDA));
+      const d = JSON.parse(localStorage.getItem(window.chaveConta(CHAVE_VIDA)));
       if (d && typeof d.vida === 'number'){ vida = d.vida; ultimoDia = d.ultimoDia || null; }
     } catch(e){}
   }
@@ -3496,7 +3525,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     // duas IIFEs sem expor mais coisa do que o necessario).
     let vigorPontos = 0;
     try {
-      const a = JSON.parse(localStorage.getItem('questlog.atrib.v1'));
+      const a = JSON.parse(localStorage.getItem(window.chaveConta('questlog.atrib.v1')));
       if (a && typeof a.vigor === 'number') vigorPontos = a.vigor;
     } catch(e){}
     const perdaoVigorPct = Math.min(0.30, vigorPontos * 0.02); // v4.123: era 0.50 -- mantido em sincronia com VIGOR_TETO do modulo Atributos
@@ -4990,7 +5019,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 
   function ler(){
     try {
-      const d = JSON.parse(localStorage.getItem(CHAVE_HP));
+      const d = JSON.parse(localStorage.getItem(window.chaveConta(CHAVE_HP)));
       if (d && typeof d.total === 'number'){
         hpDia = d.dia || null;
         hpTotal = d.total;
@@ -4999,7 +5028,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     } catch(e){}
   }
   function gravar(){
-    try { localStorage.setItem(CHAVE_HP, JSON.stringify({dia: hpDia, total: hpTotal, dano: hpDano})); } catch(e){}
+    try { localStorage.setItem(window.chaveConta(CHAVE_HP), JSON.stringify({dia: hpDia, total: hpTotal, dano: hpDano})); } catch(e){}
   }
 
   // vira o dia (ou primeira carga): re-sincroniza com a lista real de hoje.
@@ -5295,12 +5324,12 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   const CHAVE_VISTOS = 'questlog.itensVistos.v1';
   let vistos = new Set();
   try {
-    const bruto = localStorage.getItem(CHAVE_VISTOS);
+    const bruto = localStorage.getItem(window.chaveConta(CHAVE_VISTOS));
     if (bruto) vistos = new Set(JSON.parse(bruto));
   } catch(e){ vistos = new Set(); }
 
   function salvarVistos(){
-    try { localStorage.setItem(CHAVE_VISTOS, JSON.stringify(Array.from(vistos))); } catch(e){}
+    try { localStorage.setItem(window.chaveConta(CHAVE_VISTOS), JSON.stringify(Array.from(vistos))); } catch(e){}
   }
 
   // migracao: quem ja tinha itens no inventario antes desta feature existir
@@ -5400,12 +5429,12 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
   function carregar(){
     try {
-      const d = JSON.parse(localStorage.getItem(CHAVE_HIST));
+      const d = JSON.parse(localStorage.getItem(window.chaveConta(CHAVE_HIST)));
       if (Array.isArray(d)) historico = d;
     } catch(e){}
   }
   function persistir(){
-    try { localStorage.setItem(CHAVE_HIST, JSON.stringify(historico)); } catch(e){}
+    try { localStorage.setItem(window.chaveConta(CHAVE_HIST), JSON.stringify(historico)); } catch(e){}
   }
   carregar();
 
@@ -5470,10 +5499,10 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 (function(){
   const CHAVE_CONCLUIDAS = 'questlog.tarefasConcluidas.v1';
   let total = 0;
-  try { total = Number(localStorage.getItem(CHAVE_CONCLUIDAS)) || 0; } catch(e){ total = 0; }
+  try { total = Number(localStorage.getItem(window.chaveConta(CHAVE_CONCLUIDAS))) || 0; } catch(e){ total = 0; }
 
   function persistir(){
-    try { localStorage.setItem(CHAVE_CONCLUIDAS, String(total)); } catch(e){}
+    try { localStorage.setItem(window.chaveConta(CHAVE_CONCLUIDAS), String(total)); } catch(e){}
   }
 
   const _alternarContador = window.alternar;
@@ -5624,7 +5653,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
   function itensVistosSet(){
     try {
-      const bruto = localStorage.getItem('questlog.itensVistos.v1');
+      const bruto = localStorage.getItem(window.chaveConta('questlog.itensVistos.v1'));
       const arr = bruto ? JSON.parse(bruto) : [];
       return new Set(Array.isArray(arr) ? arr : []);
     } catch(e){ return new Set(); }
@@ -5712,13 +5741,13 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
   function resgatadosSet(){
     try {
-      const bruto = localStorage.getItem('questlog.conquistasResgatadas.v1');
+      const bruto = localStorage.getItem(window.chaveConta('questlog.conquistasResgatadas.v1'));
       const arr = bruto ? JSON.parse(bruto) : [];
       return new Set(Array.isArray(arr) ? arr : []);
     } catch(e){ return new Set(); }
   }
   function persistirResgatados(set){
-    try { localStorage.setItem('questlog.conquistasResgatadas.v1', JSON.stringify(Array.from(set))); } catch(e){}
+    try { localStorage.setItem(window.chaveConta('questlog.conquistasResgatadas.v1'), JSON.stringify(Array.from(set))); } catch(e){}
   }
 
   function renderCategoria(cat, ctx, resgatados){
@@ -6126,13 +6155,13 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   const CHAVE_DESBLOQUEIOS_V2 = 'questlog.conquistasDesbloqueadasV2.v1';
   function obterDesbloqueiosV2(){
     try {
-      const bruto = localStorage.getItem(CHAVE_DESBLOQUEIOS_V2);
+      const bruto = localStorage.getItem(window.chaveConta(CHAVE_DESBLOQUEIOS_V2));
       const obj = bruto ? JSON.parse(bruto) : {};
       return (obj && typeof obj === 'object') ? obj : {};
     } catch(e){ return {}; }
   }
   function persistirDesbloqueiosV2(obj){
-    try { localStorage.setItem(CHAVE_DESBLOQUEIOS_V2, JSON.stringify(obj)); } catch(e){}
+    try { localStorage.setItem(window.chaveConta(CHAVE_DESBLOQUEIOS_V2), JSON.stringify(obj)); } catch(e){}
   }
 
   // "vistas": subconjunto de ids desbloqueados que o jogador ja OLHOU (abriu
@@ -6146,13 +6175,13 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   const CHAVE_VISTAS_V2 = 'questlog.conquistasVistasV2.v1';
   function obterVistasV2(){
     try {
-      const bruto = localStorage.getItem(CHAVE_VISTAS_V2);
+      const bruto = localStorage.getItem(window.chaveConta(CHAVE_VISTAS_V2));
       const arr = bruto ? JSON.parse(bruto) : [];
       return new Set(Array.isArray(arr) ? arr : []);
     } catch(e){ return new Set(); }
   }
   function persistirVistasV2(set){
-    try { localStorage.setItem(CHAVE_VISTAS_V2, JSON.stringify([...set])); } catch(e){}
+    try { localStorage.setItem(window.chaveConta(CHAVE_VISTAS_V2), JSON.stringify([...set])); } catch(e){}
   }
 
   // ---------------------------------------------------------------------
@@ -6166,12 +6195,12 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // preferencia de exibicao, nao afeta progresso.
   const CHAVE_TITULO = 'questlog.tituloEquipado.v1';
   function obterTituloEquipado(){
-    try { return localStorage.getItem(CHAVE_TITULO) || null; } catch(e){ return null; }
+    try { return localStorage.getItem(window.chaveConta(CHAVE_TITULO)) || null; } catch(e){ return null; }
   }
   function definirTituloEquipado(id){
     try {
-      if (id) localStorage.setItem(CHAVE_TITULO, id);
-      else localStorage.removeItem(CHAVE_TITULO);
+      if (id) localStorage.setItem(window.chaveConta(CHAVE_TITULO), id);
+      else localStorage.removeItem(window.chaveConta(CHAVE_TITULO));
     } catch(e){}
   }
   function renderTituloPerfil(){
@@ -8499,6 +8528,31 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           const progressoConvidado = localStorage.getItem('questlog.v1');
           if (progressoConvidado) localStorage.setItem(window.chaveSaveAtual(), progressoConvidado);
         } catch(e){}
+
+        // item 13f do roadmap: mesma migracao acima, generalizada pras
+        // outras 12 chaves que tambem passaram a ser separadas por conta
+        // nesta sessao. So roda pra conta nova (mesma condicao do save
+        // principal) -- quem ja tem conta usa puxarNuvem()/dados
+        // proprios, nao precisa herdar nada do modo convidado.
+        [
+          'questlog.atrib.v1',
+          'questlog.conquistasDesbloqueadasV2.v1',
+          'questlog.conquistasResgatadas.v1',
+          'questlog.conquistasVistasV2.v1',
+          'questlog.dia.v1',
+          'questlog.hist.v1',
+          'questlog.hpMonstro.v1',
+          'questlog.itensVistos.v1',
+          'questlog.loja.v1',
+          'questlog.tarefasConcluidas.v1',
+          'questlog.tituloEquipado.v1',
+          'questlog.vida.v1'
+        ].forEach(chaveBase => {
+          try {
+            const valorConvidado = localStorage.getItem(chaveBase);
+            if (valorConvidado !== null) localStorage.setItem(window.chaveConta(chaveBase), valorConvidado);
+          } catch(e){}
+        });
       }
 
       try {

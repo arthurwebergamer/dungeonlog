@@ -2755,7 +2755,21 @@ function salvarBauDia(estado){
   try { localStorage.setItem(window.chaveConta(CHAVE_BAU_DIA), JSON.stringify(estado)); } catch(e){}
 }
 function lerBauDia(){
-  try { return JSON.parse(localStorage.getItem(window.chaveConta(CHAVE_BAU_DIA))); } catch(e){ return null; }
+  try {
+    const estado = JSON.parse(localStorage.getItem(window.chaveConta(CHAVE_BAU_DIA)));
+    // migracao: formato antigo era um bau so, {ids,trancado,tier,aberto}.
+    // Se cair um desses (salvo antes do bau virar padrao+especial), reorganiza
+    // pro formato novo e salva de volta -- NAO chama darLoot/creditarGanhos de
+    // novo, so reaproveita os ids que ja tinham sido sorteados/creditados.
+    if (estado && !estado.padrao && Array.isArray(estado.ids)){
+      const migrado = estado.trancado
+        ? { dia: estado.dia, padrao: null, especial: { ids: estado.ids, tier: estado.tier, aberto: estado.aberto } }
+        : { dia: estado.dia, padrao: { ids: estado.ids, aberto: estado.aberto }, especial: null };
+      salvarBauDia(migrado);
+      return migrado;
+    }
+    return estado;
+  } catch(e){ return null; }
 }
 window.lerBauDia = lerBauDia;
 

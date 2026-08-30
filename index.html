@@ -812,15 +812,32 @@ let _dbgContaT0 = performance.now();
 let _dbgContaLinhas = [];
 let _dbgContaAberto = false;
 function _dbgContaRepintar(){
+  // item: TOGGLE DEBUG (clique nas moedas) -- esta pilula usa
+  // painel.style.display inline (abaixo), que sempre vence a regra CSS
+  // .debug-el{display:none} (inline bate qualquer seletor de stylesheet).
+  // Por isso o toggle mestre precisa ser checado AQUI em JS tambem, nao
+  // so via classe -- senao um painel deixado aberto reaparece sozinho
+  // na proxima linha de log, mesmo com o mestre desligado.
+  const debugMestreLigado = (typeof window.modoDebugAtivo === 'function') ? window.modoDebugAtivo() : false;
+
   let pilula = document.getElementById('dbgContaPilula');
   if (!pilula){
     pilula = document.createElement('button');
     pilula.id = 'dbgContaPilula';
+    pilula.className = 'debug-el';
     pilula.type = 'button';
     pilula.style.cssText = 'position:fixed;bottom:8px;right:8px;z-index:99999;background:#001a00;color:#0f0;font:10px monospace;padding:4px 8px;border:1px solid #0f0;border-radius:999px;line-height:1.4';
     pilula.onclick = () => { _dbgContaAberto = !_dbgContaAberto; _dbgContaRepintar(); };
     document.body.appendChild(pilula);
   }
+
+  if (!debugMestreLigado){
+    pilula.style.display = 'none';
+    const painelExistente = document.getElementById('dbgContaPainel');
+    if (painelExistente) painelExistente.style.display = 'none';
+    return;
+  }
+  pilula.style.display = '';
   pilula.textContent = (_dbgContaAberto ? '✕ fechar' : '☰ log') + ' (' + _dbgContaLinhas.length + ')';
 
   let painel = document.getElementById('dbgContaPainel');
@@ -828,6 +845,7 @@ function _dbgContaRepintar(){
     if (!painel){
       painel = document.createElement('div');
       painel.id = 'dbgContaPainel';
+      painel.className = 'debug-el';
       painel.style.cssText = 'position:fixed;bottom:36px;right:8px;left:8px;z-index:99998;background:#001a00;color:#0f0;font:10px monospace;padding:6px;max-height:45vh;overflow-y:auto;white-space:pre-wrap;border:1px solid #0f0;border-radius:8px';
       document.body.appendChild(painel);
     }
@@ -843,6 +861,7 @@ function _dbgContaRepintar(){
     painel.style.display = 'none';
   }
 }
+window.__dbgContaAtualizarVisibilidade = _dbgContaRepintar; // hook pro toggle mestre forcar repintura na hora do clique
 function dbgConta(msg){
   if (!DEBUG_CONTA) return;
   const t = Math.round(performance.now() - _dbgContaT0);
@@ -9914,6 +9933,10 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
   function aplicar(ligado){
     document.body.classList.toggle('modo-debug', ligado);
+    // pilula do item 81 (dbgContaPilula) usa display inline, que a regra
+    // .debug-el do CSS sozinha nao alcanca -- forca a repintura dela
+    // tambem, na hora, pra sumir/aparecer junto com o resto.
+    if (typeof window.__dbgContaAtualizarVisibilidade === 'function') window.__dbgContaAtualizarVisibilidade();
   }
 
   window.modoDebugAtivo = lerModoDebug; // exposto p/ outros blocos consultarem se precisar

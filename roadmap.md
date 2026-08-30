@@ -8325,3 +8325,22 @@ Trocado `await import()` sequencial por `Promise.all()` nos 3 pontos — os 3 pe
  
 ### Validação
 `node --check` nos 44 blocos. Confirmado que não sobrou nenhum `import()` sequencial fora de `Promise.all` (8 imports totais, agrupados em 3 chamadas). Teste isolado do ganho: sequencial somou as 3 latências simuladas (~1050ms), paralelo ficou só com a do mais lento (~400ms).
+
+---
+
+## 83. Ajuste do overlay do item 81: visual só aparece em rede lenta de verdade
+
+### Contexto
+Overlay do item 81 (ver seção 81) pintava fundo/blur/cartão "Carregando…" desde o instante em que era criado — usuário queria que a trava de interação continuasse ativa do mesmo jeito (zero mudança na correção da corrida original), mas que o visual só aparecesse quando a confirmação realmente demorasse, não sempre.
+
+### Tentativa 1 — limiar de 180ms (REVERTIDA)
+Primeira versão: overlay nascia transparente (só bloqueando clique) e só pintava fundo/cartão se `aoLogar()`/`aoLogarSilencioso()` não resolvesse em ~180ms. **Rejeitada pelo usuário na prática** — 180ms é curto demais pro tempo real de import do SDK do Firebase via CDN + round-trip de auth, então o visual acabava aparecendo quase sempre, inclusive em conexão boa. Não resolvia o problema.
+
+### Tentativa 2 — 100% invisível, nunca aparece (REVERTIDA)
+Segunda versão: removido todo o conteúdo visual, overlay virou um `div` transparente só pra bloquear clique, em qualquer cenário. Levantado o risco pelo Claude e confirmado pelo usuário como indesejado: em rede ruim/instável, o app trava a interação por até 8s (teto de segurança já existente) **sem nenhum feedback visual** — usuário não tem como saber se o app travou/quebrou ou só está esperando a rede.
+
+### Fix final
+Limiar alto, pensado especificamente pra separar "caso comum" de "rede lenta de verdade": `LIMIAR_REDE_LENTA_MS = 2500`. Overlay nasce transparente (trava de clique ativa desde o início, síncrona, sem nenhuma mudança na lógica que resolve a corrida do item 81). Só ganha fundo escurecido + blur + cartão "Carregando…" se passar de 2,5s sem `confirmarSessaoResolvida()` disparar — bem acima do tempo normal de confirmação em rede boa, então não aparece no caso comum, mas cobre o cenário de rede ruim antes do teto de 8s (inalterado) liberar o app pra seguir 100% local. Convidado genuíno (`!uidConhecido`) continua sem ver nada, como sempre.
+
+### Validação
+`node --check` nos 42 blocos `<script>` inline (contagem já refletindo a divisão em `index.html`/`style.css`/`assets.js`, ver item de infraestrutura). Balanceamento de `<div>`/`<svg>` conferido. `dbgConta` instrumentado com linha própria (`'overlay de sessao ficou visivel -- rede lenta (> 2500ms)'`) pra permitir confirmar em campo, via log real do aparelho, se uma

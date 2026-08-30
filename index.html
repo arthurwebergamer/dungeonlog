@@ -18,6 +18,41 @@
 <link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=Outfit:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 
+<!-- =====================================================================
+     TOGGLE DEBUG — silenciar console (log/warn/error)  —  precisa ser o
+     primeiro bloco de script dentro do cabecalho do documento, antes de
+     qualquer outro codigo (inclusive assets.js e o bloco de i18n logo
+     abaixo), pra garantir que nenhuma chamada de console escape do gate
+     antes do toggle entrar em vigor.
+
+     Mesma chave/flag do toggle de UI (icone de moedas):
+     localStorage['questlog.modoDebug.v1']. Default false -> console
+     100% mudo (log, warn E error) ate o jogador clicar nas moedas.
+     Ao religar em runtime (sem reload), volta a imprimir na hora,
+     porque cada chamada consulta o localStorage de novo, nao um
+     valor cacheado na carga da pagina.
+
+     Import.: console.error tambem fica mudo por padrao -- inclui
+     erros reais de Firebase/rede (ver blocos "Firebase" mais abaixo).
+     Decisao explicita do usuario: log e debug, debug fica escondido
+     junto com o resto ate o toggle ligar.
+     ===================================================================== -->
+<script>
+(function(){
+  const CHAVE = 'questlog.modoDebug.v1';
+  function modoDebugLigado(){
+    try { return localStorage.getItem(CHAVE) === 'true'; } catch(e){ return false; }
+  }
+  const original = { log: console.log, warn: console.warn, error: console.error, table: console.table, info: console.info, debug: console.debug };
+  window.__consoleOriginal = original; // acesso de emergencia via devtools, se precisar depurar o proprio silenciador
+  ['log','warn','error','table','info','debug'].forEach(function(metodo){
+    console[metodo] = function(){
+      if (modoDebugLigado()) original[metodo].apply(console, arguments);
+    };
+  });
+})();
+</script>
+
 <script>
   // item 49 do roadmap (pedido do usuario): detecta o idioma do
   // dispositivo/navegador e usa como padrao ANTES do jogador escolher
@@ -9858,8 +9893,10 @@ window.mostrarNivelUp = function(nivel, aoFechar){
      Persistencia: localStorage['questlog.modoDebug.v1'] (boolean,
      default false). Efeito: classe .modo-debug no <body> -- CSS decide o
      que aparece (.debugbar e qualquer .debug-el futuro; ver style.css,
-     perto da linha 216). Zero feedback visual no icone -- fica
-     indistinguivel do normal de proposito.
+     perto da linha 216). Mesma chave tambem controla o silenciador de
+     console (log/warn/error), instalado como primeiro bloco de script do
+     cabecalho -- ver bloco no topo do arquivo, antes do i18n. Zero
+     feedback visual no icone -- fica indistinguivel do normal de proposito.
 
      DEBUG_ARRASTO e outras flags booleanas fixas no codigo ficam de fora
      disso: continuam exigindo trocar a constante manualmente, porque sao

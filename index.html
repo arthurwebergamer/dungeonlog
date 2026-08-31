@@ -2456,12 +2456,24 @@ function darLoot(nTarefas){
 
 // mesma logica de darLoot, mas so ESCOLHE os itens -- nao credita no
 // inventario ainda. Usado pelo bau trancado (Spec 4b): o loot so existe
-// de verdade se o jogador destrancar (risco real de perder no fim do dia)
-function sortearGanhos(nTarefas){
-  const sorte = Math.min(1, nTarefas / 10);
+// de verdade se o jogador destrancar (risco real de perder no fim do dia).
+// bonusSorte (0..1) desloca o sorteio pra raridade alta; rarMinima (opcional)
+// GARANTE que pelo menos 1 item saia nessa raridade ou melhor -- o bonus
+// sozinho e fraco demais pra se notar (a formula de sortearItem satura
+// rapido), entao o bau especial usa os dois: bonus + garantia
+function sortearGanhos(nTarefas, bonusSorte, rarMinima){
+  const sorte = Math.min(1, nTarefas / 10 + (bonusSorte || 0));
   const qtd = Math.min(ECO.lootMax, ECO.lootBase + Math.floor(nTarefas / ECO.lootExtraCada));
   const ids = [];
   for (let i=0;i<qtd;i++) ids.push(sortearItem(sorte));
+  if (rarMinima != null){
+    let piorIdx = 0;
+    for (let i=1;i<ids.length;i++){ if (ITENS[ids[i]][3] < ITENS[ids[piorIdx]][3]) piorIdx = i; }
+    if (ITENS[ids[piorIdx]][3] < rarMinima){
+      const pool = ITENS.map((_,i)=>i).filter(i => ITENS[i][3] >= rarMinima && !ITENS[i][8]);
+      if (pool.length) ids[piorIdx] = pool[Math.floor(Math.random()*pool.length)];
+    }
+  }
   return ids;
 }
 // credita uma lista de ids no inventario (espelha o final de darLoot) --
@@ -2795,7 +2807,15 @@ function gerarEstadoBauDia(dia, nTarefas){
   const media = mediaDifHoje();
   let especial = null;
   if (Math.random() < chanceBauTrancado(media)){
-    especial = { ids: sortearGanhos(nTarefas), tier: tierBauNecessario(media), aberto: false };
+    const tier = tierBauNecessario(media);
+    // loot do especial e melhor de proposito: bonus de sorte + garantia de
+    // raridade minima, os dois crescendo com o tier da chave exigida
+    // (Incomum p/ tier0 .. Lendario p/ tier3) -- ver sortearGanhos
+    const RAR_MINIMA_POR_TIER = [1, 2, 3, 4];
+    especial = {
+      ids: sortearGanhos(nTarefas, 0.35 + tier * 0.15, RAR_MINIMA_POR_TIER[tier]),
+      tier, aberto: false
+    };
   }
   return { dia, padrao: { ids: idsPadrao, aberto: false }, especial };
 }

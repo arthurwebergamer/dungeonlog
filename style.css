@@ -3503,3 +3503,7 @@
   animation: bauSurge .5s cubic-bezier(.34,1.56,.64,1) both,
              bauPulso 1.4s ease-in-out .5s infinite;
 }
+/* precisa ser mais especifica que .bauArena.mostrar (2 classes) pra vencer
+   a cascata de verdade -- antes as duas regras tinham a mesma especificidade
+   e a que vinha depois no arquivo ganhava, entao o pulso nao parava */
+.bauArena.mostrar.aberto{ animation:none; }

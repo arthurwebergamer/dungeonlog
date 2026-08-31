@@ -1496,7 +1496,7 @@
                 justify-content:center;background:var(--conqcat-cor);color:#1A1526}
   .conqcaticone svg{width:18px;height:18px}
   .conqcattxt{flex:1;min-width:0}
-  .conqcatnome{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--conqcat-cor)}
+  .conqcatnome{font-family:'Outfit',sans-serif;font-size:18px;font-weight:700;color:var(--conqcat-cor)}
   .conqcatsub{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
 
   /* CONQUISTAS V2 -- lista plana (Minhas conquistas / Não desbloqueadas), sem
@@ -2632,7 +2632,7 @@
                 justify-content:center;background:var(--conqcat-cor);color:#1A1526}
   .conqcaticone svg{width:18px;height:18px}
   .conqcattxt{flex:1;min-width:0}
-  .conqcatnome{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--conqcat-cor)}
+  .conqcatnome{font-family:'Outfit',sans-serif;font-size:18px;font-weight:700;color:var(--conqcat-cor)}
   .conqcatsub{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
 
   /* CONQUISTAS V2 -- lista plana (Minhas conquistas / Não desbloqueadas), sem

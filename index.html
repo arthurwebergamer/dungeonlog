@@ -395,42 +395,42 @@
           <span class="atrpill" id="atrDisponiveis">0 disponíveis</span>
         </div>
 
-        <div class="atrcard" style="--atr-cor:#F2A65A">
-          <div class="atrbarra">
+        <div class="atrcard2" style="--atr-cor:#F2A65A">
+          <div class="atrcard2-topo">
             <svg class="atricone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5l2.9 6.6 7.1.7-5.4 4.8 1.6 7-6.2-3.8-6.2 3.8 1.6-7-5.4-4.8 7.1-.7z"/></svg>
             <span class="atrnome" data-i18n="atr.fortuna">Fortuna</span>
             <span class="atrvalor" id="atrFortunaValor">+0%</span>
-            <svg class="atrchevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
           </div>
-          <div class="atrcorpo">
-            <span class="atrdesc" data-i18n="atr.fortunaDesc">chance de raridade no espólio</span>
-            <button class="atrmais" id="atrMaisFortuna" type="button">+</button>
+          <div class="atrdesc" data-i18n="atr.fortunaDesc">chance de raridade no espólio</div>
+          <div class="atrcard2-linha">
+            <div class="atrbarrafundo"><div class="atrbarrafill" id="atrFortunaBarra"></div></div>
+            <button class="atrmais2" id="atrMaisFortuna" type="button">+</button>
           </div>
         </div>
 
-        <div class="atrcard" style="--atr-cor:#5AA9F2">
-          <div class="atrbarra">
+        <div class="atrcard2" style="--atr-cor:#5AA9F2">
+          <div class="atrcard2-topo">
             <svg class="atricone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".8" fill="currentColor"/></svg>
             <span class="atrnome" data-i18n="atr.foco">Foco</span>
             <span class="atrvalor" id="atrFocoValor">0%</span>
-            <svg class="atrchevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
           </div>
-          <div class="atrcorpo">
-            <span class="atrdesc" data-i18n="atr.focoDesc">de desconto na loja</span>
-            <button class="atrmais" id="atrMaisFoco" type="button">+</button>
+          <div class="atrdesc" data-i18n="atr.focoDesc">de desconto na loja</div>
+          <div class="atrcard2-linha">
+            <div class="atrbarrafundo"><div class="atrbarrafill" id="atrFocoBarra"></div></div>
+            <button class="atrmais2" id="atrMaisFoco" type="button">+</button>
           </div>
         </div>
 
-        <div class="atrcard" style="--atr-cor:#E5698A">
-          <div class="atrbarra">
+        <div class="atrcard2" style="--atr-cor:#E5698A">
+          <div class="atrcard2-topo">
             <svg class="atricone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5s-7.5-4.6-9.8-9.3C.9 8 2.4 4.8 5.6 4.1c2-.4 3.9.5 5 2.1a5.5 5.5 0 015-2.1c3.2.7 4.7 3.9 3.4 7.1-2.3 4.7-9.8 9.3-9.8 9.3z"/></svg>
             <span class="atrnome" data-i18n="atr.vigor">Vigor</span>
             <span class="atrvalor" id="atrVigorValor">-0%</span>
-            <svg class="atrchevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
           </div>
-          <div class="atrcorpo">
-            <span class="atrdesc" data-i18n="atr.vigorDesc">de perdão no dano por tarefa largada</span>
-            <button class="atrmais" id="atrMaisVigor" type="button">+</button>
+          <div class="atrdesc" data-i18n="atr.vigorDesc">de perdão no dano por tarefa largada</div>
+          <div class="atrcard2-linha">
+            <div class="atrbarrafundo"><div class="atrbarrafill" id="atrVigorBarra"></div></div>
+            <button class="atrmais2" id="atrMaisVigor" type="button">+</button>
           </div>
         </div>
       </div>
@@ -917,8 +917,8 @@ const ECO = {
   lootMax:                 3,
 
   // --- bau trancado (Spec 4b: chave por dificuldade media do dia) ---
-  chanceBauTrancadoMin: 0.15,   // chance minima (dia so com tarefas trivial/facil)
-  chanceBauTrancadoMax: 0.50,   // chance maxima (dia so com tarefas dificil)
+  chanceBauTrancadoMin: 0.10,   // chance minima (dia so com tarefas trivial/facil)
+  chanceBauTrancadoMax: 0.30,   // chance maxima (dia so com tarefas dificil)
 
   // --- niveis ---
   nivelBase:             100,   // XP para sair do nivel I
@@ -2429,14 +2429,16 @@ function persistir(){ if (typeof jaComecou !== 'undefined' && jaComecou) salvar(
 /* ---------- espolio ---------- */
 const PESO_RAR = [50, 28, 14, 6, 2];
 
-function sortearItem(sorte){
+function sortearItem(sorte, permitirLendario){
+  if (permitirLendario === undefined) permitirLendario = true;
   // sorte 0..1 desloca o peso para raridades altas
   const pesos = PESO_RAR.map((p,i) => p * (1 + sorte * i * 0.9));
+  if (!permitirLendario) pesos[4] = 0;   // Lendario reservado pro bau especial (ver darLoot/sortearGanhos)
   const total = pesos.reduce((a,b)=>a+b,0);
   let r = Math.random() * total, rar = 0;
   for (let i=0;i<pesos.length;i++){ r -= pesos[i]; if (r <= 0){ rar = i; break; } }
   let pool = ITENS.map((_,i)=>i).filter(i => ITENS[i][3] === rar && !ITENS[i][8]);
-  if (!pool.length) pool = ITENS.map((_,i)=>i).filter(i => !ITENS[i][8]);
+  if (!pool.length) pool = ITENS.map((_,i)=>i).filter(i => !ITENS[i][8] && (permitirLendario || ITENS[i][3] < 4));
   return pool[Math.floor(Math.random()*pool.length)];
 }
 
@@ -2445,7 +2447,7 @@ function darLoot(nTarefas){
   const qtd = Math.min(ECO.lootMax, ECO.lootBase + Math.floor(nTarefas / ECO.lootExtraCada));
   const ganhos = [];
   for (let i=0;i<qtd;i++){
-    const id = sortearItem(sorte);
+    const id = sortearItem(sorte, false);   // false = sem Lendario -- exclusivo do bau especial
     darItem(id, 1);
     ganhos.push(item(id));
   }
@@ -2599,12 +2601,13 @@ function abrirFicha(id){
     if (bi.m) bonus += '<span>' + (en ? 'Coins ' : 'Moedas ') + (bi.m>0?'+':'')+bi.m+'%</span>';
   }
   if (it.tipo !== 'chave') bonus += '<span>' + (en ? 'Sells for ' + precoVenda(it) + ' coins' : 'Vende por '+precoVenda(it)+' moedas') + '</span>';
+  if (it.tipo === 'chave' && id !== ID_GRIMORIO_INV) bonus += '<span>' + (en ? 'Used automatically to unlock a locked chest in the Arena' : 'Usada automaticamente pra destrancar um baú trancado na Arena') + '</span>';
   if (q > 1) bonus += '<span>' + (en ? 'Quantity: ' + q : 'Quantidade: '+q) + '</span>';
 
   let acoes = '';
   if (EQUIPAVEL(id)) acoes += '<button class="prim" data-a="eq">'+(estaEquipado ? (en ? 'Unequip' : 'Desequipar') : (en ? 'Equip' : 'Equipar'))+'</button>';
   if (it.tipo === 'cons') acoes += '<button class="prim" data-a="usar">' + (en ? 'Use' : 'Usar') + '</button>';
-  if (it.tipo === 'chave') acoes += '<button class="prim" data-a="abrir">' + (en ? 'Open' : 'Abrir') + '</button>';
+  if (it.tipo === 'chave' && id === ID_GRIMORIO_INV) acoes += '<button class="prim" data-a="abrir">' + (en ? 'Open' : 'Abrir') + '</button>';
   if (it.tipo !== 'chave') acoes += '<button data-a="vender">' + (en ? 'Sell' : 'Vender') + '</button>';
 
   ficha.innerHTML =
@@ -2892,7 +2895,7 @@ function abrirBauPadrao(){
   salvarBauDia(estado);
   atualizarBauArena();
   if (typeof window.enfileirarPopup === 'function' && typeof mostrarBauLoot === 'function'){
-    window.enfileirarPopup(prox => mostrarBauLoot(ganhos, prox));
+    window.enfileirarPopup(prox => mostrarBauLoot(ganhos, prox, 'baupadrao'));
   }
 }
 window.abrirBauPadrao = abrirBauPadrao;
@@ -2928,7 +2931,7 @@ function abrirBauEspecial(){
 
   const ganhos = esp.ids.map(id => item(id));
   if (typeof window.enfileirarPopup === 'function' && typeof mostrarBauLoot === 'function'){
-    window.enfileirarPopup(prox => mostrarBauLoot(ganhos, prox));
+    window.enfileirarPopup(prox => mostrarBauLoot(ganhos, prox, 'tier' + esp.tier));
   }
 }
 window.abrirBauEspecial = abrirBauEspecial;
@@ -3636,9 +3639,16 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   // sempre alcancar a borda do card flutuante (dragEl), que segue o dedo via
   // position:fixed. Ancora no topo atual do placeholder (phTop, sua posicao
   // no fluxo) e cresce na direcao em que o card flutuante se afastou dele.
-  // Nunca fica menor que alturaBaseCard (o vao minimo e sempre 1 card) nem
-  // maior que list.clientHeight (seguranca contra esticar mais que a propria
-  // lista visivel).
+  // Nunca fica menor que alturaBaseCard (o vao minimo e sempre 1 card).
+  //
+  // Teto: NAO usa list.clientHeight -- #list e flex:1 e preenche a tela
+  // toda, tarefa nenhuma ou nao, entao com poucas tarefas sobra um espaco
+  // vazio enorme dentro do container que nao aparece visualmente mas conta
+  // pro calculo, deixando o vao esticar muito mais do que devia (bug
+  // relatado: comportamento estranho especificamente com 2 tarefas --
+  // com 3+ o conteudo ocupa mais espaco e mascara o mesmo efeito). Teto
+  // agora e proporcional ao conteudo real: nunca mais que todos os cards
+  // visiveis (dragEl + siblings) juntos, com uma folga de meio card.
   function atualizarAlturaElastica(){
     if (!placeholder || !dragEl) return;
     const phTop = placeholder.getBoundingClientRect().top;
@@ -3652,7 +3662,9 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     } else if (dragTop < phTop){
       altura = phBottomBase - dragTop;   // arrastando pra cima: estica ate o topo do card flutuante
     }
-    altura = Math.max(alturaBaseCard, Math.min(altura, list.clientHeight));
+    const nCards = list.querySelectorAll('.task:not(.dragging)').length + 1; // +1 = o proprio dragEl
+    const tetoConteudo = alturaBaseCard * (nCards + 0.5);
+    altura = Math.max(alturaBaseCard, Math.min(altura, tetoConteudo, list.clientHeight));
     placeholder.style.height = altura + 'px';
   }
 
@@ -4871,13 +4883,21 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   }
   bauBG.onclick = fecharBau;
 
-  function mostrarBauLoot(ganhos, aoFechar){
+  function mostrarBauLoot(ganhos, aoFechar, iconeVariante){
     if (!ganhos || !ganhos.length){ if (aoFechar) aoFechar(); return; }
     _aoFecharBau = aoFechar || null;
     const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
 
+    // iconeVariante: 'baupadrao' ou 'tier0'..'tier3' -- usa o sprite de
+    // verdade do baú que foi clicado (pack Treasure Chests, mesmas CSS vars
+    // da Arena) em vez do icone generico antigo do catalogo. Sem variante
+    // (chamada antiga/externa), cai no sprite generico de sempre.
+    const iconeHtml = iconeVariante
+      ? '<div class="bauicone bauicone2 ' + iconeVariante + '" id="bauIcone"></div>'
+      : '<div class="bauicone" id="bauIcone">'+spriteHTML(SP_BAU, 56)+'</div>';
+
     bauPop.innerHTML =
-      '<div class="bauicone" id="bauIcone">'+spriteHTML(SP_BAU, 56)+'</div>'+
+      iconeHtml+
       '<div class="baulabel">' + (en ? 'Treasure Chest' : 'Baú do Tesouro') + '</div>'+
       '<div class="bauitens" id="bauItens"></div>'+
       '<button class="bauok" id="bauOk">' + (en ? 'Continue' : 'Continuar') + '</button>';
@@ -5143,6 +5163,15 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     const elVigor = document.getElementById('atrVigorValor');
     if (elVigor) elVigor.textContent = '+' + Math.round(perdaoVigor() * 100) + '%';
 
+    // barra de progresso: os 3 atributos tem o mesmo teto (30%) e o mesmo
+    // custo por ponto (2%), entao bonus/TETO ja da a fracao certa pra todos
+    const barraFortuna = document.getElementById('atrFortunaBarra');
+    if (barraFortuna) barraFortuna.style.width = Math.min(100, (bonusFortuna() / FORTUNA_TETO) * 100) + '%';
+    const barraFoco = document.getElementById('atrFocoBarra');
+    if (barraFoco) barraFoco.style.width = Math.min(100, (descontoFoco() / FOCO_TETO) * 100) + '%';
+    const barraVigor = document.getElementById('atrVigorBarra');
+    if (barraVigor) barraVigor.style.width = Math.min(100, (perdaoVigor() / VIGOR_TETO) * 100) + '%';
+
     const bFortuna = document.getElementById('atrMaisFortuna');
     if (bFortuna) bFortuna.disabled = disp <= 0 || noTeto('fortuna');
     const bFoco = document.getElementById('atrMaisFoco');
@@ -5181,6 +5210,14 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
      delegacao custa a mesma coisa aqui e fica mais facil de estender se
      um 4o atributo aparecer no futuro (Vigor, o 3o, deixou de ser
      placeholder na v4.121 -- item 42-l do roadmap). ---------- */
+  /* ---------- DEPRECATED: acordeao antigo (cartao comecava fechado, toque
+     na barra revelava descricao + botao). Substituido por atrcard2: agora
+     tudo fica sempre visivel (descricao + barra de progresso + botao "+"),
+     sem precisar clicar pra expandir -- pedido do usuario, o design antigo
+     "nao tava bom ainda". Bloco mantido comentado, nao apagado, seguindo o
+     padrao do arquivo (ver outros DEPRECATED). Sem .atrbarra/.atrcard no
+     HTML novo, esse listener nunca mais encontra nada pra expandir mesmo
+     se reativado sem querer.
   const painelAtributos = document.querySelector('.atributospontos');
   if (painelAtributos){
     painelAtributos.addEventListener('click', e => {
@@ -5189,12 +5226,13 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       barra.closest('.atrcard')?.classList.toggle('aberto');
     });
   }
+  ---------- */
 
   /* ---------- efeito: Fortuna no sorteio de raridade do loot ---------- */
   const _sortearItem = window.sortearItem;
   if (typeof _sortearItem === 'function'){
-    window.sortearItem = function(sorte){
-      return _sortearItem((sorte || 0) + bonusFortuna());
+    window.sortearItem = function(sorte, ...resto){
+      return _sortearItem((sorte || 0) + bonusFortuna(), ...resto);
     };
   }
 

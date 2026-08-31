@@ -8436,3 +8436,116 @@ Chave nova no dicionário (`perfil.equipamentos`: Equipamentos/Equipment). Rótu
 
 ### Validação
 `node --check` nos 44 blocos, tags balanceadas.
+
+## 88. Bug real: item-chave abria o Grimório sem querer
+
+### O que foi pedido
+Usuário percebeu (sessão de revisão do item 86): as 5 chaves de baú, agora `tipo:"chave"` igual o Grimório, ganharam o mesmo botão "Abrir" da ficha — e clicar nele abria o bestiário do Grimório, não fazia nada relacionado à chave.
+
+### Causa raiz
+O botão "Abrir" era renderizado pra **qualquer** item com `tipo === 'chave'` (sem checar qual item era), e o handler do clique chamava `window.abrirCatalogoGrimorio()` incondicionalmente. Reaproveitar o tipo `chave` pras 5 chaves (decisão do item 86) trouxe esse efeito colateral de brinde.
+
+### Fix
+Botão "Abrir" só aparece quando `id === ID_GRIMORIO_INV` (constante que já existia no mesmo bloco, reaproveitada em vez de duplicada). Como as chaves de baú ficaram sem nenhum botão de ação (Vender já era escondido pra `tipo:"chave"` desde o item 86), adicionei uma linha informativa na ficha: *"Usada automaticamente pra destrancar um baú trancado na Arena"* — senão a ficha ficava sem nenhuma explicação de pra que serve o item.
+
+### Validação
+Testado via jsdom rodando o app de verdade: ficha da Chave de Ferro → zero botões de ação, só o texto informativo. Ficha do Grimório → continua com "Abrir" normalmente, sem regressão.
+
+## 89. Hipótese fundamentada (não confirmada em aparelho): arrasto de tarefas estranho com só 2 tarefas na lista
+
+### O que foi pedido
+Usuário relatou: arrastar pra reordenar com só 2 tarefas na lista se comporta de forma estranha; a partir de 3 tarefas funciona normal.
+
+### Causa provável
+`#list{flex:1}` faz a lista preencher toda a altura disponível na tela, **independente da quantidade de tarefas**. O teto do "vão elástico" (`atualizarAlturaElastica()`, item 64/68/75) usava `list.clientHeight` — a altura cheia do container, não a altura do conteúdo real. Com só 2 tarefas, sobra um espaço vazio enorme dentro do container que não aparece visualmente mas contava pro cálculo, deixando o vão esticar muito além do esperado. Com 3+ tarefas o conteúdo ocupa mais desse espaço e o mesmo efeito (idêntico no código) fica mascarado.
+
+### Fix
+Teto trocado pra ser proporcional à quantidade real de cards visíveis (`alturaBaseCard × (nCards + 0.5)`) em vez da altura do container inteiro.
+
+### Importante — nível de confiança
+Essa é uma **hipótese bem fundamentada por leitura de código e cálculo numérico isolado**, não um bug confirmado visualmente — jsdom não faz layout de verdade (`getBoundingClientRect` não retorna posições reais), então não dá pra reproduzir o gesto de toque aqui. **Pendente de teste em aparelho real**, mesmo padrão de outras hipóteses já registradas nesse módulo (ver comentário do `LIMIAR_TOQUE`).
+
+## 90. Item Lendário exclusivo do baú especial (nunca no baú padrão)
+
+### O que foi pedido
+Decisão do usuário: itens de raridade Lendário devem sair só do baú especial (com chave), nunca do baú padrão/comum.
+
+### Implementação
+`sortearItem()` ganhou parâmetro opcional `permitirLendario` (default `true` — não quebra nenhum chamador existente). `darLoot()` (usado só pelo baú padrão) passa `false` explicitamente: zera o peso da raridade 4 no sorteio ponderado e também exclui ela do fallback (`pool` vazio por raridade).
+
+### Bug real encontrado no caminho
+O wrapper de bônus de Fortuna (`window.sortearItem = function(sorte){ return _sortearItem((sorte||0)+bonusFortuna()); }`, item do efeito de atributo) só repassava o primeiro argumento — o `false` de `permitirLendario` seria descartado silenciosamente, e qualquer jogador com Fortuna investida voltaria a poder tirar Lendário do baú comum, furando a regra por trás das costas. Corrigido pra repassar todos os argumentos (`...resto`).
+
+### Validação
+4000 sorteios simulados via jsdom: **0 Lendários** no baú padrão, mesmo forçando um bônus de Fortuna artificialmente alto pra estressar o wrapper. Baú especial testado em paralelo, continua sorteando Lendário normalmente.
+
+## 91. Calibração da chance de spawn do baú especial (foi longe demais nos dois sentidos)
+
+### Histórico da calibração
+- Original (item 86): **15-50%/dia** — usuário achou comum demais.
+- Primeira correção: **5-18%/dia** — usuário achou raro demais (foi longe demais no sentido contrário).
+- Ajuste final, meio-termo: **10-30%/dia**.
+
+### Números de referência (dia de dificuldade média)
+- Original: ~32%/dia → ~2,3 baús especiais por semana.
+- Intermediário: ~12%/dia → ~0,8 por semana.
+- Final: ~20%/dia → ~1,4 por semana.
+
+### Onde mexer se precisar recalibrar de novo
+`ECO.chanceBauTrancadoMin` / `ECO.chanceBauTrancadoMax`, `index.html`.
+
+## 92. Ícone do popup de recompensa mostra o baú de verdade que foi aberto
+
+### O que foi pedido
+O popup de recompensa (`mostrarBauLoot`) sempre mostrava o ícone genérico antigo do catálogo (sprite 118, "Baú do Tesouro"), independente de qual baú real foi clicado — padrão ou qual tier do especial.
+
+### Implementação
+`mostrarBauLoot(ganhos, aoFechar, iconeVariante)` ganhou um terceiro parâmetro opcional (`'baupadrao'` ou `'tier0'..'tier3'`). Quando presente, o ícone do popup usa as **mesmas CSS vars do pack Treasure Chests** já embutidas pra Arena (item 86), em vez do sprite genérico — mesmo bounce de abertura de sempre (`.abriu{animation:bauPulo}`), só trocando qual imagem de fundo aparece. Sem variante (nenhuma chamada externa usa isso hoje, mas por segurança), cai no sprite genérico antigo — não quebra compatibilidade.
+
+### Validação
+Testado via jsdom: ao abrir o baú padrão, o ícone do popup recebe a classe `bauicone2 baupadrao` corretamente.
+
+## 93. Barra de categorias do inventário sumindo com muitos itens
+
+### O que foi pedido
+Com muita coisa acumulada na mochila, a barra de filtro de categorias (Tudo/Equipamento/Consumíveis/Tesouros/Item-chave) desaparecia ao rolar a grade de itens.
+
+### Causa raiz
+`#viewInventario` é uma única região rolável (`.view{flex:1;overflow-y:auto}`) — cabeçalho, caixa de equipamento, barra de filtros e grade de itens rolam tudo junto, como um bloco só. Com muitos itens, os filtros ficavam lá em cima, fora da área visível.
+
+### Fix
+`.invfiltros` virou `position:sticky;top:0`, com fundo sólido (`var(--panel)`) pra não deixar os itens da grade aparecerem por baixo enquanto ela fica fixa no topo durante a rolagem.
+
+### Validação
+Confirmado via `getComputedStyle` no jsdom que `position:sticky` está de fato aplicado no elemento.
+
+## 94. Redesign dos Pontos de Atributo (sem acordeão)
+
+### O que foi pedido
+Usuário não gostava do design anterior: cada atributo era um cartão fechado por padrão, precisava tocar pra expandir e só aí apareciam a descrição e o botão de investir — 2 toques pra gastar 1 ponto, descrição escondida por padrão.
+
+### Direção de design
+Apresentei 3 direções (bolinhas/pips sempre visíveis, cards em grid com barra de progresso, anel circular estilo skill tree). Usuário pediu pra eu escolher — fui na de **barra de progresso horizontal**, adaptada pra pilha vertical de 3 cards (não grid 2 colunas, que deixaria 1 célula órfã com só 3 itens).
+
+### Implementação
+Novo markup `.atrcard2`: ícone/nome/valor sempre visíveis no topo, descrição sempre visível logo abaixo (não escondida atrás de clique), barra de progresso (`.atrbarrafundo`/`.atrbarrafill`) mostrando a fração já investida do teto, botão "+" sempre visível ao lado da barra. Fortuna/Foco/Vigor têm o mesmo teto (30%) e custo por ponto (2%), então a barra usa `bonus/TETO` direto sem precisar de lógica por atributo.
+
+O acordeão antigo (`.atrcard`/`.atrbarra`/`.atrcorpo`, listener de clique que expandia via `.aberto`) foi **comentado, não apagado** — mesmo padrão de outros blocos `DEPRECATED` já no arquivo.
+
+### Validação
+Testado via jsdom forçando `gasto.fortuna` em valores diferentes: 5 pontos investidos → barra em 33,3% e valor `+10%`; 15 pontos (teto) → barra em 100% e valor `+30%` — batendo exato com o esperado nos dois casos.
+
+## 95. Fonte ilegível no título de categoria de conquistas
+
+### O que foi pedido
+Usuário achou o texto dos títulos de conquista (cabeçalho de cada categoria: "Sequência Diária", "Matar Monstros" etc.) muito ilegível.
+
+### Diagnóstico
+Calculei o contraste real (fórmula WCAG) de todas as 5 cores de categoria contra o fundo `--panel-2` dos 4 temas — todas passam (4,3:1 a 11:1, a maioria bem acima do mínimo de 4,5:1), então não era problema de contraste de cor. O suspeito real: `.conqcatnome` era a **única fonte serifada decorativa do app inteiro** (Cormorant Garamond) — todo o resto usa Outfit (sans) ou Silkscreen (pixel). Serifada fina não combina bem com telas pequenas/pixel-art.
+
+### Fix
+Trocada pra Outfit, peso 700, 18px (ajustado de 20px já que sans "pesa" visualmente mais que serifada no mesmo tamanho, pra manter a mesma hierarquia).
+
+### Pendência
+Não confirmado ainda se resolve de fato — se continuar ruim, o problema pode estar em outro elemento (nome individual de cada conquista, `.conqv2nome`, não o cabeçalho da categoria).
+

@@ -8549,3 +8549,17 @@ Trocada pra Outfit, peso 700, 18px (ajustado de 20px já que sans "pesa" visualm
 ### Pendência
 Não confirmado ainda se resolve de fato — se continuar ruim, o problema pode estar em outro elemento (nome individual de cada conquista, `.conqv2nome`, não o cabeçalho da categoria).
 
+## 96. Cor da dificuldade Média presa na cor do tema em vez de fixa
+
+### O que foi pedido
+A cor da dificuldade "Média" (pip no card da tarefa e seletor no composer) mudava conforme o tema escolhido pelo usuário — deveria ser uma cor fixa, como as outras 3 dificuldades já são.
+
+### Causa raiz
+`.task[data-dif="media"] .difpip{color:var(--accent)}` e `.dif[data-dif="media"].on{color:var(--accent)}` usavam a cor de destaque do tema (`--accent`), que muda entre Laranja/Azul/Dourado/Escuro. Trivial (cinza fixo `#7E8BA3`), Fácil (`--verde`) e Difícil (`--perigo`) já usavam cores fixas, independentes de tema — só Média tinha esse comportamento diferente. Achado no caminho: o nome do rótulo ("Média") no seletor do composer nem tinha regra própria de cor (`.dif[data-dif="media"].on .difnome`) — as outras 3 dificuldades têm, essa não, e caía no mesmo fallback genérico ligado ao tema.
+
+### Fix
+Trocado pra `#F2C94C` (o mesmo amarelo dourado já usado em outros lugares do app — moeda, categoria "Nível" das conquistas), fixo independente de tema. Duas correções, replicadas nos dois blocos de CSS duplicados do arquivo (6 ocorrências no total): cor do pip, cor do card ativo, e a regra do nome do rótulo que estava faltando.
+
+### Validação
+`css` npm lib confirmou o CSS válido depois da troca; conferido visualmente por grep que as 6 ocorrências (3 regras × 2 blocos duplicados) ficaram consistentes com `#F2C94C`.
+```

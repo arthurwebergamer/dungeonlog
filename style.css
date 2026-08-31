@@ -872,7 +872,7 @@
   }
   .task[data-dif="trivial"] .difpip{color:#7E8BA3}
   .task[data-dif="facil"]   .difpip{color:var(--verde)}
-  .task[data-dif="media"]   .difpip{color:var(--accent)}
+  .task[data-dif="media"]   .difpip{color:#F2C94C}
   .task[data-dif="dificil"] .difpip{color:var(--perigo)}
 
   /* --- seletor no composer --- */
@@ -899,10 +899,11 @@
 
   .dif[data-dif="trivial"].on{color:#7E8BA3}
   .dif[data-dif="facil"].on  {color:var(--verde)}
-  .dif[data-dif="media"].on  {color:var(--accent)}
+  .dif[data-dif="media"].on  {color:#F2C94C}
   .dif[data-dif="dificil"].on{color:var(--perigo)}
   .dif[data-dif="trivial"].on .difnome{color:#7E8BA3}
   .dif[data-dif="facil"].on   .difnome{color:var(--verde)}
+  .dif[data-dif="media"].on   .difnome{color:#F2C94C}
   .dif[data-dif="dificil"].on .difnome{color:var(--perigo)}
 
   /* --- "vezes por dia": mesmo rotulo do difwrap, stepper proprio --- */
@@ -2043,7 +2044,7 @@
   }
   .task[data-dif="trivial"] .difpip{color:#7E8BA3}
   .task[data-dif="facil"]   .difpip{color:var(--verde)}
-  .task[data-dif="media"]   .difpip{color:var(--accent)}
+  .task[data-dif="media"]   .difpip{color:#F2C94C}
   .task[data-dif="dificil"] .difpip{color:var(--perigo)}
 
   /* --- seletor no composer --- */
@@ -2070,10 +2071,11 @@
 
   .dif[data-dif="trivial"].on{color:#7E8BA3}
   .dif[data-dif="facil"].on  {color:var(--verde)}
-  .dif[data-dif="media"].on  {color:var(--accent)}
+  .dif[data-dif="media"].on  {color:#F2C94C}
   .dif[data-dif="dificil"].on{color:var(--perigo)}
   .dif[data-dif="trivial"].on .difnome{color:#7E8BA3}
   .dif[data-dif="facil"].on   .difnome{color:var(--verde)}
+  .dif[data-dif="media"].on   .difnome{color:#F2C94C}
   .dif[data-dif="dificil"].on .difnome{color:var(--perigo)}
 
   /* --- "vezes por dia": mesmo rotulo do difwrap, stepper proprio --- */

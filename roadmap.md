@@ -8391,3 +8391,48 @@ Testes funcionais em jsdom/Node, código real extraído do arquivo:
 
 ### Lição
 Nem todo elemento de debug obedece CSS: qualquer coisa que manipule `style.display` **inline** via JS (não só classe) precisa ser verificada caso a caso — a regra `.debug-el` sozinha só cobre quem não tem lógica de visibilidade própria em JS. Vale checar isso de novo se aparecer um painel de debug novo no futuro.
+
+## 86. Baú clicável na Arena + baú especial com chave (Spec 4 + Spec 4b)
+
+### O que foi pedido
+Spec 4: ao vencer o dia, em vez do pop-up de recompensa abrir sozinho, um sprite de baú fechado aparece fixo na Arena, ao lado do herói. Clique abre o pop-up mostrando o que já foi creditado (não recalcula). Evoluiu em sessão de brainstorm pra Spec 4b: além do baú padrão (sempre spawna, abre sem chave), uma chance à parte de um **segundo baú, especial**, que exige chave pra abrir — não substitui o padrão, os dois coexistem, e o especial pode nem aparecer.
+
+### Decisões de design (fechadas em sessão de brainstorm antes da implementação)
+- **Fonte de chave:** loot aleatório (baú comum) + loja.
+- **Itens de chave:** reaproveita os 5 já existentes no catálogo (`Chave de Ferro/Chave/Dourada/Cristal/Mestra`) — retipados de `tesouro` pra `chave` em vez de criar itens novos.
+- **Compatibilidade:** chave de tier igual ou maior destrava (consome a de **menor tier suficiente** no inventário, nunca desperdiça uma chave melhor à toa).
+- **Sem chave no fim do dia:** loot do baú especial é perdido de verdade (risco real) — o baú padrão sempre credita na hora, só o pop-up é que fica pendente até o clique.
+- **Raridade do baú especial:** pesada pra cima de propósito (pesos `[5,15,35,45]` pra Comum/Incomum/Raro/Épico) — ele já é raro de aparecer, então quando aparece deveria pedir uma chave que pareça valiosa na maior parte das vezes.
+
+### Implementação
+`assets.js`: 5 itens de chave retipados. `index.html`: `LOJA_TIPOS` ganha `'chave'` (com exclusão explícita do Grimório do pool, que também é tipo `chave` mas é recompensa de nível, não mercadoria); `mediaDifHoje()`/`chanceBauTrancado()`/`tierBauNecessario()` (pesos por tier, dificuldade do dia dá empurrão extra); `sortearGanhos()`/`creditarGanhos()`/`chaveParaDestravar()`; `gerarEstadoBauDia()` (função única compartilhada entre o gancho de vitória e o fallback de segurança); `atualizarBauArena()`/`abrirBauPadrao()`/`abrirBauEspecial()`. Sprites do pack "Treasure Chests" (Mana Seed / Seliel the Shaper, itch.io, uso comercial liberado) embutidos em base64 no `:root{}` do `style.css`, um par fechado/aberto pro baú padrão e 4 pares (um por tier de raridade) pro especial.
+
+### Bugs reais encontrados (nenhum pego só lendo código — todos surgiram testando)
+1. **Loja excluiria as chaves sozinha.** `LOJA_TIPOS` tinha uma whitelist que não incluía `'chave'` — a decisão de "loja como fonte" teria sido quebrada silenciosamente se eu não tivesse checado o filtro antes de implementar.
+2. **Estado preso em formato antigo.** Ao separar baú padrão/especial, o schema do `localStorage` mudou de `{ids,trancado,tier,aberto}` pra `{padrao,especial}`. Um dia já vencido antes da mudança ficava com dado no formato velho — o baú simplesmente não aparecia (sem erro, sem aviso). Fix: migração automática dentro de `lerBauDia()`, na leitura, sem re-creditar nada.
+3. **Baú dependia só do instante exato da vitória.** Se o dia já tinha sido vencido antes desse recurso existir (ou a transição foi perdida por qualquer motivo), recarregar a página nunca recriava o estado — `alternar()` só dispara na transição, não em reload. Fix: `garantirBauDia()`, chamado a cada `atualizarBauArena()`, gera o estado on-demand se faltando.
+4. **Causa raiz real do "sumiu de novo": `desenharHeroi()` reescreve `heroSprite.innerHTML` inteiro.** O baú tinha sido colocado como filho de `#heroSprite` pra ficar "grudado" no herói — mas essa função redesenha o sprite do zero toda vez que roda, apagando qualquer filho extra junto. Só foi encontrado rodando o app de verdade (servidor local + jsdom simulando vitória) e vendo `document.getElementById('bauArena')` voltar `null` mesmo com o estado salvo corretamente. Fix: baú virou irmão de `#heroSprite`, ambos dentro de `.fighter` (nunca reescrito).
+5. **Pulso da animação não parava quando o baú era aberto.** `.bauArena.mostrar` (com a animação) e `.bauArena.aberto` (com `animation:none`) tinham a mesma especificidade CSS (2 classes cada) — a regra que vem depois no arquivo vence em empate, e por acaso era a do pulso. Fix: `.bauArena.mostrar.aberto` (3 classes), especificidade maior, vence sempre, independente da ordem no arquivo. Confirmado calculando a especificidade real via parser CSS, não só lendo o código.
+6. **Texto da dica errado.** `"Requer uma Raro ou superior"` — faltava a palavra "chave" na frase inteira, e o adjetivo tava no gênero errado (deveria concordar com "chave", feminino). Fix: array `RARIDADES_FEM_PT` só pra essa concordância + frase corrigida pra `"Requer uma chave Rara ou superior"`.
+7. **Raridade do loot do baú especial saía fraca.** Primeira tentativa (bônus de sorte no sorteio) foi simulada antes de entregar e o resultado foi fraco demais pra se notar (~6 pontos percentuais de diferença). Trocado por garantia real: pelo menos 1 item sai numa raridade mínima que sobe com o tier (Incomum→Raro→Épico→Lendário) — testado 5000 vezes por tier, 0 falhas.
+
+### Validação
+`node --check` nos 44 blocos `<script>`, balanceamento de `<div>`/`<svg>`, CSS parseado (`css` npm lib). Além disso — pela primeira vez nessa profundidade — o app foi rodado **de verdade**: servidor HTTP local servindo os 3 arquivos + jsdom executando o JS real, simulando completar tarefas, vencer o dia, clicar nos baús (com e sem chave no inventário), e conferindo classes CSS aplicadas no DOM depois de cada ação. Foi assim que os bugs 3, 4 e 5 foram encontrados — nenhum aparecia só lendo o código.
+
+### Pendências / decisões que ainda podem mudar
+- Posicionamento visual (offsets em px dos dois baús ao lado do herói) foi calibrado por tentativa e erro a partir de prints do usuário — ainda não confirmado em dispositivo real, só no navegador dele.
+- Pesos de chance/tier/raridade (`ECO.chanceBauTrancadoMin/Max`, `PESO_TIER_ESPECIAL`, `RAR_MINIMA_POR_TIER`) são valores iniciais, fáceis de ajustar depois de testar o "feel" real.
+
+## 87. Bug pequeno: rótulo "Equipamentos" preso em português no Perfil
+
+### O que foi pedido
+A tira de badges de equipamento (acima da barra de Vida, tela de Perfil/Tarefas) sempre mostrava "Equipamentos" em português, mesmo com o app em inglês.
+
+### Causa raiz
+`montarFaixa()` criava o rótulo com texto fixo (`'<span class="xplabel">Equipamentos</span>'`), sem passar pelo sistema de i18n (`data-i18n`/`window.t()`). Bug duplo: além de nunca traduzir, mesmo que traduzisse só na criação, trocar de idioma **depois** que a linha já existia não teria efeito nenhum (a função só monta o rótulo `if (!row)`, ou seja, uma vez só).
+
+### Fix
+Chave nova no dicionário (`perfil.equipamentos`: Equipamentos/Equipment). Rótulo criado com `data-i18n="perfil.equipamentos"` (pego pelo scanner global `aplicarIdioma()`) **e** retraduzido via `window.t()` toda vez que `montarFaixa()` roda — não só na criação — pra acompanhar troca de idioma em qualquer momento.
+
+### Validação
+`node --check` nos 44 blocos, tags balanceadas.

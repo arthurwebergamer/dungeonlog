@@ -917,8 +917,8 @@ const ECO = {
   lootMax:                 3,
 
   // --- bau trancado (Spec 4b: chave por dificuldade media do dia) ---
-  chanceBauTrancadoMin: 0.15,   // chance minima (dia so com tarefas trivial/facil)
-  chanceBauTrancadoMax: 0.50,   // chance maxima (dia so com tarefas dificil)
+  chanceBauTrancadoMin: 0.05,   // chance minima (dia so com tarefas trivial/facil)
+  chanceBauTrancadoMax: 0.18,   // chance maxima (dia so com tarefas dificil)
 
   // --- niveis ---
   nivelBase:             100,   // XP para sair do nivel I
@@ -2429,14 +2429,16 @@ function persistir(){ if (typeof jaComecou !== 'undefined' && jaComecou) salvar(
 /* ---------- espolio ---------- */
 const PESO_RAR = [50, 28, 14, 6, 2];
 
-function sortearItem(sorte){
+function sortearItem(sorte, permitirLendario){
+  if (permitirLendario === undefined) permitirLendario = true;
   // sorte 0..1 desloca o peso para raridades altas
   const pesos = PESO_RAR.map((p,i) => p * (1 + sorte * i * 0.9));
+  if (!permitirLendario) pesos[4] = 0;   // Lendario reservado pro bau especial (ver darLoot/sortearGanhos)
   const total = pesos.reduce((a,b)=>a+b,0);
   let r = Math.random() * total, rar = 0;
   for (let i=0;i<pesos.length;i++){ r -= pesos[i]; if (r <= 0){ rar = i; break; } }
   let pool = ITENS.map((_,i)=>i).filter(i => ITENS[i][3] === rar && !ITENS[i][8]);
-  if (!pool.length) pool = ITENS.map((_,i)=>i).filter(i => !ITENS[i][8]);
+  if (!pool.length) pool = ITENS.map((_,i)=>i).filter(i => !ITENS[i][8] && (permitirLendario || ITENS[i][3] < 4));
   return pool[Math.floor(Math.random()*pool.length)];
 }
 
@@ -2445,7 +2447,7 @@ function darLoot(nTarefas){
   const qtd = Math.min(ECO.lootMax, ECO.lootBase + Math.floor(nTarefas / ECO.lootExtraCada));
   const ganhos = [];
   for (let i=0;i<qtd;i++){
-    const id = sortearItem(sorte);
+    const id = sortearItem(sorte, false);   // false = sem Lendario -- exclusivo do bau especial
     darItem(id, 1);
     ganhos.push(item(id));
   }
@@ -3637,9 +3639,16 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   // sempre alcancar a borda do card flutuante (dragEl), que segue o dedo via
   // position:fixed. Ancora no topo atual do placeholder (phTop, sua posicao
   // no fluxo) e cresce na direcao em que o card flutuante se afastou dele.
-  // Nunca fica menor que alturaBaseCard (o vao minimo e sempre 1 card) nem
-  // maior que list.clientHeight (seguranca contra esticar mais que a propria
-  // lista visivel).
+  // Nunca fica menor que alturaBaseCard (o vao minimo e sempre 1 card).
+  //
+  // Teto: NAO usa list.clientHeight -- #list e flex:1 e preenche a tela
+  // toda, tarefa nenhuma ou nao, entao com poucas tarefas sobra um espaco
+  // vazio enorme dentro do container que nao aparece visualmente mas conta
+  // pro calculo, deixando o vao esticar muito mais do que devia (bug
+  // relatado: comportamento estranho especificamente com 2 tarefas --
+  // com 3+ o conteudo ocupa mais espaco e mascara o mesmo efeito). Teto
+  // agora e proporcional ao conteudo real: nunca mais que todos os cards
+  // visiveis (dragEl + siblings) juntos, com uma folga de meio card.
   function atualizarAlturaElastica(){
     if (!placeholder || !dragEl) return;
     const phTop = placeholder.getBoundingClientRect().top;
@@ -3653,7 +3662,9 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     } else if (dragTop < phTop){
       altura = phBottomBase - dragTop;   // arrastando pra cima: estica ate o topo do card flutuante
     }
-    altura = Math.max(alturaBaseCard, Math.min(altura, list.clientHeight));
+    const nCards = list.querySelectorAll('.task:not(.dragging)').length + 1; // +1 = o proprio dragEl
+    const tetoConteudo = alturaBaseCard * (nCards + 0.5);
+    altura = Math.max(alturaBaseCard, Math.min(altura, tetoConteudo, list.clientHeight));
     placeholder.style.height = altura + 'px';
   }
 
@@ -5194,8 +5205,8 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   /* ---------- efeito: Fortuna no sorteio de raridade do loot ---------- */
   const _sortearItem = window.sortearItem;
   if (typeof _sortearItem === 'function'){
-    window.sortearItem = function(sorte){
-      return _sortearItem((sorte || 0) + bonusFortuna());
+    window.sortearItem = function(sorte, ...resto){
+      return _sortearItem((sorte || 0) + bonusFortuna(), ...resto);
     };
   }
 

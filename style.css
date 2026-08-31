@@ -733,7 +733,8 @@
   .bonusline .bx b{color:var(--accent)}
 
   /* --- filtros --- */
-  .invfiltros{display:flex;gap:7px;margin-bottom:12px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+  .invfiltros{display:flex;gap:7px;margin-bottom:12px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px;
+              position:sticky;top:0;z-index:2;background:var(--panel);padding-top:6px}
   .invfiltros button{flex:none;font-family:'Outfit',sans-serif;font-size:11.5px;font-weight:600;color:var(--dim);
         background:var(--panel-3);border:1px solid var(--line);border-radius:999px;padding:5px 12px;cursor:pointer}
   .invfiltros button.on{color:var(--bg);background:var(--accent);border-color:var(--accent)}
@@ -1329,6 +1330,19 @@
             display:flex;align-items:center;justify-content:center}
   .bauicone.abriu{animation:bauPulo .4s ease}
   @keyframes bauPulo{0%{transform:scale(1)}45%{transform:scale(1.2) rotate(-4deg)}100%{transform:scale(1)}}
+  /* icone de verdade do baú clicado (Arena), em vez do sprite generico do
+     catalogo -- reaproveita as mesmas CSS vars do pack Treasure Chests */
+  .bauicone2{background-size:contain;background-repeat:no-repeat;background-position:center;image-rendering:pixelated}
+  .bauicone2.baupadrao{background-image:var(--bau-fechado)}
+  .bauicone2.baupadrao.abriu{background-image:var(--bau-aberto)}
+  .bauicone2.tier0{background-image:var(--bau-esp-t0-fechado)}
+  .bauicone2.tier0.abriu{background-image:var(--bau-esp-t0-aberto)}
+  .bauicone2.tier1{background-image:var(--bau-esp-t1-fechado)}
+  .bauicone2.tier1.abriu{background-image:var(--bau-esp-t1-aberto)}
+  .bauicone2.tier2{background-image:var(--bau-esp-t2-fechado)}
+  .bauicone2.tier2.abriu{background-image:var(--bau-esp-t2-aberto)}
+  .bauicone2.tier3{background-image:var(--bau-esp-t3-fechado)}
+  .bauicone2.tier3.abriu{background-image:var(--bau-esp-t3-aberto)}
 
   .baulabel{font-family:'Silkscreen',monospace;font-size:11px;color:var(--accent);
             letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px}
@@ -1424,6 +1438,28 @@
            font-family:'Outfit',sans-serif;line-height:1}
   .atrmais:hover{background:var(--accent-dim)}
   .atrmais:disabled{opacity:.35;cursor:not-allowed;background:transparent}
+
+  /* atrcard2: redesign sem acordeao (pedido do usuario) -- tudo sempre
+     visivel (nome/valor, descricao, barra de progresso, botao +), nada
+     escondido atras de clique. Os 3 atributos tem o mesmo teto (30%) e
+     mesmo custo por ponto (2%), entao a barra usa bonus/TETO direto (ver
+     JS em renderAtributosPontos). */
+  .atrcard2{border-radius:14px;background:var(--panel-2);border:1px solid var(--line);
+            padding:12px 13px;margin-bottom:10px}
+  .atrcard2-topo{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+  .atrcard2-topo .atricone{width:18px;height:18px;flex:none;color:var(--atr-cor)}
+  .atrcard2-topo .atrnome{font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;flex:1;color:var(--text)}
+  .atrcard2-topo .atrvalor{font-family:'Silkscreen',monospace;font-size:14px;color:var(--atr-cor)}
+  .atrcard2 .atrdesc{display:block;font-family:'Outfit',sans-serif;font-size:11.5px;color:var(--dim);margin-bottom:10px}
+  .atrcard2-linha{display:flex;align-items:center;gap:10px}
+  .atrbarrafundo{flex:1;height:8px;border-radius:4px;background:var(--line);overflow:hidden}
+  .atrbarrafill{height:100%;border-radius:4px;background:var(--atr-cor);width:0%;
+                transition:width .25s ease}
+  .atrmais2{width:30px;height:30px;flex:none;border-radius:9px;border:1px solid var(--atr-cor);
+            background:transparent;color:var(--atr-cor);font-size:17px;font-weight:600;cursor:pointer;
+            font-family:'Outfit',sans-serif;line-height:1}
+  .atrmais2:hover{background:var(--atr-cor);color:var(--bg)}
+  .atrmais2:disabled{opacity:.35;cursor:not-allowed;background:transparent;color:var(--atr-cor)}
 
 /* ===== Bloco style #29 ===== */
 .lvlitem{display:flex;align-items:center;gap:10px;margin:12px 0;padding:10px 12px;

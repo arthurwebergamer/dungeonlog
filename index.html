@@ -395,42 +395,42 @@
           <span class="atrpill" id="atrDisponiveis">0 disponíveis</span>
         </div>
 
-        <div class="atrcard" style="--atr-cor:#F2A65A">
-          <div class="atrbarra">
+        <div class="atrcard2" style="--atr-cor:#F2A65A">
+          <div class="atrcard2-topo">
             <svg class="atricone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5l2.9 6.6 7.1.7-5.4 4.8 1.6 7-6.2-3.8-6.2 3.8 1.6-7-5.4-4.8 7.1-.7z"/></svg>
             <span class="atrnome" data-i18n="atr.fortuna">Fortuna</span>
             <span class="atrvalor" id="atrFortunaValor">+0%</span>
-            <svg class="atrchevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
           </div>
-          <div class="atrcorpo">
-            <span class="atrdesc" data-i18n="atr.fortunaDesc">chance de raridade no espólio</span>
-            <button class="atrmais" id="atrMaisFortuna" type="button">+</button>
+          <div class="atrdesc" data-i18n="atr.fortunaDesc">chance de raridade no espólio</div>
+          <div class="atrcard2-linha">
+            <div class="atrbarrafundo"><div class="atrbarrafill" id="atrFortunaBarra"></div></div>
+            <button class="atrmais2" id="atrMaisFortuna" type="button">+</button>
           </div>
         </div>
 
-        <div class="atrcard" style="--atr-cor:#5AA9F2">
-          <div class="atrbarra">
+        <div class="atrcard2" style="--atr-cor:#5AA9F2">
+          <div class="atrcard2-topo">
             <svg class="atricone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".8" fill="currentColor"/></svg>
             <span class="atrnome" data-i18n="atr.foco">Foco</span>
             <span class="atrvalor" id="atrFocoValor">0%</span>
-            <svg class="atrchevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
           </div>
-          <div class="atrcorpo">
-            <span class="atrdesc" data-i18n="atr.focoDesc">de desconto na loja</span>
-            <button class="atrmais" id="atrMaisFoco" type="button">+</button>
+          <div class="atrdesc" data-i18n="atr.focoDesc">de desconto na loja</div>
+          <div class="atrcard2-linha">
+            <div class="atrbarrafundo"><div class="atrbarrafill" id="atrFocoBarra"></div></div>
+            <button class="atrmais2" id="atrMaisFoco" type="button">+</button>
           </div>
         </div>
 
-        <div class="atrcard" style="--atr-cor:#E5698A">
-          <div class="atrbarra">
+        <div class="atrcard2" style="--atr-cor:#E5698A">
+          <div class="atrcard2-topo">
             <svg class="atricone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5s-7.5-4.6-9.8-9.3C.9 8 2.4 4.8 5.6 4.1c2-.4 3.9.5 5 2.1a5.5 5.5 0 015-2.1c3.2.7 4.7 3.9 3.4 7.1-2.3 4.7-9.8 9.3-9.8 9.3z"/></svg>
             <span class="atrnome" data-i18n="atr.vigor">Vigor</span>
             <span class="atrvalor" id="atrVigorValor">-0%</span>
-            <svg class="atrchevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
           </div>
-          <div class="atrcorpo">
-            <span class="atrdesc" data-i18n="atr.vigorDesc">de perdão no dano por tarefa largada</span>
-            <button class="atrmais" id="atrMaisVigor" type="button">+</button>
+          <div class="atrdesc" data-i18n="atr.vigorDesc">de perdão no dano por tarefa largada</div>
+          <div class="atrcard2-linha">
+            <div class="atrbarrafundo"><div class="atrbarrafill" id="atrVigorBarra"></div></div>
+            <button class="atrmais2" id="atrMaisVigor" type="button">+</button>
           </div>
         </div>
       </div>
@@ -2895,7 +2895,7 @@ function abrirBauPadrao(){
   salvarBauDia(estado);
   atualizarBauArena();
   if (typeof window.enfileirarPopup === 'function' && typeof mostrarBauLoot === 'function'){
-    window.enfileirarPopup(prox => mostrarBauLoot(ganhos, prox));
+    window.enfileirarPopup(prox => mostrarBauLoot(ganhos, prox, 'baupadrao'));
   }
 }
 window.abrirBauPadrao = abrirBauPadrao;
@@ -2931,7 +2931,7 @@ function abrirBauEspecial(){
 
   const ganhos = esp.ids.map(id => item(id));
   if (typeof window.enfileirarPopup === 'function' && typeof mostrarBauLoot === 'function'){
-    window.enfileirarPopup(prox => mostrarBauLoot(ganhos, prox));
+    window.enfileirarPopup(prox => mostrarBauLoot(ganhos, prox, 'tier' + esp.tier));
   }
 }
 window.abrirBauEspecial = abrirBauEspecial;
@@ -4883,13 +4883,21 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   }
   bauBG.onclick = fecharBau;
 
-  function mostrarBauLoot(ganhos, aoFechar){
+  function mostrarBauLoot(ganhos, aoFechar, iconeVariante){
     if (!ganhos || !ganhos.length){ if (aoFechar) aoFechar(); return; }
     _aoFecharBau = aoFechar || null;
     const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
 
+    // iconeVariante: 'baupadrao' ou 'tier0'..'tier3' -- usa o sprite de
+    // verdade do baú que foi clicado (pack Treasure Chests, mesmas CSS vars
+    // da Arena) em vez do icone generico antigo do catalogo. Sem variante
+    // (chamada antiga/externa), cai no sprite generico de sempre.
+    const iconeHtml = iconeVariante
+      ? '<div class="bauicone bauicone2 ' + iconeVariante + '" id="bauIcone"></div>'
+      : '<div class="bauicone" id="bauIcone">'+spriteHTML(SP_BAU, 56)+'</div>';
+
     bauPop.innerHTML =
-      '<div class="bauicone" id="bauIcone">'+spriteHTML(SP_BAU, 56)+'</div>'+
+      iconeHtml+
       '<div class="baulabel">' + (en ? 'Treasure Chest' : 'Baú do Tesouro') + '</div>'+
       '<div class="bauitens" id="bauItens"></div>'+
       '<button class="bauok" id="bauOk">' + (en ? 'Continue' : 'Continuar') + '</button>';
@@ -5155,6 +5163,15 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     const elVigor = document.getElementById('atrVigorValor');
     if (elVigor) elVigor.textContent = '+' + Math.round(perdaoVigor() * 100) + '%';
 
+    // barra de progresso: os 3 atributos tem o mesmo teto (30%) e o mesmo
+    // custo por ponto (2%), entao bonus/TETO ja da a fracao certa pra todos
+    const barraFortuna = document.getElementById('atrFortunaBarra');
+    if (barraFortuna) barraFortuna.style.width = Math.min(100, (bonusFortuna() / FORTUNA_TETO) * 100) + '%';
+    const barraFoco = document.getElementById('atrFocoBarra');
+    if (barraFoco) barraFoco.style.width = Math.min(100, (descontoFoco() / FOCO_TETO) * 100) + '%';
+    const barraVigor = document.getElementById('atrVigorBarra');
+    if (barraVigor) barraVigor.style.width = Math.min(100, (perdaoVigor() / VIGOR_TETO) * 100) + '%';
+
     const bFortuna = document.getElementById('atrMaisFortuna');
     if (bFortuna) bFortuna.disabled = disp <= 0 || noTeto('fortuna');
     const bFoco = document.getElementById('atrMaisFoco');
@@ -5193,6 +5210,14 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
      delegacao custa a mesma coisa aqui e fica mais facil de estender se
      um 4o atributo aparecer no futuro (Vigor, o 3o, deixou de ser
      placeholder na v4.121 -- item 42-l do roadmap). ---------- */
+  /* ---------- DEPRECATED: acordeao antigo (cartao comecava fechado, toque
+     na barra revelava descricao + botao). Substituido por atrcard2: agora
+     tudo fica sempre visivel (descricao + barra de progresso + botao "+"),
+     sem precisar clicar pra expandir -- pedido do usuario, o design antigo
+     "nao tava bom ainda". Bloco mantido comentado, nao apagado, seguindo o
+     padrao do arquivo (ver outros DEPRECATED). Sem .atrbarra/.atrcard no
+     HTML novo, esse listener nunca mais encontra nada pra expandir mesmo
+     se reativado sem querer.
   const painelAtributos = document.querySelector('.atributospontos');
   if (painelAtributos){
     painelAtributos.addEventListener('click', e => {
@@ -5201,6 +5226,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       barra.closest('.atrcard')?.classList.toggle('aberto');
     });
   }
+  ---------- */
 
   /* ---------- efeito: Fortuna no sorteio de raridade do loot ---------- */
   const _sortearItem = window.sortearItem;

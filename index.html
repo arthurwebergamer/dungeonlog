@@ -18,6 +18,41 @@
 <link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=Outfit:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 
+<!-- =====================================================================
+     TOGGLE DEBUG — silenciar console (log/warn/error)  —  precisa ser o
+     primeiro bloco de script dentro do cabecalho do documento, antes de
+     qualquer outro codigo (inclusive assets.js e o bloco de i18n logo
+     abaixo), pra garantir que nenhuma chamada de console escape do gate
+     antes do toggle entrar em vigor.
+
+     Mesma chave/flag do toggle de UI (icone de moedas):
+     localStorage['questlog.modoDebug.v1']. Default false -> console
+     100% mudo (log, warn E error) ate o jogador clicar nas moedas.
+     Ao religar em runtime (sem reload), volta a imprimir na hora,
+     porque cada chamada consulta o localStorage de novo, nao um
+     valor cacheado na carga da pagina.
+
+     Import.: console.error tambem fica mudo por padrao -- inclui
+     erros reais de Firebase/rede (ver blocos "Firebase" mais abaixo).
+     Decisao explicita do usuario: log e debug, debug fica escondido
+     junto com o resto ate o toggle ligar.
+     ===================================================================== -->
+<script>
+(function(){
+  const CHAVE = 'questlog.modoDebug.v1';
+  function modoDebugLigado(){
+    try { return localStorage.getItem(CHAVE) === 'true'; } catch(e){ return false; }
+  }
+  const original = { log: console.log, warn: console.warn, error: console.error, table: console.table, info: console.info, debug: console.debug };
+  window.__consoleOriginal = original; // acesso de emergencia via devtools, se precisar depurar o proprio silenciador
+  ['log','warn','error','table','info','debug'].forEach(function(metodo){
+    console[metodo] = function(){
+      if (modoDebugLigado()) original[metodo].apply(console, arguments);
+    };
+  });
+})();
+</script>
+
 <script>
   // item 49 do roadmap (pedido do usuario): detecta o idioma do
   // dispositivo/navegador e usa como padrao ANTES do jogador escolher
@@ -160,6 +195,8 @@
           <img class="heroimg" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAFPklEQVR4nJWXbUxTVxjHf4yFuEwi1pcCZZO2CHZzaNwSXoSYlhKcziwBlGzGzA+Kyz6gLgYwIUtMjPEtYNB9mJkJiWYLWGcMi0LEdi8oIkiCUYoCfUEY1EhBY+JCXO4+tOdy295C/Sc3nPuc5zz///Oc55xb4ogR2zbmScr31ttdcbHMLYSYHQWRpSAPr3uUkfFx2f7d3t0MOh9H2GMRNa+A8MwAjDodq/QfAuB1j1KypTiE3FKQJ88JMfNVZMEKbNuYJwlSEdSo08nEgkyIWmPKCrErK6ImJOYKKDMXUJIp3wWx2BqlmHARUQUoM1cSACGk0RAuBt6iAoJclDs8czWi8DGEbk20CryjRg6EkIvMlaTKvwATJ+ppv34zxCb6RoyNOl1EY0cIaL3dFSdUCvJo+wzI4xwgocUm+06cqGeNKUsWYe/sUhURIUBUwajThRCIMgoCJVlhi43SzCxygj4Cg87HckWMOh32zq6IbVAVILIXpGKc0GKTbTlBP697lNLMAElpZhaFQZ9wwSJGTD0gbrvwJqq1n8XrHqXh1E5KvVflMTePy4856FNrPxsS1+sexVKQF9ED76plb+/sImHxJB8s+VRe/MO3m9h7oh6A8sr72M7XB8gVKK/8XvG2iX35qfx0Z5R9+alUX+5Ro1LfgmhX57HGNoaccRxr7FANdqyxIzjfFjGXsHhS9TuhegoAZl8l8/TFfbzuUT5J/ReAlJQUANqvXVUVIOzC747HBUDdjVZmXyWrJha1CQF5CwQSExPJTnJx79IhVf97lw6RneQiMTExapxwEao9oMTI+DhPX0ySn24AzpGvj+4r5qYd5/A9GOK68xGzr5IRR1oNC36MTBs3BYT0N3P0821os1ez1JgWdc30yBi+B0PU3WjFuK4CAOftP6P21bwVeP3e+wCYzUWYzUXUnalki+dj8tMNaLNXR/j7Hgxxx+PiuvMRew6cB8DhuCXHUUPUClitVqmsbDvp6QYADAYDLpeLn89UzqcZgD0Hzsv+AB6PiytXLtPR0RHBN28F3G43FosVu72Dvr5eyst3YGsLBH3yxIXL5cLhuIXZXITBYCAz0yDP2WwtaDQaLBYrDsett6/Ahg2fSRpNEhrNMgCGh0eYNJbiOFohE421xTH2D6SlQtpmSSY31zWTPPIbGRlGAPz+Kfz+Gfr6emM/hvoVU+wsKkSr1eL3T8n2L3/8CwBTfS/FAz3kfgPFAz2Y6ntD5gWxVqtlZ1Eh+hVTqEFVQFmJXsrVmlj0epit6zPw+2cA2BXfycuJCUz7m+acn8wNTfubeDkxwa74zqCAGbauz2DR62FytSbKSvQRP3JVt6CsRC+V5xQAMOaZ4teHz9BokhhYamFXfCfLEwJ+s1mF8pqEx38D8HwWLv5XwEfTdvz+Gb5au5K09MA22ro7udLuju0iGvMESnbX5wQCAQri+rm2cjusWgtAsecijQ2NVB2s4ua6I4GF3ocUTLbhD8a563OSiykaTfQmFOWytbko32zg0A43De2Bi0Wr1QLQ2NBIxdcVNP/STNXBKgB8Ph8AB0uaOd2il9cDEdnPi+rqWkmgurpWKivRS10XkKSB4PMGyWq1yo/0Zm6u6wJSWYleCo+hxrPgt0DAuK6C0y3NfPFsNykrlzJxbZol8U3yfNOpIwH7s2l+/6NJvoYXQtRjePLk8biamsMh7wDPnd1Me3sY7O8G5so62B+wP3d2h/gD1NQcDnlXYt4KBBdJysWio5cnwLDCV5yMtPRl4Iu+Phxv9d8xEHKWlU0Vzb4Q/gdPH8mFQMjtPAAAAABJRU5ErkJggg==" alt="herói">
           <div class="sombra"></div>
         </div>
+        <div class="bauArena" id="bauArena"></div>
+        <div class="bauArena bauEspecial" id="bauArenaEspecial"></div>
       </div>
 
       <span class="vs">vs</span>
@@ -777,15 +814,32 @@ let _dbgContaT0 = performance.now();
 let _dbgContaLinhas = [];
 let _dbgContaAberto = false;
 function _dbgContaRepintar(){
+  // item: TOGGLE DEBUG (clique nas moedas) -- esta pilula usa
+  // painel.style.display inline (abaixo), que sempre vence a regra CSS
+  // .debug-el{display:none} (inline bate qualquer seletor de stylesheet).
+  // Por isso o toggle mestre precisa ser checado AQUI em JS tambem, nao
+  // so via classe -- senao um painel deixado aberto reaparece sozinho
+  // na proxima linha de log, mesmo com o mestre desligado.
+  const debugMestreLigado = (typeof window.modoDebugAtivo === 'function') ? window.modoDebugAtivo() : false;
+
   let pilula = document.getElementById('dbgContaPilula');
   if (!pilula){
     pilula = document.createElement('button');
     pilula.id = 'dbgContaPilula';
+    pilula.className = 'debug-el';
     pilula.type = 'button';
     pilula.style.cssText = 'position:fixed;bottom:8px;right:8px;z-index:99999;background:#001a00;color:#0f0;font:10px monospace;padding:4px 8px;border:1px solid #0f0;border-radius:999px;line-height:1.4';
     pilula.onclick = () => { _dbgContaAberto = !_dbgContaAberto; _dbgContaRepintar(); };
     document.body.appendChild(pilula);
   }
+
+  if (!debugMestreLigado){
+    pilula.style.display = 'none';
+    const painelExistente = document.getElementById('dbgContaPainel');
+    if (painelExistente) painelExistente.style.display = 'none';
+    return;
+  }
+  pilula.style.display = '';
   pilula.textContent = (_dbgContaAberto ? '✕ fechar' : '☰ log') + ' (' + _dbgContaLinhas.length + ')';
 
   let painel = document.getElementById('dbgContaPainel');
@@ -793,6 +847,7 @@ function _dbgContaRepintar(){
     if (!painel){
       painel = document.createElement('div');
       painel.id = 'dbgContaPainel';
+      painel.className = 'debug-el';
       painel.style.cssText = 'position:fixed;bottom:36px;right:8px;left:8px;z-index:99998;background:#001a00;color:#0f0;font:10px monospace;padding:6px;max-height:45vh;overflow-y:auto;white-space:pre-wrap;border:1px solid #0f0;border-radius:8px';
       document.body.appendChild(painel);
     }
@@ -808,6 +863,7 @@ function _dbgContaRepintar(){
     painel.style.display = 'none';
   }
 }
+window.__dbgContaAtualizarVisibilidade = _dbgContaRepintar; // hook pro toggle mestre forcar repintura na hora do clique
 function dbgConta(msg){
   if (!DEBUG_CONTA) return;
   const t = Math.round(performance.now() - _dbgContaT0);
@@ -859,6 +915,10 @@ const ECO = {
   lootBase:                1,   // itens garantidos por vitoria
   lootExtraCada:           5,   // +1 item a cada N tarefas do dia
   lootMax:                 3,
+
+  // --- bau trancado (Spec 4b: chave por dificuldade media do dia) ---
+  chanceBauTrancadoMin: 0.15,   // chance minima (dia so com tarefas trivial/facil)
+  chanceBauTrancadoMax: 0.50,   // chance maxima (dia so com tarefas dificil)
 
   // --- niveis ---
   nivelBase:             100,   // XP para sair do nivel I
@@ -931,6 +991,43 @@ function multDif(id){
   const d = DIFS.find(x => x.id === id) || DIFS.find(x => x.id === DIF_PADRAO);
   const v = ECO[d.eco];
   return (typeof v === 'number' && v > 0) ? v : 1;
+}
+
+// pips (1 a 4) -- so pro spawn do bau trancado, nao mexe na formula de
+// XP/moedas (essa usa multDif via ECO.dif*, escala diferente de proposito)
+function pipsDe(id){
+  const d = DIFS.find(x => x.id === id) || DIFS.find(x => x.id === DIF_PADRAO);
+  return d.pips;
+}
+// media de dificuldade das tarefas de hoje (1 a 4). null se nao ha tarefa.
+function mediaDifHoje(){
+  const doDia = tarefas.filter(ehDeHoje);
+  if (!doDia.length) return null;
+  const soma = doDia.reduce((a, t) => a + pipsDe(difDe(t)), 0);
+  return soma / doDia.length;
+}
+// 0..1 normalizado a partir da media (1..4)
+function _fatorDif(media){ return Math.max(0, Math.min(1, (media - 1) / 3)); }
+function chanceBauTrancado(media){
+  if (media == null) return 0;
+  const f = _fatorDif(media);
+  return ECO.chanceBauTrancadoMin + (ECO.chanceBauTrancadoMax - ECO.chanceBauTrancadoMin) * f;
+}
+// tier 0 (Ferro) a 3 (Cristal/Mestra) -- bate com o indice de raridade dos
+// itens tipo "chave" no catalogo. Sorteio PESADO pra cima de proposito: o
+// bau especial ja e raro de aparecer (ver chanceBauTrancado), entao quando
+// aparece ele deveria pedir uma chave que pareça valiosa na maior parte das
+// vezes -- Comum praticamente nao acontece. Dificuldade do dia da um empurrao
+// extra pros tiers altos, mas a base ja pesa pra raridade alta sozinha.
+// Pesos ajustaveis: [Comum, Incomum, Raro, Epico]
+const PESO_TIER_ESPECIAL = [5, 15, 35, 45];
+function tierBauNecessario(media){
+  const empurrao = media == null ? 0 : _fatorDif(media);
+  const pesos = PESO_TIER_ESPECIAL.map((p, i) => p + empurrao * i * 8);
+  const total = pesos.reduce((a, b) => a + b, 0);
+  let x = Math.random() * total;
+  for (let i = 0; i < pesos.length; i++){ x -= pesos[i]; if (x <= 0) return i; }
+  return pesos.length - 1;
 }
 
 /* ---------- formulas ---------- */
@@ -1073,6 +1170,27 @@ function monstroJaCaiu(){ return derrotadoEm === isoAtual(); }
 let nomeHeroi = 'Aventureiro';
 let ultimoGanho = 0;
 let _vitoriaCelebrada = false; // pedido do usuario (27/08): tela de vitoria "muito simples" -- controla o disparo unico do efeito de celebracao, ver celebrarVitoria()
+
+// fix (30/08): _vitoriaCelebrada sozinha so vive na memoria da aba -- some a
+// cada reload/reentrada na Arena (sair e voltar do app, trocar de aba), e
+// como venceu continua true (derrotadoEm ainda bate com hoje), o render()
+// disparava celebrarVitoria() nesse re-render sem culpa nenhuma do usuario.
+// Persiste a DATA em que a celebracao ja rodou, mesmo padrao de CHAVE_HP
+// (questlog.hpMonstro.v1): reseta sozinho na virada do dia porque a
+// comparacao e sempre contra isoAtual(), sem precisar limpar nada manualmente.
+// guarda {dia, ganho} em vez de so a data: ultimoGanho tambem so vive em
+// memoria (nunca foi salvo em lugar nenhum), entao sem isso o numero de
+// moedas do estado estatico apos reentrada ficaria "+0" ou vazio.
+const CHAVE_CELEBRACAO_DIA = 'questlog.celebracaoDiaMostrada.v1';
+function _lerCelebracaoDiaMostrada(){
+  try { return JSON.parse(localStorage.getItem(window.chaveConta(CHAVE_CELEBRACAO_DIA))); } catch(e){ return null; }
+}
+function _gravarCelebracaoDiaMostrada(iso, ganho){
+  try { localStorage.setItem(window.chaveConta(CHAVE_CELEBRACAO_DIA), JSON.stringify({dia: iso, ganho: ganho})); } catch(e){}
+}
+function _limparCelebracaoDiaMostrada(){
+  try { localStorage.removeItem(window.chaveConta(CHAVE_CELEBRACAO_DIA)); } catch(e){}
+}
 
 // --- inventario ---
 let inventario = [];   // [{id:indiceNoCatalogo, q:quantidade}]
@@ -1341,11 +1459,25 @@ function render(){
   document.querySelector('.arena').classList.toggle('venceu', venceu);
   document.getElementById('mobinfo').classList.toggle('off', venceu || total === 0);
   document.getElementById('vitoria').classList.toggle('on', venceu);
+  if (typeof window.atualizarBauArena === 'function') window.atualizarBauArena();
   if (venceu && !_vitoriaCelebrada){
-    _vitoriaCelebrada = true;
-    celebrarVitoria(ultimoGanho);
+    // reentrada com o dia ja vencido (reload, troca de aba, etc.): a flag em
+    // memoria voltou pra false, mas o registro gravado bate com hoje -- so
+    // sincroniza o estado como "ja celebrado" e mostra o resultado final
+    // parado, SEM disparar o efeito (flutuante/faiscas/contagem) de novo.
+    const registro = _lerCelebracaoDiaMostrada();
+    if (registro && registro.dia === isoAtual()){
+      _vitoriaCelebrada = true;
+      ultimoGanho = registro.ganho;
+      document.getElementById('ganhoTxt').textContent = '+' + ultimoGanho;
+    } else {
+      _vitoriaCelebrada = true;
+      _gravarCelebracaoDiaMostrada(isoAtual(), ultimoGanho);
+      celebrarVitoria(ultimoGanho);
+    }
   } else if (!venceu){
     _vitoriaCelebrada = false;
+    _limparCelebracaoDiaMostrada();
     document.getElementById('ganhoTxt').textContent = '+' + ultimoGanho;
   }
 
@@ -2125,6 +2257,9 @@ const SHEET_COLS = 16, SHEET_ROWS = 9;
 const RARIDADES = ['Comum','Incomum','Raro','Épico','Lendário','Único'];
 const RARIDADES_PT = RARIDADES.slice();
 const RARIDADES_EN = ['Common','Uncommon','Rare','Epic','Legendary','Unique'];
+// forma feminina, usada quando o substantivo e "chave" (Comum/Incomum sao
+// invariaveis, so os outros mudam) -- Raro fica Rara, Epico fica Epica, etc.
+const RARIDADES_FEM_PT = ['Comum','Incomum','Rara','Épica','Lendária','Única'];
 const COR_RAR   = ['#8779A8','#63C99A','#5AA9F2','#B57BE8','#F2A65A','#5AE0D8'];
 // mesma cor ja usada nos cards de atributo (--atr-cor, "PERFIL — ATRIBUTOS")
 const COR_ATR  = {fortuna:'#F2A65A', foco:'#5AA9F2', vigor:'#E5698A'};
@@ -2204,6 +2339,16 @@ function tirarItem(id, q){
     inventario.splice(i,1);
     SLOTS.forEach(s => { if (equipado[s] === id) equipado[s] = null; });
   }
+}
+
+const ID_GRIMORIO_INV = ITENS.findIndex(a => a[1] === 'Grimório');
+// devolve o id da chave de MENOR tier suficiente que o jogador tem
+// (rar >= tierMin, tipo "chave", nunca o Grimorio). null se nao tiver.
+function chaveParaDestravar(tierMin){
+  const candidatas = inventario
+    .filter(s => s.q > 0 && ITENS[s.id][2] === 'chave' && s.id !== ID_GRIMORIO_INV && ITENS[s.id][3] >= tierMin)
+    .sort((a, b) => ITENS[a.id][3] - ITENS[b.id][3]);
+  return candidatas.length ? candidatas[0].id : null;
 }
 
 function totalItens(){ return inventario.reduce((a,s)=>a+s.q, 0); }
@@ -2307,6 +2452,37 @@ function darLoot(nTarefas){
   persistir();
   if (abaAtual === 'inventario') renderInventario();
   return ganhos;
+}
+
+// mesma logica de darLoot, mas so ESCOLHE os itens -- nao credita no
+// inventario ainda. Usado pelo bau trancado (Spec 4b): o loot so existe
+// de verdade se o jogador destrancar (risco real de perder no fim do dia).
+// bonusSorte (0..1) desloca o sorteio pra raridade alta; rarMinima (opcional)
+// GARANTE que pelo menos 1 item saia nessa raridade ou melhor -- o bonus
+// sozinho e fraco demais pra se notar (a formula de sortearItem satura
+// rapido), entao o bau especial usa os dois: bonus + garantia
+function sortearGanhos(nTarefas, bonusSorte, rarMinima){
+  const sorte = Math.min(1, nTarefas / 10 + (bonusSorte || 0));
+  const qtd = Math.min(ECO.lootMax, ECO.lootBase + Math.floor(nTarefas / ECO.lootExtraCada));
+  const ids = [];
+  for (let i=0;i<qtd;i++) ids.push(sortearItem(sorte));
+  if (rarMinima != null){
+    let piorIdx = 0;
+    for (let i=1;i<ids.length;i++){ if (ITENS[ids[i]][3] < ITENS[ids[piorIdx]][3]) piorIdx = i; }
+    if (ITENS[ids[piorIdx]][3] < rarMinima){
+      const pool = ITENS.map((_,i)=>i).filter(i => ITENS[i][3] >= rarMinima && !ITENS[i][8]);
+      if (pool.length) ids[piorIdx] = pool[Math.floor(Math.random()*pool.length)];
+    }
+  }
+  return ids;
+}
+// credita uma lista de ids no inventario (espelha o final de darLoot) --
+// chamado no momento em que o bau trancado e destrancado
+function creditarGanhos(ids){
+  ids.forEach(id => darItem(id, 1));
+  persistir();
+  if (abaAtual === 'inventario') renderInventario();
+  return ids.map(id => item(id));
 }
 
 /* ---------- render ---------- */
@@ -2599,20 +2775,163 @@ document.querySelectorAll('#nav button').forEach(b => {
 });
 
 // loot ao derrotar o monstro do dia
+const CHAVE_BAU_DIA = 'questlog.bauDia.v1';
+function salvarBauDia(estado){
+  try { localStorage.setItem(window.chaveConta(CHAVE_BAU_DIA), JSON.stringify(estado)); } catch(e){}
+}
+function lerBauDia(){
+  try {
+    const estado = JSON.parse(localStorage.getItem(window.chaveConta(CHAVE_BAU_DIA)));
+    // migracao: formato antigo era um bau so, {ids,trancado,tier,aberto}.
+    // Se cair um desses (salvo antes do bau virar padrao+especial), reorganiza
+    // pro formato novo e salva de volta -- NAO chama darLoot/creditarGanhos de
+    // novo, so reaproveita os ids que ja tinham sido sorteados/creditados.
+    if (estado && !estado.padrao && Array.isArray(estado.ids)){
+      const migrado = estado.trancado
+        ? { dia: estado.dia, padrao: null, especial: { ids: estado.ids, tier: estado.tier, aberto: estado.aberto } }
+        : { dia: estado.dia, padrao: { ids: estado.ids, aberto: estado.aberto }, especial: null };
+      salvarBauDia(migrado);
+      return migrado;
+    }
+    return estado;
+  } catch(e){ return null; }
+}
+window.lerBauDia = lerBauDia;
+
+// gera o par padrao/especial do dia -- usado tanto no momento real da
+// vitoria (abaixo) quanto no fallback de atualizarBauArena() pra quando
+// o estado ficou pra tras (reload apos vitoria ja registrada antes desse
+// recurso existir, mudanca de schema, etc.)
+function gerarEstadoBauDia(dia, nTarefas){
+  const idsPadrao = darLoot(nTarefas).map(it => it.id);
+  const media = mediaDifHoje();
+  let especial = null;
+  if (Math.random() < chanceBauTrancado(media)){
+    const tier = tierBauNecessario(media);
+    // loot do especial e melhor de proposito: bonus de sorte + garantia de
+    // raridade minima, os dois crescendo com o tier da chave exigida
+    // (Incomum p/ tier0 .. Lendario p/ tier3) -- ver sortearGanhos
+    const RAR_MINIMA_POR_TIER = [1, 2, 3, 4];
+    especial = {
+      ids: sortearGanhos(nTarefas, 0.35 + tier * 0.15, RAR_MINIMA_POR_TIER[tier]),
+      tier, aberto: false
+    };
+  }
+  return { dia, padrao: { ids: idsPadrao, aberto: false }, especial };
+}
+
 const _alternarOrig = alternar;
 window.alternar = function(i){
   const antes = derrotadoEm;
   const completou = _alternarOrig(i);
   if (derrotadoEm && derrotadoEm !== antes){
-    const ganhos = darLoot(tarefas.filter(ehDeHoje).length);
-    setTimeout(() => {
-      if (typeof window.enfileirarPopup === 'function' && typeof mostrarBauLoot === 'function'){
-        window.enfileirarPopup(prox => mostrarBauLoot(ganhos, prox));
-      }
-    }, 1200);
+    const nTarefas = tarefas.filter(ehDeHoje).length;
+    // bau PADRAO credita o loot na hora, como sempre foi -- so o POP-UP
+    // fica pendente ate o clique (Spec 4). Bau ESPECIAL (Spec 4b) e chance
+    // a parte, NAO credita ate destrancar (risco real de perder no fim do dia)
+    salvarBauDia(gerarEstadoBauDia(derrotadoEm, nTarefas));
+    if (typeof window.atualizarBauArena === 'function') window.atualizarBauArena();
   }
   return completou;
 };
+
+// garante que o bau existe sempre que o dia estiver vencido, mesmo se a
+// transicao em alternar() nunca rodou nessa sessao (dia vencido antes
+// desse recurso existir, ou qualquer outro jeito do momento exato ter
+// passado batido). Sem isso o bau depende 100% de pegar o instante certo
+// da vitoria -- reload sozinho nunca recria o que nao foi salvo.
+function garantirBauDia(){
+  if (typeof monstroJaCaiu !== 'function' || !monstroJaCaiu()) return;
+  const estado = lerBauDia();
+  if (estado && estado.dia === isoAtual()) return;
+  const nTarefas = tarefas.filter(ehDeHoje).length;
+  salvarBauDia(gerarEstadoBauDia(derrotadoEm, nTarefas));
+}
+
+function atualizarBauArena(){
+  garantirBauDia();
+  const estado = lerBauDia();
+  const valido = !!(estado && estado.dia === isoAtual());
+
+  const elP = document.getElementById('bauArena');
+  if (elP){
+    const mostrarP = valido && !!estado.padrao;
+    elP.classList.toggle('mostrar', mostrarP);
+    if (mostrarP){
+      elP.classList.toggle('aberto', !!estado.padrao.aberto);
+      if (!elP.dataset.montado){ elP.onclick = abrirBauPadrao; elP.dataset.montado = '1'; }
+    }
+  }
+
+  const elE = document.getElementById('bauArenaEspecial');
+  if (elE){
+    const mostrarE = valido && !!estado.especial;
+    elE.classList.toggle('mostrar', mostrarE);
+    if (mostrarE){
+      elE.classList.toggle('trancado', !estado.especial.aberto);
+      elE.classList.toggle('aberto', !!estado.especial.aberto);
+      // tier 0..3 = visual do sprite (mais raro/vistoso quanto maior o tier,
+      // ver comentario no CSS -- .bauEspecial.tierN)
+      for (let t = 0; t < 4; t++) elE.classList.toggle('tier' + t, estado.especial.tier === t);
+      if (!elE.dataset.montado){
+        elE.innerHTML = '<div class="dica"></div>';
+        elE.onclick = abrirBauEspecial;
+        elE.dataset.montado = '1';
+      }
+    }
+  }
+}
+window.atualizarBauArena = atualizarBauArena;
+
+function abrirBauPadrao(){
+  const estado = lerBauDia();
+  if (!estado || estado.dia !== isoAtual() || !estado.padrao) return;
+  if (estado.padrao.aberto) return;   // ja foi aberto, nao clica mais
+  const ganhos = estado.padrao.ids.map(id => item(id));
+  estado.padrao.aberto = true;
+  salvarBauDia(estado);
+  atualizarBauArena();
+  if (typeof window.enfileirarPopup === 'function' && typeof mostrarBauLoot === 'function'){
+    window.enfileirarPopup(prox => mostrarBauLoot(ganhos, prox));
+  }
+}
+window.abrirBauPadrao = abrirBauPadrao;
+
+function abrirBauEspecial(){
+  const estado = lerBauDia();
+  if (!estado || estado.dia !== isoAtual() || !estado.especial) return;
+  const esp = estado.especial;
+  if (esp.aberto) return;   // ja foi aberto, nao clica mais
+
+  const chaveId = chaveParaDestravar(esp.tier);
+  if (chaveId == null){
+    // NAO usa aviso() de proposito: esse toast e silenciado hoje por
+    // TOASTS_DESATIVADOS. Chip proprio do bau, independente dessa flag.
+    const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
+    const el = document.getElementById('bauArenaEspecial');
+    const dica = el && el.querySelector('.dica');
+    if (dica){
+      dica.textContent = en
+        ? 'Requires a ' + RARIDADES[esp.tier] + ' key or higher'
+        : 'Requer uma chave ' + RARIDADES_FEM_PT[esp.tier] + ' ou superior';
+      dica.classList.add('on');
+      clearTimeout(dica._t);
+      dica._t = setTimeout(() => dica.classList.remove('on'), 1800);
+    }
+    return;
+  }
+  tirarItem(chaveId, 1);
+  creditarGanhos(esp.ids);
+  esp.aberto = true;
+  salvarBauDia(estado);
+  atualizarBauArena();
+
+  const ganhos = esp.ids.map(id => item(id));
+  if (typeof window.enfileirarPopup === 'function' && typeof mostrarBauLoot === 'function'){
+    window.enfileirarPopup(prox => mostrarBauLoot(ganhos, prox));
+  }
+}
+window.abrirBauEspecial = abrirBauEspecial;
 
 renderInventario();
 
@@ -2639,8 +2958,13 @@ renderInventario();
 
 /* ---------- regras ---------- */
 // tesouro fica de fora: ele existe para ser vendido, nao comprado
-const LOJA_TIPOS = ['arma','armadura','elmo','escudo','acess','cons'];
+const LOJA_TIPOS = ['arma','armadura','elmo','escudo','acess','cons','chave'];
 const PESO_LOJA  = [38, 30, 19, 9, 0];   // chance por raridade na prateleira — Lendario (indice 4) so em bau, nunca comprado
+// item-chave especial (Grimorio) nunca pode ser sorteado pra loja -- ele
+// e recompensa de nivel, nao mercadoria (ver ID_GRIMORIO em outro bloco,
+// nao reaproveitado aqui de proposito pra nao criar dependencia de ordem
+// de carregamento entre scripts)
+const ID_GRIMORIO_LOJA = ITENS.findIndex(a => a[1] === 'Grimório');
 
 function nivelMinimo(rar){
   return 1 + rar * Math.max(0, Math.round(ECO.lojaNivelPorRaridade));
@@ -2666,7 +2990,7 @@ function rngLoja(seed){
 
 function montarEstoque(){
   const r = rngLoja(diasCorridos() * 7919 + ((typeof semente === 'number' ? semente : 0) * 104729) + 999);
-  const pool = ITENS.map((_, i) => i).filter(i => LOJA_TIPOS.includes(ITENS[i][2]) && !ITENS[i][8]);
+  const pool = ITENS.map((_, i) => i).filter(i => LOJA_TIPOS.includes(ITENS[i][2]) && !ITENS[i][8] && i !== ID_GRIMORIO_LOJA);
   const vagas = Math.max(1, Math.round(ECO.lojaVagas));
   const total = PESO_LOJA.reduce((a, b) => a + b, 0);
   const ids = [];
@@ -3873,11 +4197,15 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     if (!row){
       row = document.createElement('div');
       row.className = 'eqrow';
-      row.innerHTML = '<div class="xprow"><span class="xplabel">Equipamentos</span>'
+      row.innerHTML = '<div class="xprow"><span class="xplabel" data-i18n="perfil.equipamentos"></span>'
                     + '<span class="xpnum" id="eqcount"></span></div>'
                     + '<div class="eqbadges"></div>';
       wrap.insertBefore(row, wrap.firstElementChild);   // antes da linha de Vida
     }
+    // traduz sempre (nao so na criacao) -- se o idioma mudar depois que a
+    // linha ja existia, sem isso o rotulo ficava preso no idioma antigo
+    const lbl = row.querySelector('.xplabel');
+    if (lbl && typeof window.t === 'function') lbl.textContent = window.t('perfil.equipamentos');
 
     // so o que esta equipado. Slot vazio nao vira caixa tracejada: cinco
     // fantasmas leem como sujeira, nao como informacao.
@@ -9593,6 +9921,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'inv.moedasMinusculo': { pt:'moedas', en:'coins' },
     'inv.filtroTudo':    { pt:'Tudo', en:'All' },
     'inv.filtroEquip':   { pt:'Equipamento', en:'Equipment' },
+    'perfil.equipamentos': { pt:'Equipamentos', en:'Equipment' },
     'inv.filtroCons':    { pt:'Consumíveis', en:'Consumables' },
     'inv.filtroTesouro': { pt:'Tesouros', en:'Treasures' },
     'inv.filtroChave':   { pt:'Item-chave', en:'Key items' },
@@ -9817,6 +10146,51 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 })();
 </script>
 
+<!-- =====================================================================
+     TOGGLE DEBUG — clique unico no icone de moedas  —  bloco autonomo,
+     cole antes de </body>
+
+     Persistencia: localStorage['questlog.modoDebug.v1'] (boolean,
+     default false). Efeito: classe .modo-debug no <body> -- CSS decide o
+     que aparece (.debugbar e qualquer .debug-el futuro; ver style.css,
+     perto da linha 216). Mesma chave tambem controla o silenciador de
+     console (log/warn/error), instalado como primeiro bloco de script do
+     cabecalho -- ver bloco no topo do arquivo, antes do i18n. Zero
+     feedback visual no icone -- fica indistinguivel do normal de proposito.
+
+     DEBUG_ARRASTO e outras flags booleanas fixas no codigo ficam de fora
+     disso: continuam exigindo trocar a constante manualmente, porque sao
+     instrumentacao de log, nao elemento de UI pra esconder/mostrar.
+     ===================================================================== -->
+<script>
+(function(){
+  const CHAVE = 'questlog.modoDebug.v1';
+  const alvo = document.querySelector('.coins');
+  if (!alvo) return;
+
+  function lerModoDebug(){
+    try { return localStorage.getItem(CHAVE) === 'true'; } catch(e){ return false; }
+  }
+
+  function aplicar(ligado){
+    document.body.classList.toggle('modo-debug', ligado);
+    // pilula do item 81 (dbgContaPilula) usa display inline, que a regra
+    // .debug-el do CSS sozinha nao alcanca -- forca a repintura dela
+    // tambem, na hora, pra sumir/aparecer junto com o resto.
+    if (typeof window.__dbgContaAtualizarVisibilidade === 'function') window.__dbgContaAtualizarVisibilidade();
+  }
+
+  window.modoDebugAtivo = lerModoDebug; // exposto p/ outros blocos consultarem se precisar
+
+  aplicar(lerModoDebug()); // pintura inicial, persiste entre aberturas
+
+  alvo.addEventListener('click', () => {
+    const novo = !lerModoDebug();
+    try { localStorage.setItem(CHAVE, String(novo)); } catch(e){}
+    aplicar(novo);
+  });
+})();
+</script>
 
 </body>
 </html>

@@ -8325,3 +8325,114 @@ Trocado `await import()` sequencial por `Promise.all()` nos 3 pontos — os 3 pe
  
 ### Validação
 `node --check` nos 44 blocos. Confirmado que não sobrou nenhum `import()` sequencial fora de `Promise.all` (8 imports totais, agrupados em 3 chamadas). Teste isolado do ganho: sequencial somou as 3 latências simuladas (~1050ms), paralelo ficou só com a do mais lento (~400ms).
+
+---
+
+
+## 83. Ajuste do overlay do item 81: visual só aparece em rede lenta de verdade
+
+### Contexto
+Overlay do item 81 (ver seção 81) pintava fundo/blur/cartão "Carregando…" desde o instante em que era criado — usuário queria que a trava de interação continuasse ativa do mesmo jeito (zero mudança na correção da corrida original), mas que o visual só aparecesse quando a confirmação realmente demorasse, não sempre.
+
+### Tentativa 1 — limiar de 180ms (REVERTIDA)
+Primeira versão: overlay nascia transparente (só bloqueando clique) e só pintava fundo/cartão se `aoLogar()`/`aoLogarSilencioso()` não resolvesse em ~180ms. **Rejeitada pelo usuário na prática** — 180ms é curto demais pro tempo real de import do SDK do Firebase via CDN + round-trip de auth, então o visual acabava aparecendo quase sempre, inclusive em conexão boa. Não resolvia o problema.
+
+### Tentativa 2 — 100% invisível, nunca aparece (REVERTIDA)
+Segunda versão: removido todo o conteúdo visual, overlay virou um `div` transparente só pra bloquear clique, em qualquer cenário. Levantado o risco pelo Claude e confirmado pelo usuário como indesejado: em rede ruim/instável, o app trava a interação por até 8s (teto de segurança já existente) **sem nenhum feedback visual** — usuário não tem como saber se o app travou/quebrou ou só está esperando a rede.
+
+### Fix final
+Limiar alto, pensado especificamente pra separar "caso comum" de "rede lenta de verdade": `LIMIAR_REDE_LENTA_MS = 2500`. Overlay nasce transparente (trava de clique ativa desde o início, síncrona, sem nenhuma mudança na lógica que resolve a corrida do item 81). Só ganha fundo escurecido + blur + cartão "Carregando…" se passar de 2,5s sem `confirmarSessaoResolvida()` disparar — bem acima do tempo normal de confirmação em rede boa, então não aparece no caso comum, mas cobre o cenário de rede ruim antes do teto de 8s (inalterado) liberar o app pra seguir 100% local. Convidado genuíno (`!uidConhecido`) continua sem ver nada, como sempre.
+
+### Validação
+`node --check` nos 42 blocos `<script>` inline (contagem já refletindo a divisão em `index.html`/`style.css`/`assets.js`, ver item de infraestrutura). Balanceamento de `<div>`/`<svg>` conferido. `dbgConta` instrumentado com linha própria (`'overlay de sessao ficou visivel -- rede lenta (> 2500ms)'`) pra permitir confirmar em campo, via log real do aparelho, se uma eventual reaparição do overlay é rede lenta genuína ou regressão.
+
+## 84. Bug real: celebração "DIA VENCIDO" disparava de novo em qualquer reentrada na Arena
+
+### Contexto
+`_vitoriaCelebrada` (flag que controla o disparo único de `celebrarVitoria()` — flutuante, faíscas e contagem progressiva de moedas) só vivia em memória. Ela some a cada reload/reentrada na Arena (sair e voltar do app, trocar de aba e voltar), mas `derrotadoEm` continua batendo com `isoAtual()` — então `render()` reconhecia `venceu = true` e disparava a celebração inteira de novo, mesmo o dia já tendo sido vencido antes. `ultimoGanho` (valor de moedas mostrado) também nunca foi persistido em lugar nenhum, então o replay indevido acontecia com `+0` moedas.
+
+### Fix
+Nova chave `questlog.celebracaoDiaMostrada.v1`, mesmo padrão de `questlog.hpMonstro.v1` (namespaced por conta via `window.chaveConta()`). Guarda `{dia, ganho}` — não só a data, porque `ultimoGanho` precisa ser restaurado de algum lugar pro estado estático mostrar o valor certo.
+
+Em `render()`: antes de chamar `celebrarVitoria()`, checa o registro persistido. Se `registro.dia === isoAtual()`, é reentrada — sincroniza `_vitoriaCelebrada = true`, restaura `ultimoGanho` do registro e escreve o texto final direto no DOM, sem animação. Só dispara a celebração completa (com gravação da flag) quando não há registro batendo com hoje — ou seja, na vitória real. Reset é automático na virada do dia: o branch `!venceu` (monstro ainda vivo, `isoAtual()` mudou) já limpa a flag, mesmo ciclo que zera `derrotadoEm`/`hpMonstro`.
+
+### Validação
+`node --check` nos 42 blocos `<script>` inline. Balanceamento de `<div>`/`<svg>` conferido (desbalanceamento pré-existente em `<script>` confirmado via `git stash` — não relacionado a este fix). Teste funcional em Node simulando os 5 cenários: vitória real → reentrada mesma sessão → segunda reentrada → virada de dia → nova vitória no dia novo. Todos passaram.
+
+## 85. Toggle de debug pelo ícone de moedas
+
+### O que foi pedido
+Um jeito de ligar/desligar tudo que é debug de uma vez, sem precisar mexer em código: 1 clique no ícone/contador de moedas (aba Tarefas) inverte o estado, salvo em `localStorage['questlog.modoDebug.v1']` (boolean, default `false`). Zero feedback visual no próprio ícone — fica indistinguível do normal de propósito. Persiste entre aberturas do app, sem reset automático.
+
+Fora do escopo por definição: `DEBUG_ARRASTO` e flags booleanas fixas no código (não-visuais) continuam exigindo trocar a constante manualmente — são instrumentação de log, não elemento de UI pra esconder/mostrar.
+
+### Implementação — 3 partes
+
+**1. CSS** (`.debugbar`/`.debug-el`): `.debugbar` (já existia, 3 botões de debug) e a nova classe genérica `.debug-el` (pra qualquer painel de debug futuro nascer já compatível) ficam `display:none` por padrão. `body.modo-debug` reverte os dois.
+
+**2. Toggle de UI**: bloco autônomo no fim do `<body>`, ouvindo clique em `.coins`. Lê/grava a chave, aplica/remove a classe `modo-debug` no `<body>`. Expõe `window.modoDebugAtivo()` pra outros blocos consultarem o estado sem duplicar a leitura do `localStorage`.
+
+**3. Silenciador de console**: pedido à parte, mesma sessão — "o log também é debug e tem que desaparecer também". Decisão do usuário: `console.log`, `.warn` e `.error` ficam **todos** mudos por padrão (não só `.log`), incluindo os ~15 `console.error` de falha real do Firebase espalhados pelo arquivo. Instalado como o **primeiro** `<script>` do `<head>`, antes até do bloco de i18n — garante que nada escapa do gate antes dele existir. Consulta o `localStorage` a cada chamada (não cacheia), então ligar/desligar em runtime já muda o comportamento na hora, sem precisar recarregar a página. Guarda as funções originais em `window.__consoleOriginal` como válvula de escape pro devtools.
+
+### Bug real encontrado depois de "pronto": a pílula do item 81 não obedecia o toggle
+Print do usuário mostrou a pílula "☰ log (2)" (`dbgContaPilula`, painel de debug do item 81 — fluxo de login/troca de conta) ainda visível com o toggle desligado.
+
+**Causa raiz:** essa pílula é criada via `document.createElement` e anexada direto no `document.body`, sem nenhuma classe — não era pega pela regra `.debugbar`/`.debug-el`. Mais grave: o painel expandido dela usa `painel.style.display = 'block'/'none'` **inline** via JS, que sempre vence qualquer regra de CSS externa (inline bate qualquer seletor de stylesheet, com ou sem classe). Se o painel fosse deixado aberto e o usuário desligasse o toggle mestre, ele reapareceria sozinho na próxima linha de log.
+
+**Fix:** `_dbgContaRepintar()` agora consulta `window.modoDebugAtivo()` diretamente em JS logo no início — se desligado, força `display:none` na pílula e no painel (se existir) e sai, independente do estado interno de aberto/fechado. `window.__dbgContaAtualizarVisibilidade` exposto como gancho, chamado pelo `aplicar()` do toggle mestre — a pílula reage **na hora do clique** nas moedas, não só na próxima mensagem de log.
+
+### Validação
+`node --check` nos 44 blocos `<script>` inline a cada rodada. Balanceamento de `<div>`/`<svg>`/`<body>`/comentários conferido (dois falsos positivos identificados e corrigidos: texto literal `<script>`/`<head>` dentro de comentários HTML — reescrito pra não usar esses tokens como texto puro, evita confundir ferramentas de extração no futuro). CSS parseado sem erro (`css` npm lib, 1510 regras).
+
+Testes funcionais em jsdom/Node, código real extraído do arquivo:
+- Toggle de UI: 3 cliques (off → on → off) + simulação de "reabertura do app" com estado persistido — todos bateram.
+- Silenciador de console: `log`/`warn`/`error` mudos por padrão, aparecem com 1 clique, mudos nen de novo com o 2º — em tempo real, sem reload.
+- Pílula do item 81: 6 fases, incluindo o cenário do bug (painel aberto quando o mestre desliga) — pílula e painel somem juntos, mesmo sem fechar o painel manualmente antes.
+
+### Lição
+Nem todo elemento de debug obedece CSS: qualquer coisa que manipule `style.display` **inline** via JS (não só classe) precisa ser verificada caso a caso — a regra `.debug-el` sozinha só cobre quem não tem lógica de visibilidade própria em JS. Vale checar isso de novo se aparecer um painel de debug novo no futuro.
+
+## 86. Baú clicável na Arena + baú especial com chave (Spec 4 + Spec 4b)
+
+### O que foi pedido
+Spec 4: ao vencer o dia, em vez do pop-up de recompensa abrir sozinho, um sprite de baú fechado aparece fixo na Arena, ao lado do herói. Clique abre o pop-up mostrando o que já foi creditado (não recalcula). Evoluiu em sessão de brainstorm pra Spec 4b: além do baú padrão (sempre spawna, abre sem chave), uma chance à parte de um **segundo baú, especial**, que exige chave pra abrir — não substitui o padrão, os dois coexistem, e o especial pode nem aparecer.
+
+### Decisões de design (fechadas em sessão de brainstorm antes da implementação)
+- **Fonte de chave:** loot aleatório (baú comum) + loja.
+- **Itens de chave:** reaproveita os 5 já existentes no catálogo (`Chave de Ferro/Chave/Dourada/Cristal/Mestra`) — retipados de `tesouro` pra `chave` em vez de criar itens novos.
+- **Compatibilidade:** chave de tier igual ou maior destrava (consome a de **menor tier suficiente** no inventário, nunca desperdiça uma chave melhor à toa).
+- **Sem chave no fim do dia:** loot do baú especial é perdido de verdade (risco real) — o baú padrão sempre credita na hora, só o pop-up é que fica pendente até o clique.
+- **Raridade do baú especial:** pesada pra cima de propósito (pesos `[5,15,35,45]` pra Comum/Incomum/Raro/Épico) — ele já é raro de aparecer, então quando aparece deveria pedir uma chave que pareça valiosa na maior parte das vezes.
+
+### Implementação
+`assets.js`: 5 itens de chave retipados. `index.html`: `LOJA_TIPOS` ganha `'chave'` (com exclusão explícita do Grimório do pool, que também é tipo `chave` mas é recompensa de nível, não mercadoria); `mediaDifHoje()`/`chanceBauTrancado()`/`tierBauNecessario()` (pesos por tier, dificuldade do dia dá empurrão extra); `sortearGanhos()`/`creditarGanhos()`/`chaveParaDestravar()`; `gerarEstadoBauDia()` (função única compartilhada entre o gancho de vitória e o fallback de segurança); `atualizarBauArena()`/`abrirBauPadrao()`/`abrirBauEspecial()`. Sprites do pack "Treasure Chests" (Mana Seed / Seliel the Shaper, itch.io, uso comercial liberado) embutidos em base64 no `:root{}` do `style.css`, um par fechado/aberto pro baú padrão e 4 pares (um por tier de raridade) pro especial.
+
+### Bugs reais encontrados (nenhum pego só lendo código — todos surgiram testando)
+1. **Loja excluiria as chaves sozinha.** `LOJA_TIPOS` tinha uma whitelist que não incluía `'chave'` — a decisão de "loja como fonte" teria sido quebrada silenciosamente se eu não tivesse checado o filtro antes de implementar.
+2. **Estado preso em formato antigo.** Ao separar baú padrão/especial, o schema do `localStorage` mudou de `{ids,trancado,tier,aberto}` pra `{padrao,especial}`. Um dia já vencido antes da mudança ficava com dado no formato velho — o baú simplesmente não aparecia (sem erro, sem aviso). Fix: migração automática dentro de `lerBauDia()`, na leitura, sem re-creditar nada.
+3. **Baú dependia só do instante exato da vitória.** Se o dia já tinha sido vencido antes desse recurso existir (ou a transição foi perdida por qualquer motivo), recarregar a página nunca recriava o estado — `alternar()` só dispara na transição, não em reload. Fix: `garantirBauDia()`, chamado a cada `atualizarBauArena()`, gera o estado on-demand se faltando.
+4. **Causa raiz real do "sumiu de novo": `desenharHeroi()` reescreve `heroSprite.innerHTML` inteiro.** O baú tinha sido colocado como filho de `#heroSprite` pra ficar "grudado" no herói — mas essa função redesenha o sprite do zero toda vez que roda, apagando qualquer filho extra junto. Só foi encontrado rodando o app de verdade (servidor local + jsdom simulando vitória) e vendo `document.getElementById('bauArena')` voltar `null` mesmo com o estado salvo corretamente. Fix: baú virou irmão de `#heroSprite`, ambos dentro de `.fighter` (nunca reescrito).
+5. **Pulso da animação não parava quando o baú era aberto.** `.bauArena.mostrar` (com a animação) e `.bauArena.aberto` (com `animation:none`) tinham a mesma especificidade CSS (2 classes cada) — a regra que vem depois no arquivo vence em empate, e por acaso era a do pulso. Fix: `.bauArena.mostrar.aberto` (3 classes), especificidade maior, vence sempre, independente da ordem no arquivo. Confirmado calculando a especificidade real via parser CSS, não só lendo o código.
+6. **Texto da dica errado.** `"Requer uma Raro ou superior"` — faltava a palavra "chave" na frase inteira, e o adjetivo tava no gênero errado (deveria concordar com "chave", feminino). Fix: array `RARIDADES_FEM_PT` só pra essa concordância + frase corrigida pra `"Requer uma chave Rara ou superior"`.
+7. **Raridade do loot do baú especial saía fraca.** Primeira tentativa (bônus de sorte no sorteio) foi simulada antes de entregar e o resultado foi fraco demais pra se notar (~6 pontos percentuais de diferença). Trocado por garantia real: pelo menos 1 item sai numa raridade mínima que sobe com o tier (Incomum→Raro→Épico→Lendário) — testado 5000 vezes por tier, 0 falhas.
+
+### Validação
+`node --check` nos 44 blocos `<script>`, balanceamento de `<div>`/`<svg>`, CSS parseado (`css` npm lib). Além disso — pela primeira vez nessa profundidade — o app foi rodado **de verdade**: servidor HTTP local servindo os 3 arquivos + jsdom executando o JS real, simulando completar tarefas, vencer o dia, clicar nos baús (com e sem chave no inventário), e conferindo classes CSS aplicadas no DOM depois de cada ação. Foi assim que os bugs 3, 4 e 5 foram encontrados — nenhum aparecia só lendo o código.
+
+### Pendências / decisões que ainda podem mudar
+- Posicionamento visual (offsets em px dos dois baús ao lado do herói) foi calibrado por tentativa e erro a partir de prints do usuário — ainda não confirmado em dispositivo real, só no navegador dele.
+- Pesos de chance/tier/raridade (`ECO.chanceBauTrancadoMin/Max`, `PESO_TIER_ESPECIAL`, `RAR_MINIMA_POR_TIER`) são valores iniciais, fáceis de ajustar depois de testar o "feel" real.
+
+## 87. Bug pequeno: rótulo "Equipamentos" preso em português no Perfil
+
+### O que foi pedido
+A tira de badges de equipamento (acima da barra de Vida, tela de Perfil/Tarefas) sempre mostrava "Equipamentos" em português, mesmo com o app em inglês.
+
+### Causa raiz
+`montarFaixa()` criava o rótulo com texto fixo (`'<span class="xplabel">Equipamentos</span>'`), sem passar pelo sistema de i18n (`data-i18n`/`window.t()`). Bug duplo: além de nunca traduzir, mesmo que traduzisse só na criação, trocar de idioma **depois** que a linha já existia não teria efeito nenhum (a função só monta o rótulo `if (!row)`, ou seja, uma vez só).
+
+### Fix
+Chave nova no dicionário (`perfil.equipamentos`: Equipamentos/Equipment). Rótulo criado com `data-i18n="perfil.equipamentos"` (pego pelo scanner global `aplicarIdioma()`) **e** retraduzido via `window.t()` toda vez que `montarFaixa()` roda — não só na criação — pra acompanhar troca de idioma em qualquer momento.
+
+### Validação
+`node --check` nos 44 blocos, tags balanceadas.

@@ -4197,11 +4197,15 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     if (!row){
       row = document.createElement('div');
       row.className = 'eqrow';
-      row.innerHTML = '<div class="xprow"><span class="xplabel">Equipamentos</span>'
+      row.innerHTML = '<div class="xprow"><span class="xplabel" data-i18n="perfil.equipamentos"></span>'
                     + '<span class="xpnum" id="eqcount"></span></div>'
                     + '<div class="eqbadges"></div>';
       wrap.insertBefore(row, wrap.firstElementChild);   // antes da linha de Vida
     }
+    // traduz sempre (nao so na criacao) -- se o idioma mudar depois que a
+    // linha ja existia, sem isso o rotulo ficava preso no idioma antigo
+    const lbl = row.querySelector('.xplabel');
+    if (lbl && typeof window.t === 'function') lbl.textContent = window.t('perfil.equipamentos');
 
     // so o que esta equipado. Slot vazio nao vira caixa tracejada: cinco
     // fantasmas leem como sujeira, nao como informacao.
@@ -9917,6 +9921,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'inv.moedasMinusculo': { pt:'moedas', en:'coins' },
     'inv.filtroTudo':    { pt:'Tudo', en:'All' },
     'inv.filtroEquip':   { pt:'Equipamento', en:'Equipment' },
+    'perfil.equipamentos': { pt:'Equipamentos', en:'Equipment' },
     'inv.filtroCons':    { pt:'Consumíveis', en:'Consumables' },
     'inv.filtroTesouro': { pt:'Tesouros', en:'Treasures' },
     'inv.filtroChave':   { pt:'Item-chave', en:'Key items' },

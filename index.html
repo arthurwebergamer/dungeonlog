@@ -2599,12 +2599,13 @@ function abrirFicha(id){
     if (bi.m) bonus += '<span>' + (en ? 'Coins ' : 'Moedas ') + (bi.m>0?'+':'')+bi.m+'%</span>';
   }
   if (it.tipo !== 'chave') bonus += '<span>' + (en ? 'Sells for ' + precoVenda(it) + ' coins' : 'Vende por '+precoVenda(it)+' moedas') + '</span>';
+  if (it.tipo === 'chave' && id !== ID_GRIMORIO_INV) bonus += '<span>' + (en ? 'Used automatically to unlock a locked chest in the Arena' : 'Usada automaticamente pra destrancar um baú trancado na Arena') + '</span>';
   if (q > 1) bonus += '<span>' + (en ? 'Quantity: ' + q : 'Quantidade: '+q) + '</span>';
 
   let acoes = '';
   if (EQUIPAVEL(id)) acoes += '<button class="prim" data-a="eq">'+(estaEquipado ? (en ? 'Unequip' : 'Desequipar') : (en ? 'Equip' : 'Equipar'))+'</button>';
   if (it.tipo === 'cons') acoes += '<button class="prim" data-a="usar">' + (en ? 'Use' : 'Usar') + '</button>';
-  if (it.tipo === 'chave') acoes += '<button class="prim" data-a="abrir">' + (en ? 'Open' : 'Abrir') + '</button>';
+  if (it.tipo === 'chave' && id === ID_GRIMORIO_INV) acoes += '<button class="prim" data-a="abrir">' + (en ? 'Open' : 'Abrir') + '</button>';
   if (it.tipo !== 'chave') acoes += '<button data-a="vender">' + (en ? 'Sell' : 'Vender') + '</button>';
 
   ficha.innerHTML =

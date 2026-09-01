@@ -8633,3 +8633,11 @@ Arquivo: index.html
   funcao limparErroEmail(), helpers expostos em window
 - Modulo Firebase (loginEntrarBtn.onclick): catch agora ramifica
   auth/email-already-in-use pro campo inline em vez do toast
+
+  - [style.css] Removida duplicação Bloco #19-20 (linhas 821-1063) — cópia byte-a-byte
+  de Módulo #2-3 (linhas 1993-2235), causada por sobreposição das duas eras de
+  numeração de bloco. Confirmado via diff textual + parser `css` (npm) que as
+  regras remanescentes no Módulo são idênticas selector+decl+!important às
+  removidas — zero mudança de cascata. 3547 → 3304 linhas. Nenhuma regra única
+  perdida. Demais blocos (fora da faixa 821-1063 ↔ 1993-2235) não foram varridos
+  — se suspeitar de outra duplicação, pedir novo mapeamento completo dos 62 blocos.

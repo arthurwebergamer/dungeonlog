@@ -1248,6 +1248,14 @@ function monstroDoDia(){
   return MONSTROS[i];
 }
 
+// mesmo ciclo de monstroDoDia(), mas pra uma data especifica (ISO) em vez
+// de "hoje" -- usado pro pop-up de tarefas perdidas mostrar o monstro do
+// DIA QUE VIROU (ultimoDia em verificarVirada()), nao o de hoje.
+function monstroDoDiaEm(iso){
+  const i = ((diasCorridos() + diffDias(iso, isoAtual()) + semente) % MONSTROS.length + MONSTROS.length) % MONSTROS.length;
+  return MONSTROS[i];
+}
+
 function desenharMonstro(){
   const m = monstroDoDia();
   document.getElementById('mobSprite').innerHTML =
@@ -3995,6 +4003,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     if (ultimoDia > hoje){ ultimoDia = hoje; gravar(); return; }
 
     const largadas = pendentesEm(ultimoDia);
+    const diaVirada = ultimoDia;   // guarda ANTES do reassign abaixo -- e o dia que fechou, nao "hoje"
     const danoBruto = largadas.reduce((s, t) =>
       s + ECO.danoPorTarefa * (typeof multDif === 'function' ? multDif(difDe(t)) : 1), 0);
 
@@ -4049,7 +4058,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
         // de tarefas, no lugar do toast generico antigo (que hoje esta mudo).
         if (!morreu){
           if (typeof window.enfileirarPopup === 'function' && typeof window.mostrarTarefasPerdidas === 'function'){
-            window.enfileirarPopup(prox => window.mostrarTarefasPerdidas(largadas, total, prox));
+            window.enfileirarPopup(prox => window.mostrarTarefasPerdidas(largadas, total, diaVirada, prox));
           } else if (typeof aviso === 'function'){
             const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
             aviso(en
@@ -5044,8 +5053,9 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   largBG.onclick = fecharLarg;
 
   // largadas: array de tarefas (objetos com .texto) que ficaram pendentes na
-  // virada -- mesmo array calculado em verificarVirada(), passado direto.
-  function mostrarTarefasPerdidas(largadas, total, aoFechar){
+  // virada. diaVirada: ISO do dia que fechou (nao "hoje") -- usado pra
+  // buscar o monstro daquele dia especifico, ver monstroDoDiaEm().
+  function mostrarTarefasPerdidas(largadas, total, diaVirada, aoFechar){
     if (!largadas || !largadas.length){ if (aoFechar) aoFechar(); return; }
     _aoFecharLarg = aoFechar || null;
     const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
@@ -5056,10 +5066,11 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
            + '<span class="difpip">' + '<i></i>'.repeat(dObj.pips) + '</span></div>';
     }).join('');
 
-    // sprite do monstro do dia: mesmo tema ja usado no app pra essa
-    // situacao ("fuga" -- ver SFX em verificarVirada() e aviso() com
-    // fuga=true), espelhado pra sugerir que ele escapou.
-    const m = (typeof monstroDoDia === 'function') ? monstroDoDia() : null;
+    // sprite do monstro DO DIA QUE A PESSOA PERDEU (diaVirada), nao o de
+    // hoje -- mesmo tema de "fuga" ja usado no app (SFX 'fuga', toast
+    // "FUGIU"), espelhado pra sugerir que ele escapou naquele dia.
+    const m = (typeof monstroDoDiaEm === 'function' && diaVirada) ? monstroDoDiaEm(diaVirada)
+            : (typeof monstroDoDia === 'function' ? monstroDoDia() : null);
     const iconeHtml = m
       ? '<div class="largicone"><img src="'+m.img+'" alt="' + (en ? 'monster fled' : 'monstro fugiu') + '"></div>'
       : '';

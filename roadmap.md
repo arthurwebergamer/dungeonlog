@@ -8562,4 +8562,35 @@ Trocado pra `#F2C94C` (o mesmo amarelo dourado já usado em outros lugares do ap
 
 ### Validação
 `css` npm lib confirmou o CSS válido depois da troca; conferido visualmente por grep que as 6 ocorrências (3 regras × 2 blocos duplicados) ficaram consistentes com `#F2C94C`.
-```
+
+### Bug: baú do dia duplicava recompensa ao criar conta depois de já ter aberto como convidado
+
+**Sintoma:** usuário abre o baú do dia como convidado (ganha moedas/item), depois cria
+conta -> Arena mostra baú novo, fechado -> abre de novo -> credita moedas e sorteia
+item outra vez. Recompensa duplicada pro mesmo dia.
+
+**Causa:** a lista de chaves migradas convidado->conta em aoLogar() (item 13f do
+roadmap, mesma rotina que migra tarefas/XP/inventário/etc. pra chave namespaced por
+uid) tem 12 chaves hardcoded. CHAVE_BAU_DIA ('questlog.bauDia.v1', item 86) foi
+implementada DEPOIS dessa lista existir e nunca foi adicionada nela. Resultado: no
+login, a chave crua do baú (convidado) é ignorada -- nem copiada nem apagada -- e
+window.chaveConta(CHAVE_BAU_DIA) não encontra nada na chave nova. garantirBauDia()
+interpreta isso como "baú do dia ainda não gerado" e cria um do zero.
+
+**Fix:** adicionada 'questlog.bauDia.v1' ao array de 12 chaves em aoLogar() (agora
+13). Nenhuma mudança em garantirBauDia()/salvarBauDia()/lerBauDia() -- a leitura já
+usava window.chaveConta() corretamente, só faltava a chave entrar na migração.
+
+**Alerta pra próximas specs:** essa lista de migração NÃO é automática -- toda vez
+que uma feature nova introduzir uma chave de localStorage namespaced por conta
+(padrão questlog.[key].v1 + chaveConta()), ela precisa ser adicionada manualmente
+a esse array em aoLogar(), ou fica invisível pro fluxo convidado->conta (mesma
+classe de bug documentada aqui, agora seu 2º caso real). Revisar esse array antes
+de fechar qualquer spec que crie chave nova.
+
+**Teste de validação:** fluxo completo simulado -- boot como convidado, resgatar
+baú do dia (moedas X, item Y anotados), criar conta, verificar: (1) nenhum baú novo
+aparece na Arena pro dia corrente, (2) saldo de moedas bate com o valor de antes da
+criação da conta (sem incremento), (3) inventário não ganhou item duplicado, (4)
+chave crua 'questlog.bauDia.v1' some do localStorage depois do login (confirma que
+foi migrada+removida, não só ignorada).

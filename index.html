@@ -7708,7 +7708,12 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
         </span>
         <input id="loginEmail" type="email" placeholder="voce@email.com" autocomplete="email">
+        <span class="campoStatus" id="loginEmailStatus">
+          <svg class="icOk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12l5 5L20 6"/></svg>
+          <svg class="icErro" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </span>
       </div>
+      <p class="loginSenhaErro" id="loginEmailErro" style="display:none"></p>
       <div class="campo campoIcone">
         <label data-i18n="login.senha">Senha</label>
         <span class="campoIc">
@@ -7889,6 +7894,16 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   const erroSenha = document.getElementById('loginSenhaErro');
   const erroConfirmar = document.getElementById('loginSenhaConfirmarErro');
 
+  const campoEmail = document.getElementById('loginEmail');
+  const statusEmail = document.getElementById('loginEmailStatus');
+  const erroEmail = document.getElementById('loginEmailErro');
+
+  function limparErroEmail(){
+    statusEmail.classList.remove('erro');
+    erroEmail.style.display = 'none';
+  }
+  campoEmail.addEventListener('input', limparErroEmail);
+
   function atualizarStatusSenha(){
     if (!modoCadastro || campoSenha.value === ''){
       statusSenha.classList.remove('ok', 'erro');
@@ -7925,7 +7940,17 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     statusConfirmar.classList.remove('ok', 'erro');
     erroSenha.style.display = 'none';
     erroConfirmar.style.display = 'none';
+    limparErroEmail();
   };
+
+  // pro modulo Firebase (catch de auth/email-already-in-use, escopo
+  // separado por ser type=module) acender/apagar o erro inline do email
+  window.questlogMostrarErroEmail = (msg) => {
+    statusEmail.classList.add('erro');
+    erroEmail.textContent = msg;
+    erroEmail.style.display = 'block';
+  };
+  window.questlogLimparErroEmail = limparErroEmail;
 
   // expõe pro modulo Firebase (script type=module abaixo) saber se e cadastro ou login
   window.questlogModoCadastro = () => modoCadastro;
@@ -9356,6 +9381,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       const email = document.getElementById('loginEmail').value.trim();
       const senha = document.getElementById('loginSenha').value;
       const en = idiomaAuth() === 'en';
+      if (typeof window.questlogLimparErroEmail === 'function') window.questlogLimparErroEmail();
       if (!email || !senha) {
         if (typeof window.aviso === 'function') window.aviso(en ? 'Fill in email and password' : 'Preenche email e senha');
         return;
@@ -9415,7 +9441,16 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           'auth/too-many-requests': 'Muitas tentativas -- espera um pouco e tenta de novo'
         };
         const msg = MENSAGENS[e && e.code] || (en ? 'Couldn\'t sign in' : 'Não deu pra entrar');
-        if (typeof window.aviso === 'function') window.aviso(msg);
+
+        // auth/email-already-in-use usa o padrao inline do campo (icone +
+        // texto), mesma linguagem visual da tela de senha -- o toast fica
+        // mudo com TOASTS_DESATIVADOS e ninguem via feedback nenhum ao
+        // tentar cadastrar email ja existente.
+        if (e && e.code === 'auth/email-already-in-use' && typeof window.questlogMostrarErroEmail === 'function') {
+          window.questlogMostrarErroEmail(msg);
+        } else if (typeof window.aviso === 'function') {
+          window.aviso(msg);
+        }
       }
     };
 

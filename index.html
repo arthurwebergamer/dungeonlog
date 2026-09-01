@@ -4044,11 +4044,18 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       const total = Math.max(1, Math.round(dano));
       setTimeout(() => {
         const morreu = ferir(total);
-        if (!morreu && typeof aviso === 'function'){
-          const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
-          aviso(en
-            ? ('−' + total + ' HEALTH FOR ' + largadas.length + (largadas.length === 1 ? ' SKIPPED TASK' : ' SKIPPED TASKS'))
-            : ('−' + total + ' DE VIDA POR ' + largadas.length + (largadas.length === 1 ? ' TAREFA LARGADA' : ' TAREFAS LARGADAS')), false, true);
+        // caso fatal: exclusivo do pop-up "Você caiu" (ja enfileirado dentro
+        // de ferir()). Caso nao-fatal: pop-up "Tarefas perdidas" com a lista
+        // de tarefas, no lugar do toast generico antigo (que hoje esta mudo).
+        if (!morreu){
+          if (typeof window.enfileirarPopup === 'function' && typeof window.mostrarTarefasPerdidas === 'function'){
+            window.enfileirarPopup(prox => window.mostrarTarefasPerdidas(largadas, total, prox));
+          } else if (typeof aviso === 'function'){
+            const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
+            aviso(en
+              ? ('−' + total + ' HEALTH FOR ' + largadas.length + (largadas.length === 1 ? ' SKIPPED TASK' : ' SKIPPED TASKS'))
+              : ('−' + total + ' DE VIDA POR ' + largadas.length + (largadas.length === 1 ? ' TAREFA LARGADA' : ' TAREFAS LARGADAS')), false, true);
+          }
         }
       }, 700);
     }
@@ -5012,6 +5019,53 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   }
 
   window.mostrarQueda = mostrarQueda;
+})();
+</script>
+
+<script>
+(function(){
+  // Pop-up "Tarefas perdidas" -- caso NAO-FATAL de verificarVirada() (ferir()
+  // retornou false). Mesma familia visual do bau: reusa .baubg (fundo
+  // escurecido) e fecha com toque nele, igual ao bau -- ver mostrarBauLoot().
+  const largBG = document.createElement('div');
+  largBG.className = 'baubg'; largBG.id = 'largBG';
+  const largPop = document.createElement('div');
+  largPop.className = 'largpop'; largPop.id = 'largPop';
+  document.body.appendChild(largBG);
+  document.body.appendChild(largPop);
+
+  let _aoFecharLarg = null;
+  function fecharLarg(){
+    largPop.classList.remove('on');
+    largBG.classList.remove('on');
+    const cb = _aoFecharLarg; _aoFecharLarg = null;
+    if (cb) cb();
+  }
+  largBG.onclick = fecharLarg;
+
+  // largadas: array de tarefas (objetos com .texto) que ficaram pendentes na
+  // virada -- mesmo array calculado em verificarVirada(), passado direto.
+  function mostrarTarefasPerdidas(largadas, total, aoFechar){
+    if (!largadas || !largadas.length){ if (aoFechar) aoFechar(); return; }
+    _aoFecharLarg = aoFechar || null;
+    const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
+
+    const itensHtml = largadas.map(t =>
+      '<div class="largitem">' + (t.texto || '') + '</div>'
+    ).join('');
+
+    largPop.innerHTML =
+      '<div class="larglabel">' + (en ? 'Skipped Tasks' : 'Tarefas Perdidas') + '</div>'+
+      '<div class="largitens">' + itensHtml + '</div>'+
+      '<div class="largtotal">' + (en ? ('−' + total + ' health') : ('−' + total + ' de vida')) + '</div>'+
+      '<button class="largok" id="largOk">' + (en ? 'Continue' : 'Continuar') + '</button>';
+
+    document.getElementById('largOk').onclick = fecharLarg;
+    largBG.classList.add('on');
+    requestAnimationFrame(() => largPop.classList.add('on'));
+  }
+
+  window.mostrarTarefasPerdidas = mostrarTarefasPerdidas;
 })();
 </script>
 

@@ -3302,3 +3302,30 @@
    a cascata de verdade -- antes as duas regras tinham a mesma especificidade
    e a que vinha depois no arquivo ganhava, entao o pulso nao parava */
 .bauArena.mostrar.aberto{ animation:none; }
+
+/* ===== módulo N — pop-up "Tarefas perdidas" (dano não-fatal na virada) =====
+   Mesma família visual do baú: reusa .baubg (fundo escurecido) já definido
+   acima; card próprio .largpop, mesma anatomia de .baupop (padding, raio,
+   escala de entrada). Fecha com toque no fundo, igual ao baú. */
+.largpop{position:fixed;left:50%;top:50%;z-index:96;
+         transform:translate(-50%,-50%) scale(.9);opacity:0;pointer-events:none;
+         transition:transform .25s cubic-bezier(.2,.9,.3,1.2), opacity .22s;
+         background:var(--panel-2);border:1px solid var(--line);border-radius:18px;
+         padding:24px 20px 20px;width:min(300px, calc(100% - 56px));text-align:center}
+  .largpop.on{transform:translate(-50%,-50%) scale(1);opacity:1;pointer-events:auto}
+
+  .larglabel{font-family:'Silkscreen',monospace;font-size:11px;color:var(--perigo);
+             letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px}
+
+  .largitens{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;
+             max-height:180px;overflow-y:auto;text-align:left}
+  .largitem{font-family:'Outfit',sans-serif;font-size:13px;color:var(--text);
+            background:var(--panel-2);border:1px solid var(--line);border-radius:8px;
+            padding:7px 10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+  .largtotal{font-family:'Outfit',sans-serif;font-size:12.5px;font-weight:700;
+             color:var(--perigo);margin-bottom:16px}
+
+  .largok{width:100%;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;
+          padding:11px;border-radius:11px;border:none;background:var(--accent);
+          color:var(--bg);cursor:pointer}

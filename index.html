@@ -5052,11 +5052,20 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 
     const itensHtml = largadas.map(t => {
       const dObj = DIFS.find(d => d.id === difDe(t)) || DIFS.find(d => d.id === DIF_PADRAO);
-      return '<div class="largitem"><span class="largnome">' + (t.texto || '') + '</span>'
-           + '<span class="largdif">' + dObj.nome + '</span></div>';
+      return '<div class="largitem" data-dif="' + dObj.id + '"><span class="largnome">' + (t.texto || '') + '</span>'
+           + '<span class="difpip">' + '<i></i>'.repeat(dObj.pips) + '</span></div>';
     }).join('');
 
+    // sprite do monstro do dia: mesmo tema ja usado no app pra essa
+    // situacao ("fuga" -- ver SFX em verificarVirada() e aviso() com
+    // fuga=true), espelhado pra sugerir que ele escapou.
+    const m = (typeof monstroDoDia === 'function') ? monstroDoDia() : null;
+    const iconeHtml = m
+      ? '<div class="largicone"><img src="'+m.img+'" alt="' + (en ? 'monster fled' : 'monstro fugiu') + '"></div>'
+      : '';
+
     largPop.innerHTML =
+      iconeHtml+
       '<div class="larglabel">' + (en ? 'Skipped Tasks' : 'Tarefas Perdidas') + '</div>'+
       '<div class="largitens">' + itensHtml + '</div>'+
       '<div class="largtotal">' + (en ? ('−' + total + ' health') : ('−' + total + ' de vida')) + '</div>'+

@@ -3314,6 +3314,11 @@
          padding:24px 20px 20px;width:min(300px, calc(100% - 56px));text-align:center}
   .largpop.on{transform:translate(-50%,-50%) scale(1);opacity:1;pointer-events:auto}
 
+  .largicone{width:56px;height:56px;margin:0 auto 10px;
+             display:flex;align-items:center;justify-content:center}
+  .largicone img{width:56px;height:56px;image-rendering:pixelated;
+                 transform:scaleX(-1);filter:grayscale(.5) brightness(.85)}
+
   .larglabel{font-family:'Silkscreen',monospace;font-size:11px;color:var(--perigo);
              letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px}
 
@@ -3324,8 +3329,13 @@
             background:var(--panel-2);border:1px solid var(--line);border-radius:8px;
             padding:7px 10px}
   .largnome{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
-  .largdif{flex:none;font-size:10.5px;font-weight:700;text-transform:uppercase;
-           letter-spacing:.04em;color:var(--muted)}
+  /* losangos de dificuldade -- mesma cor por tier de .task[data-dif] la na
+     lista de tarefas (ver modulo "linha de meta abaixo do titulo"), so que
+     escopado em .largitem pra nao depender de estar dentro de .task */
+  .largitem[data-dif="trivial"] .difpip{color:#7E8BA3}
+  .largitem[data-dif="facil"]   .difpip{color:var(--verde)}
+  .largitem[data-dif="media"]   .difpip{color:#F2C94C}
+  .largitem[data-dif="dificil"] .difpip{color:var(--perigo)}
 
   .largtotal{font-family:'Outfit',sans-serif;font-size:12.5px;font-weight:700;
              color:var(--perigo);margin-bottom:16px}

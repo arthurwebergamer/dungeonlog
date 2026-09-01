@@ -8850,7 +8850,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // evita instanciar dois setInterval se reconectarEnvio() for chamado
     // mais de uma vez na mesma sessao (nao deveria, mas e defensivo).
     let vigiaVerificacaoAtiva = false;
-    const PRAZO_TOLERANCIA_VERIFICACAO_MS = 30 * 1000; // v4.125-TESTE: 30s (era 10min) -- SO PRA TESTAR O WATCHDOG, reverter antes de publicar
+    const PRAZO_TOLERANCIA_VERIFICACAO_MS = 10 * 60 * 1000; // 10 minutos (valor de produção)
 
     let initializeApp, getAuth, GoogleAuthProvider, signInWithPopup,
         signInWithEmailAndPassword, createUserWithEmailAndPassword,

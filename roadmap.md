@@ -8594,3 +8594,42 @@ aparece na Arena pro dia corrente, (2) saldo de moedas bate com o valor de antes
 criação da conta (sem incremento), (3) inventário não ganhou item duplicado, (4)
 chave crua 'questlog.bauDia.v1' some do localStorage depois do login (confirma que
 foi migrada+removida, não só ignorada).
+
+## auth/email-already-in-use — erro inline no campo de email
+
+Problema: tentar criar conta com email ja cadastrado nao dava NENHUM
+feedback visual -- o catch chamava window.aviso(), mas aviso() fica
+mudo com TOASTS_DESATIVADOS=true. Usuario ficava sem saber por que
+o cadastro nao completou.
+
+Fix: auth/email-already-in-use passou a usar o mesmo padrao visual
+inline ja validado na tela de senha (campoStatus com icone erro +
+paragrafo .loginSenhaErro), em vez do toast generico. Os outros
+codigos de erro (weak-password, wrong-password, etc.) continuam
+passando por window.aviso() -- ou seja, continuam mudos. Nao foi
+pedido resolver isso pra todos os codigos, so pro caso especifico
+que estava sem feedback nenhum.
+
+Detalhe de arquitetura: o catch do Firebase vive num <script
+type="module"> (bloco de login/signup) que NAO compartilha escopo
+com a IIFE que controla os campos de senha (campoSenha, statusSenha
+etc, mais acima no arquivo). Por isso os helpers
+window.questlogMostrarErroEmail() e window.questlogLimparErroEmail()
+foram expostos globalmente -- mesmo padrao ja usado por
+window.questlogLimparStatusSenha() e window.questlogModoCadastro().
+
+Limpeza do erro: acontece em 3 momentos -- (1) usuario digita de
+novo no campo email (listener 'input'), (2) usuario troca de
+Entrar/Cadastro (dentro de questlogLimparStatusSenha), (3) inicio
+de cada tentativa de submit (limparErroEmail no comeco do onclick).
+
+CSS: nenhuma classe nova. Reaproveita .campoStatus.erro e
+.loginSenhaErro que ja existiam pro campo de senha.
+
+Arquivo: index.html
+- HTML do campo de email: adicionado span#loginEmailStatus +
+  p#loginEmailErro
+- IIFE do login: declarados campoEmail/statusEmail/erroEmail,
+  funcao limparErroEmail(), helpers expostos em window
+- Modulo Firebase (loginEntrarBtn.onclick): catch agora ramifica
+  auth/email-already-in-use pro campo inline em vez do toast

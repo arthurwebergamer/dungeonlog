@@ -5050,9 +5050,11 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     _aoFecharLarg = aoFechar || null;
     const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
 
-    const itensHtml = largadas.map(t =>
-      '<div class="largitem">' + (t.texto || '') + '</div>'
-    ).join('');
+    const itensHtml = largadas.map(t => {
+      const dObj = DIFS.find(d => d.id === difDe(t)) || DIFS.find(d => d.id === DIF_PADRAO);
+      return '<div class="largitem"><span class="largnome">' + (t.texto || '') + '</span>'
+           + '<span class="largdif">' + dObj.nome + '</span></div>';
+    }).join('');
 
     largPop.innerHTML =
       '<div class="larglabel">' + (en ? 'Skipped Tasks' : 'Tarefas Perdidas') + '</div>'+

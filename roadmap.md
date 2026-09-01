@@ -8549,3 +8549,95 @@ Trocada pra Outfit, peso 700, 18px (ajustado de 20px já que sans "pesa" visualm
 ### Pendência
 Não confirmado ainda se resolve de fato — se continuar ruim, o problema pode estar em outro elemento (nome individual de cada conquista, `.conqv2nome`, não o cabeçalho da categoria).
 
+## 96. Cor da dificuldade Média presa na cor do tema em vez de fixa
+
+### O que foi pedido
+A cor da dificuldade "Média" (pip no card da tarefa e seletor no composer) mudava conforme o tema escolhido pelo usuário — deveria ser uma cor fixa, como as outras 3 dificuldades já são.
+
+### Causa raiz
+`.task[data-dif="media"] .difpip{color:var(--accent)}` e `.dif[data-dif="media"].on{color:var(--accent)}` usavam a cor de destaque do tema (`--accent`), que muda entre Laranja/Azul/Dourado/Escuro. Trivial (cinza fixo `#7E8BA3`), Fácil (`--verde`) e Difícil (`--perigo`) já usavam cores fixas, independentes de tema — só Média tinha esse comportamento diferente. Achado no caminho: o nome do rótulo ("Média") no seletor do composer nem tinha regra própria de cor (`.dif[data-dif="media"].on .difnome`) — as outras 3 dificuldades têm, essa não, e caía no mesmo fallback genérico ligado ao tema.
+
+### Fix
+Trocado pra `#F2C94C` (o mesmo amarelo dourado já usado em outros lugares do app — moeda, categoria "Nível" das conquistas), fixo independente de tema. Duas correções, replicadas nos dois blocos de CSS duplicados do arquivo (6 ocorrências no total): cor do pip, cor do card ativo, e a regra do nome do rótulo que estava faltando.
+
+### Validação
+`css` npm lib confirmou o CSS válido depois da troca; conferido visualmente por grep que as 6 ocorrências (3 regras × 2 blocos duplicados) ficaram consistentes com `#F2C94C`.
+
+### Bug: baú do dia duplicava recompensa ao criar conta depois de já ter aberto como convidado
+
+**Sintoma:** usuário abre o baú do dia como convidado (ganha moedas/item), depois cria
+conta -> Arena mostra baú novo, fechado -> abre de novo -> credita moedas e sorteia
+item outra vez. Recompensa duplicada pro mesmo dia.
+
+**Causa:** a lista de chaves migradas convidado->conta em aoLogar() (item 13f do
+roadmap, mesma rotina que migra tarefas/XP/inventário/etc. pra chave namespaced por
+uid) tem 12 chaves hardcoded. CHAVE_BAU_DIA ('questlog.bauDia.v1', item 86) foi
+implementada DEPOIS dessa lista existir e nunca foi adicionada nela. Resultado: no
+login, a chave crua do baú (convidado) é ignorada -- nem copiada nem apagada -- e
+window.chaveConta(CHAVE_BAU_DIA) não encontra nada na chave nova. garantirBauDia()
+interpreta isso como "baú do dia ainda não gerado" e cria um do zero.
+
+**Fix:** adicionada 'questlog.bauDia.v1' ao array de 12 chaves em aoLogar() (agora
+13). Nenhuma mudança em garantirBauDia()/salvarBauDia()/lerBauDia() -- a leitura já
+usava window.chaveConta() corretamente, só faltava a chave entrar na migração.
+
+**Alerta pra próximas specs:** essa lista de migração NÃO é automática -- toda vez
+que uma feature nova introduzir uma chave de localStorage namespaced por conta
+(padrão questlog.[key].v1 + chaveConta()), ela precisa ser adicionada manualmente
+a esse array em aoLogar(), ou fica invisível pro fluxo convidado->conta (mesma
+classe de bug documentada aqui, agora seu 2º caso real). Revisar esse array antes
+de fechar qualquer spec que crie chave nova.
+
+**Teste de validação:** fluxo completo simulado -- boot como convidado, resgatar
+baú do dia (moedas X, item Y anotados), criar conta, verificar: (1) nenhum baú novo
+aparece na Arena pro dia corrente, (2) saldo de moedas bate com o valor de antes da
+criação da conta (sem incremento), (3) inventário não ganhou item duplicado, (4)
+chave crua 'questlog.bauDia.v1' some do localStorage depois do login (confirma que
+foi migrada+removida, não só ignorada).
+
+## auth/email-already-in-use — erro inline no campo de email
+
+Problema: tentar criar conta com email ja cadastrado nao dava NENHUM
+feedback visual -- o catch chamava window.aviso(), mas aviso() fica
+mudo com TOASTS_DESATIVADOS=true. Usuario ficava sem saber por que
+o cadastro nao completou.
+
+Fix: auth/email-already-in-use passou a usar o mesmo padrao visual
+inline ja validado na tela de senha (campoStatus com icone erro +
+paragrafo .loginSenhaErro), em vez do toast generico. Os outros
+codigos de erro (weak-password, wrong-password, etc.) continuam
+passando por window.aviso() -- ou seja, continuam mudos. Nao foi
+pedido resolver isso pra todos os codigos, so pro caso especifico
+que estava sem feedback nenhum.
+
+Detalhe de arquitetura: o catch do Firebase vive num <script
+type="module"> (bloco de login/signup) que NAO compartilha escopo
+com a IIFE que controla os campos de senha (campoSenha, statusSenha
+etc, mais acima no arquivo). Por isso os helpers
+window.questlogMostrarErroEmail() e window.questlogLimparErroEmail()
+foram expostos globalmente -- mesmo padrao ja usado por
+window.questlogLimparStatusSenha() e window.questlogModoCadastro().
+
+Limpeza do erro: acontece em 3 momentos -- (1) usuario digita de
+novo no campo email (listener 'input'), (2) usuario troca de
+Entrar/Cadastro (dentro de questlogLimparStatusSenha), (3) inicio
+de cada tentativa de submit (limparErroEmail no comeco do onclick).
+
+CSS: nenhuma classe nova. Reaproveita .campoStatus.erro e
+.loginSenhaErro que ja existiam pro campo de senha.
+
+Arquivo: index.html
+- HTML do campo de email: adicionado span#loginEmailStatus +
+  p#loginEmailErro
+- IIFE do login: declarados campoEmail/statusEmail/erroEmail,
+  funcao limparErroEmail(), helpers expostos em window
+- Modulo Firebase (loginEntrarBtn.onclick): catch agora ramifica
+  auth/email-already-in-use pro campo inline em vez do toast
+
+  - [style.css] Removida duplicação Bloco #19-20 (linhas 821-1063) — cópia byte-a-byte
+  de Módulo #2-3 (linhas 1993-2235), causada por sobreposição das duas eras de
+  numeração de bloco. Confirmado via diff textual + parser `css` (npm) que as
+  regras remanescentes no Módulo são idênticas selector+decl+!important às
+  removidas — zero mudança de cascata. 3547 → 3304 linhas. Nenhuma regra única
+  perdida. Demais blocos (fora da faixa 821-1063 ↔ 1993-2235) não foram varridos
+  — se suspeitar de outra duplicação, pedir novo mapeamento completo dos 62 blocos.

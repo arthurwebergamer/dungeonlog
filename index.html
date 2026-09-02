@@ -1167,6 +1167,38 @@ let tarefas = [];
 let dragArmado = false;   // true enquanto um card esta sendo arrastado (bloqueia o click de abrir editor)
 let xpTotal = 0, moedas = 0, derrotadoEm = null, jaComecou = false;
 function monstroJaCaiu(){ return derrotadoEm === isoAtual(); }
+
+// fonte da verdade da vitoria do dia -- desacoplada de hpTotal/hpDano
+// (que so existem pra desenhar a barra visual). Criterio: zero pendentes
+// E pelo menos 1 concluida (bloqueia o exploit de excluir tudo sem
+// completar nada, mas permite excluir a ultima pendente pra fechar o dia).
+function avaliarVitoriaDoDia(){
+  const doDia = tarefas.filter(ehDeHoje);
+  const concluidas = doDia.filter(feitaHoje).length;
+  const pendentes = doDia.length - concluidas;
+  return pendentes === 0 && concluidas > 0;
+}
+
+// dispara a recompensa/efeitos de vitoria -- extraido de dentro de alternar()
+// pra ser chamado tambem por verificarVitoriaAoExcluir() (vitoria por
+// exclusao da ultima pendente)
+function dispararVitoriaDoDia(doDia, nivelAntes){
+  derrotadoEm = isoAtual();
+  const ganho = recompensaVitoria(doDia.length);
+  moedas += ganho;
+  ultimoGanho = ganho;
+  moedasCaindo(Math.max(3, Math.min(10, Math.round(ganho / 6))));
+  render();
+  setTimeout(()=>aviso((idiomaApp() === 'en' ? 'MONSTER DEFEATED  +' : 'MONSTRO DERROTADO  +')+ganho+(idiomaApp() === 'en' ? ' COINS' : ' MOEDAS'), true), 350);
+  const nivelDepois = progresso().nivel;
+  if (nivelDepois > nivelAntes){
+    setTimeout(() => {
+      if (typeof window.enfileirarPopup === 'function' && typeof mostrarNivelUp === 'function'){
+        window.enfileirarPopup(prox => mostrarNivelUp(nivelDepois, prox));
+      }
+    }, 700);
+  }
+}
 let nomeHeroi = 'Aventureiro';
 let ultimoGanho = 0;
 let _vitoriaCelebrada = false; // pedido do usuario (27/08): tela de vitoria "muito simples" -- controla o disparo unico do efeito de celebracao, ver celebrarVitoria()
@@ -1459,10 +1491,10 @@ function render(){
   document.getElementById('mobSprite').classList.toggle('dead', morto);
   document.getElementById('mobSprite').classList.toggle('espreita', semTarefas);
 
-  // vitoria: monstro derrotado de verdade (derrotadoEm bate com hoje) —
-  // NAO usar "viva === 0" aqui: isso tambem fica 0 quando as tarefas
-  // pendentes sao excluidas em vez de concluidas, o que daria vitoria de
-  // graca so apagando o que falta (ja rolou, ver historico no roadmap)
+  // vitoria: monstro derrotado de verdade (derrotadoEm bate com hoje) --
+  // criterio real fica em avaliarVitoriaDoDia() (0 pendentes E >=1
+  // concluida), avaliado em alternar()/verificarVitoriaAoExcluir(); aqui
+  // so lemos o resultado ja decidido, nao recalculamos nada
   const venceu = monstroJaCaiu();
   document.querySelector('.arena').classList.toggle('venceu', venceu);
   document.getElementById('mobinfo').classList.toggle('off', venceu || total === 0);
@@ -1719,28 +1751,15 @@ function alternar(i){
   animarGolpe();
   render();
 
-  const todasFeitas = doDia.length > 0 && doDia.every(feitaHoje);
+  const venceuAgora = avaliarVitoriaDoDia();
   const nivelDepois = progresso().nivel;
   const subiuNivel = nivelDepois > nivelAntes;
 
-  if (todasFeitas && !monstroJaCaiu()){
-    derrotadoEm = isoAtual();
-    const ganho = recompensaVitoria(doDia.length);
-    moedas += ganho;
-    ultimoGanho = ganho;
-    moedasCaindo(Math.max(3, Math.min(10, Math.round(ganho / 6))));
-    render();
-    setTimeout(()=>aviso((idiomaApp() === 'en' ? 'MONSTER DEFEATED  +' : 'MONSTRO DERROTADO  +')+ganho+(idiomaApp() === 'en' ? ' COINS' : ' MOEDAS'), true), 350);
-    if (subiuNivel){
-      setTimeout(() => {
-        if (typeof window.enfileirarPopup === 'function' && typeof mostrarNivelUp === 'function'){
-          window.enfileirarPopup(prox => mostrarNivelUp(nivelDepois, prox));
-        }
-      }, 700);
-    }
+  if (venceuAgora && !monstroJaCaiu()){
+    dispararVitoriaDoDia(doDia, nivelAntes);
     return true;
   }
-  if (!todasFeitas) derrotadoEm = null;
+  if (!venceuAgora) derrotadoEm = null;
 
   if (subiuNivel){
     if (typeof mostrarNivelUp === 'function') mostrarNivelUp(nivelDepois);
@@ -1754,6 +1773,12 @@ function alternar(i){
 // So garante que derrotadoEm nao fique com um valor indevido depois da exclusao.
 function verificarVitoriaAoExcluir(){
   if (monstroJaCaiu()) return;   // ja venceu de verdade antes: exclusao nao desfaz
+  if (avaliarVitoriaDoDia()){
+    // excluir a ultima pendente fechou o dia (0 pendentes, >=1 concluida)
+    const nivelAntes = progresso().nivel;
+    dispararVitoriaDoDia(tarefas.filter(ehDeHoje), nivelAntes);
+    return;
+  }
   derrotadoEm = null;
 }
 

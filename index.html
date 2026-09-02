@@ -1167,6 +1167,38 @@ let tarefas = [];
 let dragArmado = false;   // true enquanto um card esta sendo arrastado (bloqueia o click de abrir editor)
 let xpTotal = 0, moedas = 0, derrotadoEm = null, jaComecou = false;
 function monstroJaCaiu(){ return derrotadoEm === isoAtual(); }
+
+// fonte da verdade da vitoria do dia -- desacoplada de hpTotal/hpDano
+// (que so existem pra desenhar a barra visual). Criterio: zero pendentes
+// E pelo menos 1 concluida (bloqueia o exploit de excluir tudo sem
+// completar nada, mas permite excluir a ultima pendente pra fechar o dia).
+function avaliarVitoriaDoDia(){
+  const doDia = tarefas.filter(ehDeHoje);
+  const concluidas = doDia.filter(feitaHoje).length;
+  const pendentes = doDia.length - concluidas;
+  return pendentes === 0 && concluidas > 0;
+}
+
+// dispara a recompensa/efeitos de vitoria -- extraido de dentro de alternar()
+// pra ser chamado tambem por verificarVitoriaAoExcluir() (vitoria por
+// exclusao da ultima pendente)
+function dispararVitoriaDoDia(doDia, nivelAntes){
+  derrotadoEm = isoAtual();
+  const ganho = recompensaVitoria(doDia.length);
+  moedas += ganho;
+  ultimoGanho = ganho;
+  moedasCaindo(Math.max(3, Math.min(10, Math.round(ganho / 6))));
+  render();
+  setTimeout(()=>aviso((idiomaApp() === 'en' ? 'MONSTER DEFEATED  +' : 'MONSTRO DERROTADO  +')+ganho+(idiomaApp() === 'en' ? ' COINS' : ' MOEDAS'), true), 350);
+  const nivelDepois = progresso().nivel;
+  if (nivelDepois > nivelAntes){
+    setTimeout(() => {
+      if (typeof window.enfileirarPopup === 'function' && typeof mostrarNivelUp === 'function'){
+        window.enfileirarPopup(prox => mostrarNivelUp(nivelDepois, prox));
+      }
+    }, 700);
+  }
+}
 let nomeHeroi = 'Aventureiro';
 let ultimoGanho = 0;
 let _vitoriaCelebrada = false; // pedido do usuario (27/08): tela de vitoria "muito simples" -- controla o disparo unico do efeito de celebracao, ver celebrarVitoria()
@@ -1245,6 +1277,14 @@ function diasCorridos(){
 
 function monstroDoDia(){
   const i = (diasCorridos() + semente) % MONSTROS.length;
+  return MONSTROS[i];
+}
+
+// mesmo ciclo de monstroDoDia(), mas pra uma data especifica (ISO) em vez
+// de "hoje" -- usado pro pop-up de tarefas perdidas mostrar o monstro do
+// DIA QUE VIROU (ultimoDia em verificarVirada()), nao o de hoje.
+function monstroDoDiaEm(iso){
+  const i = ((diasCorridos() + diffDias(iso, isoAtual()) + semente) % MONSTROS.length + MONSTROS.length) % MONSTROS.length;
   return MONSTROS[i];
 }
 
@@ -1451,10 +1491,10 @@ function render(){
   document.getElementById('mobSprite').classList.toggle('dead', morto);
   document.getElementById('mobSprite').classList.toggle('espreita', semTarefas);
 
-  // vitoria: monstro derrotado de verdade (derrotadoEm bate com hoje) —
-  // NAO usar "viva === 0" aqui: isso tambem fica 0 quando as tarefas
-  // pendentes sao excluidas em vez de concluidas, o que daria vitoria de
-  // graca so apagando o que falta (ja rolou, ver historico no roadmap)
+  // vitoria: monstro derrotado de verdade (derrotadoEm bate com hoje) --
+  // criterio real fica em avaliarVitoriaDoDia() (0 pendentes E >=1
+  // concluida), avaliado em alternar()/verificarVitoriaAoExcluir(); aqui
+  // so lemos o resultado ja decidido, nao recalculamos nada
   const venceu = monstroJaCaiu();
   document.querySelector('.arena').classList.toggle('venceu', venceu);
   document.getElementById('mobinfo').classList.toggle('off', venceu || total === 0);
@@ -1711,28 +1751,15 @@ function alternar(i){
   animarGolpe();
   render();
 
-  const todasFeitas = doDia.length > 0 && doDia.every(feitaHoje);
+  const venceuAgora = avaliarVitoriaDoDia();
   const nivelDepois = progresso().nivel;
   const subiuNivel = nivelDepois > nivelAntes;
 
-  if (todasFeitas && !monstroJaCaiu()){
-    derrotadoEm = isoAtual();
-    const ganho = recompensaVitoria(doDia.length);
-    moedas += ganho;
-    ultimoGanho = ganho;
-    moedasCaindo(Math.max(3, Math.min(10, Math.round(ganho / 6))));
-    render();
-    setTimeout(()=>aviso((idiomaApp() === 'en' ? 'MONSTER DEFEATED  +' : 'MONSTRO DERROTADO  +')+ganho+(idiomaApp() === 'en' ? ' COINS' : ' MOEDAS'), true), 350);
-    if (subiuNivel){
-      setTimeout(() => {
-        if (typeof window.enfileirarPopup === 'function' && typeof mostrarNivelUp === 'function'){
-          window.enfileirarPopup(prox => mostrarNivelUp(nivelDepois, prox));
-        }
-      }, 700);
-    }
+  if (venceuAgora && !monstroJaCaiu()){
+    dispararVitoriaDoDia(doDia, nivelAntes);
     return true;
   }
-  if (!todasFeitas) derrotadoEm = null;
+  if (!venceuAgora) derrotadoEm = null;
 
   if (subiuNivel){
     if (typeof mostrarNivelUp === 'function') mostrarNivelUp(nivelDepois);
@@ -1746,6 +1773,12 @@ function alternar(i){
 // So garante que derrotadoEm nao fique com um valor indevido depois da exclusao.
 function verificarVitoriaAoExcluir(){
   if (monstroJaCaiu()) return;   // ja venceu de verdade antes: exclusao nao desfaz
+  if (avaliarVitoriaDoDia()){
+    // excluir a ultima pendente fechou o dia (0 pendentes, >=1 concluida)
+    const nivelAntes = progresso().nivel;
+    dispararVitoriaDoDia(tarefas.filter(ehDeHoje), nivelAntes);
+    return;
+  }
   derrotadoEm = null;
 }
 
@@ -3995,6 +4028,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     if (ultimoDia > hoje){ ultimoDia = hoje; gravar(); return; }
 
     const largadas = pendentesEm(ultimoDia);
+    const diaVirada = ultimoDia;   // guarda ANTES do reassign abaixo -- e o dia que fechou, nao "hoje"
     const danoBruto = largadas.reduce((s, t) =>
       s + ECO.danoPorTarefa * (typeof multDif === 'function' ? multDif(difDe(t)) : 1), 0);
 
@@ -4044,11 +4078,18 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       const total = Math.max(1, Math.round(dano));
       setTimeout(() => {
         const morreu = ferir(total);
-        if (!morreu && typeof aviso === 'function'){
-          const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
-          aviso(en
-            ? ('−' + total + ' HEALTH FOR ' + largadas.length + (largadas.length === 1 ? ' SKIPPED TASK' : ' SKIPPED TASKS'))
-            : ('−' + total + ' DE VIDA POR ' + largadas.length + (largadas.length === 1 ? ' TAREFA LARGADA' : ' TAREFAS LARGADAS')), false, true);
+        // caso fatal: exclusivo do pop-up "Você caiu" (ja enfileirado dentro
+        // de ferir()). Caso nao-fatal: pop-up "Tarefas perdidas" com a lista
+        // de tarefas, no lugar do toast generico antigo (que hoje esta mudo).
+        if (!morreu){
+          if (typeof window.enfileirarPopup === 'function' && typeof window.mostrarTarefasPerdidas === 'function'){
+            window.enfileirarPopup(prox => window.mostrarTarefasPerdidas(largadas, total, diaVirada, prox));
+          } else if (typeof aviso === 'function'){
+            const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
+            aviso(en
+              ? ('−' + total + ' HEALTH FOR ' + largadas.length + (largadas.length === 1 ? ' SKIPPED TASK' : ' SKIPPED TASKS'))
+              : ('−' + total + ' DE VIDA POR ' + largadas.length + (largadas.length === 1 ? ' TAREFA LARGADA' : ' TAREFAS LARGADAS')), false, true);
+          }
         }
       }, 700);
     }
@@ -5012,6 +5053,66 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   }
 
   window.mostrarQueda = mostrarQueda;
+})();
+</script>
+
+<script>
+(function(){
+  // Pop-up "Tarefas perdidas" -- caso NAO-FATAL de verificarVirada() (ferir()
+  // retornou false). Mesma familia visual do bau: reusa .baubg (fundo
+  // escurecido) e fecha com toque nele, igual ao bau -- ver mostrarBauLoot().
+  const largBG = document.createElement('div');
+  largBG.className = 'baubg'; largBG.id = 'largBG';
+  const largPop = document.createElement('div');
+  largPop.className = 'largpop'; largPop.id = 'largPop';
+  document.body.appendChild(largBG);
+  document.body.appendChild(largPop);
+
+  let _aoFecharLarg = null;
+  function fecharLarg(){
+    largPop.classList.remove('on');
+    largBG.classList.remove('on');
+    const cb = _aoFecharLarg; _aoFecharLarg = null;
+    if (cb) cb();
+  }
+  largBG.onclick = fecharLarg;
+
+  // largadas: array de tarefas (objetos com .texto) que ficaram pendentes na
+  // virada. diaVirada: ISO do dia que fechou (nao "hoje") -- usado pra
+  // buscar o monstro daquele dia especifico, ver monstroDoDiaEm().
+  function mostrarTarefasPerdidas(largadas, total, diaVirada, aoFechar){
+    if (!largadas || !largadas.length){ if (aoFechar) aoFechar(); return; }
+    _aoFecharLarg = aoFechar || null;
+    const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
+
+    const itensHtml = largadas.map(t => {
+      const dObj = DIFS.find(d => d.id === difDe(t)) || DIFS.find(d => d.id === DIF_PADRAO);
+      return '<div class="largitem" data-dif="' + dObj.id + '"><span class="largnome">' + (t.texto || '') + '</span>'
+           + '<span class="difpip">' + '<i></i>'.repeat(dObj.pips) + '</span></div>';
+    }).join('');
+
+    // sprite do monstro DO DIA QUE A PESSOA PERDEU (diaVirada), nao o de
+    // hoje -- mesmo tema de "fuga" ja usado no app (SFX 'fuga', toast
+    // "FUGIU"), espelhado pra sugerir que ele escapou naquele dia.
+    const m = (typeof monstroDoDiaEm === 'function' && diaVirada) ? monstroDoDiaEm(diaVirada)
+            : (typeof monstroDoDia === 'function' ? monstroDoDia() : null);
+    const iconeHtml = m
+      ? '<div class="largicone"><img src="'+m.img+'" alt="' + (en ? 'monster fled' : 'monstro fugiu') + '"></div>'
+      : '';
+
+    largPop.innerHTML =
+      iconeHtml+
+      '<div class="larglabel">' + (en ? 'Skipped Tasks' : 'Tarefas Perdidas') + '</div>'+
+      '<div class="largitens">' + itensHtml + '</div>'+
+      '<div class="largtotal">' + (en ? ('−' + total + ' health') : ('−' + total + ' de vida')) + '</div>'+
+      '<button class="largok" id="largOk">' + (en ? 'Continue' : 'Continuar') + '</button>';
+
+    document.getElementById('largOk').onclick = fecharLarg;
+    largBG.classList.add('on');
+    requestAnimationFrame(() => largPop.classList.add('on'));
+  }
+
+  window.mostrarTarefasPerdidas = mostrarTarefasPerdidas;
 })();
 </script>
 

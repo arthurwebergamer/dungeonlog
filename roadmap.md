@@ -8641,3 +8641,35 @@ Arquivo: index.html
   removidas — zero mudança de cascata. 3547 → 3304 linhas. Nenhuma regra única
   perdida. Demais blocos (fora da faixa 821-1063 ↔ 1993-2235) não foram varridos
   — se suspeitar de outra duplicação, pedir novo mapeamento completo dos 62 blocos.
+
+## Spec: Pop-up "Tarefas Perdidas" (dano não-fatal na virada de dia)
+
+**Contexto:** `verificarVirada()` já tinha dois caminhos após `ferir()`: fatal
+(`true`) → pop-up "Você caiu" (já existia). Não-fatal (`false`) → antes disso
+disparava só um `aviso()` (toast) genérico e mudo, sem detalhar as tarefas.
+
+**O que foi feito:**
+- Novo pop-up `mostrarTarefasPerdidas(largadas, total, diaVirada, aoFechar)`,
+  mesma família visual do baú (`.baubg` reaproveitado, card central, fecha
+  no toque do fundo).
+- Lista cada tarefa largada pelo nome (`t.texto`) + losango de dificuldade
+  (`.difpip`, reaproveitado 1:1 do módulo de lista de tarefas, cores por
+  tier via `data-dif` no `.largitem`) + total de vida perdida no rodapé.
+- Sprite no topo: monstro **do dia que virou**, não o de hoje — precisou de
+  `monstroDoDiaEm(iso)` (nova função, mesmo ciclo de `monstroDoDia()` mas
+  parametrizado por `diffDias(iso, isoAtual())`), porque `ultimoDia` já é
+  reatribuído pra `hoje` antes do `setTimeout` que dispara o pop-up rodar.
+  Isso exigiu capturar `const diaVirada = ultimoDia` **antes** do reassign
+  em `verificarVirada()` e propagar até o pop-up. Sprite espelhado
+  (`scaleX(-1)`) + leve dessaturação, mesmo tema de "fuga" que o app já usa
+  (SFX `'fuga'`, toast "FUGIU").
+- Caso fatal continua exclusivo do pop-up "Você caiu" — `ferir()` não foi
+  tocado, só o consumo do retorno em `verificarVirada()`.
+- Fallback: se `enfileirarPopup`/`mostrarTarefasPerdidas` não existirem por
+  algum motivo, cai de volta pro `aviso()` antigo (mesma lógica de sempre).
+
+**Armadilha a não repetir:** não usar `monstroDoDia()` (hoje) dentro desse
+pop-up — ele roda depois que `ultimoDia` já virou `hoje`, então sempre
+mostraria o monstro errado (do dia seguinte, não do dia perdido). Sempre
+capturar o ISO do dia ANTES do reassign, se precisar dele em callback
+assíncrono de `verificarVirada()`.

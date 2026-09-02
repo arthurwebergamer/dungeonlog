@@ -8734,3 +8734,58 @@ completo após os dois patches.
 **Arquivos:** `index.html` — `venderItem()` e `montarVenda()` (variável local
 renomeada de `equipado_` para `vaiDesequipar`, com a condição `s.q === 1`
 adicionada).
+
+## Landing page da waitlist — criação e integração com Firebase
+
+Objetivo: página standalone para captar interessados via TikTok antes do lançamento
+público do app. Vive em /waitlist/index.html (ver item de reestruturação de rotas
+do Cloudflare Pages).
+
+DECISÃO DE IDIOMA: página em inglês — TikToks são feitos em inglês, plano é
+divulgação global. O app em si continua 100% PT-BR; só a landing muda.
+
+CONTEÚDO/DESIGN (versão final adotada):
+- Prova social real: 3 screenshots do app (Tasks/combate, Loja, Perfil) + sprites
+  de monstro extraídos direto do assets.js do repositório (não são mockup).
+- Paleta fiel ao tema "Grafite" real do app (--panel, --panel-2, --line, --accent
+  etc.), não uma identidade visual nova inventada pra página.
+- Seção de comparação direta ("apps comuns vs DungeonLog") reforçando o
+  diferencial da mecânica (tarefa = monstro, tarefa pendente = dano de volta).
+- Hover no CTA principal usa o sprite real de combate "Slash 3" (9 frames,
+  extraído de --spr-slash-comum do style.css) + flash + tremor — não é
+  aproximação em CSS puro, é o efeito real do jogo.
+- Uma primeira versão (estética "portal de pedra/tocha medieval", usando o logo
+  enviado) foi feita e descartada em favor desta, por ser mais fiel ao produto
+  real (screenshots verdadeiros > ilustração genérica).
+
+FORMULÁRIO — captura email + plataforma (Android/iOS), grava no MESMO projeto
+Firebase do app (questlog-d4c11), em coleções novas e isoladas do resto do save:
+
+  Coleção "waitlist"
+    doc ID = email normalizado (lowercase, trim) — evita duplicata por design
+    campos: { email, platform: "android"|"ios", createdAt: serverTimestamp() }
+
+  Coleção "waitlist_stats"
+    doc único "counter"
+    campo: { total: number }
+
+Escrita feita via runTransaction (não set() solto): lê se o doc do email já
+existe (se sim, lança erro 'already-exists' tratado como "você já está na
+fila", sem duplicar contagem) e incrementa o counter atomicamente no mesmo
+commit — evita corrida entre dois cadastros simultâneos.
+
+Barra de progresso na página lê waitlist_stats/counter ao carregar (getDoc) e
+recalcula % contra uma constante GOAL (hoje = 500, ajustável direto no código,
+1 linha) — puramente cosmético/motivacional, não trava cadastro se a meta bater.
+
+SDK: Firebase modular v10.12.2 via import ESM direto de gstatic
+(https://www.gstatic.com/firebasejs/10.12.2/...), mesmo padrão já usado pelo
+app principal — sem build step, sem npm.
+
+RISCO JÁ REGISTRADO: como usa o mesmo projeto Firebase que o app, quando as
+regras de segurança do Firestore forem endurecidas (bloqueador de lançamento já
+listado), é preciso liberar escrita explícita pras coleções "waitlist" e
+"waitlist_stats" — senão o formulário para de funcionar no mesmo commit que
+travar o resto do banco.
+
+Link do TikTok (@dungeonlog) linkado no rodapé da página.

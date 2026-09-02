@@ -2447,7 +2447,10 @@ function venderItem(id, elOrigem){
   const it = item(id);
   if (it.tipo === 'chave') return;   // itens-chave (ex: Grimório) nunca sao vendaveis
   const ponto = pontoDeElemento(elOrigem); // captura ANTES do render
-  SLOTS.forEach(s => { if (equipado[s] === id) equipado[s] = null; });
+  // NAO desequipar aqui incondicionalmente: com 2+ copias do mesmo item,
+  // vender uma unidade desequipava a outra copia idêntica sem motivo.
+  // tirarItem() ja cuida disso -- so desequipa quando a ULTIMA copia sai
+  // (q chega a 0), mantendo o item equipado se ainda sobrar estoque.
   const preco = precoVenda(it);
   moedas += preco;
   tirarItem(id, 1);
@@ -3255,7 +3258,10 @@ function montarVenda(grid){
   lista.forEach(s => {
     const it = item(s.id);
     const preco = precoVenda(it);
-    const equipado_ = SLOTS.some(k => equipado[k] === s.id);
+    // aviso "sera desequipado" so faz sentido se essa venda for a ULTIMA
+    // copia (s.q === 1) -- com estoque > 1, sobra outra unidade igual e o
+    // item continua equipado normalmente
+    const vaiDesequipar = s.q === 1 && SLOTS.some(k => equipado[k] === s.id);
 
     const row = document.createElement('div');
     row.className = 'lrow';
@@ -3264,7 +3270,7 @@ function montarVenda(grid){
       '<div class="linfo">' +
         '<div class="lname">' + it.nome + (s.q > 1 ? ' <span class="lqtd">×' + s.q + '</span>' : '') + '</div>' +
         '<div class="lmeta" style="color:' + COR_RAR[it.rar] + '">' + RARIDADES[it.rar] + ' · ' + NOME_TIPO[it.tipo] + '</div>' +
-        (equipado_ ? '<div class="lbonus">' + (en ? 'in use — will be unequipped' : 'em uso — será desequipado') + '</div>' : '') +
+        (vaiDesequipar ? '<div class="lbonus">' + (en ? 'in use — will be unequipped' : 'em uso — será desequipado') + '</div>' : '') +
       '</div>' +
       '<div class="lacao"><span class="lpreco">+' + preco + MOEDA + '</span>' +
       '<button class="lbtn sec" data-v="' + s.id + '">' + (en ? 'Sell' : 'Vender') + '</button></div>';

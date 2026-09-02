@@ -8673,3 +8673,64 @@ pop-up — ele roda depois que `ultimoDia` já virou `hoje`, então sempre
 mostraria o monstro errado (do dia seguinte, não do dia perdido). Sempre
 capturar o ISO do dia ANTES do reassign, se precisar dele em callback
 assíncrono de `verificarVirada()`.
+
+## Vitória do dia desacoplada do contador visual de vida (hpTotal/hpDano)
+
+**Problema:** a condição de vitória usava `doDia.every(feitaHoje)` (todasFeitas),
+calculada só dentro de `alternar()`. Isso deixava um caso sem cobertura: completar
+2 de 3 tarefas e excluir a 3ª (pendente) não disparava a vitória — pendentes
+zerava mas ninguém verificava isso fora do fluxo de conclusão.
+
+**Correção:** critério de vitória extraído para `avaliarVitoriaDoDia()`, função
+única e independente do contador visual: `pendentes === 0 && concluidas > 0`.
+- `pendentes === 0` resolve o caso de completar quase tudo e excluir a última pendente.
+- `concluidas > 0` continua bloqueando o exploit original (excluir tudo sem
+  completar nada não vence mais nada).
+
+Lógica de recompensa (moedas, popup de derrota do monstro, level-up) extraída de
+dentro de `alternar()` para `dispararVitoriaDoDia(doDia, nivelAntes)`, reutilizada
+agora também por `verificarVitoriaAoExcluir()`.
+
+`hpTotal`/`hpDano` (módulo "VIDA DO MONSTRO", fim do arquivo) **não foram tocados**
+— continuam existindo só para desenhar a barra de vida visual do monstro, e
+deixam de ser (na prática, já não eram desde a correção anterior do exploit de
+exclusão) a fonte da verdade de quando o dia termina. Essa fonte agora é
+explicitamente `avaliarVitoriaDoDia()`.
+
+Comentário desatualizado no `render()` (que descrevia o comportamento antigo
+"NAO usar viva===0... daria vitoria de graca") também foi atualizado pra
+apontar pra `avaliarVitoriaDoDia()` como fonte da verdade, evitando confusão
+em sessões futuras.
+
+**Arquivos:** `index.html` — `avaliarVitoriaDoDia()` e `dispararVitoriaDoDia()`
+(novas, logo após `monstroJaCaiu()`), `alternar()` e `verificarVitoriaAoExcluir()`
+(ajustadas para usar o novo critério), comentário em `render()` atualizado.
+
+---
+
+## Fix: vender 1 de N cópias equipadas desequipava sem necessidade
+
+**Problema:** com 2+ instâncias do mesmo item (mesmo `id`, `inventario[i].q > 1`)
+e uma equipada, vender qualquer uma delas desequipava o slot — mesmo sobrando
+outra cópia idêntica no estoque.
+
+**Causa raiz:** `venderItem()` tinha seu próprio `SLOTS.forEach(...)` desequipando
+incondicionalmente por `id`, ANTES de chamar `tirarItem()` — que já continha a
+lógica correta (só desequipa quando `q` chega a 0, ou seja, quando é a última
+cópia). A checagem de `venderItem()` era redundante e errada: ignorava a
+quantidade restante.
+
+**Correção:** removida a linha de desequipar duplicada em `venderItem()` —
+agora só `tirarItem()` decide, olhando pra quantidade real remanescente.
+Ajustado também o aviso "em uso — será desequipado" na tela da loja
+(`montarVenda()`): antes aparecia sempre que o item estava equipado, agora só
+quando `s.q === 1` (a venda realmente vai zerar o estoque daquele item).
+
+**Validado:** simulação isolada da lógica de inventário (2 cópias equipadas →
+vende 1 → continua equipado, `q` cai pra 1 → vende a última → desequipa,
+inventário esvazia). `node --check` limpo nos 47 blocos `<script>` do arquivo
+completo após os dois patches.
+
+**Arquivos:** `index.html` — `venderItem()` e `montarVenda()` (variável local
+renomeada de `equipado_` para `vaiDesequipar`, com a condição `s.q === 1`
+adicionada).

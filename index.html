@@ -5063,8 +5063,8 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     const itensHtml = largadas.map(t => {
       const dObj = DIFS.find(d => d.id === difDe(t)) || DIFS.find(d => d.id === DIF_PADRAO);
       return '<div class="largitem" data-dif="' + dObj.id + '">'
-           + '<div class="largbox"><span class="difpip">' + '<i></i>'.repeat(dObj.pips) + '</span></div>'
-           + '<span class="largnome">' + (t.texto || '') + '</span></div>';
+           + '<span class="largnome">' + (t.texto || '') + '</span>'
+           + '<span class="difpip">' + '<i></i>'.repeat(dObj.pips) + '</span></div>';
     }).join('');
 
     // sprite do monstro DO DIA QUE A PESSOA PERDEU (diaVirada), nao o de

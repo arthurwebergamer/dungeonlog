@@ -3327,18 +3327,16 @@
 
   .largitens{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;
              max-height:180px;overflow-y:auto}
-  .largitem{display:flex;align-items:center;gap:10px;background:var(--panel-2);
-            border:1px solid var(--line);border-radius:10px;padding:8px 10px;
-            text-align:left;opacity:0;transform:translateY(6px);
+  .largitem{display:flex;align-items:center;justify-content:space-between;gap:10px;
+            background:var(--panel-2);border:1px solid var(--line);border-radius:10px;
+            padding:9px 12px;text-align:left;opacity:0;transform:translateY(6px);
             animation:largitemIn .32s ease forwards}
   @keyframes largitemIn{to{opacity:1;transform:translateY(0)}}
-  .largbox{width:34px;height:34px;border-radius:8px;background:var(--poco);flex:none;
-           display:flex;align-items:center;justify-content:center}
   .largnome{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0;
             font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;color:var(--text)}
-  /* losangos de dificuldade dentro do box, mesma cor por tier de
-     .task[data-dif] la na lista de tarefas -- so que escopado em .largitem
-     pra nao depender de estar dentro de .task */
+  /* losangos de dificuldade -- mesma cor por tier de .task[data-dif] la na
+     lista de tarefas (ver modulo "linha de meta abaixo do titulo"), so que
+     escopado em .largitem pra nao depender de estar dentro de .task */
   .largitem[data-dif="trivial"] .difpip{color:#7E8BA3}
   .largitem[data-dif="facil"]   .difpip{color:var(--verde)}
   .largitem[data-dif="media"]   .difpip{color:#F2C94C}

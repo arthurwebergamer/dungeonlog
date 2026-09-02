@@ -1167,38 +1167,6 @@ let tarefas = [];
 let dragArmado = false;   // true enquanto um card esta sendo arrastado (bloqueia o click de abrir editor)
 let xpTotal = 0, moedas = 0, derrotadoEm = null, jaComecou = false;
 function monstroJaCaiu(){ return derrotadoEm === isoAtual(); }
-
-// fonte da verdade da vitoria do dia -- desacoplada de hpTotal/hpDano
-// (que so existem pra desenhar a barra visual). Criterio: zero pendentes
-// E pelo menos 1 concluida (bloqueia o exploit de excluir tudo sem
-// completar nada, mas permite excluir a ultima pendente pra fechar o dia).
-function avaliarVitoriaDoDia(){
-  const doDia = tarefas.filter(ehDeHoje);
-  const concluidas = doDia.filter(feitaHoje).length;
-  const pendentes = doDia.length - concluidas;
-  return pendentes === 0 && concluidas > 0;
-}
-
-// dispara a recompensa/efeitos de vitoria -- extraido de dentro de alternar()
-// pra ser chamado tambem por verificarVitoriaAoExcluir() (vitoria por
-// exclusao da ultima pendente)
-function dispararVitoriaDoDia(doDia, nivelAntes){
-  derrotadoEm = isoAtual();
-  const ganho = recompensaVitoria(doDia.length);
-  moedas += ganho;
-  ultimoGanho = ganho;
-  moedasCaindo(Math.max(3, Math.min(10, Math.round(ganho / 6))));
-  render();
-  setTimeout(()=>aviso((idiomaApp() === 'en' ? 'MONSTER DEFEATED  +' : 'MONSTRO DERROTADO  +')+ganho+(idiomaApp() === 'en' ? ' COINS' : ' MOEDAS'), true), 350);
-  const nivelDepois = progresso().nivel;
-  if (nivelDepois > nivelAntes){
-    setTimeout(() => {
-      if (typeof window.enfileirarPopup === 'function' && typeof mostrarNivelUp === 'function'){
-        window.enfileirarPopup(prox => mostrarNivelUp(nivelDepois, prox));
-      }
-    }, 700);
-  }
-}
 let nomeHeroi = 'Aventureiro';
 let ultimoGanho = 0;
 let _vitoriaCelebrada = false; // pedido do usuario (27/08): tela de vitoria "muito simples" -- controla o disparo unico do efeito de celebracao, ver celebrarVitoria()
@@ -1491,10 +1459,10 @@ function render(){
   document.getElementById('mobSprite').classList.toggle('dead', morto);
   document.getElementById('mobSprite').classList.toggle('espreita', semTarefas);
 
-  // vitoria: monstro derrotado de verdade (derrotadoEm bate com hoje) --
-  // criterio real fica em avaliarVitoriaDoDia() (0 pendentes E >=1
-  // concluida), avaliado em alternar()/verificarVitoriaAoExcluir(); aqui
-  // so lemos o resultado ja decidido, nao recalculamos nada
+  // vitoria: monstro derrotado de verdade (derrotadoEm bate com hoje) —
+  // NAO usar "viva === 0" aqui: isso tambem fica 0 quando as tarefas
+  // pendentes sao excluidas em vez de concluidas, o que daria vitoria de
+  // graca so apagando o que falta (ja rolou, ver historico no roadmap)
   const venceu = monstroJaCaiu();
   document.querySelector('.arena').classList.toggle('venceu', venceu);
   document.getElementById('mobinfo').classList.toggle('off', venceu || total === 0);
@@ -1751,15 +1719,28 @@ function alternar(i){
   animarGolpe();
   render();
 
-  const venceuAgora = avaliarVitoriaDoDia();
+  const todasFeitas = doDia.length > 0 && doDia.every(feitaHoje);
   const nivelDepois = progresso().nivel;
   const subiuNivel = nivelDepois > nivelAntes;
 
-  if (venceuAgora && !monstroJaCaiu()){
-    dispararVitoriaDoDia(doDia, nivelAntes);
+  if (todasFeitas && !monstroJaCaiu()){
+    derrotadoEm = isoAtual();
+    const ganho = recompensaVitoria(doDia.length);
+    moedas += ganho;
+    ultimoGanho = ganho;
+    moedasCaindo(Math.max(3, Math.min(10, Math.round(ganho / 6))));
+    render();
+    setTimeout(()=>aviso((idiomaApp() === 'en' ? 'MONSTER DEFEATED  +' : 'MONSTRO DERROTADO  +')+ganho+(idiomaApp() === 'en' ? ' COINS' : ' MOEDAS'), true), 350);
+    if (subiuNivel){
+      setTimeout(() => {
+        if (typeof window.enfileirarPopup === 'function' && typeof mostrarNivelUp === 'function'){
+          window.enfileirarPopup(prox => mostrarNivelUp(nivelDepois, prox));
+        }
+      }, 700);
+    }
     return true;
   }
-  if (!venceuAgora) derrotadoEm = null;
+  if (!todasFeitas) derrotadoEm = null;
 
   if (subiuNivel){
     if (typeof mostrarNivelUp === 'function') mostrarNivelUp(nivelDepois);
@@ -1773,12 +1754,6 @@ function alternar(i){
 // So garante que derrotadoEm nao fique com um valor indevido depois da exclusao.
 function verificarVitoriaAoExcluir(){
   if (monstroJaCaiu()) return;   // ja venceu de verdade antes: exclusao nao desfaz
-  if (avaliarVitoriaDoDia()){
-    // excluir a ultima pendente fechou o dia (0 pendentes, >=1 concluida)
-    const nivelAntes = progresso().nivel;
-    dispararVitoriaDoDia(tarefas.filter(ehDeHoje), nivelAntes);
-    return;
-  }
   derrotadoEm = null;
 }
 
@@ -2447,10 +2422,7 @@ function venderItem(id, elOrigem){
   const it = item(id);
   if (it.tipo === 'chave') return;   // itens-chave (ex: Grimório) nunca sao vendaveis
   const ponto = pontoDeElemento(elOrigem); // captura ANTES do render
-  // NAO desequipar aqui incondicionalmente: com 2+ copias do mesmo item,
-  // vender uma unidade desequipava a outra copia idêntica sem motivo.
-  // tirarItem() ja cuida disso -- so desequipa quando a ULTIMA copia sai
-  // (q chega a 0), mantendo o item equipado se ainda sobrar estoque.
+  SLOTS.forEach(s => { if (equipado[s] === id) equipado[s] = null; });
   const preco = precoVenda(it);
   moedas += preco;
   tirarItem(id, 1);
@@ -3258,10 +3230,7 @@ function montarVenda(grid){
   lista.forEach(s => {
     const it = item(s.id);
     const preco = precoVenda(it);
-    // aviso "sera desequipado" so faz sentido se essa venda for a ULTIMA
-    // copia (s.q === 1) -- com estoque > 1, sobra outra unidade igual e o
-    // item continua equipado normalmente
-    const vaiDesequipar = s.q === 1 && SLOTS.some(k => equipado[k] === s.id);
+    const equipado_ = SLOTS.some(k => equipado[k] === s.id);
 
     const row = document.createElement('div');
     row.className = 'lrow';
@@ -3270,7 +3239,7 @@ function montarVenda(grid){
       '<div class="linfo">' +
         '<div class="lname">' + it.nome + (s.q > 1 ? ' <span class="lqtd">×' + s.q + '</span>' : '') + '</div>' +
         '<div class="lmeta" style="color:' + COR_RAR[it.rar] + '">' + RARIDADES[it.rar] + ' · ' + NOME_TIPO[it.tipo] + '</div>' +
-        (vaiDesequipar ? '<div class="lbonus">' + (en ? 'in use — will be unequipped' : 'em uso — será desequipado') + '</div>' : '') +
+        (equipado_ ? '<div class="lbonus">' + (en ? 'in use — will be unequipped' : 'em uso — será desequipado') + '</div>' : '') +
       '</div>' +
       '<div class="lacao"><span class="lpreco">+' + preco + MOEDA + '</span>' +
       '<button class="lbtn sec" data-v="' + s.id + '">' + (en ? 'Sell' : 'Vender') + '</button></div>';
@@ -5093,7 +5062,8 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 
     const itensHtml = largadas.map(t => {
       const dObj = DIFS.find(d => d.id === difDe(t)) || DIFS.find(d => d.id === DIF_PADRAO);
-      return '<div class="largitem" data-dif="' + dObj.id + '"><span class="largnome">' + (t.texto || '') + '</span>'
+      return '<div class="largitem" data-dif="' + dObj.id + '">'
+           + '<span class="largnome">' + (t.texto || '') + '</span>'
            + '<span class="difpip">' + '<i></i>'.repeat(dObj.pips) + '</span></div>';
     }).join('');
 
@@ -5109,6 +5079,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     largPop.innerHTML =
       iconeHtml+
       '<div class="larglabel">' + (en ? 'Skipped Tasks' : 'Tarefas Perdidas') + '</div>'+
+      '<div class="largtitulo">' + (en ? 'It got away.' : 'Ele escapou.') + '</div>'+
       '<div class="largitens">' + itensHtml + '</div>'+
       '<div class="largtotal">' + (en ? ('−' + total + ' health') : ('−' + total + ' de vida')) + '</div>'+
       '<button class="largok" id="largOk">' + (en ? 'Continue' : 'Continuar') + '</button>';

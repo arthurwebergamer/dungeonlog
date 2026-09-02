@@ -3304,31 +3304,36 @@
 .bauArena.mostrar.aberto{ animation:none; }
 
 /* ===== módulo N — pop-up "Tarefas perdidas" (dano não-fatal na virada) =====
-   Mesma família visual do baú: reusa .baubg (fundo escurecido) já definido
-   acima; card próprio .largpop, mesma anatomia de .baupop (padding, raio,
-   escala de entrada). Fecha com toque no fundo, igual ao baú. */
+   Mesma família visual do baú/queda: glow colorido no card (como .quedapop),
+   itens em card com box de ícone (como .baucard/.baubox), em vez de linhas
+   de texto plano. Fecha com toque no fundo, igual ao baú. */
 .largpop{position:fixed;left:50%;top:50%;z-index:96;
          transform:translate(-50%,-50%) scale(.9);opacity:0;pointer-events:none;
          transition:transform .25s cubic-bezier(.2,.9,.3,1.2), opacity .22s;
-         background:var(--panel-2);border:1px solid var(--line);border-radius:18px;
-         padding:24px 20px 20px;width:min(300px, calc(100% - 56px));text-align:center}
+         background:var(--panel-2);border:1px solid var(--perigo);border-radius:18px;
+         padding:26px 22px 20px;width:min(300px, calc(100% - 56px));text-align:center;
+         box-shadow:0 0 26px -8px var(--perigo)}
   .largpop.on{transform:translate(-50%,-50%) scale(1);opacity:1;pointer-events:auto}
 
   .largicone{width:56px;height:56px;margin:0 auto 10px;
              display:flex;align-items:center;justify-content:center}
   .largicone img{width:56px;height:56px;image-rendering:pixelated;
-                 transform:scaleX(-1);filter:grayscale(.5) brightness(.85)}
+                 transform:scaleX(-1);filter:grayscale(1) brightness(.8)}
 
   .larglabel{font-family:'Silkscreen',monospace;font-size:11px;color:var(--perigo);
-             letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px}
+             letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px}
+  .largtitulo{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:20px;
+              font-weight:600;color:var(--text);line-height:1.2;margin-bottom:14px}
 
-  .largitens{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;
-             max-height:180px;overflow-y:auto;text-align:left}
-  .largitem{display:flex;align-items:center;justify-content:space-between;gap:8px;
-            font-family:'Outfit',sans-serif;font-size:13px;color:var(--text);
-            background:var(--panel-2);border:1px solid var(--line);border-radius:8px;
-            padding:7px 10px}
-  .largnome{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
+  .largitens{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;
+             max-height:180px;overflow-y:auto}
+  .largitem{display:flex;align-items:center;justify-content:space-between;gap:10px;
+            background:var(--panel-2);border:1px solid var(--line);border-radius:10px;
+            padding:9px 12px;text-align:left;opacity:0;transform:translateY(6px);
+            animation:largitemIn .32s ease forwards}
+  @keyframes largitemIn{to{opacity:1;transform:translateY(0)}}
+  .largnome{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0;
+            font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;color:var(--text)}
   /* losangos de dificuldade -- mesma cor por tier de .task[data-dif] la na
      lista de tarefas (ver modulo "linha de meta abaixo do titulo"), so que
      escopado em .largitem pra nao depender de estar dentro de .task */

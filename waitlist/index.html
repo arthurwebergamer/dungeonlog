@@ -142,6 +142,56 @@ PROXIMA SKILL: maquina-de-anuncios (anuncio precisa de pagina - ja tem!)
   }
   .cta:hover{ transform: translateY(-1px); box-shadow: 0 6px 22px rgba(255,255,255,.14); }
   .cta:focus-visible{ outline:2px solid var(--accent); outline-offset:3px; }
+  .cta:disabled{ opacity:.55; cursor:default; transform:none; box-shadow:none; }
+
+  /* ---------- WAITLIST FORM ---------- */
+  .waitlist-form{
+    margin-top:30px;
+    background: linear-gradient(180deg, var(--panel-2) 0%, var(--panel) 100%);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:22px;
+    box-shadow: 0 20px 44px -20px rgba(0,0,0,.55);
+    max-width:420px;
+  }
+  .waitlist-field{ margin-bottom:14px; }
+  .waitlist-field label{
+    display:block; font-family:'Silkscreen', monospace; font-size:10px;
+    letter-spacing:.05em; color:var(--muted); margin-bottom:8px;
+  }
+  .waitlist-field input[type=email]{
+    width:100%; background:var(--bg); border:1px solid var(--line);
+    color:var(--text); border-radius:10px; padding:12px 13px; font-size:15px;
+    font-family:'Outfit', sans-serif; outline:none; transition:border-color .15s;
+  }
+  .waitlist-field input[type=email]:focus{ border-color: var(--accent); }
+  .waitlist-field input[type=email]::placeholder{ color:var(--dim); }
+
+  .platform-row{ display:flex; gap:10px; }
+  .platform-opt{ flex:1; position:relative; }
+  .platform-opt input{ position:absolute; opacity:0; inset:0; cursor:pointer; margin:0; }
+  .platform-opt span{
+    display:block; text-align:center; padding:10px 8px; border-radius:10px;
+    background:var(--bg); border:1px solid var(--line); color:var(--muted);
+    font-size:13.5px; font-weight:500; transition:border-color .15s,color .15s,background .15s;
+  }
+  .platform-opt input:checked + span{
+    border-color:var(--accent); color:var(--text); background:rgba(255,255,255,.06);
+  }
+  .platform-opt input:focus-visible + span{ outline:2px solid var(--accent); outline-offset:2px; }
+
+  .waitlist-msg{ margin-top:11px; font-size:13.5px; min-height:18px; font-weight:300; }
+  .waitlist-msg.ok{ color:#8fd19e; }
+  .waitlist-msg.err{ color:#e88a8a; }
+
+  .waitlist-progress{ margin-top:18px; }
+  .progress-track{
+    height:8px; border-radius:99px; background:var(--bg); border:1px solid var(--line); overflow:hidden;
+  }
+  .progress-fill{
+    height:100%; width:0%; background:var(--accent); transition:width .6s ease;
+  }
+  .progress-label{ font-size:11.5px; color:var(--dim); margin-top:7px; }
 
   .cta-hint{
     font-size:12.5px;
@@ -423,10 +473,32 @@ PROXIMA SKILL: maquina-de-anuncios (anuncio precisa de pagina - ja tem!)
       <span class="eyebrow-mini"><span class="dot"></span>DUNGEONLOG · IN DEVELOPMENT</span>
       <h1>You've quit 5 productivity apps already. This one has a monster staring you down until you finish.</h1>
       <p class="hero-sub">DungeonLog turns every pending task into today's monster — and it only falls once you finish everything. Join the list and be one of the first to play.</p>
-      <div class="hero-cta-row">
-        <a class="cta" href="mailto:waitlist@dungeonlog.app?subject=Join%20the%20DungeonLog%20waitlist&body=Hey!%20I%27d%20like%20to%20join%20the%20DungeonLog%20waitlist.%0AMy%20email%3A%20">Join the waitlist</a>
-        <span class="cta-hint">opens your email — no spam, just the launch notice</span>
-      </div>
+
+      <form id="waitlistForm" class="waitlist-form" novalidate>
+        <div class="waitlist-field">
+          <label for="wlEmail">Your email</label>
+          <input type="email" id="wlEmail" name="email" placeholder="you@example.com" required autocomplete="email">
+        </div>
+        <div class="waitlist-field">
+          <label>Which do you use?</label>
+          <div class="platform-row" role="radiogroup" aria-label="Platform">
+            <label class="platform-opt">
+              <input type="radio" name="wlPlatform" value="android" required>
+              <span>Android</span>
+            </label>
+            <label class="platform-opt">
+              <input type="radio" name="wlPlatform" value="ios" required>
+              <span>iOS</span>
+            </label>
+          </div>
+        </div>
+        <button type="submit" class="cta" id="wlBtn" style="width:100%">Join the waitlist</button>
+        <p class="waitlist-msg" id="wlMsg" role="status" aria-live="polite"></p>
+        <div class="waitlist-progress">
+          <div class="progress-track"><div class="progress-fill" id="wlProgressFill"></div></div>
+          <p class="progress-label" id="wlProgressLabel">loading waitlist...</p>
+        </div>
+      </form>
     </div>
     <div class="hero-visual">
       <div class="stage-card">
@@ -484,14 +556,126 @@ PROXIMA SKILL: maquina-de-anuncios (anuncio precisa de pagina - ja tem!)
       <p>DungeonLog already exists and already runs — combat, shop, hero and bestiary all working. We're polishing the last details before opening it up to everyone. Leave your email to be notified the moment the waitlist opens — coming soon.</p>
     </div>
     <div class="hero-cta-row">
-      <a class="cta" href="mailto:waitlist@dungeonlog.app?subject=Join%20the%20DungeonLog%20waitlist&body=Hey!%20I%27d%20like%20to%20join%20the%20DungeonLog%20waitlist.%0AMy%20email%3A%20">Join the waitlist</a>
+      <a class="cta" href="#waitlistForm">Join the waitlist</a>
     </div>
   </div>
 </section>
 
 <footer>
-  DungeonLog — made by someone who also got tired of boring to-do lists.
+  DungeonLog — made by someone who also got tired of boring to-do lists.<br>
+  Follow along on <a href="https://www.tiktok.com/@dungeonlog" target="_blank" rel="noopener">@dungeonlog</a>
 </footer>
+
+<script type="module">
+  import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, doc, runTransaction, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDbWXdoaGpY6aJpasssrqWrX-nP85c1Vv0",
+    authDomain: "questlog-d4c11.firebaseapp.com",
+    projectId: "questlog-d4c11",
+    storageBucket: "questlog-d4c11.firebasestorage.app",
+    messagingSenderId: "991047001122",
+    appId: "1:991047001122:web:983cb7e87ea3ea648c567b",
+    measurementId: "G-N75DSY4RH3"
+  };
+
+  const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const GOAL = 500; // change this number to adjust the progress bar target
+
+  const form = document.getElementById('waitlistForm');
+  const msg = document.getElementById('wlMsg');
+  const btn = document.getElementById('wlBtn');
+  const fill = document.getElementById('wlProgressFill');
+  const label = document.getElementById('wlProgressLabel');
+
+  function setMsg(text, kind){
+    msg.textContent = text;
+    msg.className = 'waitlist-msg' + (kind ? ' ' + kind : '');
+  }
+
+  function updateBar(total){
+    const pct = Math.min(100, Math.round((total / GOAL) * 100));
+    fill.style.width = pct + '%';
+    label.textContent = total + (total === 1 ? ' person' : ' people') + ' on the waitlist';
+  }
+
+  async function loadCount(){
+    try{
+      const ref = doc(db, 'waitlist_stats', 'counter');
+      const snap = await getDoc(ref);
+      const total = snap.exists() ? (snap.data().total || 0) : 0;
+      updateBar(total);
+    }catch(e){
+      label.textContent = 'Be one of the first in line';
+      fill.style.width = '4%';
+    }
+  }
+
+  async function joinWaitlist(email, platform){
+    const emailNorm = email.trim().toLowerCase();
+    const refUser = doc(db, 'waitlist', emailNorm);
+    const refCounter = doc(db, 'waitlist_stats', 'counter');
+
+    let newTotal = 0;
+    await runTransaction(db, async (tx) => {
+      const userSnap = await tx.get(refUser);
+      if (userSnap.exists()){
+        const err = new Error('already-exists');
+        err.code = 'already-exists';
+        throw err;
+      }
+      const counterSnap = await tx.get(refCounter);
+      const current = counterSnap.exists() ? (counterSnap.data().total || 0) : 0;
+      newTotal = current + 1;
+      tx.set(refUser, { email: emailNorm, platform, createdAt: serverTimestamp() });
+      tx.set(refCounter, { total: newTotal }, { merge: true });
+    });
+    return newTotal;
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('wlEmail').value;
+    const platformEl = form.querySelector('input[name="wlPlatform"]:checked');
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+      setMsg('Enter a valid email.', 'err');
+      return;
+    }
+    if (!platformEl){
+      setMsg('Pick a platform.', 'err');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Joining...';
+    setMsg('', '');
+
+    try{
+      const total = await joinWaitlist(email, platformEl.value);
+      setMsg("You're on the list! We'll email you the moment the beta opens.", 'ok');
+      updateBar(total);
+      document.getElementById('wlEmail').value = '';
+      platformEl.checked = false;
+      btn.textContent = "You're on the list";
+    }catch(err){
+      if (err && err.code === 'already-exists'){
+        setMsg('That email is already on the list.', 'err');
+        btn.disabled = false;
+        btn.textContent = 'Join the waitlist';
+      } else {
+        setMsg("Couldn't submit right now. Try again in a moment.", 'err');
+        btn.disabled = false;
+        btn.textContent = 'Join the waitlist';
+      }
+    }
+  });
+
+  loadCount();
+</script>
 
 </body>
 </html>

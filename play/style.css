@@ -3362,19 +3362,32 @@
    chao) -- ajustar left/right/top/scale abaixo se quiser recalibrar. */
 .tocha-arena{
   position:absolute;
-  top:2px;
+  top:4px;
   width:16px;
   height:32px;
-  background-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAgCAYAAABU1PscAAACoklEQVR4nO2WTUgbQRiG34RekkAPEcRDNLDKgudCWqHBgiLdICXQU2jEUoQYvJZcwx56kXrooWAgh0oqgZ5yCEZKPQQLSYVSCj2FJJKfgwiRUqiewvQQZtnZnf3Ryq6HvBA2O7vP9843s/PNAGONNdZYd1b7KyJxuw9W8lq98D9J3NYAmMUxTeDF54YnHA/dqCNOzR43AVHwEfqbWb1U2uwGpe/KzR4T6zr8/opI6NXM38ODU3IGU4UiztYSmCoUEY6H0Cn1ITd7aLSvdIyWz85NK/fheAjz0joAYGFp0xZP/ami+SCONy64/l4zmF7pLKTkjOlMiIKP1I52ITd7inGn1Mdh6g2SiSJqR7u2+Fx2G9F8UBkAAPj4R+D6e9VwSs4gl91WzNUBwvEQvrz/ZpgENV9Y2mS4aD6IcDyE5P22aRJansaYWb3E8cYFAHD9TRdxNB9URv86ys5NM5zdGB++thVey+U+/QYAvHwsMAyTgPpht+xHYJhGYJhGt+y33QlqruXpjJrJyD+aD6Jb9jNJchMARt+53OyhU+orbfPSOpaf/MTy1kPdCGh1tpYAAEPeSik5o+MDwzReva2Z+4uCjyS3npPB6R7ZKWSJuvyJgo/sFLJkcLpHpEdPuSXRLd6jDhCRYgCAd6+fcZNMJkZVqXVe1ZUzt3jDIDwNvv/lmrvJM2ug0b7ynFQObmTuFs/diQFgdnJRaWudVxkTow64weuqEM+ABrMyd4O/ZxRo4kGAuW9VrKzd4bk7sfZbPKkc2Bo9N3jD47SdNiM5yesSoIc69SICRt+hnU44zeuO0xEphh/1X9zgESlmeRx2mtdtZPT/7OSicnahR2z1s0r90LAEO8kzVYhdKFUyUQ8wEBXP3C3+WpuKkfFd5cdyQv8A0LgoFtXx0DYAAAAASUVORK5CYII=");
   background-size:48px 32px;
   image-rendering:pixelated;
-  transform:scale(1.1);
+  transform:scale(1.7);
   animation:tochaChama .6s steps(3) infinite;
   pointer-events:none;
   z-index:1;
 }
-.tocha-arena.tocha-esq{ left:4px; transform-origin:top left; }
-.tocha-arena.tocha-dir{ right:4px; transform:scale(1.1) scaleX(-1); transform-origin:top right; }
+/* duas spritesheets separadas (esq/dir ja espelhada no proprio PNG) em
+   vez de scaleX(-1) via transform -- o transform so age DEPOIS do
+   layout, entao "right:Npx" + scaleX(-1) + transform-origin:top right
+   espelha a caixa PRA FORA da ancora, nao pra dentro (bug encontrado
+   testando no aparelho: tocha direita vazava a borda da arena em
+   +13.6px). Espelhar a imagem em si elimina o problema de vez. */
+.tocha-arena.tocha-esq{
+  left:4px;
+  transform-origin:top left;
+  background-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAgCAYAAABU1PscAAACoklEQVR4nO2WTUgbQRiG34RekkAPEcRDNLDKgudCWqHBgiLdICXQU2jEUoQYvJZcwx56kXrooWAgh0oqgZ5yCEZKPQQLSYVSCj2FJJKfgwiRUqiewvQQZtnZnf3Ryq6HvBA2O7vP9843s/PNAGONNdZYd1b7KyJxuw9W8lq98D9J3NYAmMUxTeDF54YnHA/dqCNOzR43AVHwEfqbWb1U2uwGpe/KzR4T6zr8/opI6NXM38ODU3IGU4UiztYSmCoUEY6H0Cn1ITd7aLSvdIyWz85NK/fheAjz0joAYGFp0xZP/ami+SCONy64/l4zmF7pLKTkjOlMiIKP1I52ITd7inGn1Mdh6g2SiSJqR7u2+Fx2G9F8UBkAAPj4R+D6e9VwSs4gl91WzNUBwvEQvrz/ZpgENV9Y2mS4aD6IcDyE5P22aRJansaYWb3E8cYFAHD9TRdxNB9URv86ys5NM5zdGB++thVey+U+/QYAvHwsMAyTgPpht+xHYJhGYJhGt+y33QlqruXpjJrJyD+aD6Jb9jNJchMARt+53OyhU+orbfPSOpaf/MTy1kPdCGh1tpYAAEPeSik5o+MDwzReva2Z+4uCjyS3npPB6R7ZKWSJuvyJgo/sFLJkcLpHpEdPuSXRLd6jDhCRYgCAd6+fcZNMJkZVqXVe1ZUzt3jDIDwNvv/lmrvJM2ug0b7ynFQObmTuFs/diQFgdnJRaWudVxkTow64weuqEM+ABrMyd4O/ZxRo4kGAuW9VrKzd4bk7sfZbPKkc2Bo9N3jD47SdNiM5yesSoIc69SICRt+hnU44zeuO0xEphh/1X9zgESlmeRx2mtdtZPT/7OSicnahR2z1s0r90LAEO8kzVYhdKFUyUQ8wEBXP3C3+WpuKkfFd5cdyQv8A0LgoFtXx0DYAAAAASUVORK5CYII=");
+}
+.tocha-arena.tocha-dir{
+  right:4px;
+  transform-origin:top right;
+  background-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAgCAYAAABU1PscAAACuUlEQVR4nO2WP2gaURzHv4YsKnSwEDL4By5yU5dSSA1EUkgIMTi4ShVCCZjQoZvrcUMX6VpQcGhJgtBJisRSkkFSsAmELoWCqOCfQYSGUqhO4TrY38Pz3p2XNHgZ7gvi3Xu/z+/fvXf3AFu2bNmyZaCjTVExmp+7LXhXCfwvq1vAXeo2RRxtikog5sXzzzWHkR23AFFwKuREFJwK/ZsNLgpOhX5yvaPyaZYHAH90oPLFs9VUJwpORQr6EM57cLZ7xcZ7yThyUga15tCwI6LgVKqnWQDAj/J7tIpdNifXO6Z4KehDIOZFq9hFLxnH4kFBN/7cJJyS0zj8LQAAAjEvACCc9yAnZVA9zRp2kpJPxAv4lHqNVrGLcN7DkjfDp+Q0gFH3AWDxoMD+U3Jaw89NwidvzwEAZ7tX8EcHrAgAWFnf001iPPnEgyYCMS9LnnxM4yk+2Y83EAByUkZThOoJ7KyOOp/78IuNUSekoA8A8O5Lk9M7rYija+JvIn90wJLXk6oASq5dciGc98B9vQ/39T7aJRezoSKNFM570C65NLzZIvzRAZfnxZ8fv6HJF1IG1UiWjdNGpPVppI2XT7HxbLRfJvleMm7IUnweL9c73PiqAhLxAg4LcUBOY2V9T2WYktPYWRXw6s1H3QSs4NkrSRScytLCGgCMnHBE8EX5WPM6s4rnOnn4xM11oBfcSl61iWvNoaPRr+Dn5Z8bB7eK536J6ZoeKQA0+hUWRC8BK3jNWYgMxuHJOSPNmp/XWP3T5DpslKeFtobnnkZrzaHjonzM7qetXSt5w+P0tDE9zZLXFDD+PiYtLaxxT4J6wWfJa47Ty5FtruNvX79jObI99Tg8a55t4khoS2n0Kxhfe49DjwAAJ5fnqnGerOJVGyMS2mLVNfoVUDfMbkIreO4gOTL78blvvK1Z6i8q7hIvKJXHLAAAAABJRU5ErkJggg==");
+}
 
 @keyframes tochaChama{
   from{ background-position-x:0; }

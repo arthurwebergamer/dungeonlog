@@ -3348,3 +3348,35 @@
   .largok{width:100%;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;
           padding:11px;border-radius:11px;border:none;background:var(--accent);
           color:var(--bg);cursor:pointer}
+
+/* ======================================================================
+   TOCHAS DECORATIVAS DA ARENA -- puramente cosmetico, independe do
+   sistema de Temas de Arena (ainda pausado/nao implementado, ver
+   roadmap). Sprite: pack "DampDungeons" (Animations/Dungeon_ObjectsDungeon.png),
+   licenca permite uso comercial e edicao. Tocha de pe (chama + bacia +
+   tripe), 3 frames de flicker reempacotados em tira horizontal 48x32
+   (16x32 cada frame). Mesma tecnica de animacao por spritesheet ja
+   usada em fx-sprite-slash (background-position + steps(N)), so
+   trocando o asset e o timing.
+   Pedido do usuario: tocha pequena e alta na parede (nao ancorada no
+   chao) -- ajustar left/right/top/scale abaixo se quiser recalibrar. */
+.tocha-arena{
+  position:absolute;
+  top:2px;
+  width:16px;
+  height:32px;
+  background-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAgCAYAAABU1PscAAACoklEQVR4nO2WTUgbQRiG34RekkAPEcRDNLDKgudCWqHBgiLdICXQU2jEUoQYvJZcwx56kXrooWAgh0oqgZ5yCEZKPQQLSYVSCj2FJJKfgwiRUqiewvQQZtnZnf3Ryq6HvBA2O7vP9843s/PNAGONNdZYd1b7KyJxuw9W8lq98D9J3NYAmMUxTeDF54YnHA/dqCNOzR43AVHwEfqbWb1U2uwGpe/KzR4T6zr8/opI6NXM38ODU3IGU4UiztYSmCoUEY6H0Cn1ITd7aLSvdIyWz85NK/fheAjz0joAYGFp0xZP/ami+SCONy64/l4zmF7pLKTkjOlMiIKP1I52ITd7inGn1Mdh6g2SiSJqR7u2+Fx2G9F8UBkAAPj4R+D6e9VwSs4gl91WzNUBwvEQvrz/ZpgENV9Y2mS4aD6IcDyE5P22aRJansaYWb3E8cYFAHD9TRdxNB9URv86ys5NM5zdGB++thVey+U+/QYAvHwsMAyTgPpht+xHYJhGYJhGt+y33QlqruXpjJrJyD+aD6Jb9jNJchMARt+53OyhU+orbfPSOpaf/MTy1kPdCGh1tpYAAEPeSik5o+MDwzReva2Z+4uCjyS3npPB6R7ZKWSJuvyJgo/sFLJkcLpHpEdPuSXRLd6jDhCRYgCAd6+fcZNMJkZVqXVe1ZUzt3jDIDwNvv/lmrvJM2ug0b7ynFQObmTuFs/diQFgdnJRaWudVxkTow64weuqEM+ABrMyd4O/ZxRo4kGAuW9VrKzd4bk7sfZbPKkc2Bo9N3jD47SdNiM5yesSoIc69SICRt+hnU44zeuO0xEphh/1X9zgESlmeRx2mtdtZPT/7OSicnahR2z1s0r90LAEO8kzVYhdKFUyUQ8wEBXP3C3+WpuKkfFd5cdyQv8A0LgoFtXx0DYAAAAASUVORK5CYII=");
+  background-size:48px 32px;
+  image-rendering:pixelated;
+  transform:scale(1.1);
+  animation:tochaChama .6s steps(3) infinite;
+  pointer-events:none;
+  z-index:1;
+}
+.tocha-arena.tocha-esq{ left:4px; transform-origin:top left; }
+.tocha-arena.tocha-dir{ right:4px; transform:scale(1.1) scaleX(-1); transform-origin:top right; }
+
+@keyframes tochaChama{
+  from{ background-position-x:0; }
+  to{ background-position-x:-48px; }
+}

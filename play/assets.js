@@ -194,5 +194,6 @@ const ITENS = [
 const TEMAS_ARENA = [
   { id:"padrao",   nome:"Padrão",   nome_en:"Default", gratuito:true },
   { id:"floresta", nome:"Floresta", nome_en:"Jungle",  gratuito:true },
-  { id:"gelo",     nome:"Gelo",     nome_en:"Ice",      gratuito:true }
+  { id:"gelo",     nome:"Gelo",     nome_en:"Ice",      gratuito:true },
+  { id:"deserto",  nome:"Deserto",  nome_en:"Desert",   gratuito:true }
 ];

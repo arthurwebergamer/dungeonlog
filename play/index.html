@@ -188,9 +188,10 @@
   </div>
 
   <div class="tema-arena-switch">
-    <button class="tema-arena-seta" onclick="mudarTemaArena(-1)" aria-label="Tema anterior">‹</button>
-    <span id="temaArenaNome">Padrão</span>
-    <button class="tema-arena-seta" onclick="mudarTemaArena(1)" aria-label="Próximo tema">›</button>
+    <button class="tema-arena-seta-grande" onclick="mudarTemaArena(1)" aria-label="Próximo tema">▲</button>
+    <div class="tema-arena-nome-viewport">
+      <span id="temaArenaNome">Padrão</span>
+    </div>
   </div>
 
   <div class="arena">
@@ -1303,20 +1304,44 @@ function mudarTemaArena(direcao){
     if (temaArenaDesbloqueado(TEMAS_ARENA[idx])) break;
   }
   definirTemaArenaSalvo(TEMAS_ARENA[idx].id);
-  renderTemaArena();
+  renderTemaArena(true);
 }
 window.mudarTemaArena = mudarTemaArena;
 
-function renderTemaArena(){
+// animar=true: nome atual desliza pra cima e some, so entao troca o
+// fundo/texto, e o novo nome entra deslizando de baixo -- timing preso
+// na duracao real das keyframes (.18s) via 'animationend', nao um
+// setTimeout solto (evita dessincronia se o navegador atrasar o frame).
+function renderTemaArena(animar){
   const arena = document.querySelector('.arena');
   if (!arena) return;
   const tema = temaArenaAtual();
-  TEMAS_ARENA.forEach(t => arena.classList.remove('tema-' + t.id));
-  if (tema.id !== 'padrao') arena.classList.add('tema-' + tema.id);
+  const emIngles = typeof idiomaApp === 'function' && idiomaApp() === 'en';
+  const nomeTexto = emIngles ? tema.nome_en : tema.nome;
   const nomeEl = document.getElementById('temaArenaNome');
-  if (nomeEl){
-    const emIngles = typeof idiomaApp === 'function' && idiomaApp() === 'en';
-    nomeEl.textContent = emIngles ? tema.nome_en : tema.nome;
+
+  const aplicar = () => {
+    TEMAS_ARENA.forEach(t => arena.classList.remove('tema-' + t.id));
+    if (tema.id !== 'padrao') arena.classList.add('tema-' + tema.id);
+    if (nomeEl){
+      nomeEl.textContent = nomeTexto;
+      if (animar){
+        nomeEl.classList.add('tema-arena-entra');
+        nomeEl.addEventListener('animationend', () => {
+          nomeEl.classList.remove('tema-arena-entra');
+        }, { once:true });
+      }
+    }
+  };
+
+  if (animar && nomeEl){
+    nomeEl.classList.add('tema-arena-sai');
+    nomeEl.addEventListener('animationend', () => {
+      nomeEl.classList.remove('tema-arena-sai');
+      aplicar();
+    }, { once:true });
+  } else {
+    aplicar();
   }
 }
 window.renderTemaArena = renderTemaArena;

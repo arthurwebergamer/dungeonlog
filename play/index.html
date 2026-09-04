@@ -1394,12 +1394,61 @@ function mostrarDicaSwipeArenaSeNecessario(){
     clearInterval(esperar);
     if (!dispensado) return; // desistiu nessa sessao -- flag NAO e marcada, tenta de novo na proxima
     setTimeout(() => {
-      const el = document.getElementById('arenaBg' + _arenaBgFrente);
-      if (!el || _arenaBgEmTransicao) return;
-      el.classList.add('arena-swipe-dica');
-      const limpar = () => el.classList.remove('arena-swipe-dica');
-      el.addEventListener('animationend', limpar, { once:true });
-      setTimeout(limpar, 1200); // rede de seguranca, caso animationend nao dispare
+      if (_arenaBgEmTransicao) return;
+      const frenteEl = document.getElementById('arenaBg' + _arenaBgFrente);
+      const trasId = _arenaBgFrente === 'A' ? 'B' : 'A';
+      const trasEl = document.getElementById('arenaBg' + trasId);
+      if (!frenteEl || !trasEl) return;
+
+      // pega o PROXIMO tema de verdade (mesmo sentido de "arrastar pra
+      // esquerda"). Motivo de mostrar arte de outro tema, e nao so
+      // cutucar a MESMA imagem uns pixels pro lado: se o tema atual
+      // for o Padrao (parede de tijolo repetida), um nudge pequeno
+      // contra um padrao que se repete fica quase invisivel -- a
+      // textura parece igual antes/depois do desvio.
+      const idxAtual = TEMAS_ARENA.findIndex(t => t.id === temaArenaAtual().id);
+      let idx = idxAtual;
+      for (let i = 0; i < TEMAS_ARENA.length; i++){
+        idx = (idx + 1 + TEMAS_ARENA.length) % TEMAS_ARENA.length;
+        if (temaArenaDesbloqueado(TEMAS_ARENA[idx])) break;
+      }
+      if (idx === idxAtual) return; // so ha 1 tema desbloqueado -- nao ha o que espiar
+
+      aplicarFundoTemaArena(trasEl, TEMAS_ARENA[idx]);
+      _arenaBgEmTransicao = true; // mesma trava do arrasto real -- um toque comecando no meio da dica so vai ser ignorado ate ela acabar (~1.5s), em vez de brigar com o transform
+      // rede de seguranca final: se a sequencia encadeada de timeouts
+      // abaixo for interrompida por qualquer motivo (ex: app vai pra
+      // segundo plano no meio, navegador atrasa timers), isso garante
+      // que a trava nunca fica presa em true pra sempre.
+      setTimeout(() => { _arenaBgEmTransicao = false; }, 3000);
+      frenteEl.style.transition = trasEl.style.transition = 'none';
+      frenteEl.style.transform = 'translateX(0)';
+      trasEl.style.transform = 'translateX(100%)';
+
+      // double rAF, mesma tecnica/motivo do arrasto real: garante que
+      // o navegador pintou o estado inicial antes de animar.
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          frenteEl.style.transition = trasEl.style.transition = 'transform .5s ease-in-out';
+          frenteEl.style.transform = 'translateX(-28px)';
+          trasEl.style.transform = 'translateX(calc(100% - 28px))';
+
+          setTimeout(() => {
+            frenteEl.style.transform = 'translateX(0)';
+            trasEl.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+              // NAO limpar transform pra '' -- mesma licao do bug
+              // principal (sobreporia as duas camadas). So a
+              // transition precisa ser limpa; a posicao final de
+              // repouso ja foi setada explicitamente acima.
+              frenteEl.style.transition = '';
+              trasEl.style.transition = '';
+              _arenaBgEmTransicao = false;
+            }, 520);
+          }, 550);
+        });
+      });
+
       try { localStorage.setItem('questlog.arenaSwipeDicaVista.v3', '1'); } catch(e){}
     }, 500);
   }, 300);
@@ -1492,10 +1541,6 @@ window.mudarTemaArena = mudarTemaArena;
     sx = e.touches[0].clientX; sy = e.touches[0].clientY;
     rastreando = true; decidiu = false; cancelado = false;
     larguraArena = arena.getBoundingClientRect().width || 1;
-    // se a dica automatica ainda estiver rodando/grudada, remove --
-    // ela brigaria com o transform que o arrasto real vai controlar.
-    document.getElementById('arenaBgA')?.classList.remove('arena-swipe-dica');
-    document.getElementById('arenaBgB')?.classList.remove('arena-swipe-dica');
   }, { passive:true });
 
   arena.addEventListener('touchmove', e => {

@@ -3404,10 +3404,10 @@
   margin:0 0 6px;
 }
 .tema-arena-seta-grande{
-  background:none; border:none; color:#8A93A0; line-height:0;
+  background:none; border:none; color:#8A93A0; line-height:0; opacity:.7;
   cursor:pointer; padding:6px 18px 4px; display:flex;
 }
-.tema-arena-seta-grande:active{ opacity:.5; transform:translateY(-1px); }
+.tema-arena-seta-grande:active{ opacity:.4; transform:translateY(-1px); }
 
 .tema-arena-nome-viewport{
   overflow:hidden; height:15px; width:100px;

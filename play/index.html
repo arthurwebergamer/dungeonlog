@@ -1369,26 +1369,47 @@ window.renderTemaArena = renderTemaArena;
 // tema de cor/idioma/sfx, nao de conta), a camada da frente "espia"
 // pro lado sozinha e volta. Ensina o gesto sem precisar de texto/seta
 // fixa ocupando espaco na tela.
+//
+// A .arena existe no DOM e JA TEM largura>0 desde o boot -- quem
+// esconde ela e o #intro (splash/login/carrossel), que e um overlay
+// position:fixed;z-index:80 por CIMA de tudo, nao um display:none no
+// proprio .app. Ou seja: esperar a arena ficar "visivel" checando sua
+// largura NAO funciona (ela sempre teve largura, só tava tapada). A
+// condicao certa e esperar #intro ganhar a classe 'off' (e quando ele
+// vira display:none, ver regra .intro.off no style.css) -- só aí a
+// arena fica visivel de verdade pro usuario.
 function mostrarDicaSwipeArenaSeNecessario(){
   try {
     if (localStorage.getItem('questlog.arenaSwipeDicaVista.v1') === '1') return;
   } catch(e){}
-  const el = document.getElementById('arenaBg' + _arenaBgFrente);
-  if (!el) return;
-  setTimeout(() => {
-    el.classList.add('arena-swipe-dica');
-    el.addEventListener('animationend', () => {
-      el.classList.remove('arena-swipe-dica');
-    }, { once:true });
-    try { localStorage.setItem('questlog.arenaSwipeDicaVista.v1', '1'); } catch(e){}
-  }, 700);
+  let tentativas = 0;
+  const esperar = setInterval(() => {
+    tentativas++;
+    const intro = document.getElementById('intro');
+    const dispensado = !intro || intro.classList.contains('off');
+    if (!dispensado && tentativas < 200) return; // continua esperando (~60s de teto)
+    clearInterval(esperar);
+    if (!dispensado) return; // desistiu nessa sessao -- flag NAO e marcada, tenta de novo na proxima
+    setTimeout(() => {
+      const el = document.getElementById('arenaBg' + _arenaBgFrente);
+      if (!el) return;
+      el.classList.add('arena-swipe-dica');
+      el.addEventListener('animationend', () => {
+        el.classList.remove('arena-swipe-dica');
+      }, { once:true });
+      try { localStorage.setItem('questlog.arenaSwipeDicaVista.v1', '1'); } catch(e){}
+    }, 500);
+  }, 300);
 }
 
-// troca de tema COM deslize tipo carrossel: a camada de tras recebe o
-// fundo novo, comeca posicionada fora da tela (lado que a direcao
-// indica), e as duas camadas animam ao mesmo tempo -- a da frente sai,
-// a de tras entra. Depois do fim da transicao os papeis se invertem
-// pra proxima troca.
+// troca de tema COM deslize tipo carrossel -- MESMA tecnica/timing do
+// carrossel de marketing (ver deslizar(), IIFE do carrossel: reflow
+// forcado via leitura de layout, transition setada de forma SINCRONA
+// logo em seguida, sem requestAnimationFrame no meio -- foi isso que
+// deixava a troca de tema com uma sensacao mais seca que o carrossel
+// do inicio, mesmo com duracao parecida). 300ms, mesma DURACAO_SLIDE.
+const TEMA_ARENA_DURACAO_SLIDE = 300; // ms, deve bater com a transition abaixo
+
 function mudarTemaArena(direcao){
   const idxAtual = TEMAS_ARENA.findIndex(t => t.id === temaArenaAtual().id);
   let idx = idxAtual;
@@ -1407,13 +1428,16 @@ function mudarTemaArena(direcao){
   aplicarFundoTemaArena(trasEl, novoTema);
   trasEl.style.transition = 'none';
   trasEl.style.transform = 'translateX(' + (direcao > 0 ? '100%' : '-100%') + ')';
-  void trasEl.offsetWidth;
-  trasEl.style.transition = '';
+  trasEl.getBoundingClientRect(); // forca reflow -- mesma linha do deslizar() do carrossel
 
-  requestAnimationFrame(() => {
-    frenteEl.style.transform = 'translateX(' + (direcao > 0 ? '-100%' : '100%') + ')';
-    trasEl.style.transform = 'translateX(0)';
-  });
+  frenteEl.style.transition = trasEl.style.transition = 'transform ' + TEMA_ARENA_DURACAO_SLIDE + 'ms ease';
+  frenteEl.style.transform = 'translateX(' + (direcao > 0 ? '-100%' : '100%') + ')';
+  trasEl.style.transform = 'translateX(0)';
+
+  setTimeout(() => {
+    frenteEl.style.transition = frenteEl.style.transform = '';
+    trasEl.style.transition = trasEl.style.transform = '';
+  }, TEMA_ARENA_DURACAO_SLIDE);
 
   _arenaBgFrente = trasId;
   renderTemaArenaDots();

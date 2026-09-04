@@ -1410,7 +1410,18 @@ function mostrarDicaSwipeArenaSeNecessario(){
 // do inicio, mesmo com duracao parecida). 300ms, mesma DURACAO_SLIDE.
 const TEMA_ARENA_DURACAO_SLIDE = 300; // ms, deve bater com a transition abaixo
 
+// trava contra swipe duplo/rapido -- SEM isso, arrastar de novo antes
+// dos 300ms da troca anterior terminar faz o setTimeout de limpeza da
+// PRIMEIRA troca disparar NO MEIO da segunda e resetar transition/
+// transform pra '' -- os elementos "pulam" pra posicao final sem
+// suavidade nenhuma (as vezes parecendo "voltar"). Mesma trava
+// (emTransicao) que o carrossel de marketing ja usa, so que eu tinha
+// esquecido de copiar essa parte quando espelhei a tecnica dele.
+let _arenaBgEmTransicao = false;
+
 function mudarTemaArena(direcao){
+  if (_arenaBgEmTransicao) return;
+
   const idxAtual = TEMAS_ARENA.findIndex(t => t.id === temaArenaAtual().id);
   let idx = idxAtual;
   for (let i = 0; i < TEMAS_ARENA.length; i++){
@@ -1425,6 +1436,8 @@ function mudarTemaArena(direcao){
   const trasEl = document.getElementById('arenaBg' + trasId);
   if (!frenteEl || !trasEl) return;
 
+  _arenaBgEmTransicao = true;
+
   aplicarFundoTemaArena(trasEl, novoTema);
   trasEl.style.transition = 'none';
   trasEl.style.transform = 'translateX(' + (direcao > 0 ? '100%' : '-100%') + ')';
@@ -1437,6 +1450,7 @@ function mudarTemaArena(direcao){
   setTimeout(() => {
     frenteEl.style.transition = frenteEl.style.transform = '';
     trasEl.style.transition = trasEl.style.transform = '';
+    _arenaBgEmTransicao = false;
   }, TEMA_ARENA_DURACAO_SLIDE);
 
   _arenaBgFrente = trasId;

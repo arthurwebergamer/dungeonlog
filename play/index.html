@@ -187,12 +187,6 @@
     </button>
   </div>
 
-  <div class="tema-arena-switch">
-    <button class="tema-arena-seta" onclick="mudarTemaArena(-1)" aria-label="Tema anterior">‹</button>
-    <span id="temaArenaNome">Padrão</span>
-    <button class="tema-arena-seta" onclick="mudarTemaArena(1)" aria-label="Próximo tema">›</button>
-  </div>
-
   <div class="arena">
     <div class="tocha-arena tocha-esq"></div>
     <div class="tocha-arena tocha-dir"></div>
@@ -1272,72 +1266,6 @@ function desenharMonstro(){
   document.getElementById('mobname').textContent = m.nome;
 }
 
-// ---------- TEMA DE ARENA (decoracao cosmetica, catalogo em TEMAS_ARENA
-// dentro de assets.js). Independe de billing real -- ver
-// assinaturaAtiva() abaixo, stub deliberado ate a infra de Play Billing
-// entrar (fora de escopo aqui, ver roadmap). Persistencia por CONTA
-// (chaveConta()), diferente do tema de cores (questlog.tema.v1) que e
-// preferencia de aparelho -- tema de arena e ligado a entitlement, entao
-// segue a conta. Chave ja esta no array de migracao de aoLogar(). ----------
-const CHAVE_TEMA_ARENA = 'questlog.temaArena.v1';
-
-function assinaturaAtiva(){
-  try { if (localStorage.getItem('questlog.modoDebug.v1') === '1') return true; } catch(e){}
-  return false; // TODO: Play Billing real, fora de escopo por enquanto
-}
-
-function temaArenaDesbloqueado(t){
-  return !!t.gratuito || assinaturaAtiva();
-}
-
-function temaArenaSalvo(){
-  try { return localStorage.getItem(window.chaveConta(CHAVE_TEMA_ARENA)) || TEMAS_ARENA[0].id; }
-  catch(e){ return TEMAS_ARENA[0].id; }
-}
-function definirTemaArenaSalvo(id){
-  try { localStorage.setItem(window.chaveConta(CHAVE_TEMA_ARENA), id); } catch(e){}
-}
-function temaArenaAtual(){
-  return TEMAS_ARENA.find(t => t.id === temaArenaSalvo()) || TEMAS_ARENA[0];
-}
-
-// navega pro proximo/anterior tema DESBLOQUEADO (pula os bloqueados --
-// ainda nao ha UI de "comprar" aqui, so o gate visual/logico).
-function mudarTemaArena(direcao){
-  const idxAtual = TEMAS_ARENA.findIndex(t => t.id === temaArenaAtual().id);
-  let idx = idxAtual;
-  for (let i = 0; i < TEMAS_ARENA.length; i++){
-    idx = (idx + direcao + TEMAS_ARENA.length) % TEMAS_ARENA.length;
-    if (temaArenaDesbloqueado(TEMAS_ARENA[idx])) break;
-  }
-  definirTemaArenaSalvo(TEMAS_ARENA[idx].id);
-  renderTemaArena();
-}
-window.mudarTemaArena = mudarTemaArena;
-
-// limpa decoracao anterior e desenha a do tema atual. Chamada no boot
-// (ver fim do script principal) e sempre que mudarTemaArena() roda.
-function renderTemaArena(){
-  const arena = document.querySelector('.arena');
-  const fight = document.querySelector('.fight');
-  if (!arena || !fight) return;
-  const tema = temaArenaAtual();
-
-  arena.querySelectorAll('.decor-tema-arena').forEach(el => el.remove());
-  if (tema.decoracao){
-    const el = document.createElement('div');
-    el.className = 'decor-tema-arena decor-' + tema.decoracao;
-    arena.insertBefore(el, fight);
-  }
-
-  const nomeEl = document.getElementById('temaArenaNome');
-  if (nomeEl){
-    const emIngles = typeof idiomaApp === 'function' && idiomaApp() === 'en';
-    nomeEl.textContent = emIngles ? tema.nome_en : tema.nome;
-  }
-}
-window.renderTemaArena = renderTemaArena;
-
 // ---------- salvamento ----------
 // (_uidAtivo, chaveSaveAtual(), chaveConta(), definirUidAtivo() foram
 // movidos pro topo do arquivo -- ver logo apos a abertura deste mesmo
@@ -2325,7 +2253,6 @@ try {
   }
 } catch(e){}
 desenharHeroi();
-renderTemaArena();
 render();
 </script>
 
@@ -9309,7 +9236,6 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           'questlog.itensVistos.v1',
           'questlog.loja.v1',
           'questlog.tarefasConcluidas.v1',
-          'questlog.temaArena.v1',
           'questlog.tituloEquipado.v1',
           'questlog.vida.v1'
         ].forEach(chaveBase => {

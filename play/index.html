@@ -187,6 +187,12 @@
     </button>
   </div>
 
+  <div class="tema-arena-switch">
+    <button class="tema-arena-seta" onclick="mudarTemaArena(-1)" aria-label="Tema anterior">‹</button>
+    <span id="temaArenaNome">Padrão</span>
+    <button class="tema-arena-seta" onclick="mudarTemaArena(1)" aria-label="Próximo tema">›</button>
+  </div>
+
   <div class="arena">
     <div class="tocha-arena tocha-esq"></div>
     <div class="tocha-arena tocha-dir"></div>
@@ -1250,6 +1256,14 @@ function monstroDoDia(){
   return MONSTROS[i];
 }
 
+// mesmo ciclo de monstroDoDia(), mas pra uma data especifica (ISO) em vez
+// de "hoje" -- usado pro pop-up de tarefas perdidas mostrar o monstro do
+// DIA QUE VIROU (ultimoDia em verificarVirada()), nao o de hoje.
+function monstroDoDiaEm(iso){
+  const i = ((diasCorridos() + diffDias(iso, isoAtual()) + semente) % MONSTROS.length + MONSTROS.length) % MONSTROS.length;
+  return MONSTROS[i];
+}
+
 function desenharMonstro(){
   const m = monstroDoDia();
   document.getElementById('mobSprite').innerHTML =
@@ -1257,6 +1271,72 @@ function desenharMonstro(){
     '<div class="sombra"></div>';
   document.getElementById('mobname').textContent = m.nome;
 }
+
+// ---------- TEMA DE ARENA (decoracao cosmetica, catalogo em TEMAS_ARENA
+// dentro de assets.js). Independe de billing real -- ver
+// assinaturaAtiva() abaixo, stub deliberado ate a infra de Play Billing
+// entrar (fora de escopo aqui, ver roadmap). Persistencia por CONTA
+// (chaveConta()), diferente do tema de cores (questlog.tema.v1) que e
+// preferencia de aparelho -- tema de arena e ligado a entitlement, entao
+// segue a conta. Chave ja esta no array de migracao de aoLogar(). ----------
+const CHAVE_TEMA_ARENA = 'questlog.temaArena.v1';
+
+function assinaturaAtiva(){
+  try { if (localStorage.getItem('questlog.modoDebug.v1') === '1') return true; } catch(e){}
+  return false; // TODO: Play Billing real, fora de escopo por enquanto
+}
+
+function temaArenaDesbloqueado(t){
+  return !!t.gratuito || assinaturaAtiva();
+}
+
+function temaArenaSalvo(){
+  try { return localStorage.getItem(window.chaveConta(CHAVE_TEMA_ARENA)) || TEMAS_ARENA[0].id; }
+  catch(e){ return TEMAS_ARENA[0].id; }
+}
+function definirTemaArenaSalvo(id){
+  try { localStorage.setItem(window.chaveConta(CHAVE_TEMA_ARENA), id); } catch(e){}
+}
+function temaArenaAtual(){
+  return TEMAS_ARENA.find(t => t.id === temaArenaSalvo()) || TEMAS_ARENA[0];
+}
+
+// navega pro proximo/anterior tema DESBLOQUEADO (pula os bloqueados --
+// ainda nao ha UI de "comprar" aqui, so o gate visual/logico).
+function mudarTemaArena(direcao){
+  const idxAtual = TEMAS_ARENA.findIndex(t => t.id === temaArenaAtual().id);
+  let idx = idxAtual;
+  for (let i = 0; i < TEMAS_ARENA.length; i++){
+    idx = (idx + direcao + TEMAS_ARENA.length) % TEMAS_ARENA.length;
+    if (temaArenaDesbloqueado(TEMAS_ARENA[idx])) break;
+  }
+  definirTemaArenaSalvo(TEMAS_ARENA[idx].id);
+  renderTemaArena();
+}
+window.mudarTemaArena = mudarTemaArena;
+
+// limpa decoracao anterior e desenha a do tema atual. Chamada no boot
+// (ver fim do script principal) e sempre que mudarTemaArena() roda.
+function renderTemaArena(){
+  const arena = document.querySelector('.arena');
+  const fight = document.querySelector('.fight');
+  if (!arena || !fight) return;
+  const tema = temaArenaAtual();
+
+  arena.querySelectorAll('.decor-tema-arena').forEach(el => el.remove());
+  if (tema.decoracao){
+    const el = document.createElement('div');
+    el.className = 'decor-tema-arena decor-' + tema.decoracao;
+    arena.insertBefore(el, fight);
+  }
+
+  const nomeEl = document.getElementById('temaArenaNome');
+  if (nomeEl){
+    const emIngles = typeof idiomaApp === 'function' && idiomaApp() === 'en';
+    nomeEl.textContent = emIngles ? tema.nome_en : tema.nome;
+  }
+}
+window.renderTemaArena = renderTemaArena;
 
 // ---------- salvamento ----------
 // (_uidAtivo, chaveSaveAtual(), chaveConta(), definirUidAtivo() foram
@@ -2245,6 +2325,7 @@ try {
   }
 } catch(e){}
 desenharHeroi();
+renderTemaArena();
 render();
 </script>
 
@@ -3997,6 +4078,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     if (ultimoDia > hoje){ ultimoDia = hoje; gravar(); return; }
 
     const largadas = pendentesEm(ultimoDia);
+    const diaVirada = ultimoDia;   // guarda ANTES do reassign abaixo -- e o dia que fechou, nao "hoje"
     const danoBruto = largadas.reduce((s, t) =>
       s + ECO.danoPorTarefa * (typeof multDif === 'function' ? multDif(difDe(t)) : 1), 0);
 
@@ -4051,7 +4133,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
         // de tarefas, no lugar do toast generico antigo (que hoje esta mudo).
         if (!morreu){
           if (typeof window.enfileirarPopup === 'function' && typeof window.mostrarTarefasPerdidas === 'function'){
-            window.enfileirarPopup(prox => window.mostrarTarefasPerdidas(largadas, total, prox));
+            window.enfileirarPopup(prox => window.mostrarTarefasPerdidas(largadas, total, diaVirada, prox));
           } else if (typeof aviso === 'function'){
             const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
             aviso(en
@@ -5046,20 +5128,33 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   largBG.onclick = fecharLarg;
 
   // largadas: array de tarefas (objetos com .texto) que ficaram pendentes na
-  // virada -- mesmo array calculado em verificarVirada(), passado direto.
-  function mostrarTarefasPerdidas(largadas, total, aoFechar){
+  // virada. diaVirada: ISO do dia que fechou (nao "hoje") -- usado pra
+  // buscar o monstro daquele dia especifico, ver monstroDoDiaEm().
+  function mostrarTarefasPerdidas(largadas, total, diaVirada, aoFechar){
     if (!largadas || !largadas.length){ if (aoFechar) aoFechar(); return; }
     _aoFecharLarg = aoFechar || null;
     const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
 
     const itensHtml = largadas.map(t => {
       const dObj = DIFS.find(d => d.id === difDe(t)) || DIFS.find(d => d.id === DIF_PADRAO);
-      return '<div class="largitem"><span class="largnome">' + (t.texto || '') + '</span>'
-           + '<span class="largdif">' + dObj.nome + '</span></div>';
+      return '<div class="largitem" data-dif="' + dObj.id + '">'
+           + '<span class="largnome">' + (t.texto || '') + '</span>'
+           + '<span class="difpip">' + '<i></i>'.repeat(dObj.pips) + '</span></div>';
     }).join('');
 
+    // sprite do monstro DO DIA QUE A PESSOA PERDEU (diaVirada), nao o de
+    // hoje -- mesmo tema de "fuga" ja usado no app (SFX 'fuga', toast
+    // "FUGIU"), espelhado pra sugerir que ele escapou naquele dia.
+    const m = (typeof monstroDoDiaEm === 'function' && diaVirada) ? monstroDoDiaEm(diaVirada)
+            : (typeof monstroDoDia === 'function' ? monstroDoDia() : null);
+    const iconeHtml = m
+      ? '<div class="largicone"><img src="'+m.img+'" alt="' + (en ? 'monster fled' : 'monstro fugiu') + '"></div>'
+      : '';
+
     largPop.innerHTML =
+      iconeHtml+
       '<div class="larglabel">' + (en ? 'Skipped Tasks' : 'Tarefas Perdidas') + '</div>'+
+      '<div class="largtitulo">' + (en ? 'It got away.' : 'Ele escapou.') + '</div>'+
       '<div class="largitens">' + itensHtml + '</div>'+
       '<div class="largtotal">' + (en ? ('−' + total + ' health') : ('−' + total + ' de vida')) + '</div>'+
       '<button class="largok" id="largOk">' + (en ? 'Continue' : 'Continuar') + '</button>';
@@ -9214,6 +9309,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           'questlog.itensVistos.v1',
           'questlog.loja.v1',
           'questlog.tarefasConcluidas.v1',
+          'questlog.temaArena.v1',
           'questlog.tituloEquipado.v1',
           'questlog.vida.v1'
         ].forEach(chaveBase => {

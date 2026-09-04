@@ -185,3 +185,18 @@ const ITENS = [
   [133, "Escudo do Guardiao", "escudo", 4, 80, 0, 30, 0, false, "Guardian's Shield"],
   [134, "Orbe Proibido", "acess", 4, 160, 22, 35, 0, false, "Forbidden Orb"]
 ];
+
+// ===== TEMAS_ARENA -- decoracao cosmetica de fundo da Arena =====
+// Mesmo padrao de ITENS/HEROIS: catalogo simples de dados, sem logica.
+// A parede de tijolo (CSS, ja existente) e o piso sao SEMPRE os mesmos
+// em todos os temas -- decisao de escopo -- so a decoracao (props) muda
+// por tema. Entitlement fica em temaArenaDesbloqueado() no script
+// principal, desacoplado daqui de proposito (ver roadmap: Sistema de
+// Temas de Arena). "gelo" abaixo esta gratuito:true SO PRA TESTE --
+// ainda nao foi decidido qual tema vira o 2o gratis por progresso, nem
+// o gatilho, nem os temas pagos (fogo/pantano bloqueados, sem asset
+// definitivo ainda pro fogo).
+const TEMAS_ARENA = [
+  { id:"padrao", nome:"Padrão", nome_en:"Default", gratuito:true,  decoracao:null },
+  { id:"gelo",   nome:"Gelo",   nome_en:"Ice",      gratuito:true,  decoracao:"gelo" }
+];

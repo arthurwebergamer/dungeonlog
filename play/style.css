@@ -3404,8 +3404,8 @@
   margin:0 0 6px;
 }
 .tema-arena-seta-grande{
-  background:none; border:none; color:var(--text); font-size:20px; line-height:1;
-  cursor:pointer; padding:4px 18px 2px; font-family:inherit;
+  background:none; border:none; color:#8A93A0; line-height:0;
+  cursor:pointer; padding:6px 18px 4px; display:flex;
 }
 .tema-arena-seta-grande:active{ opacity:.5; transform:translateY(-1px); }
 

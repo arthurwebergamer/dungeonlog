@@ -3418,6 +3418,17 @@
   background-repeat:no-repeat; image-rendering:pixelated;
   transition:transform .28s ease;
 }
+/* icone de cadeado pros temas pagos ainda nao desbloqueados -- o
+   escurecimento (silhueta) e feito via JS como camada extra de
+   background (ver aplicarFundoTemaArena), NAO via CSS filter aqui,
+   porque filter no elemento tambem escureceria este ::after junto. */
+.arena-bg-layer.bloqueado::after{
+  content:'🔒';
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:26px;
+  text-shadow:0 2px 8px rgba(0,0,0,.7);
+}
 
 /* bolinhas indicando quantos temas existem e qual esta selecionado --
    tambem sinaliza que a arena e "navegavel" (padrao de carrossel). */

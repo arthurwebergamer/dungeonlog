@@ -1279,9 +1279,78 @@ function assinaturaAtiva(){
   try { if (localStorage.getItem('questlog.modoDebug.v1') === '1') return true; } catch(e){}
   return false;
 }
-function temaArenaDesbloqueado(t){
-  return !!t.gratuito || assinaturaAtiva();
+
+// temas com desbloqueioGratis (ex: Deserto via streak) ficam bloqueados
+// ate a condicao ser atingida -- ver verificarDesbloqueiosTemaArena().
+// Uma vez desbloqueado fica assim pra sempre (nao "tranca de novo" se a
+// streak quebrar depois). Persistencia por CONTA (mesmo motivo de
+// CHAVE_TEMA_ARENA: e entitlement, nao preferencia de aparelho).
+const CHAVE_TEMAS_DESBLOQUEADOS = 'questlog.temasDesbloqueados.v1';
+function temasDesbloqueadosSalvos(){
+  try { return JSON.parse(localStorage.getItem(window.chaveConta(CHAVE_TEMAS_DESBLOQUEADOS)) || '[]'); }
+  catch(e){ return []; }
 }
+function marcarTemaDesbloqueado(id){
+  const atuais = temasDesbloqueadosSalvos();
+  if (atuais.includes(id)) return false; // ja estava desbloqueado, nada mudou
+  atuais.push(id);
+  try { localStorage.setItem(window.chaveConta(CHAVE_TEMAS_DESBLOQUEADOS), JSON.stringify(atuais)); } catch(e){}
+  return true;
+}
+
+function temaArenaDesbloqueado(t){
+  if (t.gratuito) return true;
+  if (assinaturaAtiva()) return true;
+  if (t.desbloqueioGratis && temasDesbloqueadosSalvos().includes(t.id)) return true;
+  return false;
+}
+
+// mesma logica de melhorSequenciaDeVitorias() do modulo Conquistas
+// (linha ~6648) -- duplicada aqui de proposito em vez de reaproveitada:
+// aquela funcao vive dentro da IIFE do modulo e nao esta exposta em
+// window, e e pequena/pura o suficiente (so depende de diffDias(), ja
+// global) pra nao valer a pena abrir aquele modulo so pra exportar 1
+// funcao. Se um dia divergir, e sinal de que precisa virar utilitario
+// global de verdade.
+function _melhorSequenciaParaTemaArena(){
+  if (typeof window.obterHistorico !== 'function' || typeof diffDias !== 'function') return 0;
+  const hist = window.obterHistorico();
+  const ord = hist.slice().sort((a, b) => a.data < b.data ? -1 : (a.data > b.data ? 1 : 0));
+  let atual = 0, melhor = 0, anterior = null;
+  ord.forEach(h => {
+    const seguidoDoAnterior = anterior !== null && diffDias(h.data, anterior) === 1;
+    if (h.resultado === 'vitoria'){
+      atual = seguidoDoAnterior ? atual + 1 : 1;
+      if (atual > melhor) melhor = atual;
+    } else {
+      atual = 0;
+    }
+    anterior = h.data;
+  });
+  return melhor;
+}
+
+// roda a cada render() (ver wrap no fim do arquivo) + 1x no boot.
+// Quando uma condicao de desbloqueio gratis e atingida pela 1a vez,
+// marca o tema como desbloqueado e deixa uma "dica pendente" salva --
+// ela dispara a espiada a proxima vez que a arena for exibida (ver
+// mostrarDicaSwipeArenaSeNecessario), em vez de tentar mostrar a
+// animacao no meio de um render qualquer.
+function verificarDesbloqueiosTemaArena(){
+  TEMAS_ARENA.forEach(t => {
+    if (!t.desbloqueioGratis) return;
+    if (temasDesbloqueadosSalvos().includes(t.id)) return;
+    let atingiu = false;
+    if (t.desbloqueioGratis.tipo === 'streak'){
+      atingiu = _melhorSequenciaParaTemaArena() >= t.desbloqueioGratis.valor;
+    }
+    if (atingiu && marcarTemaDesbloqueado(t.id)){
+      try { localStorage.setItem(window.chaveConta('questlog.temaArenaDicaPendente.v1'), t.id); } catch(e){}
+    }
+  });
+}
+window.verificarDesbloqueiosTemaArena = verificarDesbloqueiosTemaArena;
+
 function temaArenaSalvo(){
   try { return localStorage.getItem(window.chaveConta(CHAVE_TEMA_ARENA)) || TEMAS_ARENA[0].id; }
   catch(e){ return TEMAS_ARENA[0].id; }
@@ -1295,21 +1364,30 @@ function temaArenaAtual(){
 // monta o valor de background (imagem/tamanho/posicao/repeticao) do
 // tema num elemento de camada -- tile de tijolo ORIGINAL sempre por
 // baixo (mesmo de sempre), arte do tema (se houver) por cima em 40%
-// de opacidade ja pre-aplicada no proprio PNG.
+// de opacidade ja pre-aplicada no proprio PNG. Tema bloqueado (pago,
+// nao assinado) ganha a classe 'bloqueado' -- CSS aplica silhueta +
+// cadeado por cima (ver style.css).
 function aplicarFundoTemaArena(el, tema){
   const tile = 'url("data:image/png;base64,' + TEMA_ARENA_TILE_B64 + '")';
   const grad = 'linear-gradient(180deg,var(--arena-1) 0%,var(--arena-2) 55%,var(--arena-3) 100%)';
+  const bloqueado = !temaArenaDesbloqueado(tema);
+  // silhueta: overlay quase preto por CIMA da arte, como camada extra
+  // de background -- feito assim (nao via CSS filter na classe
+  // .bloqueado) porque filter escureceria TAMBEM o icone de cadeado
+  // (::after), que e desenhado dentro do mesmo elemento.
+  const overlay = bloqueado ? 'linear-gradient(rgba(0,0,0,.82),rgba(0,0,0,.82)), ' : '';
   if (tema.arte){
-    el.style.backgroundImage = 'url("data:image/png;base64,' + tema.arte + '"), ' + tile + ', ' + grad;
-    el.style.backgroundSize = 'cover, 130px 41px, auto';
-    el.style.backgroundPosition = (tema.posicaoArte || 'center') + ', 0 0, 0 0';
-    el.style.backgroundRepeat = 'no-repeat, repeat, no-repeat';
+    el.style.backgroundImage = overlay + 'url("data:image/png;base64,' + tema.arte + '"), ' + tile + ', ' + grad;
+    el.style.backgroundSize = (bloqueado ? 'cover, ' : '') + 'cover, 130px 41px, auto';
+    el.style.backgroundPosition = (bloqueado ? 'center, ' : '') + (tema.posicaoArte || 'center') + ', 0 0, 0 0';
+    el.style.backgroundRepeat = (bloqueado ? 'no-repeat, ' : '') + 'no-repeat, repeat, no-repeat';
   } else {
-    el.style.backgroundImage = tile + ', ' + grad;
-    el.style.backgroundSize = '130px 41px, auto';
-    el.style.backgroundPosition = '0 0, 0 0';
-    el.style.backgroundRepeat = 'repeat, no-repeat';
+    el.style.backgroundImage = overlay + tile + ', ' + grad;
+    el.style.backgroundSize = (bloqueado ? 'cover, ' : '') + '130px 41px, auto';
+    el.style.backgroundPosition = (bloqueado ? 'center, ' : '') + '0 0, 0 0';
+    el.style.backgroundRepeat = (bloqueado ? 'no-repeat, ' : '') + 'repeat, no-repeat';
   }
+  el.classList.toggle('bloqueado', bloqueado);
 }
 
 // qual das duas camadas (#arenaBgA/#arenaBgB) esta visivel agora
@@ -1317,13 +1395,13 @@ function aplicarFundoTemaArena(el, tema){
 // ser a proxima a entrar.
 let _arenaBgFrente = 'A';
 
-// bolinhas indicando quantos temas existem e qual esta selecionado.
+// bolinhas indicando quantos temas existem (TODOS, inclusive
+// bloqueados -- o arrasto alcança os 4) e qual esta selecionado.
 function renderTemaArenaDots(){
   const el = document.getElementById('temaArenaDots');
   if (!el) return;
   const atualId = temaArenaAtual().id;
   el.innerHTML = TEMAS_ARENA
-    .filter(t => temaArenaDesbloqueado(t))
     .map(t => '<span class="tema-arena-dot' + (t.id === atualId ? ' tema-arena-dot-atual' : '') + '"></span>')
     .join('');
 }
@@ -1397,10 +1475,18 @@ function tutorialTarefasPendente(){
   return true; // elemento ainda nao existe e nunca foi visto -- assume que ainda vai aparecer
 }
 
+// dica de swipe disparada pelo DESBLOQUEIO de um tema (ver
+// verificarDesbloqueiosTemaArena()), nao mais "1a vez que o app abre".
+// A flag e o PROPRIO id do tema pendente de mostrar -- existe = tem
+// dica pra mostrar; foi removida = ja mostrou (nao precisa de uma
+// segunda flag "ja vista"). Espera os mesmos dois dialogos de sempre
+// (#intro, tutorial da aba Tarefas) antes de disparar.
 function mostrarDicaSwipeArenaSeNecessario(){
-  try {
-    if (localStorage.getItem('questlog.arenaSwipeDicaVista.v3') === '1') return;
-  } catch(e){}
+  let idPendente;
+  try { idPendente = localStorage.getItem(window.chaveConta('questlog.temaArenaDicaPendente.v1')); }
+  catch(e){ idPendente = null; }
+  if (!idPendente) return; // nada foi desbloqueado ainda nessa conta, ou a dica ja foi mostrada
+
   let tentativas = 0;
   const esperar = setInterval(() => {
     tentativas++;
@@ -1409,29 +1495,20 @@ function mostrarDicaSwipeArenaSeNecessario(){
     const dispensado = introFoi && !tutorialTarefasPendente();
     if (!dispensado && tentativas < 200) return; // continua esperando (~60s de teto)
     clearInterval(esperar);
-    if (!dispensado) return; // desistiu nessa sessao -- flag NAO e marcada, tenta de novo na proxima
+    if (!dispensado) return; // desistiu nessa sessao -- flag pendente continua salva, tenta de novo na proxima
     setTimeout(() => {
       if (_arenaBgEmTransicao) return;
+      const temaAlvo = TEMAS_ARENA.find(t => t.id === idPendente);
+      if (!temaAlvo){
+        try { localStorage.removeItem(window.chaveConta('questlog.temaArenaDicaPendente.v1')); } catch(e){}
+        return;
+      }
       const frenteEl = document.getElementById('arenaBg' + _arenaBgFrente);
       const trasId = _arenaBgFrente === 'A' ? 'B' : 'A';
       const trasEl = document.getElementById('arenaBg' + trasId);
       if (!frenteEl || !trasEl) return;
 
-      // pega o PROXIMO tema de verdade (mesmo sentido de "arrastar pra
-      // esquerda"). Motivo de mostrar arte de outro tema, e nao so
-      // cutucar a MESMA imagem uns pixels pro lado: se o tema atual
-      // for o Padrao (parede de tijolo repetida), um nudge pequeno
-      // contra um padrao que se repete fica quase invisivel -- a
-      // textura parece igual antes/depois do desvio.
-      const idxAtual = TEMAS_ARENA.findIndex(t => t.id === temaArenaAtual().id);
-      let idx = idxAtual;
-      for (let i = 0; i < TEMAS_ARENA.length; i++){
-        idx = (idx + 1 + TEMAS_ARENA.length) % TEMAS_ARENA.length;
-        if (temaArenaDesbloqueado(TEMAS_ARENA[idx])) break;
-      }
-      if (idx === idxAtual) return; // so ha 1 tema desbloqueado -- nao ha o que espiar
-
-      aplicarFundoTemaArena(trasEl, TEMAS_ARENA[idx]);
+      aplicarFundoTemaArena(trasEl, temaAlvo);
       _arenaBgEmTransicao = true; // mesma trava do arrasto real -- um toque comecando no meio da dica so vai ser ignorado ate ela acabar (~1.5s), em vez de brigar com o transform
       // rede de seguranca final: se a sequencia encadeada de timeouts
       // abaixo for interrompida por qualquer motivo (ex: app vai pra
@@ -1466,7 +1543,7 @@ function mostrarDicaSwipeArenaSeNecessario(){
         });
       });
 
-      try { localStorage.setItem('questlog.arenaSwipeDicaVista.v3', '1'); } catch(e){}
+      try { localStorage.removeItem(window.chaveConta('questlog.temaArenaDicaPendente.v1')); } catch(e){}
     }, 500);
   }, 300);
 }
@@ -1483,11 +1560,9 @@ function mudarTemaArena(direcao){
   if (_arenaBgEmTransicao) return;
 
   const idxAtual = TEMAS_ARENA.findIndex(t => t.id === temaArenaAtual().id);
-  let idx = idxAtual;
-  for (let i = 0; i < TEMAS_ARENA.length; i++){
-    idx = (idx + direcao + TEMAS_ARENA.length) % TEMAS_ARENA.length;
-    if (temaArenaDesbloqueado(TEMAS_ARENA[idx])) break;
-  }
+  // NAO pula temas bloqueados -- eles sao alcancaveis via arrasto como
+  // previa (silhueta + cadeado, ver aplicarFundoTemaArena/.bloqueado).
+  const idx = (idxAtual + direcao + TEMAS_ARENA.length) % TEMAS_ARENA.length;
   const novoTema = TEMAS_ARENA[idx];
   definirTemaArenaSalvo(novoTema.id);
 
@@ -1555,6 +1630,11 @@ window.mudarTemaArena = mudarTemaArena;
 
   arena.addEventListener('touchstart', e => {
     if (e.touches.length !== 1 || _arenaBgEmTransicao) return;
+    // arrasto so fica disponivel depois que houver pelo menos 2 temas
+    // desbloqueados (Padrao + o 1o gratis, hoje Deserto via streak) --
+    // com so 1 tema nao ha pra onde ir, e deixar arrastar sem nada pra
+    // mostrar so confunde quem esta comecando.
+    if (TEMAS_ARENA.filter(temaArenaDesbloqueado).length < 2) return;
     sx = e.touches[0].clientX; sy = e.touches[0].clientY;
     rastreando = true; decidiu = false; cancelado = false;
     larguraArena = arena.getBoundingClientRect().width || 1;
@@ -1571,12 +1651,8 @@ window.mudarTemaArena = mudarTemaArena;
       direcaoAtual = dx > 0 ? -1 : 1;
 
       const idxAtual = TEMAS_ARENA.findIndex(t => t.id === temaArenaAtual().id);
-      let idx = idxAtual;
-      for (let i = 0; i < TEMAS_ARENA.length; i++){
-        idx = (idx + direcaoAtual + TEMAS_ARENA.length) % TEMAS_ARENA.length;
-        if (temaArenaDesbloqueado(TEMAS_ARENA[idx])) break;
-      }
-      idxAlvo = idx;
+      // NAO pula bloqueados -- alcancaveis como previa (silhueta+cadeado)
+      idxAlvo = (idxAtual + direcaoAtual + TEMAS_ARENA.length) % TEMAS_ARENA.length;
 
       frenteEl = document.getElementById('arenaBg' + _arenaBgFrente);
       const trasId = _arenaBgFrente === 'A' ? 'B' : 'A';
@@ -7328,6 +7404,20 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   checarDesbloqueiosV2(); // primeira checagem, sem esperar o primeiro render() -- ja chama atualizarBadges() no proprio fim (ver linha acima), entao a primeira pintura do badge acontece aqui, com CONQUISTAS_V2 ja definida (evita o erro de TDZ que aconteceria se atualizarBadges() rodasse antes deste ponto -- ver comentario em contarPendentes())
   renderTituloPerfil(); // primeira pintura do titulo -- mesmo motivo, so agora que CONQUISTAS_V2 existe
 
+  // mesmo padrao de wrap acima, pro desbloqueio gratis de temas de
+  // arena (Deserto via streak, ver TEMAS_ARENA em assets.js) -- roda a
+  // cada render() pra pegar o momento exato em que a streak cruza o
+  // valor necessario, sem precisar interceptar cada lugar que grava no
+  // historico.
+  const _renderTemaArenaV1 = window.render;
+  if (typeof _renderTemaArenaV1 === 'function' && typeof verificarDesbloqueiosTemaArena === 'function'){
+    window.render = function(){
+      _renderTemaArenaV1.apply(this, arguments);
+      verificarDesbloqueiosTemaArena();
+    };
+  }
+  if (typeof verificarDesbloqueiosTemaArena === 'function') verificarDesbloqueiosTemaArena();
+
   // resumo compacto pra previa no Perfil unificado -- reescrito pra ler
   // do sistema V2 (desbloqueios automaticos) em vez do resgatadosSet()
   // antigo. "pendentes" nao existe mais (nada fica "feito, aguardando
@@ -9610,6 +9700,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           'questlog.loja.v1',
           'questlog.tarefasConcluidas.v1',
           'questlog.temaArena.v1',
+          'questlog.temasDesbloqueados.v1',
           'questlog.tituloEquipado.v1',
           'questlog.vida.v1'
         ].forEach(chaveBase => {

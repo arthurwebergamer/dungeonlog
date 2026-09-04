@@ -192,7 +192,6 @@
     <div class="arena-bg-layer" id="arenaBgB"></div>
     <div class="tocha-arena tocha-esq"></div>
     <div class="tocha-arena tocha-dir"></div>
-    <div class="tema-arena-toast" id="temaArenaToast"></div>
     <div class="tema-arena-dots" id="temaArenaDots"></div>
     <div class="fight">
       <div class="fighter">
@@ -1318,21 +1317,7 @@ function aplicarFundoTemaArena(el, tema){
 // ser a proxima a entrar.
 let _arenaBgFrente = 'A';
 
-// mostra o nome do tema por cima da arena por ~1.2s e some sozinho --
-// feedback do swipe (ver IIFE de gesto logo abaixo).
-function mostrarToastTemaArena(tema){
-  const el = document.getElementById('temaArenaToast');
-  if (!el) return;
-  const emIngles = typeof idiomaApp === 'function' && idiomaApp() === 'en';
-  el.textContent = emIngles ? tema.nome_en : tema.nome;
-  el.classList.remove('tema-arena-toast-mostrar');
-  void el.offsetWidth; // forca reflow -- reinicia a animacao se o usuario trocar rapido de novo
-  el.classList.add('tema-arena-toast-mostrar');
-}
-
-// bolinhas indicando quantos temas existem e qual esta selecionado --
-// tambem serve de indicio visual de que a arena e "navegavel" (padrao
-// de carrossel bem conhecido), sem precisar de seta/texto fixo.
+// bolinhas indicando quantos temas existem e qual esta selecionado.
 function renderTemaArenaDots(){
   const el = document.getElementById('temaArenaDots');
   if (!el) return;
@@ -1368,10 +1353,8 @@ window.renderTemaArena = renderTemaArena;
 // abre, mesmo os que o usuario ainda nao selecionou. Sem isso, a
 // PRIMEIRA vez que um tema novo e usado como fundo, o navegador precisa
 // decodificar aquele PNG (a Floresta sozinha e 112KB) bem na hora que a
-// transicao deveria estar rodando -- esse trabalho de decode competindo
-// com a transicao CSS e o que mais provavelmente causava a troca travar
-// no meio (visto gravando a tela). new Image() forca o decode e joga no
-// cache do navegador ANTES de precisarmos do resultado.
+// transicao deveria estar rodando. new Image() forca o decode e joga
+// no cache do navegador ANTES de precisarmos do resultado.
 function precarregarTemasArena(){
   TEMAS_ARENA.forEach(tema => {
     if (!tema.arte) return;
@@ -1380,72 +1363,12 @@ function precarregarTemasArena(){
   });
 }
 
-// dica de que a arena e arrastavel: na primeira vez que o app abre (e
-// so essa vez -- flag em localStorage, preferencia de APARELHO, igual
-// tema de cor/idioma/sfx, nao de conta), a camada da frente "espia"
-// pro lado sozinha e volta. Ensina o gesto sem precisar de texto/seta
-// fixa ocupando espaco na tela.
-//
-// A .arena existe no DOM e JA TEM largura>0 desde o boot -- quem
-// esconde ela e o #intro (splash/login/carrossel), que e um overlay
-// position:fixed;z-index:80 por CIMA de tudo, nao um display:none no
-// proprio .app. Ou seja: esperar a arena ficar "visivel" checando sua
-// largura NAO funciona (ela sempre teve largura, só tava tapada). A
-// condicao certa e esperar #intro ganhar a classe 'off' (e quando ele
-// vira display:none, ver regra .intro.off no style.css) -- só aí a
-// arena fica visivel de verdade pro usuario.
-function mostrarDicaSwipeArenaSeNecessario(){
-  try {
-    // .v2 -- versoes anteriores desse recurso marcavam essa flag como
-    // "vista" enquanto a dica tocava escondida atras do #intro (bug ja
-    // corrigido acima), entao aparelhos que testaram builds antigas tem
-    // a chave .v1 poluida e nunca mais veriam a dica. Chave nova = todo
-    // mundo comeca limpo.
-    if (localStorage.getItem('questlog.arenaSwipeDicaVista.v2') === '1') return;
-  } catch(e){}
-  let tentativas = 0;
-  const esperar = setInterval(() => {
-    tentativas++;
-    const intro = document.getElementById('intro');
-    const dispensado = !intro || intro.classList.contains('off');
-    if (!dispensado && tentativas < 200) return; // continua esperando (~60s de teto)
-    clearInterval(esperar);
-    if (!dispensado) return; // desistiu nessa sessao -- flag NAO e marcada, tenta de novo na proxima
-    setTimeout(() => {
-      const el = document.getElementById('arenaBg' + _arenaBgFrente);
-      if (!el) return;
-      el.classList.add('arena-swipe-dica');
-      // 'animationend' e o caminho normal de limpeza, mas se um swipe
-      // de verdade interromper a animacao (troca o transform inline no
-      // meio do 1.1s da dica), o evento pode nao disparar e a classe
-      // fica GRUDADA no elemento -- daí a proxima troca de tema real
-      // brigaria com essa animacao residual pela propriedade transform
-      // (foi exatamente isso que causou o arrasto manual bugado).
-      // setTimeout como rede de seguranca, sempre limpa depois de 1.2s
-      // independente do que aconteceu com o evento.
-      const limpar = () => el.classList.remove('arena-swipe-dica');
-      el.addEventListener('animationend', limpar, { once:true });
-      setTimeout(limpar, 1200);
-      try { localStorage.setItem('questlog.arenaSwipeDicaVista.v2', '1'); } catch(e){}
-    }, 500);
-  }, 300);
-}
+// troca de tema com deslize tipo carrossel. 300ms, mesma duracao do
+// carrossel de marketing (deslizar(), DURACAO_SLIDE).
+const TEMA_ARENA_DURACAO_SLIDE = 300;
 
-// troca de tema COM deslize tipo carrossel -- MESMA tecnica/timing do
-// carrossel de marketing (ver deslizar(), IIFE do carrossel: reflow
-// forcado via leitura de layout, transition setada de forma SINCRONA
-// logo em seguida, sem requestAnimationFrame no meio -- foi isso que
-// deixava a troca de tema com uma sensacao mais seca que o carrossel
-// do inicio, mesmo com duracao parecida). 300ms, mesma DURACAO_SLIDE.
-const TEMA_ARENA_DURACAO_SLIDE = 300; // ms, deve bater com a transition abaixo
-
-// trava contra swipe duplo/rapido -- SEM isso, arrastar de novo antes
-// dos 300ms da troca anterior terminar faz o setTimeout de limpeza da
-// PRIMEIRA troca disparar NO MEIO da segunda e resetar transition/
-// transform pra '' -- os elementos "pulam" pra posicao final sem
-// suavidade nenhuma (as vezes parecendo "voltar"). Mesma trava
-// (emTransicao) que o carrossel de marketing ja usa, so que eu tinha
-// esquecido de copiar essa parte quando espelhei a tecnica dele.
+// trava contra swipe duplo/rapido -- sem isso, arrastar de novo antes
+// da troca anterior terminar corrompe a animacao em andamento.
 let _arenaBgEmTransicao = false;
 
 function mudarTemaArena(direcao){
@@ -1465,26 +1388,15 @@ function mudarTemaArena(direcao){
   const trasEl = document.getElementById('arenaBg' + trasId);
   if (!frenteEl || !trasEl) return;
 
-  // remove qualquer residuo da animacao de dica (arena-swipe-dica) --
-  // se ela ainda estiver rodando/grudada num dos dois, ela brigaria com
-  // o transform que estamos prestes a animar abaixo.
-  frenteEl.classList.remove('arena-swipe-dica');
-  trasEl.classList.remove('arena-swipe-dica');
-
   _arenaBgEmTransicao = true;
 
   aplicarFundoTemaArena(trasEl, novoTema);
   trasEl.style.transition = 'none';
   trasEl.style.transform = 'translateX(' + (direcao > 0 ? '100%' : '-100%') + ')';
 
-  // double rAF -- um reflow so (getBoundingClientRect) as vezes NAO
-  // basta pra garantir que o navegador realmente pintou o estado
-  // "sem transicao, fora da tela" antes de aplicar a transicao no
-  // mesmo tick. Em mobile isso causava a troca travar exatamente na
-  // metade por varios frames (visto gravando a tela) em vez de
-  // completar em 300ms. Dois rAF empilhados garantem que o 1o frame
-  // (estado inicial) foi de fato renderizado antes do 2o frame
-  // (que dispara a transicao) -- tecnica padrao pra esse problema.
+  // double rAF -- garante que o navegador pintou o estado "sem
+  // transicao, fora da tela" antes de aplicar a transicao no mesmo
+  // tick (um reflow so as vezes nao basta em mobile).
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
       frenteEl.style.transition = trasEl.style.transition = 'transform ' + TEMA_ARENA_DURACAO_SLIDE + 'ms ease';
@@ -1501,26 +1413,18 @@ function mudarTemaArena(direcao){
     trasEl.style.transition = trasEl.style.transform = '';
     _arenaBgEmTransicao = false;
   };
-  // transitionend e o sinal correto de "acabou de verdade"; o
-  // setTimeout e so rede de seguranca (com folga pros 2 rAF do inicio)
-  // caso o evento nao dispare por algum motivo. Qualquer um dos dois
-  // que disparar primeiro CANCELA o outro (removeEventListener +
-  // clearTimeout) -- sem isso, um transitionend "atrasado" de uma
-  // troca antiga poderia disparar no meio de uma troca mais nova
-  // reaproveitando o mesmo elemento, resetando o estilo dela por baixo.
   trasEl.addEventListener('transitionend', limparTransicao, { once:true });
   timeoutLimpeza = setTimeout(limparTransicao, TEMA_ARENA_DURACAO_SLIDE + 150);
 
   _arenaBgFrente = trasId;
   renderTemaArenaDots();
-  mostrarToastTemaArena(novoTema);
 }
 window.mudarTemaArena = mudarTemaArena;
 
-// gesto de arrastar na propria arena pra trocar de tema (esquerda =
-// proximo, direita = anterior). Threshold de 40px e exige que o
-// arrasto seja mais horizontal que vertical, pra nao disparar durante
-// scroll vertical da pagina por cima da arena.
+// gesto de arrastar na propria arena pra trocar de tema. dx > 0
+// (arrastou pra DIREITA) = proximo tema; dx < 0 (ESQUERDA) = anterior.
+// Threshold de 40px e exige que o arrasto seja mais horizontal que
+// vertical, pra nao disparar durante scroll vertical da pagina.
 (function(){
   const arena = document.querySelector('.arena');
   if (!arena) return;
@@ -1535,8 +1439,6 @@ window.mudarTemaArena = mudarTemaArena;
     const t = e.changedTouches[0];
     const dx = t.clientX - sx, dy = t.clientY - sy;
     if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.5){
-      // dx > 0 = arrastou pra DIREITA -> proximo tema (+1).
-      // dx < 0 = arrastou pra ESQUERDA -> tema anterior (-1).
       mudarTemaArena(dx < 0 ? -1 : 1);
     }
   }, { passive:true });
@@ -2531,7 +2433,6 @@ try {
 desenharHeroi();
 renderTemaArena();
 precarregarTemasArena();
-mostrarDicaSwipeArenaSeNecessario();
 render();
 </script>
 

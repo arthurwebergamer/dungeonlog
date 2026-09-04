@@ -187,18 +187,10 @@
     </button>
   </div>
 
-  <div class="tema-arena-switch">
-    <button class="tema-arena-seta-grande" onclick="mudarTemaArena(1)" aria-label="Próximo tema">
-      <svg viewBox="0 0 40 14" width="40" height="14"><polygon points="20,0 40,14 0,14" fill="currentColor"/></svg>
-    </button>
-    <div class="tema-arena-nome-viewport">
-      <span id="temaArenaNome">Padrão</span>
-    </div>
-  </div>
-
   <div class="arena">
     <div class="tocha-arena tocha-esq"></div>
     <div class="tocha-arena tocha-dir"></div>
+    <div class="tema-arena-toast" id="temaArenaToast"></div>
     <div class="fight">
       <div class="fighter">
         <span id="nomeTopo">Aventureiro</span>
@@ -1306,47 +1298,55 @@ function mudarTemaArena(direcao){
     if (temaArenaDesbloqueado(TEMAS_ARENA[idx])) break;
   }
   definirTemaArenaSalvo(TEMAS_ARENA[idx].id);
-  renderTemaArena(true);
+  renderTemaArena();
+  mostrarToastTemaArena(TEMAS_ARENA[idx]);
 }
 window.mudarTemaArena = mudarTemaArena;
 
-// animar=true: nome atual desliza pra cima e some, so entao troca o
-// fundo/texto, e o novo nome entra deslizando de baixo -- timing preso
-// na duracao real das keyframes (.18s) via 'animationend', nao um
-// setTimeout solto (evita dessincronia se o navegador atrasar o frame).
-function renderTemaArena(animar){
+// mostra o nome do tema por cima da arena por ~1.2s e some sozinho --
+// so serve de feedback pro swipe (ver IIFE de gesto logo abaixo), a UI
+// nao tem mais nenhum elemento fixo ocupando espaco na tela principal.
+function mostrarToastTemaArena(tema){
+  const el = document.getElementById('temaArenaToast');
+  if (!el) return;
+  const emIngles = typeof idiomaApp === 'function' && idiomaApp() === 'en';
+  el.textContent = emIngles ? tema.nome_en : tema.nome;
+  el.classList.remove('tema-arena-toast-mostrar');
+  void el.offsetWidth; // forca reflow -- reinicia a animacao se o usuario trocar rapido de novo
+  el.classList.add('tema-arena-toast-mostrar');
+}
+
+function renderTemaArena(){
   const arena = document.querySelector('.arena');
   if (!arena) return;
   const tema = temaArenaAtual();
-  const emIngles = typeof idiomaApp === 'function' && idiomaApp() === 'en';
-  const nomeTexto = emIngles ? tema.nome_en : tema.nome;
-  const nomeEl = document.getElementById('temaArenaNome');
-
-  const aplicar = () => {
-    TEMAS_ARENA.forEach(t => arena.classList.remove('tema-' + t.id));
-    if (tema.id !== 'padrao') arena.classList.add('tema-' + tema.id);
-    if (nomeEl){
-      nomeEl.textContent = nomeTexto;
-      if (animar){
-        nomeEl.classList.add('tema-arena-entra');
-        nomeEl.addEventListener('animationend', () => {
-          nomeEl.classList.remove('tema-arena-entra');
-        }, { once:true });
-      }
-    }
-  };
-
-  if (animar && nomeEl){
-    nomeEl.classList.add('tema-arena-sai');
-    nomeEl.addEventListener('animationend', () => {
-      nomeEl.classList.remove('tema-arena-sai');
-      aplicar();
-    }, { once:true });
-  } else {
-    aplicar();
-  }
+  TEMAS_ARENA.forEach(t => arena.classList.remove('tema-' + t.id));
+  if (tema.id !== 'padrao') arena.classList.add('tema-' + tema.id);
 }
 window.renderTemaArena = renderTemaArena;
+
+// gesto de arrastar na propria arena pra trocar de tema (esquerda =
+// proximo, direita = anterior). Threshold de 40px e exige que o
+// arrasto seja mais horizontal que vertical, pra nao disparar durante
+// scroll vertical da pagina por cima da arena.
+(function(){
+  const arena = document.querySelector('.arena');
+  if (!arena) return;
+  let sx = 0, sy = 0, tocando = false;
+  arena.addEventListener('touchstart', e => {
+    if (e.touches.length !== 1) return;
+    sx = e.touches[0].clientX; sy = e.touches[0].clientY; tocando = true;
+  }, { passive:true });
+  arena.addEventListener('touchend', e => {
+    if (!tocando) return;
+    tocando = false;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - sx, dy = t.clientY - sy;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.5){
+      mudarTemaArena(dx < 0 ? 1 : -1);
+    }
+  }, { passive:true });
+})();
 
 // ---------- salvamento ----------
 // (_uidAtivo, chaveSaveAtual(), chaveConta(), definirUidAtivo() foram

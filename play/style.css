@@ -3395,38 +3395,26 @@
 }
 
 /* ======================================================================
-   SELETOR DE TEMA DE ARENA (seta grande + nome deslizante, TESTE) --
-   controla TEMAS_ARENA (assets.js) via mudarTemaArena()/renderTemaArena()
-   no script principal. Nome anima via .tema-arena-sai/.tema-arena-entra,
-   adicionadas/removidas em JS sincronizado com 'animationend'. */
-.tema-arena-switch{
-  display:flex; flex-direction:column; align-items:center; gap:0;
-  margin:0 0 6px;
-}
-.tema-arena-seta-grande{
-  background:none; border:none; color:#8A93A0; line-height:0; opacity:.7;
-  cursor:pointer; padding:6px 18px 4px; display:flex;
-}
-.tema-arena-seta-grande:active{ opacity:.4; transform:translateY(-1px); }
-
-.tema-arena-nome-viewport{
-  overflow:hidden; height:15px; width:100px;
-  display:flex; align-items:center; justify-content:center;
-}
-#temaArenaNome{
-  display:block;
+   TOAST DE TEMA DE ARENA (TESTE) -- feedback do gesto de swipe na
+   propria .arena (ver IIFE de touchstart/touchend no script principal).
+   Aparece por cima, centralizado, e some sozinho via animacao CSS;
+   classe reaplicada em JS com reflow forcado pra permitir retrigger
+   rapido se o usuario trocar de tema varias vezes seguidas. */
+.tema-arena-toast{
+  position:absolute; top:8px; left:50%; transform:translateX(-50%);
+  background:rgba(0,0,0,.55); color:#fff;
   font-family:'Outfit',sans-serif; font-size:11px; font-weight:600;
-  color:var(--muted);
+  padding:4px 12px; border-radius:20px;
+  opacity:0; pointer-events:none; z-index:2; white-space:nowrap;
 }
-#temaArenaNome.tema-arena-sai{ animation:temaArenaSai .18s ease-in forwards; }
-#temaArenaNome.tema-arena-entra{ animation:temaArenaEntra .18s ease-out forwards; }
-@keyframes temaArenaSai{
-  from{ transform:translateY(0);    opacity:1; }
-  to{   transform:translateY(-100%); opacity:0; }
+.tema-arena-toast.tema-arena-toast-mostrar{
+  animation:temaArenaToast 1.2s ease-out forwards;
 }
-@keyframes temaArenaEntra{
-  from{ transform:translateY(100%); opacity:0; }
-  to{   transform:translateY(0);    opacity:1; }
+@keyframes temaArenaToast{
+  0%{   opacity:0; transform:translateX(-50%) translateY(-4px); }
+  15%{  opacity:1; transform:translateX(-50%) translateY(0); }
+  75%{  opacity:1; }
+  100%{ opacity:0; }
 }
 
 /* ======================================================================

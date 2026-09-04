@@ -1421,26 +1421,96 @@ function mudarTemaArena(direcao){
 }
 window.mudarTemaArena = mudarTemaArena;
 
-// gesto de arrastar na propria arena pra trocar de tema. dx > 0
-// (arrastou pra DIREITA) = proximo tema; dx < 0 (ESQUERDA) = anterior.
-// Threshold de 40px e exige que o arrasto seja mais horizontal que
-// vertical, pra nao disparar durante scroll vertical da pagina.
+// gesto de arrastar na propria arena pra trocar de tema, seguindo o
+// dedo em TEMPO REAL (igual carrossel de foto de verdade) -- sem isso,
+// decidir a direcao so no touchend (versao anterior) criava a sensacao
+// de "clico e volta pro anterior" que o usuario reportou: sem feedback
+// visual durante o proprio arrasto, a pessoa nao tem como saber pra
+// onde o gesto vai resultar ate soltar o dedo.
+// Convencao (igual galeria de fotos/carrossel padrao): arrastar pra
+// DIREITA revela o tema ANTERIOR (conteudo se move JUNTO com o dedo);
+// arrastar pra ESQUERDA revela o PROXIMO.
 (function(){
   const arena = document.querySelector('.arena');
   if (!arena) return;
-  let sx = 0, sy = 0, tocando = false;
+
+  let sx = 0, sy = 0, rastreando = false, decidiu = false, cancelado = false;
+  let frenteEl = null, trasEl = null, direcaoAtual = 0, idxAlvo = 0, larguraArena = 1;
+
   arena.addEventListener('touchstart', e => {
-    if (e.touches.length !== 1) return;
-    sx = e.touches[0].clientX; sy = e.touches[0].clientY; tocando = true;
+    if (e.touches.length !== 1 || _arenaBgEmTransicao) return;
+    sx = e.touches[0].clientX; sy = e.touches[0].clientY;
+    rastreando = true; decidiu = false; cancelado = false;
+    larguraArena = arena.getBoundingClientRect().width || 1;
   }, { passive:true });
-  arena.addEventListener('touchend', e => {
-    if (!tocando) return;
-    tocando = false;
-    const t = e.changedTouches[0];
-    const dx = t.clientX - sx, dy = t.clientY - sy;
-    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.5){
-      mudarTemaArena(dx < 0 ? -1 : 1);
+
+  arena.addEventListener('touchmove', e => {
+    if (!rastreando || cancelado || e.touches.length !== 1) return;
+    const dx = e.touches[0].clientX - sx, dy = e.touches[0].clientY - sy;
+
+    if (!decidiu){
+      if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return; // ainda indeciso
+      if (Math.abs(dy) > Math.abs(dx)){ cancelado = true; return; } // e scroll vertical, desiste
+      decidiu = true;
+      direcaoAtual = dx > 0 ? -1 : 1;
+
+      const idxAtual = TEMAS_ARENA.findIndex(t => t.id === temaArenaAtual().id);
+      let idx = idxAtual;
+      for (let i = 0; i < TEMAS_ARENA.length; i++){
+        idx = (idx + direcaoAtual + TEMAS_ARENA.length) % TEMAS_ARENA.length;
+        if (temaArenaDesbloqueado(TEMAS_ARENA[idx])) break;
+      }
+      idxAlvo = idx;
+
+      frenteEl = document.getElementById('arenaBg' + _arenaBgFrente);
+      const trasId = _arenaBgFrente === 'A' ? 'B' : 'A';
+      trasEl = document.getElementById('arenaBg' + trasId);
+      aplicarFundoTemaArena(trasEl, TEMAS_ARENA[idxAlvo]);
+      frenteEl.style.transition = trasEl.style.transition = 'none';
+      trasEl.style.transform = 'translateX(' + (direcaoAtual > 0 ? '100%' : '-100%') + ')';
     }
+
+    // move os dois JUNTO com o dedo -- WYSIWYG, sem ambiguidade de direcao
+    const deslocamento = Math.max(-larguraArena, Math.min(larguraArena, dx));
+    frenteEl.style.transform = 'translateX(' + deslocamento + 'px)';
+    trasEl.style.transform = 'translateX(' + (deslocamento + (direcaoAtual > 0 ? larguraArena : -larguraArena)) + 'px)';
+  }, { passive:true });
+
+  arena.addEventListener('touchend', e => {
+    if (!rastreando) return;
+    rastreando = false;
+    if (!decidiu || cancelado) return; // tap, ou virou scroll -- nada a desfazer
+
+    const dx = e.changedTouches[0].clientX - sx;
+    const passouLimite = Math.abs(dx) > larguraArena * 0.28;
+
+    frenteEl.style.transition = trasEl.style.transition = 'transform ' + TEMA_ARENA_DURACAO_SLIDE + 'ms ease';
+
+    if (passouLimite){
+      // completa a troca de verdade
+      definirTemaArenaSalvo(TEMAS_ARENA[idxAlvo].id);
+      _arenaBgEmTransicao = true;
+      frenteEl.style.transform = 'translateX(' + (direcaoAtual > 0 ? '-100%' : '100%') + ')';
+      trasEl.style.transform = 'translateX(0)';
+      _arenaBgFrente = (_arenaBgFrente === 'A' ? 'B' : 'A');
+      renderTemaArenaDots();
+    } else {
+      // nao arrastou o suficiente -- "mola" de volta pro tema atual
+      frenteEl.style.transform = 'translateX(0)';
+      trasEl.style.transform = 'translateX(' + (direcaoAtual > 0 ? '100%' : '-100%') + ')';
+    }
+
+    const elF = frenteEl, elT = trasEl;
+    let timeoutLimpeza;
+    const limpar = () => {
+      elT.removeEventListener('transitionend', limpar);
+      clearTimeout(timeoutLimpeza);
+      elF.style.transition = elF.style.transform = '';
+      elT.style.transition = elT.style.transform = '';
+      _arenaBgEmTransicao = false;
+    };
+    elT.addEventListener('transitionend', limpar, { once:true });
+    timeoutLimpeza = setTimeout(limpar, TEMA_ARENA_DURACAO_SLIDE + 150);
   }, { passive:true });
 })();
 

@@ -1409,8 +1409,16 @@ function mudarTemaArena(direcao){
   const limparTransicao = () => {
     trasEl.removeEventListener('transitionend', limparTransicao);
     clearTimeout(timeoutLimpeza);
-    frenteEl.style.transition = frenteEl.style.transform = '';
-    trasEl.style.transition = trasEl.style.transform = '';
+    // NAO limpar o transform pra '' -- isso reseta a camada perdedora
+    // pra translateX(0), sobrepondo EXATAMENTE a camada vencedora (as
+    // duas sao position:absolute;inset:0 na mesma pilha). Como tem
+    // z-index igual, a que vem depois no HTML (arenaBgB) sempre pinta
+    // por cima -- entao dependendo de qual layer "perdeu" a rodada, o
+    // tema ANTIGO aparecia de volta por cima do novo pouco depois da
+    // troca terminar. So a transition precisa ser limpa (a posicao
+    // final de cada uma ja foi setada explicitamente acima).
+    frenteEl.style.transition = '';
+    trasEl.style.transition = '';
     _arenaBgEmTransicao = false;
   };
   trasEl.addEventListener('transitionend', limparTransicao, { once:true });
@@ -1505,8 +1513,14 @@ window.mudarTemaArena = mudarTemaArena;
     const limpar = () => {
       elT.removeEventListener('transitionend', limpar);
       clearTimeout(timeoutLimpeza);
-      elF.style.transition = elF.style.transform = '';
-      elT.style.transition = elT.style.transform = '';
+      // NAO limpar o transform pra '' -- ver comentario identico em
+      // mudarTemaArena() acima. Isso e o que causava o tema completar
+      // a troca certinho e, pouco depois, "voltar" sozinho: a camada
+      // perdedora resetava pra translateX(0), caindo EXATAMENTE em
+      // cima da vencedora, e a que vem depois no HTML sempre pinta
+      // por cima (mesmo z-index). So a transition precisa ser limpa.
+      elF.style.transition = '';
+      elT.style.transition = '';
       _arenaBgEmTransicao = false;
     };
     elT.addEventListener('transitionend', limpar, { once:true });

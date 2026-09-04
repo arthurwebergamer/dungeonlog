@@ -1460,17 +1460,40 @@ function mudarTemaArena(direcao){
   aplicarFundoTemaArena(trasEl, novoTema);
   trasEl.style.transition = 'none';
   trasEl.style.transform = 'translateX(' + (direcao > 0 ? '100%' : '-100%') + ')';
-  trasEl.getBoundingClientRect(); // forca reflow -- mesma linha do deslizar() do carrossel
 
-  frenteEl.style.transition = trasEl.style.transition = 'transform ' + TEMA_ARENA_DURACAO_SLIDE + 'ms ease';
-  frenteEl.style.transform = 'translateX(' + (direcao > 0 ? '-100%' : '100%') + ')';
-  trasEl.style.transform = 'translateX(0)';
+  // double rAF -- um reflow so (getBoundingClientRect) as vezes NAO
+  // basta pra garantir que o navegador realmente pintou o estado
+  // "sem transicao, fora da tela" antes de aplicar a transicao no
+  // mesmo tick. Em mobile isso causava a troca travar exatamente na
+  // metade por varios frames (visto gravando a tela) em vez de
+  // completar em 300ms. Dois rAF empilhados garantem que o 1o frame
+  // (estado inicial) foi de fato renderizado antes do 2o frame
+  // (que dispara a transicao) -- tecnica padrao pra esse problema.
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      frenteEl.style.transition = trasEl.style.transition = 'transform ' + TEMA_ARENA_DURACAO_SLIDE + 'ms ease';
+      frenteEl.style.transform = 'translateX(' + (direcao > 0 ? '-100%' : '100%') + ')';
+      trasEl.style.transform = 'translateX(0)';
+    });
+  });
 
-  setTimeout(() => {
+  let timeoutLimpeza;
+  const limparTransicao = () => {
+    trasEl.removeEventListener('transitionend', limparTransicao);
+    clearTimeout(timeoutLimpeza);
     frenteEl.style.transition = frenteEl.style.transform = '';
     trasEl.style.transition = trasEl.style.transform = '';
     _arenaBgEmTransicao = false;
-  }, TEMA_ARENA_DURACAO_SLIDE);
+  };
+  // transitionend e o sinal correto de "acabou de verdade"; o
+  // setTimeout e so rede de seguranca (com folga pros 2 rAF do inicio)
+  // caso o evento nao dispare por algum motivo. Qualquer um dos dois
+  // que disparar primeiro CANCELA o outro (removeEventListener +
+  // clearTimeout) -- sem isso, um transitionend "atrasado" de uma
+  // troca antiga poderia disparar no meio de uma troca mais nova
+  // reaproveitando o mesmo elemento, resetando o estilo dela por baixo.
+  trasEl.addEventListener('transitionend', limparTransicao, { once:true });
+  timeoutLimpeza = setTimeout(limparTransicao, TEMA_ARENA_DURACAO_SLIDE + 150);
 
   _arenaBgFrente = trasId;
   renderTemaArenaDots();

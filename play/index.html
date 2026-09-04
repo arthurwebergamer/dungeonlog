@@ -1380,7 +1380,12 @@ window.renderTemaArena = renderTemaArena;
 // arena fica visivel de verdade pro usuario.
 function mostrarDicaSwipeArenaSeNecessario(){
   try {
-    if (localStorage.getItem('questlog.arenaSwipeDicaVista.v1') === '1') return;
+    // .v2 -- versoes anteriores desse recurso marcavam essa flag como
+    // "vista" enquanto a dica tocava escondida atras do #intro (bug ja
+    // corrigido acima), entao aparelhos que testaram builds antigas tem
+    // a chave .v1 poluida e nunca mais veriam a dica. Chave nova = todo
+    // mundo comeca limpo.
+    if (localStorage.getItem('questlog.arenaSwipeDicaVista.v2') === '1') return;
   } catch(e){}
   let tentativas = 0;
   const esperar = setInterval(() => {
@@ -1394,10 +1399,18 @@ function mostrarDicaSwipeArenaSeNecessario(){
       const el = document.getElementById('arenaBg' + _arenaBgFrente);
       if (!el) return;
       el.classList.add('arena-swipe-dica');
-      el.addEventListener('animationend', () => {
-        el.classList.remove('arena-swipe-dica');
-      }, { once:true });
-      try { localStorage.setItem('questlog.arenaSwipeDicaVista.v1', '1'); } catch(e){}
+      // 'animationend' e o caminho normal de limpeza, mas se um swipe
+      // de verdade interromper a animacao (troca o transform inline no
+      // meio do 1.1s da dica), o evento pode nao disparar e a classe
+      // fica GRUDADA no elemento -- daí a proxima troca de tema real
+      // brigaria com essa animacao residual pela propriedade transform
+      // (foi exatamente isso que causou o arrasto manual bugado).
+      // setTimeout como rede de seguranca, sempre limpa depois de 1.2s
+      // independente do que aconteceu com o evento.
+      const limpar = () => el.classList.remove('arena-swipe-dica');
+      el.addEventListener('animationend', limpar, { once:true });
+      setTimeout(limpar, 1200);
+      try { localStorage.setItem('questlog.arenaSwipeDicaVista.v2', '1'); } catch(e){}
     }, 500);
   }, 300);
 }
@@ -1435,6 +1448,12 @@ function mudarTemaArena(direcao){
   const trasId = _arenaBgFrente === 'A' ? 'B' : 'A';
   const trasEl = document.getElementById('arenaBg' + trasId);
   if (!frenteEl || !trasEl) return;
+
+  // remove qualquer residuo da animacao de dica (arena-swipe-dica) --
+  // se ela ainda estiver rodando/grudada num dos dois, ela brigaria com
+  // o transform que estamos prestes a animar abaixo.
+  frenteEl.classList.remove('arena-swipe-dica');
+  trasEl.classList.remove('arena-swipe-dica');
 
   _arenaBgEmTransicao = true;
 

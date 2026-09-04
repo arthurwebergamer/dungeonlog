@@ -1363,6 +1363,48 @@ function precarregarTemasArena(){
   });
 }
 
+// dica de que a arena e arrastavel: na primeira vez que o app abre (e
+// so essa vez -- flag em localStorage, preferencia de APARELHO, igual
+// tema de cor/idioma/sfx, nao de conta), a camada da frente "espia"
+// pro lado sozinha e volta.
+//
+// A .arena existe no DOM e JA TEM largura>0 desde o boot -- quem
+// esconde ela e o #intro (splash/login/carrossel), que e um overlay
+// position:fixed;z-index:80 por CIMA de tudo. A condicao certa e
+// esperar #intro ganhar a classe 'off' (ver regra .intro.off no
+// style.css) -- so ai a arena fica visivel de verdade pro usuario.
+//
+// .v3 -- essa dica ja tentou funcionar 2x antes e falhou por dois
+// motivos DIFERENTES (ambos corrigidos agora): 1) disparava escondida
+// atras do #intro e marcava a flag sem ninguem ver; 2) a classe as
+// vezes ficava grudada e brigava com o transform do arrasto real
+// (causa raiz de "a troca completa e depois volta sozinha", so
+// corrigida quando parei de limpar o transform pra '' no cleanup).
+// Chave nova pra quem testou as versoes anteriores comecar limpo.
+function mostrarDicaSwipeArenaSeNecessario(){
+  try {
+    if (localStorage.getItem('questlog.arenaSwipeDicaVista.v3') === '1') return;
+  } catch(e){}
+  let tentativas = 0;
+  const esperar = setInterval(() => {
+    tentativas++;
+    const intro = document.getElementById('intro');
+    const dispensado = !intro || intro.classList.contains('off');
+    if (!dispensado && tentativas < 200) return; // continua esperando (~60s de teto)
+    clearInterval(esperar);
+    if (!dispensado) return; // desistiu nessa sessao -- flag NAO e marcada, tenta de novo na proxima
+    setTimeout(() => {
+      const el = document.getElementById('arenaBg' + _arenaBgFrente);
+      if (!el || _arenaBgEmTransicao) return;
+      el.classList.add('arena-swipe-dica');
+      const limpar = () => el.classList.remove('arena-swipe-dica');
+      el.addEventListener('animationend', limpar, { once:true });
+      setTimeout(limpar, 1200); // rede de seguranca, caso animationend nao dispare
+      try { localStorage.setItem('questlog.arenaSwipeDicaVista.v3', '1'); } catch(e){}
+    }, 500);
+  }, 300);
+}
+
 // troca de tema com deslize tipo carrossel. 300ms, mesma duracao do
 // carrossel de marketing (deslizar(), DURACAO_SLIDE).
 const TEMA_ARENA_DURACAO_SLIDE = 300;
@@ -1450,6 +1492,10 @@ window.mudarTemaArena = mudarTemaArena;
     sx = e.touches[0].clientX; sy = e.touches[0].clientY;
     rastreando = true; decidiu = false; cancelado = false;
     larguraArena = arena.getBoundingClientRect().width || 1;
+    // se a dica automatica ainda estiver rodando/grudada, remove --
+    // ela brigaria com o transform que o arrasto real vai controlar.
+    document.getElementById('arenaBgA')?.classList.remove('arena-swipe-dica');
+    document.getElementById('arenaBgB')?.classList.remove('arena-swipe-dica');
   }, { passive:true });
 
   arena.addEventListener('touchmove', e => {
@@ -2517,6 +2563,7 @@ try {
 desenharHeroi();
 renderTemaArena();
 precarregarTemasArena();
+mostrarDicaSwipeArenaSeNecessario();
 render();
 </script>
 

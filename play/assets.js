@@ -185,3 +185,14 @@ const ITENS = [
   [133, "Escudo do Guardiao", "escudo", 4, 80, 0, 30, 0, false, "Guardian's Shield"],
   [134, "Orbe Proibido", "acess", 4, 160, 22, 35, 0, false, "Forbidden Orb"]
 ];
+
+// ===== TEMAS_ARENA -- decoracao cosmetica de fundo da Arena =====
+// TESTE, pra alternar via setinha e comparar opcoes -- nao e decisao
+// final de quais temas existem/quais sao pagos (ver roadmap: Sistema
+// de Temas de Arena). Arte de cada tema fica em classes CSS
+// (.arena.tema-X), aplicadas por renderTemaArena() no script principal.
+const TEMAS_ARENA = [
+  { id:"padrao",   nome:"Padrão",   nome_en:"Default", gratuito:true },
+  { id:"floresta", nome:"Floresta", nome_en:"Jungle",  gratuito:true },
+  { id:"gelo",     nome:"Gelo",     nome_en:"Ice",      gratuito:true }
+];

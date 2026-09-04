@@ -187,6 +187,12 @@
     </button>
   </div>
 
+  <div class="tema-arena-switch">
+    <button class="tema-arena-seta" onclick="mudarTemaArena(-1)" aria-label="Tema anterior">‹</button>
+    <span id="temaArenaNome">Padrão</span>
+    <button class="tema-arena-seta" onclick="mudarTemaArena(1)" aria-label="Próximo tema">›</button>
+  </div>
+
   <div class="arena">
     <div class="tocha-arena tocha-esq"></div>
     <div class="tocha-arena tocha-dir"></div>
@@ -1266,6 +1272,55 @@ function desenharMonstro(){
   document.getElementById('mobname').textContent = m.nome;
 }
 
+// ---------- TEMA DE ARENA (TESTE -- catalogo em TEMAS_ARENA, assets.js).
+// Arte de cada tema fica em classes CSS (.arena.tema-X); aqui so troca
+// a classe e persiste a escolha. Persistencia por CONTA (chaveConta()),
+// nao por aparelho -- ver comentario em CHAVE_TEMA_ARENA. ----------
+const CHAVE_TEMA_ARENA = 'questlog.temaArena.v1';
+
+function assinaturaAtiva(){
+  try { if (localStorage.getItem('questlog.modoDebug.v1') === '1') return true; } catch(e){}
+  return false;
+}
+function temaArenaDesbloqueado(t){
+  return !!t.gratuito || assinaturaAtiva();
+}
+function temaArenaSalvo(){
+  try { return localStorage.getItem(window.chaveConta(CHAVE_TEMA_ARENA)) || TEMAS_ARENA[0].id; }
+  catch(e){ return TEMAS_ARENA[0].id; }
+}
+function definirTemaArenaSalvo(id){
+  try { localStorage.setItem(window.chaveConta(CHAVE_TEMA_ARENA), id); } catch(e){}
+}
+function temaArenaAtual(){
+  return TEMAS_ARENA.find(t => t.id === temaArenaSalvo()) || TEMAS_ARENA[0];
+}
+function mudarTemaArena(direcao){
+  const idxAtual = TEMAS_ARENA.findIndex(t => t.id === temaArenaAtual().id);
+  let idx = idxAtual;
+  for (let i = 0; i < TEMAS_ARENA.length; i++){
+    idx = (idx + direcao + TEMAS_ARENA.length) % TEMAS_ARENA.length;
+    if (temaArenaDesbloqueado(TEMAS_ARENA[idx])) break;
+  }
+  definirTemaArenaSalvo(TEMAS_ARENA[idx].id);
+  renderTemaArena();
+}
+window.mudarTemaArena = mudarTemaArena;
+
+function renderTemaArena(){
+  const arena = document.querySelector('.arena');
+  if (!arena) return;
+  const tema = temaArenaAtual();
+  TEMAS_ARENA.forEach(t => arena.classList.remove('tema-' + t.id));
+  if (tema.id !== 'padrao') arena.classList.add('tema-' + tema.id);
+  const nomeEl = document.getElementById('temaArenaNome');
+  if (nomeEl){
+    const emIngles = typeof idiomaApp === 'function' && idiomaApp() === 'en';
+    nomeEl.textContent = emIngles ? tema.nome_en : tema.nome;
+  }
+}
+window.renderTemaArena = renderTemaArena;
+
 // ---------- salvamento ----------
 // (_uidAtivo, chaveSaveAtual(), chaveConta(), definirUidAtivo() foram
 // movidos pro topo do arquivo -- ver logo apos a abertura deste mesmo
@@ -2253,6 +2308,7 @@ try {
   }
 } catch(e){}
 desenharHeroi();
+renderTemaArena();
 render();
 </script>
 
@@ -9236,6 +9292,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           'questlog.itensVistos.v1',
           'questlog.loja.v1',
           'questlog.tarefasConcluidas.v1',
+          'questlog.temaArena.v1',
           'questlog.tituloEquipado.v1',
           'questlog.vida.v1'
         ].forEach(chaveBase => {

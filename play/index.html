@@ -1381,6 +1381,22 @@ function precarregarTemasArena(){
 // (causa raiz de "a troca completa e depois volta sozinha", so
 // corrigida quando parei de limpar o transform pra '' no cleanup).
 // Chave nova pra quem testou as versoes anteriores comecar limpo.
+// true enquanto o dialogo de tutorial do personagem (aba Tarefas, ver
+// "MODULO DIALOGO POR TELA" mais abaixo) ainda pode aparecer por cima
+// da arena -- ou porque esta mostrando agora (.dlgOverlay.on), ou
+// porque o elemento nem foi criado ainda mas tambem nunca foi visto
+// antes (entao ainda vai aparecer quando agendarDialogoTela('tarefas')
+// rodar, alguns ms depois do #intro sumir).
+function tutorialTarefasPendente(){
+  const overlay = document.querySelector('.dlgOverlay');
+  if (overlay) return overlay.classList.contains('on');
+  try {
+    const vistas = JSON.parse(localStorage.getItem('questlog.tutorialTelas.v2') || '{}');
+    if (vistas && vistas.tarefas) return false; // ja visto em sessao anterior, nao vai aparecer
+  } catch(e){}
+  return true; // elemento ainda nao existe e nunca foi visto -- assume que ainda vai aparecer
+}
+
 function mostrarDicaSwipeArenaSeNecessario(){
   try {
     if (localStorage.getItem('questlog.arenaSwipeDicaVista.v3') === '1') return;
@@ -1389,7 +1405,8 @@ function mostrarDicaSwipeArenaSeNecessario(){
   const esperar = setInterval(() => {
     tentativas++;
     const intro = document.getElementById('intro');
-    const dispensado = !intro || intro.classList.contains('off');
+    const introFoi = !intro || intro.classList.contains('off');
+    const dispensado = introFoi && !tutorialTarefasPendente();
     if (!dispensado && tentativas < 200) return; // continua esperando (~60s de teto)
     clearInterval(esperar);
     if (!dispensado) return; // desistiu nessa sessao -- flag NAO e marcada, tenta de novo na proxima

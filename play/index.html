@@ -1364,6 +1364,26 @@ function renderTemaArena(){
 }
 window.renderTemaArena = renderTemaArena;
 
+// dica de que a arena e arrastavel: na primeira vez que o app abre (e
+// so essa vez -- flag em localStorage, preferencia de APARELHO, igual
+// tema de cor/idioma/sfx, nao de conta), a camada da frente "espia"
+// pro lado sozinha e volta. Ensina o gesto sem precisar de texto/seta
+// fixa ocupando espaco na tela.
+function mostrarDicaSwipeArenaSeNecessario(){
+  try {
+    if (localStorage.getItem('questlog.arenaSwipeDicaVista.v1') === '1') return;
+  } catch(e){}
+  const el = document.getElementById('arenaBg' + _arenaBgFrente);
+  if (!el) return;
+  setTimeout(() => {
+    el.classList.add('arena-swipe-dica');
+    el.addEventListener('animationend', () => {
+      el.classList.remove('arena-swipe-dica');
+    }, { once:true });
+    try { localStorage.setItem('questlog.arenaSwipeDicaVista.v1', '1'); } catch(e){}
+  }, 700);
+}
+
 // troca de tema COM deslize tipo carrossel: a camada de tras recebe o
 // fundo novo, comeca posicionada fora da tela (lado que a direcao
 // indica), e as duas camadas animam ao mesmo tempo -- a da frente sai,
@@ -2412,6 +2432,7 @@ try {
 } catch(e){}
 desenharHeroi();
 renderTemaArena();
+mostrarDicaSwipeArenaSeNecessario();
 render();
 </script>
 

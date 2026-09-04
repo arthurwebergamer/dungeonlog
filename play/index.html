@@ -1364,6 +1364,22 @@ function renderTemaArena(){
 }
 window.renderTemaArena = renderTemaArena;
 
+// pre-carrega (decodifica) a arte de TODOS os temas assim que o app
+// abre, mesmo os que o usuario ainda nao selecionou. Sem isso, a
+// PRIMEIRA vez que um tema novo e usado como fundo, o navegador precisa
+// decodificar aquele PNG (a Floresta sozinha e 112KB) bem na hora que a
+// transicao deveria estar rodando -- esse trabalho de decode competindo
+// com a transicao CSS e o que mais provavelmente causava a troca travar
+// no meio (visto gravando a tela). new Image() forca o decode e joga no
+// cache do navegador ANTES de precisarmos do resultado.
+function precarregarTemasArena(){
+  TEMAS_ARENA.forEach(tema => {
+    if (!tema.arte) return;
+    const img = new Image();
+    img.src = 'data:image/png;base64,' + tema.arte;
+  });
+}
+
 // dica de que a arena e arrastavel: na primeira vez que o app abre (e
 // so essa vez -- flag em localStorage, preferencia de APARELHO, igual
 // tema de cor/idioma/sfx, nao de conta), a camada da frente "espia"
@@ -2512,6 +2528,7 @@ try {
 } catch(e){}
 desenharHeroi();
 renderTemaArena();
+precarregarTemasArena();
 mostrarDicaSwipeArenaSeNecessario();
 render();
 </script>

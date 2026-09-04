@@ -3418,12 +3418,16 @@
 }
 
 /* ======================================================================
-   FIX DE STACKING: .fight (herói/monstro) nao tem position definido na
-   regra original (so display:flex), entao por padrao pinta ATRAS de
-   qualquer descendente posicionado com z-index -- incluindo as novas
-   .arena-bg-layer abaixo. Sem isso os personagens ficariam escondidos
-   atras do fundo. Aditivo, nao mexe na regra original (~linha 38). */
-.fight{ position:relative; z-index:1; }
+   FIX DE STACKING: .fight, .vitoria e .mobinfo (herói/monstro, banner
+   "dia vencido", nome+vida do monstro) sao os 3 filhos diretos de
+   .arena com CONTEUDO visivel, e nenhum tem position definido nas
+   regras originais -- por padrao todos pintam ATRAS de qualquer
+   descendente posicionado com z-index, incluindo as novas
+   .arena-bg-layer. Sem isso ficam escondidos atras do fundo (foi
+   exatamente o que aconteceu com .mobinfo -- nome do monstro sumiu --
+   eu tinha corrigido so .fight antes e esquecido dos outros dois).
+   Aditivo, nao mexe nas regras originais (~linhas 38, 90, 96). */
+.fight, .vitoria, .mobinfo{ position:relative; z-index:1; }
 
 /* ======================================================================
    CAMADAS DE FUNDO DA ARENA (carrossel deslizante, TESTE) -- duas divs

@@ -188,9 +188,12 @@
   </div>
 
   <div class="arena">
+    <div class="arena-bg-layer" id="arenaBgA"></div>
+    <div class="arena-bg-layer" id="arenaBgB"></div>
     <div class="tocha-arena tocha-esq"></div>
     <div class="tocha-arena tocha-dir"></div>
     <div class="tema-arena-toast" id="temaArenaToast"></div>
+    <div class="tema-arena-dots" id="temaArenaDots"></div>
     <div class="fight">
       <div class="fighter">
         <span id="nomeTopo">Aventureiro</span>
@@ -1290,22 +1293,33 @@ function definirTemaArenaSalvo(id){
 function temaArenaAtual(){
   return TEMAS_ARENA.find(t => t.id === temaArenaSalvo()) || TEMAS_ARENA[0];
 }
-function mudarTemaArena(direcao){
-  const idxAtual = TEMAS_ARENA.findIndex(t => t.id === temaArenaAtual().id);
-  let idx = idxAtual;
-  for (let i = 0; i < TEMAS_ARENA.length; i++){
-    idx = (idx + direcao + TEMAS_ARENA.length) % TEMAS_ARENA.length;
-    if (temaArenaDesbloqueado(TEMAS_ARENA[idx])) break;
+// monta o valor de background (imagem/tamanho/posicao/repeticao) do
+// tema num elemento de camada -- tile de tijolo ORIGINAL sempre por
+// baixo (mesmo de sempre), arte do tema (se houver) por cima em 40%
+// de opacidade ja pre-aplicada no proprio PNG.
+function aplicarFundoTemaArena(el, tema){
+  const tile = 'url("data:image/png;base64,' + TEMA_ARENA_TILE_B64 + '")';
+  const grad = 'linear-gradient(180deg,var(--arena-1) 0%,var(--arena-2) 55%,var(--arena-3) 100%)';
+  if (tema.arte){
+    el.style.backgroundImage = 'url("data:image/png;base64,' + tema.arte + '"), ' + tile + ', ' + grad;
+    el.style.backgroundSize = 'cover, 130px 41px, auto';
+    el.style.backgroundPosition = (tema.posicaoArte || 'center') + ', 0 0, 0 0';
+    el.style.backgroundRepeat = 'no-repeat, repeat, no-repeat';
+  } else {
+    el.style.backgroundImage = tile + ', ' + grad;
+    el.style.backgroundSize = '130px 41px, auto';
+    el.style.backgroundPosition = '0 0, 0 0';
+    el.style.backgroundRepeat = 'repeat, no-repeat';
   }
-  definirTemaArenaSalvo(TEMAS_ARENA[idx].id);
-  renderTemaArena();
-  mostrarToastTemaArena(TEMAS_ARENA[idx]);
 }
-window.mudarTemaArena = mudarTemaArena;
+
+// qual das duas camadas (#arenaBgA/#arenaBgB) esta visivel agora
+// (translateX(0)) -- a outra fica esperando fora da tela, pronta pra
+// ser a proxima a entrar.
+let _arenaBgFrente = 'A';
 
 // mostra o nome do tema por cima da arena por ~1.2s e some sozinho --
-// so serve de feedback pro swipe (ver IIFE de gesto logo abaixo), a UI
-// nao tem mais nenhum elemento fixo ocupando espaco na tela principal.
+// feedback do swipe (ver IIFE de gesto logo abaixo).
 function mostrarToastTemaArena(tema){
   const el = document.getElementById('temaArenaToast');
   if (!el) return;
@@ -1316,14 +1330,76 @@ function mostrarToastTemaArena(tema){
   el.classList.add('tema-arena-toast-mostrar');
 }
 
+// bolinhas indicando quantos temas existem e qual esta selecionado --
+// tambem serve de indicio visual de que a arena e "navegavel" (padrao
+// de carrossel bem conhecido), sem precisar de seta/texto fixo.
+function renderTemaArenaDots(){
+  const el = document.getElementById('temaArenaDots');
+  if (!el) return;
+  const atualId = temaArenaAtual().id;
+  el.innerHTML = TEMAS_ARENA
+    .filter(t => temaArenaDesbloqueado(t))
+    .map(t => '<span class="tema-arena-dot' + (t.id === atualId ? ' tema-arena-dot-atual' : '') + '"></span>')
+    .join('');
+}
+
+// chamada no boot: so posiciona a camada da frente com o tema salvo,
+// sem nenhuma animacao (nao faz sentido a arena "deslizar" ao abrir o
+// app pela primeira vez).
 function renderTemaArena(){
-  const arena = document.querySelector('.arena');
-  if (!arena) return;
+  const elA = document.getElementById('arenaBgA');
+  const elB = document.getElementById('arenaBgB');
+  if (!elA || !elB) return;
   const tema = temaArenaAtual();
-  TEMAS_ARENA.forEach(t => arena.classList.remove('tema-' + t.id));
-  if (tema.id !== 'padrao') arena.classList.add('tema-' + tema.id);
+  aplicarFundoTemaArena(elA, tema);
+  aplicarFundoTemaArena(elB, tema);
+  [elA, elB].forEach(el => {
+    el.style.transition = 'none';
+    el.style.transform = 'translateX(0)';
+  });
+  void elA.offsetWidth;
+  [elA, elB].forEach(el => { el.style.transition = ''; });
+  _arenaBgFrente = 'A';
+  renderTemaArenaDots();
 }
 window.renderTemaArena = renderTemaArena;
+
+// troca de tema COM deslize tipo carrossel: a camada de tras recebe o
+// fundo novo, comeca posicionada fora da tela (lado que a direcao
+// indica), e as duas camadas animam ao mesmo tempo -- a da frente sai,
+// a de tras entra. Depois do fim da transicao os papeis se invertem
+// pra proxima troca.
+function mudarTemaArena(direcao){
+  const idxAtual = TEMAS_ARENA.findIndex(t => t.id === temaArenaAtual().id);
+  let idx = idxAtual;
+  for (let i = 0; i < TEMAS_ARENA.length; i++){
+    idx = (idx + direcao + TEMAS_ARENA.length) % TEMAS_ARENA.length;
+    if (temaArenaDesbloqueado(TEMAS_ARENA[idx])) break;
+  }
+  const novoTema = TEMAS_ARENA[idx];
+  definirTemaArenaSalvo(novoTema.id);
+
+  const frenteEl = document.getElementById('arenaBg' + _arenaBgFrente);
+  const trasId = _arenaBgFrente === 'A' ? 'B' : 'A';
+  const trasEl = document.getElementById('arenaBg' + trasId);
+  if (!frenteEl || !trasEl) return;
+
+  aplicarFundoTemaArena(trasEl, novoTema);
+  trasEl.style.transition = 'none';
+  trasEl.style.transform = 'translateX(' + (direcao > 0 ? '100%' : '-100%') + ')';
+  void trasEl.offsetWidth;
+  trasEl.style.transition = '';
+
+  requestAnimationFrame(() => {
+    frenteEl.style.transform = 'translateX(' + (direcao > 0 ? '-100%' : '100%') + ')';
+    trasEl.style.transform = 'translateX(0)';
+  });
+
+  _arenaBgFrente = trasId;
+  renderTemaArenaDots();
+  mostrarToastTemaArena(novoTema);
+}
+window.mudarTemaArena = mudarTemaArena;
 
 // gesto de arrastar na propria arena pra trocar de tema (esquerda =
 // proximo, direita = anterior). Threshold de 40px e exige que o

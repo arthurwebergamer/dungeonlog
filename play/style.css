@@ -3298,6 +3298,14 @@
   animation: bauSurge .5s cubic-bezier(.34,1.56,.64,1) both,
              bauPulso 1.4s ease-in-out .5s infinite;
 }
+/* pedido do usuario: clicar no bau especial trancado sem ter chave
+   disponivel para de incomodar com o pulso continuo (ver
+   abrirBauEspecial() -- branch chaveId==null). Volta a pulsar sozinho
+   se uma chave ficar disponivel depois (ver atualizarBauArena()).
+   Selector composto (3 classes) de proposito, pra ganhar de
+   .bauArena.mostrar (2 classes) na especificidade sem depender da
+   ordem no arquivo. */
+.bauArena.mostrar.bau-pausado{ animation:none; }
 /* precisa ser mais especifica que .bauArena.mostrar (2 classes) pra vencer
    a cascata de verdade -- antes as duas regras tinham a mesma especificidade
    e a que vinha depois no arquivo ganhava, entao o pulso nao parava */
@@ -3348,3 +3356,96 @@
   .largok{width:100%;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;
           padding:11px;border-radius:11px;border:none;background:var(--accent);
           color:var(--bg);cursor:pointer}
+
+/* ======================================================================
+   TOCHAS DECORATIVAS DA ARENA -- puramente cosmetico, independe do
+   sistema de Temas de Arena (ainda pausado/nao implementado, ver
+   roadmap). Sprite: pack "DampDungeons" (Animations/Dungeon_ObjectsDungeon.png),
+   licenca permite uso comercial e edicao. Tocha de pe (chama + bacia +
+   tripe), 3 frames de flicker reempacotados em tira horizontal 48x32
+   (16x32 cada frame). Mesma tecnica de animacao por spritesheet ja
+   usada em fx-sprite-slash (background-position + steps(N)), so
+   trocando o asset e o timing.
+   Pedido do usuario: tocha pequena e alta na parede (nao ancorada no
+   chao) -- ajustar left/right/top/scale abaixo se quiser recalibrar. */
+.tocha-arena{
+  position:absolute;
+  top:4px;
+  width:16px;
+  height:32px;
+  background-size:48px 32px;
+  image-rendering:pixelated;
+  transform:scale(1.7);
+  animation:tochaChama .6s steps(3) infinite;
+  pointer-events:none;
+  z-index:1;
+}
+/* duas spritesheets separadas (esq/dir ja espelhada no proprio PNG) em
+   vez de scaleX(-1) via transform -- o transform so age DEPOIS do
+   layout, entao "right:Npx" + scaleX(-1) + transform-origin:top right
+   espelha a caixa PRA FORA da ancora, nao pra dentro (bug encontrado
+   testando no aparelho: tocha direita vazava a borda da arena em
+   +13.6px). Espelhar a imagem em si elimina o problema de vez. */
+.tocha-arena.tocha-esq{
+  left:4px;
+  transform-origin:top left;
+  background-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAgCAYAAABU1PscAAACoklEQVR4nO2WTUgbQRiG34RekkAPEcRDNLDKgudCWqHBgiLdICXQU2jEUoQYvJZcwx56kXrooWAgh0oqgZ5yCEZKPQQLSYVSCj2FJJKfgwiRUqiewvQQZtnZnf3Ryq6HvBA2O7vP9843s/PNAGONNdZYd1b7KyJxuw9W8lq98D9J3NYAmMUxTeDF54YnHA/dqCNOzR43AVHwEfqbWb1U2uwGpe/KzR4T6zr8/opI6NXM38ODU3IGU4UiztYSmCoUEY6H0Cn1ITd7aLSvdIyWz85NK/fheAjz0joAYGFp0xZP/ami+SCONy64/l4zmF7pLKTkjOlMiIKP1I52ITd7inGn1Mdh6g2SiSJqR7u2+Fx2G9F8UBkAAPj4R+D6e9VwSs4gl91WzNUBwvEQvrz/ZpgENV9Y2mS4aD6IcDyE5P22aRJansaYWb3E8cYFAHD9TRdxNB9URv86ys5NM5zdGB++thVey+U+/QYAvHwsMAyTgPpht+xHYJhGYJhGt+y33QlqruXpjJrJyD+aD6Jb9jNJchMARt+53OyhU+orbfPSOpaf/MTy1kPdCGh1tpYAAEPeSik5o+MDwzReva2Z+4uCjyS3npPB6R7ZKWSJuvyJgo/sFLJkcLpHpEdPuSXRLd6jDhCRYgCAd6+fcZNMJkZVqXVe1ZUzt3jDIDwNvv/lmrvJM2ug0b7ynFQObmTuFs/diQFgdnJRaWudVxkTow64weuqEM+ABrMyd4O/ZxRo4kGAuW9VrKzd4bk7sfZbPKkc2Bo9N3jD47SdNiM5yesSoIc69SICRt+hnU44zeuO0xEphh/1X9zgESlmeRx2mtdtZPT/7OSicnahR2z1s0r90LAEO8kzVYhdKFUyUQ8wEBXP3C3+WpuKkfFd5cdyQv8A0LgoFtXx0DYAAAAASUVORK5CYII=");
+}
+.tocha-arena.tocha-dir{
+  right:4px;
+  transform-origin:top right;
+  background-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAgCAYAAABU1PscAAACuUlEQVR4nO2WP2gaURzHv4YsKnSwEDL4By5yU5dSSA1EUkgIMTi4ShVCCZjQoZvrcUMX6VpQcGhJgtBJisRSkkFSsAmELoWCqOCfQYSGUqhO4TrY38Pz3p2XNHgZ7gvi3Xu/z+/fvXf3AFu2bNmyZaCjTVExmp+7LXhXCfwvq1vAXeo2RRxtikog5sXzzzWHkR23AFFwKuREFJwK/ZsNLgpOhX5yvaPyaZYHAH90oPLFs9VUJwpORQr6EM57cLZ7xcZ7yThyUga15tCwI6LgVKqnWQDAj/J7tIpdNifXO6Z4KehDIOZFq9hFLxnH4kFBN/7cJJyS0zj8LQAAAjEvACCc9yAnZVA9zRp2kpJPxAv4lHqNVrGLcN7DkjfDp+Q0gFH3AWDxoMD+U3Jaw89NwidvzwEAZ7tX8EcHrAgAWFnf001iPPnEgyYCMS9LnnxM4yk+2Y83EAByUkZThOoJ7KyOOp/78IuNUSekoA8A8O5Lk9M7rYija+JvIn90wJLXk6oASq5dciGc98B9vQ/39T7aJRezoSKNFM570C65NLzZIvzRAZfnxZ8fv6HJF1IG1UiWjdNGpPVppI2XT7HxbLRfJvleMm7IUnweL9c73PiqAhLxAg4LcUBOY2V9T2WYktPYWRXw6s1H3QSs4NkrSRScytLCGgCMnHBE8EX5WPM6s4rnOnn4xM11oBfcSl61iWvNoaPRr+Dn5Z8bB7eK536J6ZoeKQA0+hUWRC8BK3jNWYgMxuHJOSPNmp/XWP3T5DpslKeFtobnnkZrzaHjonzM7qetXSt5w+P0tDE9zZLXFDD+PiYtLaxxT4J6wWfJa47Ty5FtruNvX79jObI99Tg8a55t4khoS2n0Kxhfe49DjwAAJ5fnqnGerOJVGyMS2mLVNfoVUDfMbkIreO4gOTL78blvvK1Z6i8q7hIvKJXHLAAAAABJRU5ErkJggg==");
+}
+
+@keyframes tochaChama{
+  from{ background-position-x:0; }
+  to{ background-position-x:-48px; }
+}
+
+/* ======================================================================
+   FIX DE STACKING: .fight, .vitoria e .mobinfo (herói/monstro, banner
+   "dia vencido", nome+vida do monstro) sao os 3 filhos diretos de
+   .arena com CONTEUDO visivel, e nenhum tem position definido nas
+   regras originais -- por padrao todos pintam ATRAS de qualquer
+   descendente posicionado com z-index, incluindo as novas
+   .arena-bg-layer. Sem isso ficam escondidos atras do fundo (foi
+   exatamente o que aconteceu com .mobinfo -- nome do monstro sumiu --
+   eu tinha corrigido so .fight antes e esquecido dos outros dois).
+   Aditivo, nao mexe nas regras originais (~linhas 38, 90, 96). */
+.fight, .vitoria, .mobinfo{ position:relative; z-index:1; }
+
+/* ======================================================================
+   CAMADAS DE FUNDO DA ARENA (carrossel deslizante, TESTE) -- duas divs
+   full-cover, cada uma recebe o fundo de um tema via JS
+   (aplicarFundoTemaArena) e anima com transform:translateX, tecnica
+   classica de carrossel (uma sai enquanto a outra entra). z-index:0 pra
+   ficar atras de tocha/fight/toast/dots. .arena precisa continuar com
+   overflow:hidden (ja tem, regra padrao) pra cortar o que sai da tela. */
+.arena-bg-layer{
+  position:absolute; inset:0; z-index:0;
+  background-repeat:no-repeat; image-rendering:pixelated;
+  transition:transform .28s ease;
+}
+/* icone de cadeado pros temas pagos ainda nao desbloqueados -- o
+   escurecimento (silhueta) e feito via JS como camada extra de
+   background (ver aplicarFundoTemaArena), NAO via CSS filter aqui,
+   porque filter no elemento tambem escureceria este ::after junto. */
+.arena-bg-layer.bloqueado::after{
+  content:'🔒';
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:26px;
+  text-shadow:0 2px 8px rgba(0,0,0,.7);
+}
+
+/* bolinhas indicando quantos temas existem e qual esta selecionado --
+   tambem sinaliza que a arena e "navegavel" (padrao de carrossel). */
+.tema-arena-dots{
+  position:absolute; bottom:5px; left:50%; transform:translateX(-50%);
+  display:flex; gap:5px; z-index:2; pointer-events:none;
+}
+.tema-arena-dot{
+  width:5px; height:5px; border-radius:50%;
+  background:rgba(255,255,255,.35);
+}
+.tema-arena-dot-atual{ background:rgba(255,255,255,.9); }

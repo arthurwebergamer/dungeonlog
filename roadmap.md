@@ -8789,3 +8789,52 @@ listado), é preciso liberar escrita explícita pras coleções "waitlist" e
 travar o resto do banco.
 
 Link do TikTok (@dungeonlog) linkado no rodapé da página.
+
+## [Sessão] Sistema de Temas de Arena — implementação completa (torch + backgrounds + entitlement + swipe)
+
+### Contexto
+Sessão longa que evoluiu do pedido inicial de tocha decorativa até o sistema completo de temas de fundo da Arena, com desbloqueio gratuito por streak e temas pagos. Múltiplas idas e vindas de debug — registrado com atenção especial aos bugs encontrados, porque a causa raiz de vários problemas reportados como "coisas diferentes" acabou sendo a mesma.
+
+### Entregue e funcionando
+- **Tocha decorativa da Arena**: sprite animado (3 frames) do pack DampDungeons (`Animations/Dungeon_ObjectsDungeon.png`), sempre visível em todos os temas, independente do sistema de temas.
+- **Catálogo `TEMAS_ARENA`** (`assets.js`), ordem final: **Padrão → Deserto → Floresta → Gelo**.
+  - Padrão: grátis, sem arte (só tile de tijolo + gradiente do tema de cor).
+  - Deserto: grátis, mas **bloqueado até desbloquear** (ver gatilho abaixo).
+  - Floresta / Gelo: pagos (via `assinaturaAtiva()`, ainda stub).
+  - Arte de cada tema: camadas do pack "Free" (parallax Jungle/Mountain/Desert), achatadas e aplicadas com ~40% de opacidade por cima do tile de tijolo original — dá pra ver a "masmorra" por trás de qualquer cenário.
+- **Arrasto ao vivo (live-drag)**: o fundo segue o dedo em tempo real durante o gesto (como carrossel de foto de verdade), com "mola" de volta se soltar antes de ~16% da largura da arena. Direção: arrastar pra DIREITA revela o tema ANTERIOR, ESQUERDA revela o PRÓXIMO (convenção padrão de carrossel/galeria).
+- **Bolinhas de posição** (`#temaArenaDots`) mostrando todos os 4 temas (inclusive bloqueados) e qual está selecionado.
+- **Temas bloqueados aparecem como prévia**: silhueta escura (overlay preto ~82% via camada extra de `background-image`, não `filter` — motivo: filter também escureceria o ícone) + 🔒 centralizado. Alcançáveis arrastando, mesmo sem estar desbloqueados.
+- **Entitlement**:
+  - `assinaturaAtiva()` — stub, `false` a menos que `.modo-debug` ligado. Play Billing real fica pra depois.
+  - `temaArenaDesbloqueado(t)` — `true` se `gratuito`, ou assinatura ativa, ou já desbloqueado via `desbloqueioGratis`.
+  - `temasDesbloqueadosSalvos()` / `marcarTemaDesbloqueado()` — persistência por CONTA (`questlog.temasDesbloqueados.v1`, já no array de migração), desbloqueio é permanente (não tranca de novo se a streak quebrar).
+- **Gatilho do Deserto**: streak de **5 dias seguidos** vencidos (`melhorSequência >= 5`), reaproveitando a MESMA fórmula de cálculo do módulo Conquistas (`melhorSequenciaDeVitorias`, duplicada como `_melhorSequenciaParaTemaArena()` porque a original não é exposta em `window`).
+- **Checagem automática**: `verificarDesbloqueiosTemaArena()` roda a cada `render()` (mesmo padrão de wrap que o módulo Conquistas V2 já usa — `_renderX = window.render; window.render = function(){ _renderX(...); minhaChecagem(); }`), sem precisar interceptar cada ponto que grava no histórico.
+- **Notificação de desbloqueio**: reaproveita `notificarFlutuante()` (mesmo sistema de +XP/+moeda), ancorada na arena.
+- **Conquista "Pegando o Jeito" (5 dias) adicionada à lista curada** (`IDS_CURADOS_V2`, agora inclui `'sequencia:1'`) — antes só 1/15/60 dias apareciam pro jogador, criando descompasso entre o gatilho do tema e o que a tela de Conquistas mostrava.
+- **Dica de "dá pra arrastar"**: dispara pelo EVENTO de desbloqueio (não mais "1ª vez que o app abre"). Espera `#intro.off` E o diálogo de tutorial da aba Tarefas (`.dlgOverlay`) serem dispensados. Toca a arte do tema recém-desbloqueado entrando pela lateral (não um nudge na mesma imagem — fica invisível contra padrões repetitivos tipo o tijolo). **Fica em loop** (repete a cada 2.6s) até o usuário arrastar de verdade, momento em que `pararDicaSwipeArena()` cancela o loop e limpa a flag.
+- Arrasto só fica disponível com 2+ temas desbloqueados (com só o Padrão, não há pra onde ir).
+
+### Bugs sérios encontrados e corrigidos (documentado pra não repetir)
+1. **Project Knowledge desatualizada vs. GitHub**: o `index.html` do projeto estava com hash diferente do `dev` branch real. Todo trabalho de implementação nessa sessão passou a puxar direto do repo (via zip do `codeload.github.com` — `raw.githubusercontent.com` retorna 404 porque os arquivos ficam em `play/`, não na raiz).
+2. **Bug de stacking (z-index)**: `.fight`, `.vitoria` e `.mobinfo` não tinham `position` definido nas regras originais — as camadas novas de fundo (`.arena-bg-layer`, `z-index:0`) pintavam POR CIMA delas (regra do CSS: elemento posicionado com z-index pinta depois de bloco não-posicionado em fluxo normal). Sintoma: nome do monstro sumindo. Fix aditivo: `.fight, .vitoria, .mobinfo{ position:relative; z-index:1; }`.
+3. **Bug raiz do "a troca completa e depois volta sozinha"**: o cleanup pós-transição limpava `transform` da camada perdedora de volta pra `''` (vazio) — isso reseta ela pra `translateX(0)`, EXATAMENTE em cima da vencedora. Como as duas têm z-index igual, a que vem depois no HTML (`arenaBgB`) sempre pinta por cima quando sobrepostas. Fix: nunca limpar `transform` no cleanup, só `transition` — a posição final de repouso já foi setada explicitamente antes.
+4. **Direção do swipe invertida**: resolvido definitivamente trocando de "decide direção só no touchend" pra arrasto ao vivo (segue o dedo em tempo real) — eliminou a ambiguidade de vez, já que o usuário vê o resultado acontecendo durante o gesto.
+5. **Trava de concorrência** (`_arenaBgEmTransicao`): sem ela, arrastar de novo antes da transição anterior (300ms) terminar corrompia a animação em andamento.
+6. **Double rAF em vez de reflow único**: um único `getBoundingClientRect()` pra forçar reflow nem sempre bastava em mobile pra garantir que o estado inicial foi pintado antes da transição — trocado por dois `requestAnimationFrame` empilhados.
+7. **Pré-carregamento de imagens** (`precarregarTemasArena()`): evita que o decode de uma arte pesada (Floresta, 112KB) aconteça bem na hora que a transição deveria estar rodando suave.
+8. **Timing da dica automática**: o `#intro` (splash/login) é um overlay `position:fixed` por CIMA do app, não um `display:none` no `.app` — checar largura da arena não detecta isso (ela sempre teve largura). Fix: esperar `#intro.classList.contains('off')`. Depois descobriu-se um SEGUNDO diálogo (tutorial da aba Tarefas, `.dlgOverlay`) que também precisa ser esperado.
+9. **Dica só disparava 1x no boot**: um desbloqueio no MEIO da sessão (ex: debug "próximo dia" repetido) nunca disparava a dica até recarregar a página. Fix: chamar a função de mostrar a dica também de dentro de `verificarDesbloqueiosTemaArena()`, na hora que desbloqueia.
+
+### Assets usados
+- **DampDungeons** (tocha, licença comercial livre) — `Animations/Dungeon_ObjectsDungeon.png`.
+- **Pack "Free"** (parallax backgrounds, camadas Sky/Buildings/Mountains/etc., licença livre) — usado Jungle e Mountain (virou "Gelo"); Desert também usado. City_Clean/City_Dirty descartados (quebram a fantasia medieval).
+- Estalagmites de gelo desenhadas proceduralmente via PIL foram DESCARTADAS depois que a camada "Mountain" do pack Free se mostrou melhor (ficou registrado só como aprendizado: nem sempre vale a pena desenhar do zero se já tem asset melhor disponível).
+
+### Em aberto / próximos passos
+- **Testando neste exato momento**: por que a animação de dica não disparou numa sessão de teste após ajustar o gatilho pra 5 dias — suspeita forte é resíduo de teste anterior (Deserto já marcado como desbloqueado de um teste com o valor antigo), não bug novo. Rodar o diagnóstico via console antes de investigar mais fundo.
+- Fonte de asset pra tema "Fogo" ainda não decidida (nenhum pack disponível tem lava/brasa).
+- UI de seleção fora do gesto de swipe (ex: tela de Config/Aparência) — decidido NÃO fazer por enquanto, o swipe na própria arena resolve.
+- Play Billing real (Digital Goods API, Cloud Function de validação, RTDN) — segue fora de escopo, `assinaturaAtiva()` continua stub.
+- Firestore security rules ainda em modo de teste (item antigo, não mexido nesta sessão).

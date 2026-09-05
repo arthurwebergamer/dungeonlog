@@ -3298,6 +3298,14 @@
   animation: bauSurge .5s cubic-bezier(.34,1.56,.64,1) both,
              bauPulso 1.4s ease-in-out .5s infinite;
 }
+/* pedido do usuario: clicar no bau especial trancado sem ter chave
+   disponivel para de incomodar com o pulso continuo (ver
+   abrirBauEspecial() -- branch chaveId==null). Volta a pulsar sozinho
+   se uma chave ficar disponivel depois (ver atualizarBauArena()).
+   Selector composto (3 classes) de proposito, pra ganhar de
+   .bauArena.mostrar (2 classes) na especificidade sem depender da
+   ordem no arquivo. */
+.bauArena.mostrar.bau-pausado{ animation:none; }
 /* precisa ser mais especifica que .bauArena.mostrar (2 classes) pra vencer
    a cascata de verdade -- antes as duas regras tinham a mesma especificidade
    e a que vinha depois no arquivo ganhava, entao o pulso nao parava */

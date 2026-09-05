@@ -3421,6 +3421,22 @@ function atualizarBauArena(){
       // tier 0..3 = visual do sprite (mais raro/vistoso quanto maior o tier,
       // ver comentario no CSS -- .bauEspecial.tierN)
       for (let t = 0; t < 4; t++) elE.classList.toggle('tier' + t, estado.especial.tier === t);
+      // baus de dias diferentes sao entidades diferentes -- sem isso, uma
+      // pausa de ONTEM (bau-pausado) vazaria pro bau NOVO de hoje, que
+      // nunca foi clicado e devia pulsar normalmente.
+      const idChestHoje = isoAtual() + ':' + estado.especial.tier;
+      if (elE.dataset.chestId !== idChestHoje){
+        elE.dataset.chestId = idChestHoje;
+        elE.classList.remove('bau-pausado');
+      }
+      // volta a pulsar sozinho se o pulso tinha sido pausado (clique sem
+      // chave, ver abrirBauEspecial()) e agora ja existe chave valida --
+      // a situacao mudou, entao faz sentido chamar atencao de novo.
+      if (elE.classList.contains('bau-pausado') &&
+          !estado.especial.aberto &&
+          chaveParaDestravar(estado.especial.tier) != null){
+        elE.classList.remove('bau-pausado');
+      }
       if (!elE.dataset.montado){
         elE.innerHTML = '<div class="dica"></div>';
         elE.onclick = abrirBauEspecial;
@@ -3466,6 +3482,10 @@ function abrirBauEspecial(){
       clearTimeout(dica._t);
       dica._t = setTimeout(() => dica.classList.remove('on'), 1800);
     }
+    // pedido do usuario: ja que o jogador clicou e descobriu que precisa
+    // de chave, para de pulsar/chamar atencao -- volta a pulsar sozinho
+    // se uma chave ficar disponivel depois (ver atualizarBauArena()).
+    if (el) el.classList.add('bau-pausado');
     return;
   }
   tirarItem(chaveId, 1);

@@ -1324,7 +1324,16 @@ function desenharMonstro(){
 const CHAVE_TEMA_ARENA = 'questlog.temaArena.v1';
 
 function assinaturaAtiva(){
-  try { if (localStorage.getItem('questlog.modoDebug.v1') === '1') return true; } catch(e){}
+  // FIX: o alternador real de modo debug (clicar no icone das moedas,
+  // ver modulo perto do fim do arquivo) salva a STRING 'true', nao '1'
+  // -- essa funcao comparava com '1' por engano, entao nunca detectava
+  // o modo debug como ativo mesmo com ele ligado (debugbar visivel).
+  // window.modoDebugAtivo() ja existe e e a fonte da verdade -- usa ela
+  // direto se disponivel, com o mesmo fallback de string por baixo.
+  try {
+    if (typeof window.modoDebugAtivo === 'function') return window.modoDebugAtivo();
+    if (localStorage.getItem('questlog.modoDebug.v1') === 'true') return true;
+  } catch(e){}
   return false;
 }
 

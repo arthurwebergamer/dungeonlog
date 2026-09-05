@@ -8838,3 +8838,29 @@ Sessão longa que evoluiu do pedido inicial de tocha decorativa até o sistema c
 - UI de seleção fora do gesto de swipe (ex: tela de Config/Aparência) — decidido NÃO fazer por enquanto, o swipe na própria arena resolve.
 - Play Billing real (Digital Goods API, Cloud Function de validação, RTDN) — segue fora de escopo, `assinaturaAtiva()` continua stub.
 - Firestore security rules ainda em modo de teste (item antigo, não mexido nesta sessão).
+
+## [Sessão] Fix off-by-one no desbloqueio de tema + pausa do pulso do baú trancado
+
+### Contexto
+Continuação da sessão do Sistema de Temas de Arena. Usuário fez upload de uma versão nova no GitHub com correções de inventário/dias — confirmado que o código de Temas de Arena estava idêntico entre essa versão nova e a última entregue (só deslocado de linha), então virou a base de trabalho a partir daqui.
+
+### Bug corrigido: desbloqueio de tema acontecia 1 dia atrasado
+- **Sintoma**: gatilho configurado pra 5 dias seguidos, mas o desbloqueio do tema Deserto só acontecia no dia 6.
+- **Causa raiz**: `window.obterHistorico()` só grava o resultado de um dia na VIRADA — vencer hoje não aparece no histórico permanente até amanhã. O módulo Conquistas já tinha resolvido exatamente esse problema com o padrão `comHoje` em `montarContexto()` (anexa uma entrada sintética do dia atual, nunca persistida, se `monstroJaCaiu()`), mas `_melhorSequenciaParaTemaArena()` (a função duplicada pro sistema de Temas de Arena) não replicava esse padrão.
+- **Fix**: `_melhorSequenciaParaTemaArena()` agora também anexa a entrada sintética de hoje antes de calcular a sequência, igual ao módulo Conquistas.
+- **Confirmado por simulação**: histórico com 4 dias gravados + hoje vencido (mas ainda não virado) → sem o fix calculava streak=4, com o fix calcula streak=5 corretamente.
+
+### Nova feature: baú trancado para de pulsar ao clicar sem chave
+- Pedido do usuário, sem relação com o sistema de temas.
+- `.bauArena.bauEspecial` tem uma animação contínua de pulso (`bauPulso`, "toque aqui") enquanto não é aberto. Clicar nele sem ter uma chave compatível no inventário agora adiciona a classe `bau-pausado` (`animation:none`, especificidade de 3 classes pra garantir a sobreposição), parando o pulso — o jogador já sabe que precisa de chave, não faz sentido continuar chamando atenção.
+- **Retoma o pulso sozinho** em duas situações:
+  1. O jogador consegue uma chave compatível depois (`chaveParaDestravar(tier) != null` na próxima checagem de `atualizarBauArena()`).
+  2. Um baú NOVO aparece no dia seguinte (rastreado via `data-chest-id = isoAtual() + ':' + tier`) — evita a pausa de ontem vazar pro baú de hoje, que nunca foi clicado.
+
+### Arquivos afetados
+- `index.html`: `_melhorSequenciaParaTemaArena()` (fix do comHoje), `abrirBauEspecial()` (adiciona `bau-pausado` no clique sem chave), `atualizarBauArena()` (reset por dia/tier + retomada quando há chave).
+- `style.css`: regra `.bauArena.mostrar.bau-pausado{ animation:none; }`.
+- `assets.js`: sem mudanças nessa sessão.
+
+### Em aberto (sem mudança nesta sessão)
+- Mesmos itens já registrados na sessão anterior: fonte de asset pro tema "Fogo", Play Billing real, Firestore em modo de teste.

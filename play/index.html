@@ -7223,7 +7223,12 @@ window.mostrarNivelUp = function(nivel, aoFechar){
      so a CURADORIA (quais tiers entram) e a APRESENTACAO sao novas.
      ===================================================================== */
   const IDS_CURADOS_V2 = [
-    'sequencia:0', 'sequencia:2', 'sequencia:5',
+    // sequencia:1 (tier de 5 dias, "Pegando o Jeito") adicionado pra
+    // bater com o gatilho de desbloqueio gratis do tema de Arena
+    // Deserto (ver TEMAS_ARENA em assets.js) -- antes so 0/2/5 (1, 15,
+    // 60 dias) apareciam, entao o desbloqueio do tema acontecia sem
+    // nenhuma conquista combinando na tela.
+    'sequencia:0', 'sequencia:1', 'sequencia:2', 'sequencia:5',
     'monstros:0', 'monstros:2', 'monstros:6', 'monstros:9',
     'nivel:0', 'nivel:2', 'nivel:7',
     'tarefas:0', 'tarefas:2', 'tarefas:5',

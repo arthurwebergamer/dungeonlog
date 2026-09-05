@@ -988,6 +988,22 @@ function aplicarIdiomaDados(){
 aplicarIdiomaDados();
 window.aplicarIdiomaDados = aplicarIdiomaDados;
 
+// os botoes de dificuldade (composer de criar tarefa E editor) sao
+// construidos 1x so, no carregamento da pagina (ver as duas IIFEs que
+// fazem DIFS.forEach(...) mais abaixo no arquivo) -- trocar de idioma
+// DEPOIS disso (Config > Preferencias > Idioma) atualiza o resto da UI
+// dinamicamente, mas esses botoes ja construidos ficavam com o texto
+// "congelado" no idioma que estava ativo no boot. Atualiza so o
+// texto (nao reconstroi o botao inteiro), casando pelo data-dif.
+function atualizarTextosDificuldade(){
+  document.querySelectorAll('.dif[data-dif]').forEach(btn => {
+    const d = DIFS.find(x => x.id === btn.dataset.dif);
+    const span = btn.querySelector('.difnome');
+    if (d && span) span.textContent = d.nome;
+  });
+}
+window.atualizarTextosDificuldade = atualizarTextosDificuldade;
+
 function difDe(t){                                 // sempre devolve um id valido
   const id = t && t.dif;
   return DIFS.some(d => d.id === id) ? id : DIF_PADRAO;
@@ -1730,13 +1746,6 @@ window.mudarTemaArena = mudarTemaArena;
     // com so 1 tema nao ha pra onde ir, e deixar arrastar sem nada pra
     // mostrar so confunde quem esta comecando.
     if (TEMAS_ARENA.filter(temaArenaDesbloqueado).length < 2) return;
-    // usuario descobriu que da pra arrastar -- para o loop da dica
-    // automatica (ver pararDicaSwipeArena()), nao precisa mais repetir.
-    if (typeof pararDicaSwipeArena === 'function') pararDicaSwipeArena();
-    // mostra as bolinhas so enquanto o usuario esta de fato arrastando
-    // (ver clearTimeout/setTimeout no touchend, mais abaixo)
-    const dotsEl = document.getElementById('temaArenaDots');
-    if (dotsEl){ clearTimeout(dotsEl._timeoutEsconder); dotsEl.classList.add('visivel'); }
     sx = e.touches[0].clientX; sy = e.touches[0].clientY;
     rastreando = true; decidiu = false; cancelado = false;
     larguraArena = arena.getBoundingClientRect().width || 1;
@@ -1751,6 +1760,15 @@ window.mudarTemaArena = mudarTemaArena;
       if (Math.abs(dy) > Math.abs(dx)){ cancelado = true; return; } // e scroll vertical, desiste
       decidiu = true;
       direcaoAtual = dx > 0 ? -1 : 1;
+
+      // AQUI e onde o usuario de fato comprovou que esta arrastando
+      // (moveu mais horizontal que vertical, alem do limiar de 5px) --
+      // NAO no touchstart (um simples toque sem mover tambem disparava
+      // o touchstart, parando o loop da dica cedo demais, antes do
+      // usuario realmente descobrir o gesto).
+      if (typeof pararDicaSwipeArena === 'function') pararDicaSwipeArena();
+      const dotsEl = document.getElementById('temaArenaDots');
+      if (dotsEl){ clearTimeout(dotsEl._timeoutEsconder); dotsEl.classList.add('visivel'); }
 
       const idxAtual = TEMAS_ARENA.findIndex(t => t.id === temaArenaAtual().id);
       // NAO pula bloqueados -- alcancaveis como previa (silhueta+cadeado)
@@ -10809,6 +10827,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // renderConquistas definido ainda nesse ponto do arquivo).
     ['render','renderInventario','renderLoja','renderConquistasV2','renderBestiario','renderHistorico','renderGrimorio','desenharHeroi','renderTituloPerfil']
       .forEach(fn => { if (typeof window[fn] === 'function') window[fn](); });
+    if (typeof window.atualizarTextosDificuldade === 'function') window.atualizarTextosDificuldade();
     if (typeof window.pintarTemaGrid === 'function') window.pintarTemaGrid();
     if (typeof window.pintarIdiomaGrid === 'function') window.pintarIdiomaGrid();
 

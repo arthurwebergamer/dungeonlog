@@ -1346,6 +1346,26 @@ function verificarDesbloqueiosTemaArena(){
     }
     if (atingiu && marcarTemaDesbloqueado(t.id)){
       try { localStorage.setItem(window.chaveConta('questlog.temaArenaDicaPendente.v1'), t.id); } catch(e){}
+
+      // aviso visivel -- reaproveita o mesmo flutuante ja usado pra
+      // +XP/+moeda etc., ancorado na propria arena.
+      const emIngles = typeof idiomaApp === 'function' && idiomaApp() === 'en';
+      const arena = document.querySelector('.arena');
+      if (arena && typeof notificarFlutuante === 'function'){
+        notificarFlutuante(
+          arena,
+          emIngles ? 'New arena unlocked:' : 'Nova arena desbloqueada:',
+          emIngles ? t.nome_en : t.nome,
+          '#F2C94C'
+        );
+      }
+
+      // dispara a dica JA -- verificarDesbloqueiosTemaArena() roda a
+      // cada render() (frequente), mas mostrarDicaSwipeArenaSeNecessario()
+      // antes so era chamada 1x no boot. Um desbloqueio no MEIO da
+      // sessao (ex: debug "proximo dia" repetido) nunca disparava a
+      // dica ate a pagina recarregar -- chamar aqui corrige isso.
+      if (typeof mostrarDicaSwipeArenaSeNecessario === 'function') mostrarDicaSwipeArenaSeNecessario();
     }
   });
 }
@@ -1476,74 +1496,97 @@ function tutorialTarefasPendente(){
 }
 
 // dica de swipe disparada pelo DESBLOQUEIO de um tema (ver
-// verificarDesbloqueiosTemaArena()), nao mais "1a vez que o app abre".
-// A flag e o PROPRIO id do tema pendente de mostrar -- existe = tem
-// dica pra mostrar; foi removida = ja mostrou (nao precisa de uma
-// segunda flag "ja vista"). Espera os mesmos dois dialogos de sempre
-// (#intro, tutorial da aba Tarefas) antes de disparar.
+// verificarDesbloqueiosTemaArena()). A flag e o PROPRIO id do tema
+// pendente -- existe = tem dica pra mostrar; foi removida (ver
+// pararDicaSwipeArena()) = usuario ja descobriu, para de repetir.
+// Espera os mesmos dois dialogos de sempre (#intro, tutorial da aba
+// Tarefas) antes de comecar, DEPOIS fica repetindo em loop ate o
+// usuario arrastar de verdade -- 1 vez so passava despercebido
+// facilmente (animacao curta, usuario podia estar olhando outra
+// parte da tela naquele instante).
+let _arenaDicaLoopId = null;      // setInterval do loop de replay
+let _arenaDicaEsperandoId = null; // setInterval enquanto espera os dialogos
+
+// para o loop e limpa a flag pendente -- chamada quando o usuario
+// realmente arrasta (ver touchstart do gesto real, mais abaixo).
+function pararDicaSwipeArena(){
+  if (_arenaDicaLoopId){ clearInterval(_arenaDicaLoopId); _arenaDicaLoopId = null; }
+  if (_arenaDicaEsperandoId){ clearInterval(_arenaDicaEsperandoId); _arenaDicaEsperandoId = null; }
+  try { localStorage.removeItem(window.chaveConta('questlog.temaArenaDicaPendente.v1')); } catch(e){}
+}
+
+// 1 ciclo isolado da animacao de "espiada" revelando temaAlvo -- sem
+// mexer em flag/localStorage, so o efeito visual, reaproveitado pelo
+// loop abaixo.
+function tocarPeekTemaArena(temaAlvo){
+  if (_arenaBgEmTransicao) return;
+  const frenteEl = document.getElementById('arenaBg' + _arenaBgFrente);
+  const trasId = _arenaBgFrente === 'A' ? 'B' : 'A';
+  const trasEl = document.getElementById('arenaBg' + trasId);
+  if (!frenteEl || !trasEl) return;
+
+  aplicarFundoTemaArena(trasEl, temaAlvo);
+  _arenaBgEmTransicao = true; // mesma trava do arrasto real -- um toque comecando no meio da dica so vai ser ignorado ate ela acabar, em vez de brigar com o transform
+  // rede de seguranca: se a sequencia encadeada de timeouts abaixo for
+  // interrompida (ex: app vai pra segundo plano no meio), garante que
+  // a trava nunca fica presa em true pra sempre.
+  setTimeout(() => { _arenaBgEmTransicao = false; }, 3000);
+  frenteEl.style.transition = trasEl.style.transition = 'none';
+  frenteEl.style.transform = 'translateX(0)';
+  trasEl.style.transform = 'translateX(100%)';
+
+  // double rAF, mesma tecnica/motivo do arrasto real: garante que o
+  // navegador pintou o estado inicial antes de animar.
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      frenteEl.style.transition = trasEl.style.transition = 'transform .5s ease-in-out';
+      frenteEl.style.transform = 'translateX(-28px)';
+      trasEl.style.transform = 'translateX(calc(100% - 28px))';
+
+      setTimeout(() => {
+        frenteEl.style.transform = 'translateX(0)';
+        trasEl.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+          // NAO limpar transform pra '' -- mesma licao do bug
+          // principal (sobreporia as duas camadas). So a transition
+          // precisa ser limpa; a posicao final de repouso ja foi
+          // setada explicitamente acima.
+          frenteEl.style.transition = '';
+          trasEl.style.transition = '';
+          _arenaBgEmTransicao = false;
+        }, 520);
+      }, 550);
+    });
+  });
+}
+
 function mostrarDicaSwipeArenaSeNecessario(){
+  if (_arenaDicaLoopId || _arenaDicaEsperandoId) return; // ja esta rodando ou esperando -- nao duplica
+
   let idPendente;
   try { idPendente = localStorage.getItem(window.chaveConta('questlog.temaArenaDicaPendente.v1')); }
   catch(e){ idPendente = null; }
-  if (!idPendente) return; // nada foi desbloqueado ainda nessa conta, ou a dica ja foi mostrada
+  if (!idPendente) return; // nada pendente -- ou nunca desbloqueou nada, ou usuario ja descobriu o arrasto
 
   let tentativas = 0;
-  const esperar = setInterval(() => {
+  _arenaDicaEsperandoId = setInterval(() => {
     tentativas++;
     const intro = document.getElementById('intro');
     const introFoi = !intro || intro.classList.contains('off');
     const dispensado = introFoi && !tutorialTarefasPendente();
     if (!dispensado && tentativas < 200) return; // continua esperando (~60s de teto)
-    clearInterval(esperar);
+    clearInterval(_arenaDicaEsperandoId);
+    _arenaDicaEsperandoId = null;
     if (!dispensado) return; // desistiu nessa sessao -- flag pendente continua salva, tenta de novo na proxima
+
     setTimeout(() => {
-      if (_arenaBgEmTransicao) return;
       const temaAlvo = TEMAS_ARENA.find(t => t.id === idPendente);
       if (!temaAlvo){
         try { localStorage.removeItem(window.chaveConta('questlog.temaArenaDicaPendente.v1')); } catch(e){}
         return;
       }
-      const frenteEl = document.getElementById('arenaBg' + _arenaBgFrente);
-      const trasId = _arenaBgFrente === 'A' ? 'B' : 'A';
-      const trasEl = document.getElementById('arenaBg' + trasId);
-      if (!frenteEl || !trasEl) return;
-
-      aplicarFundoTemaArena(trasEl, temaAlvo);
-      _arenaBgEmTransicao = true; // mesma trava do arrasto real -- um toque comecando no meio da dica so vai ser ignorado ate ela acabar (~1.5s), em vez de brigar com o transform
-      // rede de seguranca final: se a sequencia encadeada de timeouts
-      // abaixo for interrompida por qualquer motivo (ex: app vai pra
-      // segundo plano no meio, navegador atrasa timers), isso garante
-      // que a trava nunca fica presa em true pra sempre.
-      setTimeout(() => { _arenaBgEmTransicao = false; }, 3000);
-      frenteEl.style.transition = trasEl.style.transition = 'none';
-      frenteEl.style.transform = 'translateX(0)';
-      trasEl.style.transform = 'translateX(100%)';
-
-      // double rAF, mesma tecnica/motivo do arrasto real: garante que
-      // o navegador pintou o estado inicial antes de animar.
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          frenteEl.style.transition = trasEl.style.transition = 'transform .5s ease-in-out';
-          frenteEl.style.transform = 'translateX(-28px)';
-          trasEl.style.transform = 'translateX(calc(100% - 28px))';
-
-          setTimeout(() => {
-            frenteEl.style.transform = 'translateX(0)';
-            trasEl.style.transform = 'translateX(100%)';
-            setTimeout(() => {
-              // NAO limpar transform pra '' -- mesma licao do bug
-              // principal (sobreporia as duas camadas). So a
-              // transition precisa ser limpa; a posicao final de
-              // repouso ja foi setada explicitamente acima.
-              frenteEl.style.transition = '';
-              trasEl.style.transition = '';
-              _arenaBgEmTransicao = false;
-            }, 520);
-          }, 550);
-        });
-      });
-
-      try { localStorage.removeItem(window.chaveConta('questlog.temaArenaDicaPendente.v1')); } catch(e){}
+      tocarPeekTemaArena(temaAlvo);
+      _arenaDicaLoopId = setInterval(() => tocarPeekTemaArena(temaAlvo), 2600);
     }, 500);
   }, 300);
 }
@@ -1635,6 +1678,9 @@ window.mudarTemaArena = mudarTemaArena;
     // com so 1 tema nao ha pra onde ir, e deixar arrastar sem nada pra
     // mostrar so confunde quem esta comecando.
     if (TEMAS_ARENA.filter(temaArenaDesbloqueado).length < 2) return;
+    // usuario descobriu que da pra arrastar -- para o loop da dica
+    // automatica (ver pararDicaSwipeArena()), nao precisa mais repetir.
+    if (typeof pararDicaSwipeArena === 'function') pararDicaSwipeArena();
     sx = e.touches[0].clientX; sy = e.touches[0].clientY;
     rastreando = true; decidiu = false; cancelado = false;
     larguraArena = arena.getBoundingClientRect().width || 1;

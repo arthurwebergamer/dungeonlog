@@ -1344,9 +1344,21 @@ function temaArenaDesbloqueado(t){
 // global) pra nao valer a pena abrir aquele modulo so pra exportar 1
 // funcao. Se um dia divergir, e sinal de que precisa virar utilitario
 // global de verdade.
+//
+// FIX (bug reportado: desbloqueio acontecia no dia 6, nao no dia 5):
+// window.obterHistorico() so grava o resultado de um dia na VIRADA --
+// vencer HOJE nao aparece ali ate amanha. Mesmo problema que o modulo
+// Conquistas ja tinha resolvido com o padrao "comHoje" em
+// montarContexto() (linha ~6818): anexa uma entrada SINTETICA de hoje
+// (nunca persistida, recalculada a cada chamada) se monstroJaCaiu(),
+// pra o desbloqueio contar o dia atual na hora, nao 1 dia atrasado.
 function _melhorSequenciaParaTemaArena(){
   if (typeof window.obterHistorico !== 'function' || typeof diffDias !== 'function') return 0;
-  const hist = window.obterHistorico();
+  let hist = window.obterHistorico();
+  if (typeof monstroJaCaiu === 'function' && monstroJaCaiu() &&
+      typeof isoAtual === 'function' && !hist.some(h => h.data === isoAtual())){
+    hist = hist.concat([{ data: isoAtual(), resultado: 'vitoria' }]);
+  }
   const ord = hist.slice().sort((a, b) => a.data < b.data ? -1 : (a.data > b.data ? 1 : 0));
   let atual = 0, melhor = 0, anterior = null;
   ord.forEach(h => {

@@ -1392,17 +1392,25 @@ function verificarDesbloqueiosTemaArena(){
       try { localStorage.setItem(window.chaveConta('questlog.temaArenaDicaPendente.v1'), t.id); } catch(e){}
 
       // aviso visivel -- reaproveita o mesmo flutuante ja usado pra
-      // +XP/+moeda etc., ancorado na propria arena.
+      // +XP/+moeda etc., ancorado na propria arena. Atrasado ~2.2s: o
+      // desbloqueio costuma coincidir com a virada do dia, que ja
+      // dispara +XP, possivel level up e a conquista "Pegando o Jeito"
+      // tudo de uma vez -- competir com esse monte de texto simultaneo
+      // (queixa do usuario: "nem da pra ler direito") deixando esse
+      // aviso pra depois, quando a poeira baixou, resolve sem precisar
+      // mexer nos outros sistemas de notificacao.
       const emIngles = typeof idiomaApp === 'function' && idiomaApp() === 'en';
-      const arena = document.querySelector('.arena');
-      if (arena && typeof notificarFlutuante === 'function'){
-        notificarFlutuante(
-          arena,
-          emIngles ? 'New arena unlocked:' : 'Nova arena desbloqueada:',
-          emIngles ? t.nome_en : t.nome,
-          '#F2C94C'
-        );
-      }
+      setTimeout(() => {
+        const arena = document.querySelector('.arena');
+        if (arena && typeof notificarFlutuante === 'function'){
+          notificarFlutuante(
+            arena,
+            emIngles ? 'New theme:' : 'Novo tema:',
+            emIngles ? t.nome_en : t.nome,
+            '#F2C94C'
+          );
+        }
+      }, 2200);
 
       // dispara a dica JA -- verificarDesbloqueiosTemaArena() roda a
       // cada render() (frequente), mas mostrarDicaSwipeArenaSeNecessario()
@@ -1725,6 +1733,10 @@ window.mudarTemaArena = mudarTemaArena;
     // usuario descobriu que da pra arrastar -- para o loop da dica
     // automatica (ver pararDicaSwipeArena()), nao precisa mais repetir.
     if (typeof pararDicaSwipeArena === 'function') pararDicaSwipeArena();
+    // mostra as bolinhas so enquanto o usuario esta de fato arrastando
+    // (ver clearTimeout/setTimeout no touchend, mais abaixo)
+    const dotsEl = document.getElementById('temaArenaDots');
+    if (dotsEl){ clearTimeout(dotsEl._timeoutEsconder); dotsEl.classList.add('visivel'); }
     sx = e.touches[0].clientX; sy = e.touches[0].clientY;
     rastreando = true; decidiu = false; cancelado = false;
     larguraArena = arena.getBoundingClientRect().width || 1;
@@ -1799,6 +1811,14 @@ window.mudarTemaArena = mudarTemaArena;
     };
     elT.addEventListener('transitionend', limpar, { once:true });
     timeoutLimpeza = setTimeout(limpar, TEMA_ARENA_DURACAO_SLIDE + 150);
+
+    // esconde as bolinhas de novo depois de um tempinho -- da pra ver
+    // a posicao final antes de sumir, em vez de cortar na hora.
+    const dotsEl = document.getElementById('temaArenaDots');
+    if (dotsEl){
+      clearTimeout(dotsEl._timeoutEsconder);
+      dotsEl._timeoutEsconder = setTimeout(() => dotsEl.classList.remove('visivel'), 900);
+    }
   }, { passive:true });
 })();
 

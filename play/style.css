@@ -3439,11 +3439,15 @@
 }
 
 /* bolinhas indicando quantos temas existem e qual esta selecionado --
-   tambem sinaliza que a arena e "navegavel" (padrao de carrossel). */
+   escondidas por padrao (opacity:0), so aparecem durante o arrasto
+   (classe .visivel, adicionada/removida em JS no touchstart/touchend
+   do gesto real) e so quando ha 2+ temas acessiveis pra navegar. */
 .tema-arena-dots{
   position:absolute; bottom:5px; left:50%; transform:translateX(-50%);
   display:flex; gap:5px; z-index:2; pointer-events:none;
+  opacity:0; transition:opacity .25s ease;
 }
+.tema-arena-dots.visivel{ opacity:1; }
 .tema-arena-dot{
   width:5px; height:5px; border-radius:50%;
   background:rgba(255,255,255,.35);

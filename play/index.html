@@ -2339,6 +2339,13 @@ function alternar(i){
   const subiuNivel = nivelDepois > nivelAntes;
 
   if (venceuAgora && !monstroJaCaiu()){
+    // numeroFlutuante() ANTES do atraso -- mesma posicao/timing de
+    // qualquer outra tarefa (ancorado no monstro, junto com a propria
+    // animacao de golpe). Antes, o golpe final pulava direto pro toast
+    // de "MONSTRO DERROTADO" (generico, nao ancorado, so mostrava
+    // moedas) sem nenhum numero aparecer perto do monstro -- unica
+    // tarefa do dia que nao dava esse feedback.
+    numeroFlutuante(xpGanho, moedasGanhas);
     // atraso proposital: animarGolpe() (chamada logo acima) leva 320ms
     // pra terminar (hero bate, monstro treme, os dois voltam ao
     // normal -- ver a funcao). dispararVitoriaDoDia() faz o proprio

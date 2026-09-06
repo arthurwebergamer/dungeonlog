@@ -1208,18 +1208,22 @@ function avaliarVitoriaDoDia(){
 // pra ser chamado tambem por verificarVitoriaAoExcluir() (vitoria por
 // exclusao da ultima pendente)
 function dispararVitoriaDoDia(doDia, nivelAntes){
-  // captura a posicao do monstro ANTES de render() (logo abaixo) trocar
+  // captura a posicao do monstro ANTES de render() (mais abaixo) trocar
   // a visual pro estado "derrotado" e escondê-lo -- se pedir isso DEPOIS
   // do render(), o sprite ja nao esta mais visivel/no lugar certo.
   if (typeof mostrarPoofMonstro === 'function') mostrarPoofMonstro();
 
-  // resto da funcao (render() pesado -- atualiza tarefas, XP, moedas,
-  // conquistas etc. -- + toasts) so roda DEPOIS de garantir 1 frame de
-  // pintura pro poof. Sem isso, o poof e criado e o proximo trabalho
-  // sincrono (render()) podia monopolizar o thread principal tempo
-  // suficiente pro navegador pular direto pro estado final sem nunca
-  // chegar a pintar a animacao no meio (poof "nao aparecia").
-  requestAnimationFrame(() => {
+  // resto da funcao (render() -- troca a visual pro estado "derrotado",
+  // mostrando o bau) so roda DEPOIS da nuvem de poof terminar de tocar
+  // (mesma duracao do CSS, 560ms -- ver .poof-monstro). Antes disso
+  // era so 1 frame (requestAnimationFrame) de espera: tempo suficiente
+  // pra garantir que o poof CHEGASSE a pintar, mas nao pra ele
+  // terminar -- bau e nuvem apareciam ao mesmo tempo, se sobrepondo
+  // (confirmado com zoom em video: a nuvem realmente tocava, so que
+  // por cima do bau que ja tinha aparecido junto, virando uma bagunca
+  // visual em vez de uma sequencia -- monstro morre, nuvem, so ENTAO
+  // bau).
+  setTimeout(() => {
     derrotadoEm = isoAtual();
     const ganho = recompensaVitoria(doDia.length);
     moedas += ganho;
@@ -1235,7 +1239,7 @@ function dispararVitoriaDoDia(doDia, nivelAntes){
         }
       }, 700);
     }
-  });
+  }, 560);
 }
 
 // nuvem de "poof" (4 frames, pixel art, gerada proceduralmente -- sem

@@ -1257,12 +1257,30 @@ function mostrarPoofMonstro(){
   const originX = mobRect.left - arenaRect.left + mobRect.width / 2;
   const originY = mobRect.top - arenaRect.top + mobRect.height / 2;
 
+  // esconde o SPRITE do monstro JA (opacity, nao display -- nao mexe
+  // no layout/posicao de mais nada) -- sem isso, a nuvem branca
+  // semi-transparente tocava por CIMA do monstro ainda visivel (o
+  // render() que realmente aplica o estado "derrotado" so roda 560ms
+  // depois, esperando a nuvem terminar). Branco+cor do monstro por
+  // baixo = mistura suja/acinzentada, nao branco solido (queixa do
+  // usuario, confirmada em video).
+  mob.style.opacity = '0';
+
   const el = document.createElement('div');
   el.className = 'poof-monstro';
   el.style.left = originX + 'px';
   el.style.top = originY + 'px';
   arena.appendChild(el);
-  setTimeout(() => el.remove(), 560);
+  setTimeout(() => {
+    el.remove();
+    // reseta a opacity inline (nao deixa '0' pra sempre) -- se
+    // render() (que roda antes disso, 560ms apos mostrarPoofMonstro())
+    // ja escondeu #mobSprite por outro mecanismo (classe/innerHTML),
+    // isso e um no-op inofensivo; se nao escondeu, evita que o PROXIMO
+    // monstro (amanha) nasca invisivel por causa desse estilo inline
+    // grudado no mesmo elemento.
+    mob.style.opacity = '';
+  }, 560);
 }
 window.mostrarPoofMonstro = mostrarPoofMonstro;
 let nomeHeroi = 'Aventureiro';

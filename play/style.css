@@ -3449,7 +3449,7 @@
   opacity:0; pointer-events:none;
 }
 .tema-arena-cadeado-img{
-  width:32px; height:auto; image-rendering:pixelated;
+  width:32px; height:auto;
   filter:drop-shadow(0 2px 6px rgba(0,0,0,.5));
 }
 #temaArenaBloqueioTexto{

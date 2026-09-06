@@ -1247,20 +1247,18 @@ function dispararVitoriaDoDia(doDia, nivelAntes){
 function mostrarPoofMonstro(){
   const arena = document.querySelector('.arena');
   const mob = document.getElementById('mobSprite');
-  if (!arena || !mob){ console.log('[POOF-DEBUG] arena ou mob nao encontrado', {arena:!!arena, mob:!!mob}); return; }
+  if (!arena || !mob) return;
   const arenaRect = arena.getBoundingClientRect();
   const mobRect = mob.getBoundingClientRect();
   const originX = mobRect.left - arenaRect.left + mobRect.width / 2;
   const originY = mobRect.top - arenaRect.top + mobRect.height / 2;
-  console.log('[POOF-DEBUG] criando poof em', {originX, originY, mobRect, arenaRect});
 
   const el = document.createElement('div');
   el.className = 'poof-monstro';
   el.style.left = originX + 'px';
   el.style.top = originY + 'px';
   arena.appendChild(el);
-  console.log('[POOF-DEBUG] elemento anexado?', arena.contains(el), el);
-  setTimeout(() => el.remove(), 2000);
+  setTimeout(() => el.remove(), 560);
 }
 window.mostrarPoofMonstro = mostrarPoofMonstro;
 let nomeHeroi = 'Aventureiro';

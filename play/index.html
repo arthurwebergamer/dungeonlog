@@ -1208,6 +1208,10 @@ function avaliarVitoriaDoDia(){
 // pra ser chamado tambem por verificarVitoriaAoExcluir() (vitoria por
 // exclusao da ultima pendente)
 function dispararVitoriaDoDia(doDia, nivelAntes){
+  // captura a posicao do monstro ANTES de render() (logo abaixo) trocar
+  // a visual pro estado "derrotado" e escondê-lo -- se pedir isso DEPOIS
+  // do render(), o sprite ja nao esta mais visivel/no lugar certo.
+  if (typeof mostrarPoofMonstro === 'function') mostrarPoofMonstro();
   derrotadoEm = isoAtual();
   const ganho = recompensaVitoria(doDia.length);
   moedas += ganho;
@@ -1224,6 +1228,30 @@ function dispararVitoriaDoDia(doDia, nivelAntes){
     }, 700);
   }
 }
+
+// nuvem de "poof" (4 frames, pixel art, gerada proceduralmente -- sem
+// asset externo) no exato lugar onde o monstro estava, no instante da
+// derrota. Mesma tecnica de spritesheet+steps() ja usada na tocha da
+// Arena, so que via animation JS (setTimeout) em vez de CSS puro,
+// porque cada instancia precisa nascer numa posicao diferente
+// (calculada em cima da posicao real do monstro, nao fixa como a tocha).
+function mostrarPoofMonstro(){
+  const arena = document.querySelector('.arena');
+  const mob = document.getElementById('mobSprite');
+  if (!arena || !mob) return;
+  const arenaRect = arena.getBoundingClientRect();
+  const mobRect = mob.getBoundingClientRect();
+  const originX = mobRect.left - arenaRect.left + mobRect.width / 2;
+  const originY = mobRect.top - arenaRect.top + mobRect.height / 2;
+
+  const el = document.createElement('div');
+  el.className = 'poof-monstro';
+  el.style.left = originX + 'px';
+  el.style.top = originY + 'px';
+  arena.appendChild(el);
+  setTimeout(() => el.remove(), 500);
+}
+window.mostrarPoofMonstro = mostrarPoofMonstro;
 let nomeHeroi = 'Aventureiro';
 let ultimoGanho = 0;
 let _vitoriaCelebrada = false; // pedido do usuario (27/08): tela de vitoria "muito simples" -- controla o disparo unico do efeito de celebracao, ver celebrarVitoria()

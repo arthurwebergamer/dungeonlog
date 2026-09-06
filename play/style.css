@@ -3473,3 +3473,24 @@
   background:rgba(255,255,255,.35);
 }
 .tema-arena-dot-atual{ background:rgba(255,255,255,.9); }
+
+/* ======================================================================
+   POOF DE DERROTA DO MONSTRO -- nuvem de fumaca (4 frames, pixel art
+   gerada proceduralmente via PIL, sem asset externo), spawnada por
+   mostrarPoofMonstro() no exato lugar onde o monstro estava, no
+   instante da derrota (ANTES de render() escondê-lo). Mesma tecnica de
+   spritesheet+steps() da tocha da Arena. Item 2 do redesign de feedback
+   de combate (ver roadmap: numero ancorado -> poof -> recompensa
+   voando -> entrada do bau). */
+.poof-monstro{
+  position:absolute; left:0; top:0; width:48px; height:48px;
+  transform:translate(-50%,-50%);
+  background-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAAAYCAYAAAAF6fiUAAACqklEQVR4nO2YvYryQBiFzwYRixQ2go2lNyAa7LyLVFaCoIVFCq/DwiKFYGVl5S1YKVGExdLSMk0KiyAhfoWMO5mdTGay3250Nw8I+ZkdxnPe98ysQE7OX+Yt6wW8Es1ms5w0Zr/feypz5gZIICM8i6wRBdWJc9RoNBplcn04HDz2/a81YDgcdthntm2vf3INtPjknjXhV0UQT3QeQRDEvpvNZhGT0sQPAIRhGPuuULjXveM4XuYdMJ/PJ+S61+tZaeeRFf+ZMAyjrGW9iP+FTLwEQSCsfgDo9/udfr//MFP1VBOGobD62XVkEkF01fO4Xq+fng0GA2F3qHSAyIRSqQQAmE6nayBdBCUZAHzEUCYd0Ov1rLi4SRNDKtmf1AG+78P3fYxGo1SRJiM+WQuQogN2u92NfdZqtZTmeYUOIGw2m3fZeWlkNmFAsgOOx+ONfFixVcWXoVgsRu51XcdisRCa9l1HTNU9AEjuAroAlMRzXfdR/ZVKJZXwy+VycrlcYt/zqp+g6zoAoNvtcrtBpguSIgiIdsFut3uX/TuCyh4gPIaez+eH4Gxruq578zzvcV+v16UMMU3TAuKNqFarAACRSTwsy+r4vp84jnxxnqDsdwSA7Xbrtdvtsspa6IhJgisaLTxLrVZ7A4DT6fRpTJIJy+VSGCNANH54JsRVP3A3AbhvpHHQ4tDjeOID99MQMUCmCzRN7VyTyTGUZ4RpmtZqtYo8VzUA+DABiAps2/Z6PB4nGsRCIoggMqFQKEDTNKW4EhpAdwKp/K8i6gJ28wWiJqiIzzKZTCKbtMwxk/wvAACiGNputx65NgwjdhyPzH4Loo0g+wIP+vSTZIAqIhNo8Qk8E2jxgRcy4BlQNUAWFRP+tAHfjYwRuQE/BG2G4zhedivJyXkm/gFNYUir9jmdLAAAAABJRU5ErkJggg==");
+  background-size:192px 48px; image-rendering:pixelated;
+  pointer-events:none; z-index:2;
+  animation:poofMonstroFrames .44s steps(4) forwards;
+}
+@keyframes poofMonstroFrames{
+  from{ background-position-x:0; }
+  to{ background-position-x:-192px; }
+}

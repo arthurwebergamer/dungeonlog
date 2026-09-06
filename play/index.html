@@ -2339,7 +2339,15 @@ function alternar(i){
   const subiuNivel = nivelDepois > nivelAntes;
 
   if (venceuAgora && !monstroJaCaiu()){
-    dispararVitoriaDoDia(doDia, nivelAntes);
+    // atraso proposital: animarGolpe() (chamada logo acima) leva 320ms
+    // pra terminar (hero bate, monstro treme, os dois voltam ao
+    // normal -- ver a funcao). dispararVitoriaDoDia() faz o proprio
+    // render(), que troca a visual pro estado "derrotado" (esconde o
+    // monstro). Sem esse atraso, essa troca acontecia quase instantanea
+    // -- ainda no mesmo tick -- cortando a animacao de golpe pela
+    // metade, dando a impressao de que o golpe acertou o bau em vez do
+    // monstro (queixa do usuario, dava pra perceber facil).
+    setTimeout(() => dispararVitoriaDoDia(doDia, nivelAntes), 400);
     return true;
   }
   if (!venceuAgora) derrotadoEm = null;

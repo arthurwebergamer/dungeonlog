@@ -1212,21 +1212,30 @@ function dispararVitoriaDoDia(doDia, nivelAntes){
   // a visual pro estado "derrotado" e escondê-lo -- se pedir isso DEPOIS
   // do render(), o sprite ja nao esta mais visivel/no lugar certo.
   if (typeof mostrarPoofMonstro === 'function') mostrarPoofMonstro();
-  derrotadoEm = isoAtual();
-  const ganho = recompensaVitoria(doDia.length);
-  moedas += ganho;
-  ultimoGanho = ganho;
-  moedasCaindo(Math.max(3, Math.min(10, Math.round(ganho / 6))));
-  render();
-  setTimeout(()=>aviso((idiomaApp() === 'en' ? 'MONSTER DEFEATED  +' : 'MONSTRO DERROTADO  +')+ganho+(idiomaApp() === 'en' ? ' COINS' : ' MOEDAS'), true), 350);
-  const nivelDepois = progresso().nivel;
-  if (nivelDepois > nivelAntes){
-    setTimeout(() => {
-      if (typeof window.enfileirarPopup === 'function' && typeof mostrarNivelUp === 'function'){
-        window.enfileirarPopup(prox => mostrarNivelUp(nivelDepois, prox));
-      }
-    }, 700);
-  }
+
+  // resto da funcao (render() pesado -- atualiza tarefas, XP, moedas,
+  // conquistas etc. -- + toasts) so roda DEPOIS de garantir 1 frame de
+  // pintura pro poof. Sem isso, o poof e criado e o proximo trabalho
+  // sincrono (render()) podia monopolizar o thread principal tempo
+  // suficiente pro navegador pular direto pro estado final sem nunca
+  // chegar a pintar a animacao no meio (poof "nao aparecia").
+  requestAnimationFrame(() => {
+    derrotadoEm = isoAtual();
+    const ganho = recompensaVitoria(doDia.length);
+    moedas += ganho;
+    ultimoGanho = ganho;
+    moedasCaindo(Math.max(3, Math.min(10, Math.round(ganho / 6))));
+    render();
+    setTimeout(()=>aviso((idiomaApp() === 'en' ? 'MONSTER DEFEATED  +' : 'MONSTRO DERROTADO  +')+ganho+(idiomaApp() === 'en' ? ' COINS' : ' MOEDAS'), true), 350);
+    const nivelDepois = progresso().nivel;
+    if (nivelDepois > nivelAntes){
+      setTimeout(() => {
+        if (typeof window.enfileirarPopup === 'function' && typeof mostrarNivelUp === 'function'){
+          window.enfileirarPopup(prox => mostrarNivelUp(nivelDepois, prox));
+        }
+      }, 700);
+    }
+  });
 }
 
 // nuvem de "poof" (4 frames, pixel art, gerada proceduralmente -- sem

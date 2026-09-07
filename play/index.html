@@ -2423,7 +2423,14 @@ function numeroFlutuanteHeroi(xpGanho, moedasGanhas){
   const arenaRect = arena.getBoundingClientRect();
   const heroiRect = heroi.getBoundingClientRect();
   const originX = heroiRect.right - arenaRect.left; // lado direito do heroi, "saindo" dele
-  const originY = heroiRect.top - arenaRect.top + heroiRect.height / 2;
+  // FIX (pedido do usuario): estava heroiRect.top + height/2 (centro do
+  // sprite) -- o texto nascia no MEIO do heroi. Agora nasce ACIMA do topo
+  // do sprite (-14px, mesmo offset usado em numeroFlutuante/mob). X
+  // continua do lado direito (nao centralizado) de proposito: #nomeTopo
+  // fica centralizado ACIMA do sprite, entao subir mantendo X a direita
+  // evita a colisao com o nome que as tentativas anteriores (comentario
+  // acima) tiveram ao tentar centralizar em cima da cabeca.
+  const originY = heroiRect.top - arenaRect.top - 14;
 
   const el = document.createElement('div');
   el.className = 'dmg-float';

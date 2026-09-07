@@ -57,22 +57,18 @@
   /* item 40 do roadmap: "damage number" positivo, mesma tecnica de
      origem/posicionamento de .coin-drop (left/top absolutos calculados
      em JS a partir do centro do #mobSprite) -- so troca queda por subida */
-  /* FIX (visibilidade contra os temas de Arena, roadmap item 40-bis):
-     antes so tinha text-shadow de 1 lado -- lia bem no tema Padrao (fundo
-     escuro liso) mas sumia nos temas Deserto/Gelo (fundo claro), fazendo
-     o texto parecer que "sumia rapido" quando na verdade so ficava
-     ilegivel durante o tempo em que ja estava com opacity:1. Pilula de
-     fundo semitransparente escura resolve pra qualquer tema, sem
-     depender da cor por tras. Duracao/percurso tambem alongados (1.6s->
-     1.9s, 55px->62px) pra dar mais tempo de leitura. */
+  /* FIX v2 (pedido do usuario): a v1 dessa correcao tinha subida + pilula
+     de fundo -- usuario NAO queria a pilula (parecia borda) e o problema
+     real era a subida rapida sumindo da tela, nao legibilidade do texto.
+     Agora o texto nasce PARADO em cima do sprite (sem transform de
+     posicao) e so faz fade in/out no lugar -- sem pilula, sem box-shadow,
+     so o text-shadow (mesmo que ja existia antes de qualquer fix) pra
+     descolar do fundo sem parecer uma caixa. */
   .dmg-float{position:absolute;left:0;top:0;pointer-events:none;
     animation:dmgFloat 1.9s ease-out forwards;
-    display:flex;align-items:center;gap:4px;white-space:nowrap;
-    font-family:'Silkscreen',monospace;font-size:14px;font-weight:700;
-    padding:4px 9px;border-radius:9px;
-    background:rgba(12,9,20,.64);
-    box-shadow:0 2px 8px rgba(0,0,0,.4);
-    text-shadow:0 1px 1px rgba(0,0,0,.9),0 0 5px rgba(0,0,0,.7)}
+    display:flex;align-items:center;gap:3px;white-space:nowrap;
+    font-family:'Silkscreen',monospace;font-size:13px;font-weight:700;
+    text-shadow:0 1px 2px rgba(0,0,0,.6)}
   /* variante pra fora da Arena (Inventario, e qualquer outra tela sem
      .arena como container relativo) -- mesma animacao, so troca pra
      position:fixed com coordenadas de viewport, empilhada acima de
@@ -93,10 +89,9 @@
   .dmg-float .dmg-xp{color:var(--text)}
   @keyframes dmgFloat{
     0%{transform:translate(-50%,-50%) scale(.8);opacity:0}
-    12%{transform:translate(-50%,-62%) scale(1.04);opacity:1}
-    20%{transform:translate(-50%,-65%) scale(1);opacity:1}
-    75%{transform:translate(-50%,calc(-50% - 46px)) scale(1);opacity:1}
-    100%{transform:translate(-50%,calc(-50% - 62px)) scale(1);opacity:0}
+    15%{transform:translate(-50%,-50%) scale(1);opacity:1}
+    75%{transform:translate(-50%,-50%) scale(1);opacity:1}
+    100%{transform:translate(-50%,-50%) scale(1);opacity:0}
   }
   .vs{font-family:'Outfit',sans-serif;font-size:11px;font-weight:500;color:var(--dim);padding-bottom:30px;letter-spacing:1px}
   .mobinfo{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;transition:opacity .3s}

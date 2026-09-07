@@ -2408,6 +2408,14 @@ function numeroFlutuante(xpGanho, moedasGanhas){
 // HEROI em vez do monstro -- usada pelo golpe final depois que os
 // icones voadores (voarRecompensaFinal) chegam nele, imitando o video
 // de referencia (recompensa pousa no personagem, ai sim mostra "+X").
+// classe/keyframe PROPRIA (nao reaproveita mais dmg-float/dmgFloat) --
+// aquela foi pensada pra numeros rapidos de dano no monstro (sobe e
+// some rapido, faz sentido la). Aqui o texto so aparece (pop+fade),
+// FICA PARADO por um bom tempo (sem subir), e desaparece no lugar --
+// pedido do usuario: a subida ficava rapida/dificil de ler mesmo com
+// mais duracao. Posicionado ABAIXO do sprite (nao mais em cima) --
+// menos coisa competindo por espaco ali (tochas, "vs", nome do
+// monstro ficam todos na parte de cima da arena).
 function numeroFlutuanteHeroi(xpGanho, moedasGanhas){
   const arena = document.querySelector('.arena');
   const heroi = document.getElementById('heroSprite');
@@ -2415,16 +2423,16 @@ function numeroFlutuanteHeroi(xpGanho, moedasGanhas){
   const arenaRect = arena.getBoundingClientRect();
   const heroiRect = heroi.getBoundingClientRect();
   const originX = heroiRect.left - arenaRect.left + heroiRect.width / 2;
-  const originY = heroiRect.top - arenaRect.top + heroiRect.height / 2; // meio do sprite, nao mais o topo
+  const originY = heroiRect.bottom - arenaRect.top + 4; // logo abaixo dos pes do heroi
 
   const el = document.createElement('div');
-  el.className = 'dmg-float dmg-float-empilhado';
+  el.className = 'recompensa-heroi';
   el.style.left = originX + 'px';
   el.style.top = originY + 'px';
   el.innerHTML = '<span class="dmg-xp">+' + xpGanho + ' XP</span>'
     + '<span class="dmg-moeda">+' + moedasGanhas + ' ' + COIN_SVG + '</span>';
   arena.appendChild(el);
-  setTimeout(() => el.remove(), 2600);
+  setTimeout(() => el.remove(), 2400);
 }
 window.numeroFlutuanteHeroi = numeroFlutuanteHeroi;
 

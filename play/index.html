@@ -1213,28 +1213,16 @@ function dispararVitoriaDoDia(doDia, nivelAntes, xpGanho, moedasGanhas){
   // do render(), o sprite ja nao esta mais visivel/no lugar certo.
   if (typeof mostrarPoofMonstro === 'function') mostrarPoofMonstro();
 
-  // item 3: moeda+XP nascem no meio da animacao do poof (250ms -- ainda
-  // visivel/dissipando, mas ja da tempo da recompensa "emergir" dele
-  // em vez de nascer simultaneo) e voam de verdade ate os elementos
-  // reais (contador de moedas, barra de XP), em vez de um numero
-  // estatico. So dispara se teve reward de verdade (nao dispara vindo
-  // do caminho de exclusao de tarefa, que chama essa funcao sem
-  // xpGanho/moedasGanhas).
-  if ((xpGanho || moedasGanhas) && typeof voarRecompensaFinal === 'function'){
-    setTimeout(() => voarRecompensaFinal(xpGanho || 0, moedasGanhas || 0), 250);
-  }
-
   // resto da funcao (render() -- troca a visual pro estado "derrotado",
-  // mostrando o bau) so roda DEPOIS da nuvem de poof terminar de tocar
-  // (mesma duracao do CSS, 560ms -- ver .poof-monstro). Antes disso
-  // era so 1 frame (requestAnimationFrame) de espera: tempo suficiente
-  // pra garantir que o poof CHEGASSE a pintar, mas nao pra ele
-  // terminar -- bau e nuvem apareciam ao mesmo tempo, se sobrepondo
-  // (confirmado com zoom em video: a nuvem realmente tocava, so que
-  // por cima do bau que ja tinha aparecido junto, virando uma bagunca
-  // visual em vez de uma sequencia -- monstro morre, nuvem, so ENTAO
-  // bau).
-  setTimeout(() => {
+  // mostrando o bau, atualiza os contadores) empacotado numa funcao a
+  // parte pra poder ser chamada como CONTINUACAO de verdade da
+  // recompensa voando (ver mostrarBauEContadores abaixo), em vez de um
+  // setTimeout(...) paralelo com um numero fixo adivinhando quanto
+  // tempo o voo ia levar. Bug real que isso corrigia: o contador de
+  // moedas ja tinha terminado de subir e se acomodado MUITO antes do
+  // "+X" aparecer em cima do heroi -- os dois timers rodavam em
+  // paralelo, sem um esperar o outro de verdade (confirmado em video).
+  const mostrarBauEContadores = () => {
     derrotadoEm = isoAtual();
     const ganho = recompensaVitoria(doDia.length);
     moedas += ganho;
@@ -1250,7 +1238,27 @@ function dispararVitoriaDoDia(doDia, nivelAntes, xpGanho, moedasGanhas){
         }
       }, 700);
     }
-  }, 560);
+  };
+
+  // item 3: moeda+XP nascem no meio da animacao do poof (250ms -- ainda
+  // visivel/dissipando, mas ja da tempo da recompensa "emergir" dele em
+  // vez de nascer simultaneo), voam ate o HEROI, e SO DEPOIS que "+X"
+  // aparece em cima da cabeca dele (dentro de voarRecompensaFinal) e
+  // que o bau/contadores sao liberados -- com uma folga de 350ms pra
+  // dar tempo de ler o "+X" antes do bau roubar a atencao.
+  //
+  // Se nao tem reward pra mostrar (veio do caminho de exclusao de
+  // tarefa, que chama esta funcao sem xpGanho/moedasGanhas), pula
+  // direto pro bau, so esperando o poof terminar (560ms).
+  if ((xpGanho || moedasGanhas) && typeof voarRecompensaFinal === 'function'){
+    setTimeout(() => {
+      voarRecompensaFinal(xpGanho || 0, moedasGanhas || 0, () => {
+        setTimeout(mostrarBauEContadores, 350);
+      });
+    }, 250);
+  } else {
+    setTimeout(mostrarBauEContadores, 560);
+  }
 }
 
 // nuvem de "poof" (4 frames, pixel art, gerada proceduralmente -- sem
@@ -2288,11 +2296,14 @@ window.voarRecompensa = voarRecompensa;
 // heroi (ver numeroFlutuanteHeroi, logo abaixo de numeroFlutuante) --
 // so ENTAO e que os contadores reais (coinnum/xpnum, no topo/embaixo)
 // atualizam de verdade, via a contagem suave que render() ja faz.
-function voarRecompensaFinal(xpGanho, moedasGanhas){
+function voarRecompensaFinal(xpGanho, moedasGanhas, aoTerminar){
   const arena = document.querySelector('.arena');
   const mob = document.getElementById('mobSprite');
   const heroi = document.getElementById('heroSprite');
-  if (!arena || !mob || !heroi) return;
+  if (!arena || !mob || !heroi){
+    if (typeof aoTerminar === 'function') aoTerminar(); // nao trava a sequencia se algo faltar
+    return;
+  }
   const mobRect = mob.getBoundingClientRect();
   const origemX = mobRect.left + mobRect.width / 2;
   const origemY = mobRect.top + mobRect.height / 2;
@@ -2302,9 +2313,14 @@ function voarRecompensaFinal(xpGanho, moedasGanhas){
 
   // "+moedas +XP" so aparece quando os icones JA CHEGARAM no heroi --
   // 1100ms bate com a duracao do voo (.recompensa-voando, style.css)
-  // mais a folga do segundo icone (90ms de atraso acima).
+  // mais a folga do segundo icone (90ms de atraso acima). aoTerminar()
+  // e chamado AQUI, como continuacao de verdade, nao um timer paralelo
+  // adivinhando essa mesma duracao (era assim antes -- o contador do
+  // topo terminava de contar bem antes do "+X" aparecer, confirmado em
+  // video).
   setTimeout(() => {
     if (typeof numeroFlutuanteHeroi === 'function') numeroFlutuanteHeroi(xpGanho, moedasGanhas);
+    if (typeof aoTerminar === 'function') aoTerminar();
   }, 1100);
 }
 window.voarRecompensaFinal = voarRecompensaFinal;

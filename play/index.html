@@ -1255,7 +1255,7 @@ function dispararVitoriaDoDia(doDia, nivelAntes, xpGanho, moedasGanhas){
       voarRecompensaFinal(xpGanho || 0, moedasGanhas || 0, () => {
         setTimeout(mostrarBauEContadores, 350);
       });
-    }, 250);
+    }, 450);
   } else {
     setTimeout(mostrarBauEContadores, 560);
   }
@@ -2215,7 +2215,13 @@ function animarContagemNumero(el, valorFinal, duracaoMs, sufixo){
   if (!el) return;
   sufixo = sufixo || '';
   const textoAtual = el.textContent || '';
-  const valorAtualTexto = parseInt(textoAtual.replace(/[^\d-]/g, ''), 10);
+  // BUG corrigido: replace(/[^\d-]/g,'') removia a barra de "40 / 100"
+  // mas JUNTAVA os dois numeros num so ("40100"), que so cresce mais
+  // ainda no proximo render() -- por isso a Experiencia mostrava
+  // "29611 / 100" etc. match() pega SO o primeiro grupo de digitos,
+  // ignorando o resto do texto (a barra, o "100" do sufixo etc.)
+  const match = textoAtual.match(/-?\d+/);
+  const valorAtualTexto = match ? parseInt(match[0], 10) : NaN;
   const valorInicial = isNaN(valorAtualTexto) ? valorFinal : valorAtualTexto;
 
   if (valorInicial === valorFinal){

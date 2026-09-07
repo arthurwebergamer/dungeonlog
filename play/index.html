@@ -2405,7 +2405,7 @@ function numeroFlutuante(xpGanho, moedasGanhas){
     + '<span class="dmg-sep">·</span>'
     + '<span class="dmg-xp">+' + xpGanho + ' XP</span>';
   arena.appendChild(el);
-  setTimeout(() => el.remove(), 1600);
+  setTimeout(() => el.remove(), 1100); // bate com a nova duracao de dmgFloat (1.9s -> 1.1s)
 }
 
 // COPIA EXATA de numeroFlutuante() acima (mesma classe dmg-float,
@@ -2443,7 +2443,7 @@ function numeroFlutuanteHeroi(xpGanho, moedasGanhas){
   el.innerHTML = '<span class="dmg-moeda">+' + moedasGanhas + ' ' + COIN_SVG + '</span>'
     + '<span class="dmg-xp">+' + xpGanho + ' XP</span>';
   arena.appendChild(el);
-  setTimeout(() => el.remove(), 1600);
+  setTimeout(() => el.remove(), 1100); // bate com a nova duracao de dmgFloat (1.9s -> 1.1s)
 }
 window.numeroFlutuanteHeroi = numeroFlutuanteHeroi;
 

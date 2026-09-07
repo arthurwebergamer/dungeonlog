@@ -65,7 +65,7 @@
      so o text-shadow (mesmo que ja existia antes de qualquer fix) pra
      descolar do fundo sem parecer uma caixa. */
   .dmg-float{position:absolute;left:0;top:0;pointer-events:none;
-    animation:dmgFloat 1.9s ease-out forwards;
+    animation:dmgFloat 1.1s ease-out forwards;
     display:flex;align-items:center;gap:3px;white-space:nowrap;
     font-family:'Silkscreen',monospace;font-size:13px;font-weight:700;
     text-shadow:0 1px 2px rgba(0,0,0,.6)}
@@ -93,11 +93,15 @@
   .dmg-float .dmg-moeda{color:var(--gold)}
   .dmg-float .dmg-sep{color:var(--muted);font-weight:500}
   .dmg-float .dmg-xp{color:var(--text)}
+  /* FIX v3 (pedido do usuario): v2 ficava parado o tempo todo (fade in
+     place). Agora e mais rapido (1.9s->1.1s) e volta a subir -- mas so
+     no FIM (55%->100%), depois de ja ter aparecido parado por um tempo
+     (15%->55%) pra dar tempo de ler antes de comecar a subir/sumir. */
   @keyframes dmgFloat{
     0%{transform:translate(-50%,-50%) scale(.8);opacity:0}
     15%{transform:translate(-50%,-50%) scale(1);opacity:1}
-    75%{transform:translate(-50%,-50%) scale(1);opacity:1}
-    100%{transform:translate(-50%,-50%) scale(1);opacity:0}
+    55%{transform:translate(-50%,-50%) scale(1);opacity:1}
+    100%{transform:translate(-50%,calc(-50% - 34px)) scale(1);opacity:0}
   }
   /* variante empilhada usa o mesmo translate(-50%,-50%) da keyframe
      acima (centraliza no ponto left/top) -- o "ficar a esquerda do

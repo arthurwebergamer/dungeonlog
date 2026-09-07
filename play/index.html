@@ -2422,22 +2422,25 @@ function numeroFlutuanteHeroi(xpGanho, moedasGanhas){
   if (!arena || !heroi) return;
   const arenaRect = arena.getBoundingClientRect();
   const heroiRect = heroi.getBoundingClientRect();
-  const originX = heroiRect.right - arenaRect.left; // lado direito do heroi, "saindo" dele
-  // FIX (pedido do usuario): estava heroiRect.top + height/2 (centro do
-  // sprite) -- o texto nascia no MEIO do heroi. Agora nasce ACIMA do topo
-  // do sprite (-14px, mesmo offset usado em numeroFlutuante/mob). X
-  // continua do lado direito (nao centralizado) de proposito: #nomeTopo
-  // fica centralizado ACIMA do sprite, entao subir mantendo X a direita
-  // evita a colisao com o nome que as tentativas anteriores (comentario
-  // acima) tiveram ao tentar centralizar em cima da cabeca.
-  const originY = heroiRect.top - arenaRect.top - 14;
+  // FIX v2 (pedido do usuario, com print): a v1 (lado direito, centro
+  // vertical do sprite) aparecia longe demais do heroi, quase colado no
+  // topo da arena -- ver historico. Layout novo: empilhado (+moedas em
+  // cima, +XP embaixo, ver .dmg-float.pilha no style.css) do lado
+  // ESQUERDO do sprite. originX = borda esquerda do heroi menos uma
+  // folga (o bloco de texto fica CENTRADO nesse ponto via
+  // translate(-50%,-50%) da keyframe, entao a folga de 30px empurra o
+  // centro do texto pra fora do sprite em vez de em cima dele).
+  // originY = centro vertical do sprite (nao mais topo/base) -- com o
+  // texto empilhado em 2 linhas, o centro fica correto: moedas puxa pra
+  // cima, XP puxa pra baixo, igual pedido.
+  const originX = heroiRect.left - arenaRect.left - 30;
+  const originY = heroiRect.top - arenaRect.top + heroiRect.height / 2;
 
   const el = document.createElement('div');
-  el.className = 'dmg-float';
+  el.className = 'dmg-float pilha';
   el.style.left = originX + 'px';
   el.style.top = originY + 'px';
   el.innerHTML = '<span class="dmg-moeda">+' + moedasGanhas + ' ' + COIN_SVG + '</span>'
-    + '<span class="dmg-sep">·</span>'
     + '<span class="dmg-xp">+' + xpGanho + ' XP</span>';
   arena.appendChild(el);
   setTimeout(() => el.remove(), 1600);

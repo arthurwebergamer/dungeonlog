@@ -81,6 +81,12 @@
   .dmg-float.msg{display:block;white-space:normal;text-align:center;max-width:190px;
     line-height:1.4;font-size:10.5px;font-weight:600;letter-spacing:.02em}
   .dmg-float svg{width:13px;height:13px;image-rendering:pixelated;flex-shrink:0}
+  /* variante empilhada (pedido do usuario, golpe final): em vez de
+     "+moedas · +XP" numa linha só horizontal, empilha +moedas em cima e
+     +XP embaixo -- cada linha e seu proprio flex row (icone+numero).
+     Usada so em numeroFlutuanteHeroi() por enquanto. */
+  .dmg-float.pilha{flex-direction:column;align-items:flex-end;gap:2px}
+  .dmg-float.pilha .dmg-moeda,.dmg-float.pilha .dmg-xp{display:flex;align-items:center;gap:3px}
   /* moeda em --gold (mesma cor de .coins no topbar e .toast.gold), XP em
      cor neutra (mesma familia de .xpnum) -- app ja diferencia os dois
      assim em todo outro lugar, uma cor unica pra tudo quebrava esse padrao */
@@ -93,6 +99,10 @@
     75%{transform:translate(-50%,-50%) scale(1);opacity:1}
     100%{transform:translate(-50%,-50%) scale(1);opacity:0}
   }
+  /* variante empilhada usa o mesmo translate(-50%,-50%) da keyframe
+     acima (centraliza no ponto left/top) -- o "ficar a esquerda do
+     sprite" e resolvido no JS (originX com folga pra esquerda), nao
+     aqui, pra nao precisar de uma keyframe separada so pra isso */
   .vs{font-family:'Outfit',sans-serif;font-size:11px;font-weight:500;color:var(--dim);padding-bottom:30px;letter-spacing:1px}
   .mobinfo{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;transition:opacity .3s}
   .mobinfo.off{opacity:0}

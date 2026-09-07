@@ -67,29 +67,6 @@
      position:fixed com coordenadas de viewport, empilhada acima de
      overlays/fichas (z-index 200) pois a ficha fecha logo em seguida */
   .dmg-float.fixo{position:fixed;z-index:200}
-  /* recompensa do golpe final (XP em cima, moedas embaixo,
-     empilhado), abaixo do heroi -- classe/keyframe PROPRIA, nao
-     reaproveita mais .dmg-float/dmgFloat (aquela sobe e some rapido,
-     pensada pra numeros de dano no monstro; aqui o pedido era o
-     oposto: aparecer e FICAR PARADO, sem subir, tempo suficiente pra
-     ler com folga). */
-  .recompensa-heroi{
-    position:absolute;left:0;top:0;pointer-events:none;
-    transform:translate(-50%,0);
-    display:flex;flex-direction:column;gap:1px;align-items:center;white-space:nowrap;
-    font-family:'Silkscreen',monospace;font-size:13px;font-weight:700;
-    text-shadow:0 1px 2px rgba(0,0,0,.6);
-    animation:recompensaHeroiAparece 2.4s ease-out forwards;
-  }
-  .recompensa-heroi svg{width:13px;height:13px;image-rendering:pixelated;flex-shrink:0}
-  .recompensa-heroi .dmg-moeda{color:var(--gold)}
-  .recompensa-heroi .dmg-xp{color:var(--text)}
-  @keyframes recompensaHeroiAparece{
-    0%{   transform:translate(-50%,6px)  scale(.75); opacity:0; }
-    12%{  transform:translate(-50%,0)    scale(1);   opacity:1; }
-    82%{  transform:translate(-50%,0)    scale(1);   opacity:1; }
-    100%{ transform:translate(-50%,-4px) scale(.94); opacity:0; }
-  }
   /* pedido do usuario (27/08): mensagens tipo "Voce comprou X"/"Voce
      melhorou Fortuna" podem ser longas -- sem isso, nowrap fazia o texto
      estourar pra fora da tela quando o botao de origem ficava perto da

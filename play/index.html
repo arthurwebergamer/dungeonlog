@@ -2404,43 +2404,32 @@ function numeroFlutuante(xpGanho, moedasGanhas){
   setTimeout(() => el.remove(), 1600);
 }
 
-// mesma tecnica/classe de numeroFlutuante() acima, so que ancorada no
-// HEROI em vez do monstro -- usada pelo golpe final depois que os
-// icones voadores (voarRecompensaFinal) chegam nele, imitando o video
-// de referencia (recompensa pousa no personagem, ai sim mostra "+X").
-// classe/keyframe PROPRIA (nao reaproveita mais dmg-float/dmgFloat) --
-// aquela foi pensada pra numeros rapidos de dano no monstro (sobe e
-// some rapido, faz sentido la). Aqui o texto so aparece (pop+fade),
-// FICA PARADO por um bom tempo (sem subir), e desaparece no lugar --
-// pedido do usuario: a subida ficava rapida/dificil de ler mesmo com
-// mais duracao. Posicionado ABAIXO do sprite (nao mais em cima) --
-// menos coisa competindo por espaco ali (tochas, "vs", nome do
-// monstro ficam todos na parte de cima da arena).
+// COPIA EXATA de numeroFlutuante() acima (mesma classe dmg-float,
+// mesma animacao de subir e sumir, mesmo timing) -- so muda a origem,
+// que agora sai do LADO do heroi em vez do centro do monstro. Pedido
+// do usuario: minhas duas tentativas anteriores de posicionamento
+// proprio (em cima da cabeca, depois embaixo dos pes, depois no chao
+// da arena) foram todas colidindo com outro elemento ou ficando longe
+// demais -- mais simples e confiavel reaproveitar o mesmo padrao que
+// ja funciona pras tarefas normais, so trocando o alvo.
 function numeroFlutuanteHeroi(xpGanho, moedasGanhas){
   const arena = document.querySelector('.arena');
   const heroi = document.getElementById('heroSprite');
   if (!arena || !heroi) return;
   const arenaRect = arena.getBoundingClientRect();
   const heroiRect = heroi.getBoundingClientRect();
-  const originX = heroiRect.left - arenaRect.left + heroiRect.width / 2;
-  // FIX: "logo abaixo dos pes do heroi" (heroiRect.bottom + 4) colidia
-  // direto com o nome do monstro (#mobname), que fica centralizado
-  // NESSA MESMA faixa vertical, um pouco abaixo da fileira heroi/
-  // monstro -- confirmado em video (texto aparecia sobreposto em cima
-  // de "Criatura cogumelo"). Ancorado na altura da propria .arena
-  // (perto do chao/grama, margem fixa da borda de baixo) em vez da
-  // altura do heroi -- garante uma faixa livre, sem depender de onde
-  // o nome do monstro calha de estar.
-  const originY = arenaRect.height - 20;
+  const originX = heroiRect.right - arenaRect.left; // lado direito do heroi, "saindo" dele
+  const originY = heroiRect.top - arenaRect.top + heroiRect.height / 2;
 
   const el = document.createElement('div');
-  el.className = 'recompensa-heroi';
+  el.className = 'dmg-float';
   el.style.left = originX + 'px';
   el.style.top = originY + 'px';
-  el.innerHTML = '<span class="dmg-xp">+' + xpGanho + ' XP</span>'
-    + '<span class="dmg-moeda">+' + moedasGanhas + ' ' + COIN_SVG + '</span>';
+  el.innerHTML = '<span class="dmg-moeda">+' + moedasGanhas + ' ' + COIN_SVG + '</span>'
+    + '<span class="dmg-sep">·</span>'
+    + '<span class="dmg-xp">+' + xpGanho + ' XP</span>';
   arena.appendChild(el);
-  setTimeout(() => el.remove(), 2400);
+  setTimeout(() => el.remove(), 1600);
 }
 window.numeroFlutuanteHeroi = numeroFlutuanteHeroi;
 

@@ -72,7 +72,16 @@
      numeroFlutuanteHeroi() (recompensa do golpe final, pousando no
      heroi). O .dmg-float normal (monstro, outras telas) continua em
      linha, isso e so um modificador extra. */
-  .dmg-float.dmg-float-empilhado{flex-direction:column;gap:1px;align-items:center}
+  .dmg-float.dmg-float-empilhado{
+    flex-direction:column;gap:1px;align-items:center;
+    /* duracao maior que o .dmg-float padrao (1.6s) -- pedido do
+       usuario: o texto subia/sumia rapido demais pra dar tempo de ler
+       depois de acabar de acompanhar o icone voando ate aqui. A
+       keyframe (dmgFloat) mesma, so que esticada -- ela ja tem uma
+       fase "parada" no meio (10%-70%), essa fase fica proporcionalmente
+       mais longa tambem. */
+    animation-duration:2.6s;
+  }
   /* pedido do usuario (27/08): mensagens tipo "Voce comprou X"/"Voce
      melhorou Fortuna" podem ser longas -- sem isso, nowrap fazia o texto
      estourar pra fora da tela quando o botao de origem ficava perto da

@@ -2200,14 +2200,28 @@ function render(){
   // reinicia nenhuma animacao a toa. Pedido do usuario: os numeros
   // pulando instantaneos (moeda/XP) somem rapido demais pra acompanhar,
   // junto do icone que agora tambem viaja mais devagar (item 3).
-  if (typeof animarContagemNumero === 'function'){
-    animarContagemNumero(document.getElementById('xpnum'), p.resto, 1100, ' / ' + p.meta);
-    animarContagemNumero(document.getElementById('coinnum'), moedas, 1100, '');
-  } else {
-    document.getElementById('xpnum').textContent = p.resto + ' / ' + p.meta;
-    document.getElementById('coinnum').textContent = moedas;
+  //
+  // _adiarContadoresRecompensa: no golpe FINAL do dia, xpTotal/moedas
+  // ja sao somados na hora (alternar(), antes de saber que e o golpe
+  // final), mas esse render() aqui roda ANTES da sequencia toda
+  // (poof/voo/"+X") -- sem essa trava, a barra/contador ja apareciam
+  // cheios/atualizados muito antes do icone chegar no heroi (queixa do
+  // usuario, confirmada: "a barra de xp ta enchendo antes do icone
+  // chegar"). Quando a flag esta ligada, esse render() pula so essas 3
+  // linhas (numero/numero/barra) -- o resto da tela atualiza normal.
+  // A flag e desligada logo depois desse MESMO render() (ver
+  // alternar()), entao o PROXIMO render() (dentro da sequencia
+  // atrasada) atualiza tudo certinho.
+  if (!window._adiarContadoresRecompensa){
+    if (typeof animarContagemNumero === 'function'){
+      animarContagemNumero(document.getElementById('xpnum'), p.resto, 1100, ' / ' + p.meta);
+      animarContagemNumero(document.getElementById('coinnum'), moedas, 1100, '');
+    } else {
+      document.getElementById('xpnum').textContent = p.resto + ' / ' + p.meta;
+      document.getElementById('coinnum').textContent = moedas;
+    }
+    document.getElementById('fill').style.width = Math.round((p.resto/p.meta)*100) + '%';
   }
-  document.getElementById('fill').style.width = Math.round((p.resto/p.meta)*100) + '%';
   document.getElementById('nomeTopo').textContent = nomeHeroi || (idiomaApp() === 'en' ? 'Adventurer' : 'Aventureiro');
 
   if (jaComecou) salvar();
@@ -2407,7 +2421,7 @@ function numeroFlutuanteHeroi(xpGanho, moedasGanhas){
   el.innerHTML = '<span class="dmg-xp">+' + xpGanho + ' XP</span>'
     + '<span class="dmg-moeda">+' + moedasGanhas + ' ' + COIN_SVG + '</span>';
   arena.appendChild(el);
-  setTimeout(() => el.remove(), 1600);
+  setTimeout(() => el.remove(), 2600);
 }
 window.numeroFlutuanteHeroi = numeroFlutuanteHeroi;
 
@@ -2572,14 +2586,24 @@ function alternar(i){
     : moedasDaTarefa(dif);
   moedas += moedasGanhas;
 
-  animarGolpe();
-  render();
-
+  // venceuAgora computado ANTES do render() de proposito (normalmente
+  // vinha depois) -- avaliarVitoriaDoDia() so olha o estado das
+  // tarefas (ja atualizado acima), nao depende de nada que render()
+  // preencha. Precisa saber AQUI se e o golpe final pra poder segurar
+  // a barra/contador nesse render() especifico (ver
+  // _adiarContadoresRecompensa em render()).
   const venceuAgora = avaliarVitoriaDoDia();
+  const ehGolpeFinal = venceuAgora && !monstroJaCaiu();
+
+  animarGolpe();
+  if (ehGolpeFinal) window._adiarContadoresRecompensa = true;
+  render();
+  if (ehGolpeFinal) window._adiarContadoresRecompensa = false; // so vale por ESSE render() -- o de dentro da sequencia atrasada (mostrarBauEContadores) roda com a flag ja desligada
+
   const nivelDepois = progresso().nivel;
   const subiuNivel = nivelDepois > nivelAntes;
 
-  if (venceuAgora && !monstroJaCaiu()){
+  if (ehGolpeFinal){
     // item 3 do redesign: o numero estatico (item 1, antes aqui) virou
     // a recompensa voando de verdade (ver voarRecompensaFinal, chamada
     // DENTRO de dispararVitoriaDoDia, sincronizada com o poof/bau) --

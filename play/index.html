@@ -2280,26 +2280,32 @@ function voarRecompensa(origemX, origemY, destinoEl, svgHtml){
 }
 window.voarRecompensa = voarRecompensa;
 
-// dispara os dois voos (moeda -> contador do topo, XP -> barra de
-// experiencia) a partir da posicao onde o monstro estava. Chamada pelo
-// golpe final (ver dispararVitoriaDoDia), no lugar do numeroFlutuante
-// estatico que as tarefas normais usam -- a MESMA ideia (numero
-// ancorado no monstro, item 1), so que agora ela efetivamente viaja
-// ate onde a moeda/XP realmente sao contabilizados, em vez de so
-// flutuar e sumir no mesmo lugar.
+// dispara os dois voos (moeda + XP) da posicao do monstro ATE O
+// HEROI -- correcao de uma leitura errada do video de referencia: la,
+// os icones voam ate o PERSONAGEM, nao ate os contadores do topbar/
+// barra de XP (que e o que essa funcao fazia antes). Depois que os
+// icones chegam, aparece um "+moedas +XP" fixo em cima da cabeca do
+// heroi (ver numeroFlutuanteHeroi, logo abaixo de numeroFlutuante) --
+// so ENTAO e que os contadores reais (coinnum/xpnum, no topo/embaixo)
+// atualizam de verdade, via a contagem suave que render() ja faz.
 function voarRecompensaFinal(xpGanho, moedasGanhas){
   const arena = document.querySelector('.arena');
   const mob = document.getElementById('mobSprite');
-  if (!arena || !mob) return;
+  const heroi = document.getElementById('heroSprite');
+  if (!arena || !mob || !heroi) return;
   const mobRect = mob.getBoundingClientRect();
   const origemX = mobRect.left + mobRect.width / 2;
   const origemY = mobRect.top + mobRect.height / 2;
 
-  const elCoins = document.querySelector('.coins');
-  const elXpBarra = document.querySelector('.xpwrap .xprow:not(.hprow) + .bar');
+  voarRecompensa(origemX, origemY, heroi, COIN_SVG);
+  setTimeout(() => voarRecompensa(origemX, origemY, heroi, XP_GEM_SVG), 90);
 
-  voarRecompensa(origemX, origemY, elCoins, COIN_SVG);
-  setTimeout(() => voarRecompensa(origemX, origemY, elXpBarra, XP_GEM_SVG), 90);
+  // "+moedas +XP" so aparece quando os icones JA CHEGARAM no heroi --
+  // 1100ms bate com a duracao do voo (.recompensa-voando, style.css)
+  // mais a folga do segundo icone (90ms de atraso acima).
+  setTimeout(() => {
+    if (typeof numeroFlutuanteHeroi === 'function') numeroFlutuanteHeroi(xpGanho, moedasGanhas);
+  }, 1100);
 }
 window.voarRecompensaFinal = voarRecompensaFinal;
 
@@ -2349,6 +2355,31 @@ function numeroFlutuante(xpGanho, moedasGanhas){
   arena.appendChild(el);
   setTimeout(() => el.remove(), 1600);
 }
+
+// mesma tecnica/classe de numeroFlutuante() acima, so que ancorada no
+// HEROI em vez do monstro -- usada pelo golpe final depois que os
+// icones voadores (voarRecompensaFinal) chegam nele, imitando o video
+// de referencia (recompensa pousa no personagem, ai sim mostra "+X").
+function numeroFlutuanteHeroi(xpGanho, moedasGanhas){
+  const arena = document.querySelector('.arena');
+  const heroi = document.getElementById('heroSprite');
+  if (!arena || !heroi) return;
+  const arenaRect = arena.getBoundingClientRect();
+  const heroiRect = heroi.getBoundingClientRect();
+  const originX = heroiRect.left - arenaRect.left + heroiRect.width / 2;
+  const originY = heroiRect.top - arenaRect.top; // um pouco acima da cabeca, nao no meio do corpo
+
+  const el = document.createElement('div');
+  el.className = 'dmg-float';
+  el.style.left = originX + 'px';
+  el.style.top = originY + 'px';
+  el.innerHTML = '<span class="dmg-moeda">+' + moedasGanhas + ' ' + COIN_SVG + '</span>'
+    + '<span class="dmg-sep">·</span>'
+    + '<span class="dmg-xp">+' + xpGanho + ' XP</span>';
+  arena.appendChild(el);
+  setTimeout(() => el.remove(), 1600);
+}
+window.numeroFlutuanteHeroi = numeroFlutuanteHeroi;
 
 // NAO USADAS ATUALMENTE (27/08) -- pontoDeElemento/flutuanteFixo eram usadas
 // por usarItem()/venderItem() (Inventario/Loja) e antes disso por

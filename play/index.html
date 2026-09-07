@@ -1229,6 +1229,15 @@ function dispararVitoriaDoDia(doDia, nivelAntes, xpGanho, moedasGanhas){
     ultimoGanho = ganho;
     moedasCaindo(Math.max(3, Math.min(10, Math.round(ganho / 6))));
     render();
+    // reseta a opacity inline que mostrarPoofMonstro() deixou em '0'
+    // (nao deixa assim pra sempre -- evita que o PROXIMO monstro,
+    // amanha, reaproveitando o mesmo #mobSprite, nasca invisivel por
+    // causa desse estilo inline grudado). Feito AQUI, e nao mais no
+    // timer interno da propria nuvem de poof -- ver comentario em
+    // mostrarPoofMonstro() pro bug que isso corrigia (monstro
+    // "ressuscitava" visualmente no meio da recompensa ainda voando).
+    const mobEl = document.getElementById('mobSprite');
+    if (mobEl) mobEl.style.opacity = '';
     setTimeout(()=>aviso((idiomaApp() === 'en' ? 'MONSTER DEFEATED  +' : 'MONSTRO DERROTADO  +')+ganho+(idiomaApp() === 'en' ? ' COINS' : ' MOEDAS'), true), 350);
     const nivelDepois = progresso().nivel;
     if (nivelDepois > nivelAntes){
@@ -1290,17 +1299,17 @@ function mostrarPoofMonstro(){
   el.style.left = originX + 'px';
   el.style.top = originY + 'px';
   arena.appendChild(el);
-  setTimeout(() => {
-    el.remove();
-    // reseta a opacity inline (nao deixa '0' pra sempre) -- se
-    // render() (que roda antes disso, 560ms apos mostrarPoofMonstro())
-    // ja escondeu #mobSprite por outro mecanismo (classe/innerHTML),
-    // isso e um no-op inofensivo; se nao escondeu, evita que o PROXIMO
-    // monstro (amanha) nasca invisivel por causa desse estilo inline
-    // grudado no mesmo elemento.
-    mob.style.opacity = '';
-  }, 560);
-
+  // so remove o elemento da nuvem aqui -- NAO reseta mob.style.opacity
+  // (ver mostrarBauEContadores, chamado pela sequencia de
+  // dispararVitoriaDoDia): o reset tinha um timer fixo de 560ms
+  // proprio, que fazia sentido quando a sequencia inteira TAMBEM
+  // durava 560ms -- depois que a recompensa voando (item 3) esticou
+  // isso pra quase 2s, esse timer interno ficava resetando a
+  // visibilidade do monstro NO MEIO da recompensa ainda voando, e ele
+  // "ressuscitava" visualmente ate o render() de verdade rodar (bug
+  // confirmado em video: monstro reaparecia normal enquanto "+X"
+  // ainda estava na tela). Um so lugar controla isso agora.
+  setTimeout(() => el.remove(), 560);
 }
 window.mostrarPoofMonstro = mostrarPoofMonstro;
 let nomeHeroi = 'Aventureiro';

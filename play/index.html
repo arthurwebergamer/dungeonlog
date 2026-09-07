@@ -2177,12 +2177,59 @@ function render(){
 
   const p = progresso();
   document.getElementById('lvl').textContent = (idiomaApp() === 'en' ? 'Level ' : 'Nível ') + romano(p.nivel);
-  document.getElementById('xpnum').textContent = p.resto + ' / ' + p.meta;
+  // contagem suave em vez de trocar o numero na hora -- so anima
+  // quando o valor MUDOU de verdade (compara com o que ja esta
+  // exibido), entao um render() redundante com o mesmo numero nao
+  // reinicia nenhuma animacao a toa. Pedido do usuario: os numeros
+  // pulando instantaneos (moeda/XP) somem rapido demais pra acompanhar,
+  // junto do icone que agora tambem viaja mais devagar (item 3).
+  if (typeof animarContagemNumero === 'function'){
+    animarContagemNumero(document.getElementById('xpnum'), p.resto, 1100, ' / ' + p.meta);
+    animarContagemNumero(document.getElementById('coinnum'), moedas, 1100, '');
+  } else {
+    document.getElementById('xpnum').textContent = p.resto + ' / ' + p.meta;
+    document.getElementById('coinnum').textContent = moedas;
+  }
   document.getElementById('fill').style.width = Math.round((p.resto/p.meta)*100) + '%';
-  document.getElementById('coinnum').textContent = moedas;
   document.getElementById('nomeTopo').textContent = nomeHeroi || (idiomaApp() === 'en' ? 'Adventurer' : 'Aventureiro');
 
   if (jaComecou) salvar();
+}
+
+// conta suavemente de qualquer valor ATUALMENTE exibido em `el` ate
+// `valorFinal`, ao longo de `duracaoMs`, mantendo `sufixo` fixo (ex:
+// ' / 100' na barra de XP). Se o valor final for igual ao que ja esta
+// exibido, so confirma o texto (nao anima nada -- evita reiniciar uma
+// contagem a toa em re-renders que nao mudaram nada). Cancela uma
+// contagem anterior no mesmo elemento se uma nova comecar no meio
+// (ex: 2 tarefas concluidas rapido em sequencia).
+function animarContagemNumero(el, valorFinal, duracaoMs, sufixo){
+  if (!el) return;
+  sufixo = sufixo || '';
+  const textoAtual = el.textContent || '';
+  const valorAtualTexto = parseInt(textoAtual.replace(/[^\d-]/g, ''), 10);
+  const valorInicial = isNaN(valorAtualTexto) ? valorFinal : valorAtualTexto;
+
+  if (valorInicial === valorFinal){
+    el.textContent = valorFinal + sufixo;
+    return;
+  }
+
+  if (el._contagemFrameId) cancelAnimationFrame(el._contagemFrameId);
+  const inicio = performance.now();
+  function passo(agora){
+    const t = Math.min(1, (agora - inicio) / duracaoMs);
+    const facilitado = 1 - Math.pow(1 - t, 3); // ease-out cubic -- rapido no comeco, suave no final
+    const valorAtual = Math.round(valorInicial + (valorFinal - valorInicial) * facilitado);
+    el.textContent = valorAtual + sufixo;
+    if (t < 1){
+      el._contagemFrameId = requestAnimationFrame(passo);
+    } else {
+      el.textContent = valorFinal + sufixo;
+      el._contagemFrameId = null;
+    }
+  }
+  el._contagemFrameId = requestAnimationFrame(passo);
 }
 
 function animarGolpe(){
@@ -2229,7 +2276,7 @@ function voarRecompensa(origemX, origemY, destinoEl, svgHtml){
       el.style.opacity = '0';
     });
   });
-  setTimeout(() => el.remove(), 650);
+  setTimeout(() => el.remove(), 1250);
 }
 window.voarRecompensa = voarRecompensa;
 

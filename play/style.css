@@ -3494,3 +3494,22 @@
   from{ background-position-x:0; }
   to{ background-position-x:-320px; }
 }
+
+/* ======================================================================
+   RECOMPENSA VOANDO (item 3) -- icone criado dinamicamente por
+   voarRecompensa()/voarRecompensaFinal() (script principal), sempre
+   como position:fixed porque os destinos (contador de moedas no topo,
+   barra de XP embaixo da arena) ficam FORA dos limites da .arena.
+   left/top/transform/opacity mudados via JS logo apos o double rAF; a
+   transition abaixo e o que faz a viagem parecer suave em vez de um
+   "teletransporte". */
+.recompensa-voando{
+  position:fixed; width:22px; height:22px;
+  transform:translate(-50%,-50%) scale(1);
+  opacity:1; pointer-events:none; z-index:500;
+  transition:
+    left .55s cubic-bezier(.25,.65,.3,1),
+    top .55s cubic-bezier(.25,.65,.3,1),
+    transform .55s ease-in,
+    opacity .55s ease-in .12s;
+}

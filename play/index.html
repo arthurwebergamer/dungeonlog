@@ -1207,11 +1207,22 @@ function avaliarVitoriaDoDia(){
 // dispara a recompensa/efeitos de vitoria -- extraido de dentro de alternar()
 // pra ser chamado tambem por verificarVitoriaAoExcluir() (vitoria por
 // exclusao da ultima pendente)
-function dispararVitoriaDoDia(doDia, nivelAntes){
+function dispararVitoriaDoDia(doDia, nivelAntes, xpGanho, moedasGanhas){
   // captura a posicao do monstro ANTES de render() (mais abaixo) trocar
   // a visual pro estado "derrotado" e escondê-lo -- se pedir isso DEPOIS
   // do render(), o sprite ja nao esta mais visivel/no lugar certo.
   if (typeof mostrarPoofMonstro === 'function') mostrarPoofMonstro();
+
+  // item 3: moeda+XP nascem no meio da animacao do poof (250ms -- ainda
+  // visivel/dissipando, mas ja da tempo da recompensa "emergir" dele
+  // em vez de nascer simultaneo) e voam de verdade ate os elementos
+  // reais (contador de moedas, barra de XP), em vez de um numero
+  // estatico. So dispara se teve reward de verdade (nao dispara vindo
+  // do caminho de exclusao de tarefa, que chama essa funcao sem
+  // xpGanho/moedasGanhas).
+  if ((xpGanho || moedasGanhas) && typeof voarRecompensaFinal === 'function'){
+    setTimeout(() => voarRecompensaFinal(xpGanho || 0, moedasGanhas || 0), 250);
+  }
 
   // resto da funcao (render() -- troca a visual pro estado "derrotado",
   // mostrando o bau) so roda DEPOIS da nuvem de poof terminar de tocar
@@ -1251,7 +1262,7 @@ function dispararVitoriaDoDia(doDia, nivelAntes){
 function mostrarPoofMonstro(){
   const arena = document.querySelector('.arena');
   const mob = document.getElementById('mobSprite');
-  if (!arena || !mob) return;
+  if (!arena || !mob) return null;
   const arenaRect = arena.getBoundingClientRect();
   const mobRect = mob.getBoundingClientRect();
   const originX = mobRect.left - arenaRect.left + mobRect.width / 2;
@@ -1281,6 +1292,7 @@ function mostrarPoofMonstro(){
     // grudado no mesmo elemento.
     mob.style.opacity = '';
   }, 560);
+
 }
 window.mostrarPoofMonstro = mostrarPoofMonstro;
 let nomeHeroi = 'Aventureiro';
@@ -2182,6 +2194,68 @@ function animarGolpe(){
 
 const COIN_SVG = '<svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="5" y="2" width="6" height="1" fill="#F2C94C"/><rect x="3" y="3" width="10" height="2" fill="#F2C94C"/><rect x="2" y="5" width="12" height="6" fill="#F2C94C"/><rect x="3" y="11" width="10" height="2" fill="#F2C94C"/><rect x="5" y="13" width="6" height="1" fill="#F2C94C"/><rect x="6" y="5" width="2" height="6" fill="#B8942E"/></svg>';
 
+// diamante verde -- mesmo padrao crispEdges do COIN_SVG, cor da paleta
+// de XP ja usada no resto do app (--verde, ver dmg-xp em style.css)
+const XP_GEM_SVG = '<svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="7" y="1" width="2" height="1" fill="#63C99A"/><rect x="5" y="2" width="6" height="1" fill="#63C99A"/><rect x="3" y="3" width="10" height="2" fill="#7EDBB0"/><rect x="1" y="5" width="14" height="3" fill="#63C99A"/><rect x="3" y="8" width="10" height="2" fill="#4EA97E"/><rect x="5" y="10" width="6" height="1" fill="#4EA97E"/><rect x="7" y="11" width="2" height="1" fill="#4EA97E"/></svg>';
+
+// item 3 do redesign de feedback de combate: em vez de um numero
+// estatico, um icone nasce no ponto de origem (onde o monstro morreu)
+// e VOA de verdade ate o elemento de destino real na tela (contador de
+// moedas no topo, barra de XP embaixo da arena) -- ambos fora dos
+// limites da .arena, entao usa position:fixed (coordenadas de
+// viewport), nao arena como container relativo (mesmo padrao ja usado
+// por flutuanteFixo() pra casos assim).
+function voarRecompensa(origemX, origemY, destinoEl, svgHtml){
+  if (!destinoEl) return;
+  const destRect = destinoEl.getBoundingClientRect();
+  if (destRect.width === 0 && destRect.height === 0) return; // destino nao visivel agora
+
+  const el = document.createElement('div');
+  el.className = 'recompensa-voando';
+  el.innerHTML = svgHtml;
+  el.style.left = origemX + 'px';
+  el.style.top = origemY + 'px';
+  document.body.appendChild(el);
+
+  // double rAF, mesma tecnica/motivo ja usada no arrasto de tema e no
+  // poof: garante que o navegador pintou a posicao INICIAL antes de
+  // mudar left/top pra posicao final -- sem isso, a transicao as vezes
+  // nao anima (o elemento "teletransporta" direto pro destino).
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      el.style.left = (destRect.left + destRect.width / 2) + 'px';
+      el.style.top = (destRect.top + destRect.height / 2) + 'px';
+      el.style.transform = 'translate(-50%,-50%) scale(.35)';
+      el.style.opacity = '0';
+    });
+  });
+  setTimeout(() => el.remove(), 650);
+}
+window.voarRecompensa = voarRecompensa;
+
+// dispara os dois voos (moeda -> contador do topo, XP -> barra de
+// experiencia) a partir da posicao onde o monstro estava. Chamada pelo
+// golpe final (ver dispararVitoriaDoDia), no lugar do numeroFlutuante
+// estatico que as tarefas normais usam -- a MESMA ideia (numero
+// ancorado no monstro, item 1), so que agora ela efetivamente viaja
+// ate onde a moeda/XP realmente sao contabilizados, em vez de so
+// flutuar e sumir no mesmo lugar.
+function voarRecompensaFinal(xpGanho, moedasGanhas){
+  const arena = document.querySelector('.arena');
+  const mob = document.getElementById('mobSprite');
+  if (!arena || !mob) return;
+  const mobRect = mob.getBoundingClientRect();
+  const origemX = mobRect.left + mobRect.width / 2;
+  const origemY = mobRect.top + mobRect.height / 2;
+
+  const elCoins = document.querySelector('.coins');
+  const elXpBarra = document.querySelector('.xpwrap .xprow:not(.hprow) + .bar');
+
+  voarRecompensa(origemX, origemY, elCoins, COIN_SVG);
+  setTimeout(() => voarRecompensa(origemX, origemY, elXpBarra, XP_GEM_SVG), 90);
+}
+window.voarRecompensaFinal = voarRecompensaFinal;
+
 function moedasCaindo(qtd){
   const arena = document.querySelector('.arena');
   const mob = document.getElementById('mobSprite');
@@ -2398,13 +2472,12 @@ function alternar(i){
   const subiuNivel = nivelDepois > nivelAntes;
 
   if (venceuAgora && !monstroJaCaiu()){
-    // numeroFlutuante() ANTES do atraso -- mesma posicao/timing de
-    // qualquer outra tarefa (ancorado no monstro, junto com a propria
-    // animacao de golpe). Antes, o golpe final pulava direto pro toast
-    // de "MONSTRO DERROTADO" (generico, nao ancorado, so mostrava
-    // moedas) sem nenhum numero aparecer perto do monstro -- unica
-    // tarefa do dia que nao dava esse feedback.
-    numeroFlutuante(xpGanho, moedasGanhas);
+    // item 3 do redesign: o numero estatico (item 1, antes aqui) virou
+    // a recompensa voando de verdade (ver voarRecompensaFinal, chamada
+    // DENTRO de dispararVitoriaDoDia, sincronizada com o poof/bau) --
+    // por isso xpGanho/moedasGanhas agora precisam ser repassados pra
+    // la, ja que so existem aqui dentro de alternar().
+    //
     // atraso proposital: animarGolpe() (chamada logo acima) leva 320ms
     // pra terminar (hero bate, monstro treme, os dois voltam ao
     // normal -- ver a funcao). dispararVitoriaDoDia() faz o proprio
@@ -2413,7 +2486,7 @@ function alternar(i){
     // -- ainda no mesmo tick -- cortando a animacao de golpe pela
     // metade, dando a impressao de que o golpe acertou o bau em vez do
     // monstro (queixa do usuario, dava pra perceber facil).
-    setTimeout(() => dispararVitoriaDoDia(doDia, nivelAntes), 400);
+    setTimeout(() => dispararVitoriaDoDia(doDia, nivelAntes, xpGanho, moedasGanhas), 400);
     return true;
   }
   if (!venceuAgora) derrotadoEm = null;

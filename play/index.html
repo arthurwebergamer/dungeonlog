@@ -2391,7 +2391,11 @@ function numeroFlutuante(xpGanho, moedasGanhas){
   const arenaRect = arena.getBoundingClientRect();
   const mobRect = mob.getBoundingClientRect();
   const originX = mobRect.left - arenaRect.left + mobRect.width / 2;
-  const originY = mobRect.top - arenaRect.top + mobRect.height / 2;
+  // FIX (pedido do usuario): antes usava mobRect.top + height/2 (centro do
+  // sprite) -- o texto nascia por CIMA do desenho do monstro, no meio dele.
+  // Agora nasce ACIMA do topo do sprite (-14px de folga), como um "damage
+  // number" de RPG de verdade, sem sobrepor o desenho.
+  const originY = mobRect.top - arenaRect.top - 14;
 
   const el = document.createElement('div');
   el.className = 'dmg-float';

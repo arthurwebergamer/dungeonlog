@@ -1253,8 +1253,11 @@ function dispararVitoriaDoDia(doDia, nivelAntes, xpGanho, moedasGanhas){
   // visivel/dissipando, mas ja da tempo da recompensa "emergir" dele em
   // vez de nascer simultaneo), voam ate o HEROI, e SO DEPOIS que "+X"
   // aparece em cima da cabeca dele (dentro de voarRecompensaFinal) e
-  // que o bau/contadores sao liberados -- com uma folga de 350ms pra
-  // dar tempo de ler o "+X" antes do bau roubar a atencao.
+  // que o bau/contadores sao liberados -- com uma folga BEM maior
+  // (900ms, era 350ms) pra dar tempo de LER o "+X" antes do bau/
+  // contador roubarem a atencao. 350ms tava curto demais pra separar
+  // visualmente os dois momentos (confirmado em video: parecia tudo
+  // simultaneo).
   //
   // Se nao tem reward pra mostrar (veio do caminho de exclusao de
   // tarefa, que chama esta funcao sem xpGanho/moedasGanhas), pula
@@ -1262,7 +1265,7 @@ function dispararVitoriaDoDia(doDia, nivelAntes, xpGanho, moedasGanhas){
   if ((xpGanho || moedasGanhas) && typeof voarRecompensaFinal === 'function'){
     setTimeout(() => {
       voarRecompensaFinal(xpGanho || 0, moedasGanhas || 0, () => {
-        setTimeout(mostrarBauEContadores, 350);
+        setTimeout(mostrarBauEContadores, 900);
       });
     }, 450);
   } else {

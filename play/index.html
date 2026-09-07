@@ -2390,19 +2390,21 @@ function numeroFlutuante(xpGanho, moedasGanhas){
   const mob = document.getElementById('mobSprite');
   const arenaRect = arena.getBoundingClientRect();
   const mobRect = mob.getBoundingClientRect();
-  const originX = mobRect.left - arenaRect.left + mobRect.width / 2;
-  // FIX (pedido do usuario): antes usava mobRect.top + height/2 (centro do
-  // sprite) -- o texto nascia por CIMA do desenho do monstro, no meio dele.
-  // Agora nasce ACIMA do topo do sprite (-14px de folga), como um "damage
-  // number" de RPG de verdade, sem sobrepor o desenho.
-  const originY = mobRect.top - arenaRect.top - 14;
+  // FIX v2 (pedido do usuario): mesmo tratamento aplicado em
+  // numeroFlutuanteHeroi (golpe final) -- empilhado (+moedas em cima,
+  // +XP embaixo, ver .dmg-float.pilha no style.css) colado no sprite em
+  // vez de flutuando acima da cabeca. Simetrico ao do heroi: la o texto
+  // vai pra fora (esquerda do heroi, longe do "vs" central); aqui vai
+  // pra fora tambem, so que pro OUTRO lado (direita do monstro, mesmo
+  // motivo -- longe do "vs" central).
+  const originX = mobRect.right - arenaRect.left + 30;
+  const originY = mobRect.top - arenaRect.top + mobRect.height / 2;
 
   const el = document.createElement('div');
-  el.className = 'dmg-float';
+  el.className = 'dmg-float pilha direita';
   el.style.left = originX + 'px';
   el.style.top = originY + 'px';
   el.innerHTML = '<span class="dmg-moeda">+' + moedasGanhas + ' ' + COIN_SVG + '</span>'
-    + '<span class="dmg-sep">·</span>'
     + '<span class="dmg-xp">+' + xpGanho + ' XP</span>';
   arena.appendChild(el);
   setTimeout(() => el.remove(), 1100); // bate com a nova duracao de dmgFloat (1.9s -> 1.1s)
@@ -2501,23 +2503,11 @@ function celebrarVitoria(ganho){
   const alvo = document.getElementById('vitoria');
   if (!arena || !alvo) return;
 
-  // flutuante do bau, mesma origem/tecnica de numeroFlutuante() (centro
-  // do #mobSprite, classe .dmg-float ja existente, mesmo tempo de vida)
-  const mob = document.getElementById('mobSprite');
-  if (mob){
-    const arenaRect = arena.getBoundingClientRect();
-    const mobRect = mob.getBoundingClientRect();
-    const originX = mobRect.left - arenaRect.left + mobRect.width / 2;
-    const originY = mobRect.top - arenaRect.top + mobRect.height / 2;
-    const elBau = document.createElement('div');
-    elBau.className = 'dmg-float';
-    elBau.style.left = originX + 'px';
-    elBau.style.top = originY + 'px';
-    elBau.innerHTML = '<span class="dmg-moeda">' + CHEST_SVG + '</span>'
-      + '<span class="dmg-xp">' + (idiomaApp() === 'en' ? 'DAY WON!' : 'DIA VENCIDO!') + '</span>';
-    arena.appendChild(elBau);
-    setTimeout(() => elBau.remove(), 1600);
-  }
+  // REMOVIDO (pedido do usuario): flutuante "bau + DIA VENCIDO!" em cima
+  // do monstro -- redundante com a faixa grande ".vitoria .faixa" que ja
+  // mostra "DIA VENCIDO" no banner principal logo abaixo. Mantido so o
+  // burst de faiscas e a contagem do numero, que sao efeitos do banner
+  // em si, nao um popup duplicado.
 
   // burst de faiscas radiando da faixa "DIA VENCIDO" -- mesma tecnica de
   // origem/posicionamento de moedasCaindo/numeroFlutuante (getBoundingClientRect

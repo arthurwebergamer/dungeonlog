@@ -86,6 +86,10 @@
      +XP embaixo -- cada linha e seu proprio flex row (icone+numero).
      Usada so em numeroFlutuanteHeroi() por enquanto. */
   .dmg-float.pilha{flex-direction:column;align-items:flex-end;gap:2px}
+  /* espelho do .pilha acima -- usado quando o texto fica do lado DIREITO
+     do sprite (numeroFlutuante/mob) em vez do esquerdo (numeroFlutuanteHeroi):
+     alinha pela esquerda pra colar no sprite em vez de flutuar pra longe */
+  .dmg-float.pilha.direita{align-items:flex-start}
   .dmg-float.pilha .dmg-moeda,.dmg-float.pilha .dmg-xp{display:flex;align-items:center;gap:3px}
   /* moeda em --gold (mesma cor de .coins no topbar e .toast.gold), XP em
      cor neutra (mesma familia de .xpnum) -- app ja diferencia os dois

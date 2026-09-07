@@ -2299,7 +2299,7 @@ function voarRecompensa(origemX, origemY, destinoEl, svgHtml){
       el.style.opacity = '0';
     });
   });
-  setTimeout(() => el.remove(), 1250);
+  setTimeout(() => el.remove(), 900);
 }
 window.voarRecompensa = voarRecompensa;
 
@@ -2327,16 +2327,16 @@ function voarRecompensaFinal(xpGanho, moedasGanhas, aoTerminar){
   setTimeout(() => voarRecompensa(origemX, origemY, heroi, XP_GEM_SVG), 90);
 
   // "+moedas +XP" so aparece quando os icones JA CHEGARAM no heroi --
-  // 1100ms bate com a duracao do voo (.recompensa-voando, style.css)
-  // mais a folga do segundo icone (90ms de atraso acima). aoTerminar()
-  // e chamado AQUI, como continuacao de verdade, nao um timer paralelo
-  // adivinhando essa mesma duracao (era assim antes -- o contador do
-  // topo terminava de contar bem antes do "+X" aparecer, confirmado em
-  // video).
+  // 840ms bate com a duracao do voo (.75s, .recompensa-voando em
+  // style.css) mais a folga do segundo icone (90ms de atraso acima).
+  // aoTerminar() e chamado AQUI, como continuacao de verdade, nao um
+  // timer paralelo adivinhando essa mesma duracao (era assim antes --
+  // o contador do topo terminava de contar bem antes do "+X" aparecer,
+  // confirmado em video).
   setTimeout(() => {
     if (typeof numeroFlutuanteHeroi === 'function') numeroFlutuanteHeroi(xpGanho, moedasGanhas);
     if (typeof aoTerminar === 'function') aoTerminar();
-  }, 1100);
+  }, 840);
 }
 window.voarRecompensaFinal = voarRecompensaFinal;
 
@@ -2398,15 +2398,14 @@ function numeroFlutuanteHeroi(xpGanho, moedasGanhas){
   const arenaRect = arena.getBoundingClientRect();
   const heroiRect = heroi.getBoundingClientRect();
   const originX = heroiRect.left - arenaRect.left + heroiRect.width / 2;
-  const originY = heroiRect.top - arenaRect.top; // um pouco acima da cabeca, nao no meio do corpo
+  const originY = heroiRect.top - arenaRect.top + heroiRect.height / 2; // meio do sprite, nao mais o topo
 
   const el = document.createElement('div');
-  el.className = 'dmg-float';
+  el.className = 'dmg-float dmg-float-empilhado';
   el.style.left = originX + 'px';
   el.style.top = originY + 'px';
-  el.innerHTML = '<span class="dmg-moeda">+' + moedasGanhas + ' ' + COIN_SVG + '</span>'
-    + '<span class="dmg-sep">·</span>'
-    + '<span class="dmg-xp">+' + xpGanho + ' XP</span>';
+  el.innerHTML = '<span class="dmg-xp">+' + xpGanho + ' XP</span>'
+    + '<span class="dmg-moeda">+' + moedasGanhas + ' ' + COIN_SVG + '</span>';
   arena.appendChild(el);
   setTimeout(() => el.remove(), 1600);
 }

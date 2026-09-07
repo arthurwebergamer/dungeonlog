@@ -67,6 +67,12 @@
      position:fixed com coordenadas de viewport, empilhada acima de
      overlays/fichas (z-index 200) pois a ficha fecha logo em seguida */
   .dmg-float.fixo{position:fixed;z-index:200}
+  /* pedido do usuario: "+XP" e "+moedas" empilhados (XP em cima,
+     moedas embaixo) em vez de lado a lado com separador -- usado por
+     numeroFlutuanteHeroi() (recompensa do golpe final, pousando no
+     heroi). O .dmg-float normal (monstro, outras telas) continua em
+     linha, isso e so um modificador extra. */
+  .dmg-float.dmg-float-empilhado{flex-direction:column;gap:1px;align-items:center}
   /* pedido do usuario (27/08): mensagens tipo "Voce comprou X"/"Voce
      melhorou Fortuna" podem ser longas -- sem isso, nowrap fazia o texto
      estourar pra fora da tela quando o botao de origem ficava perto da
@@ -3498,8 +3504,10 @@
 /* ======================================================================
    RECOMPENSA VOANDO (item 3) -- icone criado dinamicamente por
    voarRecompensa()/voarRecompensaFinal() (script principal), sempre
-   como position:fixed porque os destinos (contador de moedas no topo,
-   barra de XP embaixo da arena) ficam FORA dos limites da .arena.
+   como position:fixed porque o destino (o HEROI) fica dentro da
+   .arena, mas o elemento nasce em coordenadas de VIEWPORT (mesma
+   tecnica da variante "fora da Arena" do dmg-float) -- mais simples
+   assim do que lidar com o offset relativo toda vez.
    left/top/transform/opacity mudados via JS logo apos o double rAF; a
    transition abaixo e o que faz a viagem parecer suave em vez de um
    "teletransporte". */
@@ -3508,8 +3516,8 @@
   transform:translate(-50%,-50%) scale(1);
   opacity:1; pointer-events:none; z-index:500;
   transition:
-    left 1.1s cubic-bezier(.25,.65,.3,1),
-    top 1.1s cubic-bezier(.25,.65,.3,1),
-    transform 1.1s ease-in,
-    opacity 1.1s ease-in .24s;
+    left .75s cubic-bezier(.25,.65,.3,1),
+    top .75s cubic-bezier(.25,.65,.3,1),
+    transform .75s ease-in,
+    opacity .75s ease-in .16s;
 }

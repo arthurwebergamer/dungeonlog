@@ -2423,7 +2423,15 @@ function numeroFlutuanteHeroi(xpGanho, moedasGanhas){
   const arenaRect = arena.getBoundingClientRect();
   const heroiRect = heroi.getBoundingClientRect();
   const originX = heroiRect.left - arenaRect.left + heroiRect.width / 2;
-  const originY = heroiRect.bottom - arenaRect.top + 4; // logo abaixo dos pes do heroi
+  // FIX: "logo abaixo dos pes do heroi" (heroiRect.bottom + 4) colidia
+  // direto com o nome do monstro (#mobname), que fica centralizado
+  // NESSA MESMA faixa vertical, um pouco abaixo da fileira heroi/
+  // monstro -- confirmado em video (texto aparecia sobreposto em cima
+  // de "Criatura cogumelo"). Ancorado na altura da propria .arena
+  // (perto do chao/grama, margem fixa da borda de baixo) em vez da
+  // altura do heroi -- garante uma faixa livre, sem depender de onde
+  // o nome do monstro calha de estar.
+  const originY = arenaRect.height - 20;
 
   const el = document.createElement('div');
   el.className = 'recompensa-heroi';

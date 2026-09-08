@@ -2581,13 +2581,23 @@ function alternar(i){
       const moedasGanhas = Math.max(1, Math.round(moedasDaTarefa(dif) / meta));
       xpTotal += xpGanho;
       moedas += moedasGanhas;
+      // mesma trava _adiarContadoresRecompensa do golpe final (ver
+      // comentario em render()) -- sem isso a barra de XP/moeda ja
+      // aparecia cheia ANTES do icone chegar no heroi, ja que
+      // xpTotal/moedas acima ja tinham sido somados antes deste
+      // render(). Libera de novo (sem suprimir) dentro do aoTerminar
+      // do voo, pra barra so andar quando o "+X" aparecer.
+      window._adiarContadoresRecompensa = true;
       render();
+      window._adiarContadoresRecompensa = false;
       // pedido do usuario: tarefa normal agora tambem tem o voo de
       // icones (moeda+XP do monstro ate o heroi) igual golpe final --
       // voarRecompensaFinal() e generica, so o nome ficou de quando so
       // era usada ali; ela mesma chama numeroFlutuanteHeroi() no final
-      // do voo, entao a chamada direta que tinha aqui antes some.
-      voarRecompensaFinal(xpGanho, moedasGanhas);
+      // do voo, entao a chamada direta que tinha aqui antes some. O
+      // 3o argumento (aoTerminar) e novo aqui: re-renderiza SEM a trava,
+      // fazendo a barra andar so depois do icone chegar.
+      voarRecompensaFinal(xpGanho, moedasGanhas, () => render());
       return false;
     }
   }
@@ -2618,13 +2628,26 @@ function alternar(i){
   const venceuAgora = avaliarVitoriaDoDia();
   const ehGolpeFinal = venceuAgora && !monstroJaCaiu();
 
-  animarGolpe();
-  if (ehGolpeFinal) window._adiarContadoresRecompensa = true;
-  render();
-  if (ehGolpeFinal) window._adiarContadoresRecompensa = false; // so vale por ESSE render() -- o de dentro da sequencia atrasada (mostrarBauEContadores) roda com a flag ja desligada
-
+  // MOVIDO pra antes do render() (era depois) -- progresso() e pura, so
+  // olha xpTotal (ja somado acima), nao depende de nada que render()
+  // preencha. Precisa saber ANTES se vai subir de nivel pra decidir se
+  // suprime os contadores no render() logo abaixo (ver comentario junto
+  // de _adiarContadoresRecompensa).
   const nivelDepois = progresso().nivel;
   const subiuNivel = nivelDepois > nivelAntes;
+
+  animarGolpe();
+  // suprime contadores no render() sempre que a barra so deve andar
+  // DEPOIS de um icone chegar no heroi (golpe final OU tarefa normal
+  // via voarRecompensaFinal, logo abaixo) -- pedido do usuario, mesmo
+  // bug do golpe final ("barra enchendo antes do icone chegar") mas
+  // que so estava corrigido pra ele. NAO suprime quando vai ter
+  // level-up: esse caminho chama mostrarNivelUp() e nao tem voo, quer
+  // o contador atualizado na hora.
+  const suprimirContadores = ehGolpeFinal || !subiuNivel;
+  if (suprimirContadores) window._adiarContadoresRecompensa = true;
+  render();
+  if (suprimirContadores) window._adiarContadoresRecompensa = false; // so vale por ESSE render() -- o de dentro da sequencia atrasada (mostrarBauEContadores) roda com a flag ja desligada
 
   if (ehGolpeFinal){
     // item 3 do redesign: o numero estatico (item 1, antes aqui) virou
@@ -2649,7 +2672,7 @@ function alternar(i){
   if (subiuNivel){
     if (typeof mostrarNivelUp === 'function') mostrarNivelUp(nivelDepois);
   }
-  else voarRecompensaFinal(xpGanho, moedasGanhas); // pedido do usuario: mesmo voo de icones do golpe final
+  else voarRecompensaFinal(xpGanho, moedasGanhas, () => render()); // pedido do usuario: mesmo voo de icones do golpe final, e barra so anda quando ele chega (aoTerminar)
   return true;
 }
 

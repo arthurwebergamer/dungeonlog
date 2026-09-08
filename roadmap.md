@@ -8864,3 +8864,41 @@ Continuação da sessão do Sistema de Temas de Arena. Usuário fez upload de um
 
 ### Em aberto (sem mudança nesta sessão)
 - Mesmos itens já registrados na sessão anterior: fonte de asset pro tema "Fogo", Play Billing real, Firestore em modo de teste.
+
+## [Sessão] Redesign do feedback de combate (+moeda/+XP) + sistema de SFX + limpeza de UI
+
+### Contexto
+Sessão de continuação de uma função incompleta de textos flutuantes de combate (item 40 do roadmap), que evoluiu pra reposicionamento completo do sistema de recompensa, sincronização de contadores, um sistema novo de SFX validado via preview antes de implementar, e duas remoções de UI redundante.
+
+### Feedback de combate — números flutuantes (`numeroFlutuante`/`numeroFlutuanteHeroi`)
+- **Histórico de iteração** (documentado pra não repetir tentativas já descartadas): posição inicial no centro do sprite → acima da cabeça (`-14px`) → empilhado (`.dmg-float.pilha`, moedas em cima/XP embaixo) colado na lateral do sprite, espelhado conforme o lado (`.pilha` = alinha à direita, pro herói; `.pilha.direita` = alinha à esquerda, pro monstro).
+- **Unificação de fluxo**: os 3 casos que davam recompensa (golpe final, meta parcial de tarefa com `meta>1`, tarefa normal completa sem level-up) passaram a usar **só** `voarRecompensaFinal()` — a moeda e o XP voam do monstro até o herói (mesma animação do golpe final) antes do texto aparecer. `numeroFlutuante()` (a versão "no monstro") ficou sem chamada ativa, mantida no arquivo comentada (padrão append-only já usado com `flutuanteFixo`/`pontoDeElemento`).
+- **Level-up continua sem voo**: `mostrarNivelUp()` é chamado direto, sem passar por `voarRecompensaFinal()` — não faz sentido animar moeda/XP voando quando o que domina a tela é o popup de nível.
+- **Animação do `.dmg-float`** (`style.css`, `@keyframes dmgFloat`): reduzida de 1.9s pra 1.1s — aparece rápido, segura por um tempo curto (legível), sobe e some só no trecho final (55%→100%), em vez de ficar parado o tempo todo.
+
+### Contadores (barra de XP/moeda) sincronizados com a animação
+- Bug: a barra de XP/moeda enchia **antes** do ícone chegar no herói, porque `xpTotal`/`moedas` já eram somados no estado antes do `render()` que atualiza a UI.
+- Mecanismo `_adiarContadoresRecompensa` (já existia, só valia pro golpe final) **estendido** pros outros 2 fluxos: suprime a contagem visual no `render()` sempre que vai ter voo de ícone depois (`ehGolpeFinal || !subiuNivel`), e libera de novo (`() => render()`) como callback `aoTerminar` de `voarRecompensaFinal()`.
+- Efeito colateral técnico: o cálculo de `nivelDepois`/`subiuNivel` teve que ser adiantado pra **antes** do `render()` (possível porque `progresso()` é pura, só depende de `xpTotal`) — precisa saber se vai subir de nível pra decidir se suprime os contadores.
+
+### Popup "DIA VENCIDO" duplicado — removido
+`celebrarVitoria()` tinha um flutuante extra ("🎁 DIA VENCIDO!") em cima do monstro, redundante com a faixa grande `.vitoria .faixa` que já mostra o mesmo texto no banner principal. Removido; mantidos o burst de faíscas e a contagem progressiva do número, que são efeitos do próprio banner.
+
+### Sistema de SFX novo
+Fluxo de trabalho: preview em artifact HTML separado (Web Audio API sintetizada, várias rodadas de opções lado a lado) → aprovação → implementação direto no catálogo `SONS` já existente no app (`window.tocarSom`), sem criar motor de áudio paralelo.
+
+- **`chegadaRecompensa`** (nova entrada): cristal/gema (2 tons de sine, 1046Hz+1568Hz). Disparada dentro de `voarRecompensaFinal()` nos dois momentos reais de chegada — moeda em 750ms, XP em 840ms (bate com a duração real da transição CSS `.recompensa-voando`, `.75s`, mais o atraso de 90ms entre os dois ícones).
+- **`poofBau`** (nova entrada): "puf" único (ruído curto + tom triangle 300→600Hz ascendente). Disparado em `atualizarBauArena()` na transição real de escondido→mostrado de cada baú (guarda de estado pra não repetir a cada `render()`, já que a função roda em todo render). Se os dois baús (padrão + especial) nascerem no mesmo `render()`, toca 2x com 260ms de delay.
+  - **Decisão explícita**: esse som **não** é usado no poof do monstro — testado e descartado a pedido do usuário; a nuvem do monstro desaparecendo fica sem som.
+- **`equipar`** (substituída): design antigo ("clunk metálico com click de encaixe") trocado por "whoosh + snap" (tom triangle 300→700Hz + ruído curto + tom quadrado 200Hz). Design antigo mantido comentado no catálogo.
+- **`levelup`** (ajustada): motivo — usuário achou "muito alto, desconfortável de ouvir". Causa raiz: waveform `square` (harmônicos ímpares fortes/estridente) + ganho 0.4, bem acima da média do catálogo. Corrigido pra `sine` (mais macia) com ganho 0.25. Mesma melodia de 4 notas.
+
+### UI — fechadura pixel do baú trancado removida
+`.bauArena.trancado::after` / `.bauArena.bauEspecial.trancado::after` (overlay de cadeado via pixel art em base64) removido do `style.css`. Motivo: já existe o chip `.dica` ("Requer uma chave X ou superior") que aparece ao clicar no baú trancado (`abrirBauEspecial()`) — a fechadura era redundante e um item a mais na tela.
+
+### Assets/técnicas usadas
+- Preview de SFX: Web Audio API pura (osciladores + envelope de ganho, mais um buffer de ruído branco com decaimento), sem asset externo — mesmo padrão já usado no motor de SFX real do app.
+- Validação de cada mudança: `node --check` nos blocos `<script>` extraídos via regex, `css` npm package pro `style.css`.
+
+### Em aberto / não mexido nesta sessão
+- Nada pendente desta sessão — todas as decisões (posicionamento, sons, remoções) foram fechadas e implementadas.

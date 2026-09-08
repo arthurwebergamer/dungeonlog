@@ -2343,6 +2343,15 @@ function voarRecompensaFinal(xpGanho, moedasGanhas, aoTerminar){
   voarRecompensa(origemX, origemY, heroi, COIN_SVG);
   setTimeout(() => voarRecompensa(origemX, origemY, heroi, XP_GEM_SVG), 90);
 
+  // pedido do usuario: som quando cada icone CHEGA no heroi, nao quando
+  // sai do monstro -- 750ms bate com a duracao real da transicao CSS
+  // (.75s, .recompensa-voando em style.css), a moeda sai em t=0 entao
+  // chega em 750ms; o XP sai 90ms depois (setTimeout acima) entao chega
+  // em 840ms. Reaproveita o catalogo de SFX que ja existe no app
+  // (window.tocarSom), nao um AudioContext a parte -- respeita volume/
+  // liga-desliga que o usuario ja configurou nas Opcoes.
+  setTimeout(() => { if (typeof window.tocarSom === 'function') window.tocarSom('chegadaRecompensa'); }, 750);
+
   // "+moedas +XP" so aparece quando os icones JA CHEGARAM no heroi --
   // 840ms bate com a duracao do voo (.75s, .recompensa-voando em
   // style.css) mais a folga do segundo icone (90ms de atraso acima).
@@ -2351,6 +2360,7 @@ function voarRecompensaFinal(xpGanho, moedasGanhas, aoTerminar){
   // o contador do topo terminava de contar bem antes do "+X" aparecer,
   // confirmado em video).
   setTimeout(() => {
+    if (typeof window.tocarSom === 'function') window.tocarSom('chegadaRecompensa'); // chegada do XP (2o icone)
     if (typeof numeroFlutuanteHeroi === 'function') numeroFlutuanteHeroi(xpGanho, moedasGanhas);
     if (typeof aoTerminar === 'function') aoTerminar();
   }, 840);
@@ -8120,6 +8130,10 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     },
     grimorio: c => {                                      // Grimorio obtido (marco de nivel 5) -- arpejo mais longo e "arcano" que o levelup normal
       [392, 466, 587, 698, 932].forEach((f, i) => tom(c, { freq:f, tipo:'sine', inicio:i*0.09, duracao:0.28, ganho:0.28 }));
+    },
+    chegadaRecompensa: c => {                             // icone de moeda/XP chega no heroi (voarRecompensaFinal) -- cristal/gema, aprovada pelo usuario (opcao "C" do preview de SFX)
+      tom(c, { freq:1046, tipo:'sine', duracao:0.22, ganho:0.32 });
+      tom(c, { freq:1568, tipo:'sine', inicio:0.02, duracao:0.28, ganho:0.18 });
     }
   };
 

@@ -1297,6 +1297,12 @@ function mostrarPoofMonstro(){
   // usuario, confirmada em video).
   mob.style.opacity = '0';
 
+  // pedido do usuario: reaproveita o mesmo som do bau (poofBau) em vez
+  // de criar um som dedicado pro monstro -- disparado no MESMO instante
+  // em que a nuvem nasce (nao no fim/mostrarBauEContadores), sincronizado
+  // com o momento visual real do poof.
+  if (typeof window.tocarSom === 'function') window.tocarSom('poofBau');
+
   const el = document.createElement('div');
   el.className = 'poof-monstro';
   el.style.left = originX + 'px';
@@ -3813,10 +3819,21 @@ function atualizarBauArena(){
   const estado = lerBauDia();
   const valido = !!(estado && estado.dia === isoAtual());
 
+  // pedido do usuario: som de "spawn" (poofBau) no instante em que um
+  // baú passa de escondido pra mostrado -- guarda ANTES de mexer na
+  // classe pra saber se e uma transicao de verdade (sem isso, tocaria
+  // de novo em TODO render() enquanto o bau ja estivesse visivel, ja
+  // que atualizarBauArena() roda a cada render()). Se os DOIS baus
+  // (padrao + especial) nascerem no mesmo render(), toca 2x com delay
+  // em vez de simultaneo (mesmo padrao do "poof duplo" do preview).
+  const spawnsNovos = [];
+
   const elP = document.getElementById('bauArena');
   if (elP){
+    const jaMostravaP = elP.classList.contains('mostrar');
     const mostrarP = valido && !!estado.padrao;
     elP.classList.toggle('mostrar', mostrarP);
+    if (mostrarP && !jaMostravaP) spawnsNovos.push('padrao');
     if (mostrarP){
       elP.classList.toggle('aberto', !!estado.padrao.aberto);
       if (!elP.dataset.montado){ elP.onclick = abrirBauPadrao; elP.dataset.montado = '1'; }
@@ -3825,8 +3842,10 @@ function atualizarBauArena(){
 
   const elE = document.getElementById('bauArenaEspecial');
   if (elE){
+    const jaMostravaE = elE.classList.contains('mostrar');
     const mostrarE = valido && !!estado.especial;
     elE.classList.toggle('mostrar', mostrarE);
+    if (mostrarE && !jaMostravaE) spawnsNovos.push('especial');
     if (mostrarE){
       elE.classList.toggle('trancado', !estado.especial.aberto);
       elE.classList.toggle('aberto', !!estado.especial.aberto);
@@ -3855,6 +3874,17 @@ function atualizarBauArena(){
         elE.dataset.montado = '1';
       }
     }
+  }
+
+  // dispara o som de spawn DEPOIS dos dois blocos acima, ja sabendo se
+  // foi 1 ou 2 baus novos nesse render() -- 260ms de delay entre os 2
+  // quando ambos aparecem juntos, mesmo intervalo testado/aprovado no
+  // preview de SFX (demo "2 baus").
+  if (spawnsNovos.length === 1){
+    if (typeof window.tocarSom === 'function') window.tocarSom('poofBau');
+  } else if (spawnsNovos.length === 2){
+    if (typeof window.tocarSom === 'function') window.tocarSom('poofBau');
+    setTimeout(() => { if (typeof window.tocarSom === 'function') window.tocarSom('poofBau'); }, 260);
   }
 }
 window.atualizarBauArena = atualizarBauArena;
@@ -8113,11 +8143,18 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       tom(c, { freq:440, tipo:'triangle', duracao:0.05, ganho:0.25 });
       tom(c, { freq:660, tipo:'triangle', inicio:0.05, duracao:0.09, ganho:0.3 });
     },
-    equipar: c => {                                      // item equipado -- "clunk" metalico com click de encaixe
-      ruido(c, { duracao:0.03, ganho:0.35 });
-      tom(c, { freq:300, freqFinal:180, tipo:'square', duracao:0.08, ganho:0.4 });
-      tom(c, { freq:500, tipo:'triangle', inicio:0.03, duracao:0.06, ganho:0.25 });
+    equipar: c => {                                      // item equipado -- FIX (pedido do usuario): trocado pelo som novo aprovado no preview de SFX, opcao "F" (whoosh + snap) -- design antigo (clunk metalico puro) comentado abaixo, nao apagado
+      tom(c, { freq:300, freqFinal:700, tipo:'triangle', duracao:0.12, ganho:0.3 });
+      ruido(c, { inicio:0.11, duracao:0.03, ganho:0.5 });
+      tom(c, { freq:200, tipo:'square', inicio:0.11, duracao:0.05, ganho:0.36 });
     },
+    // DESIGN ANTERIOR de equipar (substituido acima, mantido comentado --
+    // "clunk" metalico com click de encaixe):
+    //   equipar: c => {
+    //     ruido(c, { duracao:0.03, ganho:0.35 });
+    //     tom(c, { freq:300, freqFinal:180, tipo:'square', duracao:0.08, ganho:0.4 });
+    //     tom(c, { freq:500, tipo:'triangle', inicio:0.03, duracao:0.06, ganho:0.25 });
+    //   },
     desequipar: c => {                                   // item desequipado -- thud curto e mais surdo, sem o click de encaixe
       tom(c, { freq:220, freqFinal:140, tipo:'triangle', duracao:0.09, ganho:0.3 });
     },
@@ -8134,6 +8171,10 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     chegadaRecompensa: c => {                             // icone de moeda/XP chega no heroi (voarRecompensaFinal) -- cristal/gema, aprovada pelo usuario (opcao "C" do preview de SFX)
       tom(c, { freq:1046, tipo:'sine', duracao:0.22, ganho:0.32 });
       tom(c, { freq:1568, tipo:'sine', inicio:0.02, duracao:0.28, ganho:0.18 });
+    },
+    poofBau: c => {                                       // "puf" unico -- bau spawnando na Arena (opcao "O", metade do "poof duplo" do preview de SFX). Pedido do usuario: reaproveitado TAMBEM pro monstro desaparecendo (mostrarPoofMonstro) em vez de criar um som novo pra isso -- ver comentario la
+      ruido(c, { duracao:0.05, ganho:0.36 });
+      tom(c, { freq:300, freqFinal:600, tipo:'triangle', duracao:0.06, ganho:0.22 });
     }
   };
 

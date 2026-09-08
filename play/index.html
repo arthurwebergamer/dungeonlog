@@ -2385,6 +2385,12 @@ function moedasCaindo(qtd){
 // que moedasCaindo ja usa (centro do #mobSprite via getBoundingClientRect)
 // -- so troca o conteudo (texto em vez de moeda) e a keyframe (sobe em vez
 // de cair, ver dmgFloat no style.css).
+// SEM USO ATIVO NO MOMENTO (pedido do usuario: tarefa normal passou a usar
+// numeroFlutuanteHeroi() tambem, igual golpe final -- ver os 2 call sites
+// que chamavam esta funcao, agora chamando numeroFlutuanteHeroi() no lugar).
+// Mantida no arquivo, nao apagada (mesmo padrao de flutuanteFixo/
+// pontoDeElemento logo abaixo), caso algum fluxo futuro precise voltar a
+// mostrar o flutuante em cima do MONSTRO em vez do heroi.
 function numeroFlutuante(xpGanho, moedasGanhas){
   const arena = document.querySelector('.arena');
   const mob = document.getElementById('mobSprite');
@@ -2576,7 +2582,12 @@ function alternar(i){
       xpTotal += xpGanho;
       moedas += moedasGanhas;
       render();
-      numeroFlutuante(xpGanho, moedasGanhas);
+      // pedido do usuario: tarefa normal agora tambem tem o voo de
+      // icones (moeda+XP do monstro ate o heroi) igual golpe final --
+      // voarRecompensaFinal() e generica, so o nome ficou de quando so
+      // era usada ali; ela mesma chama numeroFlutuanteHeroi() no final
+      // do voo, entao a chamada direta que tinha aqui antes some.
+      voarRecompensaFinal(xpGanho, moedasGanhas);
       return false;
     }
   }
@@ -2638,7 +2649,7 @@ function alternar(i){
   if (subiuNivel){
     if (typeof mostrarNivelUp === 'function') mostrarNivelUp(nivelDepois);
   }
-  else numeroFlutuante(xpGanho, moedasGanhas);
+  else voarRecompensaFinal(xpGanho, moedasGanhas); // pedido do usuario: mesmo voo de icones do golpe final
   return true;
 }
 

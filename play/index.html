@@ -1297,11 +1297,10 @@ function mostrarPoofMonstro(){
   // usuario, confirmada em video).
   mob.style.opacity = '0';
 
-  // pedido do usuario: reaproveita o mesmo som do bau (poofBau) em vez
-  // de criar um som dedicado pro monstro -- disparado no MESMO instante
-  // em que a nuvem nasce (nao no fim/mostrarBauEContadores), sincronizado
-  // com o momento visual real do poof.
-  if (typeof window.tocarSom === 'function') window.tocarSom('poofBau');
+  // REMOVIDO (pedido do usuario): som reaproveitado do bau (poofBau)
+  // tocando aqui tambem -- decidido que a nuvem do monstro fica sem som.
+  // poofBau continua ativo pro SPAWN do bau (ver atualizarBauArena()),
+  // so essa chamada aqui que saiu.
 
   const el = document.createElement('div');
   el.className = 'poof-monstro';
@@ -8113,8 +8112,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     fuga: c => {                                        // monstro fugiu (tarefas largadas na virada)
       tom(c, { freq:520, freqFinal:110, tipo:'sawtooth', duracao:0.4, ganho:0.4 });
     },
-    levelup: c => {                                     // subida de nivel
-      [523, 659, 784, 1047].forEach((f, i) => tom(c, { freq:f, tipo:'square', inicio:i*0.07, duracao:0.18, ganho:0.4 }));
+    levelup: c => {                                     // subida de nivel -- FIX v2 (pedido do usuario, aprovado no preview de SFX: opcao "C"): triangle (v1 do fix) trocado por sine, ganho 0.22 -> 0.25. Historico: original era square ganho 0.4 ("muito alto, desconfortavel de ouvir"), sine e a waveform mais macia das 4 disponiveis (sine/triangle/square/sawtooth), sem harmonicos fortes
+      [523, 659, 784, 1047].forEach((f, i) => tom(c, { freq:f, tipo:'sine', inicio:i*0.07, duracao:0.18, ganho:0.25 }));
     },
     loot: c => {                                        // espolio do bau -- tambem o UNICO sinal de "dia vencido" (ver nota no gancho de mostrarBauLoot)
       [880, 1175, 1568].forEach((f, i) => tom(c, { freq:f, tipo:'sine', inicio:i*0.05, duracao:0.3, ganho:0.35 }));

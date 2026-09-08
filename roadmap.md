@@ -8864,3 +8864,83 @@ Continuação da sessão do Sistema de Temas de Arena. Usuário fez upload de um
 
 ### Em aberto (sem mudança nesta sessão)
 - Mesmos itens já registrados na sessão anterior: fonte de asset pro tema "Fogo", Play Billing real, Firestore em modo de teste.
+
+## [Sessão] Redesign do feedback visual de combate (comparação com referência) + ajustes de UI do sistema de Temas de Arena
+
+### Contexto
+Usuário trouxe vídeo de outro app ("Habit Fantasy") como referência de como o combate deveria dar feedback visual, e apontou que o baú "aparecia do nada" no nosso jogo. Definimos 4 itens, feitos em ordem, um de cada vez: (1) número da recompensa ancorado no monstro, (2) nuvem de "poof" na morte do monstro, (3) moeda/XP voando até o herói, (4) baú com entrada animada.
+
+### Ajustes finos no sistema de Temas de Arena (antes do redesign de combate)
+- **Bolinhas de posição** (`#temaArenaDots`): escondidas por padrão (`opacity:0`), só aparecem durante o arrasto real (`touchstart`/`touchend`), e só quando há 2+ temas acessíveis.
+- **Notificação de tema desbloqueado**: atrasada em 2.2s (competia com XP/level up/conquista disparando tudo junto no mesmo instante) e texto encurtado ("Novo tema:" em vez de "Nova arena desbloqueada:").
+
+### Ícone de cadeado do baú trancado
+- Recriado a partir de referência visual do usuário (imagem própria, não banco de imagens licenciado) — recortada, fundo removido via flood-fill (preserva partes claras do próprio objeto), quantizada pra reduzir peso, e reduzida com Lanczos (evita perda de qualidade que `image-rendering:pixelated` causava ao encolher uma imagem não-nativa de pixel art).
+- Versão final usa as **cores originais** (dourado/cinza/escuro) — uma tentativa intermediária em cinza sólido foi descartada.
+- Troca aplicada tanto no overlay de tema bloqueado da Arena quanto no ícone do baú trancado (`.bauArena.trancado::after`), com tamanho reduzido (20px → 16px).
+
+### Redesign do feedback de combate (golpe final / vitória do dia)
+
+**Item 1 — número ancorado**: a última tarefa do dia (que derrota o monstro) não mostrava nenhum número perto do monstro antes de pular pro toast genérico "MONSTRO DERROTADO". Corrigido pra também mostrar o `numeroFlutuante()` ancorado, como qualquer outra tarefa.
+
+**Item 2 — nuvem de poof**: nuvem de 4 frames em pixel art **gerada proceduralmente via PIL** (sem asset externo, ~700 bytes), no lugar exato onde o monstro estava, capturado **antes** do `render()` escondê-lo. Bugs sérios encontrados e corrigidos nesse processo:
+- Cleanup pós-transição limpava o `transform` de volta pra `''`, sobrepondo a camada perdedora em cima da vencedora (mesma classe de bug do sistema de swipe de temas,呼raiz idêntica).
+- Nuvem tocava por cima do sprite do monstro ainda visível (branco + cor do monstro = mistura suja) — corrigido escondendo o monstro (`opacity:0`) no instante exato em que a nuvem nasce, com reset cuidadoso depois (sem deixar "grudado" pro monstro do dia seguinte).
+- Golpe final atrasado em 400ms antes de esconder o monstro, pra não cortar a animação de golpe pela metade (dava impressão de acertar o baú, não o monstro).
+
+**Item 3 — moeda/XP voando**: ícones viajam do ponto de morte do monstro até o **herói** (não até os contadores do topo, como uma primeira tentativa errada tinha feito). Ao chegar, mostra "+moedas +XP" — depois de várias iterações de posicionamento (em cima da cabeça, embaixo dos pés, no chão da arena — todas colidindo com o nome do monstro ou ficando longe demais), a solução final foi **reaproveitar exatamente a mesma animação/classe (`dmg-float`) já usada nas tarefas normais**, só trocando a origem pro lado do herói em vez do centro do monstro — mais simples e confiável que tentar inventar posicionamento próprio.
+
+**Item 4 — entrada do baú**: já existia (`bauSurge`, animação de "estouro" com overshoot) — o problema nunca foi a animação em si, era o timing (baú aparecendo no mesmo instante da morte do monstro, sem nenhuma pausa).
+
+**Sequenciamento (bugs de timing corrigidos ao longo do processo)**:
+- Timers paralelos "adivinhando" a duração um do outro (baú aparecia via `setTimeout` fixo, recompensa voando via outro `setTimeout` fixo, sem um esperar o outro de verdade) → trocado por **callback encadeado de verdade** (`aoTerminar()`), garantindo ordem correta independente de quanto cada etapa demora.
+- Contador de moedas/XP (topo) e a barra de XP atualizavam **antes** da recompensa terminar de voar até o herói — corrigido com uma flag (`_adiarContadoresRecompensa`) que segura a atualização visual (não o estado real, que já é somado na hora) até a sequência completa liberar.
+- Barra de XP (`#fill`) e o número (`#xpnum`) tinham durações de transição diferentes (0.45s vs 1.1s), ficando dessincronizados — igualado, só na barra de XP (não na de Vida, que usa a mesma classe `.fill`).
+- Bug de parsing: `animarContagemNumero()` usava um regex que **concatenava** "40" + "100" (de "40 / 100") virando "40100" — corrigido pra pegar só o primeiro grupo de dígitos.
+
+### Aprendizados registrados
+- Bug do "cleanup zera transform" já apareceu 2x em módulos diferentes (swipe de temas, poof de morte) — mesma causa raiz, mesma lição: nunca limpar `transform` de volta pra `''` num sistema de camadas sobrepostas, só a `transition`.
+- Ao reaproveitar um padrão já comprovado (`dmg-float`) em vez de inventar um novo, o bug de posicionamento sumiu de primeira — vale considerar isso primeiro da próxima vez, antes de customizar.
+- Validação de vídeo frame-a-frame (`ffmpeg -vf fps=N` + contact sheets) foi essencial pra achar várias dessas causas raízes que não eram óbvias só pela descrição do bug.
+
+### Em aberto
+- Nenhum item específico ficou pendente do redesign de combate — os 4 itens foram concluídos e confirmados pelo usuário.
+- Itens antigos ainda em aberto (não tocados nesta sessão): fonte de asset pro tema "Fogo", Play Billing real, Firestore em modo de teste.
+
+## [Sessão] Redesign do feedback de combate (+moeda/+XP) + sistema de SFX + limpeza de UI
+
+### Contexto
+Sessão de continuação de uma função incompleta de textos flutuantes de combate (item 40 do roadmap), que evoluiu pra reposicionamento completo do sistema de recompensa, sincronização de contadores, um sistema novo de SFX validado via preview antes de implementar, e duas remoções de UI redundante.
+
+### Feedback de combate — números flutuantes (`numeroFlutuante`/`numeroFlutuanteHeroi`)
+- **Histórico de iteração** (documentado pra não repetir tentativas já descartadas): posição inicial no centro do sprite → acima da cabeça (`-14px`) → empilhado (`.dmg-float.pilha`, moedas em cima/XP embaixo) colado na lateral do sprite, espelhado conforme o lado (`.pilha` = alinha à direita, pro herói; `.pilha.direita` = alinha à esquerda, pro monstro).
+- **Unificação de fluxo**: os 3 casos que davam recompensa (golpe final, meta parcial de tarefa com `meta>1`, tarefa normal completa sem level-up) passaram a usar **só** `voarRecompensaFinal()` — a moeda e o XP voam do monstro até o herói (mesma animação do golpe final) antes do texto aparecer. `numeroFlutuante()` (a versão "no monstro") ficou sem chamada ativa, mantida no arquivo comentada (padrão append-only já usado com `flutuanteFixo`/`pontoDeElemento`).
+- **Level-up continua sem voo**: `mostrarNivelUp()` é chamado direto, sem passar por `voarRecompensaFinal()` — não faz sentido animar moeda/XP voando quando o que domina a tela é o popup de nível.
+- **Animação do `.dmg-float`** (`style.css`, `@keyframes dmgFloat`): reduzida de 1.9s pra 1.1s — aparece rápido, segura por um tempo curto (legível), sobe e some só no trecho final (55%→100%), em vez de ficar parado o tempo todo.
+
+### Contadores (barra de XP/moeda) sincronizados com a animação
+- Bug: a barra de XP/moeda enchia **antes** do ícone chegar no herói, porque `xpTotal`/`moedas` já eram somados no estado antes do `render()` que atualiza a UI.
+- Mecanismo `_adiarContadoresRecompensa` (já existia, só valia pro golpe final) **estendido** pros outros 2 fluxos: suprime a contagem visual no `render()` sempre que vai ter voo de ícone depois (`ehGolpeFinal || !subiuNivel`), e libera de novo (`() => render()`) como callback `aoTerminar` de `voarRecompensaFinal()`.
+- Efeito colateral técnico: o cálculo de `nivelDepois`/`subiuNivel` teve que ser adiantado pra **antes** do `render()` (possível porque `progresso()` é pura, só depende de `xpTotal`) — precisa saber se vai subir de nível pra decidir se suprime os contadores.
+
+### Popup "DIA VENCIDO" duplicado — removido
+`celebrarVitoria()` tinha um flutuante extra ("🎁 DIA VENCIDO!") em cima do monstro, redundante com a faixa grande `.vitoria .faixa` que já mostra o mesmo texto no banner principal. Removido; mantidos o burst de faíscas e a contagem progressiva do número, que são efeitos do próprio banner.
+
+### Sistema de SFX novo
+Fluxo de trabalho: preview em artifact HTML separado (Web Audio API sintetizada, várias rodadas de opções lado a lado) → aprovação → implementação direto no catálogo `SONS` já existente no app (`window.tocarSom`), sem criar motor de áudio paralelo.
+
+- **`chegadaRecompensa`** (nova entrada): cristal/gema (2 tons de sine, 1046Hz+1568Hz). Disparada dentro de `voarRecompensaFinal()` nos dois momentos reais de chegada — moeda em 750ms, XP em 840ms (bate com a duração real da transição CSS `.recompensa-voando`, `.75s`, mais o atraso de 90ms entre os dois ícones).
+- **`poofBau`** (nova entrada): "puf" único (ruído curto + tom triangle 300→600Hz ascendente). Disparado em `atualizarBauArena()` na transição real de escondido→mostrado de cada baú (guarda de estado pra não repetir a cada `render()`, já que a função roda em todo render). Se os dois baús (padrão + especial) nascerem no mesmo `render()`, toca 2x com 260ms de delay.
+  - **Decisão explícita**: esse som **não** é usado no poof do monstro — testado e descartado a pedido do usuário; a nuvem do monstro desaparecendo fica sem som.
+- **`equipar`** (substituída): design antigo ("clunk metálico com click de encaixe") trocado por "whoosh + snap" (tom triangle 300→700Hz + ruído curto + tom quadrado 200Hz). Design antigo mantido comentado no catálogo.
+- **`levelup`** (ajustada): motivo — usuário achou "muito alto, desconfortável de ouvir". Causa raiz: waveform `square` (harmônicos ímpares fortes/estridente) + ganho 0.4, bem acima da média do catálogo. Corrigido pra `sine` (mais macia) com ganho 0.25. Mesma melodia de 4 notas.
+
+### UI — fechadura pixel do baú trancado removida
+`.bauArena.trancado::after` / `.bauArena.bauEspecial.trancado::after` (overlay de cadeado via pixel art em base64) removido do `style.css`. Motivo: já existe o chip `.dica` ("Requer uma chave X ou superior") que aparece ao clicar no baú trancado (`abrirBauEspecial()`) — a fechadura era redundante e um item a mais na tela.
+
+### Assets/técnicas usadas
+- Preview de SFX: Web Audio API pura (osciladores + envelope de ganho, mais um buffer de ruído branco com decaimento), sem asset externo — mesmo padrão já usado no motor de SFX real do app.
+- Validação de cada mudança: `node --check` nos blocos `<script>` extraídos via regex, `css` npm package pro `style.css`.
+
+### Em aberto / não mexido nesta sessão
+- Nada pendente desta sessão — todas as decisões (posicionamento, sons, remoções) foram fechadas e implementadas.

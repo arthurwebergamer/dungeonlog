@@ -57,8 +57,15 @@
   /* item 40 do roadmap: "damage number" positivo, mesma tecnica de
      origem/posicionamento de .coin-drop (left/top absolutos calculados
      em JS a partir do centro do #mobSprite) -- so troca queda por subida */
+  /* FIX v2 (pedido do usuario): a v1 dessa correcao tinha subida + pilula
+     de fundo -- usuario NAO queria a pilula (parecia borda) e o problema
+     real era a subida rapida sumindo da tela, nao legibilidade do texto.
+     Agora o texto nasce PARADO em cima do sprite (sem transform de
+     posicao) e so faz fade in/out no lugar -- sem pilula, sem box-shadow,
+     so o text-shadow (mesmo que ja existia antes de qualquer fix) pra
+     descolar do fundo sem parecer uma caixa. */
   .dmg-float{position:absolute;left:0;top:0;pointer-events:none;
-    animation:dmgFloat 1.6s ease-out forwards;
+    animation:dmgFloat 1.1s ease-out forwards;
     display:flex;align-items:center;gap:3px;white-space:nowrap;
     font-family:'Silkscreen',monospace;font-size:13px;font-weight:700;
     text-shadow:0 1px 2px rgba(0,0,0,.6)}
@@ -74,18 +81,36 @@
   .dmg-float.msg{display:block;white-space:normal;text-align:center;max-width:190px;
     line-height:1.4;font-size:10.5px;font-weight:600;letter-spacing:.02em}
   .dmg-float svg{width:13px;height:13px;image-rendering:pixelated;flex-shrink:0}
+  /* variante empilhada (pedido do usuario, golpe final): em vez de
+     "+moedas · +XP" numa linha só horizontal, empilha +moedas em cima e
+     +XP embaixo -- cada linha e seu proprio flex row (icone+numero).
+     Usada so em numeroFlutuanteHeroi() por enquanto. */
+  .dmg-float.pilha{flex-direction:column;align-items:flex-end;gap:2px}
+  /* espelho do .pilha acima -- usado quando o texto fica do lado DIREITO
+     do sprite (numeroFlutuante/mob) em vez do esquerdo (numeroFlutuanteHeroi):
+     alinha pela esquerda pra colar no sprite em vez de flutuar pra longe */
+  .dmg-float.pilha.direita{align-items:flex-start}
+  .dmg-float.pilha .dmg-moeda,.dmg-float.pilha .dmg-xp{display:flex;align-items:center;gap:3px}
   /* moeda em --gold (mesma cor de .coins no topbar e .toast.gold), XP em
      cor neutra (mesma familia de .xpnum) -- app ja diferencia os dois
      assim em todo outro lugar, uma cor unica pra tudo quebrava esse padrao */
   .dmg-float .dmg-moeda{color:var(--gold)}
   .dmg-float .dmg-sep{color:var(--muted);font-weight:500}
   .dmg-float .dmg-xp{color:var(--text)}
+  /* FIX v3 (pedido do usuario): v2 ficava parado o tempo todo (fade in
+     place). Agora e mais rapido (1.9s->1.1s) e volta a subir -- mas so
+     no FIM (55%->100%), depois de ja ter aparecido parado por um tempo
+     (15%->55%) pra dar tempo de ler antes de comecar a subir/sumir. */
   @keyframes dmgFloat{
     0%{transform:translate(-50%,-50%) scale(.8);opacity:0}
-    10%{transform:translate(-50%,-60%) scale(1);opacity:1}
-    70%{transform:translate(-50%,calc(-50% - 40px)) scale(1);opacity:1}
-    100%{transform:translate(-50%,calc(-50% - 55px)) scale(1);opacity:0}
+    15%{transform:translate(-50%,-50%) scale(1);opacity:1}
+    55%{transform:translate(-50%,-50%) scale(1);opacity:1}
+    100%{transform:translate(-50%,calc(-50% - 34px)) scale(1);opacity:0}
   }
+  /* variante empilhada usa o mesmo translate(-50%,-50%) da keyframe
+     acima (centraliza no ponto left/top) -- o "ficar a esquerda do
+     sprite" e resolvido no JS (originX com folga pra esquerda), nao
+     aqui, pra nao precisar de uma keyframe separada so pra isso */
   .vs{font-family:'Outfit',sans-serif;font-size:11px;font-weight:500;color:var(--dim);padding-bottom:30px;letter-spacing:1px}
   .mobinfo{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;transition:opacity .3s}
   .mobinfo.off{opacity:0}
@@ -130,6 +155,13 @@
   .xpnum{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
   .bar{height:9px;background:var(--panel-2);border:1px solid var(--line);border-radius:3px;padding:2px}
   .fill{height:100%;width:0%;background:linear-gradient(180deg,#7FCBF3,#3F9BD6);border-radius:2px;transition:width .45s cubic-bezier(.4,1.3,.5,1)}
+  /* #fill (barra de XP, nao a de Vida -- ver #hpfill, que fica com a
+     transicao rapida padrao) sincronizada com animarContagemNumero()
+     (script principal, 1100ms) -- ANTES herdava os mesmos .45s da
+     barra de Vida, terminando bem antes do numero (1.1s) parar de
+     contar: barra ja cheia, numero ainda subindo, dessincronizado
+     (confirmado em video: "a barra de xp ta errada"). */
+  #fill{transition:width 1.1s cubic-bezier(.4,1.3,.5,1)}
 
   .tasks{padding:16px 18px 8px;flex:1}
   .thead{display:flex;justify-content:space-between;align-items:center;margin-bottom:13px}
@@ -3268,15 +3300,12 @@
 .bauArena.bauEspecial.tier2.aberto{ background-image:var(--bau-esp-t2-aberto); }
 .bauArena.bauEspecial.tier3{ background-image:var(--bau-esp-t3-fechado); }
 .bauArena.bauEspecial.tier3.aberto{ background-image:var(--bau-esp-t3-aberto); }
-/* cadeado em pixel art -- arco metalico (com um lado sombreado pra dar
-   volume), corpo dourado com sombreamento no canto e fechadura visivel.
-   Mesma paleta do resto do jogo (dourado/bronze das chaves). */
-.bauArena.trancado::after{
-  content:""; position:absolute; right:-6px; bottom:-4px; width:20px; height:20px;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Crect x='5' y='0' width='6' height='1' fill='%23D9DEE3'/%3E%3Crect x='5' y='1' width='1' height='5' fill='%23D9DEE3'/%3E%3Crect x='10' y='1' width='1' height='5' fill='%239AA0A8'/%3E%3Crect x='3' y='6' width='10' height='1' fill='%236B4A1F'/%3E%3Crect x='3' y='15' width='10' height='1' fill='%236B4A1F'/%3E%3Crect x='3' y='6' width='1' height='10' fill='%236B4A1F'/%3E%3Crect x='12' y='6' width='1' height='10' fill='%236B4A1F'/%3E%3Crect x='4' y='7' width='8' height='8' fill='%23F2C94C'/%3E%3Crect x='8' y='11' width='4' height='4' fill='%23C9962E'/%3E%3Crect x='7' y='9' width='2' height='2' fill='%234A2F10'/%3E%3Crect x='7' y='11' width='2' height='3' fill='%234A2F10'/%3E%3C/svg%3E");
-  background-size:contain; background-repeat:no-repeat; image-rendering:pixelated;
-}
-.bauArena.bauEspecial.trancado::after{ right:auto; left:-6px; }
+/* REMOVIDO (pedido do usuario): fechadura pixel (::after) do bau trancado --
+   redundante com o chip .dica ("Requer uma chave X ou superior") que ja
+   aparece ao clicar no bau trancado (ver abrirBauEspecial()), e um item a
+   menos na tela. Regra original (com a imagem base64 do cadeado) removida
+   daqui -- historico completo no controle de versao do repo, nao
+   reproduzido no arquivo pra nao inflar o CSS com base64 morto. */
 .bauArena .dica{
   position:absolute; bottom:100%; left:50%; transform:translateX(-50%);
   white-space:nowrap; background:#000; color:#fff; padding:3px 8px;
@@ -3426,26 +3455,92 @@
   background-repeat:no-repeat; image-rendering:pixelated;
   transition:transform .28s ease;
 }
-/* icone de cadeado pros temas pagos ainda nao desbloqueados -- o
-   escurecimento (silhueta) e feito via JS como camada extra de
-   background (ver aplicarFundoTemaArena), NAO via CSS filter aqui,
-   porque filter no elemento tambem escureceria este ::after junto. */
-.arena-bg-layer.bloqueado::after{
-  content:'🔒';
-  position:absolute; inset:0;
-  display:flex; align-items:center; justify-content:center;
-  font-size:26px;
-  text-shadow:0 2px 8px rgba(0,0,0,.7);
+
+/* ======================================================================
+   OVERLAY DE TEMA BLOQUEADO -- quando o tema ATUAL (persistido, nao
+   durante o arrasto/previa) e pago e nao desbloqueado, esconde
+   herói/monstro/nome (misturar conteudo em cor cheia com um fundo em
+   silhueta ficava estranho -- feedback do usuario) e mostra so o
+   icone de cadeado (pixel art, mesma tecnica crispEdges do icone de
+   moeda -- nao emoji, pra combater com o resto do app) + texto.
+   Classe .arena.tema-bloqueado toggada em JS (ver
+   atualizarBloqueioArena()). z-index alto (3), acima de tudo. */
+.tema-arena-bloqueio{
+  position:absolute; inset:0; z-index:3;
+  display:none; flex-direction:column; align-items:center; justify-content:center; gap:10px;
+  pointer-events:none;
+  background:rgba(0,0,0,.35);
+}
+.arena.tema-bloqueado .tema-arena-bloqueio{ display:flex; }
+.arena.tema-bloqueado .fight,
+.arena.tema-bloqueado .mobinfo,
+.arena.tema-bloqueado .vitoria{
+  opacity:0; pointer-events:none;
+}
+.tema-arena-cadeado-img{
+  width:32px; height:auto;
+  filter:drop-shadow(0 2px 6px rgba(0,0,0,.5));
+}
+#temaArenaBloqueioTexto{
+  font-family:'Outfit',sans-serif; font-size:12px; font-weight:600;
+  color:#fff; text-shadow:0 2px 6px rgba(0,0,0,.7);
+  text-align:center; padding:0 24px;
 }
 
 /* bolinhas indicando quantos temas existem e qual esta selecionado --
-   tambem sinaliza que a arena e "navegavel" (padrao de carrossel). */
+   escondidas por padrao (opacity:0), so aparecem durante o arrasto
+   (classe .visivel, adicionada/removida em JS no touchstart/touchend
+   do gesto real) e so quando ha 2+ temas acessiveis pra navegar. */
 .tema-arena-dots{
   position:absolute; bottom:5px; left:50%; transform:translateX(-50%);
   display:flex; gap:5px; z-index:2; pointer-events:none;
+  opacity:0; transition:opacity .25s ease;
 }
+.tema-arena-dots.visivel{ opacity:1; }
 .tema-arena-dot{
   width:5px; height:5px; border-radius:50%;
   background:rgba(255,255,255,.35);
 }
 .tema-arena-dot-atual{ background:rgba(255,255,255,.9); }
+
+/* ======================================================================
+   POOF DE DERROTA DO MONSTRO -- nuvem de fumaca (4 frames, pixel art
+   gerada proceduralmente via PIL, sem asset externo), spawnada por
+   mostrarPoofMonstro() no exato lugar onde o monstro estava, no
+   instante da derrota (ANTES de render() escondê-lo). Mesma tecnica de
+   spritesheet+steps() da tocha da Arena. Item 2 do redesign de feedback
+   de combate (ver roadmap: numero ancorado -> poof -> recompensa
+   voando -> entrada do bau). */
+.poof-monstro{
+  position:absolute; left:0; top:0; width:80px; height:80px;
+  transform:translate(-50%,-50%);
+  background-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAAAYCAYAAAAF6fiUAAACiUlEQVR4nO2XX4uyQBTGn7QpuuhCCKQuRAi6CSH8FvuJ+xYSSJdBBC0EgVEUaH98L14mxtlR57Tbutv6g6C0DtPznOeMA9TU/GUaVS/gNzGbzaZl35lMJm+UmrUBGugIL6NrRJO+nBoKQRDczfN9/4MpL2vAYrEI5GvD4dD/zjWI4vPPsgkvNYJUoqu4Xq+590ajUcakR8YPANxut9x7jDEAgOd5b5UnYLPZvPP3tm0PHq2jK/5PIgzDaeUJ+CoDgHITijpfRkwCJQVFnS/DGKtmDxBFV11X/Yl+v19ojk4CTNMEUGxEq9XKfKaOIMMwtEzgY8igFP8qbNse5HX7IymgzP6yFCRJgiRJsFwuHxppugk4n88AHtiED4dDKl/rdrukOnkJ4DwrARxKAna73Ua3rojOJgxoJuB0OqX8JYtNFV8Hw8guizGG7XZbaNqzHjGpJ1ugPAW8+wFiAtI0vXd/o9F4SPgoit6TJMm9r9M5vV5PmQadFOhsxGIKjsfjBsiKVgZlDygU8XK53AXnG5iIKGS73SYZkmdEp9P5UFtGZcBqtQooIqmMkMcPALiu68/n8ymltkqrPJRPQaLwHL7gZrPZAIA4jjPfieM4LTMhiqLMGFH9YfGeyoS87nccx1+tVgFQ3K1cHNM0M/WL1gL871gdEyjiAxWdhGUjAMCyrMF+v89cpxjA4SYAWSOGw6G/Xq9LDZLhI0hVU4YxBtM0SfW1RxDv/M+iEp9TNuYo4ss4jpPZpHUeM13Xvf9mPp/nngfG4/F9ow7DkHRuqOwkLBphWVausOLTT5kBVIpMEMXnqEwQxQd+kQE/AaoBulBM+NMGPBsdI2oDvgnRDM/zyIe7mprX5B/I7mGnX1iCIAAAAABJRU5ErkJggg==");
+  background-size:320px 80px; image-rendering:pixelated;
+  pointer-events:none; z-index:2;
+  animation:poofMonstroFrames .5s steps(4) forwards;
+}
+@keyframes poofMonstroFrames{
+  from{ background-position-x:0; }
+  to{ background-position-x:-320px; }
+}
+
+/* ======================================================================
+   RECOMPENSA VOANDO (item 3) -- icone criado dinamicamente por
+   voarRecompensa()/voarRecompensaFinal() (script principal), sempre
+   como position:fixed porque o destino (o HEROI) fica dentro da
+   .arena, mas o elemento nasce em coordenadas de VIEWPORT (mesma
+   tecnica da variante "fora da Arena" do dmg-float) -- mais simples
+   assim do que lidar com o offset relativo toda vez.
+   left/top/transform/opacity mudados via JS logo apos o double rAF; a
+   transition abaixo e o que faz a viagem parecer suave em vez de um
+   "teletransporte". */
+.recompensa-voando{
+  position:fixed; width:22px; height:22px;
+  transform:translate(-50%,-50%) scale(1);
+  opacity:1; pointer-events:none; z-index:500;
+  transition:
+    left .75s cubic-bezier(.25,.65,.3,1),
+    top .75s cubic-bezier(.25,.65,.3,1),
+    transform .75s ease-in,
+    opacity .75s ease-in .16s;
+}

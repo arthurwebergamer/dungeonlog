@@ -193,6 +193,10 @@
     <div class="tocha-arena tocha-esq"></div>
     <div class="tocha-arena tocha-dir"></div>
     <div class="tema-arena-dots" id="temaArenaDots"></div>
+    <div class="tema-arena-bloqueio" id="temaArenaBloqueio">
+      <img class="tema-arena-cadeado-img" src="data:image/png;base64,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" alt="">
+      <span id="temaArenaBloqueioTexto">Desbloqueie na versão Premium</span>
+    </div>
     <div class="fight">
       <div class="fighter">
         <span id="nomeTopo">Aventureiro</span>
@@ -988,6 +992,22 @@ function aplicarIdiomaDados(){
 aplicarIdiomaDados();
 window.aplicarIdiomaDados = aplicarIdiomaDados;
 
+// os botoes de dificuldade (composer de criar tarefa E editor) sao
+// construidos 1x so, no carregamento da pagina (ver as duas IIFEs que
+// fazem DIFS.forEach(...) mais abaixo no arquivo) -- trocar de idioma
+// DEPOIS disso (Config > Preferencias > Idioma) atualiza o resto da UI
+// dinamicamente, mas esses botoes ja construidos ficavam com o texto
+// "congelado" no idioma que estava ativo no boot. Atualiza so o
+// texto (nao reconstroi o botao inteiro), casando pelo data-dif.
+function atualizarTextosDificuldade(){
+  document.querySelectorAll('.dif[data-dif]').forEach(btn => {
+    const d = DIFS.find(x => x.id === btn.dataset.dif);
+    const span = btn.querySelector('.difnome');
+    if (d && span) span.textContent = d.nome;
+  });
+}
+window.atualizarTextosDificuldade = atualizarTextosDificuldade;
+
 function difDe(t){                                 // sempre devolve um id valido
   const id = t && t.dif;
   return DIFS.some(d => d.id === id) ? id : DIF_PADRAO;
@@ -1187,23 +1207,119 @@ function avaliarVitoriaDoDia(){
 // dispara a recompensa/efeitos de vitoria -- extraido de dentro de alternar()
 // pra ser chamado tambem por verificarVitoriaAoExcluir() (vitoria por
 // exclusao da ultima pendente)
-function dispararVitoriaDoDia(doDia, nivelAntes){
-  derrotadoEm = isoAtual();
-  const ganho = recompensaVitoria(doDia.length);
-  moedas += ganho;
-  ultimoGanho = ganho;
-  moedasCaindo(Math.max(3, Math.min(10, Math.round(ganho / 6))));
-  render();
-  setTimeout(()=>aviso((idiomaApp() === 'en' ? 'MONSTER DEFEATED  +' : 'MONSTRO DERROTADO  +')+ganho+(idiomaApp() === 'en' ? ' COINS' : ' MOEDAS'), true), 350);
-  const nivelDepois = progresso().nivel;
-  if (nivelDepois > nivelAntes){
+function dispararVitoriaDoDia(doDia, nivelAntes, xpGanho, moedasGanhas){
+  // captura a posicao do monstro ANTES de render() (mais abaixo) trocar
+  // a visual pro estado "derrotado" e escondê-lo -- se pedir isso DEPOIS
+  // do render(), o sprite ja nao esta mais visivel/no lugar certo.
+  if (typeof mostrarPoofMonstro === 'function') mostrarPoofMonstro();
+
+  // resto da funcao (render() -- troca a visual pro estado "derrotado",
+  // mostrando o bau, atualiza os contadores) empacotado numa funcao a
+  // parte pra poder ser chamada como CONTINUACAO de verdade da
+  // recompensa voando (ver mostrarBauEContadores abaixo), em vez de um
+  // setTimeout(...) paralelo com um numero fixo adivinhando quanto
+  // tempo o voo ia levar. Bug real que isso corrigia: o contador de
+  // moedas ja tinha terminado de subir e se acomodado MUITO antes do
+  // "+X" aparecer em cima do heroi -- os dois timers rodavam em
+  // paralelo, sem um esperar o outro de verdade (confirmado em video).
+  const mostrarBauEContadores = () => {
+    derrotadoEm = isoAtual();
+    const ganho = recompensaVitoria(doDia.length);
+    moedas += ganho;
+    ultimoGanho = ganho;
+    moedasCaindo(Math.max(3, Math.min(10, Math.round(ganho / 6))));
+    render();
+    // reseta a opacity inline que mostrarPoofMonstro() deixou em '0'
+    // (nao deixa assim pra sempre -- evita que o PROXIMO monstro,
+    // amanha, reaproveitando o mesmo #mobSprite, nasca invisivel por
+    // causa desse estilo inline grudado). Feito AQUI, e nao mais no
+    // timer interno da propria nuvem de poof -- ver comentario em
+    // mostrarPoofMonstro() pro bug que isso corrigia (monstro
+    // "ressuscitava" visualmente no meio da recompensa ainda voando).
+    const mobEl = document.getElementById('mobSprite');
+    if (mobEl) mobEl.style.opacity = '';
+    setTimeout(()=>aviso((idiomaApp() === 'en' ? 'MONSTER DEFEATED  +' : 'MONSTRO DERROTADO  +')+ganho+(idiomaApp() === 'en' ? ' COINS' : ' MOEDAS'), true), 350);
+    const nivelDepois = progresso().nivel;
+    if (nivelDepois > nivelAntes){
+      setTimeout(() => {
+        if (typeof window.enfileirarPopup === 'function' && typeof mostrarNivelUp === 'function'){
+          window.enfileirarPopup(prox => mostrarNivelUp(nivelDepois, prox));
+        }
+      }, 700);
+    }
+  };
+
+  // item 3: moeda+XP nascem no meio da animacao do poof (250ms -- ainda
+  // visivel/dissipando, mas ja da tempo da recompensa "emergir" dele em
+  // vez de nascer simultaneo), voam ate o HEROI, e SO DEPOIS que "+X"
+  // aparece em cima da cabeca dele (dentro de voarRecompensaFinal) e
+  // que o bau/contadores sao liberados -- com uma folga BEM maior
+  // (900ms, era 350ms) pra dar tempo de LER o "+X" antes do bau/
+  // contador roubarem a atencao. 350ms tava curto demais pra separar
+  // visualmente os dois momentos (confirmado em video: parecia tudo
+  // simultaneo).
+  //
+  // Se nao tem reward pra mostrar (veio do caminho de exclusao de
+  // tarefa, que chama esta funcao sem xpGanho/moedasGanhas), pula
+  // direto pro bau, so esperando o poof terminar (560ms).
+  if ((xpGanho || moedasGanhas) && typeof voarRecompensaFinal === 'function'){
     setTimeout(() => {
-      if (typeof window.enfileirarPopup === 'function' && typeof mostrarNivelUp === 'function'){
-        window.enfileirarPopup(prox => mostrarNivelUp(nivelDepois, prox));
-      }
-    }, 700);
+      voarRecompensaFinal(xpGanho || 0, moedasGanhas || 0, () => {
+        setTimeout(mostrarBauEContadores, 900);
+      });
+    }, 450);
+  } else {
+    setTimeout(mostrarBauEContadores, 560);
   }
 }
+
+// nuvem de "poof" (4 frames, pixel art, gerada proceduralmente -- sem
+// asset externo) no exato lugar onde o monstro estava, no instante da
+// derrota. Mesma tecnica de spritesheet+steps() ja usada na tocha da
+// Arena, so que via animation JS (setTimeout) em vez de CSS puro,
+// porque cada instancia precisa nascer numa posicao diferente
+// (calculada em cima da posicao real do monstro, nao fixa como a tocha).
+function mostrarPoofMonstro(){
+  const arena = document.querySelector('.arena');
+  const mob = document.getElementById('mobSprite');
+  if (!arena || !mob) return null;
+  const arenaRect = arena.getBoundingClientRect();
+  const mobRect = mob.getBoundingClientRect();
+  const originX = mobRect.left - arenaRect.left + mobRect.width / 2;
+  const originY = mobRect.top - arenaRect.top + mobRect.height / 2;
+
+  // esconde o SPRITE do monstro JA (opacity, nao display -- nao mexe
+  // no layout/posicao de mais nada) -- sem isso, a nuvem branca
+  // semi-transparente tocava por CIMA do monstro ainda visivel (o
+  // render() que realmente aplica o estado "derrotado" so roda 560ms
+  // depois, esperando a nuvem terminar). Branco+cor do monstro por
+  // baixo = mistura suja/acinzentada, nao branco solido (queixa do
+  // usuario, confirmada em video).
+  mob.style.opacity = '0';
+
+  // REMOVIDO (pedido do usuario): som reaproveitado do bau (poofBau)
+  // tocando aqui tambem -- decidido que a nuvem do monstro fica sem som.
+  // poofBau continua ativo pro SPAWN do bau (ver atualizarBauArena()),
+  // so essa chamada aqui que saiu.
+
+  const el = document.createElement('div');
+  el.className = 'poof-monstro';
+  el.style.left = originX + 'px';
+  el.style.top = originY + 'px';
+  arena.appendChild(el);
+  // so remove o elemento da nuvem aqui -- NAO reseta mob.style.opacity
+  // (ver mostrarBauEContadores, chamado pela sequencia de
+  // dispararVitoriaDoDia): o reset tinha um timer fixo de 560ms
+  // proprio, que fazia sentido quando a sequencia inteira TAMBEM
+  // durava 560ms -- depois que a recompensa voando (item 3) esticou
+  // isso pra quase 2s, esse timer interno ficava resetando a
+  // visibilidade do monstro NO MEIO da recompensa ainda voando, e ele
+  // "ressuscitava" visualmente ate o render() de verdade rodar (bug
+  // confirmado em video: monstro reaparecia normal enquanto "+X"
+  // ainda estava na tela). Um so lugar controla isso agora.
+  setTimeout(() => el.remove(), 560);
+}
+window.mostrarPoofMonstro = mostrarPoofMonstro;
 let nomeHeroi = 'Aventureiro';
 let ultimoGanho = 0;
 let _vitoriaCelebrada = false; // pedido do usuario (27/08): tela de vitoria "muito simples" -- controla o disparo unico do efeito de celebracao, ver celebrarVitoria()
@@ -1308,7 +1424,16 @@ function desenharMonstro(){
 const CHAVE_TEMA_ARENA = 'questlog.temaArena.v1';
 
 function assinaturaAtiva(){
-  try { if (localStorage.getItem('questlog.modoDebug.v1') === '1') return true; } catch(e){}
+  // FIX: o alternador real de modo debug (clicar no icone das moedas,
+  // ver modulo perto do fim do arquivo) salva a STRING 'true', nao '1'
+  // -- essa funcao comparava com '1' por engano, entao nunca detectava
+  // o modo debug como ativo mesmo com ele ligado (debugbar visivel).
+  // window.modoDebugAtivo() ja existe e e a fonte da verdade -- usa ela
+  // direto se disponivel, com o mesmo fallback de string por baixo.
+  try {
+    if (typeof window.modoDebugAtivo === 'function') return window.modoDebugAtivo();
+    if (localStorage.getItem('questlog.modoDebug.v1') === 'true') return true;
+  } catch(e){}
   return false;
 }
 
@@ -1392,17 +1517,25 @@ function verificarDesbloqueiosTemaArena(){
       try { localStorage.setItem(window.chaveConta('questlog.temaArenaDicaPendente.v1'), t.id); } catch(e){}
 
       // aviso visivel -- reaproveita o mesmo flutuante ja usado pra
-      // +XP/+moeda etc., ancorado na propria arena.
+      // +XP/+moeda etc., ancorado na propria arena. Atrasado ~2.2s: o
+      // desbloqueio costuma coincidir com a virada do dia, que ja
+      // dispara +XP, possivel level up e a conquista "Pegando o Jeito"
+      // tudo de uma vez -- competir com esse monte de texto simultaneo
+      // (queixa do usuario: "nem da pra ler direito") deixando esse
+      // aviso pra depois, quando a poeira baixou, resolve sem precisar
+      // mexer nos outros sistemas de notificacao.
       const emIngles = typeof idiomaApp === 'function' && idiomaApp() === 'en';
-      const arena = document.querySelector('.arena');
-      if (arena && typeof notificarFlutuante === 'function'){
-        notificarFlutuante(
-          arena,
-          emIngles ? 'New arena unlocked:' : 'Nova arena desbloqueada:',
-          emIngles ? t.nome_en : t.nome,
-          '#F2C94C'
-        );
-      }
+      setTimeout(() => {
+        const arena = document.querySelector('.arena');
+        if (arena && typeof notificarFlutuante === 'function'){
+          notificarFlutuante(
+            arena,
+            emIngles ? 'New theme:' : 'Novo tema:',
+            emIngles ? t.nome_en : t.nome,
+            '#F2C94C'
+          );
+        }
+      }, 2200);
 
       // dispara a dica JA -- verificarDesbloqueiosTemaArena() roda a
       // cada render() (frequente), mas mostrarDicaSwipeArenaSeNecessario()
@@ -1436,9 +1569,10 @@ function aplicarFundoTemaArena(el, tema){
   const grad = 'linear-gradient(180deg,var(--arena-1) 0%,var(--arena-2) 55%,var(--arena-3) 100%)';
   const bloqueado = !temaArenaDesbloqueado(tema);
   // silhueta: overlay quase preto por CIMA da arte, como camada extra
-  // de background -- feito assim (nao via CSS filter na classe
-  // .bloqueado) porque filter escureceria TAMBEM o icone de cadeado
-  // (::after), que e desenhado dentro do mesmo elemento.
+  // de background -- da uma "espiada" no tema pago sem mostrar ele
+  // limpo. O bloqueio de verdade (esconder heroi/monstro + mensagem)
+  // e outro elemento, no nivel da .arena inteira -- ver
+  // atualizarBloqueioArena() e .tema-arena-bloqueio no CSS.
   const overlay = bloqueado ? 'linear-gradient(rgba(0,0,0,.82),rgba(0,0,0,.82)), ' : '';
   if (tema.arte){
     el.style.backgroundImage = overlay + 'url("data:image/png;base64,' + tema.arte + '"), ' + tile + ', ' + grad;
@@ -1488,8 +1622,31 @@ function renderTemaArena(){
   [elA, elB].forEach(el => { el.style.transition = ''; });
   _arenaBgFrente = 'A';
   renderTemaArenaDots();
+  atualizarBloqueioArena();
 }
 window.renderTemaArena = renderTemaArena;
+
+// mostra/esconde o overlay de bloqueio com base no tema ATUAL
+// persistido (nao durante o arrasto/previa -- so quando o usuario
+// "pousou" num tema pago ainda nao desbloqueado). Esconde
+// herói/monstro/nome junto (ver .arena.tema-bloqueado no CSS).
+function atualizarBloqueioArena(){
+  const arena = document.querySelector('.arena');
+  if (!arena) return;
+  const tema = temaArenaAtual();
+  const bloqueado = !temaArenaDesbloqueado(tema);
+  arena.classList.toggle('tema-bloqueado', bloqueado);
+  if (bloqueado){
+    const emIngles = typeof idiomaApp === 'function' && idiomaApp() === 'en';
+    const texto = document.getElementById('temaArenaBloqueioTexto');
+    if (texto){
+      texto.textContent = emIngles
+        ? 'Unlock ' + tema.nome_en + ' in Premium'
+        : 'Desbloqueie ' + tema.nome + ' na versão Premium';
+    }
+  }
+}
+window.atualizarBloqueioArena = atualizarBloqueioArena;
 
 // pre-carrega (decodifica) a arte de TODOS os temas assim que o app
 // abre, mesmo os que o usuario ainda nao selecionou. Sem isso, a
@@ -1647,8 +1804,8 @@ function mudarTemaArena(direcao){
   if (_arenaBgEmTransicao) return;
 
   const idxAtual = TEMAS_ARENA.findIndex(t => t.id === temaArenaAtual().id);
-  // NAO pula temas bloqueados -- eles sao alcancaveis via arrasto como
-  // previa (silhueta + cadeado, ver aplicarFundoTemaArena/.bloqueado).
+  // NAO pula temas bloqueados -- alcancaveis via arrasto; se pousar
+  // num tema pago, o overlay de bloqueio assume (ver atualizarBloqueioArena()).
   const idx = (idxAtual + direcao + TEMAS_ARENA.length) % TEMAS_ARENA.length;
   const novoTema = TEMAS_ARENA[idx];
   definirTemaArenaSalvo(novoTema.id);
@@ -1696,6 +1853,7 @@ function mudarTemaArena(direcao){
 
   _arenaBgFrente = trasId;
   renderTemaArenaDots();
+  if (typeof atualizarBloqueioArena === 'function') atualizarBloqueioArena();
 }
 window.mudarTemaArena = mudarTemaArena;
 
@@ -1722,9 +1880,6 @@ window.mudarTemaArena = mudarTemaArena;
     // com so 1 tema nao ha pra onde ir, e deixar arrastar sem nada pra
     // mostrar so confunde quem esta comecando.
     if (TEMAS_ARENA.filter(temaArenaDesbloqueado).length < 2) return;
-    // usuario descobriu que da pra arrastar -- para o loop da dica
-    // automatica (ver pararDicaSwipeArena()), nao precisa mais repetir.
-    if (typeof pararDicaSwipeArena === 'function') pararDicaSwipeArena();
     sx = e.touches[0].clientX; sy = e.touches[0].clientY;
     rastreando = true; decidiu = false; cancelado = false;
     larguraArena = arena.getBoundingClientRect().width || 1;
@@ -1739,6 +1894,15 @@ window.mudarTemaArena = mudarTemaArena;
       if (Math.abs(dy) > Math.abs(dx)){ cancelado = true; return; } // e scroll vertical, desiste
       decidiu = true;
       direcaoAtual = dx > 0 ? -1 : 1;
+
+      // AQUI e onde o usuario de fato comprovou que esta arrastando
+      // (moveu mais horizontal que vertical, alem do limiar de 5px) --
+      // NAO no touchstart (um simples toque sem mover tambem disparava
+      // o touchstart, parando o loop da dica cedo demais, antes do
+      // usuario realmente descobrir o gesto).
+      if (typeof pararDicaSwipeArena === 'function') pararDicaSwipeArena();
+      const dotsEl = document.getElementById('temaArenaDots');
+      if (dotsEl){ clearTimeout(dotsEl._timeoutEsconder); dotsEl.classList.add('visivel'); }
 
       const idxAtual = TEMAS_ARENA.findIndex(t => t.id === temaArenaAtual().id);
       // NAO pula bloqueados -- alcancaveis como previa (silhueta+cadeado)
@@ -1776,6 +1940,7 @@ window.mudarTemaArena = mudarTemaArena;
       trasEl.style.transform = 'translateX(0)';
       _arenaBgFrente = (_arenaBgFrente === 'A' ? 'B' : 'A');
       renderTemaArenaDots();
+      if (typeof atualizarBloqueioArena === 'function') atualizarBloqueioArena();
     } else {
       // nao arrastou o suficiente -- "mola" de volta pro tema atual
       frenteEl.style.transform = 'translateX(0)';
@@ -1799,6 +1964,14 @@ window.mudarTemaArena = mudarTemaArena;
     };
     elT.addEventListener('transitionend', limpar, { once:true });
     timeoutLimpeza = setTimeout(limpar, TEMA_ARENA_DURACAO_SLIDE + 150);
+
+    // esconde as bolinhas de novo depois de um tempinho -- da pra ver
+    // a posicao final antes de sumir, em vez de cortar na hora.
+    const dotsEl = document.getElementById('temaArenaDots');
+    if (dotsEl){
+      clearTimeout(dotsEl._timeoutEsconder);
+      dotsEl._timeoutEsconder = setTimeout(() => dotsEl.classList.remove('visivel'), 900);
+    }
   }, { passive:true });
 })();
 
@@ -2029,12 +2202,79 @@ function render(){
 
   const p = progresso();
   document.getElementById('lvl').textContent = (idiomaApp() === 'en' ? 'Level ' : 'Nível ') + romano(p.nivel);
-  document.getElementById('xpnum').textContent = p.resto + ' / ' + p.meta;
-  document.getElementById('fill').style.width = Math.round((p.resto/p.meta)*100) + '%';
-  document.getElementById('coinnum').textContent = moedas;
+  // contagem suave em vez de trocar o numero na hora -- so anima
+  // quando o valor MUDOU de verdade (compara com o que ja esta
+  // exibido), entao um render() redundante com o mesmo numero nao
+  // reinicia nenhuma animacao a toa. Pedido do usuario: os numeros
+  // pulando instantaneos (moeda/XP) somem rapido demais pra acompanhar,
+  // junto do icone que agora tambem viaja mais devagar (item 3).
+  //
+  // _adiarContadoresRecompensa: no golpe FINAL do dia, xpTotal/moedas
+  // ja sao somados na hora (alternar(), antes de saber que e o golpe
+  // final), mas esse render() aqui roda ANTES da sequencia toda
+  // (poof/voo/"+X") -- sem essa trava, a barra/contador ja apareciam
+  // cheios/atualizados muito antes do icone chegar no heroi (queixa do
+  // usuario, confirmada: "a barra de xp ta enchendo antes do icone
+  // chegar"). Quando a flag esta ligada, esse render() pula so essas 3
+  // linhas (numero/numero/barra) -- o resto da tela atualiza normal.
+  // A flag e desligada logo depois desse MESMO render() (ver
+  // alternar()), entao o PROXIMO render() (dentro da sequencia
+  // atrasada) atualiza tudo certinho.
+  if (!window._adiarContadoresRecompensa){
+    if (typeof animarContagemNumero === 'function'){
+      animarContagemNumero(document.getElementById('xpnum'), p.resto, 1100, ' / ' + p.meta);
+      animarContagemNumero(document.getElementById('coinnum'), moedas, 1100, '');
+    } else {
+      document.getElementById('xpnum').textContent = p.resto + ' / ' + p.meta;
+      document.getElementById('coinnum').textContent = moedas;
+    }
+    document.getElementById('fill').style.width = Math.round((p.resto/p.meta)*100) + '%';
+  }
   document.getElementById('nomeTopo').textContent = nomeHeroi || (idiomaApp() === 'en' ? 'Adventurer' : 'Aventureiro');
 
   if (jaComecou) salvar();
+}
+
+// conta suavemente de qualquer valor ATUALMENTE exibido em `el` ate
+// `valorFinal`, ao longo de `duracaoMs`, mantendo `sufixo` fixo (ex:
+// ' / 100' na barra de XP). Se o valor final for igual ao que ja esta
+// exibido, so confirma o texto (nao anima nada -- evita reiniciar uma
+// contagem a toa em re-renders que nao mudaram nada). Cancela uma
+// contagem anterior no mesmo elemento se uma nova comecar no meio
+// (ex: 2 tarefas concluidas rapido em sequencia).
+function animarContagemNumero(el, valorFinal, duracaoMs, sufixo){
+  if (!el) return;
+  sufixo = sufixo || '';
+  const textoAtual = el.textContent || '';
+  // BUG corrigido: replace(/[^\d-]/g,'') removia a barra de "40 / 100"
+  // mas JUNTAVA os dois numeros num so ("40100"), que so cresce mais
+  // ainda no proximo render() -- por isso a Experiencia mostrava
+  // "29611 / 100" etc. match() pega SO o primeiro grupo de digitos,
+  // ignorando o resto do texto (a barra, o "100" do sufixo etc.)
+  const match = textoAtual.match(/-?\d+/);
+  const valorAtualTexto = match ? parseInt(match[0], 10) : NaN;
+  const valorInicial = isNaN(valorAtualTexto) ? valorFinal : valorAtualTexto;
+
+  if (valorInicial === valorFinal){
+    el.textContent = valorFinal + sufixo;
+    return;
+  }
+
+  if (el._contagemFrameId) cancelAnimationFrame(el._contagemFrameId);
+  const inicio = performance.now();
+  function passo(agora){
+    const t = Math.min(1, (agora - inicio) / duracaoMs);
+    const facilitado = 1 - Math.pow(1 - t, 3); // ease-out cubic -- rapido no comeco, suave no final
+    const valorAtual = Math.round(valorInicial + (valorFinal - valorInicial) * facilitado);
+    el.textContent = valorAtual + sufixo;
+    if (t < 1){
+      el._contagemFrameId = requestAnimationFrame(passo);
+    } else {
+      el.textContent = valorFinal + sufixo;
+      el._contagemFrameId = null;
+    }
+  }
+  el._contagemFrameId = requestAnimationFrame(passo);
 }
 
 function animarGolpe(){
@@ -2045,6 +2285,92 @@ function animarGolpe(){
 }
 
 const COIN_SVG = '<svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="5" y="2" width="6" height="1" fill="#F2C94C"/><rect x="3" y="3" width="10" height="2" fill="#F2C94C"/><rect x="2" y="5" width="12" height="6" fill="#F2C94C"/><rect x="3" y="11" width="10" height="2" fill="#F2C94C"/><rect x="5" y="13" width="6" height="1" fill="#F2C94C"/><rect x="6" y="5" width="2" height="6" fill="#B8942E"/></svg>';
+
+// diamante verde -- mesmo padrao crispEdges do COIN_SVG, cor da paleta
+// de XP ja usada no resto do app (--verde, ver dmg-xp em style.css)
+const XP_GEM_SVG = '<svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="7" y="1" width="2" height="1" fill="#63C99A"/><rect x="5" y="2" width="6" height="1" fill="#63C99A"/><rect x="3" y="3" width="10" height="2" fill="#7EDBB0"/><rect x="1" y="5" width="14" height="3" fill="#63C99A"/><rect x="3" y="8" width="10" height="2" fill="#4EA97E"/><rect x="5" y="10" width="6" height="1" fill="#4EA97E"/><rect x="7" y="11" width="2" height="1" fill="#4EA97E"/></svg>';
+
+// item 3 do redesign de feedback de combate: em vez de um numero
+// estatico, um icone nasce no ponto de origem (onde o monstro morreu)
+// e VOA de verdade ate o elemento de destino real na tela (contador de
+// moedas no topo, barra de XP embaixo da arena) -- ambos fora dos
+// limites da .arena, entao usa position:fixed (coordenadas de
+// viewport), nao arena como container relativo (mesmo padrao ja usado
+// por flutuanteFixo() pra casos assim).
+function voarRecompensa(origemX, origemY, destinoEl, svgHtml){
+  if (!destinoEl) return;
+  const destRect = destinoEl.getBoundingClientRect();
+  if (destRect.width === 0 && destRect.height === 0) return; // destino nao visivel agora
+
+  const el = document.createElement('div');
+  el.className = 'recompensa-voando';
+  el.innerHTML = svgHtml;
+  el.style.left = origemX + 'px';
+  el.style.top = origemY + 'px';
+  document.body.appendChild(el);
+
+  // double rAF, mesma tecnica/motivo ja usada no arrasto de tema e no
+  // poof: garante que o navegador pintou a posicao INICIAL antes de
+  // mudar left/top pra posicao final -- sem isso, a transicao as vezes
+  // nao anima (o elemento "teletransporta" direto pro destino).
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      el.style.left = (destRect.left + destRect.width / 2) + 'px';
+      el.style.top = (destRect.top + destRect.height / 2) + 'px';
+      el.style.transform = 'translate(-50%,-50%) scale(.35)';
+      el.style.opacity = '0';
+    });
+  });
+  setTimeout(() => el.remove(), 900);
+}
+window.voarRecompensa = voarRecompensa;
+
+// dispara os dois voos (moeda + XP) da posicao do monstro ATE O
+// HEROI -- correcao de uma leitura errada do video de referencia: la,
+// os icones voam ate o PERSONAGEM, nao ate os contadores do topbar/
+// barra de XP (que e o que essa funcao fazia antes). Depois que os
+// icones chegam, aparece um "+moedas +XP" fixo em cima da cabeca do
+// heroi (ver numeroFlutuanteHeroi, logo abaixo de numeroFlutuante) --
+// so ENTAO e que os contadores reais (coinnum/xpnum, no topo/embaixo)
+// atualizam de verdade, via a contagem suave que render() ja faz.
+function voarRecompensaFinal(xpGanho, moedasGanhas, aoTerminar){
+  const arena = document.querySelector('.arena');
+  const mob = document.getElementById('mobSprite');
+  const heroi = document.getElementById('heroSprite');
+  if (!arena || !mob || !heroi){
+    if (typeof aoTerminar === 'function') aoTerminar(); // nao trava a sequencia se algo faltar
+    return;
+  }
+  const mobRect = mob.getBoundingClientRect();
+  const origemX = mobRect.left + mobRect.width / 2;
+  const origemY = mobRect.top + mobRect.height / 2;
+
+  voarRecompensa(origemX, origemY, heroi, COIN_SVG);
+  setTimeout(() => voarRecompensa(origemX, origemY, heroi, XP_GEM_SVG), 90);
+
+  // pedido do usuario: som quando cada icone CHEGA no heroi, nao quando
+  // sai do monstro -- 750ms bate com a duracao real da transicao CSS
+  // (.75s, .recompensa-voando em style.css), a moeda sai em t=0 entao
+  // chega em 750ms; o XP sai 90ms depois (setTimeout acima) entao chega
+  // em 840ms. Reaproveita o catalogo de SFX que ja existe no app
+  // (window.tocarSom), nao um AudioContext a parte -- respeita volume/
+  // liga-desliga que o usuario ja configurou nas Opcoes.
+  setTimeout(() => { if (typeof window.tocarSom === 'function') window.tocarSom('chegadaRecompensa'); }, 750);
+
+  // "+moedas +XP" so aparece quando os icones JA CHEGARAM no heroi --
+  // 840ms bate com a duracao do voo (.75s, .recompensa-voando em
+  // style.css) mais a folga do segundo icone (90ms de atraso acima).
+  // aoTerminar() e chamado AQUI, como continuacao de verdade, nao um
+  // timer paralelo adivinhando essa mesma duracao (era assim antes --
+  // o contador do topo terminava de contar bem antes do "+X" aparecer,
+  // confirmado em video).
+  setTimeout(() => {
+    if (typeof window.tocarSom === 'function') window.tocarSom('chegadaRecompensa'); // chegada do XP (2o icone)
+    if (typeof numeroFlutuanteHeroi === 'function') numeroFlutuanteHeroi(xpGanho, moedasGanhas);
+    if (typeof aoTerminar === 'function') aoTerminar();
+  }, 840);
+}
+window.voarRecompensaFinal = voarRecompensaFinal;
 
 function moedasCaindo(qtd){
   const arena = document.querySelector('.arena');
@@ -2074,24 +2400,75 @@ function moedasCaindo(qtd){
 // que moedasCaindo ja usa (centro do #mobSprite via getBoundingClientRect)
 // -- so troca o conteudo (texto em vez de moeda) e a keyframe (sobe em vez
 // de cair, ver dmgFloat no style.css).
+// SEM USO ATIVO NO MOMENTO (pedido do usuario: tarefa normal passou a usar
+// numeroFlutuanteHeroi() tambem, igual golpe final -- ver os 2 call sites
+// que chamavam esta funcao, agora chamando numeroFlutuanteHeroi() no lugar).
+// Mantida no arquivo, nao apagada (mesmo padrao de flutuanteFixo/
+// pontoDeElemento logo abaixo), caso algum fluxo futuro precise voltar a
+// mostrar o flutuante em cima do MONSTRO em vez do heroi.
 function numeroFlutuante(xpGanho, moedasGanhas){
   const arena = document.querySelector('.arena');
   const mob = document.getElementById('mobSprite');
   const arenaRect = arena.getBoundingClientRect();
   const mobRect = mob.getBoundingClientRect();
-  const originX = mobRect.left - arenaRect.left + mobRect.width / 2;
+  // FIX v2 (pedido do usuario): mesmo tratamento aplicado em
+  // numeroFlutuanteHeroi (golpe final) -- empilhado (+moedas em cima,
+  // +XP embaixo, ver .dmg-float.pilha no style.css) colado no sprite em
+  // vez de flutuando acima da cabeca. Simetrico ao do heroi: la o texto
+  // vai pra fora (esquerda do heroi, longe do "vs" central); aqui vai
+  // pra fora tambem, so que pro OUTRO lado (direita do monstro, mesmo
+  // motivo -- longe do "vs" central).
+  const originX = mobRect.right - arenaRect.left + 30;
   const originY = mobRect.top - arenaRect.top + mobRect.height / 2;
 
   const el = document.createElement('div');
-  el.className = 'dmg-float';
+  el.className = 'dmg-float pilha direita';
   el.style.left = originX + 'px';
   el.style.top = originY + 'px';
   el.innerHTML = '<span class="dmg-moeda">+' + moedasGanhas + ' ' + COIN_SVG + '</span>'
-    + '<span class="dmg-sep">·</span>'
     + '<span class="dmg-xp">+' + xpGanho + ' XP</span>';
   arena.appendChild(el);
-  setTimeout(() => el.remove(), 1600);
+  setTimeout(() => el.remove(), 1100); // bate com a nova duracao de dmgFloat (1.9s -> 1.1s)
 }
+
+// COPIA EXATA de numeroFlutuante() acima (mesma classe dmg-float,
+// mesma animacao de subir e sumir, mesmo timing) -- so muda a origem,
+// que agora sai do LADO do heroi em vez do centro do monstro. Pedido
+// do usuario: minhas duas tentativas anteriores de posicionamento
+// proprio (em cima da cabeca, depois embaixo dos pes, depois no chao
+// da arena) foram todas colidindo com outro elemento ou ficando longe
+// demais -- mais simples e confiavel reaproveitar o mesmo padrao que
+// ja funciona pras tarefas normais, so trocando o alvo.
+function numeroFlutuanteHeroi(xpGanho, moedasGanhas){
+  const arena = document.querySelector('.arena');
+  const heroi = document.getElementById('heroSprite');
+  if (!arena || !heroi) return;
+  const arenaRect = arena.getBoundingClientRect();
+  const heroiRect = heroi.getBoundingClientRect();
+  // FIX v2 (pedido do usuario, com print): a v1 (lado direito, centro
+  // vertical do sprite) aparecia longe demais do heroi, quase colado no
+  // topo da arena -- ver historico. Layout novo: empilhado (+moedas em
+  // cima, +XP embaixo, ver .dmg-float.pilha no style.css) do lado
+  // ESQUERDO do sprite. originX = borda esquerda do heroi menos uma
+  // folga (o bloco de texto fica CENTRADO nesse ponto via
+  // translate(-50%,-50%) da keyframe, entao a folga de 30px empurra o
+  // centro do texto pra fora do sprite em vez de em cima dele).
+  // originY = centro vertical do sprite (nao mais topo/base) -- com o
+  // texto empilhado em 2 linhas, o centro fica correto: moedas puxa pra
+  // cima, XP puxa pra baixo, igual pedido.
+  const originX = heroiRect.left - arenaRect.left - 30;
+  const originY = heroiRect.top - arenaRect.top + heroiRect.height / 2;
+
+  const el = document.createElement('div');
+  el.className = 'dmg-float pilha';
+  el.style.left = originX + 'px';
+  el.style.top = originY + 'px';
+  el.innerHTML = '<span class="dmg-moeda">+' + moedasGanhas + ' ' + COIN_SVG + '</span>'
+    + '<span class="dmg-xp">+' + xpGanho + ' XP</span>';
+  arena.appendChild(el);
+  setTimeout(() => el.remove(), 1100); // bate com a nova duracao de dmgFloat (1.9s -> 1.1s)
+}
+window.numeroFlutuanteHeroi = numeroFlutuanteHeroi;
 
 // NAO USADAS ATUALMENTE (27/08) -- pontoDeElemento/flutuanteFixo eram usadas
 // por usarItem()/venderItem() (Inventario/Loja) e antes disso por
@@ -2147,23 +2524,11 @@ function celebrarVitoria(ganho){
   const alvo = document.getElementById('vitoria');
   if (!arena || !alvo) return;
 
-  // flutuante do bau, mesma origem/tecnica de numeroFlutuante() (centro
-  // do #mobSprite, classe .dmg-float ja existente, mesmo tempo de vida)
-  const mob = document.getElementById('mobSprite');
-  if (mob){
-    const arenaRect = arena.getBoundingClientRect();
-    const mobRect = mob.getBoundingClientRect();
-    const originX = mobRect.left - arenaRect.left + mobRect.width / 2;
-    const originY = mobRect.top - arenaRect.top + mobRect.height / 2;
-    const elBau = document.createElement('div');
-    elBau.className = 'dmg-float';
-    elBau.style.left = originX + 'px';
-    elBau.style.top = originY + 'px';
-    elBau.innerHTML = '<span class="dmg-moeda">' + CHEST_SVG + '</span>'
-      + '<span class="dmg-xp">' + (idiomaApp() === 'en' ? 'DAY WON!' : 'DIA VENCIDO!') + '</span>';
-    arena.appendChild(elBau);
-    setTimeout(() => elBau.remove(), 1600);
-  }
+  // REMOVIDO (pedido do usuario): flutuante "bau + DIA VENCIDO!" em cima
+  // do monstro -- redundante com a faixa grande ".vitoria .faixa" que ja
+  // mostra "DIA VENCIDO" no banner principal logo abaixo. Mantido so o
+  // burst de faiscas e a contagem do numero, que sao efeitos do banner
+  // em si, nao um popup duplicado.
 
   // burst de faiscas radiando da faixa "DIA VENCIDO" -- mesma tecnica de
   // origem/posicionamento de moedasCaindo/numeroFlutuante (getBoundingClientRect
@@ -2231,8 +2596,23 @@ function alternar(i){
       const moedasGanhas = Math.max(1, Math.round(moedasDaTarefa(dif) / meta));
       xpTotal += xpGanho;
       moedas += moedasGanhas;
+      // mesma trava _adiarContadoresRecompensa do golpe final (ver
+      // comentario em render()) -- sem isso a barra de XP/moeda ja
+      // aparecia cheia ANTES do icone chegar no heroi, ja que
+      // xpTotal/moedas acima ja tinham sido somados antes deste
+      // render(). Libera de novo (sem suprimir) dentro do aoTerminar
+      // do voo, pra barra so andar quando o "+X" aparecer.
+      window._adiarContadoresRecompensa = true;
       render();
-      numeroFlutuante(xpGanho, moedasGanhas);
+      window._adiarContadoresRecompensa = false;
+      // pedido do usuario: tarefa normal agora tambem tem o voo de
+      // icones (moeda+XP do monstro ate o heroi) igual golpe final --
+      // voarRecompensaFinal() e generica, so o nome ficou de quando so
+      // era usada ali; ela mesma chama numeroFlutuanteHeroi() no final
+      // do voo, entao a chamada direta que tinha aqui antes some. O
+      // 3o argumento (aoTerminar) e novo aqui: re-renderiza SEM a trava,
+      // fazendo a barra andar so depois do icone chegar.
+      voarRecompensaFinal(xpGanho, moedasGanhas, () => render());
       return false;
     }
   }
@@ -2254,15 +2634,52 @@ function alternar(i){
     : moedasDaTarefa(dif);
   moedas += moedasGanhas;
 
-  animarGolpe();
-  render();
-
+  // venceuAgora computado ANTES do render() de proposito (normalmente
+  // vinha depois) -- avaliarVitoriaDoDia() so olha o estado das
+  // tarefas (ja atualizado acima), nao depende de nada que render()
+  // preencha. Precisa saber AQUI se e o golpe final pra poder segurar
+  // a barra/contador nesse render() especifico (ver
+  // _adiarContadoresRecompensa em render()).
   const venceuAgora = avaliarVitoriaDoDia();
+  const ehGolpeFinal = venceuAgora && !monstroJaCaiu();
+
+  // MOVIDO pra antes do render() (era depois) -- progresso() e pura, so
+  // olha xpTotal (ja somado acima), nao depende de nada que render()
+  // preencha. Precisa saber ANTES se vai subir de nivel pra decidir se
+  // suprime os contadores no render() logo abaixo (ver comentario junto
+  // de _adiarContadoresRecompensa).
   const nivelDepois = progresso().nivel;
   const subiuNivel = nivelDepois > nivelAntes;
 
-  if (venceuAgora && !monstroJaCaiu()){
-    dispararVitoriaDoDia(doDia, nivelAntes);
+  animarGolpe();
+  // suprime contadores no render() sempre que a barra so deve andar
+  // DEPOIS de um icone chegar no heroi (golpe final OU tarefa normal
+  // via voarRecompensaFinal, logo abaixo) -- pedido do usuario, mesmo
+  // bug do golpe final ("barra enchendo antes do icone chegar") mas
+  // que so estava corrigido pra ele. NAO suprime quando vai ter
+  // level-up: esse caminho chama mostrarNivelUp() e nao tem voo, quer
+  // o contador atualizado na hora.
+  const suprimirContadores = ehGolpeFinal || !subiuNivel;
+  if (suprimirContadores) window._adiarContadoresRecompensa = true;
+  render();
+  if (suprimirContadores) window._adiarContadoresRecompensa = false; // so vale por ESSE render() -- o de dentro da sequencia atrasada (mostrarBauEContadores) roda com a flag ja desligada
+
+  if (ehGolpeFinal){
+    // item 3 do redesign: o numero estatico (item 1, antes aqui) virou
+    // a recompensa voando de verdade (ver voarRecompensaFinal, chamada
+    // DENTRO de dispararVitoriaDoDia, sincronizada com o poof/bau) --
+    // por isso xpGanho/moedasGanhas agora precisam ser repassados pra
+    // la, ja que so existem aqui dentro de alternar().
+    //
+    // atraso proposital: animarGolpe() (chamada logo acima) leva 320ms
+    // pra terminar (hero bate, monstro treme, os dois voltam ao
+    // normal -- ver a funcao). dispararVitoriaDoDia() faz o proprio
+    // render(), que troca a visual pro estado "derrotado" (esconde o
+    // monstro). Sem esse atraso, essa troca acontecia quase instantanea
+    // -- ainda no mesmo tick -- cortando a animacao de golpe pela
+    // metade, dando a impressao de que o golpe acertou o bau em vez do
+    // monstro (queixa do usuario, dava pra perceber facil).
+    setTimeout(() => dispararVitoriaDoDia(doDia, nivelAntes, xpGanho, moedasGanhas), 400);
     return true;
   }
   if (!venceuAgora) derrotadoEm = null;
@@ -2270,7 +2687,7 @@ function alternar(i){
   if (subiuNivel){
     if (typeof mostrarNivelUp === 'function') mostrarNivelUp(nivelDepois);
   }
-  else numeroFlutuante(xpGanho, moedasGanhas);
+  else voarRecompensaFinal(xpGanho, moedasGanhas, () => render()); // pedido do usuario: mesmo voo de icones do golpe final, e barra so anda quando ele chega (aoTerminar)
   return true;
 }
 
@@ -3401,10 +3818,21 @@ function atualizarBauArena(){
   const estado = lerBauDia();
   const valido = !!(estado && estado.dia === isoAtual());
 
+  // pedido do usuario: som de "spawn" (poofBau) no instante em que um
+  // baú passa de escondido pra mostrado -- guarda ANTES de mexer na
+  // classe pra saber se e uma transicao de verdade (sem isso, tocaria
+  // de novo em TODO render() enquanto o bau ja estivesse visivel, ja
+  // que atualizarBauArena() roda a cada render()). Se os DOIS baus
+  // (padrao + especial) nascerem no mesmo render(), toca 2x com delay
+  // em vez de simultaneo (mesmo padrao do "poof duplo" do preview).
+  const spawnsNovos = [];
+
   const elP = document.getElementById('bauArena');
   if (elP){
+    const jaMostravaP = elP.classList.contains('mostrar');
     const mostrarP = valido && !!estado.padrao;
     elP.classList.toggle('mostrar', mostrarP);
+    if (mostrarP && !jaMostravaP) spawnsNovos.push('padrao');
     if (mostrarP){
       elP.classList.toggle('aberto', !!estado.padrao.aberto);
       if (!elP.dataset.montado){ elP.onclick = abrirBauPadrao; elP.dataset.montado = '1'; }
@@ -3413,8 +3841,10 @@ function atualizarBauArena(){
 
   const elE = document.getElementById('bauArenaEspecial');
   if (elE){
+    const jaMostravaE = elE.classList.contains('mostrar');
     const mostrarE = valido && !!estado.especial;
     elE.classList.toggle('mostrar', mostrarE);
+    if (mostrarE && !jaMostravaE) spawnsNovos.push('especial');
     if (mostrarE){
       elE.classList.toggle('trancado', !estado.especial.aberto);
       elE.classList.toggle('aberto', !!estado.especial.aberto);
@@ -3443,6 +3873,17 @@ function atualizarBauArena(){
         elE.dataset.montado = '1';
       }
     }
+  }
+
+  // dispara o som de spawn DEPOIS dos dois blocos acima, ja sabendo se
+  // foi 1 ou 2 baus novos nesse render() -- 260ms de delay entre os 2
+  // quando ambos aparecem juntos, mesmo intervalo testado/aprovado no
+  // preview de SFX (demo "2 baus").
+  if (spawnsNovos.length === 1){
+    if (typeof window.tocarSom === 'function') window.tocarSom('poofBau');
+  } else if (spawnsNovos.length === 2){
+    if (typeof window.tocarSom === 'function') window.tocarSom('poofBau');
+    setTimeout(() => { if (typeof window.tocarSom === 'function') window.tocarSom('poofBau'); }, 260);
   }
 }
 window.atualizarBauArena = atualizarBauArena;
@@ -7671,8 +8112,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     fuga: c => {                                        // monstro fugiu (tarefas largadas na virada)
       tom(c, { freq:520, freqFinal:110, tipo:'sawtooth', duracao:0.4, ganho:0.4 });
     },
-    levelup: c => {                                     // subida de nivel
-      [523, 659, 784, 1047].forEach((f, i) => tom(c, { freq:f, tipo:'square', inicio:i*0.07, duracao:0.18, ganho:0.4 }));
+    levelup: c => {                                     // subida de nivel -- FIX v2 (pedido do usuario, aprovado no preview de SFX: opcao "C"): triangle (v1 do fix) trocado por sine, ganho 0.22 -> 0.25. Historico: original era square ganho 0.4 ("muito alto, desconfortavel de ouvir"), sine e a waveform mais macia das 4 disponiveis (sine/triangle/square/sawtooth), sem harmonicos fortes
+      [523, 659, 784, 1047].forEach((f, i) => tom(c, { freq:f, tipo:'sine', inicio:i*0.07, duracao:0.18, ganho:0.25 }));
     },
     loot: c => {                                        // espolio do bau -- tambem o UNICO sinal de "dia vencido" (ver nota no gancho de mostrarBauLoot)
       [880, 1175, 1568].forEach((f, i) => tom(c, { freq:f, tipo:'sine', inicio:i*0.05, duracao:0.3, ganho:0.35 }));
@@ -7701,11 +8142,18 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       tom(c, { freq:440, tipo:'triangle', duracao:0.05, ganho:0.25 });
       tom(c, { freq:660, tipo:'triangle', inicio:0.05, duracao:0.09, ganho:0.3 });
     },
-    equipar: c => {                                      // item equipado -- "clunk" metalico com click de encaixe
-      ruido(c, { duracao:0.03, ganho:0.35 });
-      tom(c, { freq:300, freqFinal:180, tipo:'square', duracao:0.08, ganho:0.4 });
-      tom(c, { freq:500, tipo:'triangle', inicio:0.03, duracao:0.06, ganho:0.25 });
+    equipar: c => {                                      // item equipado -- FIX (pedido do usuario): trocado pelo som novo aprovado no preview de SFX, opcao "F" (whoosh + snap) -- design antigo (clunk metalico puro) comentado abaixo, nao apagado
+      tom(c, { freq:300, freqFinal:700, tipo:'triangle', duracao:0.12, ganho:0.3 });
+      ruido(c, { inicio:0.11, duracao:0.03, ganho:0.5 });
+      tom(c, { freq:200, tipo:'square', inicio:0.11, duracao:0.05, ganho:0.36 });
     },
+    // DESIGN ANTERIOR de equipar (substituido acima, mantido comentado --
+    // "clunk" metalico com click de encaixe):
+    //   equipar: c => {
+    //     ruido(c, { duracao:0.03, ganho:0.35 });
+    //     tom(c, { freq:300, freqFinal:180, tipo:'square', duracao:0.08, ganho:0.4 });
+    //     tom(c, { freq:500, tipo:'triangle', inicio:0.03, duracao:0.06, ganho:0.25 });
+    //   },
     desequipar: c => {                                   // item desequipado -- thud curto e mais surdo, sem o click de encaixe
       tom(c, { freq:220, freqFinal:140, tipo:'triangle', duracao:0.09, ganho:0.3 });
     },
@@ -7718,6 +8166,14 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     },
     grimorio: c => {                                      // Grimorio obtido (marco de nivel 5) -- arpejo mais longo e "arcano" que o levelup normal
       [392, 466, 587, 698, 932].forEach((f, i) => tom(c, { freq:f, tipo:'sine', inicio:i*0.09, duracao:0.28, ganho:0.28 }));
+    },
+    chegadaRecompensa: c => {                             // icone de moeda/XP chega no heroi (voarRecompensaFinal) -- cristal/gema, aprovada pelo usuario (opcao "C" do preview de SFX)
+      tom(c, { freq:1046, tipo:'sine', duracao:0.22, ganho:0.32 });
+      tom(c, { freq:1568, tipo:'sine', inicio:0.02, duracao:0.28, ganho:0.18 });
+    },
+    poofBau: c => {                                       // "puf" unico -- bau spawnando na Arena (opcao "O", metade do "poof duplo" do preview de SFX). Pedido do usuario: reaproveitado TAMBEM pro monstro desaparecendo (mostrarPoofMonstro) em vez de criar um som novo pra isso -- ver comentario la
+      ruido(c, { duracao:0.05, ganho:0.36 });
+      tom(c, { freq:300, freqFinal:600, tipo:'triangle', duracao:0.06, ganho:0.22 });
     }
   };
 
@@ -10789,6 +11245,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // renderConquistas definido ainda nesse ponto do arquivo).
     ['render','renderInventario','renderLoja','renderConquistasV2','renderBestiario','renderHistorico','renderGrimorio','desenharHeroi','renderTituloPerfil']
       .forEach(fn => { if (typeof window[fn] === 'function') window[fn](); });
+    if (typeof window.atualizarTextosDificuldade === 'function') window.atualizarTextosDificuldade();
     if (typeof window.pintarTemaGrid === 'function') window.pintarTemaGrid();
     if (typeof window.pintarIdiomaGrid === 'function') window.pintarIdiomaGrid();
 

@@ -226,6 +226,10 @@
       </div>
     </div>
 
+    <div class="contadorGlobal" id="contadorGlobal" style="display:none">
+      <span id="contadorGlobalTxt"></span>
+    </div>
+
     <div class="vitoria" id="vitoria">
       <span class="faixa" data-i18n="jogo.diaVencido">DIA VENCIDO</span>
       <span class="ganho">
@@ -1208,6 +1212,8 @@ function avaliarVitoriaDoDia(){
 // pra ser chamado tambem por verificarVitoriaAoExcluir() (vitoria por
 // exclusao da ultima pendente)
 function dispararVitoriaDoDia(doDia, nivelAntes, xpGanho, moedasGanhas){
+  incrementarContadorGlobal(); // fire-and-forget, nao bloqueia a animacao
+
   // captura a posicao do monstro ANTES de render() (mais abaixo) trocar
   // a visual pro estado "derrotado" e escondê-lo -- se pedir isso DEPOIS
   // do render(), o sprite ja nao esta mais visivel/no lugar certo.
@@ -1270,6 +1276,91 @@ function dispararVitoriaDoDia(doDia, nivelAntes, xpGanho, moedasGanhas){
     }, 450);
   } else {
     setTimeout(mostrarBauEContadores, 560);
+  }
+}
+
+// ---------------------------------------------------------------------
+// CONTADOR GLOBAL DE VITORIAS ("X herois ja venceram hoje") -- doc unico
+// contadorGlobal/hoje no Firestore, { data: 'YYYY-MM-DD', total: N }.
+// Sem Cloud Function: incremento via runTransaction direto do client
+// (mesmo padrao do waitlist_stats/counter em /waitlist/index.html),
+// protegido por regra do Firestore que so aceita +1 por chamada (ver
+// firestore.rules). Reset diario sem cron: quem le, se a "data" salva
+// for de ontem, trata como 0 -- a escrita seguinte corrige o doc.
+// ---------------------------------------------------------------------
+
+async function _clienteContadorGlobal(){
+  if (!window.firebaseConfig || window.firebaseConfig.apiKey === 'COLE_AQUI_SUA_APIKEY') return null;
+  const [modApp, modFirestore] = await Promise.all([
+    import("https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js"),
+    import("https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js")
+  ]);
+  const { initializeApp, getApps, getApp } = modApp;
+  const { getFirestore, doc, getDoc, runTransaction } = modFirestore;
+  const app = getApps().length ? getApp() : initializeApp(window.firebaseConfig);
+  const db = getFirestore(app);
+  return { db, ref: doc(db, 'contadorGlobal', 'hoje'), getDoc, runTransaction };
+}
+
+function _textoContadorGlobal(total){
+  const en = idiomaApp() === 'en';
+  if (total <= 0) return en ? 'Be the first hero to win today' : 'Seja o primeiro herói a vencer hoje';
+  if (total === 1) return en ? '1 hero already won today' : '1 herói já venceu hoje';
+  return total + (en ? ' heroes already won today' : ' heróis já venceram hoje');
+}
+
+function _mostrarContadorGlobal(total){
+  const el = document.getElementById('contadorGlobalTxt');
+  const wrap = document.getElementById('contadorGlobal');
+  if (!el || !wrap) return;
+  el.textContent = _textoContadorGlobal(total);
+  wrap.style.display = '';
+}
+
+// leitura simples (sem transacao) pra popular o banner no boot da Arena.
+async function carregarContadorGlobal(){
+  try {
+    const cli = await _clienteContadorGlobal();
+    if (!cli) return;
+    const snap = await cli.getDoc(cli.ref);
+    const dados = snap.exists() ? snap.data() : null;
+    const total = (dados && dados.data === isoAtual()) ? (dados.total || 0) : 0;
+    _mostrarContadorGlobal(total);
+  } catch(e){
+    console.error('QuestLog/ContadorGlobal: falha ao carregar', e);
+    // banner fica escondido (display:none do HTML) -- nao quebra a Arena
+  }
+}
+
+// incremento -- chamado de dentro de dispararVitoriaDoDia(). Fire-and-
+// forget by design (quem chama nao da await): erro de rede aqui NUNCA
+// pode travar a animacao de recompensa. Protegido contra incremento
+// duplo por flag local NAMESPACED POR CONTA (chaveConta) -- so marca a
+// flag DEPOIS da transacao confirmar, senao uma queda de rede no meio
+// marca "ja contei" sem ter contado de verdade.
+async function incrementarContadorGlobal(){
+  const CHAVE = chaveConta('questlog.contadorGlobalContadoHoje.v1');
+  const hoje = isoAtual();
+  try {
+    if (localStorage.getItem(CHAVE) === hoje) return; // ja contou hoje, nesta conta
+  } catch(e){}
+
+  try {
+    const cli = await _clienteContadorGlobal();
+    if (!cli) return;
+    let novoTotal = 0;
+    await cli.runTransaction(cli.db, async (tx) => {
+      const snap = await tx.get(cli.ref);
+      const dados = snap.exists() ? snap.data() : null;
+      const atual = (dados && dados.data === hoje) ? (dados.total || 0) : 0;
+      novoTotal = atual + 1;
+      tx.set(cli.ref, { data: hoje, total: novoTotal });
+    });
+    try { localStorage.setItem(CHAVE, hoje); } catch(e){}
+    _mostrarContadorGlobal(novoTotal);
+  } catch(e){
+    console.error('QuestLog/ContadorGlobal: falha ao incrementar', e);
+    // flag NAO marcada -- tenta de novo na proxima vitoria/sessao
   }
 }
 
@@ -3202,6 +3293,7 @@ desenharHeroi();
 renderTemaArena();
 precarregarTemasArena();
 mostrarDicaSwipeArenaSeNecessario();
+carregarContadorGlobal(); // fire-and-forget
 render();
 </script>
 

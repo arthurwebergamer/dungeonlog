@@ -226,8 +226,8 @@
       </div>
     </div>
 
-    <div class="contadorGlobal" id="contadorGlobal" style="display:none">
-      <span id="contadorGlobalTxt"></span>
+    <div class="contadorGlobal" id="contadorGlobal" style="color:#fff;font-size:12px;text-align:center;padding:4px">
+      <span id="contadorGlobalTxt">[contador: aguardando]</span>
     </div>
 
     <div class="vitoria" id="vitoria">
@@ -1317,6 +1317,14 @@ function _mostrarContadorGlobal(total){
   wrap.style.display = '';
 }
 
+// >>> DEBUG TEMPORARIO -- remover depois de confirmar no aparelho <<<
+// mostra o erro DIRETO NA TELA (sem precisar de devtools/PC conectado)
+function _erroVisivelContadorGlobal(origem, e){
+  const el = document.getElementById('contadorGlobalTxt');
+  if (el) el.textContent = '[DEBUG ' + origem + ': ' + (e && e.message ? e.message : String(e)) + ']';
+  console.error('QuestLog/ContadorGlobal:', origem, e);
+}
+
 // leitura simples (sem transacao) pra popular o banner no boot da Arena.
 async function carregarContadorGlobal(){
   try {
@@ -1327,8 +1335,7 @@ async function carregarContadorGlobal(){
     const total = (dados && dados.data === isoAtual()) ? (dados.total || 0) : 0;
     _mostrarContadorGlobal(total);
   } catch(e){
-    console.error('QuestLog/ContadorGlobal: falha ao carregar', e);
-    // banner fica escondido (display:none do HTML) -- nao quebra a Arena
+    _erroVisivelContadorGlobal('carregar', e);
   }
 }
 
@@ -1359,7 +1366,7 @@ async function incrementarContadorGlobal(){
     try { localStorage.setItem(CHAVE, hoje); } catch(e){}
     _mostrarContadorGlobal(novoTotal);
   } catch(e){
-    console.error('QuestLog/ContadorGlobal: falha ao incrementar', e);
+    _erroVisivelContadorGlobal('incrementar', e);
     // flag NAO marcada -- tenta de novo na proxima vitoria/sessao
   }
 }

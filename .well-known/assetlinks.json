@@ -1,0 +1,10 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.dungeonlog",
+    "sha256_cert_fingerprints": [
+      "46:A1:D8:6C:C5:54:1B:79:1F:88:B9:80:3D:F4:A8:85:7C:64:91:0D:69:C1:DF:AE:CE:ED:1F:2C:C5:53:0B:C8"
+    ]
+  }
+}]

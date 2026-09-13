@@ -1926,15 +1926,13 @@ function mudarTemaArena(direcao){
   const idxAtual = TEMAS_ARENA.findIndex(t => t.id === temaArenaAtual().id);
   const idx = (idxAtual + direcao + TEMAS_ARENA.length) % TEMAS_ARENA.length;
   const novoTema = TEMAS_ARENA[idx];
-  // FIX (bug relatado pelo usuario, mesma correcao do swipe acima): antes
-  // pousava no tema trancado mesmo assim (decisao antiga, "overlay de
-  // bloqueio assume") -- pedido do usuario agora e sempre voltar pro
-  // tema anterior quando o alvo esta trancado, igual o swipe ja faz.
-  // Sem drag pra "molar" de volta aqui (navegacao por indice, nao
-  // gesto): o equivalente e simplesmente nao navegar, ficar onde
-  // ja estava.
-  if (!temaArenaDesbloqueado(novoTema)) return;
-  definirTemaArenaSalvo(novoTema.id);
+  // pedido do usuario (revisado): pousar num tema trancado agora e
+  // permitido de novo (preview real, com o overlay de bloqueio), so
+  // NAO PERSISTE quando trancado -- ver mesmo comentario no swipe
+  // (touchend) e em renderTemaArena(), chamada dentro de render()/
+  // mostrarAba() pra desfazer esse preview assim que o usuario faz
+  // qualquer coisa em Tarefas ou troca de aba.
+  if (temaArenaDesbloqueado(novoTema)) definirTemaArenaSalvo(novoTema.id);
 
   const frenteEl = document.getElementById('arenaBg' + _arenaBgFrente);
   const trasId = _arenaBgFrente === 'A' ? 'B' : 'A';
@@ -2058,9 +2056,15 @@ window.mudarTemaArena = mudarTemaArena;
 
     frenteEl.style.transition = trasEl.style.transition = 'transform ' + TEMA_ARENA_DURACAO_SLIDE + 'ms ease';
 
-    if (passouLimite && temaArenaDesbloqueado(TEMAS_ARENA[idxAlvo])){
-      // completa a troca de verdade
-      definirTemaArenaSalvo(TEMAS_ARENA[idxAlvo].id);
+    if (passouLimite){
+      // completa a troca visual de verdade -- inclusive pra tema
+      // trancado (pedido do usuario, revisado: nao "mola" na hora do
+      // solte; deixa pousar e mostrar o cadeado como preview real, so
+      // NAO PERSISTE se estiver trancado. Ver renderTemaArena() chamada
+      // dentro de render()/mostrarAba() -- qualquer acao em Tarefas ou
+      // troca de aba no menu de baixo re-sincroniza a arena de volta
+      // pro tema realmente salvo, desfazendo esse preview sozinho).
+      if (temaArenaDesbloqueado(TEMAS_ARENA[idxAlvo])) definirTemaArenaSalvo(TEMAS_ARENA[idxAlvo].id);
       _arenaBgEmTransicao = true;
       frenteEl.style.transform = 'translateX(' + (direcaoAtual > 0 ? '-100%' : '100%') + ')';
       trasEl.style.transform = 'translateX(0)';
@@ -2068,13 +2072,7 @@ window.mudarTemaArena = mudarTemaArena;
       renderTemaArenaDots();
       if (typeof atualizarBloqueioArena === 'function') atualizarBloqueioArena();
     } else {
-      // nao arrastou o suficiente OU o alvo esta trancado (bug relatado
-      // pelo usuario: soltar em cima de um tema trancado deixava ele
-      // "selecionado" -- a silhueta+cadeado eram so um preview visual
-      // durante o arrasto, ver comentario "NAO pula bloqueados" acima,
-      // mas o SOLTAR completava a troca de qualquer jeito, sem checar
-      // temaArenaDesbloqueado()). Mesma mola de volta pro tema atual,
-      // reaproveitada pros dois casos.
+      // nao arrastou o suficiente -- "mola" de volta pro tema atual
       frenteEl.style.transform = 'translateX(0)';
       trasEl.style.transform = 'translateX(' + (direcaoAtual > 0 ? '100%' : '-100%') + ')';
     }
@@ -2184,6 +2182,15 @@ function resetarEstadoParaPadrao(){
 }
 
 function render(){
+  // pedido do usuario: qualquer acao na aba Tarefas desfaz um preview de
+  // tema de arena trancado (ver swipe/mudarTemaArena, permitem pousar
+  // visualmente num tema trancado sem persistir) -- re-sincroniza pro
+  // tema REALMENTE salvo. Guardado por _arenaBgEmTransicao pra nao
+  // interromper uma troca de tema em andamento (swipe ainda arrastando/
+  // animando) se um render() disparar no meio por outro motivo (ex:
+  // watchdog de dia).
+  if (!_arenaBgEmTransicao && typeof renderTemaArena === 'function') renderTemaArena();
+
   const doDia = tarefas.filter(ehDeHoje);
   const lista = document.getElementById('list');
   lista.innerHTML = '';
@@ -3249,6 +3256,11 @@ const blocosTarefas = ['.arena', '.xpwrap', '.tasks'].map(s => document.querySel
 
 function mostrarAba(nome){
   abaAtual = nome;
+
+  // mesmo motivo do gancho identico em render() (Tarefas) -- troca de
+  // aba no menu de baixo tambem desfaz um preview de tema de arena
+  // trancado, voltando pro tema realmente salvo.
+  if (!_arenaBgEmTransicao && typeof renderTemaArena === 'function') renderTemaArena();
 
   // flutuante .fixo (venda/uso de item) e position:fixed no body, nao
   // dentro do conteudo da aba -- se o usuario troca de aba enquanto ele

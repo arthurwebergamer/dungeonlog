@@ -1284,14 +1284,28 @@ function dispararVitoriaDoDia(doDia, nivelAntes, xpGanho, moedasGanhas){
     }
   };
 
-  // pedido do usuario: numero flutuante de +XP/+moedas removido de
-  // TODAS as ocasioes, inclusive o golpe final -- antes o golpe final
-  // tinha seu proprio voo (voarRecompensaFinal) rodando aqui antes do
-  // bau aparecer; agora pula direto pro bau/contadores, so esperando o
-  // poof terminar. Mesmo timing que ja existia pro caminho "sem reward
-  // pra mostrar" (usado so na exclusao de tarefa antes) -- agora e o
-  // unico caminho, pra qualquer chamada desta funcao.
-  setTimeout(mostrarBauEContadores, 560);
+  // item 3: moeda+XP nascem no meio da animacao do poof (250ms -- ainda
+  // visivel/dissipando, mas ja da tempo da recompensa "emergir" dele em
+  // vez de nascer simultaneo), voam ate o HEROI, e SO DEPOIS que "+X"
+  // aparece em cima da cabeca dele (dentro de voarRecompensaFinal) e
+  // que o bau/contadores sao liberados -- com uma folga BEM maior
+  // (900ms, era 350ms) pra dar tempo de LER o "+X" antes do bau/
+  // contador roubarem a atencao. 350ms tava curto demais pra separar
+  // visualmente os dois momentos (confirmado em video: parecia tudo
+  // simultaneo).
+  //
+  // Se nao tem reward pra mostrar (veio do caminho de exclusao de
+  // tarefa, que chama esta funcao sem xpGanho/moedasGanhas), pula
+  // direto pro bau, so esperando o poof terminar (560ms).
+  if ((xpGanho || moedasGanhas) && typeof voarRecompensaFinal === 'function'){
+    setTimeout(() => {
+      voarRecompensaFinal(xpGanho || 0, moedasGanhas || 0, () => {
+        setTimeout(mostrarBauEContadores, 900);
+      });
+    }, 450);
+  } else {
+    setTimeout(mostrarBauEContadores, 560);
+  }
 }
 
 // ---------------------------------------------------------------------
@@ -2752,13 +2766,18 @@ function alternar(i){
       // caminho sempre retorna false de proposito).
       animarGolpe();
       window.tocarSom?.('golpe');
-      // pedido do usuario: numero flutuante de +XP/+moedas removido de
-      // TODAS as ocasioes (nao so aqui, ver tambem golpe normal e golpe
-      // final mais abaixo) -- os contadores do topo (moedas/XP) sobem
-      // em silencio dentro deste render(), sem popup/icone voando.
-      // voarRecompensaFinal()/numeroFlutuanteHeroi() continuam
-      // existindo no arquivo, so sem chamador daqui em diante.
+      // mesma trava _adiarContadoresRecompensa do golpe final -- sem
+      // isso a barra de XP/moeda ja aparecia cheia ANTES do icone
+      // chegar no heroi, ja que xpTotal/moedas acima ja tinham sido
+      // somados antes deste render(). Libera de novo (sem suprimir)
+      // dentro do aoTerminar do voo, pra barra so andar quando o "+X"
+      // aparecer.
+      window._adiarContadoresRecompensa = true;
       render();
+      window._adiarContadoresRecompensa = false;
+      // mesmo voo de icones do golpe final, e barra so anda quando ele
+      // chega (aoTerminar)
+      voarRecompensaFinal(xpGanho, moedasGanhas, () => render());
       return false;
     }
   }
@@ -2798,14 +2817,17 @@ function alternar(i){
   const subiuNivel = nivelDepois > nivelAntes;
 
   animarGolpe();
-  // pedido do usuario: numero flutuante de +XP/+moedas removido de
-  // TODAS as ocasioes -- os contadores do topo (moedas/XP) sobem em
-  // silencio, direto neste render(), sem trava/atraso esperando icone
-  // nenhum chegar (a suspensao via _adiarContadoresRecompensa so
-  // existia pra sincronizar com o voo, que nao roda mais em lugar
-  // nenhum -- ver render() pro check que continua ali, so nunca mais
-  // acionado).
+  // suprime contadores no render() sempre que a barra so deve andar
+  // DEPOIS de um icone chegar no heroi (golpe final OU tarefa normal
+  // via voarRecompensaFinal, logo abaixo) -- pedido do usuario, mesmo
+  // bug do golpe final ("barra enchendo antes do icone chegar") mas
+  // que so estava corrigido pra ele. NAO suprime quando vai ter
+  // level-up: esse caminho chama mostrarNivelUp() e nao tem voo, quer
+  // o contador atualizado na hora.
+  const suprimirContadores = ehGolpeFinal || !subiuNivel;
+  if (suprimirContadores) window._adiarContadoresRecompensa = true;
   render();
+  if (suprimirContadores) window._adiarContadoresRecompensa = false; // so vale por ESSE render() -- o de dentro da sequencia atrasada (mostrarBauEContadores) roda com a flag ja desligada
 
   if (ehGolpeFinal){
     // atraso proposital: animarGolpe() (chamada logo acima) leva 320ms
@@ -2821,7 +2843,10 @@ function alternar(i){
   }
   if (!venceuAgora) derrotadoEm = null;
 
-  if (subiuNivel && typeof mostrarNivelUp === 'function') mostrarNivelUp(nivelDepois);
+  if (subiuNivel){
+    if (typeof mostrarNivelUp === 'function') mostrarNivelUp(nivelDepois);
+  }
+  else voarRecompensaFinal(xpGanho, moedasGanhas, () => render()); // mesmo voo de icones do golpe final, barra so anda quando ele chega (aoTerminar)
   return true;
 }
 

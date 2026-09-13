@@ -1090,37 +1090,35 @@
     --gold:#E8E8E8; --blood:#B8B8B8; --mobname:#E0E0E0; --sel-bg:#4A4A4A; --poco:#1C1C1C;
     --arena-1:#454545; --arena-2:#383838; --arena-3:#2C2C2C; --xp2:#EDEDED;
   }
-  /* v4.136 (correcao pedida pelo usuario -- v4.135 nao acertou a ideia):
-     o problema apontado no Azul nao era "so uma cor", era bg e accent
-     morando na MESMA familia de cor (bg #161A20 azul-acinzentado + accent
-     #5AB4EC azul -- sem contraste de verdade entre fundo e destaque). A
-     v4.135 caiu no MESMO erro pro Floresta (bg verde-escuro + accent
-     verde -- ainda monocromatico). O que faz o tema Laranja funcionar de
-     verdade e o CONTRASTE: bg roxo (fria) + accent laranja (quente),
-     duas familias de cor bem diferentes coexistindo. Reaplicado aqui:
-     Floresta = fundo MARROM/castanho (tronco, terra da masmorra -- fria
-     e neutra) + accent VERDE vivo (folhagem, quente/vibrante por cima do
-     marrom) + gold ambar (luz de sol), o mesmo padrao bg-x-accent do
-     Laranja so que com marrom+verde no lugar de roxo+laranja. */
+  /* v4.137 (2a correcao pedida pelo usuario -- v4.136 ainda nao combinou).
+     Comparando HSL do tema Laranja (aprovado) com as tentativas
+     anteriores: o problema real nao era so a distancia de matiz entre
+     bg e accent (essa ja estava ok), era o ACCENT ficar sub-saturado
+     (v4.136: S48-53%, L51-58%) contra o S85%/L65% vivido que o Laranja
+     usa de verdade -- por isso as tentativas anteriores pareciam
+     "murchas" ao lado do Laranja. Paleta gerada reaplicando a MESMA
+     receita HSL do Laranja (bg: mesma familia de matiz em S~31-34%,
+     variando so a luminosidade por camada; accent: S80-85%/L58-63%,
+     bem vivo; gold mantido quase fixo — mesma logica dos 4 temas
+     existentes, so o Grafite foge disso de proposito) com hues novos:
+     Floresta = base terracota/marrom (H20) x accent verde vivo (H135,
+     ~115 graus de distancia). */
   :root[data-tema="floresta"]{
-    --bg:#1C140D; --panel:#1C140D; --panel-2:#2A1F14; --panel-3:#392A1B;
-    --line:#4A3A26; --text:#F2EDE4; --muted:#B8A68C; --dim:#8A7358;
-    --accent:#5FC77A; --accent-dim:#1E3A22; --gold:#E0A94C; --blood:#C25B3E;
-    --mobname:#86E0A0; --sel-bg:#33281A; --poco:#120D08;
-    --arena-1:#2E2216; --arena-2:#221A10; --arena-3:#170F09; --xp2:#E0A94C;
+    --bg:#291B15; --panel:#291B15; --panel-2:#3A271D; --panel-3:#442D22;
+    --line:#5C3D2E; --text:#EBF5ED; --muted:#D4B8AA; --dim:#AD8876;
+    --accent:#45ED6F; --accent-dim:#225830; --gold:#EFC348; --blood:#E05C72;
+    --mobname:#ED96AE; --sel-bg:#513629; --poco:#2F2018;
+    --arena-1:#5C3D2E; --arena-2:#442D22; --arena-3:#36241B; --xp2:#EFC348;
   }
-  /* v4.136 (mesma correcao acima): Vinho tambem redesenhado -- bg AZUL-
-     MARINHO escuro (fria, noturna) + accent VINHO/framboesa vivo
-     (quente), em vez do bg e accent ficarem os dois na familia do
-     vermelho como na v4.135. Contraste frio-x-quente, mesma logica do
-     Laranja, cor final bem diferente (fundo azulado, identidade toda em
-     tons de vinho puxando pro rose). */
+  /* v4.137 (mesma correcao acima): Vinho = base azul-noite (H212) x
+     accent vinho/carmim vivo (H350, ~138 graus de distancia) -- mesma
+     receita, accent bem mais saturado/vivo que a tentativa anterior. */
   :root[data-tema="vinho"]{
-    --bg:#0F1524; --panel:#0F1524; --panel-2:#182030; --panel-3:#202C42;
-    --line:#2E3D57; --text:#F0EEEF; --muted:#A8A8BC; --dim:#6E7086;
-    --accent:#C4405C; --accent-dim:#4A1220; --gold:#C99A4A; --blood:#A02D42;
-    --mobname:#E8748C; --sel-bg:#24304A; --poco:#0A0D14;
-    --arena-1:#1C2740; --arena-2:#151D30; --arena-3:#0F1420; --xp2:#C99A4A;
+    --bg:#141E29; --panel:#141E29; --panel-2:#1D2A3A; --panel-3:#223244;
+    --line:#2D435C; --text:#F5EBEC; --muted:#AABED5; --dim:#758FAE;
+    --accent:#EA3E5B; --accent-dim:#57232C; --gold:#EFC348; --blood:#D43542;
+    --mobname:#E36D83; --sel-bg:#283C52; --poco:#182330;
+    --arena-1:#2D435C; --arena-2:#223244; --arena-3:#1B2837; --xp2:#EFC348;
   }
 
 /* ===== Bloco style #27 ===== */
@@ -2281,37 +2279,35 @@
     --gold:#E8E8E8; --blood:#B8B8B8; --mobname:#E0E0E0; --sel-bg:#4A4A4A; --poco:#1C1C1C;
     --arena-1:#454545; --arena-2:#383838; --arena-3:#2C2C2C; --xp2:#EDEDED;
   }
-  /* v4.136 (correcao pedida pelo usuario -- v4.135 nao acertou a ideia):
-     o problema apontado no Azul nao era "so uma cor", era bg e accent
-     morando na MESMA familia de cor (bg #161A20 azul-acinzentado + accent
-     #5AB4EC azul -- sem contraste de verdade entre fundo e destaque). A
-     v4.135 caiu no MESMO erro pro Floresta (bg verde-escuro + accent
-     verde -- ainda monocromatico). O que faz o tema Laranja funcionar de
-     verdade e o CONTRASTE: bg roxo (fria) + accent laranja (quente),
-     duas familias de cor bem diferentes coexistindo. Reaplicado aqui:
-     Floresta = fundo MARROM/castanho (tronco, terra da masmorra -- fria
-     e neutra) + accent VERDE vivo (folhagem, quente/vibrante por cima do
-     marrom) + gold ambar (luz de sol), o mesmo padrao bg-x-accent do
-     Laranja so que com marrom+verde no lugar de roxo+laranja. */
+  /* v4.137 (2a correcao pedida pelo usuario -- v4.136 ainda nao combinou).
+     Comparando HSL do tema Laranja (aprovado) com as tentativas
+     anteriores: o problema real nao era so a distancia de matiz entre
+     bg e accent (essa ja estava ok), era o ACCENT ficar sub-saturado
+     (v4.136: S48-53%, L51-58%) contra o S85%/L65% vivido que o Laranja
+     usa de verdade -- por isso as tentativas anteriores pareciam
+     "murchas" ao lado do Laranja. Paleta gerada reaplicando a MESMA
+     receita HSL do Laranja (bg: mesma familia de matiz em S~31-34%,
+     variando so a luminosidade por camada; accent: S80-85%/L58-63%,
+     bem vivo; gold mantido quase fixo — mesma logica dos 4 temas
+     existentes, so o Grafite foge disso de proposito) com hues novos:
+     Floresta = base terracota/marrom (H20) x accent verde vivo (H135,
+     ~115 graus de distancia). */
   :root[data-tema="floresta"]{
-    --bg:#1C140D; --panel:#1C140D; --panel-2:#2A1F14; --panel-3:#392A1B;
-    --line:#4A3A26; --text:#F2EDE4; --muted:#B8A68C; --dim:#8A7358;
-    --accent:#5FC77A; --accent-dim:#1E3A22; --gold:#E0A94C; --blood:#C25B3E;
-    --mobname:#86E0A0; --sel-bg:#33281A; --poco:#120D08;
-    --arena-1:#2E2216; --arena-2:#221A10; --arena-3:#170F09; --xp2:#E0A94C;
+    --bg:#291B15; --panel:#291B15; --panel-2:#3A271D; --panel-3:#442D22;
+    --line:#5C3D2E; --text:#EBF5ED; --muted:#D4B8AA; --dim:#AD8876;
+    --accent:#45ED6F; --accent-dim:#225830; --gold:#EFC348; --blood:#E05C72;
+    --mobname:#ED96AE; --sel-bg:#513629; --poco:#2F2018;
+    --arena-1:#5C3D2E; --arena-2:#442D22; --arena-3:#36241B; --xp2:#EFC348;
   }
-  /* v4.136 (mesma correcao acima): Vinho tambem redesenhado -- bg AZUL-
-     MARINHO escuro (fria, noturna) + accent VINHO/framboesa vivo
-     (quente), em vez do bg e accent ficarem os dois na familia do
-     vermelho como na v4.135. Contraste frio-x-quente, mesma logica do
-     Laranja, cor final bem diferente (fundo azulado, identidade toda em
-     tons de vinho puxando pro rose). */
+  /* v4.137 (mesma correcao acima): Vinho = base azul-noite (H212) x
+     accent vinho/carmim vivo (H350, ~138 graus de distancia) -- mesma
+     receita, accent bem mais saturado/vivo que a tentativa anterior. */
   :root[data-tema="vinho"]{
-    --bg:#0F1524; --panel:#0F1524; --panel-2:#182030; --panel-3:#202C42;
-    --line:#2E3D57; --text:#F0EEEF; --muted:#A8A8BC; --dim:#6E7086;
-    --accent:#C4405C; --accent-dim:#4A1220; --gold:#C99A4A; --blood:#A02D42;
-    --mobname:#E8748C; --sel-bg:#24304A; --poco:#0A0D14;
-    --arena-1:#1C2740; --arena-2:#151D30; --arena-3:#0F1420; --xp2:#C99A4A;
+    --bg:#141E29; --panel:#141E29; --panel-2:#1D2A3A; --panel-3:#223244;
+    --line:#2D435C; --text:#F5EBEC; --muted:#AABED5; --dim:#758FAE;
+    --accent:#EA3E5B; --accent-dim:#57232C; --gold:#EFC348; --blood:#D43542;
+    --mobname:#E36D83; --sel-bg:#283C52; --poco:#182330;
+    --arena-1:#2D435C; --arena-2:#223244; --arena-3:#1B2837; --xp2:#EFC348;
   }
 
 /* --- Módulo style #10 --- */

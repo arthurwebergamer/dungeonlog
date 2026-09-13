@@ -1090,18 +1090,33 @@
     --gold:#E8E8E8; --blood:#B8B8B8; --mobname:#E0E0E0; --sel-bg:#4A4A4A; --poco:#1C1C1C;
     --arena-1:#454545; --arena-2:#383838; --arena-3:#2C2C2C; --xp2:#EDEDED;
   }
-  /* DEPRECATED (v4.124): tema Floresta removido da lista visivel no
-     Aparencia > Tema (item de identidade visual -- decisao do usuario
-     de manter laranja como tema/cor de marca, sem verde na paleta de
-     escolha). As variaveis continuam aqui, so nao aparecem mais em
-     TEMAS[] (index.html) nem em CICLO_TEMAS -- ninguem aponta pra
-     [data-tema="floresta"] no momento. */
+  /* v4.135 (pedido do usuario): tema Floresta REATIVADO e redesenhado --
+     a versao antiga (v4.124, removida da lista visivel) era verde quase
+     monocromatico, mesmo problema de "basico" que o usuario apontou no
+     tema Azul (bg e accent na mesma familia de cor, sem contraste real).
+     Paleta nova mistura DUAS cores de verdade -- verde de folha (accent,
+     identidade principal) + ambar/dourado (gold, luz de sol filtrada
+     pela copa), a mesma logica que ja funciona no tema Laranja (bg roxo
+     + accent laranja -- por isso aquele "combina e fica sensacional").
+     --blood vira terracota em vez de vermelho puro, pra nao destoar do
+     resto da paleta terrosa. */
   :root[data-tema="floresta"]{
-    --bg:#0E1712; --panel:#0E1712; --panel-2:#16241C; --panel-3:#1E3226;
-    --line:#2C4838; --text:#E9F2EC; --muted:#8FAA9A; --dim:#5C7A68;
-    --accent:#4ADE80; --accent-dim:#164D2E;
-    --gold:#A3D977; --blood:#6B9B7A; --mobname:#7FE8A0; --sel-bg:#1D3828; --poco:#0A120D;
-    --arena-1:#1A2E20; --arena-2:#132419; --arena-3:#0D1A11; --xp2:#A3D977;
+    --bg:#0D1712; --panel:#121D17; --panel-2:#1A2A20; --panel-3:#22392A;
+    --line:#2E4A38; --text:#F0F2EA; --muted:#9AB09E; --dim:#62806A;
+    --accent:#6BCB77; --accent-dim:#1E4028; --gold:#E0B15C; --blood:#D46A5C;
+    --mobname:#8FE0A0; --sel-bg:#23392A; --poco:#0A120D;
+    --arena-1:#1E3327; --arena-2:#16261C; --arena-3:#0F1B14; --xp2:#E0B15C;
+  }
+  /* v4.135: tema NOVO (pedido do usuario) -- Vinho, misturando rose/
+     framboesa (accent) com dourado antigo (gold), mesmo padrao de duas
+     cores contrastantes dos temas acima. Distinto de todos os outros 5
+     (nenhum usa tons de vermelho/rosa como identidade principal). */
+  :root[data-tema="vinho"]{
+    --bg:#1A0E14; --panel:#1A0E14; --panel-2:#26141C; --panel-3:#331C26;
+    --line:#4A2836; --text:#F5EDEF; --muted:#C2A0AC; --dim:#8A6070;
+    --accent:#E85D75; --accent-dim:#4A1B26; --gold:#D4A24C; --blood:#B8324A;
+    --mobname:#F090A8; --sel-bg:#3A1F2A; --poco:#120A0E;
+    --arena-1:#3A1F2C; --arena-2:#2C1721; --arena-3:#1F1017; --xp2:#D4A24C;
   }
 
 /* ===== Bloco style #27 ===== */
@@ -2262,18 +2277,33 @@
     --gold:#E8E8E8; --blood:#B8B8B8; --mobname:#E0E0E0; --sel-bg:#4A4A4A; --poco:#1C1C1C;
     --arena-1:#454545; --arena-2:#383838; --arena-3:#2C2C2C; --xp2:#EDEDED;
   }
-  /* DEPRECATED (v4.124): tema Floresta removido da lista visivel no
-     Aparencia > Tema (item de identidade visual -- decisao do usuario
-     de manter laranja como tema/cor de marca, sem verde na paleta de
-     escolha). As variaveis continuam aqui, so nao aparecem mais em
-     TEMAS[] (index.html) nem em CICLO_TEMAS -- ninguem aponta pra
-     [data-tema="floresta"] no momento. */
+  /* v4.135 (pedido do usuario): tema Floresta REATIVADO e redesenhado --
+     a versao antiga (v4.124, removida da lista visivel) era verde quase
+     monocromatico, mesmo problema de "basico" que o usuario apontou no
+     tema Azul (bg e accent na mesma familia de cor, sem contraste real).
+     Paleta nova mistura DUAS cores de verdade -- verde de folha (accent,
+     identidade principal) + ambar/dourado (gold, luz de sol filtrada
+     pela copa), a mesma logica que ja funciona no tema Laranja (bg roxo
+     + accent laranja -- por isso aquele "combina e fica sensacional").
+     --blood vira terracota em vez de vermelho puro, pra nao destoar do
+     resto da paleta terrosa. */
   :root[data-tema="floresta"]{
-    --bg:#0E1712; --panel:#0E1712; --panel-2:#16241C; --panel-3:#1E3226;
-    --line:#2C4838; --text:#E9F2EC; --muted:#8FAA9A; --dim:#5C7A68;
-    --accent:#4ADE80; --accent-dim:#164D2E;
-    --gold:#A3D977; --blood:#6B9B7A; --mobname:#7FE8A0; --sel-bg:#1D3828; --poco:#0A120D;
-    --arena-1:#1A2E20; --arena-2:#132419; --arena-3:#0D1A11; --xp2:#A3D977;
+    --bg:#0D1712; --panel:#121D17; --panel-2:#1A2A20; --panel-3:#22392A;
+    --line:#2E4A38; --text:#F0F2EA; --muted:#9AB09E; --dim:#62806A;
+    --accent:#6BCB77; --accent-dim:#1E4028; --gold:#E0B15C; --blood:#D46A5C;
+    --mobname:#8FE0A0; --sel-bg:#23392A; --poco:#0A120D;
+    --arena-1:#1E3327; --arena-2:#16261C; --arena-3:#0F1B14; --xp2:#E0B15C;
+  }
+  /* v4.135: tema NOVO (pedido do usuario) -- Vinho, misturando rose/
+     framboesa (accent) com dourado antigo (gold), mesmo padrao de duas
+     cores contrastantes dos temas acima. Distinto de todos os outros 5
+     (nenhum usa tons de vermelho/rosa como identidade principal). */
+  :root[data-tema="vinho"]{
+    --bg:#1A0E14; --panel:#1A0E14; --panel-2:#26141C; --panel-3:#331C26;
+    --line:#4A2836; --text:#F5EDEF; --muted:#C2A0AC; --dim:#8A6070;
+    --accent:#E85D75; --accent-dim:#4A1B26; --gold:#D4A24C; --blood:#B8324A;
+    --mobname:#F090A8; --sel-bg:#3A1F2A; --poco:#120A0E;
+    --arena-1:#3A1F2C; --arena-2:#2C1721; --arena-3:#1F1017; --xp2:#D4A24C;
   }
 
 /* --- Módulo style #10 --- */

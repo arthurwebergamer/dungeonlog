@@ -8944,3 +8944,122 @@ Fluxo de trabalho: preview em artifact HTML separado (Web Audio API sintetizada,
 
 ### Em aberto / não mexido nesta sessão
 - Nada pendente desta sessão — todas as decisões (posicionamento, sons, remoções) foram fechadas e implementadas.
+
+---
+
+## Infraestrutura — TWA (Trusted Web Activity) para Google Play, PR 1 (12/09)
+
+### Objetivo
+
+Empacotar o PWA como app Android instalável via Google Play, usando TWA
+(Trusted Web Activity) via Bubblewrap — pré-requisito obrigatório pra
+qualquer trabalho de Google Play Billing (PRs seguintes). Escopo desta
+sessão: só o TWA em si, sem billing — decisão explícita de quebrar o
+trabalho em PRs pequenos e validáveis (TWA → compra client-side →
+validação server-side → RTDN → leitura de entitlement do Firestore).
+
+### Domínio de produção
+
+- **`dungeonlog.weberlabs.com.br`** — subdomínio novo, criado
+  especificamente pra este fim (domínio raiz `weberlabs.com.br`
+  registrado no Registro.br, `.com.br`, status ativo).
+- **Decisão:** subdomínio em vez de domínio raiz, pra deixar
+  `weberlabs.com.br` livre para outros projetos futuros.
+- **CNAME** `dungeonlog` → `questlog-911.pages.dev` (mesmo projeto
+  Cloudflare Pages já em uso), criado via modo avançado ("Configurar
+  zona DNS") do Registro.br. **Gotcha:** o Registro.br trava edição da
+  zona DNS avançada por ~2h toda vez que alguém entra nesse modo pela
+  primeira vez ("domínio em transição") — não tem como pular a espera.
+- **Gotcha de app path:** o app real vive em `/play/`, não na raiz do
+  domínio — `_redirects` na raiz do repo (`/  /waitlist  302`) redireciona
+  a raiz pra uma landing page de waitlist. Decisão: **não mexer nesse
+  redirect** (pode servir outro propósito/domínio) — em vez disso, o TWA
+  foi configurado com `startUrl: /play/` e `fullScopeUrl` apontando pro
+  subcaminho, não pra raiz.
+- Verificado com sucesso via API oficial do Google
+  (`digitalassetlinks.googleapis.com/v1/statements:list`) — confirma
+  `packageName`, SHA-256 e `relation` corretos, domínio resolvendo com
+  SSL ativo.
+
+### O que foi publicado no repo (branch `dev`, já mergeado pra produção)
+
+- `play/manifest.json` — extraído do manifest que já vivia embutido em
+  base64 dentro do `<head>` do `index.html`; criado como arquivo
+  separado porque o Bubblewrap busca o manifest via URL, não lê o
+  inline. Ícones referenciados com **caminho relativo** (`icon-192.png`,
+  sem barra na frente) — caminho absoluto (`/icon-192.png`) resolveria
+  errado pra raiz do domínio, já que o manifest fica dentro de `/play/`.
+- `play/icon-192.png` e `play/icon-512.png` — extraídos do base64 do
+  manifest antigo (ícones reais do app, pixel art de portal de dungeon
+  em tons de cinza — não confundir com um ícone "D" metálico avaliado à
+  parte e descartado, sem relação com o app).
+- `.well-known/assetlinks.json` — na **raiz** do repo (não em `/play/`,
+  path fixo exigido pelo protocolo Digital Asset Links), com o
+  `sha256_cert_fingerprints` da keystore de produção.
+
+### TWA — build e assinatura
+
+- **`packageId`: `com.dungeonlog`**
+- Gerado com Bubblewrap CLI (`@bubblewrap/cli`) em máquina Windows,
+  numa pasta **fora** do repositório Git (`C:\Users\User\dungeonlog\dungeonlog-twa`)
+  — de propósito, pra não arriscar a keystore ser commitada por engano.
+- **Keystore**: `android.keystore`, alias `dungeonlog`, com backup em
+  Google Drive pessoal (recomendado replicar em um segundo local —
+  perder esse arquivo ou a senha inviabiliza publicar updates futuros
+  do app pra sempre).
+- **SHA-256 da keystore**: `46:A1:D8:6C:C5:54:1B:79:1F:88:B9:80:3D:F4:A8:85:7C:64:91:0D:69:C1:DF:AE:CE:ED:1F:2C:C5:53:0B:C8`
+- **`playBilling.enabled: false`** no `twa-manifest.json` — deixado
+  desligado de propósito, billing é escopo do PR 2/3, não deste PR.
+- Build final: `app-release.aab` (~1.1MB), gerado via
+  `.\gradlew.bat bundleRelease` — **não** via `bubblewrap build`
+  (ver gotchas abaixo).
+
+### Gotchas de ambiente, pra próxima vez
+
+- **JDK errado instalado por padrão.** O instalador "padrão" do
+  Adoptium deu JDK 25 em vez de JDK 17 (versão exigida/testada pelo
+  Android Gradle Plugin usado pelo Bubblewrap). Precisou instalar o
+  JDK 17 lado a lado (coexistem sem conflito, cada instalação em pasta
+  própria) e apontar o Bubblewrap pra ele explicitamente na primeira
+  configuração (`bubblewrap init` pergunta o caminho do JDK 17
+  existente).
+- **`bubblewrap build` tem bug de buffer overflow** — trava com
+  `cli ERROR stdErr maxBuffer length exceeded` em builds normais.
+  **Contorno: rodar `.\gradlew.bat bundleRelease` diretamente** na
+  pasta do projeto gerado, em vez do wrapper do Bubblewrap.
+- **`jcenter()` não existe mais** (desativado há anos) — o template do
+  Bubblewrap usado ainda referenciava esse repositório em
+  `build.gradle` (raiz do projeto, 2 ocorrências: `buildscript` e
+  `allprojects`). Precisou trocar as duas por `mavenCentral()` antes do
+  Gradle conseguir resolver dependências.
+- **SDK Android baixado incompleto pelo Bubblewrap** — faltavam as
+  pastas `platforms` e `platform-tools` (só vieram `build-tools`,
+  `licenses`, `tools`). Completado manualmente via
+  `sdkmanager.bat --sdk_root=... "platform-tools" "platforms;android-34"`.
+- **`local.properties` (com `sdk.dir`) precisou ser criado manualmente**
+  — o Gradle direto (`gradlew.bat`, fora do wrapper do Bubblewrap) não
+  herda essa config sozinho. No PowerShell, `Set-Content -Encoding ASCII`
+  é necessário — `echo ... >` no PowerShell grava em encoding
+  (UTF-16 com BOM) que o Gradle não lê corretamente.
+
+### Pendente (bloqueia fechamento do PR 1)
+
+- Criar conta de desenvolvedor no Google Play Console (taxa única,
+  ~US$25 + verificação de identidade) — em andamento.
+- Criar o app "Dungeonlog" no Console, subir o `app-release.aab` em
+  internal testing, instalar no celular via link de teste e confirmar
+  que abre fullscreen (sem barra de URL) — validação final que ainda
+  não foi feita num dispositivo real.
+- Domínio `dungeonlog.weberlabs.com.br` já adicionado aos domínios
+  autorizados do Firebase Auth (necessário pra qualquer login
+  funcionar a partir dessa origem).
+
+### Próximos PRs (não iniciados)
+
+Ordem confirmada com o usuário, cada um só depois do anterior validado:
+PR 2 (Digital Goods API + PaymentRequest, client-side) → PR 3 (Cloud
+Function de validação server-side contra a Google Play Developer API,
+primeiro uso de Cloud Functions no projeto) → PR 4 (RTDN via Pub/Sub) →
+PR 5 (`assinaturaAtiva()`, hoje só stub de `modoDebugAtivo()`, passa a
+ler entitlement real do Firestore, mantendo o modo debug como fallback
+só em teste).

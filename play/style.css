@@ -1055,13 +1055,27 @@
   .temaswatch.sel{border-color:var(--text)}
 
   /* paletas — so custom properties, sem redesenho de layout */
-  :root[data-tema="meianoite"]{
-    --bg:#161A20; --panel:#1E232B; --panel-2:#272D37; --line:#374050;
-    --text:#EDF0F4; --muted:#96A1B0; --dim:#65707E;
-    --accent:#5AB4EC; --accent-dim:#153A52; --gold:#F5BE4A; --blood:#EC6A62;
-    --panel-3:#313A48; --poco:#12161B; --sel-bg:#2D3846; --mobname:#8FD0F0;
-    --arena-1:#23303F; --arena-2:#1B2530; --arena-3:#131A22;
-    --xp2:#7FE0E8;
+  /* v4.138 (pedido do usuario): tema Azul (meianoite) REMOVIDO da paleta,
+     substituido por Branco -- contraparte CLARA do Grafite. Grafite e
+     100% grayscale de proposito (item 25 do roadmap, R=G=B em todo
+     valor, inclusive gold/blood -- ver comentario dele mais abaixo);
+     Branco segue a MESMA filosofia so que invertida (fundo claro, texto
+     escuro), pra formar o par "Preto e Branco" que o usuario pediu pra
+     aparecer primeiro na lista, antes dos temas coloridos. */
+  /* v4.140 (ajuste pedido pelo usuario -- "tema branco ta forte demais"):
+     contraste interno suavizado. Um tema claro sempre vai parecer mais
+     "forte" do lado de 5 temas escuros (isso e fisico, tela branca emite
+     bem mais luz -- nao da pra evitar), mas o contraste PRETO-no-BRANCO
+     estava no extremo (#1E1E1E em #EDEDED). Suavizado pra um cinza mais
+     morno em vez de branco/preto puros -- mais parecido com o "light
+     mode" nativo de iOS/Android (nunca usam #FFF/#000 puros tambem). */
+  :root[data-tema="branco"]{
+    --bg:#E4E2DE; --panel:#EDEBE7; --panel-2:#E0DEDA; --line:#C8C5BF;
+    --text:#2E2C29; --muted:#66625C; --dim:#918D85;
+    --accent:#2E2C29; --accent-dim:#D6D3CD; --gold:#5C5650; --blood:#78716A;
+    --panel-3:#D4D1CB; --poco:#F7F6F3; --sel-bg:#D4D1CB; --mobname:#4A453F;
+    --arena-1:#D4D1CB; --arena-2:#DCD9D3; --arena-3:#E6E4DF;
+    --xp2:#5C5650;
   }
   :root[data-tema="pergaminho"]{
     --bg:#0F1216; --panel:#0F1216; --panel-2:#151A20; --line:#232A33;
@@ -1090,18 +1104,17 @@
     --gold:#E8E8E8; --blood:#B8B8B8; --mobname:#E0E0E0; --sel-bg:#4A4A4A; --poco:#1C1C1C;
     --arena-1:#454545; --arena-2:#383838; --arena-3:#2C2C2C; --xp2:#EDEDED;
   }
-  /* DEPRECATED (v4.124): tema Floresta removido da lista visivel no
-     Aparencia > Tema (item de identidade visual -- decisao do usuario
-     de manter laranja como tema/cor de marca, sem verde na paleta de
-     escolha). As variaveis continuam aqui, so nao aparecem mais em
-     TEMAS[] (index.html) nem em CICLO_TEMAS -- ninguem aponta pra
-     [data-tema="floresta"] no momento. */
+  /* v4.139 (pedido do usuario, cores especificas fornecidas): Floresta
+     refeito de novo com a paleta exata pedida -- Cor 1 (fundo/blocos) =
+     verde-musgo bem escuro, quase preto; Cor 2 (botoes/destaques) =
+     magenta/rosa-orquidea vibrante. Combinacao mais ousada que as
+     tentativas anteriores (verde+marrom, verde+dourado), de proposito. */
   :root[data-tema="floresta"]{
-    --bg:#0E1712; --panel:#0E1712; --panel-2:#16241C; --panel-3:#1E3226;
-    --line:#2C4838; --text:#E9F2EC; --muted:#8FAA9A; --dim:#5C7A68;
-    --accent:#4ADE80; --accent-dim:#164D2E;
-    --gold:#A3D977; --blood:#6B9B7A; --mobname:#7FE8A0; --sel-bg:#1D3828; --poco:#0A120D;
-    --arena-1:#1A2E20; --arena-2:#132419; --arena-3:#0D1A11; --xp2:#A3D977;
+    --bg:#131A0F; --panel:#131A0F; --panel-2:#1E2A19; --panel-3:#25331E;
+    --line:#364A2B; --text:#F4ECF2; --muted:#ACC69F; --dim:#7C9D6C;
+    --accent:#E949CE; --accent-dim:#4F2247; --gold:#EFC348; --blood:#DE546B;
+    --mobname:#EC8EA7; --sel-bg:#2F4026; --poco:#172013;
+    --arena-1:#364A2B; --arena-2:#25331E; --arena-3:#1C2717; --xp2:#EFC348;
   }
 
 /* ===== Bloco style #27 ===== */
@@ -2227,13 +2240,27 @@
   .temaswatch.sel{border-color:var(--text)}
 
   /* paletas — so custom properties, sem redesenho de layout */
-  :root[data-tema="meianoite"]{
-    --bg:#161A20; --panel:#1E232B; --panel-2:#272D37; --line:#374050;
-    --text:#EDF0F4; --muted:#96A1B0; --dim:#65707E;
-    --accent:#5AB4EC; --accent-dim:#153A52; --gold:#F5BE4A; --blood:#EC6A62;
-    --panel-3:#313A48; --poco:#12161B; --sel-bg:#2D3846; --mobname:#8FD0F0;
-    --arena-1:#23303F; --arena-2:#1B2530; --arena-3:#131A22;
-    --xp2:#7FE0E8;
+  /* v4.138 (pedido do usuario): tema Azul (meianoite) REMOVIDO da paleta,
+     substituido por Branco -- contraparte CLARA do Grafite. Grafite e
+     100% grayscale de proposito (item 25 do roadmap, R=G=B em todo
+     valor, inclusive gold/blood -- ver comentario dele mais abaixo);
+     Branco segue a MESMA filosofia so que invertida (fundo claro, texto
+     escuro), pra formar o par "Preto e Branco" que o usuario pediu pra
+     aparecer primeiro na lista, antes dos temas coloridos. */
+  /* v4.140 (ajuste pedido pelo usuario -- "tema branco ta forte demais"):
+     contraste interno suavizado. Um tema claro sempre vai parecer mais
+     "forte" do lado de 5 temas escuros (isso e fisico, tela branca emite
+     bem mais luz -- nao da pra evitar), mas o contraste PRETO-no-BRANCO
+     estava no extremo (#1E1E1E em #EDEDED). Suavizado pra um cinza mais
+     morno em vez de branco/preto puros -- mais parecido com o "light
+     mode" nativo de iOS/Android (nunca usam #FFF/#000 puros tambem). */
+  :root[data-tema="branco"]{
+    --bg:#E4E2DE; --panel:#EDEBE7; --panel-2:#E0DEDA; --line:#C8C5BF;
+    --text:#2E2C29; --muted:#66625C; --dim:#918D85;
+    --accent:#2E2C29; --accent-dim:#D6D3CD; --gold:#5C5650; --blood:#78716A;
+    --panel-3:#D4D1CB; --poco:#F7F6F3; --sel-bg:#D4D1CB; --mobname:#4A453F;
+    --arena-1:#D4D1CB; --arena-2:#DCD9D3; --arena-3:#E6E4DF;
+    --xp2:#5C5650;
   }
   :root[data-tema="pergaminho"]{
     --bg:#0F1216; --panel:#0F1216; --panel-2:#151A20; --line:#232A33;
@@ -2262,18 +2289,17 @@
     --gold:#E8E8E8; --blood:#B8B8B8; --mobname:#E0E0E0; --sel-bg:#4A4A4A; --poco:#1C1C1C;
     --arena-1:#454545; --arena-2:#383838; --arena-3:#2C2C2C; --xp2:#EDEDED;
   }
-  /* DEPRECATED (v4.124): tema Floresta removido da lista visivel no
-     Aparencia > Tema (item de identidade visual -- decisao do usuario
-     de manter laranja como tema/cor de marca, sem verde na paleta de
-     escolha). As variaveis continuam aqui, so nao aparecem mais em
-     TEMAS[] (index.html) nem em CICLO_TEMAS -- ninguem aponta pra
-     [data-tema="floresta"] no momento. */
+  /* v4.139 (pedido do usuario, cores especificas fornecidas): Floresta
+     refeito de novo com a paleta exata pedida -- Cor 1 (fundo/blocos) =
+     verde-musgo bem escuro, quase preto; Cor 2 (botoes/destaques) =
+     magenta/rosa-orquidea vibrante. Combinacao mais ousada que as
+     tentativas anteriores (verde+marrom, verde+dourado), de proposito. */
   :root[data-tema="floresta"]{
-    --bg:#0E1712; --panel:#0E1712; --panel-2:#16241C; --panel-3:#1E3226;
-    --line:#2C4838; --text:#E9F2EC; --muted:#8FAA9A; --dim:#5C7A68;
-    --accent:#4ADE80; --accent-dim:#164D2E;
-    --gold:#A3D977; --blood:#6B9B7A; --mobname:#7FE8A0; --sel-bg:#1D3828; --poco:#0A120D;
-    --arena-1:#1A2E20; --arena-2:#132419; --arena-3:#0D1A11; --xp2:#A3D977;
+    --bg:#131A0F; --panel:#131A0F; --panel-2:#1E2A19; --panel-3:#25331E;
+    --line:#364A2B; --text:#F4ECF2; --muted:#ACC69F; --dim:#7C9D6C;
+    --accent:#E949CE; --accent-dim:#4F2247; --gold:#EFC348; --blood:#DE546B;
+    --mobname:#EC8EA7; --sel-bg:#2F4026; --poco:#172013;
+    --arena-1:#364A2B; --arena-2:#25331E; --arena-3:#1C2717; --xp2:#EFC348;
   }
 
 /* --- Módulo style #10 --- */

@@ -2224,6 +2224,14 @@ function render(){
     const vezesAtual = (t.vezesData === isoAtual()) ? (t.vezesN || 0) : 0;
     if (meta > 1) el.querySelector('.vezesbadge').textContent = vezesAtual + '/' + meta;
 
+    // ve comentario em _tarefaPopIdx (perto de alternar()) -- esta e a
+    // MESMA tarefa que acabou de tocar .saiu antes deste render() rodar,
+    // entao o elemento novo entra com um pop em vez de aparecer seco.
+    if (i === _tarefaPopIdx){
+      el.classList.add('entrou');
+      _tarefaPopIdx = null;
+    }
+
     if (t.corBox){
       el.querySelector('.box').style.setProperty('border-color', t.corBox, 'important');
     }
@@ -2250,8 +2258,12 @@ function render(){
         setTimeout(() => el.classList.add('vanish'), 180);
         setTimeout(() => alternar(i), 460);
       } else {
-        el.classList.add('tap');
-        setTimeout(() => alternar(i), 150);
+        // pop-out rapido (ver _tarefaPopIdx acima) -- o elemento NOVO,
+        // recriado pelo render() dentro de alternar(), pega o pop-in
+        // (.entrou) automaticamente pro mesmo indice.
+        el.classList.add('saiu');
+        _tarefaPopIdx = i;
+        setTimeout(() => alternar(i), 130);
       }
     };
     el.onclick = e => {
@@ -2687,6 +2699,17 @@ function celebrarVitoria(ganho){
   }
   requestAnimationFrame(passo);
 }
+
+// pedido do usuario: tarefa com meta>1 (concluir "2x", "3x" etc.) so
+// trocava o numero do badge (0/2 -> 1/2) num corte seco a cada toque
+// parcial, porque render() reconstroi a lista inteira do zero (linha
+// ~2177) -- o elemento .task antigo e literalmente destruido e um novo
+// nasce no lugar, sem nenhuma transicao entre os dois. Fix: o proprio
+// elemento toca uma saida rapida (.saiu) no clique, e o elemento NOVO
+// que nasce no proximo render() pra esse MESMO indice recebe .entrou
+// (pop de volta), ao inves de aparecer instantaneo. So dura 1 render():
+// setada aqui, consumida e limpa dentro do forEach de render() abaixo.
+let _tarefaPopIdx = null;
 
 function alternar(i){
   const t = tarefas[i];
@@ -3185,7 +3208,7 @@ document.getElementById('entrar').onclick = () => {
   if (pendente){ tarefasIniciais.push(pendente); campoIni.value = ''; }
   if (tarefasIniciais.length === 0){
     campoIni.focus();
-    campoIni.placeholder = 'Escreva ao menos uma tarefa';
+    campoIni.placeholder = idiomaApp() === 'en' ? 'Write at least one task' : 'Escreva ao menos uma tarefa';
     return;
   }
   tarefasIniciais.forEach(t => tarefas.push({ texto:t, tipo:'hoje', data:isoAtual(), feitaEm:null }));
@@ -4408,7 +4431,7 @@ function montarVenda(grid){
     tesouros.forEach(s => total += precoVenda(item(s.id)) * s.q);
     const bt = document.createElement('button');
     bt.className = 'lbulk';
-    bt.textContent = 'Vender todos os tesouros  ·  +' + total + ' moedas';
+    bt.textContent = en ? ('Sell all treasures  ·  +' + total + ' coins') : ('Vender todos os tesouros  ·  +' + total + ' moedas');
     bt.onclick = venderTesouros;
     grid.appendChild(bt);
   }
@@ -5827,7 +5850,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       if (!vistos.length){
         const vazio = document.createElement('span');
         vazio.className = 'prevvazio';
-        vazio.textContent = 'Nenhum monstro derrotado ainda';
+        vazio.textContent = en ? 'No monster defeated yet' : 'Nenhum monstro derrotado ainda';
         faixaBest.appendChild(vazio);
       } else {
         vistos.forEach(idx => {
@@ -9844,7 +9867,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     const n = campo.value.trim();
     if (!n){
       campo.focus();
-      campo.placeholder = 'Escolha um nome pra continuar';
+      campo.placeholder = idiomaApp() === 'en' ? 'Choose a name to continue' : 'Escolha um nome pra continuar';
       campo.style.borderColor = 'var(--blood)';
       return;
     }
@@ -10014,7 +10037,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       if (!elEntra && dir === 1 && atualNum === SLIDE_NOME){
         const campo = document.getElementById('nomeHeroi');
         if (campo){
-          campo.placeholder = 'Escolha um nome pra continuar';
+          campo.placeholder = idiomaApp() === 'en' ? 'Choose a name to continue' : 'Escolha um nome pra continuar';
           campo.style.borderColor = 'var(--blood)';
         }
       }

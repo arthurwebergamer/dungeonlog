@@ -1284,28 +1284,14 @@ function dispararVitoriaDoDia(doDia, nivelAntes, xpGanho, moedasGanhas){
     }
   };
 
-  // item 3: moeda+XP nascem no meio da animacao do poof (250ms -- ainda
-  // visivel/dissipando, mas ja da tempo da recompensa "emergir" dele em
-  // vez de nascer simultaneo), voam ate o HEROI, e SO DEPOIS que "+X"
-  // aparece em cima da cabeca dele (dentro de voarRecompensaFinal) e
-  // que o bau/contadores sao liberados -- com uma folga BEM maior
-  // (900ms, era 350ms) pra dar tempo de LER o "+X" antes do bau/
-  // contador roubarem a atencao. 350ms tava curto demais pra separar
-  // visualmente os dois momentos (confirmado em video: parecia tudo
-  // simultaneo).
-  //
-  // Se nao tem reward pra mostrar (veio do caminho de exclusao de
-  // tarefa, que chama esta funcao sem xpGanho/moedasGanhas), pula
-  // direto pro bau, so esperando o poof terminar (560ms).
-  if ((xpGanho || moedasGanhas) && typeof voarRecompensaFinal === 'function'){
-    setTimeout(() => {
-      voarRecompensaFinal(xpGanho || 0, moedasGanhas || 0, () => {
-        setTimeout(mostrarBauEContadores, 900);
-      });
-    }, 450);
-  } else {
-    setTimeout(mostrarBauEContadores, 560);
-  }
+  // pedido do usuario: numero flutuante de +XP/+moedas removido de
+  // TODAS as ocasioes, inclusive o golpe final -- antes o golpe final
+  // tinha seu proprio voo (voarRecompensaFinal) rodando aqui antes do
+  // bau aparecer; agora pula direto pro bau/contadores, so esperando o
+  // poof terminar. Mesmo timing que ja existia pro caminho "sem reward
+  // pra mostrar" (usado so na exclusao de tarefa antes) -- agora e o
+  // unico caminho, pra qualquer chamada desta funcao.
+  setTimeout(mostrarBauEContadores, 560);
 }
 
 // ---------------------------------------------------------------------
@@ -2758,35 +2744,21 @@ function alternar(i){
       const moedasGanhas = Math.max(1, Math.round(moedasDaTarefa(dif) / meta));
       xpTotal += xpGanho;
       moedas += moedasGanhas;
-      // pedido do usuario: toque parcial (meta>1, ainda nao completou)
-      // nao tocava animarGolpe() nem o som 'golpe' -- so o alternar()
-      // retornar 'false' aqui ja bastava pro hook de SFX (ver bloco SFX,
-      // 'golpe no monstro') pular o som, entao alinhado com o silencio
-      // visual daqui. Mas cada toque numa tarefa repetivel AINDA
-      // representa um golpe de verdade no monstro (mesma fantasia do
-      // resto do app: "toda tarefa concluida e um golpe"), so nao fecha
-      // o dia -- por isso chama os dois AQUI direto, sem depender do
-      // hook externo (que so dispara quando alternar() NAO retorna
-      // false, e este caminho sempre retorna false de proposito).
+      // toque parcial (meta>1, ainda nao completou) ainda representa um
+      // golpe de verdade no monstro (mesma fantasia do resto do app:
+      // "toda tarefa concluida e um golpe"), so nao fecha o dia -- por
+      // isso chama os dois AQUI direto, sem depender do hook externo de
+      // SFX (que so dispara quando alternar() NAO retorna false, e este
+      // caminho sempre retorna false de proposito).
       animarGolpe();
       window.tocarSom?.('golpe');
-      // mesma trava _adiarContadoresRecompensa do golpe final (ver
-      // comentario em render()) -- sem isso a barra de XP/moeda ja
-      // aparecia cheia ANTES do icone chegar no heroi, ja que
-      // xpTotal/moedas acima ja tinham sido somados antes deste
-      // render(). Libera de novo (sem suprimir) dentro do aoTerminar
-      // do voo, pra barra so andar quando o "+X" aparecer.
-      window._adiarContadoresRecompensa = true;
+      // pedido do usuario: numero flutuante de +XP/+moedas removido de
+      // TODAS as ocasioes (nao so aqui, ver tambem golpe normal e golpe
+      // final mais abaixo) -- os contadores do topo (moedas/XP) sobem
+      // em silencio dentro deste render(), sem popup/icone voando.
+      // voarRecompensaFinal()/numeroFlutuanteHeroi() continuam
+      // existindo no arquivo, so sem chamador daqui em diante.
       render();
-      window._adiarContadoresRecompensa = false;
-      // pedido do usuario: tarefa normal agora tambem tem o voo de
-      // icones (moeda+XP do monstro ate o heroi) igual golpe final --
-      // voarRecompensaFinal() e generica, so o nome ficou de quando so
-      // era usada ali; ela mesma chama numeroFlutuanteHeroi() no final
-      // do voo, entao a chamada direta que tinha aqui antes some. O
-      // 3o argumento (aoTerminar) e novo aqui: re-renderiza SEM a trava,
-      // fazendo a barra andar so depois do icone chegar.
-      voarRecompensaFinal(xpGanho, moedasGanhas, () => render());
       return false;
     }
   }
@@ -2826,25 +2798,16 @@ function alternar(i){
   const subiuNivel = nivelDepois > nivelAntes;
 
   animarGolpe();
-  // suprime contadores no render() sempre que a barra so deve andar
-  // DEPOIS de um icone chegar no heroi (golpe final OU tarefa normal
-  // via voarRecompensaFinal, logo abaixo) -- pedido do usuario, mesmo
-  // bug do golpe final ("barra enchendo antes do icone chegar") mas
-  // que so estava corrigido pra ele. NAO suprime quando vai ter
-  // level-up: esse caminho chama mostrarNivelUp() e nao tem voo, quer
-  // o contador atualizado na hora.
-  const suprimirContadores = ehGolpeFinal || !subiuNivel;
-  if (suprimirContadores) window._adiarContadoresRecompensa = true;
+  // pedido do usuario: numero flutuante de +XP/+moedas removido de
+  // TODAS as ocasioes -- os contadores do topo (moedas/XP) sobem em
+  // silencio, direto neste render(), sem trava/atraso esperando icone
+  // nenhum chegar (a suspensao via _adiarContadoresRecompensa so
+  // existia pra sincronizar com o voo, que nao roda mais em lugar
+  // nenhum -- ver render() pro check que continua ali, so nunca mais
+  // acionado).
   render();
-  if (suprimirContadores) window._adiarContadoresRecompensa = false; // so vale por ESSE render() -- o de dentro da sequencia atrasada (mostrarBauEContadores) roda com a flag ja desligada
 
   if (ehGolpeFinal){
-    // item 3 do redesign: o numero estatico (item 1, antes aqui) virou
-    // a recompensa voando de verdade (ver voarRecompensaFinal, chamada
-    // DENTRO de dispararVitoriaDoDia, sincronizada com o poof/bau) --
-    // por isso xpGanho/moedasGanhas agora precisam ser repassados pra
-    // la, ja que so existem aqui dentro de alternar().
-    //
     // atraso proposital: animarGolpe() (chamada logo acima) leva 320ms
     // pra terminar (hero bate, monstro treme, os dois voltam ao
     // normal -- ver a funcao). dispararVitoriaDoDia() faz o proprio
@@ -2858,10 +2821,7 @@ function alternar(i){
   }
   if (!venceuAgora) derrotadoEm = null;
 
-  if (subiuNivel){
-    if (typeof mostrarNivelUp === 'function') mostrarNivelUp(nivelDepois);
-  }
-  else voarRecompensaFinal(xpGanho, moedasGanhas, () => render()); // pedido do usuario: mesmo voo de icones do golpe final, e barra so anda quando ele chega (aoTerminar)
+  if (subiuNivel && typeof mostrarNivelUp === 'function') mostrarNivelUp(nivelDepois);
   return true;
 }
 

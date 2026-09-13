@@ -793,6 +793,37 @@ function chaveConta(chaveBase){
 }
 window.chaveConta = chaveConta;
 
+// FIX (item novo, bug relatado pelo usuario: contagem de dias/historico/
+// atributos/conquistas resetando toda vez que o app roda numa origem
+// nova -- ex: preview deploy novo do Cloudflare Pages -- mesmo com a
+// conta logada certinho). Causa raiz: empurrarNuvem()/puxarNuvem() so
+// sincronizavam a chave principal (chaveSaveAtual) -- estas 15 chaves
+// secundarias nunca iam pra nuvem, existiam so no localStorage daquele
+// device/origem. Mesma lista que ja era usada na migracao convidado->
+// conta (aoLogar, item 13f do roadmap) -- extraida pra UMA constante de
+// proposito, pra migracao e sync na nuvem nunca divergirem uma da outra
+// (risco ja documentado: toda chave nova namespacada por conta precisa
+// entrar aqui manualmente).
+const CHAVES_SECUNDARIAS_CONTA = [
+  'questlog.atrib.v1',
+  'questlog.bauDia.v1',
+  'questlog.celebracaoDiaMostrada.v1',
+  'questlog.conquistasDesbloqueadasV2.v1',
+  'questlog.conquistasResgatadas.v1',
+  'questlog.conquistasVistasV2.v1',
+  'questlog.dia.v1',
+  'questlog.hist.v1',
+  'questlog.hpMonstro.v1',
+  'questlog.itensVistos.v1',
+  'questlog.loja.v1',
+  'questlog.tarefasConcluidas.v1',
+  'questlog.temaArena.v1',
+  'questlog.temasDesbloqueados.v1',
+  'questlog.tituloEquipado.v1',
+  'questlog.vida.v1'
+];
+window.CHAVES_SECUNDARIAS_CONTA = CHAVES_SECUNDARIAS_CONTA;
+
 window.definirUidAtivo = function(uid){
   _uidAtivo = uid || null;
   try {
@@ -1229,7 +1260,9 @@ function dispararVitoriaDoDia(doDia, nivelAntes, xpGanho, moedasGanhas){
     const ganho = recompensaVitoria(doDia.length);
     moedas += ganho;
     ultimoGanho = ganho;
-    moedasCaindo(Math.max(3, Math.min(10, Math.round(ganho / 6))));
+    // moedasCaindo(...) removida daqui a pedido do usuario -- particula de
+    // moedas no fim do dia nao deveria mais aparecer. Funcao moedasCaindo()
+    // continua existindo (~linha 2493) e nao foi apagada, so este gancho.
     render();
     // reseta a opacity inline que mostrarPoofMonstro() deixou em '0'
     // (nao deixa assim pra sempre -- evita que o PROXIMO monstro,
@@ -4066,6 +4099,26 @@ const ID_GRIMORIO_LOJA = ITENS.findIndex(a => a[1] === 'Grimório');
 function nivelMinimo(rar){
   return 1 + rar * Math.max(0, Math.round(ECO.lojaNivelPorRaridade));
 }
+
+// BUG DE BALANCEAMENTO ENCONTRADO E CORRIGIDO (simulacao de progressao
+// pedida pelo usuario): PESO_LOJA era fixo, sem levar o nivel do jogador
+// em conta. Raro (peso 19, exige nivel 5) + Epico (peso 9, exige nivel 7)
+// somam 28 dos 96 pontos de peso total -- ~29% das vagas, todo santo dia,
+// mostrando item que um jogador nivel 1-4 (a maioria nas primeiras ~2
+// semanas, ver simulacao de XP) nem pode comprar. Como o estoque e fixo
+// no dia (garantirEstoque so re-sorteia na virada), essas vagas ficavam
+// permanentemente desperdicadas pra quem esta comecando.
+// Fix: zera o peso de qualquer raridade acima do nivel atual do jogador
+// e realoca 100% do peso pras raridades ja compraveis, na MESMA proporcao
+// relativa entre elas (nao inventa uma curva nova, so remove o que era
+// inutil). Lendario (indice 4) fica de fora SEMPRE, comprado ou nao --
+// existe so via bau, nunca vendido, independente de nivel.
+function pesosLojaPorNivel(nivel){
+  const pesos = PESO_LOJA.map((p, rar) => (rar < 4 && nivelMinimo(rar) <= nivel) ? p : 0);
+  const soma = pesos.reduce((a, b) => a + b, 0);
+  return soma > 0 ? pesos : [1, 0, 0, 0, 0]; // defensivo: Comum (nivelMinimo=1) cobre qualquer nivel >=1, isto nunca deveria disparar
+}
+
 function precoLoja(id, oferta){
   const margem = ITENS[id][2] === 'cons' ? ECO.lojaMargemConsumivel : ECO.lojaMargem;
   const base = ITENS[id][4] * margem * (oferta ? ECO.lojaDesconto : 1);
@@ -4089,14 +4142,16 @@ function montarEstoque(){
   const r = rngLoja(diasCorridos() * 7919 + ((typeof semente === 'number' ? semente : 0) * 104729) + 999);
   const pool = ITENS.map((_, i) => i).filter(i => LOJA_TIPOS.includes(ITENS[i][2]) && !ITENS[i][8] && i !== ID_GRIMORIO_LOJA);
   const vagas = Math.max(1, Math.round(ECO.lojaVagas));
-  const total = PESO_LOJA.reduce((a, b) => a + b, 0);
+  const nivelAtual = (typeof progresso === 'function') ? progresso().nivel : 1;
+  const pesos = pesosLojaPorNivel(nivelAtual);
+  const total = pesos.reduce((a, b) => a + b, 0);
   const ids = [];
   let voltas = 0;
 
   while (ids.length < vagas && voltas < 500){
     voltas++;
     let x = r() * total, rar = 0;
-    for (let i = 0; i < PESO_LOJA.length; i++){ x -= PESO_LOJA[i]; if (x <= 0){ rar = i; break; } }
+    for (let i = 0; i < pesos.length; i++){ x -= pesos[i]; if (x <= 0){ rar = i; break; } }
     let sub = pool.filter(i => ITENS[i][3] === rar && ids.indexOf(i) < 0);
     if (!sub.length) sub = pool.filter(i => ids.indexOf(i) < 0);
     if (!sub.length) break;
@@ -4136,6 +4191,14 @@ function carregarLoja(){
   } catch(e){}
 }
 carregarLoja();
+// chamado por puxarNuvem() apos restaurar CHAVE_LOJA vinda da nuvem --
+// mesmo motivo do vidaHeroi.recarregar() (ver bloco VIDA DO HEROI): esta
+// chave tambem so era lida 1x, no boot (carregarLoja() acima).
+window.recarregarLoja = function(){
+  carregarLoja();
+  garantirEstoque();
+  if (typeof window.abaAtual !== 'undefined' && window.abaAtual === 'loja' && typeof renderLoja === 'function') renderLoja();
+};
 
 function garantirEstoque(){
   const hoje = isoAtual();
@@ -5202,7 +5265,14 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     get:() => vida,
     set:v => { vida = v; gravar(); pintar(); },
     max:vidaMax,
-    checarVirada: verificarVirada       // usado pelo watchdog de dia
+    checarVirada: verificarVirada,      // usado pelo watchdog de dia
+    // chamado por puxarNuvem() (bloco AUTH/Firebase) apos restaurar
+    // CHAVE_VIDA vinda da nuvem -- sem isto, o boot desta IIFE ja tinha
+    // lido (e persistido) um ultimoDia vazio/velho ANTES do puxarNuvem()
+    // assincrono terminar, e o proximo gravar() sobrescreveria o dado
+    // recem-restaurado com esse estado desatualizado preso na closure.
+    // Rele do zero e reavalia a virada com o dado real.
+    recarregar: () => { ler(); if (vida === null) vida = vidaMax(); pintar(); verificarVirada(); }
   };
 })();
 </script>
@@ -6257,18 +6327,32 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   const VIGOR_POR_PONTO   = 0.02;   // v4.122: era 0.05 -- pedido do usuario, mesmo incremento da Fortuna
   const VIGOR_TETO        = 0.30;   // v4.123: era 0.50 -- padronizado com Fortuna/Foco, nunca perdoa o dano inteiro, so 30% dele no maximo
 
+  // BUG REAL ENCONTRADO (achado investigando o reset de vida/historico):
+  // estas duas funcoes nunca usaram window.chaveConta() -- liam/escreviam
+  // direto na chave crua. Pra convidado (_uidAtivo null) isso e invisivel
+  // (chaveConta(x) === x sem uid), mas pra qualquer conta logada os
+  // pontos de Fortuna/Foco/Vigor iam pra uma chave COMPARTILHADA entre
+  // todas as contas do mesmo aparelho/navegador -- nao so "nao
+  // sincroniza com a nuvem", vaza entre contas de verdade. Prova de que
+  // era bug, nao intencional: verificarVirada() (perdao de Vigor, bloco
+  // VIDA DO HEROI, linha ~5146) sempre leu a versao COM chaveConta()
+  // desta mesma chave -- ou seja, o perdao de dano por Vigor nunca via
+  // os pontos que salvarAtrib() de fato gravava, pra ninguem logado.
   function carregarAtrib(){
     try {
-      const d = JSON.parse(localStorage.getItem(CHAVE_ATRIB));
+      const d = JSON.parse(localStorage.getItem(window.chaveConta(CHAVE_ATRIB)));
       if (d && typeof d.fortuna === 'number') gasto.fortuna = d.fortuna;
       if (d && typeof d.foco === 'number') gasto.foco = d.foco;
       if (d && typeof d.vigor === 'number') gasto.vigor = d.vigor;   // v4.121
     } catch(e){}
   }
   function salvarAtrib(){
-    try { localStorage.setItem(CHAVE_ATRIB, JSON.stringify(gasto)); } catch(e){}
+    try { localStorage.setItem(window.chaveConta(CHAVE_ATRIB), JSON.stringify(gasto)); } catch(e){}
   }
   carregarAtrib();
+  // chamado por puxarNuvem() apos restaurar CHAVE_ATRIB vinda da nuvem --
+  // mesmo motivo do vidaHeroi.recarregar() (ver bloco VIDA DO HEROI).
+  window.recarregarAtributos = carregarAtrib;
 
   // "apagar tudo" (CHAVE_ATRIB incluida) agora e feito num lugar so, na
   // folha de confirmacao -- ver "CONFIRMAR APAGAR TUDO EM FOLHA" perto do
@@ -6734,6 +6818,10 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   sincronizar();
   if (typeof render === 'function') render();   // repinta com o hp correto assim que o modulo carrega
 
+  // chamado por puxarNuvem() apos restaurar CHAVE_HP vinda da nuvem --
+  // mesmo motivo do vidaHeroi.recarregar() (ver bloco VIDA DO HEROI).
+  window.recarregarHpMonstro = function(){ ler(); sincronizar(); if (typeof render === 'function') render(); };
+
   window.hpMonstroDoDia = function(){
     sincronizar();
     // auto-cura do teto: nunca fica abaixo do que existe de verdade agora.
@@ -7024,6 +7112,16 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     try { localStorage.setItem(window.chaveConta(CHAVE_VISTOS), JSON.stringify(Array.from(vistos))); } catch(e){}
   }
 
+  // chamado por puxarNuvem() apos restaurar CHAVE_VISTOS vinda da nuvem --
+  // mesmo motivo do vidaHeroi.recarregar() (ver bloco VIDA DO HEROI): esta
+  // IIFE tambem le localStorage so 1x, no boot.
+  window.recarregarItensVistos = function(){
+    try {
+      const bruto = localStorage.getItem(window.chaveConta(CHAVE_VISTOS));
+      vistos = bruto ? new Set(JSON.parse(bruto)) : new Set();
+    } catch(e){ vistos = new Set(); }
+  };
+
   // migracao: quem ja tinha itens no inventario antes desta feature existir
   // nao pode ver tudo como "nunca visto"
   if (typeof inventario !== 'undefined') inventario.forEach(s => vistos.add(s.id));
@@ -7168,6 +7266,10 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // mutar o array real por acidente.
   window.registrarHistorico = registrarHistorico;
   window.obterHistorico = function(){ return historico.slice(); };
+  // chamado por puxarNuvem() apos restaurar CHAVE_HIST vinda da nuvem --
+  // mesmo motivo do vidaHeroi.recarregar() (ver bloco VIDA DO HEROI):
+  // este modulo tambem le localStorage so 1x, no boot da IIFE.
+  window.recarregarHistorico = carregar;
 })();
 </script>
 
@@ -7210,6 +7312,13 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   }
 
   window.totalTarefasConcluidas = function(){ return total; };
+
+  // chamado por puxarNuvem() apos restaurar CHAVE_CONCLUIDAS vinda da
+  // nuvem -- mesmo motivo do vidaHeroi.recarregar() (ver bloco VIDA DO
+  // HEROI): esta IIFE tambem le localStorage so 1x, no boot.
+  window.recarregarTarefasConcluidas = function(){
+    try { total = Number(localStorage.getItem(window.chaveConta(CHAVE_CONCLUIDAS))) || 0; } catch(e){ total = 0; }
+  };
 })();
 </script>
 
@@ -10106,13 +10215,50 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       if (snap.exists() && snap.data().data) {
         try { localStorage.setItem(window.chaveSaveAtual(), snap.data().data); } catch(e){}
       }
+      // restaura as 15 chaves secundarias (ver empurrarNuvem/
+      // CHAVES_SECUNDARIAS_CONTA) -- so sobrescreve o que realmente veio
+      // da nuvem, nunca apaga uma chave local que a nuvem nao tinha
+      // (ex: conta antiga, empurrada antes deste fix existir).
+      if (snap.exists() && snap.data().extras) {
+        const extras = snap.data().extras;
+        window.CHAVES_SECUNDARIAS_CONTA.forEach(chaveBase => {
+          if (Object.prototype.hasOwnProperty.call(extras, chaveBase)) {
+            try { localStorage.setItem(window.chaveConta(chaveBase), extras[chaveBase]); } catch(e){}
+          }
+        });
+        // esses modulos ja leram (e persistiram) seu proprio estado do
+        // localStorage de forma SINCRONA, no boot -- bem antes deste
+        // await assincrono terminar. Sem isto, o proximo "gravar()"
+        // interno de qualquer um deles sobrescreveria o dado que
+        // acabamos de restaurar com o estado velho ainda preso na
+        // closure. Lista levantada auditando TODAS as chaves em
+        // CHAVES_SECUNDARIAS_CONTA por esse mesmo padrao (cache
+        // populado 1x no boot da IIFE, nunca relido depois) -- as que
+        // ja leem direto do localStorage a cada chamada (bauDia,
+        // conquistas V2, titulo equipado) nao precisam de gancho.
+        if (window.vidaHeroi && typeof window.vidaHeroi.recarregar === 'function') window.vidaHeroi.recarregar();
+        if (typeof window.recarregarHistorico === 'function') window.recarregarHistorico();
+        if (typeof window.recarregarAtributos === 'function') window.recarregarAtributos();
+        if (typeof window.recarregarLoja === 'function') window.recarregarLoja();
+        if (typeof window.recarregarHpMonstro === 'function') window.recarregarHpMonstro();
+        if (typeof window.recarregarItensVistos === 'function') window.recarregarItensVistos();
+        if (typeof window.recarregarTarefasConcluidas === 'function') window.recarregarTarefasConcluidas();
+      }
     }
 
     async function empurrarNuvem(uid){
       try {
         const dados = localStorage.getItem(window.chaveSaveAtual()) || '';
-        window.dbgConta && window.dbgConta('empurrarNuvem(' + uid.slice(0,6) + ') INICIOU -- chave lida: ' + window.chaveSaveAtual() + ' | tamanho: ' + dados.length);
-        await setDoc(doc(db, 'saves', uid), { data: dados, atualizadoEm: Date.now() });
+        // FIX bug reset (ver CHAVES_SECUNDARIAS_CONTA, topo do arquivo):
+        // essas 15 chaves nunca iam pra nuvem antes -- empacotadas aqui
+        // num segundo campo do mesmo doc.
+        const extras = {};
+        window.CHAVES_SECUNDARIAS_CONTA.forEach(chaveBase => {
+          const v = localStorage.getItem(window.chaveConta(chaveBase));
+          if (v !== null) extras[chaveBase] = v;
+        });
+        window.dbgConta && window.dbgConta('empurrarNuvem(' + uid.slice(0,6) + ') INICIOU -- chave lida: ' + window.chaveSaveAtual() + ' | tamanho: ' + dados.length + ' | extras: ' + Object.keys(extras).length);
+        await setDoc(doc(db, 'saves', uid), { data: dados, extras: extras, atualizadoEm: Date.now() });
         window.dbgConta && window.dbgConta('empurrarNuvem(' + uid.slice(0,6) + ') TERMINOU com sucesso');
       } catch(e){
         window.dbgConta && window.dbgConta('empurrarNuvem(' + uid.slice(0,6) + ') FALHOU: ' + e.message);
@@ -10345,23 +10491,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         // recarregava ele na memoria, contaminando a proxima conta que
         // logasse -- foi exatamente o bug relatado pelo usuario com a
         // tarefa "estudar" aparecendo na Conta B.
-        [
-          'questlog.atrib.v1',
-          'questlog.bauDia.v1',
-          'questlog.conquistasDesbloqueadasV2.v1',
-          'questlog.conquistasResgatadas.v1',
-          'questlog.conquistasVistasV2.v1',
-          'questlog.dia.v1',
-          'questlog.hist.v1',
-          'questlog.hpMonstro.v1',
-          'questlog.itensVistos.v1',
-          'questlog.loja.v1',
-          'questlog.tarefasConcluidas.v1',
-          'questlog.temaArena.v1',
-          'questlog.temasDesbloqueados.v1',
-          'questlog.tituloEquipado.v1',
-          'questlog.vida.v1'
-        ].forEach(chaveBase => {
+        window.CHAVES_SECUNDARIAS_CONTA.forEach(chaveBase => {
           try {
             const valorConvidado = localStorage.getItem(chaveBase);
             if (valorConvidado !== null) localStorage.setItem(window.chaveConta(chaveBase), valorConvidado);

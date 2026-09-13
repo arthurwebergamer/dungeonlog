@@ -8623,6 +8623,23 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     };
   }
 
+  // botao "Vender todos os tesouros" (Loja) nao tinha som -- pedido do
+  // usuario, mesmo som 'venda' do item avulso acima. Ao contrario de
+  // venderItem(), esta tem uma guarda de validacao real (retorna cedo,
+  // sem vender nada, se nao houver tesouros no inventario -- ver
+  // "if (!alvos.length) return;"), entao precisa conferir se o SALDO
+  // de moedas realmente mudou antes de tocar, senao tocaria o som
+  // mesmo quando o botao nao fez nada.
+  const _venderTesourosSfx = window.venderTesouros;
+  if (typeof _venderTesourosSfx === 'function'){
+    window.venderTesouros = function(){
+      const moedasAntes = moedas;
+      const r = _venderTesourosSfx.apply(this, arguments);
+      if (moedas !== moedasAntes) window.tocarSom('venda');
+      return r;
+    };
+  }
+
   // equipar/desequipar -- equipar(id) alterna equipado[tipo] (equipa se
   // vazio ou de outro item, desequipa se era o mesmo id) e tambem retorna
   // cedo, sem mudar nada, se o item nao for equipavel (EQUIPAVEL(id) falso).

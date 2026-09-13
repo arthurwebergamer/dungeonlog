@@ -918,8 +918,8 @@ window.dbgConta = dbgConta;
    ======================================================================= */
 const ECO = {
   // --- experiencia ---
-  xpPorTarefa:            20,   // XP base de cada tarefa concluida
-  xpTarefasCheias:         8,   // ate a Nª tarefa do dia o XP e cheio
+  xpPorTarefa:            28,   // XP base de cada tarefa concluida (era 20 -- rebalanceamento pedido pelo usuario apos simulacao de 15 dias, ver roadmap)
+  xpTarefasCheias:        10,   // ate a Nª tarefa do dia o XP e cheio (era 8)
   xpDecaimento:         0.50,   // XP das tarefas acima do teto (anti-farm)
 
   // --- dificuldade (multiplica XP e moedas da tarefa) ---
@@ -937,9 +937,9 @@ const ECO = {
   penalidadeMorte:      0.50,   // fracao das moedas perdida ao zerar a vida
 
   // --- moedas ---
-  moedasPorTarefa:         2,   // pingado a cada tarefa concluida
-  moedasVitoriaBase:      12,   // bonus fixo por derrubar o monstro do dia
-  moedasVitoriaPorTarefa:  4,   // por tarefa do dia...
+  moedasPorTarefa:         3,   // pingado a cada tarefa concluida (era 2)
+  moedasVitoriaBase:      16,   // bonus fixo por derrubar o monstro do dia (era 12)
+  moedasVitoriaPorTarefa:  5,   // por tarefa do dia... (era 4)
   moedasVitoriaTeto:       6,   // ...contando no maximo N tarefas
 
   // --- loja ---

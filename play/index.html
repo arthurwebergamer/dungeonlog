@@ -2739,6 +2739,18 @@ function alternar(i){
       const moedasGanhas = Math.max(1, Math.round(moedasDaTarefa(dif) / meta));
       xpTotal += xpGanho;
       moedas += moedasGanhas;
+      // pedido do usuario: toque parcial (meta>1, ainda nao completou)
+      // nao tocava animarGolpe() nem o som 'golpe' -- so o alternar()
+      // retornar 'false' aqui ja bastava pro hook de SFX (ver bloco SFX,
+      // 'golpe no monstro') pular o som, entao alinhado com o silencio
+      // visual daqui. Mas cada toque numa tarefa repetivel AINDA
+      // representa um golpe de verdade no monstro (mesma fantasia do
+      // resto do app: "toda tarefa concluida e um golpe"), so nao fecha
+      // o dia -- por isso chama os dois AQUI direto, sem depender do
+      // hook externo (que so dispara quando alternar() NAO retorna
+      // false, e este caminho sempre retorna false de proposito).
+      animarGolpe();
+      window.tocarSom?.('golpe');
       // mesma trava _adiarContadoresRecompensa do golpe final (ver
       // comentario em render()) -- sem isso a barra de XP/moeda ja
       // aparecia cheia ANTES do icone chegar no heroi, ja que
@@ -5762,8 +5774,18 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       const hoje = new Date();
       const prefixoMes = hoje.getFullYear() + '-' + String(hoje.getMonth() + 1).padStart(2, '0');
       const doMes = hist.filter(h => typeof h.data === 'string' && h.data.startsWith(prefixoMes));
-      const vitorias = doMes.filter(h => h.resultado === 'vitoria').length;
+      let vitorias = doMes.filter(h => h.resultado === 'vitoria').length;
       const fugas = doMes.filter(h => h.resultado === 'fuga').length;
+      // mesmo bonus "hoje ao vivo" que o calendario logo abaixo (faixaHist,
+      // ver monstroJaCaiu()) e o bestiario (renderBestiario) ja aplicam --
+      // sem isso, esse texto dizia "0 vitorias" enquanto o calendario e o
+      // bestiario ja mostravam a vitoria de hoje: contradicao visivel no
+      // mesmo cartao (bug relatado pelo usuario). So conta se hoje ainda
+      // nao tem entrada permanente (evita contar 2x se a virada ja rodou).
+      if (typeof monstroJaCaiu === 'function' && monstroJaCaiu() &&
+          typeof isoAtual === 'function' && !hist.some(h => h.data === isoAtual())){
+        vitorias++;
+      }
       elHist.textContent = en
         ? (vitorias + ' wins, ' + fugas + ' escapes this month')
         : (vitorias + ' vitórias, ' + fugas + ' fugas este mês');
@@ -5837,7 +5859,20 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     const faixaBest = document.getElementById('prevBestiarioFaixa');
     if (faixaBest && typeof MONSTROS !== 'undefined'){
       const vitorias = hist.filter(h => h.resultado === 'vitoria' && typeof h.monstroId === 'number')
-        .slice().sort((a, b) => (a.data < b.data ? 1 : a.data > b.data ? -1 : 0));
+        .slice();
+      // mesmo bonus "hoje ao vivo" que renderBestiario() ja aplica no
+      // cabecalho "X de Y monstros derrotados" (chamado logo acima, ver
+      // monstroJaCaiu() la) -- sem isso essa faixa contradizia o proprio
+      // cabecalho: "1 de 63" em cima, "nenhum monstro derrotado" embaixo
+      // (bug relatado pelo usuario). So adiciona se hoje ainda nao tem
+      // entrada permanente no historico (evita duplicar apos a virada).
+      if (typeof monstroJaCaiu === 'function' && monstroJaCaiu() &&
+          typeof monstroDoDia === 'function' && typeof isoAtual === 'function' &&
+          !vitorias.some(v => v.data === isoAtual())){
+        const idxHoje = MONSTROS.indexOf(monstroDoDia());
+        if (idxHoje >= 0) vitorias.push({ data: isoAtual(), monstroId: idxHoje });
+      }
+      vitorias.sort((a, b) => (a.data < b.data ? 1 : a.data > b.data ? -1 : 0));
       const vistos = [];
       const jaVisto = new Set();
       for (const v of vitorias){

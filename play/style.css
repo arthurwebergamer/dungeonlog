@@ -1062,13 +1062,20 @@
      Branco segue a MESMA filosofia so que invertida (fundo claro, texto
      escuro), pra formar o par "Preto e Branco" que o usuario pediu pra
      aparecer primeiro na lista, antes dos temas coloridos. */
+  /* v4.140 (ajuste pedido pelo usuario -- "tema branco ta forte demais"):
+     contraste interno suavizado. Um tema claro sempre vai parecer mais
+     "forte" do lado de 5 temas escuros (isso e fisico, tela branca emite
+     bem mais luz -- nao da pra evitar), mas o contraste PRETO-no-BRANCO
+     estava no extremo (#1E1E1E em #EDEDED). Suavizado pra um cinza mais
+     morno em vez de branco/preto puros -- mais parecido com o "light
+     mode" nativo de iOS/Android (nunca usam #FFF/#000 puros tambem). */
   :root[data-tema="branco"]{
-    --bg:#EDEDED; --panel:#F5F5F5; --panel-2:#E8E8E8; --line:#C4C4C4;
-    --text:#1E1E1E; --muted:#5A5A5A; --dim:#8C8C8C;
-    --accent:#1A1A1A; --accent-dim:#D4D4D4; --gold:#4A4A4A; --blood:#6E6E6E;
-    --panel-3:#DCDCDC; --poco:#FFFFFF; --sel-bg:#DCDCDC; --mobname:#3C3C3C;
-    --arena-1:#DCDCDC; --arena-2:#E6E6E6; --arena-3:#F0F0F0;
-    --xp2:#4A4A4A;
+    --bg:#E4E2DE; --panel:#EDEBE7; --panel-2:#E0DEDA; --line:#C8C5BF;
+    --text:#2E2C29; --muted:#66625C; --dim:#918D85;
+    --accent:#2E2C29; --accent-dim:#D6D3CD; --gold:#5C5650; --blood:#78716A;
+    --panel-3:#D4D1CB; --poco:#F7F6F3; --sel-bg:#D4D1CB; --mobname:#4A453F;
+    --arena-1:#D4D1CB; --arena-2:#DCD9D3; --arena-3:#E6E4DF;
+    --xp2:#5C5650;
   }
   :root[data-tema="pergaminho"]{
     --bg:#0F1216; --panel:#0F1216; --panel-2:#151A20; --line:#232A33;
@@ -1108,16 +1115,6 @@
     --accent:#E949CE; --accent-dim:#4F2247; --gold:#EFC348; --blood:#DE546B;
     --mobname:#EC8EA7; --sel-bg:#2F4026; --poco:#172013;
     --arena-1:#364A2B; --arena-2:#25331E; --arena-3:#1C2717; --xp2:#EFC348;
-  }
-  /* v4.137 (mesma correcao acima): Vinho = base azul-noite (H212) x
-     accent vinho/carmim vivo (H350, ~138 graus de distancia) -- mesma
-     receita, accent bem mais saturado/vivo que a tentativa anterior. */
-  :root[data-tema="vinho"]{
-    --bg:#141E29; --panel:#141E29; --panel-2:#1D2A3A; --panel-3:#223244;
-    --line:#2D435C; --text:#F5EBEC; --muted:#AABED5; --dim:#758FAE;
-    --accent:#EA3E5B; --accent-dim:#57232C; --gold:#EFC348; --blood:#D43542;
-    --mobname:#E36D83; --sel-bg:#283C52; --poco:#182330;
-    --arena-1:#2D435C; --arena-2:#223244; --arena-3:#1B2837; --xp2:#EFC348;
   }
 
 /* ===== Bloco style #27 ===== */
@@ -2250,13 +2247,20 @@
      Branco segue a MESMA filosofia so que invertida (fundo claro, texto
      escuro), pra formar o par "Preto e Branco" que o usuario pediu pra
      aparecer primeiro na lista, antes dos temas coloridos. */
+  /* v4.140 (ajuste pedido pelo usuario -- "tema branco ta forte demais"):
+     contraste interno suavizado. Um tema claro sempre vai parecer mais
+     "forte" do lado de 5 temas escuros (isso e fisico, tela branca emite
+     bem mais luz -- nao da pra evitar), mas o contraste PRETO-no-BRANCO
+     estava no extremo (#1E1E1E em #EDEDED). Suavizado pra um cinza mais
+     morno em vez de branco/preto puros -- mais parecido com o "light
+     mode" nativo de iOS/Android (nunca usam #FFF/#000 puros tambem). */
   :root[data-tema="branco"]{
-    --bg:#EDEDED; --panel:#F5F5F5; --panel-2:#E8E8E8; --line:#C4C4C4;
-    --text:#1E1E1E; --muted:#5A5A5A; --dim:#8C8C8C;
-    --accent:#1A1A1A; --accent-dim:#D4D4D4; --gold:#4A4A4A; --blood:#6E6E6E;
-    --panel-3:#DCDCDC; --poco:#FFFFFF; --sel-bg:#DCDCDC; --mobname:#3C3C3C;
-    --arena-1:#DCDCDC; --arena-2:#E6E6E6; --arena-3:#F0F0F0;
-    --xp2:#4A4A4A;
+    --bg:#E4E2DE; --panel:#EDEBE7; --panel-2:#E0DEDA; --line:#C8C5BF;
+    --text:#2E2C29; --muted:#66625C; --dim:#918D85;
+    --accent:#2E2C29; --accent-dim:#D6D3CD; --gold:#5C5650; --blood:#78716A;
+    --panel-3:#D4D1CB; --poco:#F7F6F3; --sel-bg:#D4D1CB; --mobname:#4A453F;
+    --arena-1:#D4D1CB; --arena-2:#DCD9D3; --arena-3:#E6E4DF;
+    --xp2:#5C5650;
   }
   :root[data-tema="pergaminho"]{
     --bg:#0F1216; --panel:#0F1216; --panel-2:#151A20; --line:#232A33;
@@ -2296,16 +2300,6 @@
     --accent:#E949CE; --accent-dim:#4F2247; --gold:#EFC348; --blood:#DE546B;
     --mobname:#EC8EA7; --sel-bg:#2F4026; --poco:#172013;
     --arena-1:#364A2B; --arena-2:#25331E; --arena-3:#1C2717; --xp2:#EFC348;
-  }
-  /* v4.137 (mesma correcao acima): Vinho = base azul-noite (H212) x
-     accent vinho/carmim vivo (H350, ~138 graus de distancia) -- mesma
-     receita, accent bem mais saturado/vivo que a tentativa anterior. */
-  :root[data-tema="vinho"]{
-    --bg:#141E29; --panel:#141E29; --panel-2:#1D2A3A; --panel-3:#223244;
-    --line:#2D435C; --text:#F5EBEC; --muted:#AABED5; --dim:#758FAE;
-    --accent:#EA3E5B; --accent-dim:#57232C; --gold:#EFC348; --blood:#D43542;
-    --mobname:#E36D83; --sel-bg:#283C52; --poco:#182330;
-    --arena-1:#2D435C; --arena-2:#223244; --arena-3:#1B2837; --xp2:#EFC348;
   }
 
 /* --- Módulo style #10 --- */

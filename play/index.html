@@ -2284,14 +2284,14 @@ function render(){
       if (seraFinal){
         el.classList.add('done');
         setTimeout(() => el.classList.add('vanish'), 180);
-        setTimeout(() => alternar(i), 620); // sincronizado com .task.vanish (400ms, ver style.css) -- 180ms de espera + 400ms de deslize + folga
+        setTimeout(() => alternar(i), 460);
       } else {
-        // pop-out rapido (ver _tarefaPopIdx acima) -- o elemento NOVO,
-        // recriado pelo render() dentro de alternar(), pega o pop-in
-        // (.entrou) automaticamente pro mesmo indice.
-        el.classList.add('saiu');
-        _tarefaPopIdx = i;
-        setTimeout(() => alternar(i), 260); // sincronizado com .task.saiu (260ms, ver style.css) -- antes cortava a animacao no meio (130ms pro render(), 180ms pra animacao)
+        // pedido do usuario: tirar a animacao de saida/entrada (.saiu/
+        // .entrou) -- nao ficou legal. Mantido animarGolpe()+som (pedido
+        // anterior, esse funcionou), so sem efeito visual de saida.
+        // 350ms da tempo do animarGolpe() (320ms) terminar antes do
+        // render() (dentro de alternar()) trocar a tela.
+        setTimeout(() => alternar(i), 350);
       }
     };
     el.onclick = e => {

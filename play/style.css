@@ -178,18 +178,14 @@
   .task.done .box svg{opacity:1}
   .task.done .label{color:var(--dim);text-decoration:line-through}
   .task.done{opacity:.6}
-  .task.vanish{opacity:0 !important;transform:translateX(120%) !important;transition:opacity .4s,transform .4s !important}
+  .task.vanish{opacity:0;transform:translateX(40px);transition:opacity .3s,transform .3s}
   .task.tap{transform:scale(.97);transition:transform .12s}
-  /* toque parcial numa tarefa "2x/3x" (meta>1, ver alternar() e
-     _tarefaPopIdx no JS): o elemento antigo toca .saiu e some rapido; o
-     elemento NOVO que o proximo render() cria pro mesmo indice (badge
-     ja atualizado, ex. 1/2) nasce com .entrou, deslizando de volta a
-     partir da esquerda em vez de aparecer seco no lugar. Usa animation
-     (nao transition) porque o elemento e recriado do zero a cada
-     render() -- sem estado "de" pra fazer transition, precisa da
-     animacao definir o proprio ponto de partida (0%). Mesmo gesto de
-     "arrastar pra direita" da conclusao final (.task.vanish acima),
-     pedido do usuario -- so que aqui a tarefa volta, nao some de vez. */
+  /* pedido do usuario: animacao de saida/entrada no toque parcial
+     (.saiu/.entrou) removida -- nao ficou legal, revertido pro toque
+     parcial sem efeito visual de saida (so animarGolpe()+som, ver
+     alternar() no JS). Regras abaixo ficam definidas mas sem chamador
+     (mesma convencao de moedasCaindo()/voarRecompensaFinal() nao
+     removidas quando desligadas -- nao apaga, so para de usar). */
   @keyframes tarefaPopOut{ from{transform:translateX(0);opacity:1} to{transform:translateX(120%);opacity:0} }
   @keyframes tarefaPopIn{ 0%{transform:translateX(-30%);opacity:0} 60%{transform:translateX(4%);opacity:1} 100%{transform:translateX(0);opacity:1} }
   .task.saiu{animation:tarefaPopOut .26s ease-in both !important}

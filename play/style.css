@@ -1097,25 +1097,17 @@
     --gold:#E8E8E8; --blood:#B8B8B8; --mobname:#E0E0E0; --sel-bg:#4A4A4A; --poco:#1C1C1C;
     --arena-1:#454545; --arena-2:#383838; --arena-3:#2C2C2C; --xp2:#EDEDED;
   }
-  /* v4.137 (2a correcao pedida pelo usuario -- v4.136 ainda nao combinou).
-     Comparando HSL do tema Laranja (aprovado) com as tentativas
-     anteriores: o problema real nao era so a distancia de matiz entre
-     bg e accent (essa ja estava ok), era o ACCENT ficar sub-saturado
-     (v4.136: S48-53%, L51-58%) contra o S85%/L65% vivido que o Laranja
-     usa de verdade -- por isso as tentativas anteriores pareciam
-     "murchas" ao lado do Laranja. Paleta gerada reaplicando a MESMA
-     receita HSL do Laranja (bg: mesma familia de matiz em S~31-34%,
-     variando so a luminosidade por camada; accent: S80-85%/L58-63%,
-     bem vivo; gold mantido quase fixo — mesma logica dos 4 temas
-     existentes, so o Grafite foge disso de proposito) com hues novos:
-     Floresta = base terracota/marrom (H20) x accent verde vivo (H135,
-     ~115 graus de distancia). */
+  /* v4.139 (pedido do usuario, cores especificas fornecidas): Floresta
+     refeito de novo com a paleta exata pedida -- Cor 1 (fundo/blocos) =
+     verde-musgo bem escuro, quase preto; Cor 2 (botoes/destaques) =
+     magenta/rosa-orquidea vibrante. Combinacao mais ousada que as
+     tentativas anteriores (verde+marrom, verde+dourado), de proposito. */
   :root[data-tema="floresta"]{
-    --bg:#291B15; --panel:#291B15; --panel-2:#3A271D; --panel-3:#442D22;
-    --line:#5C3D2E; --text:#EBF5ED; --muted:#D4B8AA; --dim:#AD8876;
-    --accent:#45ED6F; --accent-dim:#225830; --gold:#EFC348; --blood:#E05C72;
-    --mobname:#ED96AE; --sel-bg:#513629; --poco:#2F2018;
-    --arena-1:#5C3D2E; --arena-2:#442D22; --arena-3:#36241B; --xp2:#EFC348;
+    --bg:#131A0F; --panel:#131A0F; --panel-2:#1E2A19; --panel-3:#25331E;
+    --line:#364A2B; --text:#F4ECF2; --muted:#ACC69F; --dim:#7C9D6C;
+    --accent:#E949CE; --accent-dim:#4F2247; --gold:#EFC348; --blood:#DE546B;
+    --mobname:#EC8EA7; --sel-bg:#2F4026; --poco:#172013;
+    --arena-1:#364A2B; --arena-2:#25331E; --arena-3:#1C2717; --xp2:#EFC348;
   }
   /* v4.137 (mesma correcao acima): Vinho = base azul-noite (H212) x
      accent vinho/carmim vivo (H350, ~138 graus de distancia) -- mesma
@@ -2293,25 +2285,17 @@
     --gold:#E8E8E8; --blood:#B8B8B8; --mobname:#E0E0E0; --sel-bg:#4A4A4A; --poco:#1C1C1C;
     --arena-1:#454545; --arena-2:#383838; --arena-3:#2C2C2C; --xp2:#EDEDED;
   }
-  /* v4.137 (2a correcao pedida pelo usuario -- v4.136 ainda nao combinou).
-     Comparando HSL do tema Laranja (aprovado) com as tentativas
-     anteriores: o problema real nao era so a distancia de matiz entre
-     bg e accent (essa ja estava ok), era o ACCENT ficar sub-saturado
-     (v4.136: S48-53%, L51-58%) contra o S85%/L65% vivido que o Laranja
-     usa de verdade -- por isso as tentativas anteriores pareciam
-     "murchas" ao lado do Laranja. Paleta gerada reaplicando a MESMA
-     receita HSL do Laranja (bg: mesma familia de matiz em S~31-34%,
-     variando so a luminosidade por camada; accent: S80-85%/L58-63%,
-     bem vivo; gold mantido quase fixo — mesma logica dos 4 temas
-     existentes, so o Grafite foge disso de proposito) com hues novos:
-     Floresta = base terracota/marrom (H20) x accent verde vivo (H135,
-     ~115 graus de distancia). */
+  /* v4.139 (pedido do usuario, cores especificas fornecidas): Floresta
+     refeito de novo com a paleta exata pedida -- Cor 1 (fundo/blocos) =
+     verde-musgo bem escuro, quase preto; Cor 2 (botoes/destaques) =
+     magenta/rosa-orquidea vibrante. Combinacao mais ousada que as
+     tentativas anteriores (verde+marrom, verde+dourado), de proposito. */
   :root[data-tema="floresta"]{
-    --bg:#291B15; --panel:#291B15; --panel-2:#3A271D; --panel-3:#442D22;
-    --line:#5C3D2E; --text:#EBF5ED; --muted:#D4B8AA; --dim:#AD8876;
-    --accent:#45ED6F; --accent-dim:#225830; --gold:#EFC348; --blood:#E05C72;
-    --mobname:#ED96AE; --sel-bg:#513629; --poco:#2F2018;
-    --arena-1:#5C3D2E; --arena-2:#442D22; --arena-3:#36241B; --xp2:#EFC348;
+    --bg:#131A0F; --panel:#131A0F; --panel-2:#1E2A19; --panel-3:#25331E;
+    --line:#364A2B; --text:#F4ECF2; --muted:#ACC69F; --dim:#7C9D6C;
+    --accent:#E949CE; --accent-dim:#4F2247; --gold:#EFC348; --blood:#DE546B;
+    --mobname:#EC8EA7; --sel-bg:#2F4026; --poco:#172013;
+    --arena-1:#364A2B; --arena-2:#25331E; --arena-3:#1C2717; --xp2:#EFC348;
   }
   /* v4.137 (mesma correcao acima): Vinho = base azul-noite (H212) x
      accent vinho/carmim vivo (H350, ~138 graus de distancia) -- mesma

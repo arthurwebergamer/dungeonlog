@@ -180,6 +180,18 @@
   .task.done{opacity:.6}
   .task.vanish{opacity:0;transform:translateX(40px);transition:opacity .3s,transform .3s}
   .task.tap{transform:scale(.97);transition:transform .12s}
+  /* toque parcial numa tarefa "2x/3x" (meta>1, ver alternar() e
+     _tarefaPopIdx no JS): o elemento antigo toca .saiu e some rapido; o
+     elemento NOVO que o proximo render() cria pro mesmo indice (badge
+     ja atualizado, ex. 1/2) nasce com .entrou, um pop de volta em vez
+     de aparecer seco no lugar. Usa animation (nao transition) porque o
+     elemento e recriado do zero a cada render() -- sem estado "de" pra
+     fazer transition, precisa da animacao definir o proprio ponto de
+     partida (0%). */
+  @keyframes tarefaPopOut{ from{transform:scale(1);opacity:1} to{transform:scale(.82);opacity:0} }
+  @keyframes tarefaPopIn{ 0%{transform:scale(.82);opacity:0} 60%{transform:scale(1.04);opacity:1} 100%{transform:scale(1);opacity:1} }
+  .task.saiu{animation:tarefaPopOut .13s ease-in both}
+  .task.entrou{animation:tarefaPopIn .22s cubic-bezier(.2,.9,.3,1.2) both}
   .tinfo{display:flex;flex-direction:column;gap:2px;min-width:0}
   .label{font-size:14px;line-height:1.3}
   .repeat{font-family:'Outfit',sans-serif;font-size:11px;color:var(--dim);letter-spacing:0}

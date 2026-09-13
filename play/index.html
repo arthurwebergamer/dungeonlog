@@ -1924,11 +1924,15 @@ function mudarTemaArena(direcao){
   if (_arenaBgEmTransicao) return;
 
   const idxAtual = TEMAS_ARENA.findIndex(t => t.id === temaArenaAtual().id);
-  // NAO pula temas bloqueados -- alcancaveis via arrasto; se pousar
-  // num tema pago, o overlay de bloqueio assume (ver atualizarBloqueioArena()).
   const idx = (idxAtual + direcao + TEMAS_ARENA.length) % TEMAS_ARENA.length;
   const novoTema = TEMAS_ARENA[idx];
-  definirTemaArenaSalvo(novoTema.id);
+  // pedido do usuario (revisado): pousar num tema trancado agora e
+  // permitido de novo (preview real, com o overlay de bloqueio), so
+  // NAO PERSISTE quando trancado -- ver mesmo comentario no swipe
+  // (touchend) e em renderTemaArena(), chamada dentro de render()/
+  // mostrarAba() pra desfazer esse preview assim que o usuario faz
+  // qualquer coisa em Tarefas ou troca de aba.
+  if (temaArenaDesbloqueado(novoTema)) definirTemaArenaSalvo(novoTema.id);
 
   const frenteEl = document.getElementById('arenaBg' + _arenaBgFrente);
   const trasId = _arenaBgFrente === 'A' ? 'B' : 'A';
@@ -2053,8 +2057,14 @@ window.mudarTemaArena = mudarTemaArena;
     frenteEl.style.transition = trasEl.style.transition = 'transform ' + TEMA_ARENA_DURACAO_SLIDE + 'ms ease';
 
     if (passouLimite){
-      // completa a troca de verdade
-      definirTemaArenaSalvo(TEMAS_ARENA[idxAlvo].id);
+      // completa a troca visual de verdade -- inclusive pra tema
+      // trancado (pedido do usuario, revisado: nao "mola" na hora do
+      // solte; deixa pousar e mostrar o cadeado como preview real, so
+      // NAO PERSISTE se estiver trancado. Ver renderTemaArena() chamada
+      // dentro de render()/mostrarAba() -- qualquer acao em Tarefas ou
+      // troca de aba no menu de baixo re-sincroniza a arena de volta
+      // pro tema realmente salvo, desfazendo esse preview sozinho).
+      if (temaArenaDesbloqueado(TEMAS_ARENA[idxAlvo])) definirTemaArenaSalvo(TEMAS_ARENA[idxAlvo].id);
       _arenaBgEmTransicao = true;
       frenteEl.style.transform = 'translateX(' + (direcaoAtual > 0 ? '-100%' : '100%') + ')';
       trasEl.style.transform = 'translateX(0)';
@@ -2172,6 +2182,15 @@ function resetarEstadoParaPadrao(){
 }
 
 function render(){
+  // pedido do usuario: qualquer acao na aba Tarefas desfaz um preview de
+  // tema de arena trancado (ver swipe/mudarTemaArena, permitem pousar
+  // visualmente num tema trancado sem persistir) -- re-sincroniza pro
+  // tema REALMENTE salvo. Guardado por _arenaBgEmTransicao pra nao
+  // interromper uma troca de tema em andamento (swipe ainda arrastando/
+  // animando) se um render() disparar no meio por outro motivo (ex:
+  // watchdog de dia).
+  if (!_arenaBgEmTransicao && typeof renderTemaArena === 'function') renderTemaArena();
+
   const doDia = tarefas.filter(ehDeHoje);
   const lista = document.getElementById('list');
   lista.innerHTML = '';
@@ -2224,6 +2243,14 @@ function render(){
     const vezesAtual = (t.vezesData === isoAtual()) ? (t.vezesN || 0) : 0;
     if (meta > 1) el.querySelector('.vezesbadge').textContent = vezesAtual + '/' + meta;
 
+    // ve comentario em _tarefaPopIdx (perto de alternar()) -- esta e a
+    // MESMA tarefa que acabou de tocar .saiu antes deste render() rodar,
+    // entao o elemento novo entra com um pop em vez de aparecer seco.
+    if (i === _tarefaPopIdx){
+      el.classList.add('entrou');
+      _tarefaPopIdx = null;
+    }
+
     if (t.corBox){
       el.querySelector('.box').style.setProperty('border-color', t.corBox, 'important');
     }
@@ -2250,8 +2277,12 @@ function render(){
         setTimeout(() => el.classList.add('vanish'), 180);
         setTimeout(() => alternar(i), 460);
       } else {
-        el.classList.add('tap');
-        setTimeout(() => alternar(i), 150);
+        // pop-out rapido (ver _tarefaPopIdx acima) -- o elemento NOVO,
+        // recriado pelo render() dentro de alternar(), pega o pop-in
+        // (.entrou) automaticamente pro mesmo indice.
+        el.classList.add('saiu');
+        _tarefaPopIdx = i;
+        setTimeout(() => alternar(i), 130);
       }
     };
     el.onclick = e => {
@@ -2688,6 +2719,17 @@ function celebrarVitoria(ganho){
   requestAnimationFrame(passo);
 }
 
+// pedido do usuario: tarefa com meta>1 (concluir "2x", "3x" etc.) so
+// trocava o numero do badge (0/2 -> 1/2) num corte seco a cada toque
+// parcial, porque render() reconstroi a lista inteira do zero (linha
+// ~2177) -- o elemento .task antigo e literalmente destruido e um novo
+// nasce no lugar, sem nenhuma transicao entre os dois. Fix: o proprio
+// elemento toca uma saida rapida (.saiu) no clique, e o elemento NOVO
+// que nasce no proximo render() pra esse MESMO indice recebe .entrou
+// (pop de volta), ao inves de aparecer instantaneo. So dura 1 render():
+// setada aqui, consumida e limpa dentro do forEach de render() abaixo.
+let _tarefaPopIdx = null;
+
 function alternar(i){
   const t = tarefas[i];
 
@@ -2716,22 +2758,25 @@ function alternar(i){
       const moedasGanhas = Math.max(1, Math.round(moedasDaTarefa(dif) / meta));
       xpTotal += xpGanho;
       moedas += moedasGanhas;
-      // mesma trava _adiarContadoresRecompensa do golpe final (ver
-      // comentario em render()) -- sem isso a barra de XP/moeda ja
-      // aparecia cheia ANTES do icone chegar no heroi, ja que
-      // xpTotal/moedas acima ja tinham sido somados antes deste
-      // render(). Libera de novo (sem suprimir) dentro do aoTerminar
-      // do voo, pra barra so andar quando o "+X" aparecer.
+      // toque parcial (meta>1, ainda nao completou) ainda representa um
+      // golpe de verdade no monstro (mesma fantasia do resto do app:
+      // "toda tarefa concluida e um golpe"), so nao fecha o dia -- por
+      // isso chama os dois AQUI direto, sem depender do hook externo de
+      // SFX (que so dispara quando alternar() NAO retorna false, e este
+      // caminho sempre retorna false de proposito).
+      animarGolpe();
+      window.tocarSom?.('golpe');
+      // mesma trava _adiarContadoresRecompensa do golpe final -- sem
+      // isso a barra de XP/moeda ja aparecia cheia ANTES do icone
+      // chegar no heroi, ja que xpTotal/moedas acima ja tinham sido
+      // somados antes deste render(). Libera de novo (sem suprimir)
+      // dentro do aoTerminar do voo, pra barra so andar quando o "+X"
+      // aparecer.
       window._adiarContadoresRecompensa = true;
       render();
       window._adiarContadoresRecompensa = false;
-      // pedido do usuario: tarefa normal agora tambem tem o voo de
-      // icones (moeda+XP do monstro ate o heroi) igual golpe final --
-      // voarRecompensaFinal() e generica, so o nome ficou de quando so
-      // era usada ali; ela mesma chama numeroFlutuanteHeroi() no final
-      // do voo, entao a chamada direta que tinha aqui antes some. O
-      // 3o argumento (aoTerminar) e novo aqui: re-renderiza SEM a trava,
-      // fazendo a barra andar so depois do icone chegar.
+      // mesmo voo de icones do golpe final, e barra so anda quando ele
+      // chega (aoTerminar)
       voarRecompensaFinal(xpGanho, moedasGanhas, () => render());
       return false;
     }
@@ -2785,12 +2830,6 @@ function alternar(i){
   if (suprimirContadores) window._adiarContadoresRecompensa = false; // so vale por ESSE render() -- o de dentro da sequencia atrasada (mostrarBauEContadores) roda com a flag ja desligada
 
   if (ehGolpeFinal){
-    // item 3 do redesign: o numero estatico (item 1, antes aqui) virou
-    // a recompensa voando de verdade (ver voarRecompensaFinal, chamada
-    // DENTRO de dispararVitoriaDoDia, sincronizada com o poof/bau) --
-    // por isso xpGanho/moedasGanhas agora precisam ser repassados pra
-    // la, ja que so existem aqui dentro de alternar().
-    //
     // atraso proposital: animarGolpe() (chamada logo acima) leva 320ms
     // pra terminar (hero bate, monstro treme, os dois voltam ao
     // normal -- ver a funcao). dispararVitoriaDoDia() faz o proprio
@@ -2807,7 +2846,7 @@ function alternar(i){
   if (subiuNivel){
     if (typeof mostrarNivelUp === 'function') mostrarNivelUp(nivelDepois);
   }
-  else voarRecompensaFinal(xpGanho, moedasGanhas, () => render()); // pedido do usuario: mesmo voo de icones do golpe final, e barra so anda quando ele chega (aoTerminar)
+  else voarRecompensaFinal(xpGanho, moedasGanhas, () => render()); // mesmo voo de icones do golpe final, barra so anda quando ele chega (aoTerminar)
   return true;
 }
 
@@ -3185,7 +3224,7 @@ document.getElementById('entrar').onclick = () => {
   if (pendente){ tarefasIniciais.push(pendente); campoIni.value = ''; }
   if (tarefasIniciais.length === 0){
     campoIni.focus();
-    campoIni.placeholder = 'Escreva ao menos uma tarefa';
+    campoIni.placeholder = idiomaApp() === 'en' ? 'Write at least one task' : 'Escreva ao menos uma tarefa';
     return;
   }
   tarefasIniciais.forEach(t => tarefas.push({ texto:t, tipo:'hoje', data:isoAtual(), feitaEm:null }));
@@ -3202,6 +3241,11 @@ const blocosTarefas = ['.arena', '.xpwrap', '.tasks'].map(s => document.querySel
 
 function mostrarAba(nome){
   abaAtual = nome;
+
+  // mesmo motivo do gancho identico em render() (Tarefas) -- troca de
+  // aba no menu de baixo tambem desfaz um preview de tema de arena
+  // trancado, voltando pro tema realmente salvo.
+  if (!_arenaBgEmTransicao && typeof renderTemaArena === 'function') renderTemaArena();
 
   // flutuante .fixo (venda/uso de item) e position:fixed no body, nao
   // dentro do conteudo da aba -- se o usuario troca de aba enquanto ele
@@ -4408,7 +4452,7 @@ function montarVenda(grid){
     tesouros.forEach(s => total += precoVenda(item(s.id)) * s.q);
     const bt = document.createElement('button');
     bt.className = 'lbulk';
-    bt.textContent = 'Vender todos os tesouros  ·  +' + total + ' moedas';
+    bt.textContent = en ? ('Sell all treasures  ·  +' + total + ' coins') : ('Vender todos os tesouros  ·  +' + total + ' moedas');
     bt.onclick = venderTesouros;
     grid.appendChild(bt);
   }
@@ -5739,8 +5783,18 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       const hoje = new Date();
       const prefixoMes = hoje.getFullYear() + '-' + String(hoje.getMonth() + 1).padStart(2, '0');
       const doMes = hist.filter(h => typeof h.data === 'string' && h.data.startsWith(prefixoMes));
-      const vitorias = doMes.filter(h => h.resultado === 'vitoria').length;
+      let vitorias = doMes.filter(h => h.resultado === 'vitoria').length;
       const fugas = doMes.filter(h => h.resultado === 'fuga').length;
+      // mesmo bonus "hoje ao vivo" que o calendario logo abaixo (faixaHist,
+      // ver monstroJaCaiu()) e o bestiario (renderBestiario) ja aplicam --
+      // sem isso, esse texto dizia "0 vitorias" enquanto o calendario e o
+      // bestiario ja mostravam a vitoria de hoje: contradicao visivel no
+      // mesmo cartao (bug relatado pelo usuario). So conta se hoje ainda
+      // nao tem entrada permanente (evita contar 2x se a virada ja rodou).
+      if (typeof monstroJaCaiu === 'function' && monstroJaCaiu() &&
+          typeof isoAtual === 'function' && !hist.some(h => h.data === isoAtual())){
+        vitorias++;
+      }
       elHist.textContent = en
         ? (vitorias + ' wins, ' + fugas + ' escapes this month')
         : (vitorias + ' vitórias, ' + fugas + ' fugas este mês');
@@ -5814,7 +5868,20 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     const faixaBest = document.getElementById('prevBestiarioFaixa');
     if (faixaBest && typeof MONSTROS !== 'undefined'){
       const vitorias = hist.filter(h => h.resultado === 'vitoria' && typeof h.monstroId === 'number')
-        .slice().sort((a, b) => (a.data < b.data ? 1 : a.data > b.data ? -1 : 0));
+        .slice();
+      // mesmo bonus "hoje ao vivo" que renderBestiario() ja aplica no
+      // cabecalho "X de Y monstros derrotados" (chamado logo acima, ver
+      // monstroJaCaiu() la) -- sem isso essa faixa contradizia o proprio
+      // cabecalho: "1 de 63" em cima, "nenhum monstro derrotado" embaixo
+      // (bug relatado pelo usuario). So adiciona se hoje ainda nao tem
+      // entrada permanente no historico (evita duplicar apos a virada).
+      if (typeof monstroJaCaiu === 'function' && monstroJaCaiu() &&
+          typeof monstroDoDia === 'function' && typeof isoAtual === 'function' &&
+          !vitorias.some(v => v.data === isoAtual())){
+        const idxHoje = MONSTROS.indexOf(monstroDoDia());
+        if (idxHoje >= 0) vitorias.push({ data: isoAtual(), monstroId: idxHoje });
+      }
+      vitorias.sort((a, b) => (a.data < b.data ? 1 : a.data > b.data ? -1 : 0));
       const vistos = [];
       const jaVisto = new Set();
       for (const v of vitorias){
@@ -5827,7 +5894,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       if (!vistos.length){
         const vazio = document.createElement('span');
         vazio.className = 'prevvazio';
-        vazio.textContent = 'Nenhum monstro derrotado ainda';
+        vazio.textContent = en ? 'No monster defeated yet' : 'Nenhum monstro derrotado ainda';
         faixaBest.appendChild(vazio);
       } else {
         vistos.forEach(idx => {
@@ -8556,6 +8623,23 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     };
   }
 
+  // botao "Vender todos os tesouros" (Loja) nao tinha som -- pedido do
+  // usuario, mesmo som 'venda' do item avulso acima. Ao contrario de
+  // venderItem(), esta tem uma guarda de validacao real (retorna cedo,
+  // sem vender nada, se nao houver tesouros no inventario -- ver
+  // "if (!alvos.length) return;"), entao precisa conferir se o SALDO
+  // de moedas realmente mudou antes de tocar, senao tocaria o som
+  // mesmo quando o botao nao fez nada.
+  const _venderTesourosSfx = window.venderTesouros;
+  if (typeof _venderTesourosSfx === 'function'){
+    window.venderTesouros = function(){
+      const moedasAntes = moedas;
+      const r = _venderTesourosSfx.apply(this, arguments);
+      if (moedas !== moedasAntes) window.tocarSom('venda');
+      return r;
+    };
+  }
+
   // equipar/desequipar -- equipar(id) alterna equipado[tipo] (equipa se
   // vazio ou de outro item, desequipa se era o mesmo id) e tambem retorna
   // cedo, sem mudar nada, se o item nao for equipavel (EQUIPAVEL(id) falso).
@@ -9844,7 +9928,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     const n = campo.value.trim();
     if (!n){
       campo.focus();
-      campo.placeholder = 'Escolha um nome pra continuar';
+      campo.placeholder = idiomaApp() === 'en' ? 'Choose a name to continue' : 'Escolha um nome pra continuar';
       campo.style.borderColor = 'var(--blood)';
       return;
     }
@@ -10014,7 +10098,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       if (!elEntra && dir === 1 && atualNum === SLIDE_NOME){
         const campo = document.getElementById('nomeHeroi');
         if (campo){
-          campo.placeholder = 'Escolha um nome pra continuar';
+          campo.placeholder = idiomaApp() === 'en' ? 'Choose a name to continue' : 'Escolha um nome pra continuar';
           campo.style.borderColor = 'var(--blood)';
         }
       }

@@ -1750,10 +1750,19 @@ window.renderTemaArena = renderTemaArena;
 // persistido (nao durante o arrasto/previa -- so quando o usuario
 // "pousou" num tema pago ainda nao desbloqueado). Esconde
 // herói/monstro/nome junto (ver .arena.tema-bloqueado no CSS).
-function atualizarBloqueioArena(){
+function atualizarBloqueioArena(temaForcado){
   const arena = document.querySelector('.arena');
   if (!arena) return;
-  const tema = temaArenaAtual();
+  // BUG REAL ENCONTRADO (relatado pelo usuario: cadeado nao aparecia no
+  // Floresta mesmo com debug desligado). temaArenaAtual() le o tema
+  // PERSISTIDO (localStorage) -- mas desde o fix anterior (pousar num
+  // tema trancado durante o swipe/navegacao SEM persistir), a tela podia
+  // estar mostrando visualmente um tema diferente do que temaArenaAtual()
+  // retorna. Resultado: esta funcao sempre checava o tema salvo antigo
+  // (destravado), nunca o que estava REALMENTE na tela. temaForcado
+  // deixa quem chama (swipe/mudarTemaArena) informar qual tema esta
+  // sendo mostrado NESTE instante, mesmo sem persistir.
+  const tema = temaForcado || temaArenaAtual();
   const bloqueado = !temaArenaDesbloqueado(tema);
   arena.classList.toggle('tema-bloqueado', bloqueado);
   if (bloqueado){
@@ -1977,7 +1986,7 @@ function mudarTemaArena(direcao){
 
   _arenaBgFrente = trasId;
   renderTemaArenaDots();
-  if (typeof atualizarBloqueioArena === 'function') atualizarBloqueioArena();
+  if (typeof atualizarBloqueioArena === 'function') atualizarBloqueioArena(novoTema);
 }
 window.mudarTemaArena = mudarTemaArena;
 
@@ -2070,7 +2079,7 @@ window.mudarTemaArena = mudarTemaArena;
       trasEl.style.transform = 'translateX(0)';
       _arenaBgFrente = (_arenaBgFrente === 'A' ? 'B' : 'A');
       renderTemaArenaDots();
-      if (typeof atualizarBloqueioArena === 'function') atualizarBloqueioArena();
+      if (typeof atualizarBloqueioArena === 'function') atualizarBloqueioArena(TEMAS_ARENA[idxAlvo]);
     } else {
       // nao arrastou o suficiente -- "mola" de volta pro tema atual
       frenteEl.style.transform = 'translateX(0)';

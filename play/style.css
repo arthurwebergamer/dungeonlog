@@ -1055,13 +1055,20 @@
   .temaswatch.sel{border-color:var(--text)}
 
   /* paletas — so custom properties, sem redesenho de layout */
-  :root[data-tema="meianoite"]{
-    --bg:#161A20; --panel:#1E232B; --panel-2:#272D37; --line:#374050;
-    --text:#EDF0F4; --muted:#96A1B0; --dim:#65707E;
-    --accent:#5AB4EC; --accent-dim:#153A52; --gold:#F5BE4A; --blood:#EC6A62;
-    --panel-3:#313A48; --poco:#12161B; --sel-bg:#2D3846; --mobname:#8FD0F0;
-    --arena-1:#23303F; --arena-2:#1B2530; --arena-3:#131A22;
-    --xp2:#7FE0E8;
+  /* v4.138 (pedido do usuario): tema Azul (meianoite) REMOVIDO da paleta,
+     substituido por Branco -- contraparte CLARA do Grafite. Grafite e
+     100% grayscale de proposito (item 25 do roadmap, R=G=B em todo
+     valor, inclusive gold/blood -- ver comentario dele mais abaixo);
+     Branco segue a MESMA filosofia so que invertida (fundo claro, texto
+     escuro), pra formar o par "Preto e Branco" que o usuario pediu pra
+     aparecer primeiro na lista, antes dos temas coloridos. */
+  :root[data-tema="branco"]{
+    --bg:#EDEDED; --panel:#F5F5F5; --panel-2:#E8E8E8; --line:#C4C4C4;
+    --text:#1E1E1E; --muted:#5A5A5A; --dim:#8C8C8C;
+    --accent:#1A1A1A; --accent-dim:#D4D4D4; --gold:#4A4A4A; --blood:#6E6E6E;
+    --panel-3:#DCDCDC; --poco:#FFFFFF; --sel-bg:#DCDCDC; --mobname:#3C3C3C;
+    --arena-1:#DCDCDC; --arena-2:#E6E6E6; --arena-3:#F0F0F0;
+    --xp2:#4A4A4A;
   }
   :root[data-tema="pergaminho"]{
     --bg:#0F1216; --panel:#0F1216; --panel-2:#151A20; --line:#232A33;
@@ -2244,13 +2251,20 @@
   .temaswatch.sel{border-color:var(--text)}
 
   /* paletas — so custom properties, sem redesenho de layout */
-  :root[data-tema="meianoite"]{
-    --bg:#161A20; --panel:#1E232B; --panel-2:#272D37; --line:#374050;
-    --text:#EDF0F4; --muted:#96A1B0; --dim:#65707E;
-    --accent:#5AB4EC; --accent-dim:#153A52; --gold:#F5BE4A; --blood:#EC6A62;
-    --panel-3:#313A48; --poco:#12161B; --sel-bg:#2D3846; --mobname:#8FD0F0;
-    --arena-1:#23303F; --arena-2:#1B2530; --arena-3:#131A22;
-    --xp2:#7FE0E8;
+  /* v4.138 (pedido do usuario): tema Azul (meianoite) REMOVIDO da paleta,
+     substituido por Branco -- contraparte CLARA do Grafite. Grafite e
+     100% grayscale de proposito (item 25 do roadmap, R=G=B em todo
+     valor, inclusive gold/blood -- ver comentario dele mais abaixo);
+     Branco segue a MESMA filosofia so que invertida (fundo claro, texto
+     escuro), pra formar o par "Preto e Branco" que o usuario pediu pra
+     aparecer primeiro na lista, antes dos temas coloridos. */
+  :root[data-tema="branco"]{
+    --bg:#EDEDED; --panel:#F5F5F5; --panel-2:#E8E8E8; --line:#C4C4C4;
+    --text:#1E1E1E; --muted:#5A5A5A; --dim:#8C8C8C;
+    --accent:#1A1A1A; --accent-dim:#D4D4D4; --gold:#4A4A4A; --blood:#6E6E6E;
+    --panel-3:#DCDCDC; --poco:#FFFFFF; --sel-bg:#DCDCDC; --mobname:#3C3C3C;
+    --arena-1:#DCDCDC; --arena-2:#E6E6E6; --arena-3:#F0F0F0;
+    --xp2:#4A4A4A;
   }
   :root[data-tema="pergaminho"]{
     --bg:#0F1216; --panel:#0F1216; --panel-2:#151A20; --line:#232A33;

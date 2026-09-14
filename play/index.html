@@ -3545,7 +3545,11 @@ function usarItem(id, elOrigem){
 
 function venderItem(id, elOrigem){
   const it = item(id);
-  if (it.tipo === 'chave') return;   // itens-chave (ex: Grimório) nunca sao vendaveis
+  // pedido do usuario: chaves normais (Ferro/comum/Dourada/Cristal/
+  // Mestra) agora sao vendaveis -- so o Grimorio continua bloqueado
+  // (item unico, tem acao propria "Abrir", val:0 no catalogo, nunca foi
+  // pra vender). Antes este guard barrava TODO tipo:'chave' junto.
+  if (it.tipo === 'chave' && id === ID_GRIMORIO_INV) return;
   const ponto = pontoDeElemento(elOrigem); // captura ANTES do render
   // NAO desequipar aqui incondicionalmente: com 2+ copias do mesmo item,
   // vender uma unidade desequipava a outra copia idêntica sem motivo.
@@ -3736,7 +3740,10 @@ function abrirFicha(id){
     if (bi.x) bonus += '<span>XP '+(bi.x>0?'+':'')+bi.x+'%</span>';
     if (bi.m) bonus += '<span>' + (en ? 'Coins ' : 'Moedas ') + (bi.m>0?'+':'')+bi.m+'%</span>';
   }
-  if (it.tipo !== 'chave') bonus += '<span>' + (en ? 'Sells for ' + precoVenda(it) + ' coins' : 'Vende por '+precoVenda(it)+' moedas') + '</span>';
+  // pedido do usuario: chaves normais agora sao vendaveis -- so o
+  // Grimorio (val:0, acao propria "Abrir") continua fora do preco/botao
+  // de venda. Antes "it.tipo !== 'chave'" excluia TODA chave junto.
+  if (!(it.tipo === 'chave' && id === ID_GRIMORIO_INV)) bonus += '<span>' + (en ? 'Sells for ' + precoVenda(it) + ' coins' : 'Vende por '+precoVenda(it)+' moedas') + '</span>';
   if (it.tipo === 'chave' && id !== ID_GRIMORIO_INV) bonus += '<span>' + (en ? 'Used automatically to unlock a locked chest in the Arena' : 'Usada automaticamente pra destrancar um baú trancado na Arena') + '</span>';
   if (q > 1) bonus += '<span>' + (en ? 'Quantity: ' + q : 'Quantidade: '+q) + '</span>';
 
@@ -3744,7 +3751,7 @@ function abrirFicha(id){
   if (EQUIPAVEL(id)) acoes += '<button class="prim" data-a="eq">'+(estaEquipado ? (en ? 'Unequip' : 'Desequipar') : (en ? 'Equip' : 'Equipar'))+'</button>';
   if (it.tipo === 'cons') acoes += '<button class="prim" data-a="usar">' + (en ? 'Use' : 'Usar') + '</button>';
   if (it.tipo === 'chave' && id === ID_GRIMORIO_INV) acoes += '<button class="prim" data-a="abrir">' + (en ? 'Open' : 'Abrir') + '</button>';
-  if (it.tipo !== 'chave') acoes += '<button data-a="vender">' + (en ? 'Sell' : 'Vender') + '</button>';
+  if (!(it.tipo === 'chave' && id === ID_GRIMORIO_INV)) acoes += '<button data-a="vender">' + (en ? 'Sell' : 'Vender') + '</button>';
 
   ficha.innerHTML =
     '<div class="ihead">'+
@@ -4416,7 +4423,7 @@ function montarVenda(grid){
   }
 
   const lista = inventario.slice()
-    .filter(s => item(s.id).tipo !== 'chave')   // itens-chave (Grimório) nao aparecem pra vender
+    .filter(s => !(item(s.id).tipo === 'chave' && s.id === ID_GRIMORIO_INV))   // pedido do usuario: chaves normais agora aparecem pra vender, so o Grimorio continua fora
     .sort((a, z) => {
     const A = item(a.id), Z = item(z.id);
     if (A.tipo === 'tesouro' && Z.tipo !== 'tesouro') return -1;

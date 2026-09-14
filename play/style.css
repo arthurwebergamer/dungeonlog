@@ -234,13 +234,12 @@
 
   .est-streaknum{font-family:'Silkscreen',monospace;font-size:40px;color:var(--text);line-height:1}
   .est-montanha{position:absolute;right:0;bottom:0;width:172px;height:auto;pointer-events:none;z-index:0;opacity:.92}
-  .est-streaklbl{font-size:11px;color:var(--dim);margin-top:6px;max-width:160px}
+  .est-streaklbl{display:none}
 
   .est-statsrow{display:flex;gap:12px;margin-bottom:14px}
   .est-statscol{flex:1;min-width:0;margin-bottom:0;display:flex;flex-direction:column;align-items:center;text-align:center}
   .est-statscol .est-titulo{justify-content:center}
   .est-statscol .est-ringbox,.est-statscol .est-donutbox{margin:6px 0 12px}
-  .est-statscaption{font-size:10px;color:var(--dim);line-height:1.4}
   .est-donutlegenda-compacta{width:100%}
   .est-donutlegenda-compacta .est-legitem{font-size:10.5px}
   .est-donutlegenda-compacta .est-legbar{display:none}

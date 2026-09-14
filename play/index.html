@@ -3299,10 +3299,9 @@ function moverNavPill(nome){
   const pill = document.getElementById('navPill');
   const btn = document.querySelector('#nav button[data-aba="' + nome + '"]');
   if (!pill || !btn) return;
-  const tam = 44;
+  const tam = 58; // largura da pilula -- a altura fica fixa no CSS (.navpill)
   const centro = btn.offsetLeft + btn.offsetWidth / 2;
   pill.style.width = tam + 'px';
-  pill.style.height = tam + 'px';
   pill.style.transform = 'translateX(' + (centro - tam / 2) + 'px)';
 }
 moverNavPill(abaAtual);

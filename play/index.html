@@ -735,13 +735,42 @@
   <div class="view" id="viewEstatisticas">
     <div class="vhead">
       <span class="vtitle" data-i18n="nav.estatisticas">Estatísticas</span>
+      <span class="vsub" id="estMesLabel"></span>
     </div>
-    <!-- conteudo real (streak, concluidas no mes, perdidas no mes) entra aqui
-         numa proxima etapa -- por enquanto so a casca pra nav funcionar -->
+
+    <div class="est-streakhero">
+      <div class="est-fogo"><svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="7" y="1" width="2" height="1" fill="#F2A65A"/><rect x="6" y="2" width="4" height="1" fill="#F2A65A"/><rect x="5" y="3" width="6" height="2" fill="#F2A65A"/><rect x="4" y="5" width="8" height="4" fill="#F2A65A"/><rect x="5" y="9" width="6" height="2" fill="#F2A65A"/><rect x="6" y="11" width="4" height="1" fill="#F2A65A"/><rect x="7" y="12" width="2" height="1" fill="#F2A65A"/><rect x="7" y="5" width="2" height="4" fill="#F2C94C"/></svg></div>
+      <div class="est-info">
+        <div class="est-streaknum"><span id="estStreakNum">0</span><small data-i18n="est.diasSeguidos">dias seguidos</small></div>
+        <div class="est-streaklbl" id="estStreakLbl"></div>
+        <div class="est-streakbar"><i id="estStreakBar" style="width:0%"></i></div>
+      </div>
+      <div class="est-recorde"><b id="estRecordeNum">0</b><span data-i18n="est.recorde">RECORDE</span></div>
+    </div>
+
+    <div class="est-ringcard">
+      <div class="est-ringbox" id="estTaxaRing" style="--pct:0">
+        <div class="est-ringbg"></div>
+        <div class="est-ringtrack"></div>
+        <div class="est-ringtxt"><span class="n" id="estTaxaNum">0%</span><span class="u" data-i18n="est.mes">MÊS</span></div>
+      </div>
+      <div class="est-ringlbl" data-i18n="est.taxaConclusao">taxa de conclusão dos dias com tarefa, este mês</div>
+    </div>
+
+    <div class="est-card">
+      <div class="est-titulo"><span class="est-ic"><svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="2" y="3" width="12" height="10" fill="#5A3D20"/><rect x="2" y="3" width="12" height="1" fill="#8B5A2B"/><rect x="6" y="4" width="1" height="9" fill="#4A3018"/><rect x="10" y="4" width="1" height="9" fill="#4A3018"/><rect x="7" y="7" width="2" height="2" fill="#F2A65A"/></svg></span><span data-i18n="est.mapaDoMes">Mapa do mês</span></div>
+      <div class="est-mapames" id="estMapaMes"></div>
+      <div class="est-mapalegenda">
+        <div class="est-tile"></div><span data-i18n="est.semTarefa">sem tarefa</span>
+        <div class="est-tile est-tile-fuga"></div><span data-i18n="est.fuga">fugiu</span>
+        <div class="est-tile est-tile-vitoria"></div><span data-i18n="est.vitoria">venceu</span>
+      </div>
+    </div>
+
+    <div class="est-rodape" data-i18n="est.emBreve">Distribuição por horário e "tarefas mais puladas" pedem rastrear novos dados — entram numa próxima etapa.</div>
   </div>
 
-  
-<div class="nav" id="nav">
+  <div class="nav" id="nav">
 <div class="navpill" id="navPill"></div>
 
     <button class="on" data-aba="tarefas">
@@ -3290,6 +3319,7 @@ function mostrarAba(nome){
   moverNavPill(nome);
 
   if (nome === 'loja') document.getElementById('saldoLoja').textContent = moedas;
+  if (nome === 'estatisticas') renderEstatisticas();
 }
 
 // pilula que fica atras do icone selecionado na nav e desliza ate ele --
@@ -3306,6 +3336,103 @@ function moverNavPill(nome){
 }
 moverNavPill(abaAtual);
 window.addEventListener('resize', () => moverNavPill(abaAtual));
+
+// ---------- Estatisticas: dados reais a partir de window.obterHistorico() ----------
+// historico[i] = { data:'YYYY-MM-DD', resultado:'vitoria'|'fuga'|'sem_tarefa', monstroId, tarefas }
+// (ver registrarHistorico() -- secao de Vida/virada de dia). 'fuga' = pelo menos
+// 1 tarefa largada naquele dia; 'sem_tarefa' = dia sem nenhuma tarefa criada.
+
+// streak ATUAL: dias consecutivos com 'vitoria' terminando hoje ou ontem (se
+// hoje ainda esta em aberto sem registro). Independente de melhorSequenciaDeVitorias()
+// (que calcula o RECORDE, nao a sequencia corrente) porque aquela funcao vive
+// dentro de outra IIFE e nao esta exposta em window -- reimplementada aqui em
+// cima da MESMA regra (resultado==='vitoria' e diffDias()===1 pro dia anterior).
+function estStreakAtual(hist){
+  const porData = new Map(hist.map(h => [h.data, h.resultado]));
+  let cursor = isoAtual();
+  if (!porData.has(cursor)) cursor = isoDe(new Date(new Date(cursor + 'T12:00:00').getTime() - 86400000));
+  let streak = 0;
+  while (porData.get(cursor) === 'vitoria'){
+    streak++;
+    cursor = isoDe(new Date(new Date(cursor + 'T12:00:00').getTime() - 86400000));
+  }
+  return streak;
+}
+
+function estRecorde(hist){
+  const ord = hist.slice().sort((a, b) => a.data < b.data ? -1 : (a.data > b.data ? 1 : 0));
+  let atual = 0, melhor = 0, anterior = null;
+  ord.forEach(h => {
+    const seguido = anterior !== null && diffDias(h.data, anterior) === 1;
+    if (h.resultado === 'vitoria'){
+      atual = seguido ? atual + 1 : 1;
+      if (atual > melhor) melhor = atual;
+    } else {
+      atual = 0;
+    }
+    anterior = h.data;
+  });
+  return melhor;
+}
+
+function renderMapaDoMes(hist, ano, mes){
+  const el = document.getElementById('estMapaMes');
+  if (!el) return;
+  const porData = new Map(hist.map(h => [h.data, h.resultado]));
+  const hoje = isoAtual();
+  const diasNoMes = new Date(ano, mes, 0).getDate();
+  el.innerHTML = '';
+  for (let d = 1; d <= diasNoMes; d++){
+    const iso = ano + '-' + String(mes).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+    const tile = document.createElement('div');
+    tile.className = 'est-tile';
+    if (iso <= hoje){
+      const resultado = porData.get(iso);
+      if (resultado === 'vitoria') tile.classList.add('est-tile-vitoria');
+      else if (resultado === 'fuga') tile.classList.add('est-tile-fuga');
+      // 'sem_tarefa' ou sem registro nenhum (ex: antes de criar a conta) fica neutro
+    }
+    el.appendChild(tile);
+  }
+}
+
+function renderEstatisticas(){
+  const hist = (typeof window.obterHistorico === 'function') ? window.obterHistorico() : [];
+  const hoje = isoAtual();
+  const [anoStr, mesStr] = hoje.split('-');
+  const ano = Number(anoStr), mes = Number(mesStr);
+  const anoMesPrefixo = anoStr + '-' + mesStr;
+
+  const streak = estStreakAtual(hist);
+  const recorde = estRecorde(hist);
+  document.getElementById('estStreakNum').textContent = streak;
+  document.getElementById('estRecordeNum').textContent = recorde;
+  const lblEl = document.getElementById('estStreakLbl');
+  const barEl = document.getElementById('estStreakBar');
+  if (recorde === 0){
+    lblEl.textContent = 'Vença hoje pra começar uma sequência';
+    barEl.style.width = '0%';
+  } else if (streak >= recorde){
+    lblEl.textContent = 'Essa é a sua maior sequência!';
+    barEl.style.width = '100%';
+  } else {
+    const faltam = recorde - streak;
+    lblEl.textContent = 'Falta' + (faltam === 1 ? ' 1 dia' : 'm ' + faltam + ' dias') + ' pra bater seu recorde';
+    barEl.style.width = Math.round((streak / recorde) * 100) + '%';
+  }
+
+  const doMes = hist.filter(h => h.data.startsWith(anoMesPrefixo));
+  const vitoriasMes = doMes.filter(h => h.resultado === 'vitoria').length;
+  const comTarefaMes = doMes.filter(h => h.resultado !== 'sem_tarefa').length;
+  const taxa = comTarefaMes > 0 ? Math.round((vitoriasMes / comTarefaMes) * 100) : 0;
+  document.getElementById('estTaxaRing').style.setProperty('--pct', taxa);
+  document.getElementById('estTaxaNum').textContent = taxa + '%';
+
+  const nomeMes = new Date(ano, mes - 1, 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+  document.getElementById('estMesLabel').textContent = nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1);
+
+  renderMapaDoMes(hist, ano, mes);
+}
 
 document.querySelectorAll('#nav button').forEach(b => {
   b.onclick = () => mostrarAba(b.dataset.aba);
@@ -11417,6 +11544,16 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'nav.inventario': { pt:'Inventário', en:'Inventory' },
     'nav.loja':       { pt:'Loja',       en:'Shop' },
     'nav.perfil':     { pt:'Perfil',     en:'Profile' },
+    'nav.estatisticas': { pt:'Estatísticas', en:'Stats' },
+    'est.diasSeguidos': { pt:'dias seguidos', en:'days in a row' },
+    'est.recorde':      { pt:'RECORDE', en:'RECORD' },
+    'est.mes':          { pt:'MÊS', en:'MONTH' },
+    'est.taxaConclusao':{ pt:'taxa de conclusão dos dias com tarefa, este mês', en:'completion rate of days with tasks, this month' },
+    'est.mapaDoMes':    { pt:'Mapa do mês', en:'Month map' },
+    'est.semTarefa':    { pt:'sem tarefa', en:'no task' },
+    'est.fuga':         { pt:'fugiu', en:'fled' },
+    'est.vitoria':      { pt:'venceu', en:'won' },
+    'est.emBreve':      { pt:'Distribuição por horário e "tarefas mais puladas" pedem rastrear novos dados — entram numa próxima etapa.', en:'Time-of-day breakdown and "most skipped tasks" need new data tracking — coming in a future update.' },
 
     'acao.continuar': { pt:'Continuar', en:'Continue' },
     'acao.voltar':    { pt:'Voltar',    en:'Back' },

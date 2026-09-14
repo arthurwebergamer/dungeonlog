@@ -213,9 +213,12 @@
   .cbtn{background:var(--accent);color:var(--bg);border:none;border-radius:9px;padding:11px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;cursor:pointer}
 
   .nav{display:flex;border-top:1px solid var(--line);background:var(--panel-2);margin-top:14px}
-  .nav button{flex:1;background:none;border:none;cursor:pointer;padding:11px 6px 14px;display:flex;flex-direction:column;align-items:center;gap:5px;color:var(--dim);font-family:'Outfit',sans-serif;font-size:11px;font-weight:500;letter-spacing:0;transition:color .15s}
-  .nav button svg{width:23px;height:23px}
+  .nav button{flex:1;position:relative;background:none;border:none;cursor:pointer;padding:12px 4px 10px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--dim);transition:color .15s}
+  .nav button svg{width:20px;height:20px}
+  .nav button span{display:none}
   .nav button.on{color:var(--accent)}
+  .nav button.on::after{content:'';position:absolute;top:3px;left:50%;width:4px;height:4px;border-radius:50%;background:var(--accent);transform:translateX(-50%) scale(0);animation:navDotPop .28s cubic-bezier(.34,1.56,.64,1) forwards}
+  @keyframes navDotPop{to{transform:translateX(-50%) scale(1)}}
 
   .toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);background:var(--accent);color:var(--bg);font-family:'Silkscreen',monospace;font-size:10px;padding:11px 18px;border-radius:8px;opacity:0;pointer-events:none;transition:all .3s;text-align:center;z-index:200}
   .toast.gold{background:var(--gold)}

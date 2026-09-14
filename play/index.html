@@ -732,6 +732,14 @@
     <div class="lojalista" id="lojaGrid"></div>
   </div>
 
+  <div class="view" id="viewEstatisticas">
+    <div class="vhead">
+      <span class="vtitle" data-i18n="nav.estatisticas">Estatísticas</span>
+    </div>
+    <!-- conteudo real (streak, concluidas no mes, perdidas no mes) entra aqui
+         numa proxima etapa -- por enquanto so a casca pra nav funcionar -->
+  </div>
+
   
 <div class="nav" id="nav">
 
@@ -750,6 +758,10 @@
     <button data-aba="perfil">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v5a5 5 0 01-10 0V4z"/><path d="M17 5.5h2.5a2.5 2.5 0 01-2.5 4"/><path d="M7 5.5H4.5a2.5 2.5 0 002.5 4"/><path d="M12 14v3"/><path d="M8.5 20h7"/><path d="M10 17h4l.8 3H9.2l.8-3z"/></svg>
       <span data-i18n="nav.perfil">Perfil</span>
+    </button>
+    <button data-aba="estatisticas">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10"/><path d="M12 20V4"/><path d="M20 20v-7"/></svg>
+      <span data-i18n="nav.estatisticas">Estatísticas</span>
     </button>
   </div>
 
@@ -3269,6 +3281,7 @@ function mostrarAba(nome){
   document.getElementById('viewInventario').classList.toggle('on', nome === 'inventario');
   document.getElementById('viewLoja').classList.toggle('on', nome === 'loja');
   document.getElementById('viewPerfil').classList.toggle('on', nome === 'perfil');
+  document.getElementById('viewEstatisticas').classList.toggle('on', nome === 'estatisticas');
 
   document.querySelectorAll('#nav button').forEach(b => {
     b.classList.toggle('on', b.dataset.aba === nome);

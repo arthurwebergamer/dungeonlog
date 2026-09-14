@@ -765,18 +765,32 @@
       </div>
     </div>
 
-    <div class="est-card">
-      <div class="est-ringrow">
+    <div class="est-statsrow">
+      <div class="est-card est-statscol">
+        <div class="est-titulo" data-i18n="est.taxaConclusaoTitulo">Taxa de conclusão</div>
         <div class="est-ringbox" id="estTaxaRing" style="--pct:0">
           <div class="est-ringbg"></div>
           <div class="est-ringtrack"></div>
           <div class="est-ringtxt"><span class="n" id="estTaxaNum">0%</span><span class="u" data-i18n="est.mes">MÊS</span></div>
         </div>
-        <div class="est-ringlbl"><b data-i18n="est.taxaConclusaoTitulo">Taxa de conclusão</b><span data-i18n="est.taxaConclusao">taxa de conclusão dos dias com tarefa, este mês</span></div>
+        <div class="est-statscaption" data-i18n="est.taxaConclusao">taxa de conclusão dos dias com tarefa, este mês</div>
       </div>
 
-      <div class="est-divider"></div>
+      <div class="est-card est-statscol">
+        <div class="est-titulo"><span class="est-ic"><svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="5" y="1" width="6" height="1" fill="#F2A65A"/><rect x="3" y="2" width="10" height="2" fill="#F2A65A"/><rect x="2" y="4" width="12" height="8" fill="#F2A65A"/><rect x="3" y="12" width="10" height="2" fill="#F2A65A"/><rect x="5" y="14" width="6" height="1" fill="#F2A65A"/><rect x="6" y="6" width="4" height="4" fill="#251E38"/></svg></span><span data-i18n="est.comoFoiMes">Como foi o mês</span></div>
+        <div class="est-donutbox">
+          <div class="est-donutring" id="estDonutMes"></div>
+          <div class="est-donuttxt" id="estDonutTotal">0</div>
+        </div>
+        <div class="est-donutlegenda est-donutlegenda-compacta">
+          <div class="est-legitem"><span class="est-dot" style="background:var(--accent)"></span><span data-i18n="est.vitoria">venceu</span><div class="est-legbar"><i id="estBarraVitoria" style="width:0%;background:var(--accent)"></i></div><b id="estQtdVitoria">0</b></div>
+          <div class="est-legitem"><span class="est-dot" style="background:color-mix(in srgb, var(--accent) 40%, transparent)"></span><span data-i18n="est.fuga">fugiu</span><div class="est-legbar"><i id="estBarraFuga" style="width:0%;background:color-mix(in srgb, var(--accent) 40%, transparent)"></i></div><b id="estQtdFuga">0</b></div>
+          <div class="est-legitem"><span class="est-dot" style="background:var(--panel-3)"></span><span data-i18n="est.semTarefa">sem tarefa</span><div class="est-legbar"><i id="estBarraSemTarefa" style="width:0%"></i></div><b id="estQtdSemTarefa">0</b></div>
+        </div>
+      </div>
+    </div>
 
+    <div class="est-card">
       <div class="est-titulo"><span class="est-ic"><svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="2" y="12" width="2" height="2" fill="#8779A8"/><rect x="2" y="9" width="2" height="3" fill="#8779A8"/><rect x="6" y="6" width="2" height="6" fill="#F2A65A"/><rect x="10" y="3" width="2" height="9" fill="#F2A65A"/><rect x="1" y="13" width="13" height="1" fill="#3B3057"/></svg></span><span data-i18n="est.ultimos7">Últimos 7 dias</span></div>
       <div class="est-chartwrap">
         <svg id="est7DiasSvg" viewBox="0 0 300 80" width="100%" height="80" preserveAspectRatio="none">
@@ -789,24 +803,9 @@
         </svg>
       </div>
       <div class="est-chartlabels" id="est7DiasLabels"></div>
+    </div>
 
-      <div class="est-divider"></div>
-
-      <div class="est-titulo"><span class="est-ic"><svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="5" y="1" width="6" height="1" fill="#F2A65A"/><rect x="3" y="2" width="10" height="2" fill="#F2A65A"/><rect x="2" y="4" width="12" height="8" fill="#F2A65A"/><rect x="3" y="12" width="10" height="2" fill="#F2A65A"/><rect x="5" y="14" width="6" height="1" fill="#F2A65A"/><rect x="6" y="6" width="4" height="4" fill="#251E38"/></svg></span><span data-i18n="est.comoFoiMes">Como foi o mês</span></div>
-      <div class="est-donutrow">
-        <div class="est-donutbox">
-          <div class="est-donutring" id="estDonutMes"></div>
-          <div class="est-donuttxt" id="estDonutTotal">0</div>
-        </div>
-        <div class="est-donutlegenda">
-          <div class="est-legitem"><span class="est-dot" style="background:var(--accent)"></span><span data-i18n="est.vitoria">venceu</span><div class="est-legbar"><i id="estBarraVitoria" style="width:0%;background:var(--accent)"></i></div><b id="estQtdVitoria">0</b></div>
-          <div class="est-legitem"><span class="est-dot" style="background:color-mix(in srgb, var(--accent) 40%, transparent)"></span><span data-i18n="est.fuga">fugiu</span><div class="est-legbar"><i id="estBarraFuga" style="width:0%;background:color-mix(in srgb, var(--accent) 40%, transparent)"></i></div><b id="estQtdFuga">0</b></div>
-          <div class="est-legitem"><span class="est-dot" style="background:var(--panel-3)"></span><span data-i18n="est.semTarefa">sem tarefa</span><div class="est-legbar"><i id="estBarraSemTarefa" style="width:0%"></i></div><b id="estQtdSemTarefa">0</b></div>
-        </div>
-      </div>
-
-      <div class="est-divider"></div>
-
+    <div class="est-card">
       <div class="est-titulo"><span class="est-ic"><svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="2" y="3" width="12" height="10" fill="#5A3D20"/><rect x="2" y="3" width="12" height="1" fill="#8B5A2B"/><rect x="6" y="4" width="1" height="9" fill="#4A3018"/><rect x="10" y="4" width="1" height="9" fill="#4A3018"/><rect x="7" y="7" width="2" height="2" fill="#F2A65A"/></svg></span><span data-i18n="est.mapaDoMes">Mapa do mês</span></div>
       <div class="est-mapames" id="estMapaMes"></div>
       <div class="est-mapalegenda">
@@ -3525,6 +3524,7 @@ function renderMapaDoMes(hist, ano, mes){
     const iso = ano + '-' + String(mes).padStart(2, '0') + '-' + String(d).padStart(2, '0');
     const tile = document.createElement('div');
     tile.className = 'est-tile';
+    tile.textContent = d;
     if (iso <= hoje){
       const resultado = porData.get(iso);
       if (resultado === 'vitoria') tile.classList.add('est-tile-vitoria');

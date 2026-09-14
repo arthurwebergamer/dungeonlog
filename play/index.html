@@ -3573,6 +3573,20 @@ function renderEstatisticas(){
   const ano = Number(anoStr), mes = Number(mesStr);
   const anoMesPrefixo = anoStr + '-' + mesStr;
 
+  // usa a arte do tema de arena que o jogador tem EQUIPADO agora (mesmo
+  // objeto que a combat arena le -- ver temaArenaAtual()/aplicarFundoTemaArena()).
+  // tema "padrao" tem arte:null -- nesse caso volta pro fundo solido normal
+  // do .est-card em vez de forcar uma imagem que nao existe.
+  const streakCardEl = document.querySelector('.est-streakcard');
+  if (streakCardEl && typeof temaArenaAtual === 'function'){
+    const tema = temaArenaAtual();
+    if (tema && tema.arte){
+      streakCardEl.style.backgroundImage = 'url("data:image/png;base64,' + tema.arte + '")';
+    } else {
+      streakCardEl.style.backgroundImage = 'none';
+    }
+  }
+
   // resumo vitalicio -- totalTarefasConcluidas() ja existe desde o
   // "CONTADOR - TAREFAS CONCLUIDAS (lifetime)" (incrementa 1x por
   // conclusao real, ver alternar()); o resto vem do historico completo.

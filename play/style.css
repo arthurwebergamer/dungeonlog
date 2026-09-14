@@ -214,10 +214,10 @@
 
   .nav{display:flex;position:relative;border-top:1px solid var(--line);background:var(--panel-2);margin-top:14px}
   .nav button{flex:1;position:relative;z-index:1;background:none;border:none;cursor:pointer;padding:14px 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--dim);transition:color .15s}
-  .nav button svg{width:22px;height:22px}
+  .nav button svg{width:26px;height:26px}
   .nav button span{display:none}
   .nav button.on{color:var(--accent)}
-  .navpill{position:absolute;top:12px;left:0;width:58px;height:36px;border-radius:999px;background:var(--accent-dim);border:1px solid rgba(255,255,255,.14);box-shadow:0 0 10px rgba(255,255,255,.08);transform:translateX(0);transition:transform .32s cubic-bezier(.34,1.56,.64,1);pointer-events:none;z-index:0}
+  .navpill{position:absolute;top:8px;left:0;width:62px;height:44px;border-radius:999px;background:var(--accent-dim);border:1px solid rgba(255,255,255,.14);box-shadow:0 0 10px rgba(255,255,255,.08);transform:translateX(0);transition:transform .32s cubic-bezier(.34,1.56,.64,1);pointer-events:none;z-index:0}
 
   .toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);background:var(--accent);color:var(--bg);font-family:'Silkscreen',monospace;font-size:10px;padding:11px 18px;border-radius:8px;opacity:0;pointer-events:none;transition:all .3s;text-align:center;z-index:200}
   .toast.gold{background:var(--gold)}

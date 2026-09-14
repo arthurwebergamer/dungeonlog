@@ -235,7 +235,7 @@
   .est-streakcard .est-titulo{position:relative;z-index:1}
 
   .est-streaknum{font-family:'Silkscreen',monospace;font-size:40px;color:var(--text);line-height:1}
-  .est-montanha{position:absolute;right:-6px;bottom:-4px;width:118px;height:auto;pointer-events:none;z-index:0;opacity:.9}
+  .est-montanha{position:absolute;right:-10px;bottom:0;width:172px;height:auto;pointer-events:none;z-index:0;opacity:.92}
   .est-streaklbl{font-size:11px;color:var(--dim);margin-top:6px;max-width:160px}
 
   .est-ringrow{display:flex;align-items:center;gap:18px}

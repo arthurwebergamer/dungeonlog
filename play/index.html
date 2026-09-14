@@ -3542,9 +3542,33 @@ function renderMapaDoMes(hist, ano, mes){
   }
 }
 
-function renderEstatisticas(){
+// o historico persistido so ganha o registro de hoje quando o dia VIRA
+// (registrarHistorico(), chamado na virada oficial -- meia-noite real ou
+// botao de debug). Isso fazia as Estatisticas so mostrarem "hoje" como
+// vencido depois da virada, mesmo que o jogador ja tivesse terminado a
+// ultima tarefa horas antes. Aqui a gente injeta um registro AO VIVO de
+// hoje (sem persistir nada) quando TODAS as tarefas de hoje ja estao
+// feitas -- assim conta como vencido na hora, sem esperar o dia mudar.
+// So injeta se o historico real AINDA NAO tem uma entrada pra hoje (senao
+// duplicaria o dia quando a virada oficial ja rodou).
+function estHistComHojeAoVivo(hoje){
   const hist = (typeof window.obterHistorico === 'function') ? window.obterHistorico() : [];
+  if (hist.some(h => h.data === hoje)) return hist; // virada oficial ja registrou -- usa o real
+  if (typeof tarefas === 'undefined' || typeof ehDeHoje !== 'function' || typeof feitaHoje !== 'function') return hist;
+
+  const doDia = tarefas.filter(ehDeHoje);
+  if (doDia.length > 0 && doDia.every(feitaHoje)){
+    return hist.concat([{ data: hoje, resultado: 'vitoria', monstroId: null, tarefas: doDia.length }]);
+  }
+  // ainda tem tarefa pendente (ou nenhuma tarefa hoje) -- dia em aberto,
+  // nao entra na contagem ainda (nem vitoria nem fuga: so vira fuga se
+  // sobrar pendente na hora da virada oficial)
+  return hist;
+}
+
+function renderEstatisticas(){
   const hoje = isoAtual();
+  const hist = estHistComHojeAoVivo(hoje);
   const [anoStr, mesStr] = hoje.split('-');
   const ano = Number(anoStr), mes = Number(mesStr);
   const anoMesPrefixo = anoStr + '-' + mesStr;

@@ -738,28 +738,46 @@
       <span class="vsub" id="estMesLabel"></span>
     </div>
 
-    <div class="est-streakhero">
-      <div class="est-fogo"><svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="7" y="1" width="2" height="1" fill="#F2A65A"/><rect x="6" y="2" width="4" height="1" fill="#F2A65A"/><rect x="5" y="3" width="6" height="2" fill="#F2A65A"/><rect x="4" y="5" width="8" height="4" fill="#F2A65A"/><rect x="5" y="9" width="6" height="2" fill="#F2A65A"/><rect x="6" y="11" width="4" height="1" fill="#F2A65A"/><rect x="7" y="12" width="2" height="1" fill="#F2A65A"/><rect x="7" y="5" width="2" height="4" fill="#F2C94C"/></svg></div>
-      <div class="est-info">
-        <div class="est-streaknum"><span id="estStreakNum">0</span><small data-i18n="est.diasSeguidos">dias seguidos</small></div>
-        <div class="est-streaklbl" id="estStreakLbl"></div>
-        <div class="est-streakbar"><i id="estStreakBar" style="width:0%"></i></div>
+    <div class="est-card est-streakcard">
+      <div class="est-titulo" data-i18n="est.sequenciaAtual">Sequência atual</div>
+      <div class="est-streakrow">
+        <div>
+          <div class="est-streaknum"><svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="7" y="1" width="2" height="1" fill="#F2A65A"/><rect x="6" y="2" width="4" height="1" fill="#F2A65A"/><rect x="5" y="3" width="6" height="2" fill="#F2A65A"/><rect x="4" y="5" width="8" height="4" fill="#F2A65A"/><rect x="5" y="9" width="6" height="2" fill="#F2A65A"/><rect x="6" y="11" width="4" height="1" fill="#F2A65A"/><rect x="7" y="12" width="2" height="1" fill="#F2A65A"/><rect x="7" y="5" width="2" height="4" fill="#F2C94C"/></svg><span id="estStreakNum">0</span></div>
+          <div class="est-streaklbl" id="estStreakLbl"></div>
+        </div>
+        <div class="est-trend">
+          <div class="est-trenditem est-up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg><span id="estQtdVitoriaTrend">0</span></div>
+          <div class="est-trendlbl" data-i18n="est.vitoria">venceu</div>
+          <div class="est-trenditem est-down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg><span id="estQtdFugaTrend">0</span></div>
+          <div class="est-trendlbl" data-i18n="est.fuga">fugiu</div>
+        </div>
       </div>
-      <div class="est-recorde"><b id="estRecordeNum">0</b><span data-i18n="est.recorde">RECORDE</span></div>
     </div>
 
-    <div class="est-ringcard">
-      <div class="est-ringbox" id="estTaxaRing" style="--pct:0">
-        <div class="est-ringbg"></div>
-        <div class="est-ringtrack"></div>
-        <div class="est-ringtxt"><span class="n" id="estTaxaNum">0%</span><span class="u" data-i18n="est.mes">MÊS</span></div>
+    <div class="est-card">
+      <div class="est-ringrow">
+        <div class="est-ringbox" id="estTaxaRing" style="--pct:0">
+          <div class="est-ringbg"></div>
+          <div class="est-ringtrack"></div>
+          <div class="est-ringtxt"><span class="n" id="estTaxaNum">0%</span><span class="u" data-i18n="est.mes">MÊS</span></div>
+        </div>
+        <div class="est-ringlbl"><b data-i18n="est.taxaConclusaoTitulo">Taxa de conclusão</b><span data-i18n="est.taxaConclusao">taxa de conclusão dos dias com tarefa, este mês</span></div>
       </div>
-      <div class="est-ringlbl" data-i18n="est.taxaConclusao">taxa de conclusão dos dias com tarefa, este mês</div>
     </div>
 
     <div class="est-card">
       <div class="est-titulo"><span class="est-ic"><svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="2" y="12" width="2" height="2" fill="#8779A8"/><rect x="2" y="9" width="2" height="3" fill="#8779A8"/><rect x="6" y="6" width="2" height="6" fill="#F2A65A"/><rect x="10" y="3" width="2" height="9" fill="#F2A65A"/><rect x="1" y="13" width="13" height="1" fill="#3B3057"/></svg></span><span data-i18n="est.ultimos7">Últimos 7 dias</span></div>
-      <div class="est-barras" id="est7Dias"></div>
+      <div class="est-chartwrap">
+        <svg id="est7DiasSvg" viewBox="0 0 300 80" width="100%" height="80" preserveAspectRatio="none">
+          <defs><linearGradient id="est7DiasFill" x1="0" y1="0" x2="0" y2="1">
+            <stop id="est7DiasStopTopo" offset="0%" stop-color="#F2A65A" stop-opacity="0.35"/>
+            <stop id="est7DiasStopBase" offset="100%" stop-color="#F2A65A" stop-opacity="0"/>
+          </linearGradient></defs>
+          <path id="est7DiasArea" fill="url(#est7DiasFill)"/>
+          <path id="est7DiasLinha" fill="none" stroke="#F2A65A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="est-chartlabels" id="est7DiasLabels"></div>
     </div>
 
     <div class="est-card est-donutcard">
@@ -770,9 +788,9 @@
           <div class="est-donuttxt" id="estDonutTotal">0</div>
         </div>
         <div class="est-donutlegenda">
-          <div class="est-legitem"><span class="est-dot" style="background:var(--verde)"></span><span data-i18n="est.vitoria">venceu</span>: <b id="estQtdVitoria">0</b></div>
-          <div class="est-legitem"><span class="est-dot" style="background:var(--perigo)"></span><span data-i18n="est.fuga">fugiu</span>: <b id="estQtdFuga">0</b></div>
-          <div class="est-legitem"><span class="est-dot" style="background:var(--panel-3)"></span><span data-i18n="est.semTarefa">sem tarefa</span>: <b id="estQtdSemTarefa">0</b></div>
+          <div class="est-legitem"><span class="est-dot" style="background:var(--accent)"></span><span data-i18n="est.vitoria">venceu</span><div class="est-legbar"><i id="estBarraVitoria" style="width:0%;background:var(--accent)"></i></div><b id="estQtdVitoria">0</b></div>
+          <div class="est-legitem"><span class="est-dot" style="background:color-mix(in srgb, var(--accent) 40%, transparent)"></span><span data-i18n="est.fuga">fugiu</span><div class="est-legbar"><i id="estBarraFuga" style="width:0%;background:color-mix(in srgb, var(--accent) 40%, transparent)"></i></div><b id="estQtdFuga">0</b></div>
+          <div class="est-legitem"><span class="est-dot" style="background:var(--panel-3)"></span><span data-i18n="est.semTarefa">sem tarefa</span><div class="est-legbar"><i id="estBarraSemTarefa" style="width:0%"></i></div><b id="estQtdSemTarefa">0</b></div>
         </div>
       </div>
     </div>
@@ -3397,32 +3415,70 @@ function estRecorde(hist){
 
 // barras dos ultimos 7 dias -- SEMPRE desenha as 7, mesmo sem historico:
 // dia sem registro vira barra minima (est-barra-vazia), nunca some do grafico.
+// SVG puro (atributo fill/stop-color, nao style=) nao resolve var()/color-mix()
+// de forma confiavel em todo engine -- por isso resolvemos a cor de verdade
+// em runtime via getComputedStyle. Isso automaticamente respeita qualquer
+// tema visual escolhido pelo jogador (Grafite/Verde/Branco/etc), porque
+// --accent muda de valor conforme o tema ativo.
+function corAccentComOpacidade(alpha){
+  const hex = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+  const m = hex.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i);
+  if (!m) return hex; // tema com formato de cor nao-hex (raro) -- usa cru mesmo
+  const r = parseInt(m[1], 16), g = parseInt(m[2], 16), b = parseInt(m[3], 16);
+  return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
+}
+
 function renderUltimos7Dias(hist){
-  const el = document.getElementById('est7Dias');
-  if (!el) return;
+  const linhaEl = document.getElementById('est7DiasLinha');
+  const areaEl = document.getElementById('est7DiasArea');
+  const svgEl = document.getElementById('est7DiasSvg');
+  const labelsEl = document.getElementById('est7DiasLabels');
+  if (!linhaEl || !areaEl || !svgEl || !labelsEl) return;
+
+  // atualiza o traco/area/gradiente pra cor do tema ativo agora
+  linhaEl.setAttribute('stroke', corAccentComOpacidade(1));
+  document.getElementById('est7DiasStopTopo').setAttribute('stop-color', corAccentComOpacidade(1));
+  document.getElementById('est7DiasStopBase').setAttribute('stop-color', corAccentComOpacidade(1));
+
   const porData = new Map(hist.map(h => [h.data, h.resultado]));
   const diasSemana = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S']; // Date.getDay(): 0=domingo
   const hoje = isoAtual();
-  el.innerHTML = '';
+  const LARGURA = 300, ALTURA = 80;
+  const Y_VITORIA = 8, Y_FUGA = 45, Y_VAZIO = 72; // topo=venceu, meio=fugiu, base=sem registro
+
+  const pontos = [];
+  labelsEl.innerHTML = '';
   for (let i = 6; i >= 0; i--){
     const iso = isoDe(new Date(new Date(hoje + 'T12:00:00').getTime() - i * 86400000));
     const resultado = porData.get(iso);
-    let alturaPct = 8, classe = 'est-barra-vazia';
-    if (resultado === 'vitoria'){ alturaPct = 100; classe = 'est-barra-vitoria'; }
-    else if (resultado === 'fuga'){ alturaPct = 38; classe = 'est-barra-fuga'; }
+    let y = Y_VAZIO, cor = corAccentComOpacidade(0.18);
+    if (resultado === 'vitoria'){ y = Y_VITORIA; cor = corAccentComOpacidade(1); }
+    else if (resultado === 'fuga'){ y = Y_FUGA; cor = corAccentComOpacidade(0.45); }
+    const x = (6 - i) * (LARGURA / 6);
+    pontos.push({ x, y, cor });
+
     const dow = new Date(iso + 'T12:00:00').getDay();
-    const wrap = document.createElement('div');
-    wrap.className = 'est-barrawrap';
-    const barra = document.createElement('div');
-    barra.className = 'est-barra ' + classe;
-    barra.style.height = alturaPct + '%';
     const label = document.createElement('span');
-    label.className = 'est-diasemana';
     label.textContent = diasSemana[dow];
-    wrap.appendChild(barra);
-    wrap.appendChild(label);
-    el.appendChild(wrap);
+    labelsEl.appendChild(label);
   }
+
+  const dLinha = 'M' + pontos.map(p => p.x + ',' + p.y).join(' L');
+  const dArea = dLinha + ' L' + LARGURA + ',' + ALTURA + ' L0,' + ALTURA + ' Z';
+  linhaEl.setAttribute('d', dLinha);
+  areaEl.setAttribute('d', dArea);
+
+  // remove os circulos-marcador da rodada anterior antes de redesenhar
+  svgEl.querySelectorAll('.est-chartponto').forEach(c => c.remove());
+  pontos.forEach(p => {
+    const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    c.setAttribute('cx', p.x);
+    c.setAttribute('cy', p.y);
+    c.setAttribute('r', 4);
+    c.setAttribute('fill', p.cor);
+    c.setAttribute('class', 'est-chartponto');
+    svgEl.appendChild(c);
+  });
 }
 
 // donut de composicao do mes (vitoria/fuga/sem_tarefa) -- SEMPRE desenha o
@@ -3436,12 +3492,15 @@ function renderDonutMes(vitorias, fugas, semTarefa){
   } else {
     const pVit = (vitorias / total) * 100;
     const pFuga = pVit + (fugas / total) * 100;
-    el.style.background = 'conic-gradient(var(--verde) 0% ' + pVit + '%, var(--perigo) ' + pVit + '% ' + pFuga + '%, var(--panel-3) ' + pFuga + '% 100%)';
+    el.style.background = 'conic-gradient(var(--accent) 0% ' + pVit + '%, color-mix(in srgb, var(--accent) 40%, transparent) ' + pVit + '% ' + pFuga + '%, var(--panel-3) ' + pFuga + '% 100%)';
   }
   document.getElementById('estDonutTotal').textContent = total;
   document.getElementById('estQtdVitoria').textContent = vitorias;
   document.getElementById('estQtdFuga').textContent = fugas;
   document.getElementById('estQtdSemTarefa').textContent = semTarefa;
+  document.getElementById('estBarraVitoria').style.width = (total > 0 ? (vitorias / total) * 100 : 0) + '%';
+  document.getElementById('estBarraFuga').style.width = (total > 0 ? (fugas / total) * 100 : 0) + '%';
+  document.getElementById('estBarraSemTarefa').style.width = (total > 0 ? (semTarefa / total) * 100 : 0) + '%';
 }
 
 function renderMapaDoMes(hist, ano, mes){
@@ -3475,25 +3534,22 @@ function renderEstatisticas(){
   const streak = estStreakAtual(hist);
   const recorde = estRecorde(hist);
   document.getElementById('estStreakNum').textContent = streak;
-  document.getElementById('estRecordeNum').textContent = recorde;
   const lblEl = document.getElementById('estStreakLbl');
-  const barEl = document.getElementById('estStreakBar');
   if (recorde === 0){
     lblEl.textContent = 'Vença hoje pra começar uma sequência';
-    barEl.style.width = '0%';
   } else if (streak >= recorde){
-    lblEl.textContent = 'Essa é a sua maior sequência!';
-    barEl.style.width = '100%';
+    lblEl.textContent = 'dias seguidos · essa é a sua maior sequência!';
   } else {
     const faltam = recorde - streak;
-    lblEl.textContent = 'Falta' + (faltam === 1 ? ' 1 dia' : 'm ' + faltam + ' dias') + ' pra bater seu recorde';
-    barEl.style.width = Math.round((streak / recorde) * 100) + '%';
+    lblEl.textContent = 'dias seguidos · recorde de ' + recorde + ' (falta' + (faltam === 1 ? ' 1 dia' : 'm ' + faltam + ' dias') + ')';
   }
 
   const doMes = hist.filter(h => h.data.startsWith(anoMesPrefixo));
   const vitoriasMes = doMes.filter(h => h.resultado === 'vitoria').length;
   const fugasMes = doMes.filter(h => h.resultado === 'fuga').length;
   const semTarefaMes = doMes.filter(h => h.resultado === 'sem_tarefa').length;
+  document.getElementById('estQtdVitoriaTrend').textContent = vitoriasMes;
+  document.getElementById('estQtdFugaTrend').textContent = fugasMes;
   const comTarefaMes = vitoriasMes + fugasMes;
   const taxa = comTarefaMes > 0 ? Math.round((vitoriasMes / comTarefaMes) * 100) : 0;
   const ringEl = document.getElementById('estTaxaRing');
@@ -11630,6 +11686,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'est.taxaConclusao':{ pt:'taxa de conclusão dos dias com tarefa, este mês', en:'completion rate of days with tasks, this month' },
     'est.mapaDoMes':    { pt:'Mapa do mês', en:'Month map' },
     'est.ultimos7':     { pt:'Últimos 7 dias', en:'Last 7 days' },
+    'est.sequenciaAtual':    { pt:'Sequência atual', en:'Current streak' },
+    'est.taxaConclusaoTitulo': { pt:'Taxa de conclusão', en:'Completion rate' },
     'est.comoFoiMes':   { pt:'Como foi o mês', en:'How the month went' },
     'est.semTarefa':    { pt:'sem tarefa', en:'no task' },
     'est.fuga':         { pt:'fugiu', en:'fled' },

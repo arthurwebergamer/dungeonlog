@@ -12041,5 +12041,52 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 })();
 </script>
 
+<!-- =====================================================================
+     ESTATISTICAS — atualizacao em tempo real (sem esperar trocar de aba)
+
+     Antes disso, renderEstatisticas() so rodava quando mostrarAba() abria
+     a aba -- se o jogador ja estivesse nela e concluisse uma tarefa ou
+     fechasse o dia, os numeros ficavam parados ate sair e voltar.
+
+     GANCHO: window.alternar e window.registrarHistorico ja sao reembrulhados
+     varias vezes ao longo do arquivo (contador de conclusoes, XP, som,
+     nivel...). Esse bloco fica DE PROPOSITO no fim do arquivo -- o ULTIMO a
+     reatribuir window.alternar vira o wrap mais externo, entao quando ele
+     roda, todo o resto (inclusive o total++ do contador de tarefas
+     concluidas) ja aconteceu. Se esse bloco fosse colado mais cedo no
+     arquivo, correria o risco de renderizar com um numero desatualizado
+     (teria que esperar o wrap seguinte pra refletir a conclusao).
+
+     Mesma logica pro registrarHistorico(): a aba so re-renderiza se
+     estiver visivel agora (estAbaAtiva()), pra nao gastar trabalho a toa
+     com a tela em segundo plano.
+     ===================================================================== -->
+<script>
+(function(){
+  function estAbaAtiva(){
+    const v = document.getElementById('viewEstatisticas');
+    return !!v && v.classList.contains('on');
+  }
+
+  const _alternarParaEst = window.alternar;
+  if (typeof _alternarParaEst === 'function'){
+    window.alternar = function(i){
+      const r = _alternarParaEst.apply(this, arguments);
+      if (r !== false && estAbaAtiva() && typeof renderEstatisticas === 'function') renderEstatisticas();
+      return r;
+    };
+  }
+
+  const _registrarHistoricoParaEst = window.registrarHistorico;
+  if (typeof _registrarHistoricoParaEst === 'function'){
+    window.registrarHistorico = function(){
+      const r = _registrarHistoricoParaEst.apply(this, arguments);
+      if (estAbaAtiva() && typeof renderEstatisticas === 'function') renderEstatisticas();
+      return r;
+    };
+  }
+})();
+</script>
+
 </body>
 </html>

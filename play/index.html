@@ -742,6 +742,7 @@
 
   
 <div class="nav" id="nav">
+<div class="navpill" id="navPill"></div>
 
     <button class="on" data-aba="tarefas">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4a1 1 0 00-1 1v14a1 1 0 001 1h16a1 1 0 001-1V5a1 1 0 00-1-1zm-9.3 12.2l-3.4-3.4 1.4-1.4 2 2 4.6-4.6 1.4 1.4-6 6z"/></svg>
@@ -3286,9 +3287,26 @@ function mostrarAba(nome){
   document.querySelectorAll('#nav button').forEach(b => {
     b.classList.toggle('on', b.dataset.aba === nome);
   });
+  moverNavPill(nome);
 
   if (nome === 'loja') document.getElementById('saldoLoja').textContent = moedas;
 }
+
+// pilula que fica atras do icone selecionado na nav e desliza ate ele --
+// usa offsetLeft/offsetWidth do proprio botao (em vez de dividir 100%/N),
+// entao continua correta mesmo se o numero de botoes mudar no futuro.
+function moverNavPill(nome){
+  const pill = document.getElementById('navPill');
+  const btn = document.querySelector('#nav button[data-aba="' + nome + '"]');
+  if (!pill || !btn) return;
+  const tam = 44;
+  const centro = btn.offsetLeft + btn.offsetWidth / 2;
+  pill.style.width = tam + 'px';
+  pill.style.height = tam + 'px';
+  pill.style.transform = 'translateX(' + (centro - tam / 2) + 'px)';
+}
+moverNavPill(abaAtual);
+window.addEventListener('resize', () => moverNavPill(abaAtual));
 
 document.querySelectorAll('#nav button').forEach(b => {
   b.onclick = () => mostrarAba(b.dataset.aba);

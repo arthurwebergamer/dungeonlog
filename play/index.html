@@ -449,16 +449,13 @@
            pra Config: reaproveita .cfgOverlay em vez de escrever CSS novo
            pra cada um). Cada .cfgrow abaixo abre um overlay diferente, ver
            bloco JS "PERFIL — UNIFICACAO". -->
-      <div class="cfgrow cfgcol" id="prevHistorico">
-        <div class="cfgrowtopo">
-          <div class="cfgtxt">
-            <b data-i18n="perfil.historico">Histórico</b>
-            <span id="prevHistoricoTxt">—</span>
-          </div>
-          <button class="cfgbtn" id="verHistoricoBtn" data-i18n="acao.verTudo">Ver tudo</button>
-        </div>
-        <div class="prevfaixa" id="prevHistFaixa"></div>
-      </div>
+      <!-- Card "Histórico" removido do Perfil (pedido do usuário) -- o
+           Mapa do mês em Estatísticas cobre a mesma informação agora
+           (calendário do mês com resultado por dia). #prevHistorico,
+           #verHistoricoBtn e o overlay #histOverlay saíram junto (ver
+           renderPreviewsPerfil() mais abaixo -- a variavel `hist` que a
+           previa de Historico usava continua la, ainda e reaproveitada
+           pela previa de Bestiario). -->
 
       <div class="cfgrow cfgcol" id="prevConquistas">
         <div class="cfgrowtopo">
@@ -777,7 +774,7 @@
       </div>
 
       <div class="est-card est-statscol">
-        <div class="est-titulo"><span class="est-ic"><svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="5" y="1" width="6" height="1" fill="#F2A65A"/><rect x="3" y="2" width="10" height="2" fill="#F2A65A"/><rect x="2" y="4" width="12" height="8" fill="#F2A65A"/><rect x="3" y="12" width="10" height="2" fill="#F2A65A"/><rect x="5" y="14" width="6" height="1" fill="#F2A65A"/><rect x="6" y="6" width="4" height="4" fill="#251E38"/></svg></span><span data-i18n="est.comoFoiMes">Como foi o mês</span></div>
+        <div class="est-titulo"><span data-i18n="est.comoFoiMes">Como foi o mês</span></div>
         <div class="est-donutbox">
           <div class="est-donutring" id="estDonutMes"></div>
           <div class="est-donuttxt" id="estDonutTotal">0</div>
@@ -791,7 +788,7 @@
     </div>
 
     <div class="est-card">
-      <div class="est-titulo"><span class="est-ic"><svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="2" y="12" width="2" height="2" fill="#8779A8"/><rect x="2" y="9" width="2" height="3" fill="#8779A8"/><rect x="6" y="6" width="2" height="6" fill="#F2A65A"/><rect x="10" y="3" width="2" height="9" fill="#F2A65A"/><rect x="1" y="13" width="13" height="1" fill="#3B3057"/></svg></span><span data-i18n="est.ultimos7">Últimos 7 dias</span></div>
+      <div class="est-titulo"><span data-i18n="est.ultimos7">Últimos 7 dias</span></div>
       <div class="est-chartwrap">
         <svg id="est7DiasSvg" viewBox="0 0 300 80" width="100%" height="80" preserveAspectRatio="none">
           <defs><linearGradient id="est7DiasFill" x1="0" y1="0" x2="0" y2="1">
@@ -806,7 +803,7 @@
     </div>
 
     <div class="est-card">
-      <div class="est-titulo"><span class="est-ic"><svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="2" y="3" width="12" height="10" fill="#5A3D20"/><rect x="2" y="3" width="12" height="1" fill="#8B5A2B"/><rect x="6" y="4" width="1" height="9" fill="#4A3018"/><rect x="10" y="4" width="1" height="9" fill="#4A3018"/><rect x="7" y="7" width="2" height="2" fill="#F2A65A"/></svg></span><span data-i18n="est.mapaDoMes">Mapa do mês</span></div>
+      <div class="est-titulo"><span data-i18n="est.mapaDoMes">Mapa do mês</span></div>
       <div class="est-mapames" id="estMapaMes"></div>
       <div class="est-mapalegenda">
         <div class="est-tile"></div><span data-i18n="est.semTarefa">sem tarefa</span>
@@ -815,7 +812,6 @@
       </div>
     </div>
 
-    <div class="est-rodape" data-i18n="est.emBreve">Distribuição por horário e "tarefas mais puladas" pedem rastrear novos dados — entram numa próxima etapa.</div>
   </div>
 
   <div class="nav" id="nav">
@@ -6111,17 +6107,8 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   window.abrirBestiario = abrirBestiario;
   window.fecharBestiario = fecharBestiario;
 
-  /* ---------- Historico -- so abre o overlay que ja existia (v4.37);
-     abrirHistorico()/renderHistorico() ja fazem tudo, ver bloco
-     HISTORICO mais abaixo. Reaproveita o mesmo botao que Config usava
-     ("Abrir" dentro de cfgHistorico) NAO -- a previa agora tem seu
-     proprio botao (#verHistoricoBtn), sem depender de Config aberto. ---------- */
-  const btnHistoricoAbrir = document.getElementById('verHistoricoBtn');
-  if (btnHistoricoAbrir){
-    btnHistoricoAbrir.onclick = () => {
-      if (typeof window.abrirHistorico === 'function') window.abrirHistorico();
-    };
-  }
+  /* ---------- Historico -- botao/overlay removidos do Perfil (pedido do
+     usuario, Estatisticas ja cobre isso com o Mapa do mes). ---------- */
 
   /* ---------- previas: texto resumido de Historico/Conquistas/Bestiario,
      recalculado toda vez que a aba Perfil abre (chamado de renderPerfil(),
@@ -6129,58 +6116,12 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   function renderPreviewsPerfil(){
     const en = idiomaApp() === 'en';
     // Historico -- conta vitorias/fugas do mes corrente a partir do
-    // historico permanente (window.obterHistorico(), ja exposto)
-    const elHist = document.getElementById('prevHistoricoTxt');
+    // historico permanente (window.obterHistorico(), ja exposto). A
+    // previa/texto/faixa de Historico saiu do Perfil (pedido do usuario,
+    // Estatisticas ja cobre isso) -- mas `hist` continua sendo lido aqui
+    // porque a previa de Bestiario mais abaixo (faixaBest) reaproveita
+    // essa mesma variavel.
     const hist = (typeof window.obterHistorico === 'function') ? window.obterHistorico() : [];
-    if (elHist){
-      const hoje = new Date();
-      const prefixoMes = hoje.getFullYear() + '-' + String(hoje.getMonth() + 1).padStart(2, '0');
-      const doMes = hist.filter(h => typeof h.data === 'string' && h.data.startsWith(prefixoMes));
-      let vitorias = doMes.filter(h => h.resultado === 'vitoria').length;
-      const fugas = doMes.filter(h => h.resultado === 'fuga').length;
-      // mesmo bonus "hoje ao vivo" que o calendario logo abaixo (faixaHist,
-      // ver monstroJaCaiu()) e o bestiario (renderBestiario) ja aplicam --
-      // sem isso, esse texto dizia "0 vitorias" enquanto o calendario e o
-      // bestiario ja mostravam a vitoria de hoje: contradicao visivel no
-      // mesmo cartao (bug relatado pelo usuario). So conta se hoje ainda
-      // nao tem entrada permanente (evita contar 2x se a virada ja rodou).
-      if (typeof monstroJaCaiu === 'function' && monstroJaCaiu() &&
-          typeof isoAtual === 'function' && !hist.some(h => h.data === isoAtual())){
-        vitorias++;
-      }
-      elHist.textContent = en
-        ? (vitorias + ' wins, ' + fugas + ' escapes this month')
-        : (vitorias + ' vitórias, ' + fugas + ' fugas este mês');
-    }
-
-    // faixa dos ultimos 5 dias -- mesma logica de "hoje ao vivo" ja usada
-    // no calendario (renderHistorico()): se o historico permanente ainda
-    // nao registrou hoje (so grava na virada), mas o monstro de hoje ja
-    // caiu, mostra vitoria otimista mesmo assim.
-    const faixaHist = document.getElementById('prevHistFaixa');
-    if (faixaHist){
-      const porData = new Map(hist.map(h => [h.data, h.resultado]));
-      if (typeof monstroJaCaiu === 'function' && monstroJaCaiu() && typeof isoAtual === 'function'){
-        porData.set(isoAtual(), 'vitoria');
-      }
-      const hojeIso = (typeof isoAtual === 'function') ? isoAtual() : null;
-      faixaHist.innerHTML = '';
-      if (hojeIso){
-        for (let i = 4; i >= 0; i--){
-          const d = new Date(hojeIso + 'T12:00:00');
-          d.setDate(d.getDate() - i);
-          const iso = d.toISOString().slice(0, 10);
-          const resultado = porData.get(iso);
-          const cel = document.createElement('div');
-          cel.className = 'caldia' + (resultado === 'vitoria' ? ' calvitoria'
-            : resultado === 'fuga' ? ' calfuga'
-            : resultado === 'sem_tarefa' ? ' calsemtarefa' : '');
-          cel.title = iso;
-          cel.textContent = String(d.getDate());
-          faixaHist.appendChild(cel);
-        }
-      }
-    }
 
     // Conquistas -- resumo exposto pelo proprio modulo (window.resumoConquistasPerfil)
     const elConq = document.getElementById('prevConquistasTxt');
@@ -9084,7 +9025,6 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // engrenagem, os 3 links "Ver..." das previas, e o voltar dos 3 overlays.
   [
     'perfilCfgBtn', 'cfgVoltarBtn',
-    'verHistoricoBtn',
     'verConquistasBtn', 'conquistasVoltarBtn',
     'verBestiarioBtn', 'bestiarioVoltarBtn'
   ].forEach(id => {
@@ -9251,179 +9191,12 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 })();
 </script>
 
-<!-- =====================================================================
-     HISTÓRICO — calendário do mês, em overlay de tela cheia (v4.37)
+<!-- Overlay "Historico" (calendario do mes em tela cheia, #histOverlay)
+     removido daqui (pedido do usuario) -- Estatisticas > Mapa do mes
+     agora mostra a mesma informacao (grade do mes com resultado por
+     dia). window.obterHistorico() (modulo HISTORICO, fonte dos dados)
+     nao mudou nada, so este overlay/calendario que lia dele saiu. -->
 
-     Item 4 da lista "Conteudo da aba" do Perfil no roadmap ("Calendario
-     do mes"). Versao "Completo": dias alinhados domingo-sabado de
-     verdade, com navegacao entre meses -- nao so uma grade sequencial.
-
-     MUDANCA DE ARQUITETURA (v4.37): nasceu como 5a sub-aba do Perfil
-     (v4.36), mas a nav de sub-abas so cabia bem com 4 -- 5 pills de
-     texto passavam de ~490px de largura somada contra ~324-364px
-     disponiveis dentro do .app, estourando o layout (ver nota extensa
-     na secao do roadmap sobre isso). Em vez de redesenhar a nav de
-     novo, o usuario pediu pra tirar o Historico dali: agora e um botao
-     dentro de Perfil > Config ("Histórico" / "Abrir"), que abre isto
-     aqui como um overlay de tela cheia -- MESMO PADRAO do Grimorio
-     (.grimOverlay/.grimFechar), so que com as variaveis de tema
-     (var(--bg) etc.) em vez da paleta fixa em hex que o Grimorio usa
-     (o Grimorio nao responde a troca de tema por causa disso; o
-     Historico responde, de proposito, pra nao repetir a mesma
-     inconsistencia num modulo novo).
-
-     Le de window.obterHistorico() (modulo HISTORICO, ja existente) --
-     nao guarda nenhum estado proprio, nao tem chave de localStorage
-     alem do mes/ano correntes (esses sim, so em memoria, resetam a
-     cada vez que o overlay abre -- sempre mostra o mes atual primeiro,
-     nunca "lembra" de navegacao de uma visita anterior).
-
-     3 categorias de resultado, cor por categoria (mesma paleta ja usada
-     em outros indicadores do jogo, nao cores novas inventadas):
-       - 'vitoria'    -> var(--verde)
-       - 'fuga'       -> var(--perigo)
-       - 'sem_tarefa' -> cinza neutro (var(--dim))
-       - sem entrada nenhuma (dia futuro, ou anterior ao inicio do
-         historico, ver nota "Sem backfill" no roadmap) -> celula sem cor,
-         so o numero do dia
-
-     Revelacao de HOJE em tempo real, mesmo principio ja aplicado em
-     Bestiario/Conquistas: se monstroJaCaiu(), o dia de hoje aparece como
-     'vitoria' mesmo sem entrada ainda no historico (a virada so grava
-     amanha). NAO mostra 'fuga' preventivamente pro dia corrente --
-     fuga so e um resultado definitivo depois que o dia fecha, mostrar
-     antes disso seria uma previsao, nao um fato.
-     ===================================================================== -->
-
-<div class="histOverlay" id="histOverlay">
-  <div class="histHead">
-    <h2 data-i18n="perfil.historico">Histórico</h2>
-    <button class="histFechar" id="histFechar">×</button>
-  </div>
-  <div class="histScroll">
-    <div class="calnav">
-      <button id="calAnterior" type="button" aria-label="Mês anterior">‹</button>
-      <span id="calTitulo">—</span>
-      <button id="calProximo" type="button" aria-label="Próximo mês">›</button>
-    </div>
-    <div class="caldiassemana" id="calDiasSemana"></div>
-    <div class="calgrade" id="calGrade"></div>
-    <div class="callegenda">
-      <span><i class="calponto calvitoria"></i> <span data-i18n="hist.vitoria">vitória</span></span>
-      <span><i class="calponto calfuga"></i> <span data-i18n="hist.fuga">fuga</span></span>
-      <span><i class="calponto calsemtarefa"></i> <span data-i18n="hist.semTarefa">sem tarefa</span></span>
-    </div>
-  </div>
-</div>
-
-<script>
-(function(){
-  const NOMES_MES = ['janeiro','fevereiro','março','abril','maio','junho',
-                      'julho','agosto','setembro','outubro','novembro','dezembro'];
-  const NOMES_MES_EN = ['January','February','March','April','May','June',
-                         'July','August','September','October','November','December'];
-  const DIAS_SEMANA_CURTO = ['D','S','T','Q','Q','S','S'];
-  const DIAS_SEMANA_CURTO_EN = ['S','M','T','W','T','F','S'];
-
-  // mes/ano correntes da NAVEGACAO do calendario -- so em memoria, de
-  // proposito: sempre abre no mes atual toda vez que o overlay abre,
-  // nunca "lembra" de navegacao de uma visita anterior
-  let calAno, calMes;   // calMes: 0-11
-
-  function iniciarNoMesAtual(){
-    const hoje = (typeof dataAtual === 'function') ? dataAtual() : new Date();
-    calAno = hoje.getFullYear();
-    calMes = hoje.getMonth();
-  }
-
-  function diasNoMes(ano, mes){ return new Date(ano, mes + 1, 0).getDate(); }
-  function primeiroDiaSemana(ano, mes){ return new Date(ano, mes, 1).getDay(); }
-  function isoDoDia(ano, mes, dia){
-    return ano + '-' + String(mes + 1).padStart(2, '0') + '-' + String(dia).padStart(2, '0');
-  }
-
-  function renderHistorico(){
-    const grade = document.getElementById('calGrade');
-    const titulo = document.getElementById('calTitulo');
-    const diasSemanaEl = document.getElementById('calDiasSemana');
-    if (!grade || !titulo) return;
-    if (calAno === undefined) iniciarNoMesAtual();
-
-    const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
-    const diasSemana = en ? DIAS_SEMANA_CURTO_EN : DIAS_SEMANA_CURTO;
-    const nomesMes = en ? NOMES_MES_EN : NOMES_MES;
-
-    // sempre repinta os cabecalhos de dia da semana (nao so na 1a vez) --
-    // precisa refletir troca de idioma em tempo real, igual o resto do app
-    if (diasSemanaEl) diasSemanaEl.innerHTML = diasSemana.map(d => '<span>' + d + '</span>').join('');
-
-    titulo.textContent = en ? (nomesMes[calMes] + ' ' + calAno) : (nomesMes[calMes] + ' de ' + calAno);
-
-    const hist = (typeof window.obterHistorico === 'function') ? window.obterHistorico() : [];
-    const porData = new Map(hist.map(h => [h.data, h.resultado]));
-
-    // hoje em tempo real (mesmo principio de Bestiario/Conquistas) -- so
-    // pra 'vitoria', nunca preve 'fuga' antes do dia fechar de verdade
-    if (typeof monstroJaCaiu === 'function' && monstroJaCaiu() && typeof isoAtual === 'function'){
-      porData.set(isoAtual(), 'vitoria');
-    }
-
-    const hojeIso = (typeof isoAtual === 'function') ? isoAtual() : null;
-    const totalDias = diasNoMes(calAno, calMes);
-    const offset = primeiroDiaSemana(calAno, calMes);
-
-    let html = '';
-    for (let i = 0; i < offset; i++) html += '<div class="caldia calvazio"></div>';
-    for (let dia = 1; dia <= totalDias; dia++){
-      const iso = isoDoDia(calAno, calMes, dia);
-      const resultado = porData.get(iso);
-      const classes = ['caldia'];
-      if (resultado === 'vitoria') classes.push('calvitoria');
-      else if (resultado === 'fuga') classes.push('calfuga');
-      else if (resultado === 'sem_tarefa') classes.push('calsemtarefa');
-      if (iso === hojeIso) classes.push('calhoje');
-      html += '<div class="' + classes.join(' ') + '">' + dia + '</div>';
-    }
-    grade.innerHTML = html;
-  }
-
-  const btnAnterior = document.getElementById('calAnterior');
-  if (btnAnterior) btnAnterior.onclick = () => {
-    if (calAno === undefined) iniciarNoMesAtual();
-    calMes--;
-    if (calMes < 0){ calMes = 11; calAno--; }
-    renderHistorico();
-  };
-  const btnProximo = document.getElementById('calProximo');
-  if (btnProximo) btnProximo.onclick = () => {
-    if (calAno === undefined) iniciarNoMesAtual();
-    calMes++;
-    if (calMes > 11){ calMes = 0; calAno++; }
-    renderHistorico();
-  };
-
-  // abre/fecha o overlay -- gatilho e so o botao "Ver tudo" da previa em
-  // Perfil (#verHistoricoBtn, ver bloco de previas mais acima). O card
-  // "Historico" que existia dentro de Config foi removido (pedido do
-  // usuario, duplicava o mesmo caminho) -- #cfgHistorico nao existe mais
-  // no HTML, entao btnAbrir fica null aqui, o que e esperado; o guard
-  // "if (btnAbrir)" abaixo ja cobre isso sem erro.
-  const overlay = document.getElementById('histOverlay');
-  const btnAbrir = document.getElementById('cfgHistorico');
-  const btnFechar = document.getElementById('histFechar');
-
-  function abrirHistorico(){
-    iniciarNoMesAtual();
-    renderHistorico();
-    if (overlay) overlay.classList.add('on');
-  }
-  if (btnAbrir) btnAbrir.onclick = abrirHistorico;
-  if (btnFechar) btnFechar.onclick = () => { if (overlay) overlay.classList.remove('on'); };
-
-  window.renderHistorico = renderHistorico;
-  window.abrirHistorico = abrirHistorico;
-})();
-</script>
 
 <!-- =====================================================================
      TELA DE LOGIN — bloco autonomo, cole antes de </body>

@@ -738,6 +738,24 @@
       <span class="vsub" id="estMesLabel"></span>
     </div>
 
+    <div class="est-card est-resumocard">
+      <div class="est-titulo" data-i18n="est.desdeInicio">Desde o início</div>
+      <div class="est-resumogrid">
+        <div class="est-resumoitem">
+          <div class="est-resumonum" id="estTotalConcluidas">0</div>
+          <div class="est-resumolbl" data-i18n="est.tarefasConcluidas">tarefas concluídas</div>
+        </div>
+        <div class="est-resumoitem">
+          <div class="est-resumonum" id="estTotalVitorias">0</div>
+          <div class="est-resumolbl" data-i18n="est.diasVencidos">dias vencidos</div>
+        </div>
+        <div class="est-resumoitem">
+          <div class="est-resumonum" id="estTaxaGeral">0%</div>
+          <div class="est-resumolbl" data-i18n="est.taxaGeral">taxa geral</div>
+        </div>
+      </div>
+    </div>
+
     <div class="est-card est-streakcard">
       <div class="est-titulo" data-i18n="est.sequenciaAtual">Sequência atual</div>
       <div class="est-streakrow">
@@ -3530,6 +3548,18 @@ function renderEstatisticas(){
   const [anoStr, mesStr] = hoje.split('-');
   const ano = Number(anoStr), mes = Number(mesStr);
   const anoMesPrefixo = anoStr + '-' + mesStr;
+
+  // resumo vitalicio -- totalTarefasConcluidas() ja existe desde o
+  // "CONTADOR - TAREFAS CONCLUIDAS (lifetime)" (incrementa 1x por
+  // conclusao real, ver alternar()); o resto vem do historico completo.
+  const totalConcluidas = (typeof window.totalTarefasConcluidas === 'function') ? window.totalTarefasConcluidas() : 0;
+  const vitoriasTotal = hist.filter(h => h.resultado === 'vitoria').length;
+  const fugasTotal = hist.filter(h => h.resultado === 'fuga').length;
+  const comTarefaTotal = vitoriasTotal + fugasTotal;
+  const taxaGeral = comTarefaTotal > 0 ? Math.round((vitoriasTotal / comTarefaTotal) * 100) : 0;
+  document.getElementById('estTotalConcluidas').textContent = totalConcluidas;
+  document.getElementById('estTotalVitorias').textContent = vitoriasTotal;
+  document.getElementById('estTaxaGeral').textContent = taxaGeral + '%';
 
   const streak = estStreakAtual(hist);
   const recorde = estRecorde(hist);
@@ -11687,6 +11717,10 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'est.mapaDoMes':    { pt:'Mapa do mês', en:'Month map' },
     'est.ultimos7':     { pt:'Últimos 7 dias', en:'Last 7 days' },
     'est.sequenciaAtual':    { pt:'Sequência atual', en:'Current streak' },
+    'est.desdeInicio':      { pt:'Desde o início', en:'Since the start' },
+    'est.tarefasConcluidas':{ pt:'tarefas concluídas', en:'tasks completed' },
+    'est.diasVencidos':     { pt:'dias vencidos', en:'days won' },
+    'est.taxaGeral':        { pt:'taxa geral', en:'overall rate' },
     'est.taxaConclusaoTitulo': { pt:'Taxa de conclusão', en:'Completion rate' },
     'est.comoFoiMes':   { pt:'Como foi o mês', en:'How the month went' },
     'est.semTarefa':    { pt:'sem tarefa', en:'no task' },

@@ -221,7 +221,6 @@
 
   /* ============ Estatisticas ============ */
   .est-card{background:var(--panel-2);border:1px solid var(--line);border-radius:20px;padding:20px;margin-bottom:14px;box-shadow:0 10px 24px rgba(0,0,0,.22)}
-  .est-divider{height:1px;background:var(--line);margin:18px 0 16px}
   .est-titulo{font-size:12.5px;font-weight:600;color:var(--muted);letter-spacing:.02em;margin-bottom:16px;display:flex;align-items:center;gap:7px}
   .est-ic{width:14px;height:14px;flex:none;display:flex;image-rendering:pixelated}
   .est-ic svg{width:100%;height:100%}
@@ -233,11 +232,8 @@
 
   .est-streakcard{position:relative;overflow:hidden;flex-shrink:0}
   .est-streakcard .est-titulo{position:relative;z-index:1}
-  .est-streakhero{display:flex;align-items:center;gap:14px;position:relative;z-index:1}
-  @keyframes estFlamePulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.08);opacity:.88}}
-  .est-streakflame{flex:none;animation:estFlamePulse 1.6s ease-in-out infinite;transform-origin:50% 100%}
-  @media (prefers-reduced-motion: reduce){.est-streakflame{animation:none}}
-  .est-streaknum{font-family:'Outfit',sans-serif;font-weight:600;font-size:40px;color:var(--text);line-height:1}
+
+  .est-streaknum{font-family:'Silkscreen',monospace;font-size:40px;color:var(--text);line-height:1}
   .est-montanha{position:absolute;right:-6px;bottom:-4px;width:118px;height:auto;pointer-events:none;z-index:0;opacity:.9}
   .est-streaklbl{font-size:11px;color:var(--dim);margin-top:6px;max-width:160px}
 
@@ -257,9 +253,9 @@
   .est-chartlabels span{font-size:9.5px;color:var(--dim)}
 
   .est-mapames{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
-  .est-tile{aspect-ratio:1;border-radius:3px;border:1px solid var(--line);background:var(--panel-3);image-rendering:pixelated}
-  .est-tile-vitoria{background-image:url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMCAxMCIgc2hhcGUtcmVuZGVyaW5nPSJjcmlzcEVkZ2VzIj48cmVjdCB3aWR0aD0iMTAiIGhlaWdodD0iMTAiIGZpbGw9IiMzQTJFMUEiLz48cmVjdCB4PSI0IiB5PSIxIiB3aWR0aD0iMiIgaGVpZ2h0PSIzIiBmaWxsPSIjRjJBNjVBIi8+PHJlY3QgeD0iMyIgeT0iNCIgd2lkdGg9IjQiIGhlaWdodD0iMiIgZmlsbD0iI0VGOEMzQyIvPjxyZWN0IHg9IjQiIHk9IjYiIHdpZHRoPSIyIiBoZWlnaHQ9IjMiIGZpbGw9IiM4QTRBMUUiLz48L3N2Zz4=);background-size:cover;border-color:#3A2E1A}
-  .est-tile-fuga{background-image:url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMCAxMCIgc2hhcGUtcmVuZGVyaW5nPSJjcmlzcEVkZ2VzIj48cmVjdCB3aWR0aD0iMTAiIGhlaWdodD0iMTAiIGZpbGw9IiMyNDI0MjgiLz48cmVjdCB4PSIyIiB5PSI0IiB3aWR0aD0iNiIgaGVpZ2h0PSIxIiBmaWxsPSIjM0EzQTQyIi8+PHJlY3QgeD0iMyIgeT0iNiIgd2lkdGg9IjQiIGhlaWdodD0iMSIgZmlsbD0iIzNBM0E0MiIvPjxyZWN0IHg9IjUiIHk9IjIiIHdpZHRoPSIxIiBoZWlnaHQ9IjIiIGZpbGw9IiMzQTNBNDIiLz48L3N2Zz4=);background-size:cover;border-color:#242428}
+  .est-tile{aspect-ratio:1;border-radius:4px;border:1px solid var(--line);background:var(--panel-3)}
+  .est-tile-vitoria{background:var(--accent);border-color:var(--accent)}
+  .est-tile-fuga{background:color-mix(in srgb, var(--accent) 40%, transparent);border-color:color-mix(in srgb, var(--accent) 55%, transparent)}
   .est-mapalegenda{display:flex;align-items:center;gap:6px;margin-top:10px;font-size:9.5px;color:var(--dim);flex-wrap:wrap}
   .est-mapalegenda .est-tile{width:11px;height:11px;flex:none}
   .est-rodape{font-size:10.5px;color:var(--dim);text-align:center;line-height:1.5;padding:0 6px}

@@ -3496,7 +3496,12 @@ function renderEstatisticas(){
   const semTarefaMes = doMes.filter(h => h.resultado === 'sem_tarefa').length;
   const comTarefaMes = vitoriasMes + fugasMes;
   const taxa = comTarefaMes > 0 ? Math.round((vitoriasMes / comTarefaMes) * 100) : 0;
-  document.getElementById('estTaxaRing').style.setProperty('--pct', taxa);
+  const ringEl = document.getElementById('estTaxaRing');
+  const trackEl = ringEl.querySelector('.est-ringtrack');
+  // 0% no conic-gradient deixa um traco fino de antialiasing na borda; sem
+  // valor nenhum, o .est-ringbg neutro por baixo fica visivel sozinho.
+  trackEl.style.background = taxa === 0 ? 'none' : '';
+  ringEl.style.setProperty('--pct', taxa);
   document.getElementById('estTaxaNum').textContent = taxa + '%';
 
   renderUltimos7Dias(hist);

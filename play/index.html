@@ -758,6 +758,26 @@
     </div>
 
     <div class="est-card">
+      <div class="est-titulo"><span class="est-ic"><svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="2" y="12" width="2" height="2" fill="#8779A8"/><rect x="2" y="9" width="2" height="3" fill="#8779A8"/><rect x="6" y="6" width="2" height="6" fill="#F2A65A"/><rect x="10" y="3" width="2" height="9" fill="#F2A65A"/><rect x="1" y="13" width="13" height="1" fill="#3B3057"/></svg></span><span data-i18n="est.ultimos7">Últimos 7 dias</span></div>
+      <div class="est-barras" id="est7Dias"></div>
+    </div>
+
+    <div class="est-card est-donutcard">
+      <div class="est-titulo"><span class="est-ic"><svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="5" y="1" width="6" height="1" fill="#F2A65A"/><rect x="3" y="2" width="10" height="2" fill="#F2A65A"/><rect x="2" y="4" width="12" height="8" fill="#F2A65A"/><rect x="3" y="12" width="10" height="2" fill="#F2A65A"/><rect x="5" y="14" width="6" height="1" fill="#F2A65A"/><rect x="6" y="6" width="4" height="4" fill="#251E38"/></svg></span><span data-i18n="est.comoFoiMes">Como foi o mês</span></div>
+      <div class="est-donutrow">
+        <div class="est-donutbox">
+          <div class="est-donutring" id="estDonutMes"></div>
+          <div class="est-donuttxt" id="estDonutTotal">0</div>
+        </div>
+        <div class="est-donutlegenda">
+          <div class="est-legitem"><span class="est-dot" style="background:var(--verde)"></span><span data-i18n="est.vitoria">venceu</span>: <b id="estQtdVitoria">0</b></div>
+          <div class="est-legitem"><span class="est-dot" style="background:var(--perigo)"></span><span data-i18n="est.fuga">fugiu</span>: <b id="estQtdFuga">0</b></div>
+          <div class="est-legitem"><span class="est-dot" style="background:var(--panel-3)"></span><span data-i18n="est.semTarefa">sem tarefa</span>: <b id="estQtdSemTarefa">0</b></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="est-card">
       <div class="est-titulo"><span class="est-ic"><svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="2" y="3" width="12" height="10" fill="#5A3D20"/><rect x="2" y="3" width="12" height="1" fill="#8B5A2B"/><rect x="6" y="4" width="1" height="9" fill="#4A3018"/><rect x="10" y="4" width="1" height="9" fill="#4A3018"/><rect x="7" y="7" width="2" height="2" fill="#F2A65A"/></svg></span><span data-i18n="est.mapaDoMes">Mapa do mês</span></div>
       <div class="est-mapames" id="estMapaMes"></div>
       <div class="est-mapalegenda">
@@ -3375,6 +3395,55 @@ function estRecorde(hist){
   return melhor;
 }
 
+// barras dos ultimos 7 dias -- SEMPRE desenha as 7, mesmo sem historico:
+// dia sem registro vira barra minima (est-barra-vazia), nunca some do grafico.
+function renderUltimos7Dias(hist){
+  const el = document.getElementById('est7Dias');
+  if (!el) return;
+  const porData = new Map(hist.map(h => [h.data, h.resultado]));
+  const diasSemana = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S']; // Date.getDay(): 0=domingo
+  const hoje = isoAtual();
+  el.innerHTML = '';
+  for (let i = 6; i >= 0; i--){
+    const iso = isoDe(new Date(new Date(hoje + 'T12:00:00').getTime() - i * 86400000));
+    const resultado = porData.get(iso);
+    let alturaPct = 8, classe = 'est-barra-vazia';
+    if (resultado === 'vitoria'){ alturaPct = 100; classe = 'est-barra-vitoria'; }
+    else if (resultado === 'fuga'){ alturaPct = 38; classe = 'est-barra-fuga'; }
+    const dow = new Date(iso + 'T12:00:00').getDay();
+    const wrap = document.createElement('div');
+    wrap.className = 'est-barrawrap';
+    const barra = document.createElement('div');
+    barra.className = 'est-barra ' + classe;
+    barra.style.height = alturaPct + '%';
+    const label = document.createElement('span');
+    label.className = 'est-diasemana';
+    label.textContent = diasSemana[dow];
+    wrap.appendChild(barra);
+    wrap.appendChild(label);
+    el.appendChild(wrap);
+  }
+}
+
+// donut de composicao do mes (vitoria/fuga/sem_tarefa) -- SEMPRE desenha o
+// anel cheio, mesmo com 0 dias decorridos: nesse caso fica 100% neutro (cor
+// de fundo) em vez de sumir o card inteiro.
+function renderDonutMes(vitorias, fugas, semTarefa){
+  const el = document.getElementById('estDonutMes');
+  const total = vitorias + fugas + semTarefa;
+  if (total === 0){
+    el.style.background = 'var(--panel-3)';
+  } else {
+    const pVit = (vitorias / total) * 100;
+    const pFuga = pVit + (fugas / total) * 100;
+    el.style.background = 'conic-gradient(var(--verde) 0% ' + pVit + '%, var(--perigo) ' + pVit + '% ' + pFuga + '%, var(--panel-3) ' + pFuga + '% 100%)';
+  }
+  document.getElementById('estDonutTotal').textContent = total;
+  document.getElementById('estQtdVitoria').textContent = vitorias;
+  document.getElementById('estQtdFuga').textContent = fugas;
+  document.getElementById('estQtdSemTarefa').textContent = semTarefa;
+}
+
 function renderMapaDoMes(hist, ano, mes){
   const el = document.getElementById('estMapaMes');
   if (!el) return;
@@ -3423,10 +3492,15 @@ function renderEstatisticas(){
 
   const doMes = hist.filter(h => h.data.startsWith(anoMesPrefixo));
   const vitoriasMes = doMes.filter(h => h.resultado === 'vitoria').length;
-  const comTarefaMes = doMes.filter(h => h.resultado !== 'sem_tarefa').length;
+  const fugasMes = doMes.filter(h => h.resultado === 'fuga').length;
+  const semTarefaMes = doMes.filter(h => h.resultado === 'sem_tarefa').length;
+  const comTarefaMes = vitoriasMes + fugasMes;
   const taxa = comTarefaMes > 0 ? Math.round((vitoriasMes / comTarefaMes) * 100) : 0;
   document.getElementById('estTaxaRing').style.setProperty('--pct', taxa);
   document.getElementById('estTaxaNum').textContent = taxa + '%';
+
+  renderUltimos7Dias(hist);
+  renderDonutMes(vitoriasMes, fugasMes, semTarefaMes);
 
   const nomeMes = new Date(ano, mes - 1, 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
   document.getElementById('estMesLabel').textContent = nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1);
@@ -11550,6 +11624,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'est.mes':          { pt:'MÊS', en:'MONTH' },
     'est.taxaConclusao':{ pt:'taxa de conclusão dos dias com tarefa, este mês', en:'completion rate of days with tasks, this month' },
     'est.mapaDoMes':    { pt:'Mapa do mês', en:'Month map' },
+    'est.ultimos7':     { pt:'Últimos 7 dias', en:'Last 7 days' },
+    'est.comoFoiMes':   { pt:'Como foi o mês', en:'How the month went' },
     'est.semTarefa':    { pt:'sem tarefa', en:'no task' },
     'est.fuga':         { pt:'fugiu', en:'fled' },
     'est.vitoria':      { pt:'venceu', en:'won' },

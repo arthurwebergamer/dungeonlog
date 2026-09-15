@@ -1170,14 +1170,7 @@
       const arquivo = new File([blob], 'dungeonlog-sequencia.png', { type: 'image/png' });
       const texto = emIngles ? 'Check out my DungeonLog streak!' : 'Olha minha sequência no DungeonLog!';
 
-      if (navigator.canShare && navigator.canShare({ files: [arquivo] })){
-        try {
-          await navigator.share({ files: [arquivo], text: texto });
-        } catch(e){
-          // usuario cancelou o share sheet nativo (AbortError) -- nao e erro real, ignora
-        }
-      } else {
-        // sem suporte a Web Share API com arquivo (ex: desktop) -- baixa a imagem direto
+      function baixarImagem(){
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -1186,6 +1179,26 @@
         a.click();
         document.body.removeChild(a);
         setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
+      }
+
+      if (navigator.canShare && navigator.canShare({ files: [arquivo] })){
+        try {
+          await navigator.share({ files: [arquivo], text: texto });
+        } catch(e){
+          // BUG corrigido: antes qualquer erro aqui era tratado como "usuario
+          // cancelou" e ficava em silencio, sem imagem nenhuma pro usuario.
+          // So AbortError e cancelamento de verdade (usuario fechou o share
+          // sheet de proposito) -- qualquer outro erro (ex: Windows sem
+          // nenhum app registrado pra receber imagem via Web Share, share
+          // sheet nativo quebrando com "nao foi possivel mostrar todas as
+          // maneiras de compartilhar") cai pro download, senao o usuario
+          // fica sem nada nas maos.
+          if (e && e.name === 'AbortError') return;
+          baixarImagem();
+        }
+      } else {
+        // sem suporte a Web Share API com arquivo (ex: navegador antigo) -- baixa direto
+        baixarImagem();
       }
     }, 'image/png');
   }

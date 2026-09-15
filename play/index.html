@@ -449,16 +449,13 @@
            pra Config: reaproveita .cfgOverlay em vez de escrever CSS novo
            pra cada um). Cada .cfgrow abaixo abre um overlay diferente, ver
            bloco JS "PERFIL — UNIFICACAO". -->
-      <div class="cfgrow cfgcol" id="prevHistorico">
-        <div class="cfgrowtopo">
-          <div class="cfgtxt">
-            <b data-i18n="perfil.historico">Histórico</b>
-            <span id="prevHistoricoTxt">—</span>
-          </div>
-          <button class="cfgbtn" id="verHistoricoBtn" data-i18n="acao.verTudo">Ver tudo</button>
-        </div>
-        <div class="prevfaixa" id="prevHistFaixa"></div>
-      </div>
+      <!-- Card "Histórico" removido do Perfil (pedido do usuário) -- o
+           Mapa do mês em Estatísticas cobre a mesma informação agora
+           (calendário do mês com resultado por dia). #prevHistorico,
+           #verHistoricoBtn e o overlay #histOverlay saíram junto (ver
+           renderPreviewsPerfil() mais abaixo -- a variavel `hist` que a
+           previa de Historico usava continua la, ainda e reaproveitada
+           pela previa de Bestiario). -->
 
       <div class="cfgrow cfgcol" id="prevConquistas">
         <div class="cfgrowtopo">
@@ -732,8 +729,96 @@
     <div class="lojalista" id="lojaGrid"></div>
   </div>
 
-  
-<div class="nav" id="nav">
+  <div class="view" id="viewEstatisticas">
+    <div class="vhead">
+      <span class="vtitle" data-i18n="nav.estatisticas">Estatísticas</span>
+      <span class="vsub" id="estMesLabel"></span>
+    </div>
+
+    <div class="est-card">
+      <div class="est-streakcard est-clicavel" id="estStreakCard">
+        <div class="est-titulo" data-i18n="est.sequenciaAtual">Sequência atual</div>
+        <div class="est-streaknum"><span id="estStreakNum">0</span></div>
+        <div class="est-streaklbl" id="estStreakLbl"></div>
+        <div class="est-tocha est-tocha-principal" id="estTochaPrincipal" aria-hidden="true"></div>
+      </div>
+
+      <div class="est-divider"></div>
+
+      <div class="est-titulo" data-i18n="est.desdeInicio">Desde o início</div>
+      <div class="est-resumogrid">
+        <div class="est-resumoitem">
+          <div class="est-resumonum" id="estTotalConcluidas">0</div>
+          <div class="est-resumolbl" data-i18n="est.tarefasConcluidas">tarefas concluídas</div>
+        </div>
+        <div class="est-resumoitem">
+          <div class="est-resumonum" id="estTotalVitorias">0</div>
+          <div class="est-resumolbl" data-i18n="est.diasVencidos">dias vencidos</div>
+        </div>
+        <div class="est-resumoitem">
+          <div class="est-resumonum" id="estTaxaGeral">0%</div>
+          <div class="est-resumolbl" data-i18n="est.taxaGeral">taxa geral</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="est-statsrow">
+      <div class="est-card est-statscol">
+        <div class="est-titulo" data-i18n="est.taxaConclusaoTitulo">Taxa de conclusão</div>
+        <div class="est-ringbox" id="estTaxaRing" style="--pct:0">
+          <div class="est-ringbg"></div>
+          <div class="est-ringtrack"></div>
+          <div class="est-ringtxt"><span class="n" id="estTaxaNum">0%</span><span class="u" data-i18n="est.mes">MÊS</span></div>
+        </div>
+      </div>
+
+      <div class="est-card est-statscol">
+        <div class="est-titulo"><span data-i18n="est.comoFoiMes">Como foi o mês</span></div>
+        <div class="est-donutbox">
+          <div class="est-donutring" id="estDonutMes"></div>
+          <div class="est-donuttxt" id="estDonutTotal">0</div>
+        </div>
+        <div class="est-donutlegenda est-donutlegenda-compacta">
+          <div class="est-legitem"><span class="est-dot" style="background:var(--accent)"></span><span data-i18n="est.vitoria">venceu</span><div class="est-legbar"><i id="estBarraVitoria" style="width:0%;background:var(--accent)"></i></div><b id="estQtdVitoria">0</b></div>
+          <div class="est-legitem"><span class="est-dot" style="background:color-mix(in srgb, var(--accent) 40%, transparent)"></span><span data-i18n="est.fuga">fugiu</span><div class="est-legbar"><i id="estBarraFuga" style="width:0%;background:color-mix(in srgb, var(--accent) 40%, transparent)"></i></div><b id="estQtdFuga">0</b></div>
+          <div class="est-legitem"><span class="est-dot" style="background:var(--panel-3)"></span><span data-i18n="est.semTarefa">sem tarefa</span><div class="est-legbar"><i id="estBarraSemTarefa" style="width:0%"></i></div><b id="estQtdSemTarefa">0</b></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="est-card">
+      <div class="est-titulo"><span data-i18n="est.ultimos7">Últimos 7 dias</span></div>
+      <div class="est-chartwrap">
+        <svg id="est7DiasSvg" viewBox="0 0 300 80" width="100%" height="80" preserveAspectRatio="none">
+          <defs><linearGradient id="est7DiasFill" x1="0" y1="0" x2="0" y2="1">
+            <stop id="est7DiasStopTopo" offset="0%" stop-color="#F2A65A" stop-opacity="0.35"/>
+            <stop id="est7DiasStopBase" offset="100%" stop-color="#F2A65A" stop-opacity="0"/>
+          </linearGradient></defs>
+          <path id="est7DiasArea" fill="url(#est7DiasFill)"/>
+          <path id="est7DiasLinha" fill="none" stroke="#F2A65A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="est-chartlabels" id="est7DiasLabels"></div>
+    </div>
+
+    <div class="est-card est-clicavel" id="estHistCard">
+      <div class="est-titulo est-histtitulo">
+        <span data-i18n="est.mapaDoMes">Histórico</span>
+        <span class="est-histsufixo" id="estHistSufixo" data-i18n="est.periodoMes">· mês</span>
+        <svg class="est-histchevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+      <div class="est-mapames" id="estMapaMes"></div>
+      <div class="est-mapalegenda" id="estMapaLegenda">
+        <div class="est-tile"></div><span data-i18n="est.semTarefa">sem tarefa</span>
+        <div class="est-tile est-tile-fuga"></div><span data-i18n="est.fuga">fugiu</span>
+        <div class="est-tile est-tile-vitoria"></div><span data-i18n="est.vitoria">venceu</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="nav" id="nav">
+<div class="navpill" id="navPill"></div>
 
     <button class="on" data-aba="tarefas">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4a1 1 0 00-1 1v14a1 1 0 001 1h16a1 1 0 001-1V5a1 1 0 00-1-1zm-9.3 12.2l-3.4-3.4 1.4-1.4 2 2 4.6-4.6 1.4 1.4-6 6z"/></svg>
@@ -751,9 +836,135 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v5a5 5 0 01-10 0V4z"/><path d="M17 5.5h2.5a2.5 2.5 0 01-2.5 4"/><path d="M7 5.5H4.5a2.5 2.5 0 002.5 4"/><path d="M12 14v3"/><path d="M8.5 20h7"/><path d="M10 17h4l.8 3H9.2l.8-3z"/></svg>
       <span data-i18n="nav.perfil">Perfil</span>
     </button>
+    <button data-aba="estatisticas">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10"/><path d="M12 20V4"/><path d="M20 20v-7"/></svg>
+      <span data-i18n="nav.estatisticas">Estatísticas</span>
+    </button>
   </div>
 
 </div>
+
+<!-- =====================================================================
+     ESTATISTICAS — popups de periodo e sequencia (pedido do usuario:
+     tocar em "Historico" abre um seletor de periodo, tocar em "Sequencia
+     atual" abre um popup com a montanha descendo do topo). Reaproveita
+     .edov/.edsheet (mesmo bottom sheet ja usado em "Editar tarefa"),
+     nao inventa padrao novo. ===================================================================== -->
+
+<div class="edov" id="estPeriodoOverlay">
+  <div class="edsheet" id="estPeriodoSheet">
+    <button type="button" class="edfechar" id="estPeriodoFechar" aria-label="Fechar">&#215;</button>
+    <div class="edpuxador"></div>
+    <div class="edtitulo" data-i18n="est.verPorPeriodo">Ver por período</div>
+    <button type="button" class="est-periodoopc" data-periodo="semana" data-i18n="est.periodoSemanaOpcao">Semana</button>
+    <button type="button" class="est-periodoopc" data-periodo="mes" data-i18n="est.periodoMesOpcao">Mês inteiro</button>
+    <button type="button" class="est-periodoopc" data-periodo="ano" data-i18n="est.periodoAnoOpcao">Ano inteiro</button>
+  </div>
+</div>
+
+<div class="edov" id="estMontanhaOverlay">
+  <div class="edsheet" id="estMontanhaSheet">
+    <button type="button" class="edfechar" id="estMontanhaFechar" aria-label="Fechar">&#215;</button>
+    <div class="edpuxador"></div>
+    <div class="edtitulo" data-i18n="est.sequenciaAtual">Sequência atual</div>
+    <div class="est-montpopnum"><span id="estMontPopNum">0</span></div>
+    <div class="est-montpoplbl" id="estMontPopLbl"></div>
+    <div class="est-montpopwrap">
+      <div class="est-montpopglow" id="estMontPopGlow"></div>
+      <div class="est-tocha est-montpopimg" id="estMontPopImg" aria-hidden="true"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const periodoOverlay = document.getElementById('estPeriodoOverlay');
+  const periodoFechar = document.getElementById('estPeriodoFechar');
+  const histCard = document.getElementById('estHistCard');
+  const sufixoEl = document.getElementById('estHistSufixo');
+
+  function fecharPeriodo(){ if (periodoOverlay) periodoOverlay.classList.remove('on'); }
+  if (periodoOverlay) periodoOverlay.onclick = function(e){ if (e.target === periodoOverlay) fecharPeriodo(); };
+  if (periodoFechar) periodoFechar.onclick = fecharPeriodo;
+  if (histCard) histCard.onclick = function(){
+    if (periodoOverlay) periodoOverlay.classList.add('on');
+    document.querySelectorAll('.est-periodoopc').forEach(function(b){
+      b.classList.toggle('on', b.dataset.periodo === estPeriodoAtual);
+    });
+  };
+  document.querySelectorAll('.est-periodoopc').forEach(function(btn){
+    btn.onclick = function(){
+      estPeriodoAtual = btn.dataset.periodo;
+      const chave = estPeriodoAtual === 'semana' ? 'est.periodoSemana'
+        : estPeriodoAtual === 'ano' ? 'est.periodoAno' : 'est.periodoMes';
+      if (sufixoEl){
+        sufixoEl.dataset.i18n = chave;
+        sufixoEl.textContent = (typeof window.t === 'function') ? window.t(chave) : sufixoEl.textContent;
+      }
+      fecharPeriodo();
+      if (typeof renderEstatisticas === 'function') renderEstatisticas();
+    };
+  });
+
+  const montOverlay = document.getElementById('estMontanhaOverlay');
+  const montFechar = document.getElementById('estMontanhaFechar');
+  const streakCard = document.getElementById('estStreakCard');
+  const montImg = document.getElementById('estMontPopImg');
+  const montGlow = document.getElementById('estMontPopGlow');
+
+  // escala da tocha conforme a sequencia atual (pedido do usuario:
+  // "quanto mais vitorias, mais a [tocha] cresce" -- era montanha, agora
+  // reaproveita o sprite da Arena). 3 pontos de ancora -- streak<=1: bem
+  // pequena (escala 1x); streak 7: media (1.9x); streak>=30: tamanho
+  // maximo (2.75x). Interpolacao linear entre eles. Escala (nao largura
+  // em px) porque a tocha e um sprite quadriculado (16x32) que precisa
+  // crescer via transform:scale pra continuar nitido (image-rendering:
+  // pixelated fica borrado se so mudar width/height).
+  function escalaTocha(streak){
+    const MIN = 1, MEIO = 1.9, MAX = 2.75;
+    if (streak <= 1) return MIN;
+    if (streak <= 7) return MIN + (streak - 1) / 6 * (MEIO - MIN);
+    if (streak <= 30) return MEIO + (streak - 7) / 23 * (MAX - MEIO);
+    return MAX;
+  }
+  window.escalaTocha = escalaTocha;
+
+  function fecharMontanha(){
+    if (montOverlay) montOverlay.classList.remove('on');
+    if (montImg) montImg.classList.remove('cresceu');
+    if (montGlow) montGlow.classList.remove('brilha');
+  }
+  if (montOverlay) montOverlay.onclick = function(e){ if (e.target === montOverlay) fecharMontanha(); };
+  if (montFechar) montFechar.onclick = fecharMontanha;
+  if (streakCard) streakCard.onclick = function(){
+    const numEl = document.getElementById('estStreakNum');
+    const lblEl = document.getElementById('estStreakLbl');
+    const popNum = document.getElementById('estMontPopNum');
+    const popLbl = document.getElementById('estMontPopLbl');
+    if (popNum && numEl) popNum.textContent = numEl.textContent;
+    if (popLbl && lblEl) popLbl.textContent = lblEl.textContent;
+
+    const streak = numEl ? (Number(numEl.textContent) || 0) : 0;
+    if (montImg){
+      montImg.style.setProperty('--tocha-escala', escalaTocha(streak));
+      montImg.classList.toggle('est-tocha-apagada', streak === 0);
+      montImg.classList.toggle('est-tocha-estatica', streak === 0);
+    }
+
+    if (montOverlay) montOverlay.classList.add('on');
+    if (montImg){
+      montImg.classList.remove('cresceu');
+      if (montGlow) montGlow.classList.remove('brilha');
+      requestAnimationFrame(function(){
+        requestAnimationFrame(function(){
+          montImg.classList.add('cresceu');
+          if (montGlow && streak > 0) montGlow.classList.add('brilha');
+        });
+      });
+    }
+  };
+})();
+</script>
 
 <div class="debugbar"><button class="debugbtn" id="debugbtn">próximo dia →</button><button class="debugbtn" id="pularTutoriaisBtn">pular tutorial</button><button class="debugbtn" id="debugArmasBtn">+ todas armas</button></div>
 <div class="toast" id="toast"></div>
@@ -1750,10 +1961,19 @@ window.renderTemaArena = renderTemaArena;
 // persistido (nao durante o arrasto/previa -- so quando o usuario
 // "pousou" num tema pago ainda nao desbloqueado). Esconde
 // herói/monstro/nome junto (ver .arena.tema-bloqueado no CSS).
-function atualizarBloqueioArena(){
+function atualizarBloqueioArena(temaForcado){
   const arena = document.querySelector('.arena');
   if (!arena) return;
-  const tema = temaArenaAtual();
+  // BUG REAL ENCONTRADO (relatado pelo usuario: cadeado nao aparecia no
+  // Floresta mesmo com debug desligado). temaArenaAtual() le o tema
+  // PERSISTIDO (localStorage) -- mas desde o fix anterior (pousar num
+  // tema trancado durante o swipe/navegacao SEM persistir), a tela podia
+  // estar mostrando visualmente um tema diferente do que temaArenaAtual()
+  // retorna. Resultado: esta funcao sempre checava o tema salvo antigo
+  // (destravado), nunca o que estava REALMENTE na tela. temaForcado
+  // deixa quem chama (swipe/mudarTemaArena) informar qual tema esta
+  // sendo mostrado NESTE instante, mesmo sem persistir.
+  const tema = temaForcado || temaArenaAtual();
   const bloqueado = !temaArenaDesbloqueado(tema);
   arena.classList.toggle('tema-bloqueado', bloqueado);
   if (bloqueado){
@@ -1977,7 +2197,7 @@ function mudarTemaArena(direcao){
 
   _arenaBgFrente = trasId;
   renderTemaArenaDots();
-  if (typeof atualizarBloqueioArena === 'function') atualizarBloqueioArena();
+  if (typeof atualizarBloqueioArena === 'function') atualizarBloqueioArena(novoTema);
 }
 window.mudarTemaArena = mudarTemaArena;
 
@@ -2070,7 +2290,7 @@ window.mudarTemaArena = mudarTemaArena;
       trasEl.style.transform = 'translateX(0)';
       _arenaBgFrente = (_arenaBgFrente === 'A' ? 'B' : 'A');
       renderTemaArenaDots();
-      if (typeof atualizarBloqueioArena === 'function') atualizarBloqueioArena();
+      if (typeof atualizarBloqueioArena === 'function') atualizarBloqueioArena(TEMAS_ARENA[idxAlvo]);
     } else {
       // nao arrastou o suficiente -- "mola" de volta pro tema atual
       frenteEl.style.transform = 'translateX(0)';
@@ -2277,12 +2497,12 @@ function render(){
         setTimeout(() => el.classList.add('vanish'), 180);
         setTimeout(() => alternar(i), 460);
       } else {
-        // pop-out rapido (ver _tarefaPopIdx acima) -- o elemento NOVO,
-        // recriado pelo render() dentro de alternar(), pega o pop-in
-        // (.entrou) automaticamente pro mesmo indice.
-        el.classList.add('saiu');
-        _tarefaPopIdx = i;
-        setTimeout(() => alternar(i), 130);
+        // pedido do usuario: tirar a animacao de saida/entrada (.saiu/
+        // .entrou) -- nao ficou legal. Mantido animarGolpe()+som (pedido
+        // anterior, esse funcionou), so sem efeito visual de saida.
+        // 350ms da tempo do animarGolpe() (320ms) terminar antes do
+        // render() (dentro de alternar()) trocar a tela.
+        setTimeout(() => alternar(i), 350);
       }
     };
     el.onclick = e => {
@@ -3260,12 +3480,370 @@ function mostrarAba(nome){
   document.getElementById('viewInventario').classList.toggle('on', nome === 'inventario');
   document.getElementById('viewLoja').classList.toggle('on', nome === 'loja');
   document.getElementById('viewPerfil').classList.toggle('on', nome === 'perfil');
+  document.getElementById('viewEstatisticas').classList.toggle('on', nome === 'estatisticas');
 
   document.querySelectorAll('#nav button').forEach(b => {
     b.classList.toggle('on', b.dataset.aba === nome);
   });
+  moverNavPill(nome);
 
   if (nome === 'loja') document.getElementById('saldoLoja').textContent = moedas;
+  if (nome === 'estatisticas') renderEstatisticas();
+}
+
+// pilula que fica atras do icone selecionado na nav e desliza ate ele --
+// usa offsetLeft/offsetWidth do proprio botao (em vez de dividir 100%/N),
+// entao continua correta mesmo se o numero de botoes mudar no futuro.
+function moverNavPill(nome){
+  const pill = document.getElementById('navPill');
+  const btn = document.querySelector('#nav button[data-aba="' + nome + '"]');
+  if (!pill || !btn) return;
+  const tam = 62; // largura da pilula -- a altura fica fixa no CSS (.navpill)
+  const centro = btn.offsetLeft + btn.offsetWidth / 2;
+  pill.style.width = tam + 'px';
+  pill.style.transform = 'translateX(' + (centro - tam / 2) + 'px)';
+}
+moverNavPill(abaAtual);
+window.addEventListener('resize', () => moverNavPill(abaAtual));
+
+// ---------- Estatisticas: dados reais a partir de window.obterHistorico() ----------
+// historico[i] = { data:'YYYY-MM-DD', resultado:'vitoria'|'fuga'|'sem_tarefa', monstroId, tarefas }
+// (ver registrarHistorico() -- secao de Vida/virada de dia). 'fuga' = pelo menos
+// 1 tarefa largada naquele dia; 'sem_tarefa' = dia sem nenhuma tarefa criada.
+
+// streak ATUAL: dias consecutivos com 'vitoria' terminando hoje ou ontem (se
+// hoje ainda esta em aberto sem registro). Independente de melhorSequenciaDeVitorias()
+// (que calcula o RECORDE, nao a sequencia corrente) porque aquela funcao vive
+// dentro de outra IIFE e nao esta exposta em window -- reimplementada aqui em
+// cima da MESMA regra (resultado==='vitoria' e diffDias()===1 pro dia anterior).
+function estStreakAtual(hist){
+  const porData = new Map(hist.map(h => [h.data, h.resultado]));
+  let cursor = isoAtual();
+  if (!porData.has(cursor)) cursor = isoDe(new Date(new Date(cursor + 'T12:00:00').getTime() - 86400000));
+  let streak = 0;
+  while (porData.get(cursor) === 'vitoria'){
+    streak++;
+    cursor = isoDe(new Date(new Date(cursor + 'T12:00:00').getTime() - 86400000));
+  }
+  return streak;
+}
+
+function estRecorde(hist){
+  const ord = hist.slice().sort((a, b) => a.data < b.data ? -1 : (a.data > b.data ? 1 : 0));
+  let atual = 0, melhor = 0, anterior = null;
+  ord.forEach(h => {
+    const seguido = anterior !== null && diffDias(h.data, anterior) === 1;
+    if (h.resultado === 'vitoria'){
+      atual = seguido ? atual + 1 : 1;
+      if (atual > melhor) melhor = atual;
+    } else {
+      atual = 0;
+    }
+    anterior = h.data;
+  });
+  return melhor;
+}
+
+// barras dos ultimos 7 dias -- SEMPRE desenha as 7, mesmo sem historico:
+// dia sem registro vira barra minima (est-barra-vazia), nunca some do grafico.
+// SVG puro (atributo fill/stop-color, nao style=) nao resolve var()/color-mix()
+// de forma confiavel em todo engine -- por isso resolvemos a cor de verdade
+// em runtime via getComputedStyle. Isso automaticamente respeita qualquer
+// tema visual escolhido pelo jogador (Grafite/Verde/Branco/etc), porque
+// --accent muda de valor conforme o tema ativo.
+function corAccentComOpacidade(alpha){
+  const hex = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+  const m = hex.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i);
+  if (!m) return hex; // tema com formato de cor nao-hex (raro) -- usa cru mesmo
+  const r = parseInt(m[1], 16), g = parseInt(m[2], 16), b = parseInt(m[3], 16);
+  return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
+}
+
+function renderUltimos7Dias(hist){
+  const linhaEl = document.getElementById('est7DiasLinha');
+  const areaEl = document.getElementById('est7DiasArea');
+  const svgEl = document.getElementById('est7DiasSvg');
+  const labelsEl = document.getElementById('est7DiasLabels');
+  if (!linhaEl || !areaEl || !svgEl || !labelsEl) return;
+
+  // atualiza o traco/area/gradiente pra cor do tema ativo agora
+  linhaEl.setAttribute('stroke', corAccentComOpacidade(1));
+  document.getElementById('est7DiasStopTopo').setAttribute('stop-color', corAccentComOpacidade(1));
+  document.getElementById('est7DiasStopBase').setAttribute('stop-color', corAccentComOpacidade(1));
+
+  const porData = new Map(hist.map(h => [h.data, h.resultado]));
+  const diasSemana = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S']; // Date.getDay(): 0=domingo
+  const hoje = isoAtual();
+  const LARGURA = 300, ALTURA = 80;
+  const Y_VITORIA = 8, Y_FUGA = 45, Y_VAZIO = 72; // topo=venceu, meio=fugiu, base=sem registro
+
+  const pontos = [];
+  labelsEl.innerHTML = '';
+  for (let i = 6; i >= 0; i--){
+    const iso = isoDe(new Date(new Date(hoje + 'T12:00:00').getTime() - i * 86400000));
+    const resultado = porData.get(iso);
+    let y = Y_VAZIO, cor = corAccentComOpacidade(0.18);
+    if (resultado === 'vitoria'){ y = Y_VITORIA; cor = corAccentComOpacidade(1); }
+    else if (resultado === 'fuga'){ y = Y_FUGA; cor = corAccentComOpacidade(0.45); }
+    const x = (6 - i) * (LARGURA / 6);
+    pontos.push({ x, y, cor });
+
+    const dow = new Date(iso + 'T12:00:00').getDay();
+    const label = document.createElement('span');
+    label.textContent = diasSemana[dow];
+    labelsEl.appendChild(label);
+  }
+
+  const dLinha = 'M' + pontos.map(p => p.x + ',' + p.y).join(' L');
+  const dArea = dLinha + ' L' + LARGURA + ',' + ALTURA + ' L0,' + ALTURA + ' Z';
+  linhaEl.setAttribute('d', dLinha);
+  areaEl.setAttribute('d', dArea);
+
+  // remove os circulos-marcador da rodada anterior antes de redesenhar
+  svgEl.querySelectorAll('.est-chartponto').forEach(c => c.remove());
+  pontos.forEach(p => {
+    const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    c.setAttribute('cx', p.x);
+    c.setAttribute('cy', p.y);
+    c.setAttribute('r', 4);
+    c.setAttribute('fill', p.cor);
+    c.setAttribute('class', 'est-chartponto');
+    svgEl.appendChild(c);
+  });
+}
+
+// donut de composicao do mes (vitoria/fuga/sem_tarefa) -- SEMPRE desenha o
+// anel cheio, mesmo com 0 dias decorridos: nesse caso fica 100% neutro (cor
+// de fundo) em vez de sumir o card inteiro.
+function renderDonutMes(vitorias, fugas, semTarefa){
+  const el = document.getElementById('estDonutMes');
+  const total = vitorias + fugas + semTarefa;
+  if (total === 0){
+    el.style.background = 'var(--panel-3)';
+  } else {
+    const pVit = (vitorias / total) * 100;
+    const pFuga = pVit + (fugas / total) * 100;
+    el.style.background = 'conic-gradient(var(--accent) 0% ' + pVit + '%, color-mix(in srgb, var(--accent) 40%, transparent) ' + pVit + '% ' + pFuga + '%, var(--panel-3) ' + pFuga + '% 100%)';
+  }
+  document.getElementById('estDonutTotal').textContent = total;
+  document.getElementById('estQtdVitoria').textContent = vitorias;
+  document.getElementById('estQtdFuga').textContent = fugas;
+  document.getElementById('estQtdSemTarefa').textContent = semTarefa;
+  document.getElementById('estBarraVitoria').style.width = (total > 0 ? (vitorias / total) * 100 : 0) + '%';
+  document.getElementById('estBarraFuga').style.width = (total > 0 ? (fugas / total) * 100 : 0) + '%';
+  document.getElementById('estBarraSemTarefa').style.width = (total > 0 ? (semTarefa / total) * 100 : 0) + '%';
+}
+
+// tiles do Historico (mes/semana) -- preenche numero do dia + (se
+// vencido/fugido) a tocha correspondente. Reaproveita o mesmo sprite da
+// Arena: acesa pro "venceu", apagada (filter:grayscale+brightness, ver
+// .est-tocha-apagada) pro "fugiu" -- testamos mostrar o monstro real do
+// dia (monstroIdDoDia()) primeiro, mas o usuario preferiu manter so a
+// tocha, so variando o estado dela. Pedido do usuario: dar identidade de
+// masmorra reaproveitando assets que ja existem, sem criar sprite novo.
+function preencherTileDia(tile, resultado, dia, iso){
+  if (resultado === 'vitoria'){
+    tile.classList.add('est-tile-vitoria');
+    const tocha = document.createElement('div');
+    tocha.className = 'est-tocha est-tocha-estatica';
+    tocha.setAttribute('aria-hidden', 'true');
+    tile.appendChild(tocha);
+  } else if (resultado === 'fuga'){
+    tile.classList.add('est-tile-fuga');
+    const tocha = document.createElement('div');
+    tocha.className = 'est-tocha est-tocha-estatica est-tocha-apagada';
+    tocha.setAttribute('aria-hidden', 'true');
+    tile.appendChild(tocha);
+  }
+  const diaSpan = document.createElement('span');
+  diaSpan.className = 'est-tiledia';
+  diaSpan.textContent = dia;
+  tile.appendChild(diaSpan);
+}
+
+function renderMapaDoMes(hist, ano, mes){
+  const el = document.getElementById('estMapaMes');
+  if (!el) return;
+  const porData = new Map(hist.map(h => [h.data, h.resultado]));
+  const hoje = isoAtual();
+  const diasNoMes = new Date(ano, mes, 0).getDate();
+  el.innerHTML = '';
+  for (let d = 1; d <= diasNoMes; d++){
+    const iso = ano + '-' + String(mes).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+    const tile = document.createElement('div');
+    tile.className = 'est-tile';
+    // 'sem_tarefa' ou sem registro nenhum (ex: antes de criar a conta) fica neutro
+    const resultado = (iso <= hoje) ? porData.get(iso) : null;
+    preencherTileDia(tile, resultado, d, iso);
+    el.appendChild(tile);
+  }
+}
+
+// ---------- Historico -- vistas "semana" e "ano" (pedido do usuario: tocar
+// no card "Historico" abre popup pra escolher o periodo). Reaproveita os
+// mesmos .est-tile/#estMapaMes que o mes ja usava -- so troca o conteudo
+// e o numero de colunas (.est-mapames-ano). window.estPeriodoAtual guarda
+// a escolha em memoria (reseta pro padrao "mes" a cada reload, de
+// proposito, mesmo principio que o extinto calendario de Perfil usava). */
+let estPeriodoAtual = 'mes';
+
+const NOMES_MES_CURTO = {
+  pt: ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'],
+  en: ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec']
+};
+
+function renderHistoricoSemana(hist){
+  const el = document.getElementById('estMapaMes');
+  if (!el) return;
+  el.classList.remove('est-mapames-ano');
+  const porData = new Map(hist.map(h => [h.data, h.resultado]));
+  const hoje = isoAtual();
+  el.innerHTML = '';
+  for (let i = 6; i >= 0; i--){
+    const iso = isoDe(new Date(new Date(hoje + 'T12:00:00').getTime() - i * 86400000));
+    const tile = document.createElement('div');
+    tile.className = 'est-tile';
+    preencherTileDia(tile, porData.get(iso), new Date(iso + 'T12:00:00').getDate(), iso);
+    el.appendChild(tile);
+  }
+}
+
+function renderHistoricoAno(hist, ano){
+  const el = document.getElementById('estMapaMes');
+  if (!el) return;
+  el.classList.remove('est-mapames-ano');
+  const nomes = NOMES_MES_CURTO[idiomaApp() === 'en' ? 'en' : 'pt'];
+  const porData = new Map(hist.map(h => [h.data, h.resultado]));
+  const hoje = isoAtual();
+  el.innerHTML = '';
+
+  const grade = document.createElement('div');
+  grade.className = 'est-anograde';
+
+  for (let m = 1; m <= 12; m++){
+    const linha = document.createElement('div');
+    linha.className = 'est-anolinha';
+
+    const lbl = document.createElement('span');
+    lbl.className = 'est-anomeslbl';
+    lbl.textContent = nomes[m - 1];
+    linha.appendChild(lbl);
+
+    const dias = document.createElement('div');
+    dias.className = 'est-anodias';
+    const diasNoMes = new Date(ano, m, 0).getDate();
+    for (let d = 1; d <= diasNoMes; d++){
+      const iso = ano + '-' + String(m).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+      const dia = document.createElement('span');
+      dia.className = 'est-anodia';
+      if (iso <= hoje){
+        const resultado = porData.get(iso);
+        if (resultado === 'vitoria') dia.style.background = corAccentComOpacidade(1);
+        else if (resultado === 'fuga') dia.style.background = corAccentComOpacidade(0.4);
+      }
+      dias.appendChild(dia);
+    }
+    linha.appendChild(dias);
+    grade.appendChild(linha);
+  }
+  el.appendChild(grade);
+}
+
+// dispara a vista certa conforme estPeriodoAtual -- chamado de dentro de
+// renderEstatisticas() no lugar da antiga chamada direta a renderMapaDoMes()
+function renderHistoricoConteudo(hist, ano, mes){
+  const el = document.getElementById('estMapaMes');
+  if (el && estPeriodoAtual !== 'ano') el.classList.remove('est-mapames-ano');
+  const legendaEl = document.getElementById('estMapaLegenda');
+  if (legendaEl) legendaEl.style.display = estPeriodoAtual === 'ano' ? 'none' : '';
+  if (estPeriodoAtual === 'semana') renderHistoricoSemana(hist);
+  else if (estPeriodoAtual === 'ano') renderHistoricoAno(hist, ano);
+  else renderMapaDoMes(hist, ano, mes);
+}
+
+// o historico persistido so ganha o registro de hoje quando o dia VIRA
+// (registrarHistorico(), chamado na virada oficial -- meia-noite real ou
+// botao de debug). Isso fazia as Estatisticas so mostrarem "hoje" como
+// vencido depois da virada, mesmo que o jogador ja tivesse terminado a
+// ultima tarefa horas antes. Aqui a gente injeta um registro AO VIVO de
+// hoje (sem persistir nada) quando TODAS as tarefas de hoje ja estao
+// feitas -- assim conta como vencido na hora, sem esperar o dia mudar.
+// So injeta se o historico real AINDA NAO tem uma entrada pra hoje (senao
+// duplicaria o dia quando a virada oficial ja rodou).
+function estHistComHojeAoVivo(hoje){
+  const hist = (typeof window.obterHistorico === 'function') ? window.obterHistorico() : [];
+  if (hist.some(h => h.data === hoje)) return hist; // virada oficial ja registrou -- usa o real
+  if (typeof tarefas === 'undefined' || typeof ehDeHoje !== 'function' || typeof feitaHoje !== 'function') return hist;
+
+  const doDia = tarefas.filter(ehDeHoje);
+  if (doDia.length > 0 && doDia.every(feitaHoje)){
+    return hist.concat([{ data: hoje, resultado: 'vitoria', monstroId: null, tarefas: doDia.length }]);
+  }
+  // ainda tem tarefa pendente (ou nenhuma tarefa hoje) -- dia em aberto,
+  // nao entra na contagem ainda (nem vitoria nem fuga: so vira fuga se
+  // sobrar pendente na hora da virada oficial)
+  return hist;
+}
+
+function renderEstatisticas(){
+  const hoje = isoAtual();
+  const hist = estHistComHojeAoVivo(hoje);
+  const [anoStr, mesStr] = hoje.split('-');
+  const ano = Number(anoStr), mes = Number(mesStr);
+  const anoMesPrefixo = anoStr + '-' + mesStr;
+
+  // resumo vitalicio -- totalTarefasConcluidas() ja existe desde o
+  // "CONTADOR - TAREFAS CONCLUIDAS (lifetime)" (incrementa 1x por
+  // conclusao real, ver alternar()); o resto vem do historico completo.
+  const totalConcluidas = (typeof window.totalTarefasConcluidas === 'function') ? window.totalTarefasConcluidas() : 0;
+  const vitoriasTotal = hist.filter(h => h.resultado === 'vitoria').length;
+  const fugasTotal = hist.filter(h => h.resultado === 'fuga').length;
+  const comTarefaTotal = vitoriasTotal + fugasTotal;
+  const taxaGeral = comTarefaTotal > 0 ? Math.round((vitoriasTotal / comTarefaTotal) * 100) : 0;
+  document.getElementById('estTotalConcluidas').textContent = totalConcluidas;
+  document.getElementById('estTotalVitorias').textContent = vitoriasTotal;
+  document.getElementById('estTaxaGeral').textContent = taxaGeral + '%';
+
+  const streak = estStreakAtual(hist);
+  const recorde = estRecorde(hist);
+  document.getElementById('estStreakNum').textContent = streak;
+  const montanhaEl = document.getElementById('estTochaPrincipal');
+  if (montanhaEl && typeof window.escalaTocha === 'function'){
+    montanhaEl.style.transform = 'scale(' + window.escalaTocha(streak) + ')';
+    montanhaEl.classList.toggle('est-tocha-apagada', streak === 0);
+    montanhaEl.classList.toggle('est-tocha-estatica', streak === 0);
+  }
+  const lblEl = document.getElementById('estStreakLbl');
+  if (recorde === 0){
+    lblEl.textContent = 'Vença hoje pra começar uma sequência';
+  } else if (streak >= recorde){
+    lblEl.textContent = 'dias seguidos · essa é a sua maior sequência!';
+  } else {
+    const faltam = recorde - streak;
+    lblEl.textContent = 'dias seguidos · recorde de ' + recorde + ' (falta' + (faltam === 1 ? ' 1 dia' : 'm ' + faltam + ' dias') + ')';
+  }
+
+  const doMes = hist.filter(h => h.data.startsWith(anoMesPrefixo));
+  const vitoriasMes = doMes.filter(h => h.resultado === 'vitoria').length;
+  const fugasMes = doMes.filter(h => h.resultado === 'fuga').length;
+  const semTarefaMes = doMes.filter(h => h.resultado === 'sem_tarefa').length;
+  const comTarefaMes = vitoriasMes + fugasMes;
+  const taxa = comTarefaMes > 0 ? Math.round((vitoriasMes / comTarefaMes) * 100) : 0;
+  const ringEl = document.getElementById('estTaxaRing');
+  const trackEl = ringEl.querySelector('.est-ringtrack');
+  // 0% no conic-gradient deixa um traco fino de antialiasing na borda; sem
+  // valor nenhum, o .est-ringbg neutro por baixo fica visivel sozinho.
+  trackEl.style.background = taxa === 0 ? 'none' : '';
+  ringEl.style.setProperty('--pct', taxa);
+  document.getElementById('estTaxaNum').textContent = taxa + '%';
+
+  renderUltimos7Dias(hist);
+  renderDonutMes(vitoriasMes, fugasMes, semTarefaMes);
+
+  const nomeMes = new Date(ano, mes - 1, 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+  document.getElementById('estMesLabel').textContent = nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1);
+
+  renderHistoricoConteudo(hist, ano, mes);
 }
 
 document.querySelectorAll('#nav button').forEach(b => {
@@ -3536,7 +4114,11 @@ function usarItem(id, elOrigem){
 
 function venderItem(id, elOrigem){
   const it = item(id);
-  if (it.tipo === 'chave') return;   // itens-chave (ex: Grimório) nunca sao vendaveis
+  // pedido do usuario: chaves normais (Ferro/comum/Dourada/Cristal/
+  // Mestra) agora sao vendaveis -- so o Grimorio continua bloqueado
+  // (item unico, tem acao propria "Abrir", val:0 no catalogo, nunca foi
+  // pra vender). Antes este guard barrava TODO tipo:'chave' junto.
+  if (it.tipo === 'chave' && id === ID_GRIMORIO_INV) return;
   const ponto = pontoDeElemento(elOrigem); // captura ANTES do render
   // NAO desequipar aqui incondicionalmente: com 2+ copias do mesmo item,
   // vender uma unidade desequipava a outra copia idêntica sem motivo.
@@ -3727,7 +4309,10 @@ function abrirFicha(id){
     if (bi.x) bonus += '<span>XP '+(bi.x>0?'+':'')+bi.x+'%</span>';
     if (bi.m) bonus += '<span>' + (en ? 'Coins ' : 'Moedas ') + (bi.m>0?'+':'')+bi.m+'%</span>';
   }
-  if (it.tipo !== 'chave') bonus += '<span>' + (en ? 'Sells for ' + precoVenda(it) + ' coins' : 'Vende por '+precoVenda(it)+' moedas') + '</span>';
+  // pedido do usuario: chaves normais agora sao vendaveis -- so o
+  // Grimorio (val:0, acao propria "Abrir") continua fora do preco/botao
+  // de venda. Antes "it.tipo !== 'chave'" excluia TODA chave junto.
+  if (!(it.tipo === 'chave' && id === ID_GRIMORIO_INV)) bonus += '<span>' + (en ? 'Sells for ' + precoVenda(it) + ' coins' : 'Vende por '+precoVenda(it)+' moedas') + '</span>';
   if (it.tipo === 'chave' && id !== ID_GRIMORIO_INV) bonus += '<span>' + (en ? 'Used automatically to unlock a locked chest in the Arena' : 'Usada automaticamente pra destrancar um baú trancado na Arena') + '</span>';
   if (q > 1) bonus += '<span>' + (en ? 'Quantity: ' + q : 'Quantidade: '+q) + '</span>';
 
@@ -3735,7 +4320,7 @@ function abrirFicha(id){
   if (EQUIPAVEL(id)) acoes += '<button class="prim" data-a="eq">'+(estaEquipado ? (en ? 'Unequip' : 'Desequipar') : (en ? 'Equip' : 'Equipar'))+'</button>';
   if (it.tipo === 'cons') acoes += '<button class="prim" data-a="usar">' + (en ? 'Use' : 'Usar') + '</button>';
   if (it.tipo === 'chave' && id === ID_GRIMORIO_INV) acoes += '<button class="prim" data-a="abrir">' + (en ? 'Open' : 'Abrir') + '</button>';
-  if (it.tipo !== 'chave') acoes += '<button data-a="vender">' + (en ? 'Sell' : 'Vender') + '</button>';
+  if (!(it.tipo === 'chave' && id === ID_GRIMORIO_INV)) acoes += '<button data-a="vender">' + (en ? 'Sell' : 'Vender') + '</button>';
 
   ficha.innerHTML =
     '<div class="ihead">'+
@@ -4407,7 +4992,7 @@ function montarVenda(grid){
   }
 
   const lista = inventario.slice()
-    .filter(s => item(s.id).tipo !== 'chave')   // itens-chave (Grimório) nao aparecem pra vender
+    .filter(s => !(item(s.id).tipo === 'chave' && s.id === ID_GRIMORIO_INV))   // pedido do usuario: chaves normais agora aparecem pra vender, so o Grimorio continua fora
     .sort((a, z) => {
     const A = item(a.id), Z = item(z.id);
     if (A.tipo === 'tesouro' && Z.tipo !== 'tesouro') return -1;
@@ -5758,17 +6343,8 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   window.abrirBestiario = abrirBestiario;
   window.fecharBestiario = fecharBestiario;
 
-  /* ---------- Historico -- so abre o overlay que ja existia (v4.37);
-     abrirHistorico()/renderHistorico() ja fazem tudo, ver bloco
-     HISTORICO mais abaixo. Reaproveita o mesmo botao que Config usava
-     ("Abrir" dentro de cfgHistorico) NAO -- a previa agora tem seu
-     proprio botao (#verHistoricoBtn), sem depender de Config aberto. ---------- */
-  const btnHistoricoAbrir = document.getElementById('verHistoricoBtn');
-  if (btnHistoricoAbrir){
-    btnHistoricoAbrir.onclick = () => {
-      if (typeof window.abrirHistorico === 'function') window.abrirHistorico();
-    };
-  }
+  /* ---------- Historico -- botao/overlay removidos do Perfil (pedido do
+     usuario, Estatisticas ja cobre isso com o Mapa do mes). ---------- */
 
   /* ---------- previas: texto resumido de Historico/Conquistas/Bestiario,
      recalculado toda vez que a aba Perfil abre (chamado de renderPerfil(),
@@ -5776,58 +6352,12 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   function renderPreviewsPerfil(){
     const en = idiomaApp() === 'en';
     // Historico -- conta vitorias/fugas do mes corrente a partir do
-    // historico permanente (window.obterHistorico(), ja exposto)
-    const elHist = document.getElementById('prevHistoricoTxt');
+    // historico permanente (window.obterHistorico(), ja exposto). A
+    // previa/texto/faixa de Historico saiu do Perfil (pedido do usuario,
+    // Estatisticas ja cobre isso) -- mas `hist` continua sendo lido aqui
+    // porque a previa de Bestiario mais abaixo (faixaBest) reaproveita
+    // essa mesma variavel.
     const hist = (typeof window.obterHistorico === 'function') ? window.obterHistorico() : [];
-    if (elHist){
-      const hoje = new Date();
-      const prefixoMes = hoje.getFullYear() + '-' + String(hoje.getMonth() + 1).padStart(2, '0');
-      const doMes = hist.filter(h => typeof h.data === 'string' && h.data.startsWith(prefixoMes));
-      let vitorias = doMes.filter(h => h.resultado === 'vitoria').length;
-      const fugas = doMes.filter(h => h.resultado === 'fuga').length;
-      // mesmo bonus "hoje ao vivo" que o calendario logo abaixo (faixaHist,
-      // ver monstroJaCaiu()) e o bestiario (renderBestiario) ja aplicam --
-      // sem isso, esse texto dizia "0 vitorias" enquanto o calendario e o
-      // bestiario ja mostravam a vitoria de hoje: contradicao visivel no
-      // mesmo cartao (bug relatado pelo usuario). So conta se hoje ainda
-      // nao tem entrada permanente (evita contar 2x se a virada ja rodou).
-      if (typeof monstroJaCaiu === 'function' && monstroJaCaiu() &&
-          typeof isoAtual === 'function' && !hist.some(h => h.data === isoAtual())){
-        vitorias++;
-      }
-      elHist.textContent = en
-        ? (vitorias + ' wins, ' + fugas + ' escapes this month')
-        : (vitorias + ' vitórias, ' + fugas + ' fugas este mês');
-    }
-
-    // faixa dos ultimos 5 dias -- mesma logica de "hoje ao vivo" ja usada
-    // no calendario (renderHistorico()): se o historico permanente ainda
-    // nao registrou hoje (so grava na virada), mas o monstro de hoje ja
-    // caiu, mostra vitoria otimista mesmo assim.
-    const faixaHist = document.getElementById('prevHistFaixa');
-    if (faixaHist){
-      const porData = new Map(hist.map(h => [h.data, h.resultado]));
-      if (typeof monstroJaCaiu === 'function' && monstroJaCaiu() && typeof isoAtual === 'function'){
-        porData.set(isoAtual(), 'vitoria');
-      }
-      const hojeIso = (typeof isoAtual === 'function') ? isoAtual() : null;
-      faixaHist.innerHTML = '';
-      if (hojeIso){
-        for (let i = 4; i >= 0; i--){
-          const d = new Date(hojeIso + 'T12:00:00');
-          d.setDate(d.getDate() - i);
-          const iso = d.toISOString().slice(0, 10);
-          const resultado = porData.get(iso);
-          const cel = document.createElement('div');
-          cel.className = 'caldia' + (resultado === 'vitoria' ? ' calvitoria'
-            : resultado === 'fuga' ? ' calfuga'
-            : resultado === 'sem_tarefa' ? ' calsemtarefa' : '');
-          cel.title = iso;
-          cel.textContent = String(d.getDate());
-          faixaHist.appendChild(cel);
-        }
-      }
-    }
 
     // Conquistas -- resumo exposto pelo proprio modulo (window.resumoConquistasPerfil)
     const elConq = document.getElementById('prevConquistasTxt');
@@ -7308,6 +7838,10 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     const n = MONSTROS.length;
     return ((dias + semente) % n + n) % n;   // modulo positivo, defensivo
   }
+  // exposta pra Estatisticas > Historico reaproveitar (pedido do usuario:
+  // mostrar o monstro REAL de cada dia "fugiu", em vez de um icone
+  // generico -- ver preencherTileDia() no bloco de Estatisticas)
+  window.monstroIdDoDia = monstroIdDoDia;
 
   // chamada pelo modulo Vida (ver comentario em verificarVirada) -- o
   // proprio modulo Vida ja garante que isto so roda uma vez por data real
@@ -8731,7 +9265,6 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // engrenagem, os 3 links "Ver..." das previas, e o voltar dos 3 overlays.
   [
     'perfilCfgBtn', 'cfgVoltarBtn',
-    'verHistoricoBtn',
     'verConquistasBtn', 'conquistasVoltarBtn',
     'verBestiarioBtn', 'bestiarioVoltarBtn'
   ].forEach(id => {
@@ -8898,179 +9431,12 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 })();
 </script>
 
-<!-- =====================================================================
-     HISTÓRICO — calendário do mês, em overlay de tela cheia (v4.37)
+<!-- Overlay "Historico" (calendario do mes em tela cheia, #histOverlay)
+     removido daqui (pedido do usuario) -- Estatisticas > Mapa do mes
+     agora mostra a mesma informacao (grade do mes com resultado por
+     dia). window.obterHistorico() (modulo HISTORICO, fonte dos dados)
+     nao mudou nada, so este overlay/calendario que lia dele saiu. -->
 
-     Item 4 da lista "Conteudo da aba" do Perfil no roadmap ("Calendario
-     do mes"). Versao "Completo": dias alinhados domingo-sabado de
-     verdade, com navegacao entre meses -- nao so uma grade sequencial.
-
-     MUDANCA DE ARQUITETURA (v4.37): nasceu como 5a sub-aba do Perfil
-     (v4.36), mas a nav de sub-abas so cabia bem com 4 -- 5 pills de
-     texto passavam de ~490px de largura somada contra ~324-364px
-     disponiveis dentro do .app, estourando o layout (ver nota extensa
-     na secao do roadmap sobre isso). Em vez de redesenhar a nav de
-     novo, o usuario pediu pra tirar o Historico dali: agora e um botao
-     dentro de Perfil > Config ("Histórico" / "Abrir"), que abre isto
-     aqui como um overlay de tela cheia -- MESMO PADRAO do Grimorio
-     (.grimOverlay/.grimFechar), so que com as variaveis de tema
-     (var(--bg) etc.) em vez da paleta fixa em hex que o Grimorio usa
-     (o Grimorio nao responde a troca de tema por causa disso; o
-     Historico responde, de proposito, pra nao repetir a mesma
-     inconsistencia num modulo novo).
-
-     Le de window.obterHistorico() (modulo HISTORICO, ja existente) --
-     nao guarda nenhum estado proprio, nao tem chave de localStorage
-     alem do mes/ano correntes (esses sim, so em memoria, resetam a
-     cada vez que o overlay abre -- sempre mostra o mes atual primeiro,
-     nunca "lembra" de navegacao de uma visita anterior).
-
-     3 categorias de resultado, cor por categoria (mesma paleta ja usada
-     em outros indicadores do jogo, nao cores novas inventadas):
-       - 'vitoria'    -> var(--verde)
-       - 'fuga'       -> var(--perigo)
-       - 'sem_tarefa' -> cinza neutro (var(--dim))
-       - sem entrada nenhuma (dia futuro, ou anterior ao inicio do
-         historico, ver nota "Sem backfill" no roadmap) -> celula sem cor,
-         so o numero do dia
-
-     Revelacao de HOJE em tempo real, mesmo principio ja aplicado em
-     Bestiario/Conquistas: se monstroJaCaiu(), o dia de hoje aparece como
-     'vitoria' mesmo sem entrada ainda no historico (a virada so grava
-     amanha). NAO mostra 'fuga' preventivamente pro dia corrente --
-     fuga so e um resultado definitivo depois que o dia fecha, mostrar
-     antes disso seria uma previsao, nao um fato.
-     ===================================================================== -->
-
-<div class="histOverlay" id="histOverlay">
-  <div class="histHead">
-    <h2 data-i18n="perfil.historico">Histórico</h2>
-    <button class="histFechar" id="histFechar">×</button>
-  </div>
-  <div class="histScroll">
-    <div class="calnav">
-      <button id="calAnterior" type="button" aria-label="Mês anterior">‹</button>
-      <span id="calTitulo">—</span>
-      <button id="calProximo" type="button" aria-label="Próximo mês">›</button>
-    </div>
-    <div class="caldiassemana" id="calDiasSemana"></div>
-    <div class="calgrade" id="calGrade"></div>
-    <div class="callegenda">
-      <span><i class="calponto calvitoria"></i> <span data-i18n="hist.vitoria">vitória</span></span>
-      <span><i class="calponto calfuga"></i> <span data-i18n="hist.fuga">fuga</span></span>
-      <span><i class="calponto calsemtarefa"></i> <span data-i18n="hist.semTarefa">sem tarefa</span></span>
-    </div>
-  </div>
-</div>
-
-<script>
-(function(){
-  const NOMES_MES = ['janeiro','fevereiro','março','abril','maio','junho',
-                      'julho','agosto','setembro','outubro','novembro','dezembro'];
-  const NOMES_MES_EN = ['January','February','March','April','May','June',
-                         'July','August','September','October','November','December'];
-  const DIAS_SEMANA_CURTO = ['D','S','T','Q','Q','S','S'];
-  const DIAS_SEMANA_CURTO_EN = ['S','M','T','W','T','F','S'];
-
-  // mes/ano correntes da NAVEGACAO do calendario -- so em memoria, de
-  // proposito: sempre abre no mes atual toda vez que o overlay abre,
-  // nunca "lembra" de navegacao de uma visita anterior
-  let calAno, calMes;   // calMes: 0-11
-
-  function iniciarNoMesAtual(){
-    const hoje = (typeof dataAtual === 'function') ? dataAtual() : new Date();
-    calAno = hoje.getFullYear();
-    calMes = hoje.getMonth();
-  }
-
-  function diasNoMes(ano, mes){ return new Date(ano, mes + 1, 0).getDate(); }
-  function primeiroDiaSemana(ano, mes){ return new Date(ano, mes, 1).getDay(); }
-  function isoDoDia(ano, mes, dia){
-    return ano + '-' + String(mes + 1).padStart(2, '0') + '-' + String(dia).padStart(2, '0');
-  }
-
-  function renderHistorico(){
-    const grade = document.getElementById('calGrade');
-    const titulo = document.getElementById('calTitulo');
-    const diasSemanaEl = document.getElementById('calDiasSemana');
-    if (!grade || !titulo) return;
-    if (calAno === undefined) iniciarNoMesAtual();
-
-    const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
-    const diasSemana = en ? DIAS_SEMANA_CURTO_EN : DIAS_SEMANA_CURTO;
-    const nomesMes = en ? NOMES_MES_EN : NOMES_MES;
-
-    // sempre repinta os cabecalhos de dia da semana (nao so na 1a vez) --
-    // precisa refletir troca de idioma em tempo real, igual o resto do app
-    if (diasSemanaEl) diasSemanaEl.innerHTML = diasSemana.map(d => '<span>' + d + '</span>').join('');
-
-    titulo.textContent = en ? (nomesMes[calMes] + ' ' + calAno) : (nomesMes[calMes] + ' de ' + calAno);
-
-    const hist = (typeof window.obterHistorico === 'function') ? window.obterHistorico() : [];
-    const porData = new Map(hist.map(h => [h.data, h.resultado]));
-
-    // hoje em tempo real (mesmo principio de Bestiario/Conquistas) -- so
-    // pra 'vitoria', nunca preve 'fuga' antes do dia fechar de verdade
-    if (typeof monstroJaCaiu === 'function' && monstroJaCaiu() && typeof isoAtual === 'function'){
-      porData.set(isoAtual(), 'vitoria');
-    }
-
-    const hojeIso = (typeof isoAtual === 'function') ? isoAtual() : null;
-    const totalDias = diasNoMes(calAno, calMes);
-    const offset = primeiroDiaSemana(calAno, calMes);
-
-    let html = '';
-    for (let i = 0; i < offset; i++) html += '<div class="caldia calvazio"></div>';
-    for (let dia = 1; dia <= totalDias; dia++){
-      const iso = isoDoDia(calAno, calMes, dia);
-      const resultado = porData.get(iso);
-      const classes = ['caldia'];
-      if (resultado === 'vitoria') classes.push('calvitoria');
-      else if (resultado === 'fuga') classes.push('calfuga');
-      else if (resultado === 'sem_tarefa') classes.push('calsemtarefa');
-      if (iso === hojeIso) classes.push('calhoje');
-      html += '<div class="' + classes.join(' ') + '">' + dia + '</div>';
-    }
-    grade.innerHTML = html;
-  }
-
-  const btnAnterior = document.getElementById('calAnterior');
-  if (btnAnterior) btnAnterior.onclick = () => {
-    if (calAno === undefined) iniciarNoMesAtual();
-    calMes--;
-    if (calMes < 0){ calMes = 11; calAno--; }
-    renderHistorico();
-  };
-  const btnProximo = document.getElementById('calProximo');
-  if (btnProximo) btnProximo.onclick = () => {
-    if (calAno === undefined) iniciarNoMesAtual();
-    calMes++;
-    if (calMes > 11){ calMes = 0; calAno++; }
-    renderHistorico();
-  };
-
-  // abre/fecha o overlay -- gatilho e so o botao "Ver tudo" da previa em
-  // Perfil (#verHistoricoBtn, ver bloco de previas mais acima). O card
-  // "Historico" que existia dentro de Config foi removido (pedido do
-  // usuario, duplicava o mesmo caminho) -- #cfgHistorico nao existe mais
-  // no HTML, entao btnAbrir fica null aqui, o que e esperado; o guard
-  // "if (btnAbrir)" abaixo ja cobre isso sem erro.
-  const overlay = document.getElementById('histOverlay');
-  const btnAbrir = document.getElementById('cfgHistorico');
-  const btnFechar = document.getElementById('histFechar');
-
-  function abrirHistorico(){
-    iniciarNoMesAtual();
-    renderHistorico();
-    if (overlay) overlay.classList.add('on');
-  }
-  if (btnAbrir) btnAbrir.onclick = abrirHistorico;
-  if (btnFechar) btnFechar.onclick = () => { if (overlay) overlay.classList.remove('on'); };
-
-  window.renderHistorico = renderHistorico;
-  window.abrirHistorico = abrirHistorico;
-})();
-</script>
 
 <!-- =====================================================================
      TELA DE LOGIN — bloco autonomo, cole antes de </body>
@@ -11371,6 +11737,31 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'nav.inventario': { pt:'Inventário', en:'Inventory' },
     'nav.loja':       { pt:'Loja',       en:'Shop' },
     'nav.perfil':     { pt:'Perfil',     en:'Profile' },
+    'nav.estatisticas': { pt:'Estatísticas', en:'Stats' },
+    'est.diasSeguidos': { pt:'dias seguidos', en:'days in a row' },
+    'est.recorde':      { pt:'RECORDE', en:'RECORD' },
+    'est.mes':          { pt:'MÊS', en:'MONTH' },
+    'est.taxaConclusao':{ pt:'taxa de conclusão dos dias com tarefa, este mês', en:'completion rate of days with tasks, this month' },
+    'est.mapaDoMes':    { pt:'Histórico', en:'History' },
+    'est.periodoMes':    { pt:'· mês', en:'· month' },
+    'est.periodoSemana':    { pt:'· semana', en:'· week' },
+    'est.periodoAno':    { pt:'· ano', en:'· year' },
+    'est.verPorPeriodo':    { pt:'Ver por período', en:'View by period' },
+    'est.periodoSemanaOpcao':    { pt:'Semana', en:'Week' },
+    'est.periodoMesOpcao':    { pt:'Mês inteiro', en:'Whole month' },
+    'est.periodoAnoOpcao':    { pt:'Ano inteiro', en:'Whole year' },
+    'est.ultimos7':     { pt:'Últimos 7 dias', en:'Last 7 days' },
+    'est.sequenciaAtual':    { pt:'Sequência atual', en:'Current streak' },
+    'est.desdeInicio':      { pt:'Desde o início', en:'Since the start' },
+    'est.tarefasConcluidas':{ pt:'tarefas concluídas', en:'tasks completed' },
+    'est.diasVencidos':     { pt:'dias vencidos', en:'days won' },
+    'est.taxaGeral':        { pt:'taxa geral', en:'overall rate' },
+    'est.taxaConclusaoTitulo': { pt:'Taxa de conclusão', en:'Completion rate' },
+    'est.comoFoiMes':   { pt:'Como foi o mês', en:'How the month went' },
+    'est.semTarefa':    { pt:'sem tarefa', en:'no task' },
+    'est.fuga':         { pt:'fugiu', en:'fled' },
+    'est.vitoria':      { pt:'venceu', en:'won' },
+    'est.emBreve':      { pt:'Distribuição por horário e "tarefas mais puladas" pedem rastrear novos dados — entram numa próxima etapa.', en:'Time-of-day breakdown and "most skipped tasks" need new data tracking — coming in a future update.' },
 
     'acao.continuar': { pt:'Continuar', en:'Continue' },
     'acao.voltar':    { pt:'Voltar',    en:'Back' },
@@ -11682,6 +12073,53 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     try { localStorage.setItem(CHAVE, String(novo)); } catch(e){}
     aplicar(novo);
   });
+})();
+</script>
+
+<!-- =====================================================================
+     ESTATISTICAS — atualizacao em tempo real (sem esperar trocar de aba)
+
+     Antes disso, renderEstatisticas() so rodava quando mostrarAba() abria
+     a aba -- se o jogador ja estivesse nela e concluisse uma tarefa ou
+     fechasse o dia, os numeros ficavam parados ate sair e voltar.
+
+     GANCHO: window.alternar e window.registrarHistorico ja sao reembrulhados
+     varias vezes ao longo do arquivo (contador de conclusoes, XP, som,
+     nivel...). Esse bloco fica DE PROPOSITO no fim do arquivo -- o ULTIMO a
+     reatribuir window.alternar vira o wrap mais externo, entao quando ele
+     roda, todo o resto (inclusive o total++ do contador de tarefas
+     concluidas) ja aconteceu. Se esse bloco fosse colado mais cedo no
+     arquivo, correria o risco de renderizar com um numero desatualizado
+     (teria que esperar o wrap seguinte pra refletir a conclusao).
+
+     Mesma logica pro registrarHistorico(): a aba so re-renderiza se
+     estiver visivel agora (estAbaAtiva()), pra nao gastar trabalho a toa
+     com a tela em segundo plano.
+     ===================================================================== -->
+<script>
+(function(){
+  function estAbaAtiva(){
+    const v = document.getElementById('viewEstatisticas');
+    return !!v && v.classList.contains('on');
+  }
+
+  const _alternarParaEst = window.alternar;
+  if (typeof _alternarParaEst === 'function'){
+    window.alternar = function(i){
+      const r = _alternarParaEst.apply(this, arguments);
+      if (r !== false && estAbaAtiva() && typeof renderEstatisticas === 'function') renderEstatisticas();
+      return r;
+    };
+  }
+
+  const _registrarHistoricoParaEst = window.registrarHistorico;
+  if (typeof _registrarHistoricoParaEst === 'function'){
+    window.registrarHistorico = function(){
+      const r = _registrarHistoricoParaEst.apply(this, arguments);
+      if (estAbaAtiva() && typeof renderEstatisticas === 'function') renderEstatisticas();
+      return r;
+    };
+  }
 })();
 </script>
 

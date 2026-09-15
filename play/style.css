@@ -180,18 +180,16 @@
   .task.done{opacity:.6}
   .task.vanish{opacity:0;transform:translateX(40px);transition:opacity .3s,transform .3s}
   .task.tap{transform:scale(.97);transition:transform .12s}
-  /* toque parcial numa tarefa "2x/3x" (meta>1, ver alternar() e
-     _tarefaPopIdx no JS): o elemento antigo toca .saiu e some rapido; o
-     elemento NOVO que o proximo render() cria pro mesmo indice (badge
-     ja atualizado, ex. 1/2) nasce com .entrou, um pop de volta em vez
-     de aparecer seco no lugar. Usa animation (nao transition) porque o
-     elemento e recriado do zero a cada render() -- sem estado "de" pra
-     fazer transition, precisa da animacao definir o proprio ponto de
-     partida (0%). */
-  @keyframes tarefaPopOut{ from{transform:scale(1);opacity:1} to{transform:scale(.82);opacity:0} }
-  @keyframes tarefaPopIn{ 0%{transform:scale(.82);opacity:0} 60%{transform:scale(1.04);opacity:1} 100%{transform:scale(1);opacity:1} }
-  .task.saiu{animation:tarefaPopOut .13s ease-in both}
-  .task.entrou{animation:tarefaPopIn .22s cubic-bezier(.2,.9,.3,1.2) both}
+  /* pedido do usuario: animacao de saida/entrada no toque parcial
+     (.saiu/.entrou) removida -- nao ficou legal, revertido pro toque
+     parcial sem efeito visual de saida (so animarGolpe()+som, ver
+     alternar() no JS). Regras abaixo ficam definidas mas sem chamador
+     (mesma convencao de moedasCaindo()/voarRecompensaFinal() nao
+     removidas quando desligadas -- nao apaga, so para de usar). */
+  @keyframes tarefaPopOut{ from{transform:translateX(0);opacity:1} to{transform:translateX(120%);opacity:0} }
+  @keyframes tarefaPopIn{ 0%{transform:translateX(-30%);opacity:0} 60%{transform:translateX(4%);opacity:1} 100%{transform:translateX(0);opacity:1} }
+  .task.saiu{animation:tarefaPopOut .26s ease-in both !important}
+  .task.entrou{animation:tarefaPopIn .32s cubic-bezier(.2,.9,.3,1.2) both !important}
   .tinfo{display:flex;flex-direction:column;gap:2px;min-width:0}
   .label{font-size:14px;line-height:1.3}
   .repeat{font-family:'Outfit',sans-serif;font-size:11px;color:var(--dim);letter-spacing:0}
@@ -214,10 +212,107 @@
   .day.on{background:var(--accent-dim);color:var(--accent);border-color:var(--accent-dim)}
   .cbtn{background:var(--accent);color:var(--bg);border:none;border-radius:9px;padding:11px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;cursor:pointer}
 
-  .nav{display:flex;border-top:1px solid var(--line);background:var(--panel-2);margin-top:14px}
-  .nav button{flex:1;background:none;border:none;cursor:pointer;padding:11px 6px 14px;display:flex;flex-direction:column;align-items:center;gap:5px;color:var(--dim);font-family:'Outfit',sans-serif;font-size:11px;font-weight:500;letter-spacing:0;transition:color .15s}
-  .nav button svg{width:23px;height:23px}
+  .nav{display:flex;position:relative;border-top:1px solid var(--line);background:var(--panel-2);margin-top:14px}
+  .nav button{flex:1;position:relative;z-index:1;background:none;border:none;cursor:pointer;padding:14px 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--dim);transition:color .15s}
+  .nav button svg{width:26px;height:26px}
+  .nav button span{display:none}
   .nav button.on{color:var(--accent)}
+  .navpill{position:absolute;top:8px;left:0;width:62px;height:44px;border-radius:999px;background:var(--accent-dim);border:1px solid rgba(255,255,255,.14);box-shadow:0 0 10px rgba(255,255,255,.08);transform:translateX(0);transition:transform .32s cubic-bezier(.34,1.56,.64,1);pointer-events:none;z-index:0}
+
+  /* ============ Estatisticas ============ */
+  .est-card{background:var(--panel-2);border:1px solid var(--line);border-radius:20px;padding:20px;margin-bottom:14px;box-shadow:0 10px 24px rgba(0,0,0,.22)}
+  .est-divider{height:1px;background:var(--line);margin:0 0 16px}
+  .est-titulo{font-size:12.5px;font-weight:600;color:var(--muted);letter-spacing:.02em;margin-bottom:16px;display:flex;align-items:center;gap:7px}
+
+  .est-resumogrid{display:flex;justify-content:space-between;gap:10px}
+  .est-resumoitem{flex:1;text-align:center}
+  .est-resumonum{font-family:'Silkscreen',monospace;font-size:19px;color:var(--accent)}
+  .est-resumolbl{font-size:9.5px;color:var(--dim);margin-top:4px;line-height:1.3}
+
+  .est-streakcard{position:relative;overflow:hidden;flex-shrink:0;padding-bottom:18px}
+  .est-streakcard .est-titulo{position:relative;z-index:1}
+
+  .est-streaknum{font-family:'Silkscreen',monospace;font-size:40px;color:var(--text);line-height:1}
+  /* Tocha reaproveitada do sprite ja usado nas TOCHAS DECORATIVAS DA ARENA
+     (mesmo PNG/tecnica de .tocha-arena la em baixo -- 3 frames de flicker,
+     48x32 = 16x32 por frame, animado via steps(3)+background-position).
+     Pedido do usuario: dar identidade de masmorra pra Estatisticas
+     reaproveitando assets que ja existem, sem criar sprite novo. */
+  .est-tocha{
+    width:16px;height:32px;
+    background-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAgCAYAAABU1PscAAACoklEQVR4nO2WTUgbQRiG34RekkAPEcRDNLDKgudCWqHBgiLdICXQU2jEUoQYvJZcwx56kXrooWAgh0oqgZ5yCEZKPQQLSYVSCj2FJJKfgwiRUqiewvQQZtnZnf3Ryq6HvBA2O7vP9843s/PNAGONNdZYd1b7KyJxuw9W8lq98D9J3NYAmMUxTeDF54YnHA/dqCNOzR43AVHwEfqbWb1U2uwGpe/KzR4T6zr8/opI6NXM38ODU3IGU4UiztYSmCoUEY6H0Cn1ITd7aLSvdIyWz85NK/fheAjz0joAYGFp0xZP/ami+SCONy64/l4zmF7pLKTkjOlMiIKP1I52ITd7inGn1Mdh6g2SiSJqR7u2+Fx2G9F8UBkAAPj4R+D6e9VwSs4gl91WzNUBwvEQvrz/ZpgENV9Y2mS4aD6IcDyE5P22aRJansaYWb3E8cYFAHD9TRdxNB9URv86ys5NM5zdGB++thVey+U+/QYAvHwsMAyTgPpht+xHYJhGYJhGt+y33QlqruXpjJrJyD+aD6Jb9jNJchMARt+53OyhU+orbfPSOpaf/MTy1kPdCGh1tpYAAEPeSik5o+MDwzReva2Z+4uCjyS3npPB6R7ZKWSJuvyJgo/sFLJkcLpHpEdPuSXRLd6jDhCRYgCAd6+fcZNMJkZVqXVe1ZUzt3jDIDwNvv/lmrvJM2ug0b7ynFQObmTuFs/diQFgdnJRaWudVxkTow64weuqEM+ABrMyd4O/ZxRo4kGAuW9VrKzd4bk7sfZbPKkc2Bo9N3jD47SdNiM5yesSoIc69SICRt+hnU44zeuO0xEphh/1X9zgESlmeRx2mtdtZPT/7OSicnahR2z1s0r90LAEO8kzVYhdKFUyUQ8wEBXP3C3+WpuKkfFd5cdyQv8A0LgoFtXx0DYAAAAASUVORK5CYII=");
+    background-size:48px 32px;
+    image-rendering:pixelated;
+    animation:tochaChama .6s steps(3) infinite;
+    pointer-events:none;
+  }
+  .est-tocha-estatica{animation:none;background-position-x:-16px}
+  @media (prefers-reduced-motion: reduce){.est-tocha{animation:none;background-position-x:-16px}}
+
+  .est-tocha-principal{position:absolute;right:16px;bottom:0;transform-origin:bottom right}
+  .est-streaklbl{display:none}
+
+  .est-statsrow{display:flex;gap:12px;margin-bottom:14px}
+  .est-statscol{flex:1;min-width:0;margin-bottom:0;display:flex;flex-direction:column;align-items:center;text-align:center}
+  .est-statscol .est-titulo{justify-content:center}
+  .est-statscol .est-ringbox,.est-statscol .est-donutbox{margin:6px 0 12px}
+  .est-donutlegenda-compacta{width:100%}
+  .est-donutlegenda-compacta .est-legitem{font-size:10.5px}
+  .est-donutlegenda-compacta .est-legbar{display:none}
+  .est-donutlegenda-compacta b{margin-left:auto}
+  .est-ringrow{display:flex;align-items:center;gap:18px}
+  .est-ringbox{position:relative;width:80px;height:80px;flex:none}
+  .est-ringtrack{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from -90deg, color-mix(in srgb, var(--accent) 35%, transparent) 0%, var(--accent) calc(var(--pct)*1%), transparent calc(var(--pct)*1%));-webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 6px), #000 calc(100% - 6px));mask:radial-gradient(farthest-side, transparent calc(100% - 6px), #000 calc(100% - 6px))}
+  .est-ringbg{position:absolute;inset:0;border-radius:50%;background:var(--panel-3);-webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 6px), #000 calc(100% - 6px));mask:radial-gradient(farthest-side, transparent calc(100% - 6px), #000 calc(100% - 6px));z-index:-1}
+  .est-ringtxt{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .est-ringtxt .n{font-family:'Silkscreen',monospace;font-size:16px;color:var(--accent)}
+  .est-ringtxt .u{font-size:7px;color:var(--dim);letter-spacing:.06em}
+
+  .est-chartwrap{position:relative}
+  .est-chartponto{filter:drop-shadow(0 0 2px rgba(0,0,0,.4))}
+  .est-chartlabels{display:flex;justify-content:space-between;margin-top:8px}
+  .est-chartlabels span{font-size:9.5px;color:var(--dim)}
+
+  .est-mapames{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+
+  .est-anograde{display:flex;flex-direction:column;gap:5px}
+  .est-anolinha{display:flex;align-items:center;gap:7px}
+  .est-anomeslbl{width:24px;flex:none;font-family:'Outfit',sans-serif;font-size:9.5px;color:var(--dim)}
+  .est-anodias{display:flex;gap:2px;flex:1;min-width:0;height:8px}
+  .est-anodia{display:block;flex:1;min-width:1px;max-width:8px;height:8px;border-radius:1.5px;background:var(--panel-3)}
+  .est-clicavel{cursor:pointer}
+  .est-histchevron{width:14px;height:14px;margin-left:auto;flex:none;color:var(--dim)}
+  .est-histsufixo{color:var(--dim);font-weight:400}
+
+  .est-periodoopc{display:block;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:13px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;margin-bottom:8px;cursor:pointer}
+  .est-periodoopc:last-child{margin-bottom:0}
+  .est-periodoopc.on{background:var(--accent-dim);border-color:var(--accent-dim);color:var(--accent);font-weight:600}
+
+  .est-montpopnum{font-family:'Outfit',sans-serif;font-weight:600;font-size:34px;color:var(--text);text-align:center;margin-bottom:4px}
+  .est-montpoplbl{font-size:11.5px;color:var(--dim);text-align:center;margin-bottom:16px;min-height:15px}
+  .est-montpopwrap{height:130px;position:relative;overflow:hidden;border-radius:12px;background:var(--panel)}
+  .est-montpopglow{position:absolute;inset:0;background:radial-gradient(circle at 50% 85%, color-mix(in srgb, var(--accent) 35%, transparent), transparent 60%);opacity:0;transition:opacity 1.1s ease}
+  .est-montpopglow.brilha{opacity:1}
+  .est-montpopimg{position:absolute;left:50%;bottom:6px;transform:translate(-50%,0) scale(calc(var(--tocha-escala,1) * .3));transform-origin:bottom center;opacity:0;transition:transform 1s cubic-bezier(.2,.9,.25,1.3), opacity .5s ease}
+  .est-montpopimg.cresceu{opacity:1;transform:translate(-50%,0) scale(var(--tocha-escala,1))}
+  .est-tile{aspect-ratio:1;border-radius:4px;border:1px solid var(--line);background:var(--panel-3);display:flex;align-items:flex-end;justify-content:center;position:relative;overflow:hidden;font-family:'Outfit',sans-serif;font-size:8.5px;font-weight:600;color:var(--dim)}
+  .est-tile span.est-tiledia{position:relative;z-index:1;text-shadow:0 1px 2px rgba(0,0,0,.85);margin-bottom:1px}
+  .est-tile-vitoria{background:#3A2E1A;border-color:#3A2E1A;color:#F2E7D5}
+  .est-tile-fuga{background:#242428;border-color:#242428;color:#8a8a92}
+  .est-tile-vitoria .est-tocha, .est-tile-fuga .est-tocha{position:absolute;top:2px;left:50%;transform:translateX(-50%) scale(.85);transform-origin:top center}
+  .est-tocha-apagada{filter:grayscale(1) brightness(.55);clip-path:inset(56% 0 0 0)}
+  .est-mapalegenda{display:flex;align-items:center;gap:6px;margin-top:10px;font-size:9.5px;color:var(--dim);flex-wrap:wrap}
+  .est-mapalegenda .est-tile{width:11px;height:11px;flex:none;font-size:0}
+
+  .est-donutbox{position:relative;width:70px;height:70px;flex:none}
+  .est-donutring{position:absolute;inset:0;border-radius:50%;background:var(--panel-3);-webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 8px), #000 calc(100% - 8px));mask:radial-gradient(farthest-side, transparent calc(100% - 8px), #000 calc(100% - 8px))}
+  .est-donuttxt{position:absolute;inset:0;display:grid;place-items:center;font-family:'Silkscreen',monospace;font-size:14px;color:var(--text)}
+  .est-donutlegenda{flex:1;min-width:0;display:flex;flex-direction:column;gap:9px}
+  .est-legitem{font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:7px}
+  .est-legitem b{color:var(--text);font-weight:600;flex:none}
+  .est-legbar{flex:1;height:4px;border-radius:2px;background:var(--panel-3);overflow:hidden;margin:0 2px}
+  .est-legbar i{display:block;height:100%;border-radius:2px;transition:width .4s}
+  .est-dot{width:8px;height:8px;border-radius:2px;flex:none}
 
   .toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);background:var(--accent);color:var(--bg);font-family:'Silkscreen',monospace;font-size:10px;padding:11px 18px;border-radius:8px;opacity:0;pointer-events:none;transition:all .3s;text-align:center;z-index:200}
   .toast.gold{background:var(--gold)}

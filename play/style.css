@@ -262,17 +262,20 @@
      em repouso. Padrao de qualquer botao nativo. :active sozinho e pouco
      confiavel em mobile (as vezes nem dispara, principalmente
      Safari/iOS) -- por isso .est-pressionado tambem existe, ligada via
-     JS com pointerdown/pointerup (ver wiring do estStreakCard/estHistCard).
-     O streakcard inverte a direcao do movimento em relacao ao historico:
-     comeca um pouco menor (scale .97) e CRESCE ao pressionar (scale
-     1.02) em vez de encolher -- pedido do usuario, casa com o tema do
-     card inteiro ser sobre "crescer" (streak/tocha), diferente do
-     historico que so precisa do feedback padrao de botao. */
+     JS com pointerdown/pointerup (ver wiring do estStreakCard/estHistCard). */
   .est-clicavel{cursor:pointer;transition:transform .12s ease}
   .est-clicavel:active, .est-clicavel.est-pressionado{transform:scale(.97)}
 
-  .est-streakcard.est-clicavel{transform:scale(.97);transform-origin:center}
-  .est-streakcard.est-clicavel:active, .est-streakcard.est-clicavel.est-pressionado{transform:scale(1.05)}
+  /* Card inteiro (Sequencia atual + Desde o inicio, #estCardPrincipal) --
+     pedido do usuario: comeca um pouco menor (.95) e CRESCE ao puxar a
+     tela pra baixo no topo (gesto tipo "puxar pra atualizar", ver JS
+     ligado em #viewEstatisticas). Primeira tentativa escalava so o
+     streakcard de dentro no toque direto -- usuario corrigiu que queria
+     o card INTEIRO (moldura vermelha no print dele) reagindo ao gesto de
+     ARRASTAR/SCROLL, nao um toque direto. Sem transition fixa aqui --
+     o JS controla a transicao (nenhuma durante o arrasto, com "mola"
+     cubic-bezier so ao soltar) pra acompanhar o dedo em tempo real. */
+  #estCardPrincipal{transform:scale(.95);transform-origin:top center}
 
   .est-streaklbl{display:none}
 

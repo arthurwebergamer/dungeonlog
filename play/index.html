@@ -735,7 +735,7 @@
       <span class="vsub" id="estMesLabel"></span>
     </div>
 
-    <div class="est-card">
+    <div class="est-card" id="estCardPrincipal">
       <div class="est-streakcard est-clicavel" id="estStreakCard">
         <div class="est-titulo" data-i18n="est.sequenciaAtual">Sequência atual</div>
         <div class="est-streaknum"><span id="estStreakNum">0</span></div>
@@ -1005,6 +1005,58 @@
     }
   };
 })();
+</script>
+
+<script>
+(function(){
+  // "puxar pra crescer" no card inteiro (#estCardPrincipal, Sequencia
+  // atual + Desde o inicio) -- pedido do usuario: o card ja comeca menor
+  // (.95, ver .est-card#estCardPrincipal no CSS) e cresce enquanto o dedo
+  // puxa a tela pra baixo, mas SO quando a tela de Estatisticas ja esta
+  // no topo (scrollTop <= 0) -- senao ia brigar com o scroll normal da
+  // pagina. Mesmo gesto de "puxar pra atualizar" (pull-to-refresh), so
+  // que em vez de recarregar a tela, estica o card. Ao soltar, volta pro
+  // tamanho menor com uma "mola" (cubic-bezier com overshoot).
+  const viewEl = document.getElementById('viewEstatisticas');
+  const cardEl = document.getElementById('estCardPrincipal');
+  if (!viewEl || !cardEl) return;
+
+  const MAXPUXAR = 90;
+  let startY = null;
+  let puxando = false;
+
+  function aplicar(dist){
+    const f = Math.min(Math.max(dist, 0), MAXPUXAR) / MAXPUXAR;
+    cardEl.style.transition = 'none';
+    cardEl.style.transform = 'scale(' + (0.95 + f * 0.14) + ')';
+  }
+  function soltar(){
+    if (!puxando) return;
+    puxando = false;
+    startY = null;
+    cardEl.style.transition = 'transform .3s cubic-bezier(.34,1.56,.64,1)';
+    cardEl.style.transform = 'scale(.95)';
+  }
+
+  viewEl.addEventListener('touchstart', function(e){
+    if (viewEl.scrollTop <= 0){
+      startY = e.touches[0].clientY;
+      puxando = true;
+    }
+  }, {passive:true});
+
+  viewEl.addEventListener('touchmove', function(e){
+    if (!puxando || startY === null) return;
+    const dist = e.touches[0].clientY - startY;
+    if (dist <= 0){ soltar(); return; }
+    e.preventDefault();
+    aplicar(dist);
+  }, {passive:false});
+
+  viewEl.addEventListener('touchend', soltar);
+  viewEl.addEventListener('touchcancel', soltar);
+})();
+</script>
 </script>
 
 <div class="debugbar"><button class="debugbtn" id="debugbtn">próximo dia →</button><button class="debugbtn" id="pularTutoriaisBtn">pular tutorial</button><button class="debugbtn" id="debugArmasBtn">+ todas armas</button></div>

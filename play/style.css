@@ -257,25 +257,25 @@
      bom, sinal fraco demais), uma sombra fixa de elevacao no streakcard
      de dentro (tambem descartada -- retangulo solto colado na tela,
      porque o streakcard nao tem fundo proprio), uma borda dourada fixa
-     (tambem descartada), uma seta feito a do Historico (tambem
-     descartada -- nao ficou legal perto da tocha) ou o card inteiro
-     crescendo ao arrastar a tela (varias tentativas -- nenhuma ficou
-     boa), o feedback que ficou foi: compressao ao tocar (:active/
-     .est-pressionado, padrao de qualquer botao nativo) + profundidade
-     em repouso via sombra MAIS FORTE que os outros cards (ver
-     #estCardPrincipal abaixo) -- dessa vez no CARD INTEIRO, que tem
-     fundo/borda proprios (.est-card), entao a sombra sai limpa, sem o
-     problema do retangulo solto que a tentativa anterior no streakcard
-     tinha. :active sozinho e pouco confiavel em mobile (as vezes nem
-     dispara, principalmente Safari/iOS) -- por isso .est-pressionado
-     tambem existe, ligada via JS com pointerdown/pointerup (ver wiring
-     do estCardPrincipal/estHistCard). O card inteiro (Sequencia atual +
-     Desde o inicio juntos) e clicavel agora, nao so a parte de cima. */
-  .est-clicavel{cursor:pointer;transition:transform .12s ease, box-shadow .12s ease}
+     (tambem descartada), uma seta perto da tocha feito a do Historico
+     (tambem descartada -- nao ficou legal ali), o card inteiro crescendo
+     ao arrastar a tela (varias tentativas -- nenhuma ficou boa) ou
+     sombra mais forte no card inteiro (funcionou sem o problema do
+     retangulo solto, mas usuario pediu pra tirar e seguir a proxima
+     sugestao do Gemini), o que ficou foi: compressao ao tocar (:active/
+     .est-pressionado, padrao de qualquer botao nativo) + uma seta ">"
+     no canto superior direito (.est-cardseta), convencao de "abre uma
+     tela nova" (recomendacao do Gemini). :active sozinho e pouco
+     confiavel em mobile (as vezes nem dispara, principalmente
+     Safari/iOS) -- por isso .est-pressionado tambem existe, ligada via
+     JS com pointerdown/pointerup (ver wiring do estCardPrincipal/
+     estHistCard). O card inteiro (Sequencia atual + Desde o inicio
+     juntos) e clicavel, nao so a parte de cima. */
+  .est-clicavel{cursor:pointer;transition:transform .12s ease}
   .est-clicavel:active, .est-clicavel.est-pressionado{transform:scale(.97)}
 
-  #estCardPrincipal{box-shadow:0 20px 42px rgba(0,0,0,.55), 0 6px 14px rgba(0,0,0,.4)}
-  #estCardPrincipal:active, #estCardPrincipal.est-pressionado{box-shadow:0 8px 18px rgba(0,0,0,.35)}
+  #estCardPrincipal{position:relative}
+  .est-cardseta{position:absolute;top:20px;right:20px;width:15px;height:15px;color:var(--dim);z-index:1;pointer-events:none}
 
   .est-streaklbl{display:none}
 

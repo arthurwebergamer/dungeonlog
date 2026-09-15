@@ -878,10 +878,27 @@
 
 <script>
 (function(){
+  // feedback de toque confiavel em mobile -- :active sozinho nao dispara
+  // direito no Safari/iOS (as vezes nem no Chrome Android), entao liga a
+  // classe .est-pressionado via pointerdown/pointerup/pointercancel, que
+  // funciona igual em touch e mouse. pointerleave cobre o caso de
+  // arrastar o dedo pra fora do card sem soltar (nao fica "preso"
+  // pressionado).
+  function ligarFeedbackToque(el){
+    if (!el) return;
+    const ligar = function(){ el.classList.add('est-pressionado'); };
+    const desligar = function(){ el.classList.remove('est-pressionado'); };
+    el.addEventListener('pointerdown', ligar);
+    el.addEventListener('pointerup', desligar);
+    el.addEventListener('pointercancel', desligar);
+    el.addEventListener('pointerleave', desligar);
+  }
+
   const periodoOverlay = document.getElementById('estPeriodoOverlay');
   const periodoFechar = document.getElementById('estPeriodoFechar');
   const histCard = document.getElementById('estHistCard');
   const sufixoEl = document.getElementById('estHistSufixo');
+  ligarFeedbackToque(histCard);
 
   function fecharPeriodo(){ if (periodoOverlay) periodoOverlay.classList.remove('on'); }
   if (periodoOverlay) periodoOverlay.onclick = function(e){ if (e.target === periodoOverlay) fecharPeriodo(); };
@@ -911,6 +928,7 @@
   const streakCard = document.getElementById('estStreakCard');
   const montImg = document.getElementById('estMontPopImg');
   const montGlow = document.getElementById('estMontPopGlow');
+  ligarFeedbackToque(streakCard);
 
   // escala da tocha conforme a sequencia atual (pedido do usuario:
   // "quanto mais vitorias, mais a [tocha] cresce" -- era montanha, agora

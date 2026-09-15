@@ -258,9 +258,13 @@
      testada e descartada -- ficava com cara de retangulo solto colado
      na tela, ver print do usuario), so a compressao leve ao pressionar.
      Padrao de qualquer botao nativo: o feedback confirma que o toque
-     registrou, sem precisar de texto nem de elemento visual parado. */
+     registrou, sem precisar de texto nem de elemento visual parado.
+     :active sozinho e pouco confiavel em mobile (o navegador atrasa/as
+     vezes nem aplica, principalmente Safari/iOS, pra decidir se e toque
+     ou scroll) -- por isso .est-pressionado tambem existe, ligada via JS
+     com pointerdown/pointerup (ver wiring do estStreakCard/estHistCard). */
   .est-clicavel{cursor:pointer;transition:transform .12s ease}
-  .est-clicavel:active{transform:scale(.97)}
+  .est-clicavel:active, .est-clicavel.est-pressionado{transform:scale(.97)}
 
   .est-streaklbl{display:none}
 

@@ -267,15 +267,17 @@
   .est-clicavel:active, .est-clicavel.est-pressionado{transform:scale(.97)}
 
   /* Card inteiro (Sequencia atual + Desde o inicio, #estCardPrincipal) --
-     pedido do usuario: comeca um pouco menor (.95) e CRESCE ao puxar a
-     tela pra baixo no topo (gesto tipo "puxar pra atualizar", ver JS
-     ligado em #viewEstatisticas). Primeira tentativa escalava so o
-     streakcard de dentro no toque direto -- usuario corrigiu que queria
-     o card INTEIRO (moldura vermelha no print dele) reagindo ao gesto de
-     ARRASTAR/SCROLL, nao um toque direto. Sem transition fixa aqui --
-     o JS controla a transicao (nenhuma durante o arrasto, com "mola"
-     cubic-bezier so ao soltar) pra acompanhar o dedo em tempo real. */
-  #estCardPrincipal{transform:scale(.95);transform-origin:top center}
+     pedido do usuario: comeca um pouco menor (.95) e CRESCE enquanto o
+     dedo arrasta em cima dele, em QUALQUER direcao (pra cima ou pra
+     baixo, nao so puxando o topo da tela pra baixo como na primeira
+     tentativa). Testado num mockup .html isolado antes de entrar aqui
+     (travava em arrasto devagar -- corrigido com requestAnimationFrame
+     no JS). Sem transition fixa aqui -- o JS controla a transicao
+     (nenhuma durante o arrasto, com "mola" cubic-bezier so ao soltar)
+     pra acompanhar o dedo em tempo real. Listener fica no card, nao na
+     tela toda, pra nao bloquear o scroll do resto da pagina (ver JS
+     ligado em #estCardPrincipal). */
+  #estCardPrincipal{transform:scale(.95);transform-origin:center;will-change:transform}
 
   .est-streaklbl{display:none}
 

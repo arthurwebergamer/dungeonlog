@@ -258,6 +258,20 @@
   .est-chartlabels span{font-size:9.5px;color:var(--dim)}
 
   .est-mapames{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+  .est-mapames-ano{grid-template-columns:repeat(4,1fr)}
+  .est-clicavel{cursor:pointer}
+  .est-histchevron{width:14px;height:14px;margin-left:auto;flex:none;color:var(--dim)}
+  .est-histsufixo{color:var(--dim);font-weight:400}
+
+  .est-periodoopc{display:block;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:13px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;margin-bottom:8px;cursor:pointer}
+  .est-periodoopc:last-child{margin-bottom:0}
+  .est-periodoopc.on{background:var(--accent-dim);border-color:var(--accent-dim);color:var(--accent);font-weight:600}
+
+  .est-montpopnum{font-family:'Outfit',sans-serif;font-weight:600;font-size:34px;color:var(--text);text-align:center;margin-bottom:4px}
+  .est-montpoplbl{font-size:11.5px;color:var(--dim);text-align:center;margin-bottom:16px;min-height:15px}
+  .est-montpopwrap{height:130px;position:relative;overflow:hidden;border-radius:12px;background:var(--panel)}
+  .est-montpopimg{position:absolute;left:50%;top:-170px;width:220px;height:auto;transform:translateX(-50%);transition:top .55s cubic-bezier(.22,.61,.36,1)}
+  .est-montpopimg.desceu{top:-12px}
   .est-tile{aspect-ratio:1;border-radius:4px;border:1px solid var(--line);background:var(--panel-3);display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-size:9.5px;font-weight:600;color:var(--dim)}
   .est-tile-vitoria{background:var(--accent);border-color:var(--accent);color:var(--panel-2)}
   .est-tile-fuga{background:color-mix(in srgb, var(--accent) 40%, transparent);border-color:color-mix(in srgb, var(--accent) 55%, transparent);color:var(--panel-2)}

@@ -285,6 +285,7 @@
      desde o primeiro toque -- mesma tecnica que .task ja usa em outro
      lugar do app. */
   #estCardPrincipal{transform:scale(.95);transform-origin:center;will-change:transform;touch-action:none}
+  #estCardPrincipal *{touch-action:none}
 
   .est-streaklbl{display:none}
 

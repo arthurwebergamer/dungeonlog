@@ -229,7 +229,7 @@
   .est-resumonum{font-family:'Silkscreen',monospace;font-size:19px;color:var(--accent)}
   .est-resumolbl{font-size:9.5px;color:var(--dim);margin-top:4px;line-height:1.3}
 
-  .est-streakcard{position:relative;overflow:hidden;flex-shrink:0;padding:14px 14px 18px;margin:-14px -14px 0}
+  .est-streakcard{position:relative;overflow:hidden;flex-shrink:0;padding-bottom:18px}
   .est-streakcard .est-titulo{position:relative;z-index:1}
 
   .est-streaknum{font-family:'Silkscreen',monospace;font-size:40px;color:var(--text);line-height:1}
@@ -254,26 +254,25 @@
   /* Feedback de toque nos cards clicaveis (streak + historico) -- pedido
      do usuario, baseado em tecnica sugerida pelo Gemini (prints): em vez
      de um brilho ambiente "convidando" a tocar (testamos e nao ficou
-     bom, sinal fraco demais) ou uma sombra fixa de elevacao (tambem
-     testada e descartada -- ficava com cara de retangulo solto colado
-     na tela, ver print do usuario), so a compressao leve ao pressionar.
-     Padrao de qualquer botao nativo: o feedback confirma que o toque
-     registrou, sem precisar de texto nem de elemento visual parado.
-     :active sozinho e pouco confiavel em mobile (o navegador atrasa/as
-     vezes nem aplica, principalmente Safari/iOS, pra decidir se e toque
-     ou scroll) -- por isso .est-pressionado tambem existe, ligada via JS
-     com pointerdown/pointerup (ver wiring do estStreakCard/estHistCard).
-     Depois de sombra e brilho falharem, a sinalizacao em repouso que
-     ficou boa foi uma borda fina -- na cor --gold (mesmo #F2C94C da
-     moeda no topo, nao --accent que e o laranja "de acao" usado no
-     resto da tela; sugestao do Gemini, casa melhor por ja ser uma cor
-     "de progresso/recompensa" no resto do app) -- so no streakcard, que
-     fica visualmente mais parecido com uma pilula/botao proprio, sem
-     competir com o resto do card. O historico nao tem contorno proprio
-     por ja ter a seta (.est-histchevron) como sinalizacao. */
+     bom, sinal fraco demais), uma sombra fixa de elevacao (tambem
+     descartada -- retangulo solto colado na tela) ou uma borda dourada
+     fixa (tambem descartada -- usuario preferiu outra ideia), o feedback
+     que ficou foi so o proprio movimento: :active/.est-pressionado
+     confirma que o toque registrou, sem precisar de nada visual parado
+     em repouso. Padrao de qualquer botao nativo. :active sozinho e pouco
+     confiavel em mobile (as vezes nem dispara, principalmente
+     Safari/iOS) -- por isso .est-pressionado tambem existe, ligada via
+     JS com pointerdown/pointerup (ver wiring do estStreakCard/estHistCard).
+     O streakcard inverte a direcao do movimento em relacao ao historico:
+     comeca um pouco menor (scale .97) e CRESCE ao pressionar (scale
+     1.02) em vez de encolher -- pedido do usuario, casa com o tema do
+     card inteiro ser sobre "crescer" (streak/tocha), diferente do
+     historico que so precisa do feedback padrao de botao. */
   .est-clicavel{cursor:pointer;transition:transform .12s ease}
-  .est-streakcard.est-clicavel{border:1px solid color-mix(in srgb, var(--gold) 40%, transparent);border-radius:14px}
   .est-clicavel:active, .est-clicavel.est-pressionado{transform:scale(.97)}
+
+  .est-streakcard.est-clicavel{transform:scale(.97);transform-origin:center}
+  .est-streakcard.est-clicavel:active, .est-streakcard.est-clicavel.est-pressionado{transform:scale(1.02)}
 
   .est-streaklbl{display:none}
 

@@ -779,8 +779,8 @@
           <div class="est-donuttxt" id="estDonutTotal">0</div>
         </div>
         <div class="est-donutlegenda est-donutlegenda-compacta">
-          <div class="est-legitem"><span class="est-dot" style="background:var(--verde)"></span><span data-i18n="est.vitoria">venceu</span><div class="est-legbar"><i id="estBarraVitoria" style="width:0%;background:var(--verde)"></i></div><b id="estQtdVitoria">0</b></div>
-          <div class="est-legitem"><span class="est-dot" style="background:var(--perigo)"></span><span data-i18n="est.fuga">fugiu</span><div class="est-legbar"><i id="estBarraFuga" style="width:0%;background:var(--perigo)"></i></div><b id="estQtdFuga">0</b></div>
+          <div class="est-legitem"><span class="est-dot" style="background:var(--accent)"></span><span data-i18n="est.vitoria">venceu</span><div class="est-legbar"><i id="estBarraVitoria" style="width:0%;background:var(--accent)"></i></div><b id="estQtdVitoria">0</b></div>
+          <div class="est-legitem"><span class="est-dot" style="background:color-mix(in srgb, var(--accent) 40%, transparent)"></span><span data-i18n="est.fuga">fugiu</span><div class="est-legbar"><i id="estBarraFuga" style="width:0%;background:color-mix(in srgb, var(--accent) 40%, transparent)"></i></div><b id="estQtdFuga">0</b></div>
           <div class="est-legitem"><span class="est-dot" style="background:var(--panel-3)"></span><span data-i18n="est.semTarefa">sem tarefa</span><div class="est-legbar"><i id="estBarraSemTarefa" style="width:0%"></i></div><b id="estQtdSemTarefa">0</b></div>
         </div>
       </div>
@@ -3674,7 +3674,7 @@ function renderDonutMes(vitorias, fugas, semTarefa){
   } else {
     const pVit = (vitorias / total) * 100;
     const pFuga = pVit + (fugas / total) * 100;
-    el.style.background = 'conic-gradient(var(--verde) 0% ' + pVit + '%, var(--perigo) ' + pVit + '% ' + pFuga + '%, var(--panel-3) ' + pFuga + '% 100%)';
+    el.style.background = 'conic-gradient(var(--accent) 0% ' + pVit + '%, color-mix(in srgb, var(--accent) 40%, transparent) ' + pVit + '% ' + pFuga + '%, var(--panel-3) ' + pFuga + '% 100%)';
   }
   document.getElementById('estDonutTotal').textContent = total;
   document.getElementById('estQtdVitoria').textContent = vitorias;

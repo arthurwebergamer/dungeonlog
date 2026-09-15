@@ -791,11 +791,11 @@
       <div class="est-chartwrap">
         <svg id="est7DiasSvg" viewBox="0 0 300 80" width="100%" height="80" preserveAspectRatio="none">
           <defs><linearGradient id="est7DiasFill" x1="0" y1="0" x2="0" y2="1">
-            <stop id="est7DiasStopTopo" offset="0%" stop-color="#F2A65A" stop-opacity="0.35"/>
-            <stop id="est7DiasStopBase" offset="100%" stop-color="#F2A65A" stop-opacity="0"/>
+            <stop id="est7DiasStopTopo" offset="0%" stop-color="#F5F0E9" stop-opacity="0.35"/>
+            <stop id="est7DiasStopBase" offset="100%" stop-color="#F5F0E9" stop-opacity="0"/>
           </linearGradient></defs>
           <path id="est7DiasArea" fill="url(#est7DiasFill)"/>
-          <path id="est7DiasLinha" fill="none" stroke="#F2A65A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path id="est7DiasLinha" fill="none" stroke="#F5F0E9" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
       <div class="est-chartlabels" id="est7DiasLabels"></div>
@@ -948,15 +948,23 @@
   window.escalaTocha = escalaTocha;
 
   // cor do numero da sequencia -- pedido do usuario: mudar junto com o
-  // "quao acesa" a tocha esta, usando os MESMOS cortes de escalaTocha()
-  // (0 / 1-6 / 7-29 / 30+) pra ficar tudo no mesmo ritmo visual. Mockup
-  // aprovado usa as cores que o resto do app ja define: dim (apagada) ->
-  // text (comecando) -> accent (pegando fogo) -> gold (auge, mesmo tom
-  // da borda do card e da moeda).
+  // "quao acesa" a tocha esta, usando os MESMOS 3 pontos de corte de
+  // escalaTocha() (1 / 7 / 30) pra ficar no mesmo ritmo visual. Primeira
+  // versao usava faixas fixas (1-6 dias = --text, igual sempre foi) --
+  // usuario testou com streak=2 e nao viu diferenca nenhuma (faixa
+  // "neutra" cobria dia 1 ao 6 inteiro). Trocado por interpolacao
+  // continua via color-mix() -- ja da pra notar um leve laranja no dia 2,
+  // crescendo gradualmente ate o accent cheio no dia 7 e o gold no 30.
   function corDoStreak(streak){
     if (streak <= 0) return 'var(--dim)';
-    if (streak < 7) return 'var(--text)';
-    if (streak < 30) return 'var(--accent)';
+    if (streak < 7){
+      const p = Math.round((streak - 1) / 6 * 100);
+      return 'color-mix(in srgb, var(--accent) ' + p + '%, var(--text))';
+    }
+    if (streak < 30){
+      const p = Math.round((streak - 7) / 23 * 100);
+      return 'color-mix(in srgb, var(--gold) ' + p + '%, var(--accent))';
+    }
     return 'var(--gold)';
   }
   window.corDoStreak = corDoStreak;
@@ -3592,6 +3600,14 @@ function corAccentComOpacidade(alpha){
   return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
 }
 
+function corTextoComOpacidade(alpha){
+  const hex = getComputedStyle(document.documentElement).getPropertyValue('--text').trim();
+  const m = hex.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i);
+  if (!m) return hex;
+  const r = parseInt(m[1], 16), g = parseInt(m[2], 16), b = parseInt(m[3], 16);
+  return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
+}
+
 function renderUltimos7Dias(hist){
   const linhaEl = document.getElementById('est7DiasLinha');
   const areaEl = document.getElementById('est7DiasArea');
@@ -3599,10 +3615,12 @@ function renderUltimos7Dias(hist){
   const labelsEl = document.getElementById('est7DiasLabels');
   if (!linhaEl || !areaEl || !svgEl || !labelsEl) return;
 
-  // atualiza o traco/area/gradiente pra cor do tema ativo agora
-  linhaEl.setAttribute('stroke', corAccentComOpacidade(1));
-  document.getElementById('est7DiasStopTopo').setAttribute('stop-color', corAccentComOpacidade(1));
-  document.getElementById('est7DiasStopBase').setAttribute('stop-color', corAccentComOpacidade(1));
+  // atualiza o traco/area/gradiente pra cor do tema ativo agora -- branco
+  // (var(--text)), nao o accent laranja. O usuario testou com laranja e
+  // pediu de volta pro branco original.
+  linhaEl.setAttribute('stroke', corTextoComOpacidade(1));
+  document.getElementById('est7DiasStopTopo').setAttribute('stop-color', corTextoComOpacidade(1));
+  document.getElementById('est7DiasStopBase').setAttribute('stop-color', corTextoComOpacidade(1));
 
   const porData = new Map(hist.map(h => [h.data, h.resultado]));
   const diasSemana = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S']; // Date.getDay(): 0=domingo

@@ -268,24 +268,19 @@
 
   /* Card inteiro (Sequencia atual + Desde o inicio, #estCardPrincipal) --
      pedido do usuario: comeca um pouco menor (.95) e CRESCE enquanto o
-     dedo arrasta em cima dele, em QUALQUER direcao (pra cima ou pra
-     baixo, nao so puxando o topo da tela pra baixo como na primeira
-     tentativa). Testado num mockup .html isolado antes de entrar aqui
-     (travava em arrasto devagar -- corrigido com requestAnimationFrame
-     no JS). Sem transition fixa aqui -- o JS controla a transicao
-     (nenhuma durante o arrasto, com "mola" cubic-bezier so ao soltar)
-     pra acompanhar o dedo em tempo real. Listener fica no card, nao na
-     tela toda, pra nao bloquear o scroll do resto da pagina (ver JS
-     ligado em #estCardPrincipal). Usuario testou e nao funcionava nem
-     tocando direto no card -- suspeita: dentro de .view (que tem
-     overflow-y:auto), o navegador pode decidir que o gesto e "comeco de
-     scroll" antes do JS conseguir chamar preventDefault() no touchmove,
-     mesmo com passive:false certo. touch-action:none avisa o navegador
-     de saida pra nao reivindicar o gesto, deixando o JS no controle
-     desde o primeiro toque -- mesma tecnica que .task ja usa em outro
-     lugar do app. */
-  #estCardPrincipal{transform:scale(.95);transform-origin:center;will-change:transform;touch-action:none}
-  #estCardPrincipal *{touch-action:none}
+     dedo arrasta em QUALQUER LUGAR da tela de Estatisticas (nao so em
+     cima do card), em qualquer direcao. Historico de tentativas: (1) so
+     no topo da tela pra baixo (pull-to-refresh classico) -- usuario
+     queria em qualquer direcao; (2) escopado pro toque direto no card
+     com preventDefault+touch-action:none pra evitar o navegador "roubar"
+     o gesto de scroll -- funcionava (confirmado por diff de pixel entre
+     frames), mas usuario queria o efeito disparando de QUALQUER PONTO da
+     tela, nao so em cima do card. Isso exige NAO bloquear o scroll
+     nativo (preventDefault) -- por isso essa versao final e so passiva:
+     scroll da pagina e crescimento do card acontecem ao mesmo tempo, sem
+     brigar. touch-action:none foi removido daqui e dos filhos por esse
+     motivo -- ver JS ligado em #viewEstatisticas. */
+  #estCardPrincipal{transform:scale(.95);transform-origin:center;will-change:transform}
 
   .est-streaklbl{display:none}
 

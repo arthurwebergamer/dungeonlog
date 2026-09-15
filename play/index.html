@@ -1012,25 +1012,27 @@
   // "arrastar pra crescer" no card inteiro (#estCardPrincipal, Sequencia
   // atual + Desde o inicio) -- pedido do usuario: o card ja comeca menor
   // (.95, ver .est-card#estCardPrincipal no CSS) e cresce enquanto o dedo
-  // arrasta em CIMA DELE, em qualquer direcao (pra cima ou pra baixo),
-  // proporcional a distancia absoluta arrastada desde o toque inicial.
+  // arrasta em QUALQUER LUGAR da tela de Estatisticas, em qualquer
+  // direcao (pra cima ou pra baixo), proporcional a distancia absoluta
+  // arrastada desde o toque inicial -- nao precisa tocar em cima do
+  // card especificamente.
   //
-  // Escopo: o listener fica no PROPRIO CARD, nao na tela toda
-  // (#viewEstatisticas) -- testamos com a tela toda num mockup isolado
-  // (arquivo .html separado) e funcionava, mas la bloqueava o scroll da
-  // pagina INTEIRA sempre que tocava em qualquer lugar, o que quebraria
-  // a rolagem normal do resto da tela de Estatisticas no app de
-  // verdade. Escopando pro card, o preventDefault (necessario pra evitar
-  // o scroll nativo brigando com a atualizacao do transform, causava
-  // travamento em arrasto devagar) so vale enquanto o dedo esta
-  // literalmente em cima do card -- fora dele, scroll normal.
+  // Escopo: listener fica em #viewEstatisticas (a tela toda), SEM
+  // preventDefault -- tentamos escopar so pro card antes (com
+  // preventDefault + touch-action:none), usuario confirmou que
+  // funcionava mas queria o gesto disparando de qualquer ponto da tela,
+  // o que exige nao bloquear o scroll nativo (senao trava a rolagem
+  // inteira da pagina). Passive:true o tempo todo -- scroll nativo e a
+  // atualizacao do transform acontecem AO MESMO TEMPO, sem um brigar
+  // pelo controle do gesto do outro.
   //
-  // requestAnimationFrame throttla a atualizacao do transform (evita
-  // aplicar toda vez que touchmove dispara, que pode ser mais rapido que
-  // a tela consegue desenhar) -- essa foi a correcao que resolveu o
-  // travamento percebido pelo usuario no mockup.
+  // requestAnimationFrame throttla a atualizacao do transform (nao
+  // aplica toda vez que touchmove dispara, so uma vez por frame) --
+  // isso sozinho ja resolveu boa parte do travamento que o usuario via
+  // antes, mesmo sem o preventDefault.
+  const viewEl = document.getElementById('viewEstatisticas');
   const cardEl = document.getElementById('estCardPrincipal');
-  if (!cardEl) return;
+  if (!viewEl || !cardEl) return;
 
   const MAXARRASTO = 260;
   let startY = null;
@@ -1058,20 +1060,19 @@
     cardEl.style.transform = 'scale(.95)';
   }
 
-  cardEl.addEventListener('touchstart', function(e){
+  viewEl.addEventListener('touchstart', function(e){
     startY = e.touches[0].clientY;
     arrastando = true;
     cardEl.style.transition = 'none';
   }, {passive:true});
 
-  cardEl.addEventListener('touchmove', function(e){
+  viewEl.addEventListener('touchmove', function(e){
     if (!arrastando || startY === null) return;
-    e.preventDefault();
     pedirFrame(Math.abs(e.touches[0].clientY - startY));
-  }, {passive:false});
+  }, {passive:true});
 
-  cardEl.addEventListener('touchend', soltar);
-  cardEl.addEventListener('touchcancel', soltar);
+  viewEl.addEventListener('touchend', soltar);
+  viewEl.addEventListener('touchcancel', soltar);
 })();
 </script>
 

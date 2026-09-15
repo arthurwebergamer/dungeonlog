@@ -276,8 +276,15 @@
      (nenhuma durante o arrasto, com "mola" cubic-bezier so ao soltar)
      pra acompanhar o dedo em tempo real. Listener fica no card, nao na
      tela toda, pra nao bloquear o scroll do resto da pagina (ver JS
-     ligado em #estCardPrincipal). */
-  #estCardPrincipal{transform:scale(.95);transform-origin:center;will-change:transform}
+     ligado em #estCardPrincipal). Usuario testou e nao funcionava nem
+     tocando direto no card -- suspeita: dentro de .view (que tem
+     overflow-y:auto), o navegador pode decidir que o gesto e "comeco de
+     scroll" antes do JS conseguir chamar preventDefault() no touchmove,
+     mesmo com passive:false certo. touch-action:none avisa o navegador
+     de saida pra nao reivindicar o gesto, deixando o JS no controle
+     desde o primeiro toque -- mesma tecnica que .task ja usa em outro
+     lugar do app. */
+  #estCardPrincipal{transform:scale(.95);transform-origin:center;will-change:transform;touch-action:none}
 
   .est-streaklbl{display:none}
 

@@ -278,8 +278,8 @@
   .est-anograde{display:flex;flex-direction:column;gap:5px}
   .est-anolinha{display:flex;align-items:center;gap:7px}
   .est-anomeslbl{width:24px;flex:none;font-family:'Outfit',sans-serif;font-size:9.5px;color:var(--dim)}
-  .est-anodias{display:flex;gap:2px;flex:1;min-width:0}
-  .est-anodia{flex:1;min-width:0;max-width:8px;aspect-ratio:1;border-radius:1.5px;background:var(--panel-3)}
+  .est-anodias{display:flex;gap:2px;flex:1;min-width:0;height:8px}
+  .est-anodia{display:block;flex:1;min-width:1px;max-width:8px;height:8px;border-radius:1.5px;background:var(--panel-3)}
   .est-clicavel{cursor:pointer}
   .est-histchevron{width:14px;height:14px;margin-left:auto;flex:none;color:var(--dim)}
   .est-histsufixo{color:var(--dim);font-weight:400}

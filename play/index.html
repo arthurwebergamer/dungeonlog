@@ -741,6 +741,7 @@
         <div class="est-streaknum"><span id="estStreakNum">0</span></div>
         <div class="est-streaklbl" id="estStreakLbl"></div>
         <div class="est-tocha est-tocha-principal" id="estTochaPrincipal" aria-hidden="true"></div>
+        <svg class="est-tochachevron" id="estTochaChevron" style="right:58px;bottom:8px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
       </div>
 
       <div class="est-divider"></div>
@@ -1004,75 +1005,6 @@
       });
     }
   };
-})();
-</script>
-
-<script>
-(function(){
-  // "arrastar pra crescer" no card inteiro (#estCardPrincipal, Sequencia
-  // atual + Desde o inicio) -- pedido do usuario: o card ja comeca menor
-  // (.95, ver .est-card#estCardPrincipal no CSS) e cresce enquanto o dedo
-  // arrasta em QUALQUER LUGAR da tela de Estatisticas, em qualquer
-  // direcao (pra cima ou pra baixo), proporcional a distancia absoluta
-  // arrastada desde o toque inicial -- nao precisa tocar em cima do
-  // card especificamente.
-  //
-  // Escopo: listener fica em #viewEstatisticas (a tela toda), SEM
-  // preventDefault -- tentamos escopar so pro card antes (com
-  // preventDefault + touch-action:none), usuario confirmou que
-  // funcionava mas queria o gesto disparando de qualquer ponto da tela,
-  // o que exige nao bloquear o scroll nativo (senao trava a rolagem
-  // inteira da pagina). Passive:true o tempo todo -- scroll nativo e a
-  // atualizacao do transform acontecem AO MESMO TEMPO, sem um brigar
-  // pelo controle do gesto do outro.
-  //
-  // requestAnimationFrame throttla a atualizacao do transform (nao
-  // aplica toda vez que touchmove dispara, so uma vez por frame) --
-  // isso sozinho ja resolveu boa parte do travamento que o usuario via
-  // antes, mesmo sem o preventDefault.
-  const viewEl = document.getElementById('viewEstatisticas');
-  const cardEl = document.getElementById('estCardPrincipal');
-  if (!viewEl || !cardEl) return;
-
-  const MAXARRASTO = 260;
-  let startY = null;
-  let arrastando = false;
-  let distAtual = 0;
-  let rafPendente = false;
-
-  function aplicarFrame(){
-    rafPendente = false;
-    const f = Math.min(distAtual, MAXARRASTO) / MAXARRASTO;
-    cardEl.style.transform = 'scale(' + (0.95 + f * 0.16).toFixed(3) + ')';
-  }
-  function pedirFrame(distAbs){
-    distAtual = distAbs;
-    if (!rafPendente){
-      rafPendente = true;
-      requestAnimationFrame(aplicarFrame);
-    }
-  }
-  function soltar(){
-    if (!arrastando) return;
-    arrastando = false;
-    startY = null;
-    cardEl.style.transition = 'transform .3s cubic-bezier(.34,1.56,.64,1)';
-    cardEl.style.transform = 'scale(.95)';
-  }
-
-  viewEl.addEventListener('touchstart', function(e){
-    startY = e.touches[0].clientY;
-    arrastando = true;
-    cardEl.style.transition = 'none';
-  }, {passive:true});
-
-  viewEl.addEventListener('touchmove', function(e){
-    if (!arrastando || startY === null) return;
-    pedirFrame(Math.abs(e.touches[0].clientY - startY));
-  }, {passive:true});
-
-  viewEl.addEventListener('touchend', soltar);
-  viewEl.addEventListener('touchcancel', soltar);
 })();
 </script>
 

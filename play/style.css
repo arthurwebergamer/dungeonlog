@@ -255,32 +255,23 @@
      do usuario, baseado em tecnica sugerida pelo Gemini (prints): em vez
      de um brilho ambiente "convidando" a tocar (testamos e nao ficou
      bom, sinal fraco demais), uma sombra fixa de elevacao (tambem
-     descartada -- retangulo solto colado na tela) ou uma borda dourada
-     fixa (tambem descartada -- usuario preferiu outra ideia), o feedback
-     que ficou foi so o proprio movimento: :active/.est-pressionado
-     confirma que o toque registrou, sem precisar de nada visual parado
-     em repouso. Padrao de qualquer botao nativo. :active sozinho e pouco
+     descartada -- retangulo solto colado na tela), uma borda dourada
+     fixa (tambem descartada) ou o card inteiro crescendo ao arrastar a
+     tela (varias tentativas -- so no card, so no topo, em qualquer
+     lugar -- nenhuma ficou boa e a ultima ainda tinha scroll competindo
+     com a animacao), o feedback que ficou foi so o proprio movimento:
+     :active/.est-pressionado confirma que o toque registrou ao tocar,
+     sem precisar de nada visual parado em repouso nem de gestos de
+     arrastar. Padrao de qualquer botao nativo. :active sozinho e pouco
      confiavel em mobile (as vezes nem dispara, principalmente
      Safari/iOS) -- por isso .est-pressionado tambem existe, ligada via
-     JS com pointerdown/pointerup (ver wiring do estStreakCard/estHistCard). */
+     JS com pointerdown/pointerup (ver wiring do estStreakCard/estHistCard).
+     Pra sinalizar em repouso que da pra tocar, reaproveitamos a mesma
+     seta que o Histórico ja usa (.est-histchevron) -- so que posicionada
+     perto da tocha (.est-tochachevron), nao do titulo, porque o usuario
+     pediu o sinal especificamente ali. */
   .est-clicavel{cursor:pointer;transition:transform .12s ease}
   .est-clicavel:active, .est-clicavel.est-pressionado{transform:scale(.97)}
-
-  /* Card inteiro (Sequencia atual + Desde o inicio, #estCardPrincipal) --
-     pedido do usuario: comeca um pouco menor (.95) e CRESCE enquanto o
-     dedo arrasta em QUALQUER LUGAR da tela de Estatisticas (nao so em
-     cima do card), em qualquer direcao. Historico de tentativas: (1) so
-     no topo da tela pra baixo (pull-to-refresh classico) -- usuario
-     queria em qualquer direcao; (2) escopado pro toque direto no card
-     com preventDefault+touch-action:none pra evitar o navegador "roubar"
-     o gesto de scroll -- funcionava (confirmado por diff de pixel entre
-     frames), mas usuario queria o efeito disparando de QUALQUER PONTO da
-     tela, nao so em cima do card. Isso exige NAO bloquear o scroll
-     nativo (preventDefault) -- por isso essa versao final e so passiva:
-     scroll da pagina e crescimento do card acontecem ao mesmo tempo, sem
-     brigar. touch-action:none foi removido daqui e dos filhos por esse
-     motivo -- ver JS ligado em #viewEstatisticas. */
-  #estCardPrincipal{transform:scale(.95);transform-origin:center;will-change:transform}
 
   .est-streaklbl{display:none}
 
@@ -313,6 +304,7 @@
   .est-anodias{display:flex;gap:2px;flex:1;min-width:0;height:8px}
   .est-anodia{display:block;flex:1;min-width:1px;max-width:8px;height:8px;border-radius:1.5px;background:var(--panel-3)}
   .est-histchevron{width:14px;height:14px;margin-left:auto;flex:none;color:var(--dim)}
+  .est-tochachevron{position:absolute;width:13px;height:13px;color:var(--dim);z-index:1}
   .est-histsufixo{color:var(--dim);font-weight:400}
 
   .est-periodoopc{display:block;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:13px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;margin-bottom:8px;cursor:pointer}

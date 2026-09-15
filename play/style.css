@@ -249,7 +249,26 @@
   .est-tocha-estatica{animation:none;background-position-x:-16px}
   @media (prefers-reduced-motion: reduce){.est-tocha{animation:none;background-position-x:-16px}}
 
-  .est-tocha-principal{position:absolute;right:16px;bottom:0;transform-origin:bottom right}
+  .est-tocha-principal{position:absolute;right:16px;bottom:0;transform-origin:bottom right;z-index:1}
+
+  /* Brilho pulsante atras da tocha do card -- pedido do usuario: sinalizar
+     que da pra tocar/clicar SEM texto ("clique aqui") e sem reaproveitar
+     o padrao de seta do Histórico -- a propria luz "respirando" convida
+     a tocar. So no card principal (clicavel); as tochinhas dos tiles do
+     calendario e a do popup nao precisam disso. */
+  .est-tocha-brilho{
+    position:absolute; right:16px; bottom:6px;
+    width:34px; height:34px; border-radius:50%;
+    background:radial-gradient(circle, color-mix(in srgb, var(--accent) 50%, transparent) 0%, transparent 72%);
+    transform:translate(50%,20%);
+    animation:tochaRespira 2.6s ease-in-out infinite;
+    pointer-events:none; z-index:0;
+  }
+  @keyframes tochaRespira{
+    0%,100%{opacity:.3; transform:translate(50%,20%) scale(.8)}
+    50%{opacity:.8; transform:translate(50%,20%) scale(1.25)}
+  }
+  @media (prefers-reduced-motion: reduce){.est-tocha-brilho{animation:none;opacity:.45}}
   .est-streaklbl{display:none}
 
   .est-statsrow{display:flex;gap:12px;margin-bottom:14px}

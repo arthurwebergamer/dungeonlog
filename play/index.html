@@ -740,6 +740,7 @@
         <div class="est-titulo" data-i18n="est.sequenciaAtual">Sequência atual</div>
         <div class="est-streaknum"><span id="estStreakNum">0</span></div>
         <div class="est-streaklbl" id="estStreakLbl"></div>
+        <div class="est-tocha-brilho" aria-hidden="true"></div>
         <div class="est-tocha est-tocha-principal" id="estTochaPrincipal" aria-hidden="true"></div>
       </div>
 
@@ -3812,6 +3813,10 @@ function renderEstatisticas(){
     montanhaEl.style.transform = 'scale(' + window.escalaTocha(streak) + ')';
     montanhaEl.classList.toggle('est-tocha-apagada', streak === 0);
     montanhaEl.classList.toggle('est-tocha-estatica', streak === 0);
+  }
+  const brilhoEl = montanhaEl ? montanhaEl.previousElementSibling : null;
+  if (brilhoEl && brilhoEl.classList.contains('est-tocha-brilho')){
+    brilhoEl.style.display = streak === 0 ? 'none' : '';
   }
   const lblEl = document.getElementById('estStreakLbl');
   if (recorde === 0){

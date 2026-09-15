@@ -254,15 +254,13 @@
   /* Feedback de toque nos cards clicaveis (streak + historico) -- pedido
      do usuario, baseado em tecnica sugerida pelo Gemini (prints): em vez
      de um brilho ambiente "convidando" a tocar (testamos e nao ficou
-     bom, sinal fraco demais), o proprio toque responde na hora --
-     compressao leve + sombra reduzindo ao pressionar. Padrao de qualquer
-     botao nativo: o feedback confirma que o toque registrou, sem
-     precisar de texto nem de animacao passiva antes do toque. */
+     bom, sinal fraco demais) ou uma sombra fixa de elevacao (tambem
+     testada e descartada -- ficava com cara de retangulo solto colado
+     na tela, ver print do usuario), so a compressao leve ao pressionar.
+     Padrao de qualquer botao nativo: o feedback confirma que o toque
+     registrou, sem precisar de texto nem de elemento visual parado. */
   .est-clicavel{cursor:pointer;transition:transform .12s ease}
   .est-clicavel:active{transform:scale(.97)}
-  .est-streakcard.est-clicavel{box-shadow:0 6px 16px rgba(0,0,0,.28);border-radius:14px;transition:transform .12s ease,box-shadow .12s ease}
-  .est-streakcard.est-clicavel:active{box-shadow:0 2px 8px rgba(0,0,0,.22)}
-  #estHistCard.est-clicavel:active{box-shadow:0 4px 12px rgba(0,0,0,.18)}
 
   .est-streaklbl{display:none}
 

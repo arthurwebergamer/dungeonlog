@@ -264,13 +264,15 @@
      ou scroll) -- por isso .est-pressionado tambem existe, ligada via JS
      com pointerdown/pointerup (ver wiring do estStreakCard/estHistCard).
      Depois de sombra e brilho falharem, a sinalizacao em repouso que
-     ficou boa foi uma borda fina no tom do accent (sugestao do Gemini,
-     "borda ativa dourada") -- so no streakcard, que fica visualmente
-     mais parecido com uma pilula/botao proprio, sem competir com o
-     resto do card. O historico nao tem contorno proprio por ja ter
-     a seta (.est-histchevron) como sinalizacao. */
+     ficou boa foi uma borda fina -- na cor --gold (mesmo #F2C94C da
+     moeda no topo, nao --accent que e o laranja "de acao" usado no
+     resto da tela; sugestao do Gemini, casa melhor por ja ser uma cor
+     "de progresso/recompensa" no resto do app) -- so no streakcard, que
+     fica visualmente mais parecido com uma pilula/botao proprio, sem
+     competir com o resto do card. O historico nao tem contorno proprio
+     por ja ter a seta (.est-histchevron) como sinalizacao. */
   .est-clicavel{cursor:pointer;transition:transform .12s ease}
-  .est-streakcard.est-clicavel{border:1px solid color-mix(in srgb, var(--accent) 35%, transparent);border-radius:14px}
+  .est-streakcard.est-clicavel{border:1px solid color-mix(in srgb, var(--gold) 40%, transparent);border-radius:14px}
   .est-clicavel:active, .est-clicavel.est-pressionado{transform:scale(.97)}
 
   .est-streaklbl{display:none}

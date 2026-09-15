@@ -735,8 +735,9 @@
       <span class="vsub" id="estMesLabel"></span>
     </div>
 
-    <div class="est-card">
-      <div class="est-streakcard est-clicavel" id="estStreakCard">
+    <div class="est-card est-clicavel" id="estCardPrincipal">
+      <svg class="est-cardseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+      <div class="est-streakcard">
         <div class="est-titulo" data-i18n="est.sequenciaAtual">Sequência atual</div>
         <div class="est-streaknum"><span id="estStreakNum">0</span></div>
         <div class="est-streaklbl" id="estStreakLbl"></div>
@@ -791,11 +792,11 @@
       <div class="est-chartwrap">
         <svg id="est7DiasSvg" viewBox="0 0 300 80" width="100%" height="80" preserveAspectRatio="none">
           <defs><linearGradient id="est7DiasFill" x1="0" y1="0" x2="0" y2="1">
-            <stop id="est7DiasStopTopo" offset="0%" stop-color="#F2A65A" stop-opacity="0.35"/>
-            <stop id="est7DiasStopBase" offset="100%" stop-color="#F2A65A" stop-opacity="0"/>
+            <stop id="est7DiasStopTopo" offset="0%" stop-color="#F5F0E9" stop-opacity="0.35"/>
+            <stop id="est7DiasStopBase" offset="100%" stop-color="#F5F0E9" stop-opacity="0"/>
           </linearGradient></defs>
           <path id="est7DiasArea" fill="url(#est7DiasFill)"/>
-          <path id="est7DiasLinha" fill="none" stroke="#F2A65A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path id="est7DiasLinha" fill="none" stroke="#F5F0E9" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
       <div class="est-chartlabels" id="est7DiasLabels"></div>
@@ -805,7 +806,7 @@
       <div class="est-titulo est-histtitulo">
         <span data-i18n="est.mapaDoMes">Histórico</span>
         <span class="est-histsufixo" id="estHistSufixo" data-i18n="est.periodoMes">· mês</span>
-        <svg class="est-histchevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+        <svg class="est-histchevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
       </div>
       <div class="est-mapames" id="estMapaMes"></div>
       <div class="est-mapalegenda" id="estMapaLegenda">
@@ -873,15 +874,36 @@
       <div class="est-montpopglow" id="estMontPopGlow"></div>
       <div class="est-tocha est-montpopimg" id="estMontPopImg" aria-hidden="true"></div>
     </div>
+    <button type="button" class="est-compartilharBtn" id="estCompartilharBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 8l5-5 5 5"/><path d="M5 15v3a2 2 0 002 2h10a2 2 0 002-2v-3"/></svg>
+      <span data-i18n="est.compartilhar">Compartilhar</span>
+    </button>
   </div>
 </div>
 
 <script>
 (function(){
+  // feedback de toque confiavel em mobile -- :active sozinho nao dispara
+  // direito no Safari/iOS (as vezes nem no Chrome Android), entao liga a
+  // classe .est-pressionado via pointerdown/pointerup/pointercancel, que
+  // funciona igual em touch e mouse. pointerleave cobre o caso de
+  // arrastar o dedo pra fora do card sem soltar (nao fica "preso"
+  // pressionado).
+  function ligarFeedbackToque(el){
+    if (!el) return;
+    const ligar = function(){ el.classList.add('est-pressionado'); };
+    const desligar = function(){ el.classList.remove('est-pressionado'); };
+    el.addEventListener('pointerdown', ligar);
+    el.addEventListener('pointerup', desligar);
+    el.addEventListener('pointercancel', desligar);
+    el.addEventListener('pointerleave', desligar);
+  }
+
   const periodoOverlay = document.getElementById('estPeriodoOverlay');
   const periodoFechar = document.getElementById('estPeriodoFechar');
   const histCard = document.getElementById('estHistCard');
   const sufixoEl = document.getElementById('estHistSufixo');
+  ligarFeedbackToque(histCard);
 
   function fecharPeriodo(){ if (periodoOverlay) periodoOverlay.classList.remove('on'); }
   if (periodoOverlay) periodoOverlay.onclick = function(e){ if (e.target === periodoOverlay) fecharPeriodo(); };
@@ -908,9 +930,10 @@
 
   const montOverlay = document.getElementById('estMontanhaOverlay');
   const montFechar = document.getElementById('estMontanhaFechar');
-  const streakCard = document.getElementById('estStreakCard');
+  const streakCard = document.getElementById('estCardPrincipal'); // nome mantido por historico -- agora e o card inteiro (Sequencia atual + Desde o inicio), nao so o streakcard de cima
   const montImg = document.getElementById('estMontPopImg');
   const montGlow = document.getElementById('estMontPopGlow');
+  ligarFeedbackToque(streakCard);
 
   // escala da tocha conforme a sequencia atual (pedido do usuario:
   // "quanto mais vitorias, mais a [tocha] cresce" -- era montanha, agora
@@ -929,6 +952,28 @@
   }
   window.escalaTocha = escalaTocha;
 
+  // cor do numero da sequencia -- pedido do usuario: mudar junto com o
+  // "quao acesa" a tocha esta, usando os MESMOS 3 pontos de corte de
+  // escalaTocha() (1 / 7 / 30) pra ficar no mesmo ritmo visual. Primeira
+  // versao usava faixas fixas (1-6 dias = --text, igual sempre foi) --
+  // usuario testou com streak=2 e nao viu diferenca nenhuma (faixa
+  // "neutra" cobria dia 1 ao 6 inteiro). Trocado por interpolacao
+  // continua via color-mix() -- ja da pra notar um leve laranja no dia 2,
+  // crescendo gradualmente ate o accent cheio no dia 7 e o gold no 30.
+  function corDoStreak(streak){
+    if (streak <= 0) return 'var(--dim)';
+    if (streak < 7){
+      const p = Math.round((streak - 1) / 6 * 100);
+      return 'color-mix(in srgb, var(--accent) ' + p + '%, var(--text))';
+    }
+    if (streak < 30){
+      const p = Math.round((streak - 7) / 23 * 100);
+      return 'color-mix(in srgb, var(--gold) ' + p + '%, var(--accent))';
+    }
+    return 'var(--gold)';
+  }
+  window.corDoStreak = corDoStreak;
+
   function fecharMontanha(){
     if (montOverlay) montOverlay.classList.remove('on');
     if (montImg) montImg.classList.remove('cresceu');
@@ -945,6 +990,7 @@
     if (popLbl && lblEl) popLbl.textContent = lblEl.textContent;
 
     const streak = numEl ? (Number(numEl.textContent) || 0) : 0;
+    if (popNum) popNum.style.color = corDoStreak(streak);
     if (montImg){
       montImg.style.setProperty('--tocha-escala', escalaTocha(streak));
       montImg.classList.toggle('est-tocha-apagada', streak === 0);
@@ -962,6 +1008,193 @@
         });
       });
     }
+  };
+
+  // ===================================================================
+  // Compartilhar sequencia -- gera um card 9:16 em <canvas> (tocha, nome
+  // do jogador, numero do streak) e abre o share sheet nativo via Web
+  // Share API (com fallback pra download se o navegador nao suportar
+  // compartilhar arquivo). Mockup aprovado pelo usuario antes desta
+  // implementacao -- ver conversa/roadmap. Heroi tinha entrado numa
+  // versao anterior mas foi removido a pedido do usuario -- so a
+  // tocha fica, sem dividir atencao com mais nada no card.
+  // ===================================================================
+
+  function carregarImagem(src){
+    return new Promise(function(resolve){
+      if (!src){ resolve(null); return; }
+      const img = new Image();
+      img.onload = function(){ resolve(img); };
+      img.onerror = function(){ resolve(null); };
+      img.src = src;
+    });
+  }
+
+  // extrai a MESMA imagem que .est-tocha ja usa via CSS (background-image),
+  // em vez de duplicar o base64 aqui -- se o sprite da tocha mudar um dia,
+  // o card de compartilhamento acompanha sozinho, sem precisar editar 2 lugares.
+  function carregarImagemDoCss(selector){
+    const el = document.querySelector(selector);
+    if (!el) return Promise.resolve(null);
+    const bg = getComputedStyle(el).backgroundImage;
+    const m = bg && bg.match(/url\(["']?(data:image\/[^"')]+)["']?\)/);
+    if (!m) return Promise.resolve(null);
+    return carregarImagem(m[1]);
+  }
+
+  function hexParaRgb(hex){
+    const m = (hex || '').trim().match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i);
+    if (!m) return null;
+    return [parseInt(m[1], 16), parseInt(m[2], 16), parseInt(m[3], 16)];
+  }
+  // mistura hexB em hexA na proporcao pct% (mesma semantica de
+  // color-mix(in srgb, hexB pct%, hexA), so resolvida em JS pq canvas
+  // fillStyle nao resolve var()/color-mix() com custom properties.
+  function misturarCores(hexA, hexB, pct){
+    const a = hexParaRgb(hexA), b = hexParaRgb(hexB);
+    if (!a || !b) return hexA || '#8779A8';
+    const t = Math.max(0, Math.min(100, pct)) / 100;
+    const r = Math.round(a[0] + (b[0] - a[0]) * t);
+    const g = Math.round(a[1] + (b[1] - a[1]) * t);
+    const bl = Math.round(a[2] + (b[2] - a[2]) * t);
+    return 'rgb(' + r + ',' + g + ',' + bl + ')';
+  }
+  // mesma regra de corDoStreak() (3 cortes 1/7/30), so com cores JA
+  // resolvidas (getComputedStyle) em vez de var()/color-mix() cru --
+  // necessario pq canvas fillStyle nao entende var() dentro da string.
+  function corDoStreakCanvas(streak, cs){
+    const accent = cs.getPropertyValue('--accent').trim();
+    const texto = cs.getPropertyValue('--text').trim();
+    const gold = cs.getPropertyValue('--gold').trim();
+    const dim = cs.getPropertyValue('--dim').trim();
+    if (streak <= 0) return dim;
+    if (streak < 7) return misturarCores(texto, accent, Math.round((streak - 1) / 6 * 100));
+    if (streak < 30) return misturarCores(accent, gold, Math.round((streak - 7) / 23 * 100));
+    return gold;
+  }
+
+  // teto de escala MAIOR que escalaTocha() do popup (2.75) -- aqui a
+  // tocha e a UNICA protagonista do card (sem numero/resumo do lado),
+  // mesmos valores validados no mockup aprovado pelo usuario.
+  function escalaTochaCompartilhar(streak){
+    const MIN = 1.8, MEIO = 2.9, MAX = 3.6;
+    if (streak <= 1) return MIN;
+    if (streak <= 7) return MIN + (streak - 1) / 6 * (MEIO - MIN);
+    if (streak <= 30) return MEIO + (streak - 7) / 23 * (MAX - MEIO);
+    return MAX;
+  }
+
+  async function gerarCardCompartilhamento(streak){
+    if (document.fonts && document.fonts.ready){
+      try { await document.fonts.ready; } catch(e){}
+    }
+
+    const W = 810, H = 1440; // 9:16, mesma proporcao do mockup aprovado
+    const canvas = document.createElement('canvas');
+    canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = false; // sprites pixelados continuam nitidos
+
+    const cs = getComputedStyle(document.documentElement);
+    const corBg = cs.getPropertyValue('--bg').trim();
+    const corTexto = cs.getPropertyValue('--text').trim();
+    const corDim = cs.getPropertyValue('--dim').trim();
+    const corMuted = cs.getPropertyValue('--muted').trim();
+
+    // fundo -- mesmo escuro plano do app (--bg), igual ao mockup aprovado
+    ctx.fillStyle = corBg;
+    ctx.fillRect(0, 0, W, H);
+
+    const glowX = W / 2, glowY = H * 0.40, glowR = 340;
+    const brilho = (typeof corAccentComOpacidade === 'function') ? corAccentComOpacidade(0.32) : 'transparent';
+    const grad = ctx.createRadialGradient(glowX, glowY, 0, glowX, glowY, glowR);
+    grad.addColorStop(0, brilho);
+    grad.addColorStop(1, 'transparent');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+
+    // marca -- so texto, fonte pixel, sem logo (pedido do usuario)
+    ctx.fillStyle = corDim;
+    ctx.font = '28px Silkscreen, monospace';
+    ctx.textAlign = 'center';
+    try { ctx.letterSpacing = '10px'; } catch(e){} // no-op silencioso em navegadores sem suporte
+    ctx.fillText('DUNGEONLOG', W / 2, 90);
+    try { ctx.letterSpacing = '0px'; } catch(e){}
+
+    // nome do jogador -- grande, centralizado
+    const emIngles = (typeof idiomaApp === 'function') && idiomaApp() === 'en';
+    const nome = (typeof nomeHeroi !== 'undefined' && nomeHeroi) || (emIngles ? 'Adventurer' : 'Aventureiro');
+    ctx.fillStyle = corTexto;
+    ctx.font = '600 48px Outfit, sans-serif';
+    ctx.fillText(nome, W / 2, 175);
+
+    // tocha -- extraida do CSS (.est-tocha), so o frame estatico (2o
+    // frame da spritesheet, mesmo recorte que .est-tocha-estatica usa)
+    const tochaImg = await carregarImagemDoCss('.est-tocha');
+    const escala = escalaTochaCompartilhar(streak);
+    const tW = 16 * 4 * escala, tH = 32 * 4 * escala;
+    const tX = W / 2 - tW / 2, tY = glowY - tH * 0.5; // centralizada no glow (antes deixava espaco embaixo pro heroi)
+    if (tochaImg){
+      if (streak === 0) ctx.filter = 'grayscale(1) brightness(.55)';
+      ctx.drawImage(tochaImg, 16, 0, 16, 32, tX, tY, tW, tH);
+      ctx.filter = 'none';
+    }
+
+    // heroi removido do card por pedido do usuario -- so a tocha fica,
+    // sem competir por atencao. tY/tH acima ja centralizam a tocha em
+    // torno do glow (glowY), entao nao precisa recalcular nada aqui.
+
+    // numero + legenda da sequencia
+    ctx.fillStyle = corDoStreakCanvas(streak, cs);
+    ctx.font = '700 130px Silkscreen, monospace';
+    ctx.fillText(String(streak), W / 2, H * 0.82);
+
+    ctx.fillStyle = corMuted;
+    ctx.font = '30px Outfit, sans-serif';
+    const lblTxt = streak === 1
+      ? (emIngles ? 'day in a row' : 'dia seguido')
+      : (emIngles ? 'days in a row' : 'dias seguidos');
+    ctx.fillText(streak + ' ' + lblTxt, W / 2, H * 0.82 + 46);
+
+    return canvas;
+  }
+
+  async function compartilharSequencia(){
+    const numEl = document.getElementById('estStreakNum');
+    const streak = numEl ? (Number(numEl.textContent) || 0) : 0;
+    const canvas = await gerarCardCompartilhamento(streak);
+
+    canvas.toBlob(async function(blob){
+      if (!blob) return;
+      const emIngles = (typeof idiomaApp === 'function') && idiomaApp() === 'en';
+      const arquivo = new File([blob], 'dungeonlog-sequencia.png', { type: 'image/png' });
+      const texto = emIngles ? 'Check out my DungeonLog streak!' : 'Olha minha sequência no DungeonLog!';
+
+      if (navigator.canShare && navigator.canShare({ files: [arquivo] })){
+        try {
+          await navigator.share({ files: [arquivo], text: texto });
+        } catch(e){
+          // usuario cancelou o share sheet nativo (AbortError) -- nao e erro real, ignora
+        }
+      } else {
+        // sem suporte a Web Share API com arquivo (ex: desktop) -- baixa a imagem direto
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'dungeonlog-sequencia.png';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
+      }
+    }, 'image/png');
+  }
+
+  const compartilharBtn = document.getElementById('estCompartilharBtn');
+  if (compartilharBtn) compartilharBtn.onclick = async function(){
+    compartilharBtn.disabled = true;
+    try { await compartilharSequencia(); }
+    finally { compartilharBtn.disabled = false; }
   };
 })();
 </script>
@@ -3559,6 +3792,14 @@ function corAccentComOpacidade(alpha){
   return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
 }
 
+function corTextoComOpacidade(alpha){
+  const hex = getComputedStyle(document.documentElement).getPropertyValue('--text').trim();
+  const m = hex.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i);
+  if (!m) return hex;
+  const r = parseInt(m[1], 16), g = parseInt(m[2], 16), b = parseInt(m[3], 16);
+  return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
+}
+
 function renderUltimos7Dias(hist){
   const linhaEl = document.getElementById('est7DiasLinha');
   const areaEl = document.getElementById('est7DiasArea');
@@ -3566,7 +3807,11 @@ function renderUltimos7Dias(hist){
   const labelsEl = document.getElementById('est7DiasLabels');
   if (!linhaEl || !areaEl || !svgEl || !labelsEl) return;
 
-  // atualiza o traco/area/gradiente pra cor do tema ativo agora
+  // atualiza o traco/area/gradiente pra cor do tema ativo (--accent) --
+  // v1 usou accent, v2 (pedido do usuario) trocou pra branco (--text),
+  // v3 (aqui, pedido novo do usuario) volta pro accent. Reversao real,
+  // registrada, nao silenciosa -- se pedir branco de novo no futuro, ja
+  // teve ida e volta 2x.
   linhaEl.setAttribute('stroke', corAccentComOpacidade(1));
   document.getElementById('est7DiasStopTopo').setAttribute('stop-color', corAccentComOpacidade(1));
   document.getElementById('est7DiasStopBase').setAttribute('stop-color', corAccentComOpacidade(1));
@@ -3711,7 +3956,11 @@ function renderHistoricoSemana(hist){
 function renderHistoricoAno(hist, ano){
   const el = document.getElementById('estMapaMes');
   if (!el) return;
-  el.classList.remove('est-mapames-ano');
+  el.classList.add('est-mapames-ano'); // BUG corrigido: estava .remove() aqui -- a classe nunca era
+                                        // adicionada em lugar nenhum, so removida, entao a view de
+                                        // ano ficava presa no grid de 7 colunas do mes/semana
+                                        // (.est-mapames), espremendo as 12 linhas numa fatia so da
+                                        // largura do card em vez de ocupar tudo.
   const nomes = NOMES_MES_CURTO[idiomaApp() === 'en' ? 'en' : 'pt'];
   const porData = new Map(hist.map(h => [h.data, h.resultado]));
   const hoje = isoAtual();
@@ -3806,7 +4055,9 @@ function renderEstatisticas(){
 
   const streak = estStreakAtual(hist);
   const recorde = estRecorde(hist);
-  document.getElementById('estStreakNum').textContent = streak;
+  const streakNumEl = document.getElementById('estStreakNum');
+  streakNumEl.textContent = streak;
+  if (typeof window.corDoStreak === 'function') streakNumEl.style.color = window.corDoStreak(streak);
   const montanhaEl = document.getElementById('estTochaPrincipal');
   if (montanhaEl && typeof window.escalaTocha === 'function'){
     montanhaEl.style.transform = 'scale(' + window.escalaTocha(streak) + ')';
@@ -3814,13 +4065,15 @@ function renderEstatisticas(){
     montanhaEl.classList.toggle('est-tocha-estatica', streak === 0);
   }
   const lblEl = document.getElementById('estStreakLbl');
+  const tEst = (typeof window.t === 'function') ? window.t : function(chave){ return chave; };
   if (recorde === 0){
-    lblEl.textContent = 'Vença hoje pra começar uma sequência';
+    lblEl.textContent = tEst('est.vencaHoje');
   } else if (streak >= recorde){
-    lblEl.textContent = 'dias seguidos · essa é a sua maior sequência!';
+    lblEl.textContent = tEst('est.recordeAtual');
   } else {
     const faltam = recorde - streak;
-    lblEl.textContent = 'dias seguidos · recorde de ' + recorde + ' (falta' + (faltam === 1 ? ' 1 dia' : 'm ' + faltam + ' dias') + ')';
+    const chaveFaltam = faltam === 1 ? 'est.recordeFaltaUm' : 'est.recordeFaltam';
+    lblEl.textContent = tEst(chaveFaltam).replace('{recorde}', recorde).replace('{faltam}', faltam);
   }
 
   const doMes = hist.filter(h => h.data.startsWith(anoMesPrefixo));
@@ -3840,7 +4093,8 @@ function renderEstatisticas(){
   renderUltimos7Dias(hist);
   renderDonutMes(vitoriasMes, fugasMes, semTarefaMes);
 
-  const nomeMes = new Date(ano, mes - 1, 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+  const localeMes = (typeof window.idiomaAtual === 'function' && window.idiomaAtual() === 'en') ? 'en-US' : 'pt-BR';
+  const nomeMes = new Date(ano, mes - 1, 1).toLocaleDateString(localeMes, { month: 'long', year: 'numeric' });
   document.getElementById('estMesLabel').textContent = nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1);
 
   renderHistoricoConteudo(hist, ano, mes);
@@ -7141,6 +7395,11 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       'Cada nível me dá pontos pra investir em Fortuna, que melhora minha sorte no saque, ou em Foco, que barateia a loja.',
       'As Conquistas recompensam marcos que eu alcanço — e o Bestiário guarda o registro de cada monstro que já enfrentei.',
       'Aqui também posso ajustar as configurações da minha experiência, como o tema, verificar meu histórico de dias completados, entre outras funções.'
+    ],
+    estatisticas: [
+      'Essa aba mostra como venho me saindo — minha sequência de vitórias, o quanto completei no mês e o histórico completo dos meus dias.',
+      'Essa tocha ali em cima cresce e fica mais forte a cada dia que eu vencer sem parar. Se eu deixar a sequência quebrar, ela apaga.',
+      'Toque em Histórico pra ver dia a dia, semana, mês ou o ano inteiro — cada quadradinho mostra se eu venci, fugi ou nem tinha tarefa naquele dia.'
     ]
   };
 
@@ -7170,6 +7429,11 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       'Every level gives me points to invest in Fortune, which improves my luck on loot, or Focus, which makes the shop cheaper.',
       'Achievements reward the milestones I reach — and the Bestiary keeps a record of every monster I\'ve faced.',
       'I can also tweak my experience here, like the theme, check my history of completed days, and a few other things.'
+    ],
+    estatisticas: [
+      'This tab shows how I\'ve been doing — my win streak, how much I finished this month, and the full history of my days.',
+      'That torch up top grows and burns stronger every day I keep the streak alive. Let it break, and it goes out.',
+      'Tap History to see it day by day, week, month, or the whole year — each little square shows whether I won, fled, or had no tasks that day.'
     ]
   };
 
@@ -11762,6 +12026,11 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'est.fuga':         { pt:'fugiu', en:'fled' },
     'est.vitoria':      { pt:'venceu', en:'won' },
     'est.emBreve':      { pt:'Distribuição por horário e "tarefas mais puladas" pedem rastrear novos dados — entram numa próxima etapa.', en:'Time-of-day breakdown and "most skipped tasks" need new data tracking — coming in a future update.' },
+    'est.vencaHoje':       { pt:'Vença hoje pra começar uma sequência', en:'Win today to start a streak' },
+    'est.recordeAtual':    { pt:'dias seguidos · essa é a sua maior sequência!', en:'days in a row · this is your best streak!' },
+    'est.recordeFaltaUm':  { pt:'dias seguidos · recorde de {recorde} (falta 1 dia)', en:'days in a row · record of {recorde} (1 day to go)' },
+    'est.recordeFaltam':   { pt:'dias seguidos · recorde de {recorde} (faltam {faltam} dias)', en:'days in a row · record of {recorde} ({faltam} days to go)' },
+    'est.compartilhar':    { pt:'Compartilhar', en:'Share' },
 
     'acao.continuar': { pt:'Continuar', en:'Continue' },
     'acao.voltar':    { pt:'Voltar',    en:'Back' },

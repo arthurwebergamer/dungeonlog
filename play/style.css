@@ -249,7 +249,34 @@
   .est-tocha-estatica{animation:none;background-position-x:-16px}
   @media (prefers-reduced-motion: reduce){.est-tocha{animation:none;background-position-x:-16px}}
 
-  .est-tocha-principal{position:absolute;right:16px;bottom:0;transform-origin:bottom right}
+  .est-tocha-principal{position:absolute;right:16px;bottom:0;transform-origin:bottom right;z-index:1}
+
+  /* Feedback de toque nos cards clicaveis (streak + historico) -- pedido
+     do usuario, baseado em tecnica sugerida pelo Gemini (prints): em vez
+     de um brilho ambiente "convidando" a tocar (testamos e nao ficou
+     bom, sinal fraco demais), uma sombra fixa de elevacao no streakcard
+     de dentro (tambem descartada -- retangulo solto colado na tela,
+     porque o streakcard nao tem fundo proprio), uma borda dourada fixa
+     (tambem descartada), uma seta perto da tocha feito a do Historico
+     (tambem descartada -- nao ficou legal ali), o card inteiro crescendo
+     ao arrastar a tela (varias tentativas -- nenhuma ficou boa) ou
+     sombra mais forte no card inteiro (funcionou sem o problema do
+     retangulo solto, mas usuario pediu pra tirar e seguir a proxima
+     sugestao do Gemini), o que ficou foi: compressao ao tocar (:active/
+     .est-pressionado, padrao de qualquer botao nativo) + uma seta ">"
+     no canto superior direito (.est-cardseta), convencao de "abre uma
+     tela nova" (recomendacao do Gemini). :active sozinho e pouco
+     confiavel em mobile (as vezes nem dispara, principalmente
+     Safari/iOS) -- por isso .est-pressionado tambem existe, ligada via
+     JS com pointerdown/pointerup (ver wiring do estCardPrincipal/
+     estHistCard). O card inteiro (Sequencia atual + Desde o inicio
+     juntos) e clicavel, nao so a parte de cima. */
+  .est-clicavel{cursor:pointer;transition:transform .12s ease}
+  .est-clicavel:active, .est-clicavel.est-pressionado{transform:scale(.97)}
+
+  #estCardPrincipal{position:relative}
+  .est-cardseta{position:absolute;top:20px;right:20px;width:15px;height:15px;color:var(--dim);z-index:1;pointer-events:none}
+
   .est-streaklbl{display:none}
 
   .est-statsrow{display:flex;gap:12px;margin-bottom:14px}
@@ -274,13 +301,19 @@
   .est-chartlabels span{font-size:9.5px;color:var(--dim)}
 
   .est-mapames{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+  /* view de Ano precisa sair do grid de 7 colunas (mes/semana) -- essa
+     regra nunca existiu, so era referenciada em comentario/JS (.remove()
+     em 3 lugares, .add() em nenhum) -- classe totalmente morta ate agora.
+     Sem isso, .est-anograde (que ja e display:flex;flex-direction:column
+     por conta propria) virava 1 item de grid preso na coluna 1 de 7,
+     espremendo as 12 linhas do ano numa fatia da largura do card. */
+  #estMapaMes.est-mapames-ano{display:block}
 
   .est-anograde{display:flex;flex-direction:column;gap:5px}
   .est-anolinha{display:flex;align-items:center;gap:7px}
   .est-anomeslbl{width:24px;flex:none;font-family:'Outfit',sans-serif;font-size:9.5px;color:var(--dim)}
   .est-anodias{display:flex;gap:2px;flex:1;min-width:0;height:8px}
   .est-anodia{display:block;flex:1;min-width:1px;max-width:8px;height:8px;border-radius:1.5px;background:var(--panel-3)}
-  .est-clicavel{cursor:pointer}
   .est-histchevron{width:14px;height:14px;margin-left:auto;flex:none;color:var(--dim)}
   .est-histsufixo{color:var(--dim);font-weight:400}
 
@@ -295,6 +328,23 @@
   .est-montpopglow.brilha{opacity:1}
   .est-montpopimg{position:absolute;left:50%;bottom:6px;transform:translate(-50%,0) scale(calc(var(--tocha-escala,1) * .3));transform-origin:bottom center;opacity:0;transition:transform 1s cubic-bezier(.2,.9,.25,1.3), opacity .5s ease}
   .est-montpopimg.cresceu{opacity:1;transform:translate(-50%,0) scale(var(--tocha-escala,1))}
+
+  /* Botao "Compartilhar" -- pedido explicito do usuario: cor FIXA (nao
+     var(--accent)), de proposito, pra se destacar mesmo no tema Grafite
+     (que e 100% grayscale por decisao de design -- ver [data-tema="grafite"]).
+     Unico botao do app que quebra a regra "tudo segue o tema" -- excecao
+     proposital, nao esquecimento de usar var(). */
+  .est-compartilharBtn{
+    margin-top:14px;width:100%;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    padding:13px;border:none;border-radius:12px;cursor:pointer;
+    background:linear-gradient(135deg, #F2A65A, #E949CE);
+    color:#1A1526;font-family:'Outfit',sans-serif;font-weight:600;font-size:14px;
+    transition:transform .12s ease, opacity .15s ease;
+  }
+  .est-compartilharBtn svg{width:17px;height:17px;flex:none}
+  .est-compartilharBtn:active{transform:scale(.97)}
+  .est-compartilharBtn:disabled{opacity:.6;cursor:default;transform:none}
   .est-tile{aspect-ratio:1;border-radius:4px;border:1px solid var(--line);background:var(--panel-3);display:flex;align-items:flex-end;justify-content:center;position:relative;overflow:hidden;font-family:'Outfit',sans-serif;font-size:8.5px;font-weight:600;color:var(--dim)}
   .est-tile span.est-tiledia{position:relative;z-index:1;text-shadow:0 1px 2px rgba(0,0,0,.85);margin-bottom:1px}
   .est-tile-vitoria{background:#3A2E1A;border-color:#3A2E1A;color:#F2E7D5}

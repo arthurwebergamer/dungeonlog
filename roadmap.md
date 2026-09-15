@@ -9063,3 +9063,125 @@ primeiro uso de Cloud Functions no projeto) → PR 4 (RTDN via Pub/Sub) →
 PR 5 (`assinaturaAtiva()`, hoje só stub de `modoDebugAtivo()`, passa a
 ler entitlement real do Firestore, mantendo o modo debug como fallback
 só em teste).
+
+## [Retroativo] Tela de Estatísticas — 5ª aba da nav, implementação completa
+
+### Contexto
+Esta seção não existia no `roadmap.md` — a feature inteira (streak, tocha, gráficos, Histórico) foi construída ao longo de **3 chats diferentes**, nenhum deles registrou nada aqui. O texto abaixo foi **reconstruído lendo o código já implementado** (comentários inline no `index.html`/`style.css`, nomes de função, decisões que sobreviveram como comentário) nesta sessão — não é um relato de primeira mão de "o que aconteceu em cada chat", é uma reconstrução funcional do estado final e do raciocínio que ficou documentado no próprio código. Se algo aqui estiver incompleto ou errado, é porque a decisão só existiu na conversa e não deixou rastro no arquivo — vale revisar com calma.
+
+**Ponto que merece atenção antes de mais nada:** a seção 5 mais antiga deste roadmap (item "Sequência (streak)", v4.36) registra a decisão explícita de **descartar** uma tela dedicada de streak — o argumento documentado era que uma 6ª sub-aba dentro de Perfil "infla a tela sem cumprir a função" e que, se retomado, "a versão que faria sentido é um indicador pequeno sempre visível, não uma tela nova". O que foi implementado depois (nos 3 chats não documentados) foi o oposto: uma **tela cheia**, como 5ª aba própria da nav principal (não sub-aba de Perfil). Não sobrou nenhum comentário no código explicando a mudança de direção — pode ter sido um pedido novo do usuário, replanejamento válido, ou simplesmente essa decisão antiga foi perdida de vista entre chats. Sinalizando aqui pra não virar confusão numa sessão futura.
+
+### Entregue e funcionando
+
+**1. Nav — 5ª aba (`data-aba="estatisticas"`)**
+- Ícone de barras (`<path d="M4 20V10"/><path d="M12 20V4"/><path d="M20 20v-7"/>`), rótulo `nav.estatisticas` (PT: "Estatísticas", EN: "Stats").
+- `.navpill` (indicador animado atrás do botão ativo) é **genérico** — `moverNavPill()` calcula posição por `offsetLeft`/`offsetWidth` do botão ativo, não teve hardcode pra 4 abas: a 5ª entrou sem exigir ajuste nessa função.
+
+**2. Card principal — Sequência atual + Desde o início (`#estCardPrincipal`)**
+- Um card só, clicável em qualquer parte (`.est-clicavel`), abre popup ao tocar.
+- Tocha decorativa **reaproveitada** do sprite já usado nas tochas da Arena (pack "DampDungeons", 3 frames de flicker, animação via `steps()` + `background-position`) — decisão explícita registrada no CSS: "dar identidade de masmorra pra Estatísticas reaproveitando assets que já existem, sem criar sprite novo".
+- `escalaTocha(streak)` — escala a tocha conforme a sequência: 1x (streak≤1) → 1.9x (streak=7) → 2.75x (streak≥30), interpolação linear entre os 3 pontos de corte. Escala via `transform`, não largura/altura em px, porque o sprite é pixelado (`image-rendering:pixelated` borra se redimensionar via width/height).
+- `corDoStreak(streak)` — cor do número do streak muda gradualmente nos MESMOS 3 cortes (1/7/30), via `color-mix()`: dim → branco/texto → laranja (accent) → dourado (gold). Comentário no código registra que a 1ª versão (faixas fixas) não mostrava diferença nenhuma no streak=2, daí a troca pra interpolação contínua.
+- Tocha apaga (`.est-tocha-apagada`: `filter:grayscale(1) brightness(.55)`) quando streak = 0.
+- **Legenda de recorde escondida no card principal** (`.est-streaklbl{display:none}`) — o texto só aparece no popup (item 3). Confirma o que você já tinha descrito.
+- **Seta `›` no canto superior direito** (`.est-cardseta`) sinalizando "abre tela nova" — comentário no CSS documenta um histórico e tanto de tentativas descartadas antes de chegar nisso: brilho ambiente (sinal fraco), sombra fixa de elevação (retângulo solto, sem fundo próprio pro streakcard), borda dourada fixa, uma seta perto da tocha (não ficou legal ali), card inteiro crescendo ao arrastar (várias tentativas, nenhuma boa), sombra mais forte no card inteiro (funcionou, mas foi pedido tirar mesmo assim). O padrão final — compressão ao toque (`:active`/`.est-pressionado`) + seta convencional de "abre tela" — foi sugestão trazida de prints do Gemini. `.est-pressionado` existe porque `:active` sozinho não dispara de forma confiável em mobile (Safari/iOS principalmente); é ligada via `pointerdown`/`pointerup`/`pointercancel`/`pointerleave`.
+
+**3. Popup da sequência (`#estMontanhaOverlay`)**
+- Reaproveita o mesmo bottom sheet (`.edov`/`.edsheet`) já usado em "Editar tarefa" — decisão de não inventar padrão novo.
+- Tocha "nasce do chão": `.est-montpopimg` começa em `scale(.3)`/`opacity:0`, ancorada em `bottom:6px` (`transform-origin:bottom center`), anima pra escala real + opacidade 1 ao abrir (classe `.cresceu`, easing `cubic-bezier(.2,.9,.25,1.3)` — leve overshoot).
+- Brilho (`.est-montpopglow`, radial-gradient) fade-in junto (classe `.brilha`), só quando streak > 0.
+- É aqui que mora o texto de recorde (escondido no card principal) — reaproveita o mesmo `textContent` de `#estStreakLbl`.
+
+**4. Taxa de conclusão + Como foi o mês (lado a lado, `.est-statsrow`)**
+- Taxa de conclusão: anel/donut via `conic-gradient` + `mask` radial (`.est-ringtrack`/`.est-ringbg`), lê `window.obterHistorico()` filtrado pelo mês corrente.
+- Como foi o mês: donut de composição (vitória/fuga/sem tarefa) com legenda compacta e barras de proporção. Quando `total===0`, o anel fica neutro (`var(--panel-3)`) em vez de sumir o card — decisão de sempre desenhar o anel cheio.
+
+**5. Últimos 7 dias — gráfico de linha (`renderUltimos7Dias`)**
+- SVG puro (300×80), sempre desenha as 7 barras/pontos mesmo sem histórico (dia sem registro vira ponto na base, nunca some do gráfico).
+- Cor resolvida em runtime via `getComputedStyle` (`corAccentComOpacidade`/`corTextoComOpacidade`) — comentário explica que atributos SVG (`fill`/`stop-color`) não resolvem `var()`/`color-mix()` de forma confiável em todo engine, então a cor real é calculada em JS. Isso também faz o gráfico respeitar automaticamente qualquer tema visual ativo (Grafite/Verde/Branco etc.), já que `--accent` muda com o tema.
+- Linha/área usam `var(--text)` (branco), não o laranja do accent — comentário registra que foi testado com laranja e o usuário pediu de volta pro branco original.
+
+**6. Histórico — ex-"Mapa do mês" (`#estHistCard`)**
+- Renomeado de "Mapa do mês" pra "Histórico" — a chave i18n interna ainda se chama `est.mapaDoMes` (mapeia pro texto "Histórico" em PT / "History" em EN) e as funções internas ainda se chamam `renderMapaDoMes()`/`#estMapaMes` — renomeação foi só de rótulo visível, não dos identificadores internos. Vale saber disso se for mexer de novo, pra não estranhar o nome descolado do texto.
+- Clicável, abre bottom sheet de período (`#estPeriodoOverlay`, mesmo padrão de sheet reaproveitado) com 3 opções: Semana / Mês inteiro / Ano inteiro (`window.estPeriodoAtual`, guardado só em memória — reseta pro padrão "mês" a cada reload, mesmo princípio que o extinto calendário de Perfil usava).
+- **Semana/Mês**: tiles (`.est-tile`) com tocha estática acesa (`.est-tile-vitoria`) ou apagada/grayscale (`.est-tile-fuga`) por cima do número do dia. Comentário registra que chegou a testar mostrar o monstro real do dia (`monstroIdDoDia()`), mas o usuário preferiu manter só a tocha variando de estado — identidade de masmorra consistente, sem sprite novo.
+- **Ano**: `renderHistoricoAno()` — 12 tiras horizontais (`.est-anolinha`), uma por mês, com quadradinhos diários (`.est-anodia`) coloridos por opacidade do accent — estilo grafo de contribuição (GitHub-like).
+- `preencherTileDia()` é compartilhada entre as 3 vistas (mês/semana/reaproveitada pro resto), evita duplicar a lógica de tile.
+
+**7. Dado ao vivo do dia atual (`estHistComHojeAoVivo`)**
+- `window.obterHistorico()` só grava o resultado de um dia na **virada** (meia-noite real ou botão de debug). Sem tratamento, "hoje" só apareceria como vencido no dia seguinte, mesmo com todas as tarefas já feitas.
+- Fix: injeta uma entrada sintética de "hoje" (nunca persistida) quando todas as tarefas do dia já estão feitas, mas só se o histórico real ainda não tem entrada pra hoje (evita duplicar quando a virada oficial já rodou). Mesmo padrão que o módulo Conquistas já usa (`comHoje` em `montarContexto()`) — reaproveitado aqui, não reinventado.
+
+**8. Resumo vitalício** ("Desde o início", dentro do card principal)
+- `estTotalConcluidas` (via `window.totalTarefasConcluidas()`, contador lifetime existente), `estTotalVitorias` e `estTaxaGeral` — todos derivados de `window.obterHistorico()` completo, sem filtro de período.
+
+**9. i18n**
+- Todas as chaves `est.*` usadas na tela (23 chaves + as 4 novas desta sessão) têm PT/EN completos em `TRADUCOES`.
+- **Achado nesta sessão**: `est.emBreve` está definido (PT/EN) mas **não é usado em lugar nenhum da UI** — parece ser texto preparado pra um recurso futuro ("Distribuição por horário" e "tarefas mais puladas") que nunca chegou a ser plugado em nenhum elemento. Fica como pendência/lembrete: ou conectar em algum lugar quando esse recurso for feito, ou remover se não for mais o plano.
+
+**10. Diálogo do personagem**
+- Não existia até esta sessão (ver conversa anterior) — adicionado ao módulo `DIALOGOS`/`DIALOGOS_EN` (dispara 1x por aba, na primeira visita).
+
+**11. Limpeza no Perfil**
+- Card "Histórico" antigo (calendário separado, `#prevHistorico`/`#verHistoricoBtn`/`#histOverlay`) removido do Perfil — redundante com o novo Histórico de Estatísticas. `abrirHistorico()` e o overlay continuaram existindo internamente (reaproveitados por outro caminho), só o atalho duplicado saiu.
+- Um segundo atalho duplicado (dentro de Config) também foi removido na mesma limpeza, pelo mesmo motivo.
+
+### Notas técnicas (pra não redescobrir depois)
+- Resolver cores de tema via `getComputedStyle` pra atributos SVG é o padrão certo neste projeto — `var()`/`color-mix()` direto em atributo SVG (`fill=`, `stroke=`) não é confiável entre engines.
+- `escalaTocha()`/`corDoStreak()` são expostas em `window` (usadas tanto no card principal quanto no popup) — os mesmos 3 cortes (1/7/30 dias) governam os dois efeitos visuais, de propósito, pra manter o ritmo visual consistente.
+- `estStreakAtual()` (streak atual) é uma reimplementação independente de `melhorSequenciaDeVitorias()` (recorde, módulo Conquistas) — a original não está exposta em `window`, então a de Estatísticas foi refeita em cima da mesma regra (`resultado==='vitoria'` + `diffDias()===1` pro dia anterior), não reaproveitada por import.
+
+### Pendências / ideias não implementadas
+- `est.emBreve` (item 9 acima) — texto órfão, recurso de "distribuição por horário" e "tarefas mais puladas" nunca ganhou UI.
+- Nenhum outro `TODO`/comentário de "fazer depois" foi encontrado especificamente nesta tela além desse.
+
+---
+
+## [Sessão] Card de Compartilhamento da Sequência — mockup + implementação completa no popup da tocha
+
+### Contexto
+Ideia retomada de uma tentativa **descartada na semana anterior** (chat diferente, não documentado) de colocar um card de compartilhamento no menu de Tarefas — o design não funcionou lá. Não sobrou nenhum vestígio dessa tentativa no código nem no roadmap (nem comentário, nem componente comentado) — só o relato do usuário. Nesta sessão a ideia foi retomada com um lugar novo: o popup da sequência que já existe em Estatísticas (`#estMontanhaOverlay`, aberto ao tocar no card principal da tocha).
+
+### Decisões de design (fechadas antes do mockup)
+Perguntado ao usuário antes de gastar tempo desenhando — 3 decisões:
+1. **O que destacar**: sequência + o herói que o jogador está usando (decisão inicial; **revertida depois**, ver "Iterações" abaixo — o herói acabou saindo de vez).
+2. **Marca do app**: sim, com logo, mas **sem** texto tipo "baixe aqui".
+3. **Visual**: reaproveitar a estética já existente da tocha/Estatísticas, não criar layout do zero.
+
+### Mockup — iterações (arquivo standalone, `mockup-card-streak.html`, nunca chega a produção)
+Construído como página HTML isolada com controles ao vivo (slider de streak 0-40, campo de nome, seletor de tema) pra aprovar antes de mexer no app de verdade — seguindo o princípio já estabelecido do projeto (mockup antes de produção pra decisão visual).
+
+Histórico de idas e vindas, registrado porque mostra o raciocínio de cada corte:
+1. **v1**: herói ao lado da tocha, fundo gradiente roxo da Arena, logo (imagem) + "DungeonLog" no topo.
+2. **v2** (pedido do usuário): herói removido, tocha centralizada sozinha, nome do jogador grande centralizado no topo, fundo trocado pro escuro plano do app (`--bg`) em vez do gradiente da Arena.
+3. **v3** (pedido do usuário): marca virou só texto "DUNGEONLOG" na fonte pixel (Silkscreen) — sem nenhuma imagem de logo. Herói **voltou**, mas menor, abaixo da tocha (tamanho fixo, não escala com o streak).
+4. **v4** (pedido do usuário): seletor de tema adicionado — as 5 paletas reais do app (Laranja/padrão, Escuro/grafite, Branco, Dourado/pergaminho, Verde/floresta) copiadas de `style.css` e escopadas em `.card[data-tema]`. Como todo o card já usava `var(--accent)`/`var(--text)`/etc., o card inteiro passou a reagir à troca de tema sem nenhuma lógica nova — só copiar os valores de cor.
+5. **v5** (pedido do usuário): herói aumentado pra tamanho médio (46px → 72px) com bem mais espaço até a tocha (gap 14px → 38px).
+6. **Pergunta em aberto respondida sem mudar arquivo**: usuário perguntou se deveria mostrar também os itens equipados do dia. Resposta: não, por dois motivos — (a) equipamento hoje só dá bônus de atributo, não existe camada visual de arma/armadura desenhada em cima do sprite do herói (mostrar item exigiria uma fileira de ícones separada, não algo integrado); (b) cada elemento novo compete por atenção com a tocha, que é o foco pedido desde o início.
+
+### Implementação em produção (index.html/style.css)
+Depois do mockup aprovado, implementado de verdade no popup da tocha:
+
+- **Botão "Compartilhar"** (`#estCompartilharBtn`), dentro de `#estMontanhaSheet`, logo abaixo do `.est-montpopwrap`.
+- **Cor do botão é FIXA** (`linear-gradient(135deg, #F2A65A, #E949CE)`, texto `#1A1526`), **não** `var(--accent)` — pedido explícito do usuário: precisa se destacar mesmo no tema Grafite, que é 100% grayscale por decisão de design antiga (item 25 do roadmap principal). É a **única exceção do app** à regra "tudo segue o tema via `var()`" — documentado como exceção proposital no comentário do CSS, não esquecimento.
+- **`gerarCardCompartilhamento(streak)`**: monta a imagem final num `<canvas>` 810×1440 (9:16, mesma proporção do mockup aprovado):
+  - Fundo: `var(--bg)` resolvido via `getComputedStyle` (plano, cor do tema ativo — não o gradiente da Arena).
+  - Brilho atrás da tocha: reaproveita `corAccentComOpacidade(0.32)`, função que já existia no módulo de Estatísticas.
+  - Marca "DUNGEONLOG": só texto, fonte Silkscreen, espaçamento de letras via `ctx.letterSpacing` (com fallback silencioso em navegadores sem suporte).
+  - Nome do jogador (`nomeHeroi`), grande, centralizado.
+  - **Tocha**: extraída **dinamicamente do CSS já existente** (`carregarImagemDoCss('.est-tocha')`, lê o `background-image` computado e extrai a data URI) — não duplica o base64 do sprite no JS. Se o sprite da tocha mudar um dia, o card de compartilhamento acompanha sozinho. Desenha o frame estático (2º frame da spritesheet de 3, mesmo recorte que `.est-tocha-estatica` usa).
+  - Escala da tocha: `escalaTochaCompartilhar(streak)` — mesma forma de 3 pontos de corte (1/7/30 dias) que `escalaTocha()` do popup, mas com **teto maior** (MIN 1.8 / MEIO 2.9 / MAX 3.6, contra 1/1.9/2.75 do popup) porque aqui a tocha é a única protagonista do card.
+  - **Herói**: chegou a ser desenhado abaixo da tocha (replicando a v3-v5 do mockup), mas foi **removido a pedido do usuário** logo depois ("só tira o personagem e deixa somente a tocha mesmo") — a tocha foi recentralizada no brilho (`tY = glowY - tH*0.5`, antes `*0.62` pra sobrar espaço embaixo pro herói).
+  - Número + legenda da sequência: cor via `corDoStreakCanvas(streak, cs)` — reimplementação **necessária** de `corDoStreak()` com cores já resolvidas (`getComputedStyle` + `hexParaRgb()`/`misturarCores()`, mistura manual em RGB), porque `canvas.fillStyle` não resolve `var()`/`color-mix()` com custom properties dentro da string (limitação diferente da dos atributos SVG, mas mesma raiz: canvas não faz parte da cascata de estilos do DOM).
+- **`compartilharSequencia()`**: canvas → blob → `File` → tenta `navigator.share({files, text})` quando `navigator.canShare()` permite; senão cai direto pro download (`baixarImagem()`).
+- **Chave i18n nova**: `est.compartilhar` (PT "Compartilhar" / EN "Share").
+
+### Bugs encontrados e corrigidos nesta sessão (documentado pra não repetir)
+1. **Gráfico "Últimos 7 dias" trocado de cor pela 2ª vez**: histórico do valor — v1 usava `--accent` (laranja) → v2 (pedido anterior do usuário) trocou pra `--text` (branco) → v3 (pedido **desta** sessão) voltou pro `--accent`. Registrado como reversão real de novo, não silenciosa — se pedir branco de novo no futuro, já teve ida e volta 2x.
+2. **Gráfico anual (`Histórico · ano`) estava quebrado de verdade, não só feio**: a classe `.est-mapames-ano` — que deveria tirar a view de Ano do grid de 7 colunas usado por mês/semana — **nunca existiu no CSS**, e no JS era só **removida** em 3 lugares (`renderHistoricoSemana`, `renderHistoricoAno`, `renderHistoricoConteudo`), nunca **adicionada**. Resultado: a grade de 12 meses (`.est-anograde`, já `display:flex;flex-direction:column` por conta própria) ficava presa como 1 item dentro da 1ª coluna de um grid de 7 (`.est-mapames{display:grid;grid-template-columns:repeat(7,1fr)}`), espremida numa fração da largura do card. Fix: `renderHistoricoAno()` agora **adiciona** a classe (`.remove()` → `.add()`), e a regra `#estMapaMes.est-mapames-ano{display:block}` foi criada no CSS (nunca tinha existido).
+3. **Fallback de compartilhamento engolia erros reais como se fossem cancelamento**: `compartilharSequencia()` tratava **qualquer** erro do `navigator.share()` como se o usuário tivesse cancelado de propósito (silêncio total, sem fallback). Na prática, no Windows sem nenhum app registrado pra receber imagem via Web Share, o próprio SO mostra um diálogo de erro ("Tente novamente — Não foi possível mostrar todas as maneiras de compartilhar") e a Promise rejeita com um erro que **não é** `AbortError` — o usuário ficava sem a imagem e sem fallback nenhum. Fix: só `e.name === 'AbortError'` (cancelamento de verdade) é ignorado; qualquer outro erro cai pro download (`baixarImagem()`, extraída pra função própria, reaproveitada nos dois caminhos de fallback).
+   - **Observação**: a falha do share sheet nativo no Windows em si é limitação do SO (sem app registrado pra aquele tipo de conteúdo), não é algo que dê pra corrigir via JS — o fix aqui é só garantir que o app **degrada bem** (baixa o arquivo) em vez de travar. Usuário confirmou que desktop não é plataforma alvo real do app (TWA/mobile-first), então isso é rede de segurança, não prioridade.
+
+### Pendências / não testado ainda
+- `navigator.share({files})` só funciona em contexto seguro (HTTPS/TWA) — comportamento em produção (fora do Cloudflare Pages de dev) ainda não confirmado num Android real.
+- Fontes (Silkscreen/Outfit) no canvas: existe a salvaguarda de `document.fonts.ready`, mas não foi confirmado visualmente num dispositivo se o texto nunca sai com fonte de fallback (flash antes da fonte carregar).

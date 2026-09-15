@@ -272,7 +272,7 @@
   .est-clicavel:active, .est-clicavel.est-pressionado{transform:scale(.97)}
 
   .est-streakcard.est-clicavel{transform:scale(.97);transform-origin:center}
-  .est-streakcard.est-clicavel:active, .est-streakcard.est-clicavel.est-pressionado{transform:scale(1.02)}
+  .est-streakcard.est-clicavel:active, .est-streakcard.est-clicavel.est-pressionado{transform:scale(1.05)}
 
   .est-streaklbl{display:none}
 

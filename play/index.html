@@ -945,7 +945,11 @@
     if (popLbl && lblEl) popLbl.textContent = lblEl.textContent;
 
     const streak = numEl ? (Number(numEl.textContent) || 0) : 0;
-    if (montImg) montImg.style.setProperty('--tocha-escala', escalaTocha(streak));
+    if (montImg){
+      montImg.style.setProperty('--tocha-escala', escalaTocha(streak));
+      montImg.classList.toggle('est-tocha-apagada', streak === 0);
+      montImg.classList.toggle('est-tocha-estatica', streak === 0);
+    }
 
     if (montOverlay) montOverlay.classList.add('on');
     if (montImg){
@@ -954,7 +958,7 @@
       requestAnimationFrame(function(){
         requestAnimationFrame(function(){
           montImg.classList.add('cresceu');
-          if (montGlow) montGlow.classList.add('brilha');
+          if (montGlow && streak > 0) montGlow.classList.add('brilha');
         });
       });
     }
@@ -3631,12 +3635,12 @@ function renderDonutMes(vitorias, fugas, semTarefa){
 }
 
 // tiles do Historico (mes/semana) -- preenche numero do dia + (se
-// vencido/fugido) o sprite correspondente. Reaproveita a tocha da Arena
-// pro "venceu" e o monstro REAL daquele dia (monstroIdDoDia(), a mesma
-// funcao que a Arena usa pra sortear o monstro -- ja exposta global por
-// ser uma "function" no escopo top-level do script) pro "fugiu". Pedido
-// do usuario: dar identidade de masmorra reaproveitando assets que ja
-// existem, sem criar sprite novo.
+// vencido/fugido) a tocha correspondente. Reaproveita o mesmo sprite da
+// Arena: acesa pro "venceu", apagada (filter:grayscale+brightness, ver
+// .est-tocha-apagada) pro "fugiu" -- testamos mostrar o monstro real do
+// dia (monstroIdDoDia()) primeiro, mas o usuario preferiu manter so a
+// tocha, so variando o estado dela. Pedido do usuario: dar identidade de
+// masmorra reaproveitando assets que ja existem, sem criar sprite novo.
 function preencherTileDia(tile, resultado, dia, iso){
   if (resultado === 'vitoria'){
     tile.classList.add('est-tile-vitoria');
@@ -3646,10 +3650,10 @@ function preencherTileDia(tile, resultado, dia, iso){
     tile.appendChild(tocha);
   } else if (resultado === 'fuga'){
     tile.classList.add('est-tile-fuga');
-    if (iso && typeof monstroIdDoDia === 'function' && typeof MONSTROS !== 'undefined'){
-      const idx = monstroIdDoDia(iso);
-      if (idx !== null && MONSTROS[idx]) tile.style.backgroundImage = 'url(' + MONSTROS[idx].img + ')';
-    }
+    const tocha = document.createElement('div');
+    tocha.className = 'est-tocha est-tocha-estatica est-tocha-apagada';
+    tocha.setAttribute('aria-hidden', 'true');
+    tile.appendChild(tocha);
   }
   const diaSpan = document.createElement('span');
   diaSpan.className = 'est-tiledia';
@@ -3806,6 +3810,8 @@ function renderEstatisticas(){
   const montanhaEl = document.getElementById('estTochaPrincipal');
   if (montanhaEl && typeof window.escalaTocha === 'function'){
     montanhaEl.style.transform = 'scale(' + window.escalaTocha(streak) + ')';
+    montanhaEl.classList.toggle('est-tocha-apagada', streak === 0);
+    montanhaEl.classList.toggle('est-tocha-estatica', streak === 0);
   }
   const lblEl = document.getElementById('estStreakLbl');
   if (recorde === 0){

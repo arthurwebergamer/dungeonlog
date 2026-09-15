@@ -233,7 +233,23 @@
   .est-streakcard .est-titulo{position:relative;z-index:1}
 
   .est-streaknum{font-family:'Silkscreen',monospace;font-size:40px;color:var(--text);line-height:1}
-  .est-montanha{position:absolute;right:0;bottom:0;width:172px;height:auto;pointer-events:none;z-index:0;opacity:.92}
+  /* Tocha reaproveitada do sprite ja usado nas TOCHAS DECORATIVAS DA ARENA
+     (mesmo PNG/tecnica de .tocha-arena la em baixo -- 3 frames de flicker,
+     48x32 = 16x32 por frame, animado via steps(3)+background-position).
+     Pedido do usuario: dar identidade de masmorra pra Estatisticas
+     reaproveitando assets que ja existem, sem criar sprite novo. */
+  .est-tocha{
+    width:16px;height:32px;
+    background-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAgCAYAAABU1PscAAACoklEQVR4nO2WTUgbQRiG34RekkAPEcRDNLDKgudCWqHBgiLdICXQU2jEUoQYvJZcwx56kXrooWAgh0oqgZ5yCEZKPQQLSYVSCj2FJJKfgwiRUqiewvQQZtnZnf3Ryq6HvBA2O7vP9843s/PNAGONNdZYd1b7KyJxuw9W8lq98D9J3NYAmMUxTeDF54YnHA/dqCNOzR43AVHwEfqbWb1U2uwGpe/KzR4T6zr8/opI6NXM38ODU3IGU4UiztYSmCoUEY6H0Cn1ITd7aLSvdIyWz85NK/fheAjz0joAYGFp0xZP/ami+SCONy64/l4zmF7pLKTkjOlMiIKP1I52ITd7inGn1Mdh6g2SiSJqR7u2+Fx2G9F8UBkAAPj4R+D6e9VwSs4gl91WzNUBwvEQvrz/ZpgENV9Y2mS4aD6IcDyE5P22aRJansaYWb3E8cYFAHD9TRdxNB9URv86ys5NM5zdGB++thVey+U+/QYAvHwsMAyTgPpht+xHYJhGYJhGt+y33QlqruXpjJrJyD+aD6Jb9jNJchMARt+53OyhU+orbfPSOpaf/MTy1kPdCGh1tpYAAEPeSik5o+MDwzReva2Z+4uCjyS3npPB6R7ZKWSJuvyJgo/sFLJkcLpHpEdPuSXRLd6jDhCRYgCAd6+fcZNMJkZVqXVe1ZUzt3jDIDwNvv/lmrvJM2ug0b7ynFQObmTuFs/diQFgdnJRaWudVxkTow64weuqEM+ABrMyd4O/ZxRo4kGAuW9VrKzd4bk7sfZbPKkc2Bo9N3jD47SdNiM5yesSoIc69SICRt+hnU44zeuO0xEphh/1X9zgESlmeRx2mtdtZPT/7OSicnahR2z1s0r90LAEO8kzVYhdKFUyUQ8wEBXP3C3+WpuKkfFd5cdyQv8A0LgoFtXx0DYAAAAASUVORK5CYII=");
+    background-size:48px 32px;
+    image-rendering:pixelated;
+    animation:tochaChama .6s steps(3) infinite;
+    pointer-events:none;
+  }
+  .est-tocha-estatica{animation:none;background-position-x:-16px}
+  @media (prefers-reduced-motion: reduce){.est-tocha{animation:none;background-position-x:-16px}}
+
+  .est-tocha-principal{position:absolute;right:16px;bottom:0;transform-origin:bottom right}
   .est-streaklbl{display:none}
 
   .est-statsrow{display:flex;gap:12px;margin-bottom:14px}
@@ -272,11 +288,14 @@
   .est-montpopwrap{height:130px;position:relative;overflow:hidden;border-radius:12px;background:var(--panel)}
   .est-montpopglow{position:absolute;inset:0;background:radial-gradient(circle at 50% 85%, color-mix(in srgb, var(--accent) 35%, transparent), transparent 60%);opacity:0;transition:opacity 1.1s ease}
   .est-montpopglow.brilha{opacity:1}
-  .est-montpopimg{position:absolute;left:50%;bottom:-6px;height:auto;transform:translate(-50%,0) scale(.3);transform-origin:bottom center;opacity:0;transition:transform 1s cubic-bezier(.2,.9,.25,1.3), opacity .5s ease}
-  .est-montpopimg.cresceu{opacity:1;transform:translate(-50%,0) scale(1)}
-  .est-tile{aspect-ratio:1;border-radius:4px;border:1px solid var(--line);background:var(--panel-3);display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-size:9.5px;font-weight:600;color:var(--dim)}
-  .est-tile-vitoria{background:var(--accent);border-color:var(--accent);color:var(--panel-2)}
-  .est-tile-fuga{background:color-mix(in srgb, var(--accent) 40%, transparent);border-color:color-mix(in srgb, var(--accent) 55%, transparent);color:var(--panel-2)}
+  .est-montpopimg{position:absolute;left:50%;bottom:6px;transform:translate(-50%,0) scale(calc(var(--tocha-escala,1) * .3));transform-origin:bottom center;opacity:0;transition:transform 1s cubic-bezier(.2,.9,.25,1.3), opacity .5s ease}
+  .est-montpopimg.cresceu{opacity:1;transform:translate(-50%,0) scale(var(--tocha-escala,1))}
+  .est-tile{aspect-ratio:1;border-radius:4px;border:1px solid var(--line);background:var(--panel-3);display:flex;align-items:flex-end;justify-content:center;position:relative;overflow:hidden;font-family:'Outfit',sans-serif;font-size:8.5px;font-weight:600;color:var(--dim)}
+  .est-tile span.est-tiledia{position:relative;z-index:1;text-shadow:0 1px 2px rgba(0,0,0,.85);margin-bottom:1px}
+  .est-tile-vitoria{background:#3A2E1A;border-color:#3A2E1A;color:#F2E7D5}
+  .est-tile-vitoria .est-tocha{position:absolute;top:2px;left:50%;transform:translateX(-50%) scale(.85);transform-origin:top center}
+  .est-tile-fuga{background:#242428;border-color:#242428;color:#E8E6E2;background-size:cover;background-position:center;background-repeat:no-repeat}
+  .est-tile-fuga::after{content:"";position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,.55), transparent 55%)}
   .est-mapalegenda{display:flex;align-items:center;gap:6px;margin-top:10px;font-size:9.5px;color:var(--dim);flex-wrap:wrap}
   .est-mapalegenda .est-tile{width:11px;height:11px;flex:none;font-size:0}
 

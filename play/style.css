@@ -274,8 +274,8 @@
   .est-clicavel{cursor:pointer;transition:transform .12s ease, box-shadow .12s ease}
   .est-clicavel:active, .est-clicavel.est-pressionado{transform:scale(.97)}
 
-  #estCardPrincipal{box-shadow:0 14px 30px rgba(0,0,0,.4), 0 3px 8px rgba(0,0,0,.3)}
-  #estCardPrincipal:active, #estCardPrincipal.est-pressionado{box-shadow:0 6px 14px rgba(0,0,0,.3)}
+  #estCardPrincipal{box-shadow:0 20px 42px rgba(0,0,0,.55), 0 6px 14px rgba(0,0,0,.4)}
+  #estCardPrincipal:active, #estCardPrincipal.est-pressionado{box-shadow:0 8px 18px rgba(0,0,0,.35)}
 
   .est-streaklbl{display:none}
 

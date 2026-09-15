@@ -301,6 +301,13 @@
   .est-chartlabels span{font-size:9.5px;color:var(--dim)}
 
   .est-mapames{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+  /* view de Ano precisa sair do grid de 7 colunas (mes/semana) -- essa
+     regra nunca existiu, so era referenciada em comentario/JS (.remove()
+     em 3 lugares, .add() em nenhum) -- classe totalmente morta ate agora.
+     Sem isso, .est-anograde (que ja e display:flex;flex-direction:column
+     por conta propria) virava 1 item de grid preso na coluna 1 de 7,
+     espremendo as 12 linhas do ano numa fatia da largura do card. */
+  #estMapaMes.est-mapames-ano{display:block}
 
   .est-anograde{display:flex;flex-direction:column;gap:5px}
   .est-anolinha{display:flex;align-items:center;gap:7px}

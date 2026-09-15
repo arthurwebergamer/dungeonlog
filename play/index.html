@@ -1012,10 +1012,12 @@
 
   // ===================================================================
   // Compartilhar sequencia -- gera um card 9:16 em <canvas> (tocha, nome
-  // do jogador, heroi atual, numero do streak) e abre o share sheet
-  // nativo via Web Share API (com fallback pra download se o navegador
-  // nao suportar compartilhar arquivo). Mockup aprovado pelo usuario
-  // antes desta implementacao -- ver conversa/roadmap.
+  // do jogador, numero do streak) e abre o share sheet nativo via Web
+  // Share API (com fallback pra download se o navegador nao suportar
+  // compartilhar arquivo). Mockup aprovado pelo usuario antes desta
+  // implementacao -- ver conversa/roadmap. Heroi tinha entrado numa
+  // versao anterior mas foi removido a pedido do usuario -- so a
+  // tocha fica, sem dividir atencao com mais nada no card.
   // ===================================================================
 
   function carregarImagem(src){
@@ -1131,20 +1133,16 @@
     const tochaImg = await carregarImagemDoCss('.est-tocha');
     const escala = escalaTochaCompartilhar(streak);
     const tW = 16 * 4 * escala, tH = 32 * 4 * escala;
-    const tX = W / 2 - tW / 2, tY = glowY - tH * 0.62;
+    const tX = W / 2 - tW / 2, tY = glowY - tH * 0.5; // centralizada no glow (antes deixava espaco embaixo pro heroi)
     if (tochaImg){
       if (streak === 0) ctx.filter = 'grayscale(1) brightness(.55)';
       ctx.drawImage(tochaImg, 16, 0, 16, 32, tX, tY, tW, tH);
       ctx.filter = 'none';
     }
 
-    // heroi atual do jogador -- tamanho medio fixo, sempre abaixo da
-    // tocha (que continua sendo o foco), pedido explicito do usuario
-    const heroImg = await carregarImagem((typeof heroiAtual === 'function') ? heroiAtual().img : null);
-    if (heroImg){
-      const hS = 170;
-      ctx.drawImage(heroImg, W / 2 - hS / 2, tY + tH + 70, hS, hS);
-    }
+    // heroi removido do card por pedido do usuario -- so a tocha fica,
+    // sem competir por atencao. tY/tH acima ja centralizam a tocha em
+    // torno do glow (glowY), entao nao precisa recalcular nada aqui.
 
     // numero + legenda da sequencia
     ctx.fillStyle = corDoStreakCanvas(streak, cs);
@@ -3809,12 +3807,14 @@ function renderUltimos7Dias(hist){
   const labelsEl = document.getElementById('est7DiasLabels');
   if (!linhaEl || !areaEl || !svgEl || !labelsEl) return;
 
-  // atualiza o traco/area/gradiente pra cor do tema ativo agora -- branco
-  // (var(--text)), nao o accent laranja. O usuario testou com laranja e
-  // pediu de volta pro branco original.
-  linhaEl.setAttribute('stroke', corTextoComOpacidade(1));
-  document.getElementById('est7DiasStopTopo').setAttribute('stop-color', corTextoComOpacidade(1));
-  document.getElementById('est7DiasStopBase').setAttribute('stop-color', corTextoComOpacidade(1));
+  // atualiza o traco/area/gradiente pra cor do tema ativo (--accent) --
+  // v1 usou accent, v2 (pedido do usuario) trocou pra branco (--text),
+  // v3 (aqui, pedido novo do usuario) volta pro accent. Reversao real,
+  // registrada, nao silenciosa -- se pedir branco de novo no futuro, ja
+  // teve ida e volta 2x.
+  linhaEl.setAttribute('stroke', corAccentComOpacidade(1));
+  document.getElementById('est7DiasStopTopo').setAttribute('stop-color', corAccentComOpacidade(1));
+  document.getElementById('est7DiasStopBase').setAttribute('stop-color', corAccentComOpacidade(1));
 
   const porData = new Map(hist.map(h => [h.data, h.resultado]));
   const diasSemana = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S']; // Date.getDay(): 0=domingo
@@ -3956,7 +3956,11 @@ function renderHistoricoSemana(hist){
 function renderHistoricoAno(hist, ano){
   const el = document.getElementById('estMapaMes');
   if (!el) return;
-  el.classList.remove('est-mapames-ano');
+  el.classList.add('est-mapames-ano'); // BUG corrigido: estava .remove() aqui -- a classe nunca era
+                                        // adicionada em lugar nenhum, so removida, entao a view de
+                                        // ano ficava presa no grid de 7 colunas do mes/semana
+                                        // (.est-mapames), espremendo as 12 linhas numa fatia so da
+                                        // largura do card em vez de ocupar tudo.
   const nomes = NOMES_MES_CURTO[idiomaApp() === 'en' ? 'en' : 'pt'];
   const porData = new Map(hist.map(h => [h.data, h.resultado]));
   const hoje = isoAtual();

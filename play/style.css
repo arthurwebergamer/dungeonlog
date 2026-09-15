@@ -298,9 +298,9 @@
   .est-tile{aspect-ratio:1;border-radius:4px;border:1px solid var(--line);background:var(--panel-3);display:flex;align-items:flex-end;justify-content:center;position:relative;overflow:hidden;font-family:'Outfit',sans-serif;font-size:8.5px;font-weight:600;color:var(--dim)}
   .est-tile span.est-tiledia{position:relative;z-index:1;text-shadow:0 1px 2px rgba(0,0,0,.85);margin-bottom:1px}
   .est-tile-vitoria{background:#3A2E1A;border-color:#3A2E1A;color:#F2E7D5}
-  .est-tile-vitoria .est-tocha{position:absolute;top:2px;left:50%;transform:translateX(-50%) scale(.85);transform-origin:top center}
-  .est-tile-fuga{background:#242428;border-color:#242428;color:#E8E6E2;background-size:cover;background-position:center;background-repeat:no-repeat}
-  .est-tile-fuga::after{content:"";position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,.55), transparent 55%)}
+  .est-tile-fuga{background:#242428;border-color:#242428;color:#8a8a92}
+  .est-tile-vitoria .est-tocha, .est-tile-fuga .est-tocha{position:absolute;top:2px;left:50%;transform:translateX(-50%) scale(.85);transform-origin:top center}
+  .est-tocha-apagada{filter:grayscale(1) brightness(.55);clip-path:inset(56% 0 0 0)}
   .est-mapalegenda{display:flex;align-items:center;gap:6px;margin-top:10px;font-size:9.5px;color:var(--dim);flex-wrap:wrap}
   .est-mapalegenda .est-tile{width:11px;height:11px;flex:none;font-size:0}
 

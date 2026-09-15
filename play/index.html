@@ -3868,13 +3868,15 @@ function renderEstatisticas(){
     montanhaEl.classList.toggle('est-tocha-estatica', streak === 0);
   }
   const lblEl = document.getElementById('estStreakLbl');
+  const tEst = (typeof window.t === 'function') ? window.t : function(chave){ return chave; };
   if (recorde === 0){
-    lblEl.textContent = 'Vença hoje pra começar uma sequência';
+    lblEl.textContent = tEst('est.vencaHoje');
   } else if (streak >= recorde){
-    lblEl.textContent = 'dias seguidos · essa é a sua maior sequência!';
+    lblEl.textContent = tEst('est.recordeAtual');
   } else {
     const faltam = recorde - streak;
-    lblEl.textContent = 'dias seguidos · recorde de ' + recorde + ' (falta' + (faltam === 1 ? ' 1 dia' : 'm ' + faltam + ' dias') + ')';
+    const chaveFaltam = faltam === 1 ? 'est.recordeFaltaUm' : 'est.recordeFaltam';
+    lblEl.textContent = tEst(chaveFaltam).replace('{recorde}', recorde).replace('{faltam}', faltam);
   }
 
   const doMes = hist.filter(h => h.data.startsWith(anoMesPrefixo));
@@ -3894,7 +3896,8 @@ function renderEstatisticas(){
   renderUltimos7Dias(hist);
   renderDonutMes(vitoriasMes, fugasMes, semTarefaMes);
 
-  const nomeMes = new Date(ano, mes - 1, 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+  const localeMes = (typeof window.idiomaAtual === 'function' && window.idiomaAtual() === 'en') ? 'en-US' : 'pt-BR';
+  const nomeMes = new Date(ano, mes - 1, 1).toLocaleDateString(localeMes, { month: 'long', year: 'numeric' });
   document.getElementById('estMesLabel').textContent = nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1);
 
   renderHistoricoConteudo(hist, ano, mes);
@@ -7195,6 +7198,11 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       'Cada nível me dá pontos pra investir em Fortuna, que melhora minha sorte no saque, ou em Foco, que barateia a loja.',
       'As Conquistas recompensam marcos que eu alcanço — e o Bestiário guarda o registro de cada monstro que já enfrentei.',
       'Aqui também posso ajustar as configurações da minha experiência, como o tema, verificar meu histórico de dias completados, entre outras funções.'
+    ],
+    estatisticas: [
+      'Essa aba mostra como venho me saindo — minha sequência de vitórias, o quanto completei no mês e o histórico completo dos meus dias.',
+      'Essa tocha ali em cima cresce e fica mais forte a cada dia que eu vencer sem parar. Se eu deixar a sequência quebrar, ela apaga.',
+      'Toque em Histórico pra ver dia a dia, semana, mês ou o ano inteiro — cada quadradinho mostra se eu venci, fugi ou nem tinha tarefa naquele dia.'
     ]
   };
 
@@ -7224,6 +7232,11 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       'Every level gives me points to invest in Fortune, which improves my luck on loot, or Focus, which makes the shop cheaper.',
       'Achievements reward the milestones I reach — and the Bestiary keeps a record of every monster I\'ve faced.',
       'I can also tweak my experience here, like the theme, check my history of completed days, and a few other things.'
+    ],
+    estatisticas: [
+      'This tab shows how I\'ve been doing — my win streak, how much I finished this month, and the full history of my days.',
+      'That torch up top grows and burns stronger every day I keep the streak alive. Let it break, and it goes out.',
+      'Tap History to see it day by day, week, month, or the whole year — each little square shows whether I won, fled, or had no tasks that day.'
     ]
   };
 
@@ -11816,6 +11829,10 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'est.fuga':         { pt:'fugiu', en:'fled' },
     'est.vitoria':      { pt:'venceu', en:'won' },
     'est.emBreve':      { pt:'Distribuição por horário e "tarefas mais puladas" pedem rastrear novos dados — entram numa próxima etapa.', en:'Time-of-day breakdown and "most skipped tasks" need new data tracking — coming in a future update.' },
+    'est.vencaHoje':       { pt:'Vença hoje pra começar uma sequência', en:'Win today to start a streak' },
+    'est.recordeAtual':    { pt:'dias seguidos · essa é a sua maior sequência!', en:'days in a row · this is your best streak!' },
+    'est.recordeFaltaUm':  { pt:'dias seguidos · recorde de {recorde} (falta 1 dia)', en:'days in a row · record of {recorde} (1 day to go)' },
+    'est.recordeFaltam':   { pt:'dias seguidos · recorde de {recorde} (faltam {faltam} dias)', en:'days in a row · record of {recorde} ({faltam} days to go)' },
 
     'acao.continuar': { pt:'Continuar', en:'Continue' },
     'acao.voltar':    { pt:'Voltar',    en:'Back' },

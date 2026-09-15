@@ -254,24 +254,28 @@
   /* Feedback de toque nos cards clicaveis (streak + historico) -- pedido
      do usuario, baseado em tecnica sugerida pelo Gemini (prints): em vez
      de um brilho ambiente "convidando" a tocar (testamos e nao ficou
-     bom, sinal fraco demais), uma sombra fixa de elevacao (tambem
-     descartada -- retangulo solto colado na tela), uma borda dourada
-     fixa (tambem descartada) ou o card inteiro crescendo ao arrastar a
-     tela (varias tentativas -- so no card, so no topo, em qualquer
-     lugar -- nenhuma ficou boa e a ultima ainda tinha scroll competindo
-     com a animacao), o feedback que ficou foi so o proprio movimento:
-     :active/.est-pressionado confirma que o toque registrou ao tocar,
-     sem precisar de nada visual parado em repouso nem de gestos de
-     arrastar. Padrao de qualquer botao nativo. :active sozinho e pouco
-     confiavel em mobile (as vezes nem dispara, principalmente
-     Safari/iOS) -- por isso .est-pressionado tambem existe, ligada via
-     JS com pointerdown/pointerup (ver wiring do estStreakCard/estHistCard).
-     Pra sinalizar em repouso que da pra tocar, reaproveitamos a mesma
-     seta que o Histórico ja usa (.est-histchevron) -- so que posicionada
-     perto da tocha (.est-tochachevron), nao do titulo, porque o usuario
-     pediu o sinal especificamente ali. */
-  .est-clicavel{cursor:pointer;transition:transform .12s ease}
+     bom, sinal fraco demais), uma sombra fixa de elevacao no streakcard
+     de dentro (tambem descartada -- retangulo solto colado na tela,
+     porque o streakcard nao tem fundo proprio), uma borda dourada fixa
+     (tambem descartada), uma seta feito a do Historico (tambem
+     descartada -- nao ficou legal perto da tocha) ou o card inteiro
+     crescendo ao arrastar a tela (varias tentativas -- nenhuma ficou
+     boa), o feedback que ficou foi: compressao ao tocar (:active/
+     .est-pressionado, padrao de qualquer botao nativo) + profundidade
+     em repouso via sombra MAIS FORTE que os outros cards (ver
+     #estCardPrincipal abaixo) -- dessa vez no CARD INTEIRO, que tem
+     fundo/borda proprios (.est-card), entao a sombra sai limpa, sem o
+     problema do retangulo solto que a tentativa anterior no streakcard
+     tinha. :active sozinho e pouco confiavel em mobile (as vezes nem
+     dispara, principalmente Safari/iOS) -- por isso .est-pressionado
+     tambem existe, ligada via JS com pointerdown/pointerup (ver wiring
+     do estCardPrincipal/estHistCard). O card inteiro (Sequencia atual +
+     Desde o inicio juntos) e clicavel agora, nao so a parte de cima. */
+  .est-clicavel{cursor:pointer;transition:transform .12s ease, box-shadow .12s ease}
   .est-clicavel:active, .est-clicavel.est-pressionado{transform:scale(.97)}
+
+  #estCardPrincipal{box-shadow:0 14px 30px rgba(0,0,0,.4), 0 3px 8px rgba(0,0,0,.3)}
+  #estCardPrincipal:active, #estCardPrincipal.est-pressionado{box-shadow:0 6px 14px rgba(0,0,0,.3)}
 
   .est-streaklbl{display:none}
 
@@ -304,7 +308,6 @@
   .est-anodias{display:flex;gap:2px;flex:1;min-width:0;height:8px}
   .est-anodia{display:block;flex:1;min-width:1px;max-width:8px;height:8px;border-radius:1.5px;background:var(--panel-3)}
   .est-histchevron{width:14px;height:14px;margin-left:auto;flex:none;color:var(--dim)}
-  .est-tochachevron{position:absolute;width:13px;height:13px;color:var(--dim);z-index:1}
   .est-histsufixo{color:var(--dim);font-weight:400}
 
   .est-periodoopc{display:block;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:13px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;margin-bottom:8px;cursor:pointer}

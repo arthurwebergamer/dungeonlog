@@ -735,13 +735,12 @@
       <span class="vsub" id="estMesLabel"></span>
     </div>
 
-    <div class="est-card" id="estCardPrincipal">
-      <div class="est-streakcard est-clicavel" id="estStreakCard">
+    <div class="est-card est-clicavel" id="estCardPrincipal">
+      <div class="est-streakcard">
         <div class="est-titulo" data-i18n="est.sequenciaAtual">Sequência atual</div>
         <div class="est-streaknum"><span id="estStreakNum">0</span></div>
         <div class="est-streaklbl" id="estStreakLbl"></div>
         <div class="est-tocha est-tocha-principal" id="estTochaPrincipal" aria-hidden="true"></div>
-        <svg class="est-tochachevron" id="estTochaChevron" style="right:58px;bottom:8px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
       </div>
 
       <div class="est-divider"></div>
@@ -926,7 +925,7 @@
 
   const montOverlay = document.getElementById('estMontanhaOverlay');
   const montFechar = document.getElementById('estMontanhaFechar');
-  const streakCard = document.getElementById('estStreakCard');
+  const streakCard = document.getElementById('estCardPrincipal'); // nome mantido por historico -- agora e o card inteiro (Sequencia atual + Desde o inicio), nao so o streakcard de cima
   const montImg = document.getElementById('estMontPopImg');
   const montGlow = document.getElementById('estMontPopGlow');
   ligarFeedbackToque(streakCard);

@@ -2612,10 +2612,14 @@ function viajarParaTemaEstagio(){
   }
   if (_arenaBgEmTransicao){
     // ja tem uma viagem rolando -- nao empilha outra tela cheia em cima.
-    // So garante que o tema final fica persistido; o proximo render()
-    // corrige o resto (mesmo raciocinio do self-heal em renderTemaArena()).
-    debugEstagio('ja em transicao -- so persistindo o tema alvo, sem empilhar 2a tela cheia');
-    definirTemaArenaSalvo(temaAlvo.id);
+    // NAO persiste aqui: persistir cedo faz qualquer renderTemaArena()
+    // chamado por outro fluxo (ex: render() do resto do app) pintar o
+    // fundo novo ANTES da tela cheia aparecer -- era exatamente o bug
+    // relatado ("aparece um popup e ja pula pro tema novo"), causado por
+    // essa troca acontecer adiantada em vez de sincronizada com a tela.
+    // Persistencia + pintura agora sao atomicas, dentro de
+    // mostrarEstagioDesbloqueado() (ver BUG CORRIGIDO la).
+    debugEstagio('ja em transicao -- ignorando chamada duplicada');
     return;
   }
 
@@ -2653,12 +2657,16 @@ function viajarParaTemaEstagio(){
   // rodou logo acima, entao o self-heal dentro de renderTemaArena() ve
   // que o tema salvo ja bate com o esperado e nao entra em loop
   // chamando viajarParaTemaEstagio() de novo.
-  try {
-    definirTemaArenaSalvo(temaAlvo.id);
-    if (typeof renderTemaArena === 'function') renderTemaArena();
-  } catch(e){
-    debugEstagio('ERRO ao trocar o fundo escondido: ' + (e && e.message));
-  }
+  // BUG CORRIGIDO (relatado pelo usuario: "aparece um popup na tela e
+  // pula direto pro tema novo ja"): essa troca de fundo rodava AQUI, de
+  // forma sincrona, ANTES da tela cheia sequer entrar na fila de popups
+  // (enfileirarPopup). Se ja houvesse outro popup na fila no mesmo
+  // instante (nivel up, bau -- comum, ja que cruzar limiar de tarefas
+  // quase sempre acontece junto com ganho de XP), o fundo novo ja ficava
+  // visivel por baixo dele, bem antes da tela "Estagio Concluido" abrir
+  // -- quando ela finalmente aparecia, o tema ja tinha mudado ha tempo.
+  // Fix: a troca foi MOVIDA pra dentro de mostrarEstagioDesbloqueado(),
+  // sincronizada com o proprio fade de entrada da tela cheia.
 
   const finalizarViagem = () => {
     if (finalizado) return;
@@ -7340,6 +7348,25 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     // transicao (a tela so aparece de repente, sem fade -- exatamente o
     // "nao ta aparecendo nenhuma animacao" relatado pelo usuario).
     requestAnimationFrame(() => { estagioTela.classList.add('on'); });
+
+    // BUG CORRIGIDO (relatado pelo usuario: "aparece um popup e ja pula
+    // pro tema novo"): a troca de fundo (definirTemaArenaSalvo +
+    // renderTemaArena) rodava em viajarParaTemaEstagio(), ANTES dessa
+    // tela cheia sequer entrar na fila de popups -- se outro popup
+    // (nivel/bau) ja estivesse na fila, o fundo ja tinha mudado por baixo
+    // dele, visivel, bem antes da tela cheia abrir. Agora a troca so
+    // acontece AQUI, sincronizada com o fade de entrada desta tela --
+    // 350ms de espera (bate com a transicao de opacity de .estagio-tela.on
+    // no CSS) garante que a tela ja esta opaca cobrindo tudo quando o
+    // fundo muda por baixo dela, igual era a intencao original.
+    setTimeout(() => {
+      try {
+        if (typeof definirTemaArenaSalvo === 'function') definirTemaArenaSalvo(tema.id);
+        if (typeof renderTemaArena === 'function') renderTemaArena();
+      } catch(e){
+        debugEstagio('ERRO ao trocar o fundo (mostrarEstagioDesbloqueado): ' + (e && e.message));
+      }
+    }, 350);
   }
 
   window.mostrarEstagioDesbloqueado = mostrarEstagioDesbloqueado;

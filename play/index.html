@@ -2131,6 +2131,24 @@ function marcarTemaDesbloqueado(id){
 function temaArenaDesbloqueado(t){
   if (t.gratuito) return true;
   if (assinaturaAtiva()) return true;
+  // BUG CORRIGIDO (cadeado aparecia no tema mesmo com o Estagio ja
+  // alcancado -- print do usuario): antes, temas do tipo 'tarefasTotais'
+  // so eram considerados desbloqueados via temasDesbloqueadosSalvos(),
+  // uma flag persistida SEPARADA, marcada por marcarTemaDesbloqueado().
+  // Essa flag podia ficar fora de sincronia com o total real de tarefas
+  // (ex: sync da nuvem restaurando temaArena.v1 sem restaurar
+  // temasDesbloqueados.v1 no mesmo instante) -- resultado: estagioAtual()
+  // (calculado ao vivo) ja dizia Estagio 2, mas o cadeado do Deserto
+  // continuava aparecendo porque so aquela flag persistida era checada.
+  // Fix: pra esse tipo de desbloqueio, calcula direto da MESMA fonte que
+  // estagioAtual() usa (totalTarefasConcluidas()) -- nao depende mais de
+  // uma segunda flag que pode divergir. Monotonico (contador lifetime),
+  // entao continua "desbloqueado pra sempre" uma vez alcancado, sem
+  // nenhuma regressao de comportamento.
+  if (t.desbloqueioGratis && t.desbloqueioGratis.tipo === 'tarefasTotais'){
+    const total = (typeof window.totalTarefasConcluidas === 'function') ? window.totalTarefasConcluidas() : 0;
+    if (total >= t.desbloqueioGratis.valor) return true;
+  }
   if (t.desbloqueioGratis && temasDesbloqueadosSalvos().includes(t.id)) return true;
   return false;
 }

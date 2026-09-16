@@ -2533,6 +2533,16 @@ function viajarParaTemaEstagio(){
   }
 
   _arenaBgEmTransicao = true;
+  // trava criar/completar tarefa NA HORA que a transicao comeca -- sem
+  // esperar o proximo render() espontaneo. Usa um helper dedicado, NAO
+  // render() inteiro: viajarParaTemaEstagio() e chamada de DENTRO de
+  // verificarDesbloqueiosTemaArena(), que por sua vez roda de dentro de
+  // render() -- chamar render() aqui seria reentrancia (render() dentro
+  // de render(), no meio da execucao), arriscando mexer em estado que
+  // nao devia (celebracao de vitoria, animacao de XP/moeda em andamento)
+  // so pra atualizar 2 botoes. atualizarTravaTransicaoEstagio() faz so
+  // isso, sem tocar em mais nada.
+  atualizarTravaTransicaoEstagio();
   const DURACAO = 480;
 
   heroEl.classList.add('heroi-viagem-sai');
@@ -2550,10 +2560,24 @@ function viajarParaTemaEstagio(){
     setTimeout(() => {
       heroEl.classList.remove('heroi-viagem-chega');
       _arenaBgEmTransicao = false;
+      // destrava de volta assim que a viagem termina, mesmo motivo acima
+      atualizarTravaTransicaoEstagio();
     }, DURACAO);
   }, DURACAO);
 }
 window.viajarParaTemaEstagio = viajarParaTemaEstagio;
+
+// so trava/destrava os 2 pontos de entrada de tarefa (+ Adicionar e
+// Criar tarefa do composer) conforme _arenaBgEmTransicao -- ver
+// chamadas em viajarParaTemaEstagio(). Pequeno e isolado de proposito
+// (nao e render()), pra poder ser chamado no meio de outra logica sem
+// risco de reentrancia.
+function atualizarTravaTransicaoEstagio(){
+  const addBtnEl = document.getElementById('addbtn');
+  if (addBtnEl) addBtnEl.disabled = (typeof monstroJaCaiu === 'function' && monstroJaCaiu()) || _arenaBgEmTransicao;
+  if (typeof atualizarEstadoSave === 'function') atualizarEstadoSave();
+}
+window.atualizarTravaTransicaoEstagio = atualizarTravaTransicaoEstagio;
 
 
 // gesto de arrastar na propria arena pra trocar de tema, seguindo o
@@ -2778,8 +2802,10 @@ function render(){
   // Roda a cada render() pra cobrir a virada automatica do dia (watchdog),
   // nao so o clique manual. window.atualizarEstadoSave e definida mais
   // abaixo no mesmo <script>, hoisted (function declaration).
+  // Tambem desabilita durante a transicao de viagem de estagio
+  // (_arenaBgEmTransicao) -- mesmo motivo do guard em alternar().
   const addBtnEl = document.getElementById('addbtn');
-  if (addBtnEl) addBtnEl.disabled = typeof monstroJaCaiu === 'function' && monstroJaCaiu();
+  if (addBtnEl) addBtnEl.disabled = (typeof monstroJaCaiu === 'function' && monstroJaCaiu()) || _arenaBgEmTransicao;
   if (typeof atualizarEstadoSave === 'function') atualizarEstadoSave();
 
   document.getElementById('hoje').textContent = (idiomaApp() === 'en' ? 'Tasks for ' : 'Tarefas de ') + nomeDiaLocal(diaDaSemana());
@@ -3312,6 +3338,12 @@ let _tarefaPopIdx = null;
 function alternar(i){
   const t = tarefas[i];
 
+  // Sistema de Estagios: durante a transicao de viagem (heroi correndo
+  // pra fora/voltando, troca de fundo no meio), o jogador nao pode
+  // completar tarefa nenhuma -- evita mexer no estado do dia (XP/moeda/
+  // virada) bem no meio da cena trocando de lugar embaixo dos pes dele.
+  if (typeof _arenaBgEmTransicao !== 'undefined' && _arenaBgEmTransicao) return false;
+
   // GUARDA REDUNDANTE (defesa em profundidade): alem da trava no clique da
   // caixa (ver el.dataset.travado em render()), alternar() tambem nao pode
   // recompensar duas vezes a MESMA tarefa de meta=1 no mesmo dia -- vale
@@ -3483,7 +3515,10 @@ function atualizarEstadoSave(){
   const semTexto = input.value.trim().length === 0;
   const semDia = modo === 'repete' && diasEscolhidos.length === 0;
   const diaVencido = typeof monstroJaCaiu === 'function' && monstroJaCaiu();
-  btnSave.disabled = semTexto || semDia || diaVencido;
+  // Sistema de Estagios: tambem trava durante a transicao de viagem --
+  // mesmo motivo do guard em alternar() e do botao "+ Adicionar".
+  const emTransicaoEstagio = typeof _arenaBgEmTransicao !== 'undefined' && _arenaBgEmTransicao;
+  btnSave.disabled = semTexto || semDia || diaVencido || emTransicaoEstagio;
 }
 window.atualizarEstadoSave = atualizarEstadoSave;
 

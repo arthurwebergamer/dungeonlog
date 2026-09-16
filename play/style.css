@@ -513,30 +513,6 @@
   .mobinfo{margin-top:10px}
 
   .hero-sprite{position:relative}
-  /* Sistema de Estagios: heroi corre pra fora de cena (direita) antes
-     do fundo trocar, depois corre de volta entrando pela esquerda --
-     ver viajarParaTemaEstagio() no script principal.
-     FIX (relatado pelo usuario, com video: "a animacao ta toda lascada"):
-     2 problemas reais achados no video, quadro a quadro --
-     1) translateX(160%) e relativo a LARGURA DO PROPRIO heroSprite (spec
-        do CSS, transform percentual e sempre relativo ao proprio elemento,
-        nao ao container) -- pra um sprite de ~60-70px isso da uns 100-110px
-        de deslocamento, curto demais pra passar do monstro, que fica bem
-        mais pra direita. Trocado pra valor fixo generoso (280px) que limpa
-        o monstro e sai da moldura da Arena (que tem overflow:hidden, entao
-        ele some ao cruzar a borda, nao precisa viajar mais que isso).
-     2) sem z-index proprio durante a corrida, a ordem do DOM (monstro
-        vem DEPOIS do heroi no HTML) fazia o monstro pintar por CIMA do
-        heroi -- no video da pra ver o heroi "atravessando por baixo" do
-        monstro em vez de passar na frente dele. z-index:5 durante as 2
-        classes resolve. */
-  #heroSprite{ transition:transform .48s ease, opacity .48s ease; }
-  #heroSprite.heroi-viagem-sai{ transform:translateX(280px); opacity:0; z-index:5; }
-  #heroSprite.heroi-viagem-chega{ transition:none; animation:heroiChegaViagem .48s ease; z-index:5; }
-  @keyframes heroiChegaViagem{
-    from{ transform:translateX(-280px); opacity:0; }
-    to{ transform:translateX(0); opacity:1; }
-  }
 
 /* ===== Bloco style #4 ===== */
 /* ---------- layout: tela cheia, so a lista rola ---------- */
@@ -1370,26 +1346,43 @@
          padding:11px;border-radius:11px;border:none;background:var(--accent);
          color:var(--bg);cursor:pointer}
 
-  /* Popup "Novo Estagio Desbloqueado" -- mesmo padrao visual/estrutural
-     do popup de Level Up (.baubg reaproveitado como fundo escurecido,
-     .lvlpop como referencia de moldura), so com cor de destaque no
-     accent do tema em vez do gold fixo do level up (o tema MUDA junto,
-     entao usar --accent aqui acompanha visualmente o tema novo). */
-  .estagiopop{position:fixed;left:50%;top:50%;z-index:96;
-    transform:translate(-50%,-50%) scale(.9);opacity:0;pointer-events:none;
-    transition:transform .25s cubic-bezier(.2,.9,.3,1.2), opacity .22s;
-    background:var(--panel-2);border:1px solid var(--accent);border-radius:18px;
-    padding:26px 22px 20px;width:min(280px, calc(100% - 56px));text-align:center;
-    box-shadow:0 0 26px -8px var(--accent)}
-  .estagiopop.on{transform:translate(-50%,-50%) scale(1);opacity:1;pointer-events:auto}
-  .estagiopoplabel{font-family:'Silkscreen',monospace;font-size:11px;color:var(--muted);
-    letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}
-  .estagiopopflag{font-size:34px;line-height:1;margin-bottom:6px}
-  .estagiopopnome{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;
-    color:var(--accent);line-height:1;margin-bottom:16px}
-  .estagiopopok{width:100%;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;
-    padding:11px;border-radius:11px;border:none;background:var(--accent);
-    color:var(--bg);cursor:pointer}
+  /* Tela cheia "Estagio Concluido" -- REESCRITO (pedido do usuario:
+     comparando com video de referencia de outro app, queria uma tela
+     cheia abrindo, nao um popup pequeno por cima da Arena). Cobre a
+     tela inteira (inclusive topbar), fundo solido (nao precisa mais do
+     .baubg escurecido nem do backdrop-blur -- e opaco por conta propria),
+     com o sprite do heroi centralizado. z-index bem alto (150) pra
+     garantir que fica acima de QUALQUER outro overlay. */
+  .estagio-tela{
+    position:fixed; inset:0; z-index:150;
+    display:none; flex-direction:column; align-items:center; justify-content:center; gap:16px;
+    background:var(--bg); padding:24px; text-align:center;
+  }
+  .estagio-tela.on{display:flex}
+  .estagio-tela-titulo{
+    font-family:'Outfit',sans-serif; font-weight:700; font-size:22px; color:var(--text);
+    animation:estagioTelaSobe .4s ease both;
+  }
+  .estagio-tela-hero{
+    width:120px; height:120px; object-fit:contain; image-rendering:pixelated;
+    filter:drop-shadow(0 12px 18px rgba(0,0,0,.5));
+    animation:estagioTelaSobe .45s ease .05s both;
+  }
+  .estagio-tela-sub{
+    display:flex; align-items:center; gap:8px;
+    font-family:'Silkscreen',monospace; font-size:12px; color:var(--dim); letter-spacing:.04em;
+    animation:estagioTelaSobe .45s ease .1s both;
+  }
+  .estagio-tela-sub-flag{font-size:14px}
+  .estagio-tela-continuar{
+    margin-top:8px; padding:13px 38px; border:none; border-radius:12px; cursor:pointer;
+    background:var(--accent); color:var(--bg); font-family:'Outfit',sans-serif; font-weight:600; font-size:14px;
+    animation:estagioTelaSobe .45s ease .15s both;
+  }
+  @keyframes estagioTelaSobe{
+    from{opacity:0; transform:translateY(14px)}
+    to{opacity:1; transform:translateY(0)}
+  }
 
   .quedapop{position:fixed;left:50%;top:50%;z-index:96;
             transform:translate(-50%,-50%) scale(.9);opacity:0;pointer-events:none;
@@ -2563,26 +2556,43 @@
          padding:11px;border-radius:11px;border:none;background:var(--accent);
          color:var(--bg);cursor:pointer}
 
-  /* Popup "Novo Estagio Desbloqueado" -- mesmo padrao visual/estrutural
-     do popup de Level Up (.baubg reaproveitado como fundo escurecido,
-     .lvlpop como referencia de moldura), so com cor de destaque no
-     accent do tema em vez do gold fixo do level up (o tema MUDA junto,
-     entao usar --accent aqui acompanha visualmente o tema novo). */
-  .estagiopop{position:fixed;left:50%;top:50%;z-index:96;
-    transform:translate(-50%,-50%) scale(.9);opacity:0;pointer-events:none;
-    transition:transform .25s cubic-bezier(.2,.9,.3,1.2), opacity .22s;
-    background:var(--panel-2);border:1px solid var(--accent);border-radius:18px;
-    padding:26px 22px 20px;width:min(280px, calc(100% - 56px));text-align:center;
-    box-shadow:0 0 26px -8px var(--accent)}
-  .estagiopop.on{transform:translate(-50%,-50%) scale(1);opacity:1;pointer-events:auto}
-  .estagiopoplabel{font-family:'Silkscreen',monospace;font-size:11px;color:var(--muted);
-    letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}
-  .estagiopopflag{font-size:34px;line-height:1;margin-bottom:6px}
-  .estagiopopnome{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;
-    color:var(--accent);line-height:1;margin-bottom:16px}
-  .estagiopopok{width:100%;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;
-    padding:11px;border-radius:11px;border:none;background:var(--accent);
-    color:var(--bg);cursor:pointer}
+  /* Tela cheia "Estagio Concluido" -- REESCRITO (pedido do usuario:
+     comparando com video de referencia de outro app, queria uma tela
+     cheia abrindo, nao um popup pequeno por cima da Arena). Cobre a
+     tela inteira (inclusive topbar), fundo solido (nao precisa mais do
+     .baubg escurecido nem do backdrop-blur -- e opaco por conta propria),
+     com o sprite do heroi centralizado. z-index bem alto (150) pra
+     garantir que fica acima de QUALQUER outro overlay. */
+  .estagio-tela{
+    position:fixed; inset:0; z-index:150;
+    display:none; flex-direction:column; align-items:center; justify-content:center; gap:16px;
+    background:var(--bg); padding:24px; text-align:center;
+  }
+  .estagio-tela.on{display:flex}
+  .estagio-tela-titulo{
+    font-family:'Outfit',sans-serif; font-weight:700; font-size:22px; color:var(--text);
+    animation:estagioTelaSobe .4s ease both;
+  }
+  .estagio-tela-hero{
+    width:120px; height:120px; object-fit:contain; image-rendering:pixelated;
+    filter:drop-shadow(0 12px 18px rgba(0,0,0,.5));
+    animation:estagioTelaSobe .45s ease .05s both;
+  }
+  .estagio-tela-sub{
+    display:flex; align-items:center; gap:8px;
+    font-family:'Silkscreen',monospace; font-size:12px; color:var(--dim); letter-spacing:.04em;
+    animation:estagioTelaSobe .45s ease .1s both;
+  }
+  .estagio-tela-sub-flag{font-size:14px}
+  .estagio-tela-continuar{
+    margin-top:8px; padding:13px 38px; border:none; border-radius:12px; cursor:pointer;
+    background:var(--accent); color:var(--bg); font-family:'Outfit',sans-serif; font-weight:600; font-size:14px;
+    animation:estagioTelaSobe .45s ease .15s both;
+  }
+  @keyframes estagioTelaSobe{
+    from{opacity:0; transform:translateY(14px)}
+    to{opacity:1; transform:translateY(0)}
+  }
 
   .quedapop{position:fixed;left:50%;top:50%;z-index:96;
             transform:translate(-50%,-50%) scale(.9);opacity:0;pointer-events:none;

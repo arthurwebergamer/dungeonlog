@@ -2582,6 +2582,16 @@ function debugEstagio(msg){
 }
 window.debugEstagio = debugEstagio;
 
+// REESCRITA (pedido do usuario, comparando com video de referencia de
+// outro app): em vez do heroi deslizar DENTRO do card pequeno da Arena
+// (que colidia visualmente com o sprite do monstro -- bug relatado e
+// corrigido numa leva anterior, mas o resultado ainda nao ficava
+// parecido com a referencia), agora abre uma TELA CHEIA (ver
+// mostrarEstagioDesbloqueado()) que cobre a Arena inteira -- a troca de
+// fundo acontece ESCONDIDA atras dela, sem nenhum sprite se movendo
+// dentro do card. Mais simples tambem: nao precisa mais coreografar
+// heroi saindo/entrando com timers separados, e o card pequeno nunca
+// mais precisa lidar com sobreposicao de sprite nenhuma.
 function viajarParaTemaEstagio(){
   debugEstagio('viajarParaTemaEstagio() chamada. _arenaBgEmTransicao=' + _arenaBgEmTransicao);
   if (typeof TEMAS_ARENA === 'undefined' || typeof estagioAtual !== 'function'){
@@ -2597,128 +2607,70 @@ function viajarParaTemaEstagio(){
     debugEstagio('saiu cedo: temaArenaSalvo() ja e ' + temaAlvo.id + ' -- nada a fazer');
     return;
   }
-
-  const heroEl = document.getElementById('heroSprite');
-  const frenteEl = document.getElementById('arenaBg' + _arenaBgFrente);
-  debugEstagio('temaAlvo=' + temaAlvo.id + ' heroEl achado=' + !!heroEl + ' frenteEl achado=' + !!frenteEl + ' _arenaBgEmTransicao=' + _arenaBgEmTransicao);
-
-  // Arena fora de tela (usuario em outra aba) ou ja tem outra transicao
-  // rodando -- persiste e re-sincroniza SEM animar. renderTemaArena() ja
-  // faz exatamente isso (usado no boot): aplica o tema salvo nas 2
-  // camadas sem transicao nenhuma. Corrige o efeito "sumiu no meio do
-  // caminho" do bug antigo -- agora sempre sobra pelo menos o estado
-  // final correto, animado ou nao.
-  if (!heroEl || !frenteEl || _arenaBgEmTransicao){
-    debugEstagio('CAMINHO SILENCIOSO tomado (sem animacao/popup) -- motivo: ' + (!heroEl ? 'heroEl null' : (!frenteEl ? 'frenteEl null' : '_arenaBgEmTransicao ja true')));
+  if (_arenaBgEmTransicao){
+    // ja tem uma viagem rolando -- nao empilha outra tela cheia em cima.
+    // So garante que o tema final fica persistido; o proximo render()
+    // corrige o resto (mesmo raciocinio do self-heal em renderTemaArena()).
+    debugEstagio('ja em transicao -- so persistindo o tema alvo, sem empilhar 2a tela cheia');
     definirTemaArenaSalvo(temaAlvo.id);
-    if (typeof renderTemaArena === 'function') renderTemaArena();
     return;
   }
 
-  debugEstagio('CAMINHO ANIMADO tomado -- heroi deve comecar a correr agora');
+  debugEstagio('abrindo tela cheia pra ' + temaAlvo.id);
   _arenaBgEmTransicao = true;
-  // trava criar/completar tarefa NA HORA que a transicao comeca -- sem
-  // esperar o proximo render() espontaneo. Usa um helper dedicado, NAO
-  // render() inteiro: viajarParaTemaEstagio() e chamada de DENTRO de
-  // verificarDesbloqueiosTemaArena(), que por sua vez roda de dentro de
-  // render() -- chamar render() aqui seria reentrancia (render() dentro
-  // de render(), no meio da execucao), arriscando mexer em estado que
-  // nao devia (celebracao de vitoria, animacao de XP/moeda em andamento)
-  // so pra atualizar 2 botoes. atualizarTravaTransicaoEstagio() faz so
-  // isso, sem tocar em mais nada.
   atualizarTravaTransicaoEstagio();
-  const DURACAO = 480;
 
-  // REDE DE SEGURANCA (mesmo padrao de tocarPeekTemaArena, mais abaixo
-  // no arquivo): se QUALQUER coisa no meio da cadeia de callbacks
-  // (popup nao aparecer, enfileirarPopup travar por outro motivo, erro
-  // silencioso) quebrar antes de _arenaBgEmTransicao voltar pra false,
-  // TODO desbloqueio seguinte cai pro caminho silencioso (so persiste,
-  // sem nunca mais animar nem mostrar popup nenhum) PRO RESTO DA SESSAO
-  // -- suspeita real de ser a causa do "nao tem popup nenhum e nem
-  // transicao nenhuma" relatado. Sem essa rede, um unico ponto de falha
-  // no meio do caminho silenciava o sistema inteiro pra sempre.
+  // REDE DE SEGURANCA: se a tela cheia nunca fechar por algum motivo
+  // (popup travado, erro silencioso), forca o reset depois de 8s em vez
+  // de deixar o app travado pro resto da sessao.
   let finalizado = false;
   const seguranca = setTimeout(() => {
     if (finalizado) return;
     finalizado = true;
-    debugEstagio('REDE DE SEGURANCA disparou (8s sem terminar) -- forcando reset. Isso significa que algo travou no meio do caminho.');
-    heroEl.classList.remove('heroi-viagem-sai', 'heroi-viagem-chega');
+    debugEstagio('REDE DE SEGURANCA disparou (8s sem terminar) -- forcando reset');
+    if (typeof fecharEstagioTelaCompleta === 'function') fecharEstagioTelaCompleta();
     _arenaBgEmTransicao = false;
     atualizarTravaTransicaoEstagio();
   }, 8000);
 
-  heroEl.classList.add('heroi-viagem-sai');
-  debugEstagio('classe heroi-viagem-sai adicionada -- heroi deveria estar correndo pra fora agora. Esperando ' + DURACAO + 'ms pra trocar o fundo.');
+  // troca o fundo JA -- fica escondido atras da tela cheia que abre no
+  // mesmo instante, entao nao ha frame nenhum onde o jogador veria o
+  // cenario antigo ainda visivel depois de "Continuar".
+  try {
+    definirTemaArenaSalvo(temaAlvo.id);
+    const frenteEl = document.getElementById('arenaBg' + _arenaBgFrente);
+    if (frenteEl && typeof aplicarFundoTemaArena === 'function') aplicarFundoTemaArena(frenteEl, temaAlvo);
+    if (typeof renderTemaArenaDots === 'function') renderTemaArenaDots();
+    if (typeof atualizarBloqueioArena === 'function') atualizarBloqueioArena(temaAlvo);
+  } catch(e){
+    debugEstagio('ERRO ao trocar o fundo escondido: ' + (e && e.message));
+  }
 
-  setTimeout(() => {
-    debugEstagio('setTimeout de ' + DURACAO + 'ms disparou -- trocando fundo agora');
-    try {
-      // heroi ja fora de cena -- troca o fundo na mesma camada visivel
-      // (nao precisa da 2a camada/crossfade: o heroi cobre a troca)
-      definirTemaArenaSalvo(temaAlvo.id);
-      aplicarFundoTemaArena(frenteEl, temaAlvo);
-      renderTemaArenaDots();
-      atualizarBloqueioArena(temaAlvo);
+  const finalizarViagem = () => {
+    if (finalizado) return;
+    finalizado = true;
+    clearTimeout(seguranca);
+    _arenaBgEmTransicao = false;
+    atualizarTravaTransicaoEstagio();
+    debugEstagio('viagem finalizada normalmente, _arenaBgEmTransicao voltou pra false');
+  };
 
-      heroEl.classList.remove('heroi-viagem-sai');
-
-      // Heroi sumiu, fundo ja trocado -- AQUI mostra o popup "Novo Estagio
-      // Desbloqueado" (pedido do usuario: queria um popup de verdade, nao
-      // so o aviso flutuante pequeno que ja existia). Usa a MESMA fila de
-      // popups do Level Up/Bau (enfileirarPopup) -- se um level up
-      // acontecer no mesmo instante (bem provavel, o mesmo watchdog de
-      // virada de dia dispara varias coisas juntas), os dois entram na
-      // fila e aparecem em sequencia, nunca sobrepostos. O heroi so volta
-      // correndo (heroi-viagem-chega) DEPOIS que o jogador fechar o popup
-      // -- ate la a trava de criar/completar tarefa continua ativa.
-      const finalizarViagem = () => {
-        if (finalizado) return; // a rede de seguranca ja rodou -- nao desfaz o que ela fez
-        finalizado = true;
-        clearTimeout(seguranca);
-        heroEl.classList.add('heroi-viagem-chega');
-        setTimeout(() => {
-          heroEl.classList.remove('heroi-viagem-chega');
-          _arenaBgEmTransicao = false;
-          atualizarTravaTransicaoEstagio();
-          debugEstagio('viagem finalizada normalmente, _arenaBgEmTransicao voltou pra false');
-        }, DURACAO);
-      };
-
-      debugEstagio('fundo trocado. enfileirarPopup existe=' + (typeof window.enfileirarPopup === 'function') + ', mostrarEstagioDesbloqueado existe=' + (typeof window.mostrarEstagioDesbloqueado === 'function'));
-      if (typeof window.enfileirarPopup === 'function' && typeof window.mostrarEstagioDesbloqueado === 'function'){
-        window.enfileirarPopup(prox => {
-          debugEstagio('funcao da fila de popups executando -- chamando mostrarEstagioDesbloqueado() agora');
-          try {
-            window.mostrarEstagioDesbloqueado(temaAlvo, () => { finalizarViagem(); prox(); });
-          } catch(e){
-            // popup falhou no meio -- nao deixa a fila de popups travada
-            // pros proximos (level up, bau, etc. ficariam presos atras
-            // dele pra sempre) nem a viagem sem terminar
-            debugEstagio('ERRO ao chamar mostrarEstagioDesbloqueado(): ' + (e && e.message));
-            finalizarViagem();
-            prox();
-          }
-        });
-      } else {
-        // fallback -- funcao do popup nao carregou por algum motivo, nao trava a viagem pra sempre
-        debugEstagio('fallback SEM popup tomado -- enfileirarPopup ou mostrarEstagioDesbloqueado nao existem');
+  debugEstagio('fundo trocado (escondido). enfileirarPopup existe=' + (typeof window.enfileirarPopup === 'function') + ', mostrarEstagioDesbloqueado existe=' + (typeof window.mostrarEstagioDesbloqueado === 'function'));
+  if (typeof window.enfileirarPopup === 'function' && typeof window.mostrarEstagioDesbloqueado === 'function'){
+    window.enfileirarPopup(prox => {
+      debugEstagio('funcao da fila de popups executando -- chamando mostrarEstagioDesbloqueado() (tela cheia) agora');
+      try {
+        window.mostrarEstagioDesbloqueado(temaAlvo, () => { finalizarViagem(); prox(); });
+      } catch(e){
+        debugEstagio('ERRO ao chamar mostrarEstagioDesbloqueado(): ' + (e && e.message));
         finalizarViagem();
+        prox();
       }
-    } catch(e){
-      // qualquer erro inesperado no meio da troca de fundo -- a rede de
-      // seguranca (8s) ainda pega isso, mas nao precisa esperar: limpa
-      // na hora, mesma logica de finalizarViagem() sem depender do popup
-      debugEstagio('ERRO CAPTURADO no meio da troca de fundo: ' + (e && e.message) + ' -- stack: ' + (e && e.stack ? String(e.stack).slice(0,200) : '?'));
-      if (!finalizado){
-        finalizado = true;
-        clearTimeout(seguranca);
-        heroEl.classList.remove('heroi-viagem-sai');
-        _arenaBgEmTransicao = false;
-        atualizarTravaTransicaoEstagio();
-      }
-    }
-  }, DURACAO);
+    });
+  } else {
+    debugEstagio('fallback SEM tela cheia tomado -- enfileirarPopup ou mostrarEstagioDesbloqueado nao existem');
+    finalizarViagem();
+  }
 }
 window.viajarParaTemaEstagio = viajarParaTemaEstagio;
 
@@ -7324,43 +7276,42 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 </script>
 
 <script>
-// Popup "Novo Estagio Desbloqueado" -- mesma estrutura/padrao do de
-// Level Up acima (baubg reaproveitado, fila via enfileirarPopup()),
-// so com conteudo proprio (bandeira + nome do tema). Chamado de dentro
-// de viajarParaTemaEstagio() (script "TEMA DE ARENA", mais acima no
-// arquivo) via window.mostrarEstagioDesbloqueado -- referencia
-// adiantada, segura pq so roda em runtime (clique/evento), depois de
-// TODO script da pagina ja ter executado.
+// Tela cheia "Estagio Concluido" -- REESCRITO (pedido do usuario,
+// comparando com video de referencia de outro app: "abre outra tela
+// antes, o heroi so passa direto"). Antes disso era um popup pequeno
+// (.estagiopop) por cima da Arena; agora e uma tela cheia de verdade
+// que cobre TUDO (inclusive a topbar), com o sprite do heroi no meio.
+// Continua usando a fila de popups (enfileirarPopup()) do Level Up/Bau
+// -- mesmo raciocinio de antes, so nao aparecem sobrepostos.
 (function(){
-  const estagioBG = document.createElement('div');
-  estagioBG.className = 'baubg'; estagioBG.id = 'estagioPopBG'; // reusa o mesmo fundo escurecido do bau/nivel
-  const estagioPop = document.createElement('div');
-  estagioPop.className = 'estagiopop'; estagioPop.id = 'estagioPop';
-  document.body.appendChild(estagioBG);
-  document.body.appendChild(estagioPop);
+  const estagioTela = document.createElement('div');
+  estagioTela.className = 'estagio-tela'; estagioTela.id = 'estagioTelaCompleta';
+  document.body.appendChild(estagioTela);
 
-  let _aoFecharEstagioPop = null;
-  function fecharEstagioPop(){
-    estagioPop.classList.remove('on');
-    estagioBG.classList.remove('on');
-    const cb = _aoFecharEstagioPop; _aoFecharEstagioPop = null;
+  let _aoFecharEstagioTela = null;
+  function fecharEstagioTelaCompleta(){
+    estagioTela.classList.remove('on');
+    const cb = _aoFecharEstagioTela; _aoFecharEstagioTela = null;
     if (cb) cb();
   }
-  estagioBG.onclick = fecharEstagioPop;
+  window.fecharEstagioTelaCompleta = fecharEstagioTelaCompleta; // exposta pra rede de seguranca em viajarParaTemaEstagio()
 
   function mostrarEstagioDesbloqueado(tema, aoFechar){
-    _aoFecharEstagioPop = aoFechar || null;
+    _aoFecharEstagioTela = aoFechar || null;
     const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
+    const numEstagio = (typeof estagioAtual === 'function') ? estagioAtual() : '';
+    const heroImg = (typeof heroiAtual === 'function') ? heroiAtual().img : '';
 
-    estagioPop.innerHTML =
-      '<div class="estagiopoplabel">' + (en ? 'New Stage Unlocked' : 'Novo Estágio Desbloqueado') + '</div>' +
-      '<div class="estagiopopflag" aria-hidden="true">&#127937;</div>' +
-      '<div class="estagiopopnome">' + (en ? tema.nome_en : tema.nome) + '</div>' +
-      '<button class="estagiopopok" id="estagioPopOk">' + (en ? 'Continue' : 'Continuar') + '</button>';
+    estagioTela.innerHTML =
+      '<div class="estagio-tela-titulo">' + (en ? 'Stage ' + numEstagio + ' Complete!' : 'Estágio ' + numEstagio + ' Concluído!') + '</div>' +
+      (heroImg ? '<img class="estagio-tela-hero" src="' + heroImg + '" alt="">' : '') +
+      '<div class="estagio-tela-sub"><span class="estagio-tela-sub-flag" aria-hidden="true">&#127937;</span>' +
+        (en ? 'Welcome to ' + tema.nome_en : 'Bem-vindo ao ' + tema.nome) +
+      '</div>' +
+      '<button class="estagio-tela-continuar" id="estagioTelaContinuarBtn">' + (en ? 'Continue' : 'Continuar') + '</button>';
 
-    document.getElementById('estagioPopOk').onclick = fecharEstagioPop;
-    estagioBG.classList.add('on');
-    requestAnimationFrame(() => { estagioPop.classList.add('on'); });
+    document.getElementById('estagioTelaContinuarBtn').onclick = fecharEstagioTelaCompleta;
+    estagioTela.classList.add('on');
   }
 
   window.mostrarEstagioDesbloqueado = mostrarEstagioDesbloqueado;

@@ -1219,7 +1219,7 @@
 })();
 </script>
 
-<div class="debugbar"><button class="debugbtn" id="debugbtn">próximo dia →</button><button class="debugbtn" id="pularTutoriaisBtn">pular tutorial</button><button class="debugbtn" id="debugArmasBtn">+ todas armas</button></div>
+<div class="debugbar"><button class="debugbtn" id="debugbtn">próximo dia →</button><button class="debugbtn" id="pularTutoriaisBtn">pular tutorial</button><button class="debugbtn" id="debugArmasBtn">+ todas armas</button><button class="debugbtn" id="debugEstagioBtn">forçar estágio</button></div>
 <div class="toast" id="toast"></div>
 
 <script src="assets.js"></script>
@@ -2575,43 +2575,85 @@ function viajarParaTemaEstagio(){
   atualizarTravaTransicaoEstagio();
   const DURACAO = 480;
 
+  // REDE DE SEGURANCA (mesmo padrao de tocarPeekTemaArena, mais abaixo
+  // no arquivo): se QUALQUER coisa no meio da cadeia de callbacks
+  // (popup nao aparecer, enfileirarPopup travar por outro motivo, erro
+  // silencioso) quebrar antes de _arenaBgEmTransicao voltar pra false,
+  // TODO desbloqueio seguinte cai pro caminho silencioso (so persiste,
+  // sem nunca mais animar nem mostrar popup nenhum) PRO RESTO DA SESSAO
+  // -- suspeita real de ser a causa do "nao tem popup nenhum e nem
+  // transicao nenhuma" relatado. Sem essa rede, um unico ponto de falha
+  // no meio do caminho silenciava o sistema inteiro pra sempre.
+  let finalizado = false;
+  const seguranca = setTimeout(() => {
+    if (finalizado) return;
+    finalizado = true;
+    heroEl.classList.remove('heroi-viagem-sai', 'heroi-viagem-chega');
+    _arenaBgEmTransicao = false;
+    atualizarTravaTransicaoEstagio();
+  }, 8000);
+
   heroEl.classList.add('heroi-viagem-sai');
 
   setTimeout(() => {
-    // heroi ja fora de cena -- troca o fundo na mesma camada visivel
-    // (nao precisa da 2a camada/crossfade: o heroi cobre a troca)
-    definirTemaArenaSalvo(temaAlvo.id);
-    aplicarFundoTemaArena(frenteEl, temaAlvo);
-    renderTemaArenaDots();
-    atualizarBloqueioArena(temaAlvo);
+    try {
+      // heroi ja fora de cena -- troca o fundo na mesma camada visivel
+      // (nao precisa da 2a camada/crossfade: o heroi cobre a troca)
+      definirTemaArenaSalvo(temaAlvo.id);
+      aplicarFundoTemaArena(frenteEl, temaAlvo);
+      renderTemaArenaDots();
+      atualizarBloqueioArena(temaAlvo);
 
-    heroEl.classList.remove('heroi-viagem-sai');
+      heroEl.classList.remove('heroi-viagem-sai');
 
-    // Heroi sumiu, fundo ja trocado -- AQUI mostra o popup "Novo Estagio
-    // Desbloqueado" (pedido do usuario: queria um popup de verdade, nao
-    // so o aviso flutuante pequeno que ja existia). Usa a MESMA fila de
-    // popups do Level Up/Bau (enfileirarPopup) -- se um level up
-    // acontecer no mesmo instante (bem provavel, o mesmo watchdog de
-    // virada de dia dispara varias coisas juntas), os dois entram na
-    // fila e aparecem em sequencia, nunca sobrepostos. O heroi so volta
-    // correndo (heroi-viagem-chega) DEPOIS que o jogador fechar o popup
-    // -- ate la a trava de criar/completar tarefa continua ativa.
-    const finalizarViagem = () => {
-      heroEl.classList.add('heroi-viagem-chega');
-      setTimeout(() => {
-        heroEl.classList.remove('heroi-viagem-chega');
+      // Heroi sumiu, fundo ja trocado -- AQUI mostra o popup "Novo Estagio
+      // Desbloqueado" (pedido do usuario: queria um popup de verdade, nao
+      // so o aviso flutuante pequeno que ja existia). Usa a MESMA fila de
+      // popups do Level Up/Bau (enfileirarPopup) -- se um level up
+      // acontecer no mesmo instante (bem provavel, o mesmo watchdog de
+      // virada de dia dispara varias coisas juntas), os dois entram na
+      // fila e aparecem em sequencia, nunca sobrepostos. O heroi so volta
+      // correndo (heroi-viagem-chega) DEPOIS que o jogador fechar o popup
+      // -- ate la a trava de criar/completar tarefa continua ativa.
+      const finalizarViagem = () => {
+        if (finalizado) return; // a rede de seguranca ja rodou -- nao desfaz o que ela fez
+        finalizado = true;
+        clearTimeout(seguranca);
+        heroEl.classList.add('heroi-viagem-chega');
+        setTimeout(() => {
+          heroEl.classList.remove('heroi-viagem-chega');
+          _arenaBgEmTransicao = false;
+          atualizarTravaTransicaoEstagio();
+        }, DURACAO);
+      };
+
+      if (typeof window.enfileirarPopup === 'function' && typeof window.mostrarEstagioDesbloqueado === 'function'){
+        window.enfileirarPopup(prox => {
+          try {
+            window.mostrarEstagioDesbloqueado(temaAlvo, () => { finalizarViagem(); prox(); });
+          } catch(e){
+            // popup falhou no meio -- nao deixa a fila de popups travada
+            // pros proximos (level up, bau, etc. ficariam presos atras
+            // dele pra sempre) nem a viagem sem terminar
+            finalizarViagem();
+            prox();
+          }
+        });
+      } else {
+        // fallback -- funcao do popup nao carregou por algum motivo, nao trava a viagem pra sempre
+        finalizarViagem();
+      }
+    } catch(e){
+      // qualquer erro inesperado no meio da troca de fundo -- a rede de
+      // seguranca (8s) ainda pega isso, mas nao precisa esperar: limpa
+      // na hora, mesma logica de finalizarViagem() sem depender do popup
+      if (!finalizado){
+        finalizado = true;
+        clearTimeout(seguranca);
+        heroEl.classList.remove('heroi-viagem-sai');
         _arenaBgEmTransicao = false;
         atualizarTravaTransicaoEstagio();
-      }, DURACAO);
-    };
-
-    if (typeof window.enfileirarPopup === 'function' && typeof window.mostrarEstagioDesbloqueado === 'function'){
-      window.enfileirarPopup(prox => {
-        window.mostrarEstagioDesbloqueado(temaAlvo, () => { finalizarViagem(); prox(); });
-      });
-    } else {
-      // fallback -- funcao do popup nao carregou por algum motivo, nao trava a viagem pra sempre
-      finalizarViagem();
+      }
     }
   }, DURACAO);
 }
@@ -8461,6 +8503,14 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   }
 
   window.totalTarefasConcluidas = function(){ return total; };
+  // DEBUG apenas: forca o contador lifetime pra um valor especifico, sem
+  // mexer em XP/moeda/tarefas reais -- usado pelo botao de debug
+  // "forcar estagio" pra testar o Sistema de Estagios sem precisar
+  // completar 30+ tarefas de verdade em sessoes reais.
+  window._debugDefinirTotalTarefas = function(n){
+    total = Math.max(0, Math.round(n));
+    persistir();
+  };
 
   // chamado por puxarNuvem() apos restaurar CHAVE_CONCLUIDAS vinda da
   // nuvem -- mesmo motivo do vidaHeroi.recarregar() (ver bloco VIDA DO
@@ -12225,6 +12275,29 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       if (typeof render === 'function') render();
       if (typeof renderInventario === 'function') renderInventario();
       if (typeof aviso === 'function') aviso(qtd + ' ARMAS ADICIONADAS AO INVENTARIO');
+    };
+  }
+
+  const btnEstagio = document.getElementById('debugEstagioBtn');
+  if (btnEstagio){
+    btnEstagio.onclick = () => {
+      // DEBUG: pula o contador lifetime de tarefas direto pro proximo
+      // limiar de estagio (ver LIMIARES_ESTAGIO/_debugDefinirTotalTarefas),
+      // sem completar tarefa nenhuma de verdade -- so pra testar a
+      // viagem/popup do Sistema de Estagios sem grind.
+      if (typeof window._debugDefinirTotalTarefas !== 'function' || typeof window.totalTarefasConcluidas !== 'function'){
+        console.error('debug forcar estagio: _debugDefinirTotalTarefas indisponivel');
+        return;
+      }
+      const atual = window.totalTarefasConcluidas();
+      const limiares = (typeof LIMIARES_ESTAGIO !== 'undefined') ? LIMIARES_ESTAGIO : [30, 90, 200];
+      const proximo = limiares.find(v => v > atual);
+      if (proximo === undefined){
+        if (typeof aviso === 'function') aviso('JÁ ESTÁ NO ÚLTIMO ESTÁGIO');
+        return;
+      }
+      window._debugDefinirTotalTarefas(proximo);
+      if (typeof render === 'function') render();
     };
   }
 

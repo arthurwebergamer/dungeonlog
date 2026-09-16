@@ -7348,12 +7348,25 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   function mostrarEstagioDesbloqueado(tema, aoFechar){
     _aoFecharEstagioTela = aoFechar || null;
     const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
-    const numEstagio = (typeof estagioAtual === 'function') ? estagioAtual() : '';
     const heroImg = (typeof heroiAtual === 'function') ? heroiAtual().img : '';
+    // BUG CORRIGIDO (relatado pelo usuario, print: tela mostrava "Estagio 2
+    // Concluido" bem-vindo ao Deserto, mas Deserto E o Estagio 2 -- quem
+    // acabou de ser concluido foi o Estagio 1). numEstagio aqui e o estagio
+    // que o jogador ACABOU de terminar, nao o que esta comecando agora --
+    // por isso -1 em relacao a estagioAtual() (que ja reflete o novo
+    // estagio corrente).
+    const numEstagioConcluido = (typeof estagioAtual === 'function') ? estagioAtual() - 1 : '';
+    // Preview do novo bioma (pedido do usuario): mostra a arte de fundo
+    // do tema que acabou de desbloquear, se existir (temas sem arte
+    // propria, tipo Padrao, simplesmente nao mostram nada aqui).
+    const previewArte = tema.arte
+      ? '<img class="estagio-tela-preview" src="data:image/png;base64,' + tema.arte + '" alt="">'
+      : '';
 
     estagioTela.innerHTML =
-      '<div class="estagio-tela-titulo">' + (en ? 'Stage ' + numEstagio + ' Complete!' : 'Estágio ' + numEstagio + ' Concluído!') + '</div>' +
+      '<div class="estagio-tela-titulo">' + (en ? 'Stage ' + numEstagioConcluido + ' Complete!' : 'Estágio ' + numEstagioConcluido + ' Concluído!') + '</div>' +
       (heroImg ? '<img class="estagio-tela-hero" src="' + heroImg + '" alt="">' : '') +
+      previewArte +
       '<div class="estagio-tela-sub"><span class="estagio-tela-sub-flag" aria-hidden="true">&#127937;</span>' +
         (en ? 'Welcome to ' + tema.nome_en : 'Bem-vindo ao ' + tema.nome) +
       '</div>' +

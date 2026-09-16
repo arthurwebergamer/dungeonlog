@@ -1377,6 +1377,14 @@
     width:120px; height:120px; object-fit:contain; image-rendering:pixelated;
     filter:drop-shadow(0 12px 18px rgba(0,0,0,.5));
   }
+  /* Preview do bioma novo (pedido do usuario) -- banner com a arte de
+     fundo do tema que acabou de ser desbloqueado, entre o heroi e o
+     texto "Bem-vindo ao X". Temas sem arte propria (Padrao) nunca
+     chegam aqui -- a ceremonia so roda pra Deserto/Floresta/Gelo. */
+  .estagio-tela-preview{
+    width:min(260px, calc(100% - 64px)); aspect-ratio:16/9; object-fit:cover;
+    border-radius:14px; box-shadow:0 10px 24px -8px rgba(0,0,0,.55);
+  }
   .estagio-tela-sub{
     display:flex; align-items:center; gap:8px;
     font-family:'Silkscreen',monospace; font-size:12px; color:var(--dim); letter-spacing:.04em;
@@ -2593,6 +2601,14 @@
   .estagio-tela-hero{
     width:120px; height:120px; object-fit:contain; image-rendering:pixelated;
     filter:drop-shadow(0 12px 18px rgba(0,0,0,.5));
+  }
+  /* Preview do bioma novo (pedido do usuario) -- banner com a arte de
+     fundo do tema que acabou de ser desbloqueado, entre o heroi e o
+     texto "Bem-vindo ao X". Temas sem arte propria (Padrao) nunca
+     chegam aqui -- a ceremonia so roda pra Deserto/Floresta/Gelo. */
+  .estagio-tela-preview{
+    width:min(260px, calc(100% - 64px)); aspect-ratio:16/9; object-fit:cover;
+    border-radius:14px; box-shadow:0 10px 24px -8px rgba(0,0,0,.55);
   }
   .estagio-tela-sub{
     display:flex; align-items:center; gap:8px;

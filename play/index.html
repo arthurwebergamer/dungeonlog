@@ -2280,10 +2280,13 @@ function renderTemaArena(){
       if (typeof viajarParaTemaEstagio === 'function'){
         viajarParaTemaEstagio();
         // sai cedo -- o resto desta funcao (mais abaixo) reseta
-        // _arenaBgFrente/transform incondicionalmente, o que brigaria
-        // com a cerimonia que acabou de comecar (heroi correndo, troca
-        // de fundo agendada pro frenteEl capturado dentro dela). A
-        // propria cerimonia cuida de deixar tudo pintado certo no final.
+        // _arenaBgFrente/transform incondicionalmente. Nao tem mais
+        // problema chamar de novo (a cerimonia atual e so tela cheia +
+        // renderTemaArena() escondido atras dela, sem sprite correndo
+        // pra brigar), mas sair cedo aqui continua correto: essa
+        // segunda pintura seria redundante, ja que a cerimonia vai
+        // chamar renderTemaArena() de novo por conta propria mais abaixo
+        // na sequencia dela.
         return;
       }
     }
@@ -2636,12 +2639,23 @@ function viajarParaTemaEstagio(){
   // troca o fundo JA -- fica escondido atras da tela cheia que abre no
   // mesmo instante, entao nao ha frame nenhum onde o jogador veria o
   // cenario antigo ainda visivel depois de "Continuar".
+  //
+  // BUG CORRIGIDO (relatado pelo usuario: "a primeira passagem pro tema
+  // do deserto nao ia, ficava no dungeon padrao"): essa versao anterior
+  // so pintava aplicarFundoTemaArena() numa camada SO (a que _arenaBgFrente
+  // apontava no momento) -- se por qualquer motivo essa nao fosse
+  // realmente a camada visivel (ex: transform desalinhado de uma
+  // interacao anterior), a troca nunca aparecia. Trocado pra chamar
+  // renderTemaArena() de verdade -- a MESMA funcao robusta usada no boot,
+  // que pinta as 2 camadas (A e B), reseta o transform das 2 pra 0 e
+  // forca _arenaBgFrente='A' -- sem depender de qual camada "deveria"
+  // estar na frente. Seguro chamar aqui: definirTemaArenaSalvo() ja
+  // rodou logo acima, entao o self-heal dentro de renderTemaArena() ve
+  // que o tema salvo ja bate com o esperado e nao entra em loop
+  // chamando viajarParaTemaEstagio() de novo.
   try {
     definirTemaArenaSalvo(temaAlvo.id);
-    const frenteEl = document.getElementById('arenaBg' + _arenaBgFrente);
-    if (frenteEl && typeof aplicarFundoTemaArena === 'function') aplicarFundoTemaArena(frenteEl, temaAlvo);
-    if (typeof renderTemaArenaDots === 'function') renderTemaArenaDots();
-    if (typeof atualizarBloqueioArena === 'function') atualizarBloqueioArena(temaAlvo);
+    if (typeof renderTemaArena === 'function') renderTemaArena();
   } catch(e){
     debugEstagio('ERRO ao trocar o fundo escondido: ' + (e && e.message));
   }
@@ -7311,7 +7325,12 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       '<button class="estagio-tela-continuar" id="estagioTelaContinuarBtn">' + (en ? 'Continue' : 'Continuar') + '</button>';
 
     document.getElementById('estagioTelaContinuarBtn').onclick = fecharEstagioTelaCompleta;
-    estagioTela.classList.add('on');
+    // adia pro proximo frame -- mesmo padrao ja usado no popup de nivel/
+    // bau (.baubg/.lvlpop). Sem isso, o navegador pode colapsar "innerHTML
+    // populado + opacity:1 no mesmo tick" numa unica pintura, sem rodar a
+    // transicao (a tela so aparece de repente, sem fade -- exatamente o
+    // "nao ta aparecendo nenhuma animacao" relatado pelo usuario).
+    requestAnimationFrame(() => { estagioTela.classList.add('on'); });
   }
 
   window.mostrarEstagioDesbloqueado = mostrarEstagioDesbloqueado;

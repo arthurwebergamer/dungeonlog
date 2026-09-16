@@ -1355,10 +1355,11 @@
      garantir que fica acima de QUALQUER outro overlay. */
   .estagio-tela{
     position:fixed; inset:0; z-index:150;
-    display:none; flex-direction:column; align-items:center; justify-content:center; gap:16px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px;
     background:var(--bg); padding:24px; text-align:center;
+    opacity:0; pointer-events:none; transition:opacity .35s ease;
   }
-  .estagio-tela.on{display:flex}
+  .estagio-tela.on{opacity:1; pointer-events:auto}
   .estagio-tela-titulo{
     font-family:'Outfit',sans-serif; font-weight:700; font-size:22px; color:var(--text);
     animation:estagioTelaSobe .4s ease both;
@@ -2565,10 +2566,11 @@
      garantir que fica acima de QUALQUER outro overlay. */
   .estagio-tela{
     position:fixed; inset:0; z-index:150;
-    display:none; flex-direction:column; align-items:center; justify-content:center; gap:16px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px;
     background:var(--bg); padding:24px; text-align:center;
+    opacity:0; pointer-events:none; transition:opacity .35s ease;
   }
-  .estagio-tela.on{display:flex}
+  .estagio-tela.on{opacity:1; pointer-events:auto}
   .estagio-tela-titulo{
     font-family:'Outfit',sans-serif; font-weight:700; font-size:22px; color:var(--text);
     animation:estagioTelaSobe .4s ease both;

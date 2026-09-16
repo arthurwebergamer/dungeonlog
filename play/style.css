@@ -1360,29 +1360,35 @@
     opacity:0; pointer-events:none; transition:opacity .35s ease;
   }
   .estagio-tela.on{opacity:1; pointer-events:auto}
+  /* FIX (pedido do usuario): a animacao de entrada dos elementos (fade+
+     sobe) tocava sozinha assim que a tela abria, ANTES do usuario clicar
+     em qualquer coisa. Pedido foi: a animacao so deve tocar DEPOIS do
+     clique em "Continuar". Entao o conteudo agora aparece estatico junto
+     com o fade da propria tela (sem animacao propria nos elementos), e
+     quem anima e a SAIDA: ao clicar Continuar, a classe .estagio-tela-
+     saindo entra (ver fecharEstagioTelaCompleta() no script), fazendo a
+     tela encolher+sumir de vez (zoom leve + fade), no lugar do fade
+     simples de opacity que tinha antes -- essa e a animacao que agora
+     acontece depois do clique. */
   .estagio-tela-titulo{
     font-family:'Outfit',sans-serif; font-weight:700; font-size:22px; color:var(--text);
-    animation:estagioTelaSobe .4s ease both;
   }
   .estagio-tela-hero{
     width:120px; height:120px; object-fit:contain; image-rendering:pixelated;
     filter:drop-shadow(0 12px 18px rgba(0,0,0,.5));
-    animation:estagioTelaSobe .45s ease .05s both;
   }
   .estagio-tela-sub{
     display:flex; align-items:center; gap:8px;
     font-family:'Silkscreen',monospace; font-size:12px; color:var(--dim); letter-spacing:.04em;
-    animation:estagioTelaSobe .45s ease .1s both;
   }
   .estagio-tela-sub-flag{font-size:14px}
   .estagio-tela-continuar{
     margin-top:8px; padding:13px 38px; border:none; border-radius:12px; cursor:pointer;
     background:var(--accent); color:var(--bg); font-family:'Outfit',sans-serif; font-weight:600; font-size:14px;
-    animation:estagioTelaSobe .45s ease .15s both;
   }
-  @keyframes estagioTelaSobe{
-    from{opacity:0; transform:translateY(14px)}
-    to{opacity:1; transform:translateY(0)}
+  .estagio-tela.estagio-tela-saindo{
+    transition:opacity .38s ease, transform .38s cubic-bezier(.4,0,.7,.3);
+    transform:scale(.92); opacity:0;
   }
 
   .quedapop{position:fixed;left:50%;top:50%;z-index:96;
@@ -2571,29 +2577,35 @@
     opacity:0; pointer-events:none; transition:opacity .35s ease;
   }
   .estagio-tela.on{opacity:1; pointer-events:auto}
+  /* FIX (pedido do usuario): a animacao de entrada dos elementos (fade+
+     sobe) tocava sozinha assim que a tela abria, ANTES do usuario clicar
+     em qualquer coisa. Pedido foi: a animacao so deve tocar DEPOIS do
+     clique em "Continuar". Entao o conteudo agora aparece estatico junto
+     com o fade da propria tela (sem animacao propria nos elementos), e
+     quem anima e a SAIDA: ao clicar Continuar, a classe .estagio-tela-
+     saindo entra (ver fecharEstagioTelaCompleta() no script), fazendo a
+     tela encolher+sumir de vez (zoom leve + fade), no lugar do fade
+     simples de opacity que tinha antes -- essa e a animacao que agora
+     acontece depois do clique. */
   .estagio-tela-titulo{
     font-family:'Outfit',sans-serif; font-weight:700; font-size:22px; color:var(--text);
-    animation:estagioTelaSobe .4s ease both;
   }
   .estagio-tela-hero{
     width:120px; height:120px; object-fit:contain; image-rendering:pixelated;
     filter:drop-shadow(0 12px 18px rgba(0,0,0,.5));
-    animation:estagioTelaSobe .45s ease .05s both;
   }
   .estagio-tela-sub{
     display:flex; align-items:center; gap:8px;
     font-family:'Silkscreen',monospace; font-size:12px; color:var(--dim); letter-spacing:.04em;
-    animation:estagioTelaSobe .45s ease .1s both;
   }
   .estagio-tela-sub-flag{font-size:14px}
   .estagio-tela-continuar{
     margin-top:8px; padding:13px 38px; border:none; border-radius:12px; cursor:pointer;
     background:var(--accent); color:var(--bg); font-family:'Outfit',sans-serif; font-weight:600; font-size:14px;
-    animation:estagioTelaSobe .45s ease .15s both;
   }
-  @keyframes estagioTelaSobe{
-    from{opacity:0; transform:translateY(14px)}
-    to{opacity:1; transform:translateY(0)}
+  .estagio-tela.estagio-tela-saindo{
+    transition:opacity .38s ease, transform .38s cubic-bezier(.4,0,.7,.3);
+    transform:scale(.92); opacity:0;
   }
 
   .quedapop{position:fixed;left:50%;top:50%;z-index:96;

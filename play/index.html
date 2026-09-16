@@ -7304,9 +7304,18 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 
   let _aoFecharEstagioTela = null;
   function fecharEstagioTelaCompleta(){
-    estagioTela.classList.remove('on');
-    const cb = _aoFecharEstagioTela; _aoFecharEstagioTela = null;
-    if (cb) cb();
+    // FIX (pedido do usuario): a animacao agora acontece AQUI, disparada
+    // pelo clique em "Continuar" -- adiciona a classe de saida (zoom+fade,
+    // .38s, ver CSS), espera ela terminar de verdade, so DEPOIS tira o
+    // ".on" e chama o callback (que revela a Arena por baixo). Antes a
+    // animacao (fade+sobe) tocava sozinha assim que a tela abria, sem
+    // esperar nenhuma acao do usuario -- o contrario do que foi pedido.
+    estagioTela.classList.add('estagio-tela-saindo');
+    setTimeout(() => {
+      estagioTela.classList.remove('on', 'estagio-tela-saindo');
+      const cb = _aoFecharEstagioTela; _aoFecharEstagioTela = null;
+      if (cb) cb();
+    }, 380); // bate com a duracao do transition em .estagio-tela-saindo
   }
   window.fecharEstagioTelaCompleta = fecharEstagioTelaCompleta; // exposta pra rede de seguranca em viajarParaTemaEstagio()
 

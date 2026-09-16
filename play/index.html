@@ -3772,10 +3772,15 @@ document.getElementById('debugbtn').onclick = () => {
 };
 
 // ---------- nome do heroi ----------
+// FIX (pedido do usuario, print circulado): nome do heroi ("a" no
+// print -- nome curto usado em teste) escondido de vez. Antes essa
+// linha MOVIA o span pro topo, do lado do Nivel (lvl.after(spanNome)).
+// O elemento continua existindo no DOM -- render() (linha ~3039) ainda
+// escreve o texto nele normalmente, sem precisar mexer la -- so nao
+// aparece em lugar nenhum da tela agora.
 const spanNome = document.getElementById('nomeTopo');
-// tira o nome de cima do sprite e leva pro topo, junto do nivel
-document.getElementById('lvl').after(spanNome);
-// renomear agora e feito pela folha modal do Perfil > Config (ver bloco RENOMEAR EM FOLHA)
+if (spanNome) spanNome.style.display = 'none';
+// renomear continua feito pela folha modal do Perfil > Config (ver bloco RENOMEAR EM FOLHA)
 
 // ---------- boas-vindas ----------
 let tarefasIniciais = [];

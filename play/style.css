@@ -3747,7 +3747,8 @@
    trilho menores) pra caber melhor numa faixa mais estreita que a
    largura toda da Arena. */
 .estagio-pill-wrap{
-  display:flex; flex-direction:column; align-items:center; gap:4px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+  align-self:center;
   flex:1; min-width:0; margin:0 8px;
 }
 .estagio-pill{

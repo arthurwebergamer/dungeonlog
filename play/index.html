@@ -2180,6 +2180,7 @@ function verificarDesbloqueiosTemaArena(){
   // da verdade) e viaja direto pra ele -- nao importa quantos limiares
   // foram cruzados de uma vez.
   if (desbloqueouAlgumAgora && typeof viajarParaTemaEstagio === 'function'){
+    console.log('[ESTAGIO-DEBUG] verificarDesbloqueiosTemaArena: desbloqueou algo nesta passada, chamando viajarParaTemaEstagio()');
     viajarParaTemaEstagio();
   }
 }
@@ -2263,6 +2264,7 @@ function renderTemaArena(){
   if (typeof estagioAtual === 'function' && typeof TEMAS_ARENA !== 'undefined' && typeof temaArenaDesbloqueado === 'function'){
     const temaEsperado = TEMAS_ARENA[estagioAtual() - 1];
     if (temaEsperado && temaArenaDesbloqueado(temaEsperado) && temaArenaSalvo() !== temaEsperado.id){
+      console.log('[ESTAGIO-DEBUG] AUTO-CORRECAO silenciosa disparou em renderTemaArena() -- trocou pra', temaEsperado.id, 'sem animar. Se isso aparecer ANTES de "CAMINHO ANIMADO tomado", a auto-correcao venceu a corrida.');
       definirTemaArenaSalvo(temaEsperado.id);
     }
   }
@@ -2542,13 +2544,24 @@ window.mudarTemaArena = mudarTemaArena;
 // (direita) -> troca o fundo enquanto ele esta fora -> heroi corre de
 // volta (entrando pela esquerda), como se tivesse chegado num lugar novo.
 function viajarParaTemaEstagio(){
-  if (typeof TEMAS_ARENA === 'undefined' || typeof estagioAtual !== 'function') return;
+  console.log('[ESTAGIO-DEBUG] viajarParaTemaEstagio() chamada. _arenaBgEmTransicao=', _arenaBgEmTransicao);
+  if (typeof TEMAS_ARENA === 'undefined' || typeof estagioAtual !== 'function'){
+    console.log('[ESTAGIO-DEBUG] saiu cedo: TEMAS_ARENA ou estagioAtual indefinidos');
+    return;
+  }
   const temaAlvo = TEMAS_ARENA[estagioAtual() - 1];
-  if (!temaAlvo) return;
-  if (temaArenaSalvo() === temaAlvo.id) return; // ja esta la -- nada a fazer (chamada redundante)
+  if (!temaAlvo){
+    console.log('[ESTAGIO-DEBUG] saiu cedo: temaAlvo nao encontrado pra estagioAtual()=', estagioAtual());
+    return;
+  }
+  if (temaArenaSalvo() === temaAlvo.id){
+    console.log('[ESTAGIO-DEBUG] saiu cedo: temaArenaSalvo() ja e', temaAlvo.id, '-- nada a fazer');
+    return;
+  }
 
   const heroEl = document.getElementById('heroSprite');
   const frenteEl = document.getElementById('arenaBg' + _arenaBgFrente);
+  console.log('[ESTAGIO-DEBUG] temaAlvo=', temaAlvo.id, 'heroEl achado=', !!heroEl, 'frenteEl achado=', !!frenteEl, '_arenaBgEmTransicao=', _arenaBgEmTransicao);
 
   // Arena fora de tela (usuario em outra aba) ou ja tem outra transicao
   // rodando -- persiste e re-sincroniza SEM animar. renderTemaArena() ja
@@ -2557,11 +2570,13 @@ function viajarParaTemaEstagio(){
   // caminho" do bug antigo -- agora sempre sobra pelo menos o estado
   // final correto, animado ou nao.
   if (!heroEl || !frenteEl || _arenaBgEmTransicao){
+    console.log('[ESTAGIO-DEBUG] CAMINHO SILENCIOSO tomado (sem animacao/popup) -- motivo:', !heroEl ? 'heroEl null' : (!frenteEl ? 'frenteEl null' : '_arenaBgEmTransicao ja true'));
     definirTemaArenaSalvo(temaAlvo.id);
     if (typeof renderTemaArena === 'function') renderTemaArena();
     return;
   }
 
+  console.log('[ESTAGIO-DEBUG] CAMINHO ANIMADO tomado -- heroi deve comecar a correr agora');
   _arenaBgEmTransicao = true;
   // trava criar/completar tarefa NA HORA que a transicao comeca -- sem
   // esperar o proximo render() espontaneo. Usa um helper dedicado, NAO

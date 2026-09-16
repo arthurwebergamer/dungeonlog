@@ -1377,19 +1377,34 @@
     width:120px; height:120px; object-fit:contain; image-rendering:pixelated;
     filter:drop-shadow(0 12px 18px rgba(0,0,0,.5));
   }
-  /* Preview do bioma novo (pedido do usuario) -- banner com a arte de
-     fundo do tema que acabou de ser desbloqueado, entre o heroi e o
-     texto "Bem-vindo ao X". Temas sem arte propria (Padrao) nunca
-     chegam aqui -- a ceremonia so roda pra Deserto/Floresta/Gelo. */
+  /* Preview do bioma novo (pedido do usuario) -- ilustracao FLUTUANTE,
+     igual a montanha do card "Sequencia atual" em Estatisticas: nao e a
+     arte cheia da Arena (tema.arte), e UMA CAMADA INDIVIDUAL do pack
+     (tema.arteEstagio -- ex.: so "3.Mountains.png", sem compor com as
+     outras camadas). O PNG ja vem com fundo transparente e silhueta
+     irregular (montanha/arvores), entao flutua sozinho sem precisar de
+     mask/fade nenhum -- mesma logica da montanha original: sem
+     border-radius, sem box-shadow, sem caixa. Temas sem arte propria
+     (Padrao) nunca chegam aqui -- a ceremonia so roda pra
+     Deserto/Floresta/Gelo. */
   .estagio-tela-preview{
-    width:min(260px, calc(100% - 64px)); aspect-ratio:16/9; object-fit:cover;
-    border-radius:14px; box-shadow:0 10px 24px -8px rgba(0,0,0,.55);
+    width:min(280px, calc(100% - 48px));
+    image-rendering:pixelated;
   }
   .estagio-tela-sub{
     display:flex; align-items:center; gap:8px;
     font-family:'Silkscreen',monospace; font-size:12px; color:var(--dim); letter-spacing:.04em;
   }
   .estagio-tela-sub-flag{font-size:14px}
+  /* Mensagem extra (pedido do usuario) so quando o ULTIMO tema (hoje
+     Montanhas) e concluido -- avisa que a partir dai todos os biomas
+     ja podem ser escolhidos livremente arrastando a Arena. */
+  .estagio-tela-todos{
+    max-width:260px; text-align:center; font-family:'Outfit',sans-serif; font-size:13px;
+    color:var(--text); background:color-mix(in srgb, var(--accent) 18%, transparent);
+    border:1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+    border-radius:12px; padding:10px 14px; line-height:1.4;
+  }
   .estagio-tela-continuar{
     margin-top:8px; padding:13px 38px; border:none; border-radius:12px; cursor:pointer;
     background:var(--accent); color:var(--bg); font-family:'Outfit',sans-serif; font-weight:600; font-size:14px;
@@ -2602,19 +2617,34 @@
     width:120px; height:120px; object-fit:contain; image-rendering:pixelated;
     filter:drop-shadow(0 12px 18px rgba(0,0,0,.5));
   }
-  /* Preview do bioma novo (pedido do usuario) -- banner com a arte de
-     fundo do tema que acabou de ser desbloqueado, entre o heroi e o
-     texto "Bem-vindo ao X". Temas sem arte propria (Padrao) nunca
-     chegam aqui -- a ceremonia so roda pra Deserto/Floresta/Gelo. */
+  /* Preview do bioma novo (pedido do usuario) -- ilustracao FLUTUANTE,
+     igual a montanha do card "Sequencia atual" em Estatisticas: nao e a
+     arte cheia da Arena (tema.arte), e UMA CAMADA INDIVIDUAL do pack
+     (tema.arteEstagio -- ex.: so "3.Mountains.png", sem compor com as
+     outras camadas). O PNG ja vem com fundo transparente e silhueta
+     irregular (montanha/arvores), entao flutua sozinho sem precisar de
+     mask/fade nenhum -- mesma logica da montanha original: sem
+     border-radius, sem box-shadow, sem caixa. Temas sem arte propria
+     (Padrao) nunca chegam aqui -- a ceremonia so roda pra
+     Deserto/Floresta/Gelo. */
   .estagio-tela-preview{
-    width:min(260px, calc(100% - 64px)); aspect-ratio:16/9; object-fit:cover;
-    border-radius:14px; box-shadow:0 10px 24px -8px rgba(0,0,0,.55);
+    width:min(280px, calc(100% - 48px));
+    image-rendering:pixelated;
   }
   .estagio-tela-sub{
     display:flex; align-items:center; gap:8px;
     font-family:'Silkscreen',monospace; font-size:12px; color:var(--dim); letter-spacing:.04em;
   }
   .estagio-tela-sub-flag{font-size:14px}
+  /* Mensagem extra (pedido do usuario) so quando o ULTIMO tema (hoje
+     Montanhas) e concluido -- avisa que a partir dai todos os biomas
+     ja podem ser escolhidos livremente arrastando a Arena. */
+  .estagio-tela-todos{
+    max-width:260px; text-align:center; font-family:'Outfit',sans-serif; font-size:13px;
+    color:var(--text); background:color-mix(in srgb, var(--accent) 18%, transparent);
+    border:1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+    border-radius:12px; padding:10px 14px; line-height:1.4;
+  }
   .estagio-tela-continuar{
     margin-top:8px; padding:13px 38px; border:none; border-radius:12px; cursor:pointer;
     background:var(--accent); color:var(--bg); font-family:'Outfit',sans-serif; font-weight:600; font-size:14px;

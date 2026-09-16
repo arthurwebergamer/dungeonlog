@@ -2014,7 +2014,7 @@ const CHAVE_TEMA_ARENA = 'questlog.temaArena.v1';
 
 // ---------- SISTEMA DE ESTAGIOS ----------
 // 4 estagios = os 4 TEMAS_ARENA, na mesma ordem (padrao/deserto/floresta/
-// gelo = estagio 1/2/3/4). Avanca sozinho conforme totalTarefasConcluidas()
+// montanhas = estagio 1/2/3/4). Avanca sozinho conforme totalTarefasConcluidas()
 // (contador lifetime que ja existia, reaproveitado -- ver Estatisticas
 // "Desde o inicio"). LIMIARES_ESTAGIO[i] = total de tarefas pra cruzar do
 // estagio (i+1) pro (i+2) -- 3 valores pra 4 estagios (3 cortes).
@@ -7359,8 +7359,28 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     // Preview do novo bioma (pedido do usuario): mostra a arte de fundo
     // do tema que acabou de desbloquear, se existir (temas sem arte
     // propria, tipo Padrao, simplesmente nao mostram nada aqui).
-    const previewArte = tema.arte
-      ? '<img class="estagio-tela-preview" src="data:image/png;base64,' + tema.arte + '" alt="">'
+    // Usa arteEstagio (ilustracao flutuante composta a partir do pack de
+    // camadas, sem retangulo de fundo solido) em vez de tema.arte (a arte
+    // cheia usada como fundo da Arena) -- pedido explicito do usuario:
+    // "nao fundo, nao o cenario inteiro", igual a montanha flutuante da
+    // tela de Estatisticas.
+    const previewArte = tema.arteEstagio
+      ? '<img class="estagio-tela-preview" src="data:image/png;base64,' + tema.arteEstagio + '" alt="">'
+      : '';
+
+    // Pedido do usuario: ao concluir o ULTIMO estagio (hoje Montanhas),
+    // alem da cerimonia normal, avisar explicitamente que todos os biomas
+    // ja estao liberados e que dá pra trocar livremente arrastando a
+    // Arena pro lado -- o gesto (mudarTemaArena/touch handlers) ja existe
+    // e ja funciona pra qualquer tema desbloqueado, so faltava avisar o
+    // jogador que essa liberdade come\u00e7ou.
+    const ehUltimoTema = (typeof TEMAS_ARENA !== 'undefined') && TEMAS_ARENA.length > 0
+      && tema.id === TEMAS_ARENA[TEMAS_ARENA.length - 1].id;
+    const mensagemTodosBiomas = ehUltimoTema
+      ? '<div class="estagio-tela-todos">' + (en
+          ? '🎉 You\'ve unlocked every biome! Swipe the Arena sideways to use whichever one you like.'
+          : '🎉 Você desbloqueou todos os biomas! Arraste a Arena pro lado pra usar o que você quiser.')
+        + '</div>'
       : '';
 
     estagioTela.innerHTML =
@@ -7370,6 +7390,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       '<div class="estagio-tela-sub"><span class="estagio-tela-sub-flag" aria-hidden="true">&#127937;</span>' +
         (en ? 'Welcome to ' + tema.nome_en : 'Bem-vindo ao ' + tema.nome) +
       '</div>' +
+      mensagemTodosBiomas +
       '<button class="estagio-tela-continuar" id="estagioTelaContinuarBtn">' + (en ? 'Continue' : 'Continuar') + '</button>';
 
     document.getElementById('estagioTelaContinuarBtn').onclick = fecharEstagioTelaCompleta;

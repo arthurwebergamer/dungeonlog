@@ -2155,27 +2155,10 @@ function verificarDesbloqueiosTemaArena(){
     if (total < t.desbloqueioGratis.valor) return;
     if (!marcarTemaDesbloqueado(t.id)) return;
     desbloqueouAlgumAgora = true;
-
-    // aviso visivel -- reaproveita o mesmo flutuante ja usado pra
-    // +XP/+moeda etc., ancorado na propria arena. Atrasado ~2.2s: o
-    // desbloqueio costuma coincidir com a virada do dia, que ja
-    // dispara +XP, possivel level up e a conquista "Pegando o Jeito"
-    // tudo de uma vez -- competir com esse monte de texto simultaneo
-    // (queixa do usuario: "nem da pra ler direito") deixando esse
-    // aviso pra depois, quando a poeira baixou, resolve sem precisar
-    // mexer nos outros sistemas de notificacao.
-    const emIngles = typeof idiomaApp === 'function' && idiomaApp() === 'en';
-    setTimeout(() => {
-      const arena = document.querySelector('.arena');
-      if (arena && typeof notificarFlutuante === 'function'){
-        notificarFlutuante(
-          arena,
-          emIngles ? 'New stage:' : 'Novo estágio:',
-          emIngles ? t.nome_en : t.nome,
-          '#F2C94C'
-        );
-      }
-    }, 2200);
+    // Aviso flutuante removido daqui -- substituido pelo popup de verdade
+    // (mostrarEstagioDesbloqueado(), enfileirado via viajarParaTemaEstagio()
+    // abaixo, mesma fila do Level Up/Bau). Pedido do usuario: queria um
+    // popup, nao so um texto pequeno passando rapido.
   });
 
   // BUG CORRIGIDO (relatado pelo usuario: "nao funcionou, nao teve nem
@@ -2603,13 +2586,33 @@ function viajarParaTemaEstagio(){
     atualizarBloqueioArena(temaAlvo);
 
     heroEl.classList.remove('heroi-viagem-sai');
-    heroEl.classList.add('heroi-viagem-chega');
-    setTimeout(() => {
-      heroEl.classList.remove('heroi-viagem-chega');
-      _arenaBgEmTransicao = false;
-      // destrava de volta assim que a viagem termina, mesmo motivo acima
-      atualizarTravaTransicaoEstagio();
-    }, DURACAO);
+
+    // Heroi sumiu, fundo ja trocado -- AQUI mostra o popup "Novo Estagio
+    // Desbloqueado" (pedido do usuario: queria um popup de verdade, nao
+    // so o aviso flutuante pequeno que ja existia). Usa a MESMA fila de
+    // popups do Level Up/Bau (enfileirarPopup) -- se um level up
+    // acontecer no mesmo instante (bem provavel, o mesmo watchdog de
+    // virada de dia dispara varias coisas juntas), os dois entram na
+    // fila e aparecem em sequencia, nunca sobrepostos. O heroi so volta
+    // correndo (heroi-viagem-chega) DEPOIS que o jogador fechar o popup
+    // -- ate la a trava de criar/completar tarefa continua ativa.
+    const finalizarViagem = () => {
+      heroEl.classList.add('heroi-viagem-chega');
+      setTimeout(() => {
+        heroEl.classList.remove('heroi-viagem-chega');
+        _arenaBgEmTransicao = false;
+        atualizarTravaTransicaoEstagio();
+      }, DURACAO);
+    };
+
+    if (typeof window.enfileirarPopup === 'function' && typeof window.mostrarEstagioDesbloqueado === 'function'){
+      window.enfileirarPopup(prox => {
+        window.mostrarEstagioDesbloqueado(temaAlvo, () => { finalizarViagem(); prox(); });
+      });
+    } else {
+      // fallback -- funcao do popup nao carregou por algum motivo, nao trava a viagem pra sempre
+      finalizarViagem();
+    }
   }, DURACAO);
 }
 window.viajarParaTemaEstagio = viajarParaTemaEstagio;
@@ -7207,6 +7210,50 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   }
 
   window.mostrarNivelUp = mostrarNivelUp;
+})();
+</script>
+
+<script>
+// Popup "Novo Estagio Desbloqueado" -- mesma estrutura/padrao do de
+// Level Up acima (baubg reaproveitado, fila via enfileirarPopup()),
+// so com conteudo proprio (bandeira + nome do tema). Chamado de dentro
+// de viajarParaTemaEstagio() (script "TEMA DE ARENA", mais acima no
+// arquivo) via window.mostrarEstagioDesbloqueado -- referencia
+// adiantada, segura pq so roda em runtime (clique/evento), depois de
+// TODO script da pagina ja ter executado.
+(function(){
+  const estagioBG = document.createElement('div');
+  estagioBG.className = 'baubg'; estagioBG.id = 'estagioPopBG'; // reusa o mesmo fundo escurecido do bau/nivel
+  const estagioPop = document.createElement('div');
+  estagioPop.className = 'estagiopop'; estagioPop.id = 'estagioPop';
+  document.body.appendChild(estagioBG);
+  document.body.appendChild(estagioPop);
+
+  let _aoFecharEstagioPop = null;
+  function fecharEstagioPop(){
+    estagioPop.classList.remove('on');
+    estagioBG.classList.remove('on');
+    const cb = _aoFecharEstagioPop; _aoFecharEstagioPop = null;
+    if (cb) cb();
+  }
+  estagioBG.onclick = fecharEstagioPop;
+
+  function mostrarEstagioDesbloqueado(tema, aoFechar){
+    _aoFecharEstagioPop = aoFechar || null;
+    const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
+
+    estagioPop.innerHTML =
+      '<div class="estagiopoplabel">' + (en ? 'New Stage Unlocked' : 'Novo Estágio Desbloqueado') + '</div>' +
+      '<div class="estagiopopflag" aria-hidden="true">&#127937;</div>' +
+      '<div class="estagiopopnome">' + (en ? tema.nome_en : tema.nome) + '</div>' +
+      '<button class="estagiopopok" id="estagioPopOk">' + (en ? 'Continue' : 'Continuar') + '</button>';
+
+    document.getElementById('estagioPopOk').onclick = fecharEstagioPop;
+    estagioBG.classList.add('on');
+    requestAnimationFrame(() => { estagioPop.classList.add('on'); });
+  }
+
+  window.mostrarEstagioDesbloqueado = mostrarEstagioDesbloqueado;
 })();
 </script>
 

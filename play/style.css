@@ -1354,6 +1354,27 @@
          padding:11px;border-radius:11px;border:none;background:var(--accent);
          color:var(--bg);cursor:pointer}
 
+  /* Popup "Novo Estagio Desbloqueado" -- mesmo padrao visual/estrutural
+     do popup de Level Up (.baubg reaproveitado como fundo escurecido,
+     .lvlpop como referencia de moldura), so com cor de destaque no
+     accent do tema em vez do gold fixo do level up (o tema MUDA junto,
+     entao usar --accent aqui acompanha visualmente o tema novo). */
+  .estagiopop{position:fixed;left:50%;top:50%;z-index:96;
+    transform:translate(-50%,-50%) scale(.9);opacity:0;pointer-events:none;
+    transition:transform .25s cubic-bezier(.2,.9,.3,1.2), opacity .22s;
+    background:var(--panel-2);border:1px solid var(--accent);border-radius:18px;
+    padding:26px 22px 20px;width:min(280px, calc(100% - 56px));text-align:center;
+    box-shadow:0 0 26px -8px var(--accent)}
+  .estagiopop.on{transform:translate(-50%,-50%) scale(1);opacity:1;pointer-events:auto}
+  .estagiopoplabel{font-family:'Silkscreen',monospace;font-size:11px;color:var(--muted);
+    letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}
+  .estagiopopflag{font-size:34px;line-height:1;margin-bottom:6px}
+  .estagiopopnome{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;
+    color:var(--accent);line-height:1;margin-bottom:16px}
+  .estagiopopok{width:100%;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;
+    padding:11px;border-radius:11px;border:none;background:var(--accent);
+    color:var(--bg);cursor:pointer}
+
   .quedapop{position:fixed;left:50%;top:50%;z-index:96;
             transform:translate(-50%,-50%) scale(.9);opacity:0;pointer-events:none;
             transition:transform .25s cubic-bezier(.2,.9,.3,1.2), opacity .22s;
@@ -2525,6 +2546,27 @@
   .lvlok{width:100%;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;
          padding:11px;border-radius:11px;border:none;background:var(--accent);
          color:var(--bg);cursor:pointer}
+
+  /* Popup "Novo Estagio Desbloqueado" -- mesmo padrao visual/estrutural
+     do popup de Level Up (.baubg reaproveitado como fundo escurecido,
+     .lvlpop como referencia de moldura), so com cor de destaque no
+     accent do tema em vez do gold fixo do level up (o tema MUDA junto,
+     entao usar --accent aqui acompanha visualmente o tema novo). */
+  .estagiopop{position:fixed;left:50%;top:50%;z-index:96;
+    transform:translate(-50%,-50%) scale(.9);opacity:0;pointer-events:none;
+    transition:transform .25s cubic-bezier(.2,.9,.3,1.2), opacity .22s;
+    background:var(--panel-2);border:1px solid var(--accent);border-radius:18px;
+    padding:26px 22px 20px;width:min(280px, calc(100% - 56px));text-align:center;
+    box-shadow:0 0 26px -8px var(--accent)}
+  .estagiopop.on{transform:translate(-50%,-50%) scale(1);opacity:1;pointer-events:auto}
+  .estagiopoplabel{font-family:'Silkscreen',monospace;font-size:11px;color:var(--muted);
+    letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}
+  .estagiopopflag{font-size:34px;line-height:1;margin-bottom:6px}
+  .estagiopopnome{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;
+    color:var(--accent);line-height:1;margin-bottom:16px}
+  .estagiopopok{width:100%;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;
+    padding:11px;border-radius:11px;border:none;background:var(--accent);
+    color:var(--bg);cursor:pointer}
 
   .quedapop{position:fixed;left:50%;top:50%;z-index:96;
             transform:translate(-50%,-50%) scale(.9);opacity:0;pointer-events:none;

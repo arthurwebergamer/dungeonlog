@@ -31,13 +31,6 @@
 
   .topbar{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;border-bottom:1px solid var(--line)}
   .lvl{font-family:'Silkscreen',monospace;font-size:9px;color:var(--accent);background:var(--accent-dim);padding:5px 9px;border-radius:4px}
-  /* barra de Estagio na topbar, entre Nivel e moedas -- ocupa o espaco
-     que sobra (flex:1) empurrando moedas/som pra direita, mesmo padrao
-     de #nomeTopo (flex:1) usado alhures na Arena. */
-  .estagio-topo{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;margin:0 12px;max-width:130px}
-  .estagio-topo-lbl{font-family:'Silkscreen',monospace;font-size:8px;color:var(--dim);letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .estagio-topo-trilho{height:4px;border-radius:2px;background:var(--panel-3);overflow:hidden}
-  .estagio-topo-fill{height:100%;border-radius:2px;background:var(--accent);transition:width .4s ease}
   .coins{display:flex;align-items:center;gap:6px;font-family:'Silkscreen',monospace;font-size:10px;color:var(--gold)}
   .coins svg{width:13px;height:13px}
 
@@ -518,6 +511,16 @@
   .mobinfo{margin-top:10px}
 
   .hero-sprite{position:relative}
+  /* Sistema de Estagios: heroi corre pra fora de cena (direita) antes
+     do fundo trocar, depois corre de volta entrando pela esquerda --
+     ver viajarParaTemaEstagio() no script principal. */
+  #heroSprite{ transition:transform .48s ease, opacity .48s ease; }
+  #heroSprite.heroi-viagem-sai{ transform:translateX(160%); opacity:0; }
+  #heroSprite.heroi-viagem-chega{ transition:none; animation:heroiChegaViagem .48s ease; }
+  @keyframes heroiChegaViagem{
+    from{ transform:translateX(-160%); opacity:0; }
+    to{ transform:translateX(0); opacity:1; }
+  }
 
 /* ===== Bloco style #4 ===== */
 /* ---------- layout: tela cheia, so a lista rola ---------- */
@@ -3692,6 +3695,24 @@
   background:rgba(255,255,255,.35);
 }
 .tema-arena-dot-atual{ background:rgba(255,255,255,.9); }
+
+/* Pill "Estagio N" centralizado no topo da Arena, com trilho de
+   progresso logo abaixo -- pedido do usuario (referencia: badge
+   arredondado tipo "STAGE 2" de outro app). */
+.estagio-pill{
+  position:absolute; top:10px; left:50%; transform:translateX(-50%);
+  z-index:3; display:flex; align-items:center; gap:6px;
+  background:rgba(0,0,0,.55); border-radius:999px; padding:6px 16px;
+  font-family:'Outfit',sans-serif; font-weight:600; font-size:11.5px;
+  color:var(--text); white-space:nowrap; pointer-events:none;
+}
+.estagio-pill-flag{ font-size:12px; line-height:1; }
+.estagio-pill-trilho{
+  position:absolute; top:38px; left:50%; transform:translateX(-50%);
+  z-index:3; width:130px; height:4px; border-radius:2px;
+  background:rgba(0,0,0,.55); overflow:hidden; pointer-events:none;
+}
+.estagio-pill-fill{ height:100%; border-radius:2px; background:var(--accent); transition:width .4s ease; }
 
 /* ======================================================================
    POOF DE DERROTA DO MONSTRO -- nuvem de fumaca (4 frames, pixel art

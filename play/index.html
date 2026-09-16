@@ -178,10 +178,6 @@
 
   <div class="topbar">
     <span class="lvl" id="lvl">Nível I</span>
-    <div class="estagio-topo" id="estagioTopo">
-      <span class="estagio-topo-lbl" id="estagioTopoLbl">Estágio 1</span>
-      <div class="estagio-topo-trilho"><div class="estagio-topo-fill" id="estagioTopoFill"></div></div>
-    </div>
     <span class="coins">
       <svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="5" y="2" width="6" height="1" fill="#F2C94C"/><rect x="3" y="3" width="10" height="2" fill="#F2C94C"/><rect x="2" y="5" width="12" height="6" fill="#F2C94C"/><rect x="3" y="11" width="10" height="2" fill="#F2C94C"/><rect x="5" y="13" width="6" height="1" fill="#F2C94C"/><rect x="6" y="5" width="2" height="6" fill="#B8942E"/></svg>
       <span id="coinnum">0</span>
@@ -201,6 +197,11 @@
       <img class="tema-arena-cadeado-img" src="data:image/png;base64,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" alt="">
       <span id="temaArenaBloqueioTexto">Chegue no próximo Estágio pra desbloquear</span>
     </div>
+    <div class="estagio-pill" id="estagioPill">
+      <span class="estagio-pill-flag" aria-hidden="true">&#127937;</span>
+      <span class="estagio-pill-lbl" id="estagioTopoLbl">Estágio 1</span>
+    </div>
+    <div class="estagio-pill-trilho"><div class="estagio-pill-fill" id="estagioTopoFill"></div></div>
     <div class="fight">
       <div class="fighter">
         <span id="nomeTopo">Aventureiro</span>
@@ -2105,117 +2106,71 @@ function temaArenaDesbloqueado(t){
   return false;
 }
 
-// mesma logica de melhorSequenciaDeVitorias() do modulo Conquistas
-// (linha ~6648) -- duplicada aqui de proposito em vez de reaproveitada:
-// aquela funcao vive dentro da IIFE do modulo e nao esta exposta em
-// window, e e pequena/pura o suficiente (so depende de diffDias(), ja
-// global) pra nao valer a pena abrir aquele modulo so pra exportar 1
-// funcao. Se um dia divergir, e sinal de que precisa virar utilitario
-// global de verdade.
-//
-// FIX (bug reportado: desbloqueio acontecia no dia 6, nao no dia 5):
-// window.obterHistorico() so grava o resultado de um dia na VIRADA --
-// vencer HOJE nao aparece ali ate amanha. Mesmo problema que o modulo
-// Conquistas ja tinha resolvido com o padrao "comHoje" em
-// montarContexto() (linha ~6818): anexa uma entrada SINTETICA de hoje
-// (nunca persistida, recalculada a cada chamada) se monstroJaCaiu(),
-// pra o desbloqueio contar o dia atual na hora, nao 1 dia atrasado.
-function _melhorSequenciaParaTemaArena(){
-  if (typeof window.obterHistorico !== 'function' || typeof diffDias !== 'function') return 0;
-  let hist = window.obterHistorico();
-  if (typeof monstroJaCaiu === 'function' && monstroJaCaiu() &&
-      typeof isoAtual === 'function' && !hist.some(h => h.data === isoAtual())){
-    hist = hist.concat([{ data: isoAtual(), resultado: 'vitoria' }]);
-  }
-  const ord = hist.slice().sort((a, b) => a.data < b.data ? -1 : (a.data > b.data ? 1 : 0));
-  let atual = 0, melhor = 0, anterior = null;
-  ord.forEach(h => {
-    const seguidoDoAnterior = anterior !== null && diffDias(h.data, anterior) === 1;
-    if (h.resultado === 'vitoria'){
-      atual = seguidoDoAnterior ? atual + 1 : 1;
-      if (atual > melhor) melhor = atual;
-    } else {
-      atual = 0;
-    }
-    anterior = h.data;
-  });
-  return melhor;
-}
-
 // roda a cada render() (ver wrap no fim do arquivo) + 1x no boot.
-// Quando uma condicao de desbloqueio gratis e atingida pela 1a vez,
-// marca o tema como desbloqueado e deixa uma "dica pendente" salva --
-// ela dispara a espiada a proxima vez que a arena for exibida (ver
-// mostrarDicaSwipeArenaSeNecessario), em vez de tentar mostrar a
-// animacao no meio de um render qualquer.
+// Sistema de Estagios: verifica os 3 temas com desbloqueioGratis
+// (tipo 'tarefasTotais' -- unico tipo que existe agora) contra
+// totalTarefasConcluidas(). Marca TODOS os que ja foram alcancados
+// nesta passada ANTES de animar qualquer coisa -- ver motivo no
+// comentario dentro de viajarParaTemaEstagio().
+//
+// REMOVIDO: sistema antigo de desbloqueio por streak
+// (_melhorSequenciaParaTemaArena() + tipo:'streak') -- nenhum tema usa
+// mais isso, foi totalmente substituido pelo Sistema de Estagios
+// (tipo:'tarefasTotais'). Excluido de proposito, nao so desativado,
+// pra nao deixar codigo morto por aqui.
 function verificarDesbloqueiosTemaArena(){
+  let desbloqueouAlgumAgora = false;
   TEMAS_ARENA.forEach(t => {
-    if (!t.desbloqueioGratis) return;
+    if (!t.desbloqueioGratis || t.desbloqueioGratis.tipo !== 'tarefasTotais') return;
     if (temasDesbloqueadosSalvos().includes(t.id)) return;
-    let atingiu = false;
-    if (t.desbloqueioGratis.tipo === 'streak'){
-      atingiu = _melhorSequenciaParaTemaArena() >= t.desbloqueioGratis.valor;
-    } else if (t.desbloqueioGratis.tipo === 'tarefasTotais'){
-      // Sistema de Estagios: TEMAS_ARENA[0..3] = padrao/deserto/floresta/gelo,
-      // na MESMA ordem da trilha de estagio (1-4) -- desbloqueio aqui e
-      // "chegou no estagio seguinte", nao mais compra/assinatura.
-      const total = (typeof window.totalTarefasConcluidas === 'function') ? window.totalTarefasConcluidas() : 0;
-      atingiu = total >= t.desbloqueioGratis.valor;
-    }
-    if (atingiu && marcarTemaDesbloqueado(t.id)){
-      // Sistema de Estagios: alem de marcar desbloqueado, o personagem
-      // "viaja" pro novo tema automaticamente (pedido do usuario -- nao
-      // fica esperando o jogador descobrir/arrastar manualmente). Reaproveita
-      // mudarTemaArena(1) tal como esta: a ordem de TEMAS_ARENA JA E a ordem
-      // dos estagios, entao avancar 1 estagio = avancar 1 indice, sempre.
-      // Se a Arena nao estiver montada na tela agora (usuario em outra aba),
-      // mudarTemaArena() ainda assim PERSISTE o novo tema (definirTemaArenaSalvo
-      // roda antes do acesso ao DOM) -- so a animacao de slide e que fica de
-      // fora; o jogador ve o tema novo, sem animar, na proxima vez que abrir
-      // a Arena. Aceitavel pra essa 1a versao -- ver nota de pendencia no
-      // roadmap sobre fila de "viagem pendente" pra animar sempre.
-      if (t.desbloqueioGratis.tipo === 'tarefasTotais' && typeof mudarTemaArena === 'function'){
-        mudarTemaArena(1);
-      }
-      // dica de "arraste pra ver" so faz sentido pro tipo 'streak' (o
-      // jogador PRECISA descobrir o gesto pra alcancar o tema). Pro tipo
-      // 'tarefasTotais' o personagem ja viajou sozinho (linhas acima) e o
-      // swipe manual continua TRANCADO ate o estagio 4 (ver gate em
-      // touchstart, mais abaixo) -- ensinar a arrastar agora seria
-      // ensinar um gesto que ainda nao funciona, confuso.
-      if (t.desbloqueioGratis.tipo === 'streak'){
-        try { localStorage.setItem(window.chaveConta('questlog.temaArenaDicaPendente.v1'), t.id); } catch(e){}
-      }
+    const total = (typeof window.totalTarefasConcluidas === 'function') ? window.totalTarefasConcluidas() : 0;
+    if (total < t.desbloqueioGratis.valor) return;
+    if (!marcarTemaDesbloqueado(t.id)) return;
+    desbloqueouAlgumAgora = true;
 
-      // aviso visivel -- reaproveita o mesmo flutuante ja usado pra
-      // +XP/+moeda etc., ancorado na propria arena. Atrasado ~2.2s: o
-      // desbloqueio costuma coincidir com a virada do dia, que ja
-      // dispara +XP, possivel level up e a conquista "Pegando o Jeito"
-      // tudo de uma vez -- competir com esse monte de texto simultaneo
-      // (queixa do usuario: "nem da pra ler direito") deixando esse
-      // aviso pra depois, quando a poeira baixou, resolve sem precisar
-      // mexer nos outros sistemas de notificacao.
-      const emIngles = typeof idiomaApp === 'function' && idiomaApp() === 'en';
-      setTimeout(() => {
-        const arena = document.querySelector('.arena');
-        if (arena && typeof notificarFlutuante === 'function'){
-          notificarFlutuante(
-            arena,
-            emIngles ? 'New theme:' : 'Novo tema:',
-            emIngles ? t.nome_en : t.nome,
-            '#F2C94C'
-          );
-        }
-      }, 2200);
-
-      // dispara a dica JA -- verificarDesbloqueiosTemaArena() roda a
-      // cada render() (frequente), mas mostrarDicaSwipeArenaSeNecessario()
-      // antes so era chamada 1x no boot. Um desbloqueio no MEIO da
-      // sessao (ex: debug "proximo dia" repetido) nunca disparava a
-      // dica ate a pagina recarregar -- chamar aqui corrige isso.
-      if (typeof mostrarDicaSwipeArenaSeNecessario === 'function') mostrarDicaSwipeArenaSeNecessario();
-    }
+    // aviso visivel -- reaproveita o mesmo flutuante ja usado pra
+    // +XP/+moeda etc., ancorado na propria arena. Atrasado ~2.2s: o
+    // desbloqueio costuma coincidir com a virada do dia, que ja
+    // dispara +XP, possivel level up e a conquista "Pegando o Jeito"
+    // tudo de uma vez -- competir com esse monte de texto simultaneo
+    // (queixa do usuario: "nem da pra ler direito") deixando esse
+    // aviso pra depois, quando a poeira baixou, resolve sem precisar
+    // mexer nos outros sistemas de notificacao.
+    const emIngles = typeof idiomaApp === 'function' && idiomaApp() === 'en';
+    setTimeout(() => {
+      const arena = document.querySelector('.arena');
+      if (arena && typeof notificarFlutuante === 'function'){
+        notificarFlutuante(
+          arena,
+          emIngles ? 'New stage:' : 'Novo estágio:',
+          emIngles ? t.nome_en : t.nome,
+          '#F2C94C'
+        );
+      }
+    }, 2200);
   });
+
+  // BUG CORRIGIDO (relatado pelo usuario: "nao funcionou, nao teve nem
+  // transicao nada"): a versao anterior chamava mudarTemaArena(1) DENTRO
+  // do forEach, uma vez por tema desbloqueado nesta mesma passada. Quem
+  // ja tinha tarefas acumuladas o suficiente pra cruzar 2+ limiares de
+  // uma vez (bem provavel character com bastante historico) desbloqueava
+  // os 3 temas no mesmo render() -- mas a 2a/3a chamada de
+  // mudarTemaArena(1) caia direto no "if (_arenaBgEmTransicao) return;"
+  // do topo da funcao (a 1a chamada ainda estava animando) e retornava
+  // SEM persistir o novo tema nem animar nada. Como marcarTemaDesbloqueado
+  // ja tinha marcado os 3 como desbloqueados, o proximo render() nunca
+  // tentava de novo (guarda "if (temasDesbloqueadosSalvos().includes(t.id))
+  // return;" no topo do forEach) -- a viagem ficava presa no meio do
+  // caminho pra sempre, sem erro nenhum no console.
+  //
+  // Fix: SEPARAR marcar de animar. O forEach acima so marca. Aqui, UMA
+  // unica vez por passada, calcula o estagio REAL (estagioAtual(), fonte
+  // da verdade) e viaja direto pra ele -- nao importa quantos limiares
+  // foram cruzados de uma vez.
+  if (desbloqueouAlgumAgora && typeof viajarParaTemaEstagio === 'function'){
+    viajarParaTemaEstagio();
+  }
 }
 window.verificarDesbloqueiosTemaArena = verificarDesbloqueiosTemaArena;
 
@@ -2546,6 +2501,60 @@ function mudarTemaArena(direcao){
   if (typeof atualizarBloqueioArena === 'function') atualizarBloqueioArena(novoTema);
 }
 window.mudarTemaArena = mudarTemaArena;
+
+// ---------- Sistema de Estagios: transicao de "viagem" ----------
+// Dedicada, separada do slide de swipe (mudarTemaArena/touch handlers
+// mais abaixo) -- o swipe move 1 casa lateral (esquerda/direita) e
+// pressupoe que voce sabe pra qual lado esta indo; a viagem de estagio
+// pode pular direto pro estagio real atual (estagioAtual(), fonte da
+// verdade), nao "+1 tema", entao um slide direcional fixo nao serve
+// aqui. Coreografia pedida pelo usuario: heroi corre pra fora de cena
+// (direita) -> troca o fundo enquanto ele esta fora -> heroi corre de
+// volta (entrando pela esquerda), como se tivesse chegado num lugar novo.
+function viajarParaTemaEstagio(){
+  if (typeof TEMAS_ARENA === 'undefined' || typeof estagioAtual !== 'function') return;
+  const temaAlvo = TEMAS_ARENA[estagioAtual() - 1];
+  if (!temaAlvo) return;
+  if (temaArenaSalvo() === temaAlvo.id) return; // ja esta la -- nada a fazer (chamada redundante)
+
+  const heroEl = document.getElementById('heroSprite');
+  const frenteEl = document.getElementById('arenaBg' + _arenaBgFrente);
+
+  // Arena fora de tela (usuario em outra aba) ou ja tem outra transicao
+  // rodando -- persiste e re-sincroniza SEM animar. renderTemaArena() ja
+  // faz exatamente isso (usado no boot): aplica o tema salvo nas 2
+  // camadas sem transicao nenhuma. Corrige o efeito "sumiu no meio do
+  // caminho" do bug antigo -- agora sempre sobra pelo menos o estado
+  // final correto, animado ou nao.
+  if (!heroEl || !frenteEl || _arenaBgEmTransicao){
+    definirTemaArenaSalvo(temaAlvo.id);
+    if (typeof renderTemaArena === 'function') renderTemaArena();
+    return;
+  }
+
+  _arenaBgEmTransicao = true;
+  const DURACAO = 480;
+
+  heroEl.classList.add('heroi-viagem-sai');
+
+  setTimeout(() => {
+    // heroi ja fora de cena -- troca o fundo na mesma camada visivel
+    // (nao precisa da 2a camada/crossfade: o heroi cobre a troca)
+    definirTemaArenaSalvo(temaAlvo.id);
+    aplicarFundoTemaArena(frenteEl, temaAlvo);
+    renderTemaArenaDots();
+    atualizarBloqueioArena(temaAlvo);
+
+    heroEl.classList.remove('heroi-viagem-sai');
+    heroEl.classList.add('heroi-viagem-chega');
+    setTimeout(() => {
+      heroEl.classList.remove('heroi-viagem-chega');
+      _arenaBgEmTransicao = false;
+    }, DURACAO);
+  }, DURACAO);
+}
+window.viajarParaTemaEstagio = viajarParaTemaEstagio;
+
 
 // gesto de arrastar na propria arena pra trocar de tema, seguindo o
 // dedo em TEMPO REAL (igual carrossel de foto de verdade) -- sem isso,

@@ -515,12 +515,26 @@
   .hero-sprite{position:relative}
   /* Sistema de Estagios: heroi corre pra fora de cena (direita) antes
      do fundo trocar, depois corre de volta entrando pela esquerda --
-     ver viajarParaTemaEstagio() no script principal. */
+     ver viajarParaTemaEstagio() no script principal.
+     FIX (relatado pelo usuario, com video: "a animacao ta toda lascada"):
+     2 problemas reais achados no video, quadro a quadro --
+     1) translateX(160%) e relativo a LARGURA DO PROPRIO heroSprite (spec
+        do CSS, transform percentual e sempre relativo ao proprio elemento,
+        nao ao container) -- pra um sprite de ~60-70px isso da uns 100-110px
+        de deslocamento, curto demais pra passar do monstro, que fica bem
+        mais pra direita. Trocado pra valor fixo generoso (280px) que limpa
+        o monstro e sai da moldura da Arena (que tem overflow:hidden, entao
+        ele some ao cruzar a borda, nao precisa viajar mais que isso).
+     2) sem z-index proprio durante a corrida, a ordem do DOM (monstro
+        vem DEPOIS do heroi no HTML) fazia o monstro pintar por CIMA do
+        heroi -- no video da pra ver o heroi "atravessando por baixo" do
+        monstro em vez de passar na frente dele. z-index:5 durante as 2
+        classes resolve. */
   #heroSprite{ transition:transform .48s ease, opacity .48s ease; }
-  #heroSprite.heroi-viagem-sai{ transform:translateX(160%); opacity:0; }
-  #heroSprite.heroi-viagem-chega{ transition:none; animation:heroiChegaViagem .48s ease; }
+  #heroSprite.heroi-viagem-sai{ transform:translateX(280px); opacity:0; z-index:5; }
+  #heroSprite.heroi-viagem-chega{ transition:none; animation:heroiChegaViagem .48s ease; z-index:5; }
   @keyframes heroiChegaViagem{
-    from{ transform:translateX(-160%); opacity:0; }
+    from{ transform:translateX(-280px); opacity:0; }
     to{ transform:translateX(0); opacity:1; }
   }
 

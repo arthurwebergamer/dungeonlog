@@ -1220,6 +1220,7 @@
 </script>
 
 <div class="debugbar"><button class="debugbtn" id="debugbtn">próximo dia →</button><button class="debugbtn" id="pularTutoriaisBtn">pular tutorial</button><button class="debugbtn" id="debugArmasBtn">+ todas armas</button><button class="debugbtn" id="debugEstagioBtn">forçar estágio</button></div>
+<div id="estagioDebugPanel" class="estagio-debug-panel"></div>
 <div class="toast" id="toast"></div>
 
 <script src="assets.js"></script>
@@ -2180,7 +2181,7 @@ function verificarDesbloqueiosTemaArena(){
   // da verdade) e viaja direto pra ele -- nao importa quantos limiares
   // foram cruzados de uma vez.
   if (desbloqueouAlgumAgora && typeof viajarParaTemaEstagio === 'function'){
-    console.log('[ESTAGIO-DEBUG] verificarDesbloqueiosTemaArena: desbloqueou algo nesta passada, chamando viajarParaTemaEstagio()');
+    debugEstagio('verificarDesbloqueiosTemaArena: desbloqueou algo nesta passada, chamando viajarParaTemaEstagio()');
     viajarParaTemaEstagio();
   }
 }
@@ -2264,7 +2265,7 @@ function renderTemaArena(){
   if (typeof estagioAtual === 'function' && typeof TEMAS_ARENA !== 'undefined' && typeof temaArenaDesbloqueado === 'function'){
     const temaEsperado = TEMAS_ARENA[estagioAtual() - 1];
     if (temaEsperado && temaArenaDesbloqueado(temaEsperado) && temaArenaSalvo() !== temaEsperado.id){
-      console.log('[ESTAGIO-DEBUG] AUTO-CORRECAO silenciosa disparou em renderTemaArena() -- trocou pra', temaEsperado.id, 'sem animar. Se isso aparecer ANTES de "CAMINHO ANIMADO tomado", a auto-correcao venceu a corrida.');
+      debugEstagio('AUTO-CORRECAO silenciosa disparou em renderTemaArena() -- trocou pra ' + temaEsperado.id + ' sem animar. Se isso aparecer ANTES de CAMINHO ANIMADO, a auto-correcao venceu a corrida.');
       definirTemaArenaSalvo(temaEsperado.id);
     }
   }
@@ -2543,25 +2544,44 @@ window.mudarTemaArena = mudarTemaArena;
 // aqui. Coreografia pedida pelo usuario: heroi corre pra fora de cena
 // (direita) -> troca o fundo enquanto ele esta fora -> heroi corre de
 // volta (entrando pela esquerda), como se tivesse chegado num lugar novo.
+// Painel de debug VISIVEL NA TELA (nao so console.log) pro Sistema de
+// Estagios -- pedido depois que o usuario relatou "ainda sem animacao/
+// popup" testando no CELULAR, onde abrir o console do navegador nao e
+// pratico. Escreve no #estagioDebugPanel (so visivel em modo-debug,
+// mesmo gate que .debugbar) E no console, pra servir os dois casos.
+function debugEstagio(msg){
+  console.log('[ESTAGIO-DEBUG]', msg);
+  const painel = document.getElementById('estagioDebugPanel');
+  if (!painel) return;
+  const hora = new Date().toLocaleTimeString('pt-BR', { hour12:false, minute:'2-digit', second:'2-digit', fractionalSecondDigits:3 });
+  const linha = document.createElement('div');
+  linha.textContent = hora + ' ' + msg;
+  painel.appendChild(linha);
+  painel.scrollTop = painel.scrollHeight;
+  // limite de 40 linhas -- evita o painel crescer pra sempre numa sessao de teste longa
+  while (painel.children.length > 40) painel.removeChild(painel.firstChild);
+}
+window.debugEstagio = debugEstagio;
+
 function viajarParaTemaEstagio(){
-  console.log('[ESTAGIO-DEBUG] viajarParaTemaEstagio() chamada. _arenaBgEmTransicao=', _arenaBgEmTransicao);
+  debugEstagio('viajarParaTemaEstagio() chamada. _arenaBgEmTransicao=' + _arenaBgEmTransicao);
   if (typeof TEMAS_ARENA === 'undefined' || typeof estagioAtual !== 'function'){
-    console.log('[ESTAGIO-DEBUG] saiu cedo: TEMAS_ARENA ou estagioAtual indefinidos');
+    debugEstagio('saiu cedo: TEMAS_ARENA ou estagioAtual indefinidos');
     return;
   }
   const temaAlvo = TEMAS_ARENA[estagioAtual() - 1];
   if (!temaAlvo){
-    console.log('[ESTAGIO-DEBUG] saiu cedo: temaAlvo nao encontrado pra estagioAtual()=', estagioAtual());
+    debugEstagio('saiu cedo: temaAlvo nao encontrado pra estagioAtual()=' + estagioAtual());
     return;
   }
   if (temaArenaSalvo() === temaAlvo.id){
-    console.log('[ESTAGIO-DEBUG] saiu cedo: temaArenaSalvo() ja e', temaAlvo.id, '-- nada a fazer');
+    debugEstagio('saiu cedo: temaArenaSalvo() ja e ' + temaAlvo.id + ' -- nada a fazer');
     return;
   }
 
   const heroEl = document.getElementById('heroSprite');
   const frenteEl = document.getElementById('arenaBg' + _arenaBgFrente);
-  console.log('[ESTAGIO-DEBUG] temaAlvo=', temaAlvo.id, 'heroEl achado=', !!heroEl, 'frenteEl achado=', !!frenteEl, '_arenaBgEmTransicao=', _arenaBgEmTransicao);
+  debugEstagio('temaAlvo=' + temaAlvo.id + ' heroEl achado=' + !!heroEl + ' frenteEl achado=' + !!frenteEl + ' _arenaBgEmTransicao=' + _arenaBgEmTransicao);
 
   // Arena fora de tela (usuario em outra aba) ou ja tem outra transicao
   // rodando -- persiste e re-sincroniza SEM animar. renderTemaArena() ja
@@ -2570,13 +2590,13 @@ function viajarParaTemaEstagio(){
   // caminho" do bug antigo -- agora sempre sobra pelo menos o estado
   // final correto, animado ou nao.
   if (!heroEl || !frenteEl || _arenaBgEmTransicao){
-    console.log('[ESTAGIO-DEBUG] CAMINHO SILENCIOSO tomado (sem animacao/popup) -- motivo:', !heroEl ? 'heroEl null' : (!frenteEl ? 'frenteEl null' : '_arenaBgEmTransicao ja true'));
+    debugEstagio('CAMINHO SILENCIOSO tomado (sem animacao/popup) -- motivo: ' + (!heroEl ? 'heroEl null' : (!frenteEl ? 'frenteEl null' : '_arenaBgEmTransicao ja true')));
     definirTemaArenaSalvo(temaAlvo.id);
     if (typeof renderTemaArena === 'function') renderTemaArena();
     return;
   }
 
-  console.log('[ESTAGIO-DEBUG] CAMINHO ANIMADO tomado -- heroi deve comecar a correr agora');
+  debugEstagio('CAMINHO ANIMADO tomado -- heroi deve comecar a correr agora');
   _arenaBgEmTransicao = true;
   // trava criar/completar tarefa NA HORA que a transicao comeca -- sem
   // esperar o proximo render() espontaneo. Usa um helper dedicado, NAO
@@ -2603,14 +2623,17 @@ function viajarParaTemaEstagio(){
   const seguranca = setTimeout(() => {
     if (finalizado) return;
     finalizado = true;
+    debugEstagio('REDE DE SEGURANCA disparou (8s sem terminar) -- forcando reset. Isso significa que algo travou no meio do caminho.');
     heroEl.classList.remove('heroi-viagem-sai', 'heroi-viagem-chega');
     _arenaBgEmTransicao = false;
     atualizarTravaTransicaoEstagio();
   }, 8000);
 
   heroEl.classList.add('heroi-viagem-sai');
+  debugEstagio('classe heroi-viagem-sai adicionada -- heroi deveria estar correndo pra fora agora. Esperando ' + DURACAO + 'ms pra trocar o fundo.');
 
   setTimeout(() => {
+    debugEstagio('setTimeout de ' + DURACAO + 'ms disparou -- trocando fundo agora');
     try {
       // heroi ja fora de cena -- troca o fundo na mesma camada visivel
       // (nao precisa da 2a camada/crossfade: o heroi cobre a troca)
@@ -2639,29 +2662,35 @@ function viajarParaTemaEstagio(){
           heroEl.classList.remove('heroi-viagem-chega');
           _arenaBgEmTransicao = false;
           atualizarTravaTransicaoEstagio();
+          debugEstagio('viagem finalizada normalmente, _arenaBgEmTransicao voltou pra false');
         }, DURACAO);
       };
 
+      debugEstagio('fundo trocado. enfileirarPopup existe=' + (typeof window.enfileirarPopup === 'function') + ', mostrarEstagioDesbloqueado existe=' + (typeof window.mostrarEstagioDesbloqueado === 'function'));
       if (typeof window.enfileirarPopup === 'function' && typeof window.mostrarEstagioDesbloqueado === 'function'){
         window.enfileirarPopup(prox => {
+          debugEstagio('funcao da fila de popups executando -- chamando mostrarEstagioDesbloqueado() agora');
           try {
             window.mostrarEstagioDesbloqueado(temaAlvo, () => { finalizarViagem(); prox(); });
           } catch(e){
             // popup falhou no meio -- nao deixa a fila de popups travada
             // pros proximos (level up, bau, etc. ficariam presos atras
             // dele pra sempre) nem a viagem sem terminar
+            debugEstagio('ERRO ao chamar mostrarEstagioDesbloqueado(): ' + (e && e.message));
             finalizarViagem();
             prox();
           }
         });
       } else {
         // fallback -- funcao do popup nao carregou por algum motivo, nao trava a viagem pra sempre
+        debugEstagio('fallback SEM popup tomado -- enfileirarPopup ou mostrarEstagioDesbloqueado nao existem');
         finalizarViagem();
       }
     } catch(e){
       // qualquer erro inesperado no meio da troca de fundo -- a rede de
       // seguranca (8s) ainda pega isso, mas nao precisa esperar: limpa
       // na hora, mesma logica de finalizarViagem() sem depender do popup
+      debugEstagio('ERRO CAPTURADO no meio da troca de fundo: ' + (e && e.message) + ' -- stack: ' + (e && e.stack ? String(e.stack).slice(0,200) : '?'));
       if (!finalizado){
         finalizado = true;
         clearTimeout(seguranca);

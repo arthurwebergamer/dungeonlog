@@ -2251,22 +2251,41 @@ function renderTemaArena(){
   const elB = document.getElementById('arenaBgB');
   if (!elA || !elB) return;
 
-  // Sistema de Estagios: AUTO-CORRECAO defensiva. Se o estagio atual ja
+  // Sistema de Estagios: SINCRONIZACAO defensiva. Se o estagio atual ja
   // desbloqueou um tema mais avancado do que o persistido em
-  // temaArenaSalvo() -- por exemplo, viajarParaTemaEstagio() nao rodou
-  // no momento exato em que o limiar foi cruzado, por qualquer motivo --
-  // corrige aqui, SEM animar (silencioso). Sem isso, "Estagio N" no
-  // texto (sempre calculado ao vivo) podia ficar destoando pra sempre do
-  // cenario visual (persistido, so muda via evento) -- foi exatamente o
-  // bug relatado: Estagio 2 no texto, cenario de Dungeon continuando.
-  // NAO chama verificarDesbloqueiosTemaArena() aqui de proposito (evita
-  // reentrancia com viajarParaTemaEstagio(), que pode chamar
-  // renderTemaArena() de volta no seu proprio caminho de fallback).
+  // temaArenaSalvo() -- por exemplo, a pagina recarregou depois do
+  // desbloqueio ja ter sido marcado numa sessao/teste anterior, ou
+  // qualquer outro motivo do tema salvo estar desatualizado -- chama
+  // viajarParaTemaEstagio() (a MESMA funcao com a cerimonia completa:
+  // heroi corre, fundo troca, popup "Novo Estagio Desbloqueado").
+  //
+  // BUG CORRIGIDO (relatado pelo usuario, com print do painel de debug):
+  // antes esse bloco chamava definirTemaArenaSalvo() DIRETO, silencioso,
+  // sem cerimonia nenhuma -- e essa era a UNICA coisa que rodava sempre
+  // que o desbloqueio ja tinha sido marcado numa passada anterior
+  // (ex: verificarDesbloqueiosTemaArena ja tinha marcado o tema, entao
+  // desbloqueouAlgumAgora nunca virava true de novo, e
+  // viajarParaTemaEstagio() nunca era chamada por aquele caminho). Como
+  // isso acontece toda vez que a pagina recarrega DEPOIS do momento
+  // exato do desbloqueio (o que e o caso comum -- poucas pessoas ficam
+  // olhando pra tela no exato milissegundo do desbloqueio), o jogador
+  // via o tema mudar mas NUNCA via a cerimonia. viajarParaTemaEstagio()
+  // ja tem sua propria guarda de "ja esta la, nada a fazer" (linha
+  // logo no topo dela), entao chama-la aqui e seguro e idempotente --
+  // so faz alguma coisa quando o tema salvo realmente esta desatualizado.
   if (typeof estagioAtual === 'function' && typeof TEMAS_ARENA !== 'undefined' && typeof temaArenaDesbloqueado === 'function'){
     const temaEsperado = TEMAS_ARENA[estagioAtual() - 1];
     if (temaEsperado && temaArenaDesbloqueado(temaEsperado) && temaArenaSalvo() !== temaEsperado.id){
-      debugEstagio('AUTO-CORRECAO silenciosa disparou em renderTemaArena() -- trocou pra ' + temaEsperado.id + ' sem animar. Se isso aparecer ANTES de CAMINHO ANIMADO, a auto-correcao venceu a corrida.');
-      definirTemaArenaSalvo(temaEsperado.id);
+      debugEstagio('renderTemaArena() detectou tema desatualizado -- chamando viajarParaTemaEstagio() (com cerimonia) em vez de so persistir silencioso');
+      if (typeof viajarParaTemaEstagio === 'function'){
+        viajarParaTemaEstagio();
+        // sai cedo -- o resto desta funcao (mais abaixo) reseta
+        // _arenaBgFrente/transform incondicionalmente, o que brigaria
+        // com a cerimonia que acabou de comecar (heroi correndo, troca
+        // de fundo agendada pro frenteEl capturado dentro dela). A
+        // propria cerimonia cuida de deixar tudo pintado certo no final.
+        return;
+      }
     }
   }
 

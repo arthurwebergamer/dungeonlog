@@ -61,14 +61,20 @@
     25%{transform:translateX(-5px) rotate(-3deg)}
     55%{transform:translateX(4px) rotate(2deg)}
   }
-  .hero-sprite.hit svg{animation:spriteShake .3s var(--expo)}
-  .mob-sprite.shake svg{animation:spriteShake .2s var(--expo)}
+  /* v4.142-fix: monstros reais sao <img class="mobimg"> injetado via JS
+     (pintarMonstro()), o <svg> que aparece no HTML estatico e so
+     placeholder antes de qualquer monstro carregar -- os seletores
+     "svg" abaixo nunca batiam durante o jogo de verdade. Corrigido pra
+     animar o container (.hero-sprite/.mob-sprite) direto, que funciona
+     com <img> OU <svg> por dentro, nao importa qual. */
+  .hero-sprite.hit{animation:spriteShake .3s var(--expo)}
+  .mob-sprite.shake{animation:spriteShake .2s var(--expo)}
   @keyframes summonPop{
     0%{transform:scale(0) rotate(-8deg);opacity:0}
     60%{transform:scale(1.15) rotate(3deg);opacity:1}
     100%{transform:scale(1) rotate(0);opacity:1}
   }
-  .mob-sprite.summonPop svg{animation:summonPop .45s var(--spring-curve)}
+  .mob-sprite.summonPop{animation:summonPop .45s var(--spring-curve)}
   @keyframes fuga{
     0%{opacity:1;transform:none}
     25%{transform:translateX(6px) translateY(-4px)}
@@ -410,6 +416,19 @@
   .card{width:100%;max-width:400px;display:flex;flex-direction:column;justify-content:center;gap:20px;padding:10px 4px 24px}
   .passo{display:none;flex-direction:column;gap:18px}
   .passo.on{display:flex}
+  /* v4.148 (pedido do usuario): mostrarPasso() so trocava display:none/flex
+     na hora, sem nenhuma animacao -- diferente do carrossel de marketing
+     (deslizar()), que ja tinha curva calibrada. Nao dava pra usar o mesmo
+     truque de opacity+visibility dos overlays fixos (.edov/.cfgOverlay)
+     aqui, porque .passo fica dentro do fluxo normal do .card (position
+     estatica) -- tirar o display:none faria os 4 passos ocuparem espaco
+     ao mesmo tempo. Em vez disso: entrada via keyframe de um tiro,
+     disparada em JS (ver mostrarPasso()), sem mexer no display/layout.*/
+  @keyframes passoIn{
+    from{opacity:0;transform:translateX(16px)}
+    to{opacity:1;transform:translateX(0)}
+  }
+  .passo.on.passoIn{animation:passoIn .32s var(--expo)}
   .marca{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
   .marca svg{width:80px;height:80px;image-rendering:pixelated}
   .titulo{font-family:'Silkscreen',monospace;font-size:20px;color:var(--accent);letter-spacing:1px}

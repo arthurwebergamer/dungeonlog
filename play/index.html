@@ -2218,11 +2218,12 @@ function verificarDesbloqueiosTemaArena(){
   // ja usa, entao fica consistente com ele.
   if (desbloqueouAlgumAgora && typeof viajarParaTemaEstagio === 'function'){
     const temaRealAgora = TEMAS_ARENA[(typeof estagioAtual === 'function' ? estagioAtual() : 1) - 1];
-    if (temaRealAgora && typeof temaArenaSalvo === 'function' && temaArenaSalvo() !== temaRealAgora.id){
+    const todosOsTemasDesbloqueados = TEMAS_ARENA.every(temaArenaDesbloqueado);
+    if (!todosOsTemasDesbloqueados && temaRealAgora && typeof temaArenaSalvo === 'function' && temaArenaSalvo() !== temaRealAgora.id){
       debugEstagio('verificarDesbloqueiosTemaArena: tema salvo desatualizado, chamando viajarParaTemaEstagio()');
       viajarParaTemaEstagio();
     } else {
-      debugEstagio('verificarDesbloqueiosTemaArena: marcou tema(s) retroativamente, mas o tema salvo ja bate com o estagio atual -- nao reabre a cerimonia');
+      debugEstagio('verificarDesbloqueiosTemaArena: marcou tema(s) retroativamente, mas o tema salvo ja bate com o estagio atual (ou modo de escolha livre) -- nao reabre a cerimonia');
     }
   }
 }
@@ -2316,7 +2317,20 @@ function renderTemaArena(){
   // so faz alguma coisa quando o tema salvo realmente esta desatualizado.
   if (typeof estagioAtual === 'function' && typeof TEMAS_ARENA !== 'undefined' && typeof temaArenaDesbloqueado === 'function'){
     const temaEsperado = TEMAS_ARENA[estagioAtual() - 1];
-    if (temaEsperado && temaArenaDesbloqueado(temaEsperado) && temaArenaSalvo() !== temaEsperado.id){
+    // BUG CORRIGIDO (relatado pelo usuario: a tela de "Estagio concluido"
+    // reaparecendo ao trocar de tema): esse self-heal assumia que
+    // temaArenaSalvo() deveria SEMPRE bater com o tema do estagio atual
+    // -- premissa que quebra assim que TODOS os temas ja foram
+    // desbloqueados (modo de escolha livre, pedido do usuario: "pode
+    // arrastar pro lado pra usar o bioma que quiser"). Nesse modo, o
+    // jogador ESCOLHE de proposito um tema diferente do "oficial" do
+    // estagio (ex.: esta nas Montanhas mas arrasta pra ver o Deserto) --
+    // isso e a ESCOLHA dele, nao uma desatualizacao pra "curar". Sem essa
+    // trava, todo swipe pra outro tema virava mismatch -> viajarParaTemaEstagio()
+    // de novo -> cerimonia reabrindo. So faz sentido auto-corrigir
+    // ENQUANTO ainda ha progressao guiada (nem todos os temas liberados).
+    const todosOsTemasDesbloqueados = TEMAS_ARENA.every(temaArenaDesbloqueado);
+    if (!todosOsTemasDesbloqueados && temaEsperado && temaArenaDesbloqueado(temaEsperado) && temaArenaSalvo() !== temaEsperado.id){
       debugEstagio('renderTemaArena() detectou tema desatualizado -- chamando viajarParaTemaEstagio() (com cerimonia) em vez de so persistir silencioso');
       if (typeof viajarParaTemaEstagio === 'function'){
         viajarParaTemaEstagio();

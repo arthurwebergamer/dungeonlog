@@ -654,17 +654,6 @@
        letter-spacing:.02em !important;text-transform:none !important;color:var(--bg) !important;
        background:var(--accent) !important;padding:6px 14px !important;border-radius:20px !important}
   .lvl::before,.lvl::after{display:none}
-  /* Pill "Estagio N" (pedido do usuario: "nao ta combinando com o estilo
-     do resto do app") -- antes era cor fixa (rgba(0,0,0,.35), sempre
-     escuro) em vez de seguir as variaveis de tema (--accent/--bg) que o
-     pill de Nivel ja usa. Isso fazia ele destoar em qualquer tema onde
-     --accent nao e escuro -- ex.: no Grafite, --accent:#FFFFFF deixa o
-     Nivel branco solido, mas o Estagio continuava um retangulo escuro
-     translucido do lado. Agora usa os MESMOS tokens que o Nivel, entao
-     acompanha qualquer tema de cor automaticamente. */
-  .estagio-pill{color:var(--bg) !important; background:var(--accent) !important}
-  .estagio-pill-trilho{background:color-mix(in srgb, var(--bg) 25%, transparent) !important}
-  .estagio-pill-fill{background:var(--bg) !important}
   .coins{font-family:'Outfit',sans-serif !important;font-size:17px !important;font-weight:600 !important;
          color:var(--gold) !important}
 
@@ -3833,14 +3822,16 @@
 }
 .tema-arena-dot-atual{ background:rgba(255,255,255,.9); }
 
-/* Pill "Estagio N" -- FIX (pedido do usuario, com print circulado):
-   voltou pra topbar, no espaco vazio entre Nivel e moedas (onde estava
-   antes de eu ter movido pra dentro da Arena). Agora e um item normal
-   do flex da topbar (nao mais position:absolute sobre o cenario) --
-   .topbar{justify-content:space-between} ja empurra Nivel/moedas/som
-   pras pontas, sobrando o meio pra isso. Compactado (fonte/padding/
-   trilho menores) pra caber melhor numa faixa mais estreita que a
-   largura toda da Arena. */
+/* Indicador de Estagio -- REDESIGN (pedido do usuario: "nao ta combinando
+   com o estilo do resto do app" / "nao tem barra de XP nem nada"). A v1
+   so recolori o pill pra bater com o Nivel (badge solido), mas um pill
+   de IDENTIDADE (Nivel) e um indicador de PROGRESSO (Estagio) sao coisas
+   diferentes -- a peca certa pra copiar era a barra de Experiencia
+   (.xpwrap/.bar/.fill), que e o padrao visual REAL de progresso no app:
+   fundo neutro (var(--panel-2)), trilho escuro translucido e
+   preenchimento em gradiente accent->xp2. Agora usa exatamente os
+   mesmos tokens/gradiente, so num pacote mais compacto pra caber no
+   meio da topbar. */
 .estagio-pill-wrap{
   display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
   align-self:center;
@@ -3848,16 +3839,16 @@
 }
 .estagio-pill{
   display:flex; align-items:center; gap:5px;
-  background:rgba(0,0,0,.35); border-radius:999px; padding:4px 12px;
+  background:var(--panel-2); border-radius:999px; padding:4px 12px;
   font-family:'Outfit',sans-serif; font-weight:600; font-size:10.5px;
   color:var(--text); white-space:nowrap; max-width:100%; overflow:hidden; text-overflow:ellipsis;
 }
 .estagio-pill-flag{ font-size:11px; line-height:1; flex:none; }
 .estagio-pill-trilho{
-  width:100%; max-width:110px; height:3px; border-radius:2px;
-  background:var(--panel-3); overflow:hidden;
+  width:100%; max-width:110px; height:6px; border-radius:3px;
+  background:rgba(0,0,0,.32); overflow:hidden;
 }
-.estagio-pill-fill{ height:100%; border-radius:2px; background:var(--accent); transition:width .4s ease; }
+.estagio-pill-fill{ height:100%; border-radius:3px; background:linear-gradient(90deg,var(--accent),var(--xp2)); transition:width .4s ease; }
 
 /* ======================================================================
    POOF DE DERROTA DO MONSTRO -- nuvem de fumaca (4 frames, pixel art

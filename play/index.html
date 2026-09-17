@@ -7347,6 +7347,22 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 
   function mostrarEstagioDesbloqueado(tema, aoFechar){
     _aoFecharEstagioTela = aoFechar || null;
+    // BUG CORRIGIDO (relatado pelo usuario: tela de "todos os biomas
+    // desbloqueados" aparecendo mais de uma vez): definirTemaArenaSalvo()
+    // rodava so dentro do setTimeout de 350ms mais abaixo. Nessa janela
+    // (0-350ms), temaArenaSalvo() ainda apontava pro tema ANTIGO -- se
+    // render() rodasse de novo nesse meio-tempo (comum, roda a cada
+    // interacao), o self-heal em renderTemaArena() via o estado
+    // desatualizado e podia enfileirar a cerimonia de novo. Persistir o
+    // DADO aqui, na hora, fecha essa janela -- so a PINTURA visual
+    // (renderTemaArena(), mais abaixo) continua adiada 350ms, que era o
+    // motivo original de tirar isso da frente (nao pintar o fundo novo
+    // antes da tela cheia cobrir a Arena).
+    try {
+      if (typeof definirTemaArenaSalvo === 'function') definirTemaArenaSalvo(tema.id);
+    } catch(e){
+      debugEstagio('ERRO ao persistir o tema (mostrarEstagioDesbloqueado): ' + (e && e.message));
+    }
     const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
     const heroImg = (typeof heroiAtual === 'function') ? heroiAtual().img : '';
     // BUG CORRIGIDO (relatado pelo usuario, print: tela mostrava "Estagio 2
@@ -7373,13 +7389,25 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     // ja estao liberados e que dá pra trocar livremente arrastando a
     // Arena pro lado -- o gesto (mudarTemaArena/touch handlers) ja existe
     // e ja funciona pra qualquer tema desbloqueado, so faltava avisar o
-    // jogador que essa liberdade come\u00e7ou.
+    // jogador que essa liberdade comecou.
+    // BUG CORRIGIDO (relatado pelo usuario: mensagem aparecendo mais de
+    // uma vez): trava dedicada, persistida por conta -- mostra so uma
+    // vez na vida da conta, nunca de novo depois disso, mesmo que a
+    // cerimonia de Montanhas rode de novo por qualquer outro motivo
+    // (reload, resync da nuvem, etc).
+    const CHAVE_AVISO_TODOS_BIOMAS = 'questlog.avisoTodosBiomas.v1';
     const ehUltimoTema = (typeof TEMAS_ARENA !== 'undefined') && TEMAS_ARENA.length > 0
       && tema.id === TEMAS_ARENA[TEMAS_ARENA.length - 1].id;
-    const mensagemTodosBiomas = ehUltimoTema
+    let jaAvisado = true;
+    try { jaAvisado = localStorage.getItem(window.chaveConta(CHAVE_AVISO_TODOS_BIOMAS)) === 'true'; } catch(e){}
+    const mostrarAvisoTodosBiomas = ehUltimoTema && !jaAvisado;
+    if (mostrarAvisoTodosBiomas){
+      try { localStorage.setItem(window.chaveConta(CHAVE_AVISO_TODOS_BIOMAS), 'true'); } catch(e){}
+    }
+    const mensagemTodosBiomas = mostrarAvisoTodosBiomas
       ? '<div class="estagio-tela-todos">' + (en
-          ? '🎉 You\'ve unlocked every biome! Swipe the Arena sideways to use whichever one you like.'
-          : '🎉 Você desbloqueou todos os biomas! Arraste a Arena pro lado pra usar o que você quiser.')
+          ? 'You\'ve unlocked every biome! Swipe the Arena sideways to use whichever one you like.'
+          : 'Você desbloqueou todos os biomas! Arraste a Arena pro lado pra usar o que você quiser.')
         + '</div>'
       : '';
 
@@ -7413,10 +7441,9 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     // fundo muda por baixo dela, igual era a intencao original.
     setTimeout(() => {
       try {
-        if (typeof definirTemaArenaSalvo === 'function') definirTemaArenaSalvo(tema.id);
         if (typeof renderTemaArena === 'function') renderTemaArena();
       } catch(e){
-        debugEstagio('ERRO ao trocar o fundo (mostrarEstagioDesbloqueado): ' + (e && e.message));
+        debugEstagio('ERRO ao pintar o fundo (mostrarEstagioDesbloqueado): ' + (e && e.message));
       }
     }, 350);
   }

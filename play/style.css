@@ -1594,12 +1594,16 @@
 .bestsub{font-family:'Outfit',sans-serif;font-size:12px;color:var(--dim);margin-bottom:10px}
   .bestgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
   .bestcel{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;
-           padding:8px 4px 6px;display:flex;flex-direction:column;align-items:center;gap:4px}
+           padding:8px 4px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;
+           position:relative}
   .bestimg{width:36px;height:36px;image-rendering:pixelated;object-fit:contain}
   .bestimg.bestsilhueta{filter:brightness(0);opacity:.32}
   .bestnome{font-family:'Outfit',sans-serif;font-size:8.5px;font-weight:600;color:var(--muted);
             text-align:center;line-height:1.2;max-width:100%;overflow:hidden;
             text-overflow:ellipsis;white-space:nowrap}
+  /* Icone de bioma (pedido do usuario) -- cantinho superior direito do
+     card, so nos monstros ja descobertos. */
+  .bestbioma{position:absolute;top:4px;right:5px;font-size:10px;line-height:1;opacity:.85}
 
 /* ===== Bloco style #32 ===== */
 .histOverlay{position:fixed;inset:0;z-index:70;background:var(--bg);display:none;
@@ -2811,12 +2815,16 @@
 .bestsub{font-family:'Outfit',sans-serif;font-size:12px;color:var(--dim);margin-bottom:10px}
   .bestgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
   .bestcel{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;
-           padding:8px 4px 6px;display:flex;flex-direction:column;align-items:center;gap:4px}
+           padding:8px 4px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;
+           position:relative}
   .bestimg{width:36px;height:36px;image-rendering:pixelated;object-fit:contain}
   .bestimg.bestsilhueta{filter:brightness(0);opacity:.32}
   .bestnome{font-family:'Outfit',sans-serif;font-size:8.5px;font-weight:600;color:var(--muted);
             text-align:center;line-height:1.2;max-width:100%;overflow:hidden;
             text-overflow:ellipsis;white-space:nowrap}
+  /* Icone de bioma (pedido do usuario) -- cantinho superior direito do
+     card, so nos monstros ja descobertos. */
+  .bestbioma{position:absolute;top:4px;right:5px;font-size:10px;line-height:1;opacity:.85}
 
 /* --- Módulo style #15 --- */
 .histOverlay{position:fixed;inset:0;z-index:70;background:var(--bg);display:none;

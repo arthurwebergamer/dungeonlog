@@ -7519,6 +7519,9 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       '<button class="estagio-tela-continuar" id="estagioTelaContinuarBtn">' + (en ? 'Continue' : 'Continuar') + '</button>';
 
     document.getElementById('estagioTelaContinuarBtn').onclick = fecharEstagioTelaCompleta;
+    // Som -- so aqui, na cerimonia (pedido do usuario, revisado: NAO no
+    // swipe manual do dia a dia, so na tela cheia de desbloqueio).
+    if (typeof tocarSom === 'function') tocarSom('estagioNovo');
     // adia pro proximo frame -- mesmo padrao ja usado no popup de nivel/
     // bau (.baubg/.lvlpop). Sem isso, o navegador pode colapsar "innerHTML
     // populado + opacity:1 no mesmo tick" numa unica pintura, sem rodar a
@@ -7925,7 +7928,8 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       'Cada tarefa concluída é um golpe no monstro, e me recompensa com experiência e moedas.',
       'No final do dia, se eu concluir todas as tarefas, o monstro morre e eu ganho recompensas: armaduras, espadas, acessórios e muitos outros equipamentos.',
       'Se eu não conseguir concluir todas, o monstro me golpeia — o dano é baseado em quantas tarefas eu deixar de fazer.',
-      'Toque em uma tarefa para marcar como feita ou editar. Segure uma tarefa para reordenar a lista.'
+      'Toque em uma tarefa para marcar como feita ou editar. Segure uma tarefa para reordenar a lista.',
+      'E tem mais: quanto mais tarefas eu completo ao longo da jornada, mais eu avanço de estágio — e o cenário da Arena muda de verdade, não é só decoração. Ao alcançar o último estágio, desbloqueio todos os cenários e posso escolher qualquer um deles, quando quiser, arrastando a Arena pro lado.'
     ],
     inventario: [
       'Aqui guardo tudo que saqueei das batalhas: armas, armaduras, acessórios e alguns tesouros raros.',
@@ -7959,7 +7963,8 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       'Every task I finish is a hit on the monster, and rewards me with experience and coins.',
       'By the end of the day, if I finish every task, the monster dies and I get rewards: armor, swords, accessories, and lots of other gear.',
       'If I can\'t finish them all, the monster hits me back — the damage depends on how many tasks I leave undone.',
-      'Tap a task to mark it done or edit it. Hold a task to reorder the list.'
+      'Tap a task to mark it done or edit it. Hold a task to reorder the list.',
+      'There\'s more: the more tasks I complete throughout the journey, the further I advance through stages — and the Arena\'s scenery actually changes, it\'s not just decoration. Once I reach the final stage, I unlock every scenery and can pick any of them, whenever I want, by dragging the Arena sideways.'
     ],
     inventario: [
       'This is where I keep everything I\'ve looted from battle: weapons, armor, accessories, and a few rare treasures.',
@@ -9726,8 +9731,12 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   }
 
   // ruido curto (buffer de amostras aleatorias com fade) -- da corpo de
-  // "impacto" ao golpe, alem do tom puro
-  function ruido(c, { inicio=0, duracao=0.08, ganho=0.5 }){
+  // "impacto" ao golpe, alem do tom puro. passaAlta (opcional, Hz): filtro
+  // highpass, deixa o ruido mais "assobiado"/fino em vez de chiado cheio
+  // -- adicionado pro som de cerimonia de estagio (tocarSom('estagioNovo')),
+  // parametro default null preserva 100% o comportamento anterior pros
+  // outros efeitos que ja usam ruido() sem esse argumento.
+  function ruido(c, { inicio=0, duracao=0.08, ganho=0.5, passaAlta=null }){
     const tamanho = Math.max(1, Math.floor(c.sampleRate * duracao));
     const buffer = c.createBuffer(1, tamanho, c.sampleRate);
     const dados = buffer.getChannelData(0);
@@ -9737,7 +9746,15 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     const gain = c.createGain();
     gain.gain.setValueAtTime(Math.max(0.0001, volume * ganho), c.currentTime + inicio);
     gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + inicio + duracao);
-    fonte.connect(gain).connect(c.destination);
+    let no = fonte;
+    if (passaAlta){
+      const filtro = c.createBiquadFilter();
+      filtro.type = 'highpass';
+      filtro.frequency.value = passaAlta;
+      fonte.connect(filtro);
+      no = filtro;
+    }
+    no.connect(gain).connect(c.destination);
     fonte.start(c.currentTime + inicio);
   }
 
@@ -9815,6 +9832,11 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     poofBau: c => {                                       // "puf" unico -- bau spawnando na Arena (opcao "O", metade do "poof duplo" do preview de SFX). Pedido do usuario: reaproveitado TAMBEM pro monstro desaparecendo (mostrarPoofMonstro) em vez de criar um som novo pra isso -- ver comentario la
       ruido(c, { duracao:0.05, ganho:0.36 });
       tom(c, { freq:300, freqFinal:600, tipo:'triangle', duracao:0.06, ganho:0.22 });
+    },
+    estagioNovo: c => {                                    // tema de Arena desbloqueado (Sistema de Estagios) -- toca so na tela cheia de cerimonia, nao no swipe manual (pedido do usuario). Opcao "Portal" do preview de SFX aprovado: duas notas deslizando em paralelo + leve ruido de ataque, mais presente que um whoosh simples pra bater com o peso do momento
+      ruido(c, { duracao:0.06, ganho:0.3, passaAlta:800 });
+      tom(c, { freq:440, freqFinal:660, tipo:'triangle', duracao:0.28, ganho:0.26 });
+      tom(c, { freq:660, freqFinal:990, tipo:'sine', inicio:0.03, duracao:0.26, ganho:0.18 });
     }
   };
 
@@ -10229,12 +10251,26 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       if (idxHoje >= 0) derrotados.add(idxHoje);
     }
 
+    // Icone de bioma por monstro (pedido do usuario: mostrar no
+    // Bestiario de qual bioma cada monstro e). So nos JA DESCOBERTOS --
+    // mesma logica de "silhueta esconde tudo" ja aplicada ao nome:
+    // revelar o bioma de um monstro ainda nao derrotado seria dar uma
+    // dica indevida. Monstros sem m.bioma (genericos, aparecem em
+    // qualquer lugar) nao ganham icone nenhum.
+    const BIOMA_ICONE = { deserto:'🏜️', floresta:'🌳', montanhas:'🏔️' };
+    const BIOMA_NOME = { deserto:'Deserto', floresta:'Floresta', montanhas:'Montanhas' };
+
     grid.innerHTML = '';
     MONSTROS.forEach((m, i) => {
       const ok = derrotados.has(i);
       const cel = document.createElement('div');
       cel.className = 'bestcel';
+      const icone = (ok && m.bioma && BIOMA_ICONE[m.bioma]) ? BIOMA_ICONE[m.bioma] : '';
+      const biomaHtml = icone
+        ? '<span class="bestbioma" title="' + (BIOMA_NOME[m.bioma] || m.bioma) + '">' + icone + '</span>'
+        : '';
       cel.innerHTML =
+        biomaHtml +
         '<img class="bestimg' + (ok ? '' : ' bestsilhueta') + '" src="' + m.img + '" alt="' + (ok ? m.nome : '') + '">' +
         (ok ? '<span class="bestnome">' + m.nome + '</span>' : '');
       cel.onclick = ok

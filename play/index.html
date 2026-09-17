@@ -4271,6 +4271,30 @@ window.spring = spring;
   });
 })();
 
+// v4.146 (pedido do usuario, comparando com v0): ripple universal em
+// TODO <button> do app, delegado no document. Nao mexe em nenhum
+// onclick/handler existente -- so um efeito visual em cima. position/
+// overflow aplicados inline so no elemento clicado, na hora, pra nao
+// alterar CSS de nenhuma classe existente.
+document.addEventListener('pointerdown', e => {
+  const btn = e.target.closest('button');
+  if (!btn || btn.disabled) return;
+  if (getComputedStyle(btn).position === 'static') btn.style.position = 'relative';
+  btn.style.overflow = 'hidden';
+  const r = document.createElement('span');
+  const rect = btn.getBoundingClientRect();
+  const size = Math.max(rect.width, rect.height) * 1.3;
+  r.style.cssText = 'position:absolute;border-radius:50%;background:rgba(255,255,255,.35);' +
+    'transform:scale(0);opacity:.6;pointer-events:none;z-index:0;' +
+    'width:' + size + 'px;height:' + size + 'px;' +
+    'left:' + (e.clientX - rect.left - size/2) + 'px;' +
+    'top:' + (e.clientY - rect.top - size/2) + 'px;' +
+    'transition:transform .5s var(--expo), opacity .5s var(--expo);';
+  btn.appendChild(r);
+  requestAnimationFrame(() => { r.style.transform = 'scale(1)'; r.style.opacity = '0'; });
+  setTimeout(() => r.remove(), 550);
+});
+
 function corAccentComOpacidade(alpha){
   const hex = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
   const m = hex.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i);

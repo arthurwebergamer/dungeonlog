@@ -3240,6 +3240,56 @@
   overflow:hidden;
   text-overflow:ellipsis;
 }
+
+/* --- Módulo style #23 --- */
+/* Linhas de 1 linha só (Herói/Aparência/Preferências/Idioma): valor atual
+   mostrado a direita, antes da seta, em vez de subtitulo empilhado --
+   padrao "one-line list item, trailing supporting text" do Material.
+   Isso deixa a linha com ~56px de altura (so o <b>, sem <span> dentro de
+   .cfgtxt) em vez dos ~72px das linhas que ainda tem subtitulo real
+   (Conta/Apagar dados/Feedback, que carregam status/aviso importante). */
+.cfgOverlay .cfgval{
+  flex:none;
+  font-size:13px;
+  color:var(--dim);
+  margin-right:2px;
+  max-width:120px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+/* Sair/Apagar tudo saíram de dentro das linhas (eram pilula de 12px) e
+   viraram CTA full-width no rodape do Config -- pedido do usuario
+   comparando com o destaque que o concorrente da pra essas acoes.
+   Mesma logica de oculto/perigo de antes, so o container mudou. */
+.zonarisco{
+  margin-top:24px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.cfgbtnfull{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  width:100%;
+  padding:14px;
+  border-radius:999px;
+  font-family:'Outfit',sans-serif;
+  font-size:15px;
+  font-weight:600;
+  cursor:pointer;
+  background:transparent;
+  border:1.5px solid var(--line);
+  color:var(--text);
+}
+.cfgbtnfull svg{ width:18px; height:18px; flex:none; }
+.cfgbtnfull:active{ background:rgba(255,255,255,.06); }
+.cfgbtnfull.perigo{ border-color:var(--blood); color:var(--blood); }
+.cfgbtnfull.perigo:active{ background:rgba(229,107,107,.12); }
+
 .cfgOverlay .edsec{
   font-size:11px;
   font-weight:700;

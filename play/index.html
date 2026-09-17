@@ -545,7 +545,6 @@
           <b data-i18n="cfg.conta">Conta</b>
           <span id="cfgContaInfo">Jogando sem conta</span>
         </div>
-        <button class="cfgbtn perigo oculto" id="cfgSairBtn" data-i18n="cfg.sair">Sair</button>
         <button class="cfgbtn" id="cfgEntrarBtn" data-i18n="cfg.criarConta">Criar conta</button>
       </div>
 
@@ -555,7 +554,6 @@
           <b data-i18n="cfg.apagarDados">Apagar dados</b>
           <span data-i18n="cfg.apagarDadosDesc">Zera nível, moedas, itens e vida. Não tem volta.</span>
         </div>
-        <button class="cfgbtn perigo" id="zerarbtn" data-i18n="cfg.apagarTudo">Apagar tudo</button>
       </div>
 
       <div class="edsec" data-i18n="cfg.app">App</div>
@@ -569,8 +567,8 @@
         <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 3.5l6 6L9 21H3v-6z"/></svg></span>
         <div class="cfgtxt">
           <b data-i18n="cfg.heroi">Herói</b>
-          <span id="cfgHeroiResumo">Aventureiro</span>
         </div>
+        <span class="cfgval" id="cfgHeroiResumo">Aventureiro</span>
         <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
       </div>
 
@@ -578,8 +576,8 @@
         <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a9 9 0 1 1 0-18c4.97 0 9 3.5 9 7.5 0 2-1.5 3-3 3h-2a2 2 0 0 0-1.5 3.2c.3.4.5.9.5 1.3 0 1.6-1.3 3-3 3z"/><circle cx="7.5" cy="10.5" r="1.2" fill="currentColor"/><circle cx="12" cy="7.5" r="1.2" fill="currentColor"/><circle cx="16.5" cy="10.5" r="1.2" fill="currentColor"/></svg></span>
         <div class="cfgtxt">
           <b data-i18n="cfg.aparencia">Aparência</b>
-          <span id="cfgAparenciaResumo">Grafite</span>
         </div>
+        <span class="cfgval" id="cfgAparenciaResumo">Grafite</span>
         <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
       </div>
 
@@ -587,8 +585,8 @@
         <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h14M22 18h0"/><circle cx="14" cy="6" r="2"/><circle cx="7" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></span>
         <div class="cfgtxt">
           <b data-i18n="cfg.preferencias">Preferências</b>
-          <span id="cfgPrefsResumo">Vibrar</span>
         </div>
+        <span class="cfgval" id="cfgPrefsResumo">Vibrar</span>
         <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
       </div>
 
@@ -598,6 +596,25 @@
            Duplicava a mesma função por dois caminhos diferentes. A função
            abrirHistorico() e o overlay #histOverlay não mudaram em nada --
            só esse atalho extra saiu. -->
+
+      <!-- Zona de risco (pedido do usuário, comparando com concorrente):
+           Sair e Apagar tudo saíram de dentro das linhas Conta/Apagar
+           dados (onde eram pílula de 12px) e viraram botão full-width
+           aqui embaixo, mesmo peso visual do padrão "danger zone" de
+           apps de referência. MESMOS id (cfgSairBtn/zerarbtn) e MESMAS
+           classes de estado (oculto) das versões antigas -- só mudou de
+           lugar no HTML, nenhum JS foi tocado (ver blocos "PERFIL — SUB-
+           ABAS" e a IIFE de Conta, ambos usam getElementById puro). -->
+      <div class="zonarisco">
+        <button class="cfgbtnfull perigo oculto" id="cfgSairBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span data-i18n="cfg.sair">Sair</span>
+        </button>
+        <button class="cfgbtnfull perigo" id="zerarbtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          <span data-i18n="cfg.apagarTudo">Apagar tudo</span>
+        </button>
+      </div>
     </div>
   </div>
 
@@ -672,8 +689,8 @@
         <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.7-3.8-9s1.3-6.4 3.8-9z"/></svg></span>
         <div class="cfgtxt">
           <b data-i18n="cfg.idioma">Idioma</b>
-          <span id="cfgIdiomaResumo">🇧🇷 Português</span>
         </div>
+        <span class="cfgval" id="cfgIdiomaResumo">🇧🇷 Português</span>
         <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
       </div>
 
@@ -10213,7 +10230,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   if (!cfg) return;
   cfg.addEventListener('click', e => {
     if (e.target.closest('.swch')) return;
-    if (e.target.closest('.cfgrow.cfglink, .cfgbtn')) window.feedbackClique('clique', 10);
+    if (e.target.closest('.cfgrow.cfglink, .cfgbtn, .cfgbtnfull')) window.feedbackClique('clique', 10);
   });
 })();
 </script>

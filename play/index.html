@@ -7369,6 +7369,19 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   window.fecharEstagioTelaCompleta = fecharEstagioTelaCompleta; // exposta pra rede de seguranca em viajarParaTemaEstagio()
 
   function mostrarEstagioDesbloqueado(tema, aoFechar){
+    // GUARD REDUNDANTE (defesa extra, alem da que ja existe no topo de
+    // viajarParaTemaEstagio()): pedido do usuario, com video mostrando a
+    // tela de "Estagio concluido" reabrindo sozinha em qualquer acao.
+    // Nao importa QUEM chamou mostrarEstagioDesbloqueado() nem porque --
+    // se o tema salvo ja e este tema, e um no-op, ponto final. Isso
+    // fecha a porta pra qualquer chamador futuro (ou bug ainda nao
+    // encontrado) que decida chamar essa funcao sem passar pela guarda
+    // de viajarParaTemaEstagio().
+    if (typeof temaArenaSalvo === 'function' && temaArenaSalvo() === tema.id){
+      debugEstagio('mostrarEstagioDesbloqueado: tema ja e ' + tema.id + ' -- ignorando chamada (guard redundante)');
+      if (typeof aoFechar === 'function') aoFechar();
+      return;
+    }
     _aoFecharEstagioTela = aoFechar || null;
     // BUG CORRIGIDO (relatado pelo usuario: tela de "todos os biomas
     // desbloqueados" aparecendo mais de uma vez): definirTemaArenaSalvo()

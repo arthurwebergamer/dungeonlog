@@ -654,6 +654,17 @@
        letter-spacing:.02em !important;text-transform:none !important;color:var(--bg) !important;
        background:var(--accent) !important;padding:6px 14px !important;border-radius:20px !important}
   .lvl::before,.lvl::after{display:none}
+  /* Pill "Estagio N" (pedido do usuario: "nao ta combinando com o estilo
+     do resto do app") -- antes era cor fixa (rgba(0,0,0,.35), sempre
+     escuro) em vez de seguir as variaveis de tema (--accent/--bg) que o
+     pill de Nivel ja usa. Isso fazia ele destoar em qualquer tema onde
+     --accent nao e escuro -- ex.: no Grafite, --accent:#FFFFFF deixa o
+     Nivel branco solido, mas o Estagio continuava um retangulo escuro
+     translucido do lado. Agora usa os MESMOS tokens que o Nivel, entao
+     acompanha qualquer tema de cor automaticamente. */
+  .estagio-pill{color:var(--bg) !important; background:var(--accent) !important}
+  .estagio-pill-trilho{background:color-mix(in srgb, var(--bg) 25%, transparent) !important}
+  .estagio-pill-fill{background:var(--bg) !important}
   .coins{font-family:'Outfit',sans-serif !important;font-size:17px !important;font-weight:600 !important;
          color:var(--gold) !important}
 

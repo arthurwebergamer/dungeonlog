@@ -4131,7 +4131,10 @@ document.getElementById('entrar').onclick = () => {
   // com um pop -- nao mexe em render()/mobHp/nenhuma logica de combate.
   setTimeout(() => {
     const m = document.getElementById('mobSprite');
-    if (m){ m.classList.remove('summonPop'); void m.offsetWidth; m.classList.add('summonPop'); }
+    if (m){
+      m.classList.remove('summonPop'); void m.offsetWidth; m.classList.add('summonPop');
+      setTimeout(() => m.classList.remove('summonPop'), 450);
+    }
   }, 300);
 };
 
@@ -4399,31 +4402,80 @@ function renderUltimos7Dias(hist){
   linhaEl.setAttribute('d', dLinha);
   areaEl.setAttribute('d', dArea);
 
+  // v4.152 (pedido do usuario): grafico desenhava tudo de uma vez, sem
+  // nenhuma entrada. Linha "desenha" da esquerda pra direita via
+  // stroke-dashoffset (tecnica padrao de SVG, usa o comprimento real do
+  // path -- funciona igual não importa quantos pontos existam), area
+  // some/aparece com fade, pontos entram com leve atraso em cascata.
+  const reduzido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduzido){
+    linhaEl.style.strokeDasharray = 'none';
+    linhaEl.style.strokeDashoffset = '0';
+    areaEl.style.opacity = '1';
+  } else {
+    const comprimento = linhaEl.getTotalLength();
+    linhaEl.style.transition = 'none';
+    linhaEl.style.strokeDasharray = comprimento;
+    linhaEl.style.strokeDashoffset = comprimento;
+    areaEl.style.transition = 'none';
+    areaEl.style.opacity = '0';
+    void linhaEl.getBoundingClientRect();
+    linhaEl.style.transition = 'stroke-dashoffset .65s var(--expo)';
+    linhaEl.style.strokeDashoffset = '0';
+    areaEl.style.transition = 'opacity .5s var(--expo) .3s';
+    areaEl.style.opacity = '1';
+  }
+
   // remove os circulos-marcador da rodada anterior antes de redesenhar
   svgEl.querySelectorAll('.est-chartponto').forEach(c => c.remove());
-  pontos.forEach(p => {
+  pontos.forEach((p, i) => {
     const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     c.setAttribute('cx', p.x);
     c.setAttribute('cy', p.y);
     c.setAttribute('r', 4);
     c.setAttribute('fill', p.cor);
     c.setAttribute('class', 'est-chartponto');
+    if (!reduzido){
+      c.style.opacity = '0';
+      c.style.transform = 'scale(0)';
+      c.style.transformOrigin = p.x + 'px ' + p.y + 'px';
+      c.style.transition = 'opacity .3s var(--expo), transform .3s var(--spring-curve)';
+      c.style.transitionDelay = (0.5 + i * 0.05) + 's';
+    }
     svgEl.appendChild(c);
+    if (!reduzido) requestAnimationFrame(() => { c.style.opacity = '1'; c.style.transform = 'scale(1)'; });
   });
 }
 
 // donut de composicao do mes (vitoria/fuga/sem_tarefa) -- SEMPRE desenha o
 // anel cheio, mesmo com 0 dias decorridos: nesse caso fica 100% neutro (cor
 // de fundo) em vez de sumir o card inteiro.
+// v4.151 (pedido do usuario): guarda o ultimo estado desenhado pra
+// interpolar a partir dele, em vez de saltar direto pro valor novo.
+let _donutMesAnterior = {pVit:0, pFuga:0};
 function renderDonutMes(vitorias, fugas, semTarefa){
   const el = document.getElementById('estDonutMes');
   const total = vitorias + fugas + semTarefa;
   if (total === 0){
     el.style.background = 'var(--panel-3)';
+    _donutMesAnterior = {pVit:0, pFuga:0};
   } else {
-    const pVit = (vitorias / total) * 100;
-    const pFuga = pVit + (fugas / total) * 100;
-    el.style.background = 'conic-gradient(var(--accent) 0% ' + pVit + '%, color-mix(in srgb, var(--accent) 40%, transparent) ' + pVit + '% ' + pFuga + '%, var(--panel-3) ' + pFuga + '% 100%)';
+    const pVitAlvo = (vitorias / total) * 100;
+    const pFugaAlvo = pVitAlvo + (fugas / total) * 100;
+    const de = _donutMesAnterior;
+    function pintar(pVit, pFuga){
+      el.style.background = 'conic-gradient(var(--accent) 0% ' + pVit + '%, color-mix(in srgb, var(--accent) 40%, transparent) ' + pVit + '% ' + pFuga + '%, var(--panel-3) ' + pFuga + '% 100%)';
+    }
+    if (typeof window.spring === 'function'){
+      let atualPVit = de.pVit, atualPFuga = de.pFuga;
+      window.spring({from:de.pVit, to:pVitAlvo, stiffness:120, damping:20,
+        onUpdate:v => { atualPVit = v; pintar(atualPVit, atualPFuga); }});
+      window.spring({from:de.pFuga, to:pFugaAlvo, stiffness:120, damping:20,
+        onUpdate:v => { atualPFuga = v; pintar(atualPVit, atualPFuga); }});
+    } else {
+      pintar(pVitAlvo, pFugaAlvo);
+    }
+    _donutMesAnterior = {pVit:pVitAlvo, pFuga:pFugaAlvo};
   }
   document.getElementById('estDonutTotal').textContent = total;
   document.getElementById('estQtdVitoria').textContent = vitorias;
@@ -4642,7 +4694,17 @@ function renderEstatisticas(){
   // 0% no conic-gradient deixa um traco fino de antialiasing na borda; sem
   // valor nenhum, o .est-ringbg neutro por baixo fica visivel sozinho.
   trackEl.style.background = taxa === 0 ? 'none' : '';
-  ringEl.style.setProperty('--pct', taxa);
+  // v4.151 (pedido do usuario): --pct saltava direto pro valor final
+  // (custom property CSS nao anima sozinha sem @property, que nem todo
+  // engine suporta ainda). Interpolado via spring em JS, funciona em
+  // qualquer navegador -- nao mexe em mais nada do calculo de taxa.
+  const pctAnterior = Number(ringEl.style.getPropertyValue('--pct')) || 0;
+  if (typeof window.spring === 'function'){
+    window.spring({from:pctAnterior, to:taxa, stiffness:120, damping:20,
+      onUpdate:v => ringEl.style.setProperty('--pct', v)});
+  } else {
+    ringEl.style.setProperty('--pct', taxa);
+  }
   document.getElementById('estTaxaNum').textContent = taxa + '%';
 
   renderUltimos7Dias(hist);
@@ -7349,7 +7411,25 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     try { return localStorage.getItem(CHAVE_TEMA) || 'grafite'; } catch(e){ return 'grafite'; }
   }
   function escolherTema(id){
-    document.documentElement.setAttribute('data-tema', id);
+    // v4.150 (pedido do usuario): trocar tema so mudava --accent/--bg/etc
+    // na hora, sem transicao (variavel CSS custom property nao anima
+    // sozinha). Em vez de adicionar transition em cada componente que
+    // consome alguma dessas variaveis (risco alto, dezenas de regras),
+    // um cross-fade no documentElement inteiro resolve pra qualquer tema
+    // atual ou futuro sem tocar em mais nada.
+    const root = document.documentElement;
+    const reduzido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduzido){
+      root.setAttribute('data-tema', id);
+    } else {
+      root.style.transition = 'opacity .16s var(--expo)';
+      root.style.opacity = '0.4';
+      setTimeout(() => {
+        root.setAttribute('data-tema', id);
+        root.style.opacity = '1';
+        setTimeout(() => { root.style.transition = ''; }, 180);
+      }, 160);
+    }
     try { localStorage.setItem(CHAVE_TEMA, id); } catch(e){}
     pintarTemaGrid();
   }
@@ -8677,7 +8757,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     <p id="confirmDesc" style="font-family:'Outfit',sans-serif;font-size:13px;color:var(--dim);line-height:1.5;margin:0 0 16px"></p>
     <div class="edacoes">
       <button class="edsalvar" id="confirmCancelar" type="button" style="background:var(--panel-2);color:var(--text)">Cancelar</button>
-      <button class="edsalvar" id="confirmOk" type="button">Confirmar</button>
+      <button class="edsalvar" id="confirmOk" type="button" style="font-size:17px;padding:17px;border-radius:999px">Confirmar</button>
     </div>
   </div>
 </div>

@@ -22,6 +22,14 @@
     --sel-bg:#342A50;
     --poco:#1F1930;
     --xp2:#F2C94C;
+    /* curvas de animacao (pedido do usuario -- animacoes "premium" tipo
+       v0/Framer Motion). --expo: desacelera rapido, sem overshoot -- pra
+       coisas de tela cheia onde "passar do ponto" mostraria fundo (slides,
+       largura de barra). --spring-curve: overshoot leve tipo mola, pra
+       elementos pequenos/contidos (cards entrando, popups, pills). Nao
+       varia por tema, entao fica so aqui no :root base. */
+    --expo: cubic-bezier(.16,1,.3,1);
+    --spring-curve: cubic-bezier(.34,1.56,.64,1);
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{background:var(--bg);color:var(--text);font-family:'Outfit',system-ui,sans-serif;display:flex;justify-content:center;min-height:100vh;min-height:100dvh;padding:16px}
@@ -43,6 +51,18 @@
   .mob-sprite.dead svg{opacity:0;transform:translateY(14px) scale(.6) rotate(12deg)}
   .mob-sprite.fugiu svg{animation:fuga .55s ease-in forwards}
   .mob-sprite.espreita svg{opacity:.4;filter:grayscale(.5)}
+  /* v4.142 (pedido do usuario): .hit/.shake ja eram adicionadas pelo JS
+     (animarGolpe()) mas so o mob tinha efeito visual (flash de cor via
+     .mobimg, ver acima); nenhum dos dois tinha movimento de verdade.
+     Aditivo, nao mexe no filter existente nem no timing do JS (a classe
+     dura 200-320ms la, a animacao aqui cabe dentro disso). */
+  @keyframes spriteShake{
+    0%,100%{transform:translateX(0) rotate(0)}
+    25%{transform:translateX(-5px) rotate(-3deg)}
+    55%{transform:translateX(4px) rotate(2deg)}
+  }
+  .hero-sprite.hit svg{animation:spriteShake .3s var(--expo)}
+  .mob-sprite.shake svg{animation:spriteShake .2s var(--expo)}
   @keyframes fuga{
     0%{opacity:1;transform:none}
     25%{transform:translateX(6px) translateY(-4px)}
@@ -154,7 +174,16 @@
   .xplabel{font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;color:var(--muted)}
   .xpnum{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
   .bar{height:9px;background:var(--panel-2);border:1px solid var(--line);border-radius:3px;padding:2px}
-  .fill{height:100%;width:0%;background:linear-gradient(180deg,#7FCBF3,#3F9BD6);border-radius:2px;transition:width .45s cubic-bezier(.4,1.3,.5,1)}
+  .fill{height:100%;width:0%;background:linear-gradient(180deg,#7FCBF3,#3F9BD6);border-radius:2px;transition:width .45s cubic-bezier(.4,1.3,.5,1);position:relative;overflow:hidden}
+  /* v4.143 (pedido do usuario): shimmer continuo na barra de XP,
+     aditivo via ::after -- nao mexe no width/transition acima. */
+  .fill:not(.hpfill)::after{
+    content:'';position:absolute;inset:0;
+    background:linear-gradient(100deg,transparent 30%, rgba(255,255,255,.45) 45%, transparent 60%);
+    transform:translateX(-100%);animation:xpShimmer 2.4s ease-in-out infinite;
+  }
+  @keyframes xpShimmer{to{transform:translateX(220%)}}
+  @media (prefers-reduced-motion: reduce){ .fill::after{display:none} }
   /* #fill (barra de XP, nao a de Vida -- ver #hpfill, que fica com a
      transicao rapida padrao) sincronizada com animarContagemNumero()
      (script principal, 1100ms) -- ANTES herdava os mesmos .45s da
@@ -364,9 +393,9 @@
   .est-legbar i{display:block;height:100%;border-radius:2px;transition:width .4s}
   .est-dot{width:8px;height:8px;border-radius:2px;flex:none}
 
-  .toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);background:var(--accent);color:var(--bg);font-family:'Silkscreen',monospace;font-size:10px;padding:11px 18px;border-radius:8px;opacity:0;pointer-events:none;transition:all .3s;text-align:center;z-index:200}
+  .toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);background:var(--accent);color:var(--bg);font-family:'Silkscreen',monospace;font-size:10px;padding:11px 18px;border-radius:8px;opacity:0;pointer-events:none;transition:transform .32s var(--spring-curve), opacity .25s var(--expo);text-align:center;z-index:200}
   .toast.gold{background:var(--gold)}
-  .toast.fuga{background:var(--blood);color:#fff}
+  .toast.fuga{background:var(--perigo);color:#fff} /* --perigo, nao --blood: aviso importante, precisa se destacar mesmo no tema Grafite */
 
   /* boas-vindas */
   .intro{position:fixed;inset:0;background:var(--bg);z-index:80;display:flex;justify-content:center;padding:20px;overflow-y:auto}
@@ -962,7 +991,7 @@
   .iacts button{flex:1;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;padding:11px 6px;
                 border-radius:11px;border:1px solid var(--line);background:var(--poco);color:var(--muted);cursor:pointer}
   .iacts button.prim{background:var(--accent);border-color:var(--accent);color:var(--bg)}
-  .iacts button.danger{color:var(--blood)}
+  .iacts button.danger{color:var(--perigo)} /* --perigo, nao --blood: precisa continuar visivel no tema Grafite (acessibilidade, mesmo motivo do .cfgbtnfull.perigo) */
 
 /* ===== Bloco style #18 ===== */
 #viewLoja{padding:14px 14px 8px}
@@ -1163,9 +1192,17 @@
   /* overlay de Config -- mesmo padrao de histOverlay/grimOverlay, z-index
      um degrau abaixo (69 vs 70) de proposito: se o usuario abrir o
      Historico de dentro do Config, o Historico precisa pintar por cima. */
-  .cfgOverlay{position:fixed;inset:0;z-index:69;background:var(--bg);display:none;
-    flex-direction:column;overflow:hidden}
-  .cfgOverlay.on{display:flex}
+  /* v4.141 (pedido do usuario): mesma logica do .edov/.edsheet -- fechar
+     era display:none instantaneo, virou transition reversivel (fade +
+     leve slide). Beneficia os 7 usos de .cfgOverlay: Config, Heroi,
+     Aparencia, Preferencias, Idioma, Conquistas, Bestiario. */
+  .cfgOverlay{position:fixed;inset:0;z-index:69;background:var(--bg);
+    display:flex;flex-direction:column;overflow:hidden;
+    opacity:0;visibility:hidden;pointer-events:none;
+    transform:translateX(14px);
+    transition:opacity .24s var(--expo), transform .24s var(--expo), visibility 0s .24s;}
+  .cfgOverlay.on{opacity:1;visibility:visible;pointer-events:auto;transform:translateX(0);
+    transition:opacity .24s var(--expo), transform .24s var(--expo), visibility 0s;}
   .cfgovhead{display:flex;align-items:center;gap:10px;flex:none;
     padding:calc(14px + env(safe-area-inset-top)) 16px 10px;
     border-bottom:1px solid var(--line)}
@@ -2188,13 +2225,25 @@
   .task .tinfo{cursor:pointer}
 
   /* --- folha do editor --- */
+  /* v4.140 (pedido do usuario): abrir ja tinha animacao (@keyframes edsobe,
+     mantido abaixo so por historico -- nao e mais usado), fechar era
+     display:none instantaneo. Trocado animation (one-shot, nao reversivel)
+     por transition (reversivel de graca): fechar agora desliza pra baixo
+     e o backdrop faz fade, sem tocar em nenhum JS -- os 5 lugares que
+     reaproveitam .edov/.edsheet (Nova tarefa, Editar tarefa, Estatisticas,
+     Renomear, confirmacao de exclusao) ganham o fechar animado juntos. */
   .edov{
     position:fixed; inset:0; z-index:80;
     background:rgba(10,7,18,.68);
     backdrop-filter:blur(3px);
-    display:none; align-items:flex-end; justify-content:center;
+    display:flex; align-items:flex-end; justify-content:center;
+    opacity:0; visibility:hidden; pointer-events:none;
+    transition:opacity .22s var(--expo), visibility 0s .22s;
   }
-  .edov.on{display:flex}
+  .edov.on{
+    opacity:1; visibility:visible; pointer-events:auto;
+    transition:opacity .22s var(--expo), visibility 0s;
+  }
 
   .edsheet{
     position:relative;
@@ -2203,9 +2252,11 @@
     border-radius:20px 20px 0 0;
     padding:8px 16px calc(18px + env(safe-area-inset-bottom));
     max-height:88vh; overflow-y:auto;
-    animation:edsobe .22s cubic-bezier(.2,.9,.3,1);
+    transform:translateY(100%);
+    transition:transform .28s var(--expo);
   }
-  @keyframes edsobe{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  .edov.on .edsheet{ transform:translateY(0); }
+  @keyframes edsobe{from{transform:translateY(100%)}to{transform:translateY(0)}} /* nao usado mais, mantido por historico */
 
   .edpuxador{width:38px;height:4px;border-radius:2px;background:var(--line);margin:6px auto 14px}
 
@@ -2415,9 +2466,17 @@
   /* overlay de Config -- mesmo padrao de histOverlay/grimOverlay, z-index
      um degrau abaixo (69 vs 70) de proposito: se o usuario abrir o
      Historico de dentro do Config, o Historico precisa pintar por cima. */
-  .cfgOverlay{position:fixed;inset:0;z-index:69;background:var(--bg);display:none;
-    flex-direction:column;overflow:hidden}
-  .cfgOverlay.on{display:flex}
+  /* v4.141 (pedido do usuario): mesma logica do .edov/.edsheet -- fechar
+     era display:none instantaneo, virou transition reversivel (fade +
+     leve slide). Beneficia os 7 usos de .cfgOverlay: Config, Heroi,
+     Aparencia, Preferencias, Idioma, Conquistas, Bestiario. */
+  .cfgOverlay{position:fixed;inset:0;z-index:69;background:var(--bg);
+    display:flex;flex-direction:column;overflow:hidden;
+    opacity:0;visibility:hidden;pointer-events:none;
+    transform:translateX(14px);
+    transition:opacity .24s var(--expo), transform .24s var(--expo), visibility 0s .24s;}
+  .cfgOverlay.on{opacity:1;visibility:visible;pointer-events:auto;transform:translateX(0);
+    transition:opacity .24s var(--expo), transform .24s var(--expo), visibility 0s;}
   .cfgovhead{display:flex;align-items:center;gap:10px;flex:none;
     padding:calc(14px + env(safe-area-inset-top)) 16px 10px;
     border-bottom:1px solid var(--line)}
@@ -3287,8 +3346,15 @@
 }
 .cfgbtnfull svg{ width:18px; height:18px; flex:none; }
 .cfgbtnfull:active{ background:rgba(255,255,255,.06); }
-.cfgbtnfull.perigo{ border-color:var(--blood); color:var(--blood); }
-.cfgbtnfull.perigo:active{ background:rgba(229,107,107,.12); }
+/* Acessibilidade (pedido do usuario): --blood e zerado pro cinza no tema
+   Grafite (grayscale por decisao de design). Pra acoes destrutivas
+   importantes, isso apaga o unico sinal visual de "cuidado". Mesma logica
+   ja usada pelo .est-compartilharBtn (excecao documentada acima) --
+   var(--perigo)/var(--perigo2) NUNCA sao sobrescritas por nenhum tema
+   (ver :root, sao usadas em vida critica/calendario de falta/erro de
+   form), entao usamos elas aqui em vez de --blood. */
+.cfgbtnfull.perigo{ border-color:var(--perigo); color:var(--perigo); }
+.cfgbtnfull.perigo:active{ background:rgba(244,87,129,.12); }
 
 .cfgOverlay .edsec{
   font-size:11px;

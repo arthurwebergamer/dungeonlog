@@ -4220,6 +4220,57 @@ function estRecorde(hist){
 // em runtime via getComputedStyle. Isso automaticamente respeita qualquer
 // tema visual escolhido pelo jogador (Grafite/Verde/Branco/etc), porque
 // --accent muda de valor conforme o tema ativo.
+// --- Módulo #24 ---
+// Motor de spring fisico compartilhado (pedido do usuario: animacoes mais
+// "premium" tipo v0/Framer Motion, aplicadas aos poucos em varias telas).
+// Massa-mola-amortecedor rodando por requestAnimationFrame -- duracao
+// VARIA conforme distancia/velocidade (fisica de verdade), diferente de
+// uma transition CSS de duracao fixa. So usar em animacoes ISOLADAS que
+// nao dependem de um setTimeout com duracao fixa em outro lugar do codigo
+// (ex.: o carrossel de intro tem uma trava de seguranca contra corrida
+// dedo-vs-clique que depende de duracao fixa -- la a curva foi calibrada
+// via CSS cubic-bezier em vez de spring, de proposito, ver deslizar()).
+// Respeita prefers-reduced-motion: retorna direto pro valor final.
+const _reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function spring({from, to, stiffness=210, damping=20, mass=1, onUpdate, onComplete}){
+  if (_reducedMotion){ onUpdate(to); onComplete && onComplete(); return; }
+  let pos = from, vel = 0, last = performance.now();
+  function frame(now){
+    const dt = Math.min((now - last) / 1000, 0.032);
+    last = now;
+    const acc = (-stiffness * (pos - to) - damping * vel) / mass;
+    vel += acc * dt;
+    pos += vel * dt;
+    onUpdate(pos);
+    if (Math.abs(pos - to) < 0.15 && Math.abs(vel) < 0.15){ onUpdate(to); onComplete && onComplete(); }
+    else requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+window.spring = spring;
+
+// v4.145 (pedido do usuario): squish fisico ao pressionar/soltar qualquer
+// .cfgbtnfull (Sair, Apagar tudo). Delegado no document pra cobrir botoes
+// atuais e futuros sem precisar de listener por elemento.
+(function(){
+  const escala = new WeakMap();
+  function squish(el, alvo, rigidez, atrito){
+    const atual = escala.get(el) ?? 1;
+    spring({from:atual, to:alvo, stiffness:rigidez, damping:atrito,
+      onUpdate:v=>{ escala.set(el, v); el.style.transform = 'scale(' + v + ')'; }});
+  }
+  document.addEventListener('pointerdown', e => {
+    const btn = e.target.closest('.cfgbtnfull');
+    if (btn) squish(btn, 0.94, 420, 26);
+  });
+  ['pointerup','pointerleave','pointercancel'].forEach(ev => {
+    document.addEventListener(ev, e => {
+      const btn = e.target.closest('.cfgbtnfull');
+      if (btn) squish(btn, 1, 260, 13);
+    });
+  });
+})();
+
 function corAccentComOpacidade(alpha){
   const hex = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
   const m = hex.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i);
@@ -6903,6 +6954,21 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 
   /* ---------- Config ---------- */
   const cfgOverlay = document.getElementById('cfgOverlay');
+  /* v4.144 (pedido do usuario): stagger fisico nas linhas ao abrir Config
+     -- aditivo, so roda quando abrirConfig() e chamada, nao mexe em mais
+     nada do fluxo existente. */
+  function animarStaggerCfgRows(){
+    if (!cfgOverlay || typeof window.spring !== 'function') return;
+    cfgOverlay.querySelectorAll('.cfgrow').forEach((row, i) => {
+      row.style.opacity = '0';
+      row.style.transform = 'translateY(6px)';
+      setTimeout(() => {
+        window.spring({from:6, to:0, stiffness:230, damping:22, onUpdate:v=>{ row.style.transform = 'translateY('+v+'px)'; }});
+        window.spring({from:0, to:1, stiffness:230, damping:28, onUpdate:v=>{ row.style.opacity = v; }});
+      }, i*35);
+    });
+  }
+
   function abrirConfig(){
     sincronizarConfig();
     // atualizarLinhaConta() (bloco CONTA — SAIR/CRIAR CONTA, mais abaixo
@@ -6917,6 +6983,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     // acima.
     if (typeof window.atualizarBotaoFeedback === 'function') window.atualizarBotaoFeedback();
     if (cfgOverlay) cfgOverlay.classList.add('on');
+    animarStaggerCfgRows();
   }
   function fecharConfig(){
     if (cfgOverlay) cfgOverlay.classList.remove('on');
@@ -11054,7 +11121,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     elDentro.classList.add('on');
     elDentro.getBoundingClientRect(); // forca reflow -- sem isso o browser agrupa a mudanca de
                                        // transform com a linha de baixo e nao anima nada
-    elFora.style.transition = elDentro.style.transition = 'transform ' + DURACAO_SLIDE + 'ms ease';
+    elFora.style.transition = elDentro.style.transition = 'transform ' + DURACAO_SLIDE + 'ms var(--expo)';
     elFora.style.transform = 'translateX(' + (direcao > 0 ? '-100%' : '100%') + ')';
     elDentro.style.transform = 'translateX(0)';
 

@@ -3199,16 +3199,23 @@
   display:flex;
   align-items:center;
   gap:12px;
-  padding:13px 2px;
+  padding:16px 2px;
+  background:transparent;
+  border:none;
+  border-radius:0;
+  margin-bottom:0;
+  border-bottom:1px solid var(--line);
+  min-height:48px;
 }
+.cfgOverlay .cfgrow:last-child{ border-bottom:none }
 .cfgOverlay .cfgrow.cfgcol{
   align-items:flex-start;
   flex-direction:column;
 }
 .cfgOverlay .cfgicone{
-  flex:0 0 34px;
-  width:34px;
-  height:34px;
+  flex:0 0 40px;
+  width:40px;
+  height:40px;
   border-radius:50%;
   background:rgba(255,255,255,.07);
   display:flex;
@@ -3216,11 +3223,11 @@
   justify-content:center;
   color:var(--gold, #d4af37);
 }
-.cfgOverlay .cfgicone svg{ width:18px; height:18px; }
+.cfgOverlay .cfgicone svg{ width:22px; height:22px; }
 .cfgOverlay .cfgtxt{ flex:1; min-width:0; }
 .cfgOverlay .cfgtxt b{
   display:block;
-  font-size:15px;
+  font-size:16px;
   font-weight:600;
   line-height:1.2;
 }

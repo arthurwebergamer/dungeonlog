@@ -414,6 +414,29 @@
   .itemini button{margin-left:auto;background:none;border:none;color:var(--dim);font-size:16px;cursor:pointer}
   .dica{font-size:12px;color:var(--dim);text-align:center;line-height:1.5}
   #nomeTopo{font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;color:var(--muted);white-space:nowrap}
+
+  /* animações modernas -- tela de apresentação (onboarding), mesma
+     tecnica testada em mockup-animacoes/ (curvas --spring/--expo,
+     entrada em cascata). Reaplica sempre que .passo ganha .on de novo
+     (mostrarPasso() troca a classe a cada avanço/volta). */
+  .passo.on{animation:passoIn .45s var(--expo) both}
+  @keyframes passoIn{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
+  .passo.on>*{animation:onbFadeUp .45s var(--expo) both}
+  @keyframes onbFadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .passo.on>*:nth-child(1){animation-delay:.04s}
+  .passo.on>*:nth-child(2){animation-delay:.1s}
+  .passo.on>*:nth-child(3){animation-delay:.16s}
+  .passo.on>*:nth-child(4){animation-delay:.22s}
+  .passo.on>*:nth-child(5){animation-delay:.28s}
+  .regras .regra{animation:onbFadeUp .4s var(--expo) both}
+  .passo.on .regras .regra:nth-child(1){animation-delay:.14s}
+  .passo.on .regras .regra:nth-child(2){animation-delay:.2s}
+  .passo.on .regras .regra:nth-child(3){animation-delay:.26s}
+  .grade .opcao{animation:onbFadeUp .35s var(--expo) both}
+  .primario{transition:transform .16s var(--spring),box-shadow .2s var(--expo),filter .2s}
+  .primario:active{transform:scale(.96)}
+  .secundario{transition:transform .16s var(--spring),color .2s}
+  .secundario:active{transform:scale(.94)}
   @media (max-width:520px){
     body{padding:0}
     .app{max-width:none;border:none;border-radius:0;min-height:100vh;min-height:100dvh}
@@ -1023,7 +1046,10 @@
   .lpreco s{color:var(--dim);font-weight:500;font-size:10.5px;margin-right:4px}
   .lpreco .lmoeda{width:11px;height:11px;margin-left:3px;vertical-align:-1px}
   .lbtn{font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;padding:6px 14px;border-radius:9px;
-        border:1px solid var(--accent);background:var(--accent);color:var(--bg);cursor:pointer;white-space:nowrap}
+        border:1px solid var(--accent);background:var(--accent);color:var(--bg);cursor:pointer;white-space:nowrap;
+        position:relative;overflow:hidden;isolation:isolate;
+        transition:transform .16s var(--spring),box-shadow .2s var(--expo)}
+  .lbtn:active{transform:scale(.92)}
   .lbtn.sec{background:var(--poco);border-color:var(--line);color:var(--muted)}
   .lbtn.off{background:var(--poco);border-color:var(--line);color:var(--dim);cursor:default}
   .lflag{position:absolute;top:-7px;left:11px;font-family:'Outfit',sans-serif;font-size:9px;font-weight:700;
@@ -1035,6 +1061,22 @@
          color:var(--gold);cursor:pointer}
   .lnota{font-family:'Outfit',sans-serif;font-size:11.5px;color:var(--dim);text-align:center;
          margin:14px 0 4px;line-height:1.5}
+
+  /* ---------- feedback de clique moderno: ripple + "pop" na compra ----------
+     mesma tecnica do mockup-animacoes/ (span .ripple animado, injetado via JS
+     no clique). Botoes que recebem ripple ganham position:relative;
+     overflow:hidden acima (.lbtn) ou aqui (.primario/.cbtn); a logica de
+     criar/remover o span fica no JS (funcao delegada global no <script>). */
+  .ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.55);
+          transform:scale(0);opacity:.55;animation:rippleGo .55s var(--expo) forwards;
+          pointer-events:none;z-index:0}
+  @keyframes rippleGo{to{transform:scale(2.6);opacity:0}}
+  .primario,.cbtn{position:relative;overflow:hidden;isolation:isolate}
+  .cbtn:active{transform:scale(.96)}
+  .lrow.comprado{animation:lrowComprado .5s var(--expo)}
+  @keyframes lrowComprado{0%{background:var(--panel-3)}30%{background:color-mix(in srgb, var(--verde) 22%, var(--panel-3))}100%{background:var(--panel-3)}}
+  .lrow.comprado .lbox{animation:lboxPop .45s var(--spring)}
+  @keyframes lboxPop{0%{transform:scale(1)}40%{transform:scale(1.22) rotate(-4deg)}100%{transform:scale(1)}}
 
 /* ===== Bloco style #21 ===== */
 /* dentro da folha o composer perde a caixa propria, senao fica caixa dentro de caixa */

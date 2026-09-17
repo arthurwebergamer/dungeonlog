@@ -5108,7 +5108,7 @@ function garantirEstoque(){
 }
 
 /* ---------- compra ---------- */
-function comprar(i){
+function comprar(i, btnEl){
   garantirEstoque();
   const s = lojaEstoque[i];
   if (!s || lojaVendidos.indexOf(i) >= 0) return;
@@ -5131,6 +5131,22 @@ function comprar(i){
   renderLoja();
   if (typeof renderInventario === 'function') renderInventario();
   aviso((en ? 'BOUGHT ' : 'COMPROU ') + it.nome.toUpperCase(), true);
+
+  // feedback visual de compra (pop na linha correspondente do novo render):
+  // renderLoja() ja reconstruiu o grid, entao busca a linha nova pelo texto
+  // do item em vez de reusar btnEl (que pode ter sido substituido/removido).
+  const grid = document.getElementById('lojaGrid') || document.getElementById('lojaLista');
+  if (grid){
+    grid.querySelectorAll('.lrow .lname').forEach(nome => {
+      if (nome.textContent === it.nome){
+        const row = nome.closest('.lrow');
+        if (row && !row.classList.contains('comprado')){
+          row.classList.add('comprado');
+          setTimeout(() => row.classList.remove('comprado'), 550);
+        }
+      }
+    });
+  }
 }
 
 /* ---------- venda em lote de tesouros ---------- */
@@ -5240,7 +5256,7 @@ function montarCompra(grid){
   });
 
   grid.querySelectorAll('[data-c]').forEach(b => {
-    b.onclick = () => comprar(+b.dataset.c);
+    b.onclick = () => comprar(+b.dataset.c, b);
   });
 
   const nota = document.createElement('div');
@@ -9571,6 +9587,37 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 </script>
 
 <!-- =====================================================================
+     RIPPLE — feedback de clique moderno nos botoes principais
+     (mesma tecnica testada em mockup-animacoes/index.html)  —  bloco
+     autonomo, cole antes de </body>
+
+     Delegado no document em vez de listener por botao: cobre qualquer
+     .lbtn/.primario/.cbtn/.secundario presente hoje OU renderizado
+     depois (loja, folhas modais etc.) sem precisar religar nada. Cria
+     um <span class="ripple"> posicionado no ponto do clique, dentro do
+     proprio botao (que já tem position:relative;overflow:hidden no
+     style.css), e remove sozinho apos a animacao (rippleGo, .55s).
+     ===================================================================== -->
+<script>
+(function(){
+  const SELETOR_RIPPLE = '.lbtn, .primario, .cbtn, .secundario';
+  document.addEventListener('pointerdown', e => {
+    const btn = e.target.closest(SELETOR_RIPPLE);
+    if (!btn || btn.classList.contains('off')) return;
+    const r = btn.getBoundingClientRect();
+    const tam = Math.max(r.width, r.height) * 1.4;
+    const spn = document.createElement('span');
+    spn.className = 'ripple';
+    spn.style.width = spn.style.height = tam + 'px';
+    spn.style.left = (e.clientX - r.left - tam / 2) + 'px';
+    spn.style.top = (e.clientY - r.top - tam / 2) + 'px';
+    btn.appendChild(spn);
+    setTimeout(() => spn.remove(), 600);
+  }, { passive: true });
+})();
+</script>
+
+<!-- =====================================================================
      SFX/VIBRACAO — MENU DE CONFIG (linhas e botoes)  —  bloco autonomo,
      cole antes de </body>
 
@@ -10668,7 +10715,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
     arrasteDelta = dx;
     const atualNum = parseInt(elAtualArraste.dataset.slide, 10);
-    const dir = dx < 0 ? 1 : -1; // 1 = arrastando pra esquerda (avança), -1 = pra direita (volta)
+    const dir = dx < 0 ? 1 : -1; // 1 = arrastando pra esquerda (avan��a), -1 = pra direita (volta)
 
     if (!elVizinhoArraste || direcaoVizinho !== dir){
       if (elVizinhoArraste){

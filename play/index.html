@@ -2198,9 +2198,32 @@ function verificarDesbloqueiosTemaArena(){
   // unica vez por passada, calcula o estagio REAL (estagioAtual(), fonte
   // da verdade) e viaja direto pra ele -- nao importa quantos limiares
   // foram cruzados de uma vez.
+  //
+  // BUG CORRIGIDO (relatado pelo usuario: a tela de "Estagio concluido"
+  // reaparecendo sozinha em QUALQUER acao, nao so ao cruzar um limiar de
+  // verdade): a condicao antiga era so `desbloqueouAlgumAgora` -- ou
+  // seja, QUALQUER tema marcado nesta passada disparava a cerimonia pro
+  // estagio ATUAL (estagioAtual()-1), mesmo que esse estagio ja
+  // estivesse corretamente mostrado/salvo ha muito tempo. Isso reabria a
+  // cerimonia inteira sempre que um tema ANTIGO fosse marcado de forma
+  // atrasada/retroativa -- por exemplo, o Deserto tinha um bug (chave
+  // desbloqueioGratis duplicada em assets.js, ja corrigido) que
+  // impedia ele de ser marcado no momento certo; ao corrigir esse bug, o
+  // Deserto passou a ser marcado "atrasado" (retroativamente) em
+  // qualquer render() depois disso -- e cada marcacao retroativa dessas
+  // reabria a tela do estagio ATUAL (Montanhas), mesmo o jogador ja
+  // tendo visto essa cerimonia fazia tempo. So viajar se o tema SALVO
+  // realmente estiver desatualizado em relacao ao estagio real resolve
+  // isso de vez -- mesma checagem que o self-heal de renderTemaArena()
+  // ja usa, entao fica consistente com ele.
   if (desbloqueouAlgumAgora && typeof viajarParaTemaEstagio === 'function'){
-    debugEstagio('verificarDesbloqueiosTemaArena: desbloqueou algo nesta passada, chamando viajarParaTemaEstagio()');
-    viajarParaTemaEstagio();
+    const temaRealAgora = TEMAS_ARENA[(typeof estagioAtual === 'function' ? estagioAtual() : 1) - 1];
+    if (temaRealAgora && typeof temaArenaSalvo === 'function' && temaArenaSalvo() !== temaRealAgora.id){
+      debugEstagio('verificarDesbloqueiosTemaArena: tema salvo desatualizado, chamando viajarParaTemaEstagio()');
+      viajarParaTemaEstagio();
+    } else {
+      debugEstagio('verificarDesbloqueiosTemaArena: marcou tema(s) retroativamente, mas o tema salvo ja bate com o estagio atual -- nao reabre a cerimonia');
+    }
   }
 }
 window.verificarDesbloqueiosTemaArena = verificarDesbloqueiosTemaArena;
@@ -7372,16 +7395,13 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     // por isso -1 em relacao a estagioAtual() (que ja reflete o novo
     // estagio corrente).
     const numEstagioConcluido = (typeof estagioAtual === 'function') ? estagioAtual() - 1 : '';
-    // Preview do novo bioma (pedido do usuario): mostra a arte de fundo
-    // do tema que acabou de desbloquear, se existir (temas sem arte
-    // propria, tipo Padrao, simplesmente nao mostram nada aqui).
-    // Usa arteEstagio (ilustracao flutuante composta a partir do pack de
-    // camadas, sem retangulo de fundo solido) em vez de tema.arte (a arte
-    // cheia usada como fundo da Arena) -- pedido explicito do usuario:
-    // "nao fundo, nao o cenario inteiro", igual a montanha flutuante da
-    // tela de Estatisticas.
-    const previewArte = tema.arteEstagio
-      ? '<img class="estagio-tela-preview" src="data:image/png;base64,' + tema.arteEstagio + '" alt="">'
+    // Preview do novo bioma: pedido revisado do usuario -- mostrar a
+    // imagem CHEIA do tema (tema.arte, a mesma arte usada como fundo da
+    // Arena) aqui no popup, nao mais a camada unica flutuante
+    // (tema.arteEstagio). Temas sem arte propria (Padrao) continuam sem
+    // mostrar nada aqui.
+    const previewArte = tema.arte
+      ? '<img class="estagio-tela-preview" src="data:image/png;base64,' + tema.arte + '" alt="">'
       : '';
 
     // Pedido do usuario: ao concluir o ULTIMO estagio (hoje Montanhas),

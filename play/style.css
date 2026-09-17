@@ -1377,18 +1377,17 @@
     width:120px; height:120px; object-fit:contain; image-rendering:pixelated;
     filter:drop-shadow(0 12px 18px rgba(0,0,0,.5));
   }
-  /* Preview do bioma novo (pedido do usuario) -- ilustracao FLUTUANTE,
-     igual a montanha do card "Sequencia atual" em Estatisticas: nao e a
-     arte cheia da Arena (tema.arte), e UMA CAMADA INDIVIDUAL do pack
-     (tema.arteEstagio -- ex.: so "3.Mountains.png", sem compor com as
-     outras camadas). O PNG ja vem com fundo transparente e silhueta
-     irregular (montanha/arvores), entao flutua sozinho sem precisar de
-     mask/fade nenhum -- mesma logica da montanha original: sem
-     border-radius, sem box-shadow, sem caixa. Temas sem arte propria
-     (Padrao) nunca chegam aqui -- a ceremonia so roda pra
-     Deserto/Floresta/Gelo. */
+  /* Preview do bioma novo -- pedido revisado do usuario: voltou a
+     mostrar a imagem CHEIA do tema (tema.arte, a mesma arte de fundo da
+     Arena), nao mais a camada unica flutuante (tema.arteEstagio). Como
+     agora e um retangulo cheio (nao uma silhueta com fundo transparente
+     tipo a montanha), volta a fazer sentido ter moldura: aspect-ratio
+     16:9 + object-fit:cover pra recortar certinho, cantos arredondados
+     e sombra. Temas sem arte propria (Padrao) nunca chegam aqui -- a
+     ceremonia so roda pra Deserto/Floresta/Montanhas. */
   .estagio-tela-preview{
-    width:min(280px, calc(100% - 48px));
+    width:min(280px, calc(100% - 48px)); aspect-ratio:16/9; object-fit:cover;
+    border-radius:14px; box-shadow:0 10px 24px -8px rgba(0,0,0,.55);
     image-rendering:pixelated;
   }
   .estagio-tela-sub{
@@ -2617,18 +2616,17 @@
     width:120px; height:120px; object-fit:contain; image-rendering:pixelated;
     filter:drop-shadow(0 12px 18px rgba(0,0,0,.5));
   }
-  /* Preview do bioma novo (pedido do usuario) -- ilustracao FLUTUANTE,
-     igual a montanha do card "Sequencia atual" em Estatisticas: nao e a
-     arte cheia da Arena (tema.arte), e UMA CAMADA INDIVIDUAL do pack
-     (tema.arteEstagio -- ex.: so "3.Mountains.png", sem compor com as
-     outras camadas). O PNG ja vem com fundo transparente e silhueta
-     irregular (montanha/arvores), entao flutua sozinho sem precisar de
-     mask/fade nenhum -- mesma logica da montanha original: sem
-     border-radius, sem box-shadow, sem caixa. Temas sem arte propria
-     (Padrao) nunca chegam aqui -- a ceremonia so roda pra
-     Deserto/Floresta/Gelo. */
+  /* Preview do bioma novo -- pedido revisado do usuario: voltou a
+     mostrar a imagem CHEIA do tema (tema.arte, a mesma arte de fundo da
+     Arena), nao mais a camada unica flutuante (tema.arteEstagio). Como
+     agora e um retangulo cheio (nao uma silhueta com fundo transparente
+     tipo a montanha), volta a fazer sentido ter moldura: aspect-ratio
+     16:9 + object-fit:cover pra recortar certinho, cantos arredondados
+     e sombra. Temas sem arte propria (Padrao) nunca chegam aqui -- a
+     ceremonia so roda pra Deserto/Floresta/Montanhas. */
   .estagio-tela-preview{
-    width:min(280px, calc(100% - 48px));
+    width:min(280px, calc(100% - 48px)); aspect-ratio:16/9; object-fit:cover;
+    border-radius:14px; box-shadow:0 10px 24px -8px rgba(0,0,0,.55);
     image-rendering:pixelated;
   }
   .estagio-tela-sub{

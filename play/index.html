@@ -2023,6 +2023,10 @@ const CHAVE_TEMA_ARENA = 'questlog.temaArena.v1';
 // que o anterior -- deltas 10 -> +20 -> +40 (mesma convencao de delta do
 // design original, so que agora exatamente em dobro). Cumulativo:
 // 10, 30, 70. Antes era 30/90/200 (+60/+110, crescente mas nao em dobro).
+// ATENCAO: esses 3 valores tem que ficar EXATAMENTE iguais aos
+// desbloqueioGratis.valor de deserto/floresta/montanhas em assets.js
+// (TEMAS_ARENA) -- ja causou um bug real por ficarem dessincronizados
+// (ver aviso espelhado la).
 const LIMIARES_ESTAGIO = [10, 30, 70];
 
 function estagioAtual(){

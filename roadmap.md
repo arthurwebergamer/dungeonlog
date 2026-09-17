@@ -9314,3 +9314,55 @@ Depois do mockup aprovado, implementado de verdade no popup da tocha:
 
 ### Contexto e motivação
 Ideia do usuário: quando o jogador avança de "estágio", o personagem viaja pra um tema visual novo — mais natural que ficar trocando de tema manualmente (referência: outro app, "Habit Fantasy", com barra "STAGE N" e tela de "Estágio Concluído!" com confete/baú). Isso **resolveu uma pendência antiga do roadmap principal**: a decisão em aberto de "qual o 2º gatilho de desbloqueio grátis de tema de Arena" — os 4 `TEMAS_ARENA` (Padrão/Dungeon, Deserto, Floresta, Gelo) que tinham
+
+## [Sessão] Sistema de Estágios — parte 2: cerimônia, bugs de sincronização, biomas do pack Free, progresso visual e polish
+
+### Contexto
+Continuação do Sistema de Estágios (a sessão anterior documentou a implementação original, mas o roadmap.md ficou truncado no meio — retomado aqui a partir do código real).
+
+### Tela de cerimônia ("Estágio Concluído")
+- **Bug de contagem corrigido**: mostrava "Estágio 2 Concluído" ao desbloquear o Deserto, mas Deserto É o Estágio 2 (quem tinha acabado de ser concluído era o Estágio 1). `numEstagioConcluido` agora é `estagioAtual() - 1`.
+- **Bug de timing corrigido**: a troca visual do fundo rodava síncrona antes da tela cheia entrar na fila de popups — se outro popup já estivesse na fila, o fundo mudava visível por baixo dele. Movida pra dentro de `mostrarEstagioDesbloqueado()`, com 350ms de atraso batendo com a transição CSS.
+- **Preview do bioma**: `<img class="estagio-tela-preview">` mostrando `tema.arte` (mesma arte de fundo da Arena). Passou por iterações (virou ilustração flutuante composta do pack Free.rar, sem moldura) e voltou pro formato de imagem cheia com moldura — decisão final do usuário.
+- **Mensagem "todos os biomas desbloqueados"**: ao concluir o último estágio, aviso extra dizendo que todos os biomas foram liberados. Flag dedicada (`questlog.avisoTodosBiomas.v1`) pra aparecer só uma vez na conta. Sem emoji (pedido explícito).
+- **Som novo**: `estagioNovo` no catálogo `SONS` (mesmo motor de síntese Web Audio, sem arquivo externo) — duas notas deslizando + leve ruído de ataque (opção "Portal" aprovada num preview standalone antes de ir pro app). Toca só na cerimônia, explicitamente não no swipe manual. `ruido()` ganhou suporte a filtro passa-alta opcional (`passaAlta`, default `null`), sem afetar efeitos existentes.
+
+### Gelo renomeado pra Montanhas
+`id`/`nome`/`nome_en` do tema em `assets.js` e as 7 tags `bioma:` dos monstros correspondentes. Nada em `index.html`/`style.css` precisou mudar (tudo data-driven).
+
+### Bug real: chave `desbloqueioGratis` duplicada no Deserto
+Objeto do tema `deserto` tinha a chave duplicada — sobra do sistema antigo de streak. Em JS, chave repetida = a última vale, então o Deserto secretamente valia `{tipo:"streak", valor:5}` em vez de `{tipo:"tarefasTotais", valor:30}`, quebrando a detecção de desbloqueio em todo lugar, inclusive o gate do gesto de arrastar. Conectava com `assinaturaAtiva()` estar grudada no modo debug (`return window.modoDebugAtivo()`, sobra do sistema de assinatura antigo) — mascarava o bug 1 quando debug estava ligado. Corrigido removendo a chave duplicada.
+
+### Bug: cerimônia reabrindo sozinha (três rodadas de correção até fechar de vez)
+- 1ª causa: `verificarDesbloqueiosTemaArena()` disparava a cerimônia sempre que QUALQUER tema era marcado, mesmo retroativamente (a correção do bug do Deserto acima fez ele ser marcado atrasado, reabrindo a cerimônia do estágio atual a cada marcação).
+- 2ª causa: o self-heal em `renderTemaArena()` assumia que `temaArenaSalvo()` deveria sempre bater com o tema oficial do estágio — quebra no modo de escolha livre (troca manual virava "desatualização" pra essa lógica).
+- Tentativa intermediária (`todosOsTemasDesbloqueados`) tinha um furo: no exato instante do último estágio, "todos desbloqueados" vira verdade junto, bloqueando a cerimônia de aparecer nem essa primeira vez.
+- **Fix definitivo**: flag dedicada e monotônica `estagioCerimoniaMostradaAte()` (`questlog.estagioCerimoniaMostrada.v1`) — só guarda até qual estágio a cerimônia já foi mostrada, nunca afetada por qual tema está sendo exibido. Gatilhos comparam `estagioAtual() > estagioCerimoniaMostradaAte()`. Guard redundante em `mostrarEstagioDesbloqueado()`: nunca abre se o tema já é o atual.
+
+### Bug: monstro do bioma errado no modo de escolha livre
+`poolMonstrosFiltrado()` sorteava pelo bioma do **estágio numérico**, não pelo tema **exibido**. No modo livre (ex.: `estagioAtual()=4` mas exibindo Deserto), monstro de Montanhas caía no cenário errado. Fix: filtra por `temaArenaAtual().id`.
+
+### Indicador "Estágio N" na topbar — redesign (três rodadas)
+- 1ª tentativa: só recoloriu o pill pra bater com o badge de Nível — usuário apontou que não combinava e "não tinha barra de XP nem nada".
+- Redesign correto: copiado o estilo da barra de Experiência real (`.xpwrap`/`.bar`/`.fill`) — fundo neutro, trilho escuro translúcido, preenchimento em gradiente `accent→xp2`.
+- Bandeirinha (🏁) removida do pill por completo (pedido do usuário) — continua só na tela de cerimônia (elemento diferente).
+- Número de contagem adicionado (`estagioTopoNum`, tipo "7/10") — progresso relativo ao próximo corte, não o total bruto. Fica vazio no Estágio MAX.
+
+### Curva de limiares alterada — e um novo bug de sincronização
+Pedido do usuário: curva de dobro em dobro começando em 10 (era 30/90/200, crescente mas não em dobro). `LIMIARES_ESTAGIO` virou `[10, 30, 70]` (deltas 10→20→40). **Bug introduzido e corrigido na hora**: esqueci de atualizar o `desbloqueioGratis.valor` correspondente de cada tema em `assets.js` (ainda em 30/90/200) — ficou dessincronizado, causando o cadeado aparecer de novo mesmo com o estágio certo já alcançado (mesma classe de bug de antes). Corrigido, e **comentário de aviso cruzado adicionado nos dois arquivos** apontando um pro outro, pra não desincronizar de novo silenciosamente.
+
+### Diálogo do tutorial (aba Tarefas) atualizado
+Fala nova em `DIALOGOS.tarefas`/`DIALOGOS_EN.tarefas` explicando o Sistema de Estágios. **Bug corrigido**: a primeira versão (uma fala só, ~290 caracteres) vazava pra fora da caixa de diálogo, que tem altura fixa (148px, sem scroll) e todas as falas existentes respeitam um teto de ~150 caracteres. Dividida em duas falas curtas, mesmo padrão das demais.
+
+### Bestiário — ícones de bioma (adicionado e revertido no mesmo dia)
+Ícone por bioma (🏜️/🌳/🏔️) no canto de cada monstro descoberto — usuário achou que não ficou legal visualmente, revertido por completo (HTML e CSS).
+
+### Limpeza: debugEstagio() parou de poluir o console
+Chamava `console.log` incondicionalmente pra qualquer jogador, mesmo fora do modo debug. Agora só loga quando o painel visível (`#estagioDebugPanel`) também existe.
+
+### Pendências / decisões em aberto
+- **Animação idle (bob) de herói/monstro**: mockup aprovado como próximo passo, mas ainda **não implementado no app** — falta decidir amplitude (sutil 3px vs média 6px) e confirmar ritmo (~2s).
+- **Animação por criatura (tipo bater asa) — avaliado e descartado por ora**: cada monstro é um PNG estático único (32×32, sem frames), então animação específica por tipo exigiria redesenhar múltiplos quadros para os 63 monstros — trabalho de arte, não de código. Referência: vídeo do "Habit Fantasy" mostrando o morcego batendo asa (confirmado por diff de pixel: herói estático, morcego com movimento real).
+- O experimento de "montanha flutuante" no card Sequência Atual (Estatísticas), mencionado pelo usuário como algo já testado, **não existe no código do repo** — ficou numa sessão não commitada.
+- Pack `Free.rar` (Desert/Jungle/Mountain) usado só pra escolher a arte de fundo de cada tema — ainda tem camadas soltas (parallax) não utilizadas.
+- **Origem dos assets de monstro**: "64x Tiny Monsters" (Pixel-Deck) — já documentado na seção de licenças, não precisa registrar de novo.

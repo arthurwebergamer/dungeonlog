@@ -181,6 +181,7 @@
     <div class="estagio-pill-wrap" id="estagioPillWrap">
       <div class="estagio-pill" id="estagioPill">
         <span class="estagio-pill-lbl" id="estagioTopoLbl">Estágio 1</span>
+        <span class="estagio-pill-num" id="estagioTopoNum"></span>
       </div>
       <div class="estagio-pill-trilho"><div class="estagio-pill-fill" id="estagioTopoFill"></div></div>
     </div>
@@ -2017,10 +2018,12 @@ const CHAVE_TEMA_ARENA = 'questlog.temaArena.v1';
 // (contador lifetime que ja existia, reaproveitado -- ver Estatisticas
 // "Desde o inicio"). LIMIARES_ESTAGIO[i] = total de tarefas pra cruzar do
 // estagio (i+1) pro (i+2) -- 3 valores pra 4 estagios (3 cortes).
-// Curva crescente de proposito (30 -> +60 -> +110): cada estagio pede mais
-// que o anterior, ja que sao so 4 -- cada um precisa "durar" mais que o de
-// trás pra nao passar batido.
-const LIMIARES_ESTAGIO = [30, 90, 200];
+// Curva de dobro em dobro (pedido do usuario, revisado): primeiro corte
+// pede 10 tarefas, e cada corte seguinte pede o DOBRO de tarefas A MAIS
+// que o anterior -- deltas 10 -> +20 -> +40 (mesma convencao de delta do
+// design original, so que agora exatamente em dobro). Cumulativo:
+// 10, 30, 70. Antes era 30/90/200 (+60/+110, crescente mas nao em dobro).
+const LIMIARES_ESTAGIO = [10, 30, 70];
 
 function estagioAtual(){
   const total = (typeof window.totalTarefasConcluidas === 'function') ? window.totalTarefasConcluidas() : 0;
@@ -2097,6 +2100,7 @@ window.poolMonstrosFiltrado = poolMonstrosFiltrado;
 function renderEstagioBar(){
   const lblEl = document.getElementById('estagioTopoLbl');
   const fillEl = document.getElementById('estagioTopoFill');
+  const numEl = document.getElementById('estagioTopoNum');
   if (!lblEl || !fillEl) return;
   const emIngles = typeof idiomaApp === 'function' && idiomaApp() === 'en';
   const estagio = estagioAtual();
@@ -2105,6 +2109,22 @@ function renderEstagioBar(){
     ? (emIngles ? 'Stage ' + estagio + ' · MAX' : 'Estágio ' + estagio + ' · MAX')
     : (emIngles ? 'Stage ' + estagio : 'Estágio ' + estagio);
   fillEl.style.width = Math.round(progressoEstagio() * 100) + '%';
+
+  // Contagem numerica (pedido do usuario: mostrar o numero na barra, tipo
+  // "7/10") -- relativa ao corte do estagio ATUAL (quantas tarefas desde
+  // o inicio deste estagio / quantas faltam pro proximo), nao o total
+  // lifetime bruto -- mesma conta que progressoEstagio() ja faz por
+  // baixo dos panos, so exposta em numero em vez de so % da barra.
+  if (numEl){
+    if (max){
+      numEl.textContent = '';
+    } else {
+      const total = (typeof window.totalTarefasConcluidas === 'function') ? window.totalTarefasConcluidas() : 0;
+      const inicio = estagio === 1 ? 0 : LIMIARES_ESTAGIO[estagio - 2];
+      const alvo = LIMIARES_ESTAGIO[estagio - 1];
+      numEl.textContent = Math.max(0, Math.min(alvo - inicio, total - inicio)) + '/' + (alvo - inicio);
+    }
+  }
 }
 window.renderEstagioBar = renderEstagioBar;
 
@@ -7934,7 +7954,8 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       'No final do dia, se eu concluir todas as tarefas, o monstro morre e eu ganho recompensas: armaduras, espadas, acessórios e muitos outros equipamentos.',
       'Se eu não conseguir concluir todas, o monstro me golpeia — o dano é baseado em quantas tarefas eu deixar de fazer.',
       'Toque em uma tarefa para marcar como feita ou editar. Segure uma tarefa para reordenar a lista.',
-      'E tem mais: quanto mais tarefas eu completo ao longo da jornada, mais eu avanço de estágio — e o cenário da Arena muda de verdade, não é só decoração. Ao alcançar o último estágio, desbloqueio todos os cenários e posso escolher qualquer um deles, quando quiser, arrastando a Arena pro lado.'
+      'E tem mais: quanto mais tarefas eu completo, mais eu avanço de estágio — e o cenário da Arena muda de verdade, não é só decoração.',
+      'Ao alcançar o último estágio, desbloqueio todos os cenários e posso escolher qualquer um deles, arrastando a Arena pro lado.'
     ],
     inventario: [
       'Aqui guardo tudo que saqueei das batalhas: armas, armaduras, acessórios e alguns tesouros raros.',
@@ -7969,7 +7990,8 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       'By the end of the day, if I finish every task, the monster dies and I get rewards: armor, swords, accessories, and lots of other gear.',
       'If I can\'t finish them all, the monster hits me back — the damage depends on how many tasks I leave undone.',
       'Tap a task to mark it done or edit it. Hold a task to reorder the list.',
-      'There\'s more: the more tasks I complete throughout the journey, the further I advance through stages — and the Arena\'s scenery actually changes, it\'s not just decoration. Once I reach the final stage, I unlock every scenery and can pick any of them, whenever I want, by dragging the Arena sideways.'
+      'There\'s more: the more tasks I complete, the further I advance through stages — and the Arena\'s scenery actually changes, it\'s not just decoration.',
+      'Once I reach the final stage, I unlock every scenery and can pick any of them by dragging the Arena sideways.'
     ],
     inventario: [
       'This is where I keep everything I\'ve looted from battle: weapons, armor, accessories, and a few rare treasures.',

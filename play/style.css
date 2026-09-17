@@ -3843,7 +3843,7 @@
   font-family:'Outfit',sans-serif; font-weight:600; font-size:10.5px;
   color:var(--text); white-space:nowrap; max-width:100%; overflow:hidden; text-overflow:ellipsis;
 }
-.estagio-pill-flag{ font-size:11px; line-height:1; flex:none; }
+.estagio-pill-num{ font-size:9.5px; font-weight:500; color:var(--muted); flex:none; }
 .estagio-pill-trilho{
   width:100%; max-width:110px; height:6px; border-radius:3px;
   background:rgba(0,0,0,.32); overflow:hidden;

@@ -2128,6 +2128,28 @@ function marcarTemaDesbloqueado(id){
   return true;
 }
 
+// BUG CORRIGIDO (relatado pelo usuario: cerimonia reabrindo ao trocar de
+// tema manualmente, DEPOIS de todos desbloqueados -- E, na tentativa de
+// consertar isso, o oposto: a cerimonia parou de aparecer NA PRIMEIRA
+// VEZ que o ultimo estagio e alcancado, porque "todos desbloqueados"
+// vira verdade no EXATO mesmo instante em que a cerimonia deveria
+// disparar, entao a trava anterior bloqueava os dois casos ao mesmo
+// tempo). A causa raiz de tudo isso: usar temaArenaSalvo() (que muda
+// livremente com o swipe manual) como sinal de "a cerimonia ja foi
+// mostrada" nunca foi a comparacao certa -- sao dois conceitos
+// diferentes (qual tema esta sendo EXIBIDO agora vs. ate qual estagio a
+// cerimonia ja foi CELEBRADA). Flag dedicada, monotonica, que so anda
+// pra frente e nunca e afetada por swipe: reflete puramente "o jogador
+// ja viu a cerimonia do estagio N", nada mais.
+const CHAVE_ESTAGIO_CERIMONIA_MOSTRADA = 'questlog.estagioCerimoniaMostrada.v1';
+function estagioCerimoniaMostradaAte(){
+  try { return Number(localStorage.getItem(window.chaveConta(CHAVE_ESTAGIO_CERIMONIA_MOSTRADA))) || 1; }
+  catch(e){ return 1; }
+}
+function definirEstagioCerimoniaMostradaAte(n){
+  try { localStorage.setItem(window.chaveConta(CHAVE_ESTAGIO_CERIMONIA_MOSTRADA), String(n)); } catch(e){}
+}
+
 function temaArenaDesbloqueado(t){
   if (t.gratuito) return true;
   if (assinaturaAtiva()) return true;
@@ -2212,18 +2234,25 @@ function verificarDesbloqueiosTemaArena(){
   // Deserto passou a ser marcado "atrasado" (retroativamente) em
   // qualquer render() depois disso -- e cada marcacao retroativa dessas
   // reabria a tela do estagio ATUAL (Montanhas), mesmo o jogador ja
-  // tendo visto essa cerimonia fazia tempo. So viajar se o tema SALVO
-  // realmente estiver desatualizado em relacao ao estagio real resolve
-  // isso de vez -- mesma checagem que o self-heal de renderTemaArena()
-  // ja usa, entao fica consistente com ele.
+  // tendo visto essa cerimonia fazia tempo.
+  //
+  // BUG CORRIGIDO DE NOVO (relatado pelo usuario: cerimonia sumiu de vez
+  // depois da tentativa anterior): a trava "todosOsTemasDesbloqueados"
+  // tinha um furo -- no exato instante em que o ULTIMO estagio e
+  // alcancado, "todos desbloqueados" ja vira verdade no MESMO passo que
+  // desbloqueouAlgumAgora, entao a trava bloqueava a cerimonia de
+  // aparecer nem essa primeira vez. Fix definitivo: compara direto com
+  // estagioCerimoniaMostradaAte() -- so dispara se o estagio atual for
+  // MAIOR do que o maior estagio ja celebrado, sem depender de
+  // temaArenaSalvo() (que muda livremente com o swipe) nem de quantos
+  // temas estao desbloqueados.
   if (desbloqueouAlgumAgora && typeof viajarParaTemaEstagio === 'function'){
-    const temaRealAgora = TEMAS_ARENA[(typeof estagioAtual === 'function' ? estagioAtual() : 1) - 1];
-    const todosOsTemasDesbloqueados = TEMAS_ARENA.every(temaArenaDesbloqueado);
-    if (!todosOsTemasDesbloqueados && temaRealAgora && typeof temaArenaSalvo === 'function' && temaArenaSalvo() !== temaRealAgora.id){
-      debugEstagio('verificarDesbloqueiosTemaArena: tema salvo desatualizado, chamando viajarParaTemaEstagio()');
+    const estagioReal = (typeof estagioAtual === 'function') ? estagioAtual() : 1;
+    if (estagioReal > estagioCerimoniaMostradaAte()){
+      debugEstagio('verificarDesbloqueiosTemaArena: estagio ' + estagioReal + ' ainda nao foi celebrado, chamando viajarParaTemaEstagio()');
       viajarParaTemaEstagio();
     } else {
-      debugEstagio('verificarDesbloqueiosTemaArena: marcou tema(s) retroativamente, mas o tema salvo ja bate com o estagio atual (ou modo de escolha livre) -- nao reabre a cerimonia');
+      debugEstagio('verificarDesbloqueiosTemaArena: marcou tema(s) retroativamente, mas o estagio atual ja foi celebrado -- nao reabre a cerimonia');
     }
   }
 }
@@ -2316,22 +2345,19 @@ function renderTemaArena(){
   // logo no topo dela), entao chama-la aqui e seguro e idempotente --
   // so faz alguma coisa quando o tema salvo realmente esta desatualizado.
   if (typeof estagioAtual === 'function' && typeof TEMAS_ARENA !== 'undefined' && typeof temaArenaDesbloqueado === 'function'){
-    const temaEsperado = TEMAS_ARENA[estagioAtual() - 1];
-    // BUG CORRIGIDO (relatado pelo usuario: a tela de "Estagio concluido"
-    // reaparecendo ao trocar de tema): esse self-heal assumia que
-    // temaArenaSalvo() deveria SEMPRE bater com o tema do estagio atual
-    // -- premissa que quebra assim que TODOS os temas ja foram
-    // desbloqueados (modo de escolha livre, pedido do usuario: "pode
-    // arrastar pro lado pra usar o bioma que quiser"). Nesse modo, o
-    // jogador ESCOLHE de proposito um tema diferente do "oficial" do
-    // estagio (ex.: esta nas Montanhas mas arrasta pra ver o Deserto) --
-    // isso e a ESCOLHA dele, nao uma desatualizacao pra "curar". Sem essa
-    // trava, todo swipe pra outro tema virava mismatch -> viajarParaTemaEstagio()
-    // de novo -> cerimonia reabrindo. So faz sentido auto-corrigir
-    // ENQUANTO ainda ha progressao guiada (nem todos os temas liberados).
-    const todosOsTemasDesbloqueados = TEMAS_ARENA.every(temaArenaDesbloqueado);
-    if (!todosOsTemasDesbloqueados && temaEsperado && temaArenaDesbloqueado(temaEsperado) && temaArenaSalvo() !== temaEsperado.id){
-      debugEstagio('renderTemaArena() detectou tema desatualizado -- chamando viajarParaTemaEstagio() (com cerimonia) em vez de so persistir silencioso');
+    // BUG CORRIGIDO DUAS VEZES (relatado pelo usuario): v1 comparava
+    // temaArenaSalvo() com o tema "oficial" do estagio -- quebrava no
+    // swipe manual depois de tudo desbloqueado (reabria a cerimonia
+    // sempre). v2 tentou consertar com "todosOsTemasDesbloqueados", mas
+    // isso tem um furo -- no EXATO instante em que o ultimo estagio e
+    // alcancado, "todos desbloqueados" ja vira verdade junto, entao a
+    // cerimonia parou de aparecer ate a primeira vez. Fix definitivo:
+    // compara com estagioCerimoniaMostradaAte(), uma flag dedicada que
+    // so anda pra frente e nunca e afetada por qual tema esta sendo
+    // EXIBIDO no momento (isso e responsabilidade separada, do swipe).
+    const estagioReal = estagioAtual();
+    if (estagioReal > estagioCerimoniaMostradaAte()){
+      debugEstagio('renderTemaArena() detectou estagio ' + estagioReal + ' ainda nao celebrado -- chamando viajarParaTemaEstagio() (com cerimonia)');
       if (typeof viajarParaTemaEstagio === 'function'){
         viajarParaTemaEstagio();
         // sai cedo -- o resto desta funcao (mais abaixo) reseta
@@ -7384,15 +7410,17 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 
   function mostrarEstagioDesbloqueado(tema, aoFechar){
     // GUARD REDUNDANTE (defesa extra, alem da que ja existe no topo de
-    // viajarParaTemaEstagio()): pedido do usuario, com video mostrando a
-    // tela de "Estagio concluido" reabrindo sozinha em qualquer acao.
-    // Nao importa QUEM chamou mostrarEstagioDesbloqueado() nem porque --
-    // se o tema salvo ja e este tema, e um no-op, ponto final. Isso
-    // fecha a porta pra qualquer chamador futuro (ou bug ainda nao
-    // encontrado) que decida chamar essa funcao sem passar pela guarda
-    // de viajarParaTemaEstagio().
+    // viajarParaTemaEstagio()): se o tema salvo ja e este tema, e um
+    // no-op. Ainda assim marca a flag de cerimonia mostrada (ver
+    // estagioCerimoniaMostradaAte() acima) pra nao deixar o estado
+    // inconsistente -- sem isso, os gatilhos em verificarDesbloqueiosTemaArena()/
+    // renderTemaArena() ficariam tentando chamar isso pra sempre, sem
+    // nunca resolver (silencioso, mas desperdicio).
     if (typeof temaArenaSalvo === 'function' && temaArenaSalvo() === tema.id){
       debugEstagio('mostrarEstagioDesbloqueado: tema ja e ' + tema.id + ' -- ignorando chamada (guard redundante)');
+      if (typeof estagioAtual === 'function' && typeof definirEstagioCerimoniaMostradaAte === 'function'){
+        definirEstagioCerimoniaMostradaAte(estagioAtual());
+      }
       if (typeof aoFechar === 'function') aoFechar();
       return;
     }
@@ -7408,8 +7436,16 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     // (renderTemaArena(), mais abaixo) continua adiada 350ms, que era o
     // motivo original de tirar isso da frente (nao pintar o fundo novo
     // antes da tela cheia cobrir a Arena).
+    //
+    // Junto disso, marca estagioCerimoniaMostradaAte() com o estagio
+    // ATUAL -- e esse o momento real e definitivo em que a cerimonia
+    // deste estagio foi mostrada. Daqui pra frente, nenhum gatilho (nem
+    // swipe manual do jogador) reabre isso de novo pra esse estagio.
     try {
       if (typeof definirTemaArenaSalvo === 'function') definirTemaArenaSalvo(tema.id);
+      if (typeof estagioAtual === 'function' && typeof definirEstagioCerimoniaMostradaAte === 'function'){
+        definirEstagioCerimoniaMostradaAte(estagioAtual());
+      }
     } catch(e){
       debugEstagio('ERRO ao persistir o tema (mostrarEstagioDesbloqueado): ' + (e && e.message));
     }

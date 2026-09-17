@@ -22,6 +22,14 @@
     --sel-bg:#342A50;
     --poco:#1F1930;
     --xp2:#F2C94C;
+    /* curvas de animacao (pedido do usuario -- animacoes "premium" tipo
+       v0/Framer Motion). --expo: desacelera rapido, sem overshoot -- pra
+       coisas de tela cheia onde "passar do ponto" mostraria fundo (slides,
+       largura de barra). --spring-curve: overshoot leve tipo mola, pra
+       elementos pequenos/contidos (cards entrando, popups, pills). Nao
+       varia por tema, entao fica so aqui no :root base. */
+    --expo: cubic-bezier(.16,1,.3,1);
+    --spring-curve: cubic-bezier(.34,1.56,.64,1);
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{background:var(--bg);color:var(--text);font-family:'Outfit',system-ui,sans-serif;display:flex;justify-content:center;min-height:100vh;min-height:100dvh;padding:16px}
@@ -43,6 +51,36 @@
   .mob-sprite.dead svg{opacity:0;transform:translateY(14px) scale(.6) rotate(12deg)}
   .mob-sprite.fugiu svg{animation:fuga .55s ease-in forwards}
   .mob-sprite.espreita svg{opacity:.4;filter:grayscale(.5)}
+  /* v4.142 (pedido do usuario): .hit/.shake ja eram adicionadas pelo JS
+     (animarGolpe()) mas so o mob tinha efeito visual (flash de cor via
+     .mobimg, ver acima); nenhum dos dois tinha movimento de verdade.
+     Aditivo, nao mexe no filter existente nem no timing do JS (a classe
+     dura 200-320ms la, a animacao aqui cabe dentro disso). */
+  @keyframes spriteShake{
+    0%,100%{transform:translateX(0) rotate(0)}
+    25%{transform:translateX(-5px) rotate(-3deg)}
+    55%{transform:translateX(4px) rotate(2deg)}
+  }
+  /* v4.142-fix2 (pedido do usuario, print real): .hit no heroi e a
+     animacao de ATAQUE (heroi golpeando o monstro), nao de dano -- a
+     reacao real de dano do heroi ja existe e usa .ferido (flash branco
+     em .heroimg, ver acima). Shake tava na classe errada, fazendo
+     parecer que o heroi apanhava toda vez que ele que golpeava. Corrigido:
+     .hit vira um avanco curto (lunge), .shake continua so no monstro,
+     .ferido ganha o shake que faltava (acompanhando o flash existente). */
+  @keyframes heroLunge{
+    0%,100%{transform:translateX(0)}
+    50%{transform:translateX(6px)}
+  }
+  .hero-sprite.hit{animation:heroLunge .22s var(--expo)}
+  .hero-sprite.ferido{animation:spriteShake .2s var(--expo)}
+  @keyframes mobShakeForte{
+    0%,100%{transform:translateX(0) rotate(0)}
+    22%{transform:translateX(-9px) rotate(-6deg)}
+    50%{transform:translateX(7px) rotate(5deg)}
+    78%{transform:translateX(-3px) rotate(-2deg)}
+  }
+  .mob-sprite.shake{animation:mobShakeForte .2s var(--expo)}
   @keyframes fuga{
     0%{opacity:1;transform:none}
     25%{transform:translateX(6px) translateY(-4px)}
@@ -154,7 +192,16 @@
   .xplabel{font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;color:var(--muted)}
   .xpnum{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
   .bar{height:9px;background:var(--panel-2);border:1px solid var(--line);border-radius:3px;padding:2px}
-  .fill{height:100%;width:0%;background:linear-gradient(180deg,#7FCBF3,#3F9BD6);border-radius:2px;transition:width .45s cubic-bezier(.4,1.3,.5,1)}
+  .fill{height:100%;width:0%;background:linear-gradient(180deg,#7FCBF3,#3F9BD6);border-radius:2px;transition:width .45s cubic-bezier(.4,1.3,.5,1);position:relative;overflow:hidden}
+  /* v4.143 (pedido do usuario): shimmer continuo na barra de XP,
+     aditivo via ::after -- nao mexe no width/transition acima. */
+  .fill:not(.hpfill)::after{
+    content:'';position:absolute;inset:0;
+    background:linear-gradient(100deg,transparent 30%, rgba(255,255,255,.45) 45%, transparent 60%);
+    transform:translateX(-100%);animation:xpShimmer 2.4s ease-in-out infinite;
+  }
+  @keyframes xpShimmer{to{transform:translateX(220%)}}
+  @media (prefers-reduced-motion: reduce){ .fill::after{display:none} }
   /* #fill (barra de XP, nao a de Vida -- ver #hpfill, que fica com a
      transicao rapida padrao) sincronizada com animarContagemNumero()
      (script principal, 1100ms) -- ANTES herdava os mesmos .45s da
@@ -361,19 +408,33 @@
   .est-legitem{font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:7px}
   .est-legitem b{color:var(--text);font-weight:600;flex:none}
   .est-legbar{flex:1;height:4px;border-radius:2px;background:var(--panel-3);overflow:hidden;margin:0 2px}
-  .est-legbar i{display:block;height:100%;border-radius:2px;transition:width .4s}
+  .est-legbar i{display:block;height:100%;border-radius:2px;transition:width .5s var(--expo)}
   .est-dot{width:8px;height:8px;border-radius:2px;flex:none}
 
-  .toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);background:var(--accent);color:var(--bg);font-family:'Silkscreen',monospace;font-size:10px;padding:11px 18px;border-radius:8px;opacity:0;pointer-events:none;transition:all .3s;text-align:center;z-index:200}
+  .toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);background:var(--accent);color:var(--bg);font-family:'Silkscreen',monospace;font-size:10px;padding:11px 18px;border-radius:8px;opacity:0;pointer-events:none;transition:transform .32s var(--spring-curve), opacity .25s var(--expo);text-align:center;z-index:200}
   .toast.gold{background:var(--gold)}
-  .toast.fuga{background:var(--blood);color:#fff}
+  .toast.fuga{background:var(--perigo);color:#fff} /* --perigo, nao --blood: aviso importante, precisa se destacar mesmo no tema Grafite */
 
   /* boas-vindas */
-  .intro{position:fixed;inset:0;background:var(--bg);z-index:80;display:flex;justify-content:center;padding:20px;overflow-y:auto}
-  .intro.off{display:none}
+  .intro{position:fixed;inset:0;background:var(--bg);z-index:80;display:flex;justify-content:center;padding:20px;overflow-y:auto;
+    opacity:1;transition:opacity .3s var(--expo), visibility 0s;}
+  .intro.off{opacity:0;visibility:hidden;pointer-events:none;transition:opacity .3s var(--expo), visibility 0s .3s;}
   .card{width:100%;max-width:400px;display:flex;flex-direction:column;justify-content:center;gap:20px;padding:10px 4px 24px}
   .passo{display:none;flex-direction:column;gap:18px}
   .passo.on{display:flex}
+  /* v4.148 (pedido do usuario): mostrarPasso() so trocava display:none/flex
+     na hora, sem nenhuma animacao -- diferente do carrossel de marketing
+     (deslizar()), que ja tinha curva calibrada. Nao dava pra usar o mesmo
+     truque de opacity+visibility dos overlays fixos (.edov/.cfgOverlay)
+     aqui, porque .passo fica dentro do fluxo normal do .card (position
+     estatica) -- tirar o display:none faria os 4 passos ocuparem espaco
+     ao mesmo tempo. Em vez disso: entrada via keyframe de um tiro,
+     disparada em JS (ver mostrarPasso()), sem mexer no display/layout.*/
+  @keyframes passoIn{
+    from{opacity:0;transform:translateX(16px)}
+    to{opacity:1;transform:translateX(0)}
+  }
+  .passo.on.passoIn{animation:passoIn .32s var(--expo)}
   .marca{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
   .marca svg{width:80px;height:80px;image-rendering:pixelated}
   .titulo{font-family:'Silkscreen',monospace;font-size:20px;color:var(--accent);letter-spacing:1px}
@@ -401,6 +462,8 @@
     .nav{padding-bottom:max(0px, env(safe-area-inset-bottom))}
   }
     .debugbar{position:fixed;bottom:calc(72px + env(safe-area-inset-bottom));left:8px;display:flex;gap:5px;z-index:50}
+    .estagio-debug-panel{display:none;position:fixed;bottom:calc(72px + env(safe-area-inset-bottom) + 42px);left:8px;right:8px;max-height:170px;overflow-y:auto;z-index:50;background:rgba(0,0,0,.88);border:1px solid #4ADE80;border-radius:8px;padding:8px 10px;font-family:monospace;font-size:10px;color:#4ADE80;line-height:1.45;white-space:pre-wrap;word-break:break-word}
+    body.modo-debug .estagio-debug-panel{display:block}
   .debugbtn{background:rgba(29,34,43,.9);color:var(--dim);border:1px dashed var(--line);border-radius:6px;padding:4px 8px;font-family:'Outfit',sans-serif;font-size:10px;cursor:pointer}
   .debugbtn:hover{color:var(--text);border-color:var(--dim)}
   /* item: TOGGLE DEBUG (clique nas moedas) -- default escondido; body.modo-debug revela.
@@ -960,7 +1023,7 @@
   .iacts button{flex:1;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;padding:11px 6px;
                 border-radius:11px;border:1px solid var(--line);background:var(--poco);color:var(--muted);cursor:pointer}
   .iacts button.prim{background:var(--accent);border-color:var(--accent);color:var(--bg)}
-  .iacts button.danger{color:var(--blood)}
+  .iacts button.danger{color:var(--perigo)} /* --perigo, nao --blood: precisa continuar visivel no tema Grafite (acessibilidade, mesmo motivo do .cfgbtnfull.perigo) */
 
 /* ===== Bloco style #18 ===== */
 #viewLoja{padding:14px 14px 8px}
@@ -1161,9 +1224,17 @@
   /* overlay de Config -- mesmo padrao de histOverlay/grimOverlay, z-index
      um degrau abaixo (69 vs 70) de proposito: se o usuario abrir o
      Historico de dentro do Config, o Historico precisa pintar por cima. */
-  .cfgOverlay{position:fixed;inset:0;z-index:69;background:var(--bg);display:none;
-    flex-direction:column;overflow:hidden}
-  .cfgOverlay.on{display:flex}
+  /* v4.141 (pedido do usuario): mesma logica do .edov/.edsheet -- fechar
+     era display:none instantaneo, virou transition reversivel (fade +
+     leve slide). Beneficia os 7 usos de .cfgOverlay: Config, Heroi,
+     Aparencia, Preferencias, Idioma, Conquistas, Bestiario. */
+  .cfgOverlay{position:fixed;inset:0;z-index:69;background:var(--bg);
+    display:flex;flex-direction:column;overflow:hidden;
+    opacity:0;visibility:hidden;pointer-events:none;
+    transform:translateX(14px);
+    transition:opacity .24s var(--expo), transform .24s var(--expo), visibility 0s .24s;}
+  .cfgOverlay.on{opacity:1;visibility:visible;pointer-events:auto;transform:translateX(0);
+    transition:opacity .24s var(--expo), transform .24s var(--expo), visibility 0s;}
   .cfgovhead{display:flex;align-items:center;gap:10px;flex:none;
     padding:calc(14px + env(safe-area-inset-top)) 16px 10px;
     border-bottom:1px solid var(--line)}
@@ -1199,10 +1270,10 @@
      (.swch-bolinha) que desliza via transform quando .on entra. */
   .swch{width:46px;height:26px;flex:none;border-radius:999px;border:none;cursor:pointer;
         background:var(--line);padding:3px;display:flex;align-items:center;
-        transition:background .15s ease}
+        transition:background .22s var(--expo)}
   .swch.on{background:var(--accent)}
   .swch-bolinha{width:20px;height:20px;border-radius:50%;background:#FFF;
-        transition:transform .15s ease}
+        transition:transform .32s var(--spring-curve)}
   .swch.on .swch-bolinha{transform:translateX(20px)}
 
   .cfgcol .grade{margin:10px 0 0;grid-template-columns:repeat(4,1fr)}
@@ -1343,6 +1414,73 @@
   .lvlok{width:100%;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;
          padding:11px;border-radius:11px;border:none;background:var(--accent);
          color:var(--bg);cursor:pointer}
+
+  /* Tela cheia "Estagio Concluido" -- REESCRITO (pedido do usuario:
+     comparando com video de referencia de outro app, queria uma tela
+     cheia abrindo, nao um popup pequeno por cima da Arena). Cobre a
+     tela inteira (inclusive topbar), fundo solido (nao precisa mais do
+     .baubg escurecido nem do backdrop-blur -- e opaco por conta propria),
+     com o sprite do heroi centralizado. z-index bem alto (150) pra
+     garantir que fica acima de QUALQUER outro overlay. */
+  .estagio-tela{
+    position:fixed; inset:0; z-index:150;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px;
+    background:var(--bg); padding:24px; text-align:center;
+    opacity:0; pointer-events:none; transition:opacity .35s ease;
+  }
+  .estagio-tela.on{opacity:1; pointer-events:auto}
+  /* FIX (pedido do usuario): a animacao de entrada dos elementos (fade+
+     sobe) tocava sozinha assim que a tela abria, ANTES do usuario clicar
+     em qualquer coisa. Pedido foi: a animacao so deve tocar DEPOIS do
+     clique em "Continuar". Entao o conteudo agora aparece estatico junto
+     com o fade da propria tela (sem animacao propria nos elementos), e
+     quem anima e a SAIDA: ao clicar Continuar, a classe .estagio-tela-
+     saindo entra (ver fecharEstagioTelaCompleta() no script), fazendo a
+     tela encolher+sumir de vez (zoom leve + fade), no lugar do fade
+     simples de opacity que tinha antes -- essa e a animacao que agora
+     acontece depois do clique. */
+  .estagio-tela-titulo{
+    font-family:'Outfit',sans-serif; font-weight:700; font-size:22px; color:var(--text);
+  }
+  .estagio-tela-hero{
+    width:120px; height:120px; object-fit:contain; image-rendering:pixelated;
+    filter:drop-shadow(0 12px 18px rgba(0,0,0,.5));
+  }
+  /* Preview do bioma novo -- pedido revisado do usuario: voltou a
+     mostrar a imagem CHEIA do tema (tema.arte, a mesma arte de fundo da
+     Arena), nao mais a camada unica flutuante (tema.arteEstagio). Como
+     agora e um retangulo cheio (nao uma silhueta com fundo transparente
+     tipo a montanha), volta a fazer sentido ter moldura: aspect-ratio
+     16:9 + object-fit:cover pra recortar certinho, cantos arredondados
+     e sombra. Temas sem arte propria (Padrao) nunca chegam aqui -- a
+     ceremonia so roda pra Deserto/Floresta/Montanhas. */
+  .estagio-tela-preview{
+    width:min(280px, calc(100% - 48px)); aspect-ratio:16/9; object-fit:cover;
+    border-radius:14px; box-shadow:0 10px 24px -8px rgba(0,0,0,.55);
+    image-rendering:pixelated;
+  }
+  .estagio-tela-sub{
+    display:flex; align-items:center; gap:8px;
+    font-family:'Silkscreen',monospace; font-size:12px; color:var(--dim); letter-spacing:.04em;
+  }
+  .estagio-tela-sub-flag{font-size:14px}
+  /* Mensagem extra (pedido do usuario) so quando o ULTIMO tema (hoje
+     Montanhas) e concluido -- avisa que a partir dai todos os biomas
+     ja podem ser escolhidos livremente arrastando a Arena. */
+  .estagio-tela-todos{
+    max-width:260px; text-align:center; font-family:'Outfit',sans-serif; font-size:13px;
+    color:var(--text); background:color-mix(in srgb, var(--accent) 18%, transparent);
+    border:1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+    border-radius:12px; padding:10px 14px; line-height:1.4;
+  }
+  .estagio-tela-continuar{
+    margin-top:8px; padding:13px 38px; border:none; border-radius:12px; cursor:pointer;
+    background:var(--accent); color:var(--bg); font-family:'Outfit',sans-serif; font-weight:600; font-size:14px;
+  }
+  .estagio-tela.estagio-tela-saindo{
+    transition:opacity .38s ease, transform .38s cubic-bezier(.4,0,.7,.3);
+    transform:scale(.92); opacity:0;
+  }
 
   .quedapop{position:fixed;left:50%;top:50%;z-index:96;
             transform:translate(-50%,-50%) scale(.9);opacity:0;pointer-events:none;
@@ -2119,13 +2257,25 @@
   .task .tinfo{cursor:pointer}
 
   /* --- folha do editor --- */
+  /* v4.140 (pedido do usuario): abrir ja tinha animacao (@keyframes edsobe,
+     mantido abaixo so por historico -- nao e mais usado), fechar era
+     display:none instantaneo. Trocado animation (one-shot, nao reversivel)
+     por transition (reversivel de graca): fechar agora desliza pra baixo
+     e o backdrop faz fade, sem tocar em nenhum JS -- os 5 lugares que
+     reaproveitam .edov/.edsheet (Nova tarefa, Editar tarefa, Estatisticas,
+     Renomear, confirmacao de exclusao) ganham o fechar animado juntos. */
   .edov{
     position:fixed; inset:0; z-index:80;
     background:rgba(10,7,18,.68);
     backdrop-filter:blur(3px);
-    display:none; align-items:flex-end; justify-content:center;
+    display:flex; align-items:flex-end; justify-content:center;
+    opacity:0; visibility:hidden; pointer-events:none;
+    transition:opacity .22s var(--expo), visibility 0s .22s;
   }
-  .edov.on{display:flex}
+  .edov.on{
+    opacity:1; visibility:visible; pointer-events:auto;
+    transition:opacity .22s var(--expo), visibility 0s;
+  }
 
   .edsheet{
     position:relative;
@@ -2134,9 +2284,11 @@
     border-radius:20px 20px 0 0;
     padding:8px 16px calc(18px + env(safe-area-inset-bottom));
     max-height:88vh; overflow-y:auto;
-    animation:edsobe .22s cubic-bezier(.2,.9,.3,1);
+    transform:translateY(100%);
+    transition:transform .28s var(--expo);
   }
-  @keyframes edsobe{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  .edov.on .edsheet{ transform:translateY(0); }
+  @keyframes edsobe{from{transform:translateY(100%)}to{transform:translateY(0)}} /* nao usado mais, mantido por historico */
 
   .edpuxador{width:38px;height:4px;border-radius:2px;background:var(--line);margin:6px auto 14px}
 
@@ -2346,9 +2498,17 @@
   /* overlay de Config -- mesmo padrao de histOverlay/grimOverlay, z-index
      um degrau abaixo (69 vs 70) de proposito: se o usuario abrir o
      Historico de dentro do Config, o Historico precisa pintar por cima. */
-  .cfgOverlay{position:fixed;inset:0;z-index:69;background:var(--bg);display:none;
-    flex-direction:column;overflow:hidden}
-  .cfgOverlay.on{display:flex}
+  /* v4.141 (pedido do usuario): mesma logica do .edov/.edsheet -- fechar
+     era display:none instantaneo, virou transition reversivel (fade +
+     leve slide). Beneficia os 7 usos de .cfgOverlay: Config, Heroi,
+     Aparencia, Preferencias, Idioma, Conquistas, Bestiario. */
+  .cfgOverlay{position:fixed;inset:0;z-index:69;background:var(--bg);
+    display:flex;flex-direction:column;overflow:hidden;
+    opacity:0;visibility:hidden;pointer-events:none;
+    transform:translateX(14px);
+    transition:opacity .24s var(--expo), transform .24s var(--expo), visibility 0s .24s;}
+  .cfgOverlay.on{opacity:1;visibility:visible;pointer-events:auto;transform:translateX(0);
+    transition:opacity .24s var(--expo), transform .24s var(--expo), visibility 0s;}
   .cfgovhead{display:flex;align-items:center;gap:10px;flex:none;
     padding:calc(14px + env(safe-area-inset-top)) 16px 10px;
     border-bottom:1px solid var(--line)}
@@ -2384,10 +2544,10 @@
      (.swch-bolinha) que desliza via transform quando .on entra. */
   .swch{width:46px;height:26px;flex:none;border-radius:999px;border:none;cursor:pointer;
         background:var(--line);padding:3px;display:flex;align-items:center;
-        transition:background .15s ease}
+        transition:background .22s var(--expo)}
   .swch.on{background:var(--accent)}
   .swch-bolinha{width:20px;height:20px;border-radius:50%;background:#FFF;
-        transition:transform .15s ease}
+        transition:transform .32s var(--spring-curve)}
   .swch.on .swch-bolinha{transform:translateX(20px)}
 
   .cfgcol .grade{margin:10px 0 0;grid-template-columns:repeat(4,1fr)}
@@ -2515,6 +2675,73 @@
   .lvlok{width:100%;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;
          padding:11px;border-radius:11px;border:none;background:var(--accent);
          color:var(--bg);cursor:pointer}
+
+  /* Tela cheia "Estagio Concluido" -- REESCRITO (pedido do usuario:
+     comparando com video de referencia de outro app, queria uma tela
+     cheia abrindo, nao um popup pequeno por cima da Arena). Cobre a
+     tela inteira (inclusive topbar), fundo solido (nao precisa mais do
+     .baubg escurecido nem do backdrop-blur -- e opaco por conta propria),
+     com o sprite do heroi centralizado. z-index bem alto (150) pra
+     garantir que fica acima de QUALQUER outro overlay. */
+  .estagio-tela{
+    position:fixed; inset:0; z-index:150;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px;
+    background:var(--bg); padding:24px; text-align:center;
+    opacity:0; pointer-events:none; transition:opacity .35s ease;
+  }
+  .estagio-tela.on{opacity:1; pointer-events:auto}
+  /* FIX (pedido do usuario): a animacao de entrada dos elementos (fade+
+     sobe) tocava sozinha assim que a tela abria, ANTES do usuario clicar
+     em qualquer coisa. Pedido foi: a animacao so deve tocar DEPOIS do
+     clique em "Continuar". Entao o conteudo agora aparece estatico junto
+     com o fade da propria tela (sem animacao propria nos elementos), e
+     quem anima e a SAIDA: ao clicar Continuar, a classe .estagio-tela-
+     saindo entra (ver fecharEstagioTelaCompleta() no script), fazendo a
+     tela encolher+sumir de vez (zoom leve + fade), no lugar do fade
+     simples de opacity que tinha antes -- essa e a animacao que agora
+     acontece depois do clique. */
+  .estagio-tela-titulo{
+    font-family:'Outfit',sans-serif; font-weight:700; font-size:22px; color:var(--text);
+  }
+  .estagio-tela-hero{
+    width:120px; height:120px; object-fit:contain; image-rendering:pixelated;
+    filter:drop-shadow(0 12px 18px rgba(0,0,0,.5));
+  }
+  /* Preview do bioma novo -- pedido revisado do usuario: voltou a
+     mostrar a imagem CHEIA do tema (tema.arte, a mesma arte de fundo da
+     Arena), nao mais a camada unica flutuante (tema.arteEstagio). Como
+     agora e um retangulo cheio (nao uma silhueta com fundo transparente
+     tipo a montanha), volta a fazer sentido ter moldura: aspect-ratio
+     16:9 + object-fit:cover pra recortar certinho, cantos arredondados
+     e sombra. Temas sem arte propria (Padrao) nunca chegam aqui -- a
+     ceremonia so roda pra Deserto/Floresta/Montanhas. */
+  .estagio-tela-preview{
+    width:min(280px, calc(100% - 48px)); aspect-ratio:16/9; object-fit:cover;
+    border-radius:14px; box-shadow:0 10px 24px -8px rgba(0,0,0,.55);
+    image-rendering:pixelated;
+  }
+  .estagio-tela-sub{
+    display:flex; align-items:center; gap:8px;
+    font-family:'Silkscreen',monospace; font-size:12px; color:var(--dim); letter-spacing:.04em;
+  }
+  .estagio-tela-sub-flag{font-size:14px}
+  /* Mensagem extra (pedido do usuario) so quando o ULTIMO tema (hoje
+     Montanhas) e concluido -- avisa que a partir dai todos os biomas
+     ja podem ser escolhidos livremente arrastando a Arena. */
+  .estagio-tela-todos{
+    max-width:260px; text-align:center; font-family:'Outfit',sans-serif; font-size:13px;
+    color:var(--text); background:color-mix(in srgb, var(--accent) 18%, transparent);
+    border:1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+    border-radius:12px; padding:10px 14px; line-height:1.4;
+  }
+  .estagio-tela-continuar{
+    margin-top:8px; padding:13px 38px; border:none; border-radius:12px; cursor:pointer;
+    background:var(--accent); color:var(--bg); font-family:'Outfit',sans-serif; font-weight:600; font-size:14px;
+  }
+  .estagio-tela.estagio-tela-saindo{
+    transition:opacity .38s ease, transform .38s cubic-bezier(.4,0,.7,.3);
+    transform:scale(.92); opacity:0;
+  }
 
   .quedapop{position:fixed;left:50%;top:50%;z-index:96;
             transform:translate(-50%,-50%) scale(.9);opacity:0;pointer-events:none;
@@ -3063,16 +3290,23 @@
   display:flex;
   align-items:center;
   gap:12px;
-  padding:13px 2px;
+  padding:16px 2px;
+  background:transparent;
+  border:none;
+  border-radius:0;
+  margin-bottom:0;
+  border-bottom:1px solid var(--line);
+  min-height:48px;
 }
+.cfgOverlay .cfgrow:last-child{ border-bottom:none }
 .cfgOverlay .cfgrow.cfgcol{
   align-items:flex-start;
   flex-direction:column;
 }
 .cfgOverlay .cfgicone{
-  flex:0 0 34px;
-  width:34px;
-  height:34px;
+  flex:0 0 40px;
+  width:40px;
+  height:40px;
   border-radius:50%;
   background:rgba(255,255,255,.07);
   display:flex;
@@ -3080,11 +3314,11 @@
   justify-content:center;
   color:var(--gold, #d4af37);
 }
-.cfgOverlay .cfgicone svg{ width:18px; height:18px; }
+.cfgOverlay .cfgicone svg{ width:22px; height:22px; }
 .cfgOverlay .cfgtxt{ flex:1; min-width:0; }
 .cfgOverlay .cfgtxt b{
   display:block;
-  font-size:15px;
+  font-size:16px;
   font-weight:600;
   line-height:1.2;
 }
@@ -3097,6 +3331,63 @@
   overflow:hidden;
   text-overflow:ellipsis;
 }
+
+/* --- Módulo style #23 --- */
+/* Linhas de 1 linha só (Herói/Aparência/Preferências/Idioma): valor atual
+   mostrado a direita, antes da seta, em vez de subtitulo empilhado --
+   padrao "one-line list item, trailing supporting text" do Material.
+   Isso deixa a linha com ~56px de altura (so o <b>, sem <span> dentro de
+   .cfgtxt) em vez dos ~72px das linhas que ainda tem subtitulo real
+   (Conta/Apagar dados/Feedback, que carregam status/aviso importante). */
+.cfgOverlay .cfgval{
+  flex:none;
+  font-size:13px;
+  color:var(--dim);
+  margin-right:2px;
+  max-width:120px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+/* Sair/Apagar tudo saíram de dentro das linhas (eram pilula de 12px) e
+   viraram CTA full-width no rodape do Config -- pedido do usuario
+   comparando com o destaque que o concorrente da pra essas acoes.
+   Mesma logica de oculto/perigo de antes, so o container mudou. */
+.zonarisco{
+  margin-top:24px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.cfgbtnfull{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  width:100%;
+  padding:14px;
+  border-radius:999px;
+  font-family:'Outfit',sans-serif;
+  font-size:15px;
+  font-weight:600;
+  cursor:pointer;
+  background:transparent;
+  border:1.5px solid var(--line);
+  color:var(--text);
+}
+.cfgbtnfull svg{ width:18px; height:18px; flex:none; }
+.cfgbtnfull:active{ background:rgba(255,255,255,.06); }
+/* Acessibilidade (pedido do usuario): --blood e zerado pro cinza no tema
+   Grafite (grayscale por decisao de design). Pra acoes destrutivas
+   importantes, isso apaga o unico sinal visual de "cuidado". Mesma logica
+   ja usada pelo .est-compartilharBtn (excecao documentada acima) --
+   var(--perigo)/var(--perigo2) NUNCA sao sobrescritas por nenhum tema
+   (ver :root, sao usadas em vida critica/calendario de falta/erro de
+   form), entao usamos elas aqui em vez de --blood. */
+.cfgbtnfull.perigo{ border-color:var(--perigo); color:var(--perigo); }
+.cfgbtnfull.perigo:active{ background:rgba(244,87,129,.12); }
+
 .cfgOverlay .edsec{
   font-size:11px;
   font-weight:700;
@@ -3685,6 +3976,34 @@
   background:rgba(255,255,255,.35);
 }
 .tema-arena-dot-atual{ background:rgba(255,255,255,.9); }
+
+/* Indicador de Estagio -- REDESIGN (pedido do usuario: "nao ta combinando
+   com o estilo do resto do app" / "nao tem barra de XP nem nada"). A v1
+   so recolori o pill pra bater com o Nivel (badge solido), mas um pill
+   de IDENTIDADE (Nivel) e um indicador de PROGRESSO (Estagio) sao coisas
+   diferentes -- a peca certa pra copiar era a barra de Experiencia
+   (.xpwrap/.bar/.fill), que e o padrao visual REAL de progresso no app:
+   fundo neutro (var(--panel-2)), trilho escuro translucido e
+   preenchimento em gradiente accent->xp2. Agora usa exatamente os
+   mesmos tokens/gradiente, so num pacote mais compacto pra caber no
+   meio da topbar. */
+.estagio-pill-wrap{
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+  align-self:center;
+  flex:1; min-width:0; margin:0 8px;
+}
+.estagio-pill{
+  display:flex; align-items:center; gap:5px;
+  background:var(--panel-2); border-radius:999px; padding:4px 12px;
+  font-family:'Outfit',sans-serif; font-weight:600; font-size:10.5px;
+  color:var(--text); white-space:nowrap; max-width:100%; overflow:hidden; text-overflow:ellipsis;
+}
+.estagio-pill-num{ font-size:9.5px; font-weight:500; color:var(--muted); flex:none; }
+.estagio-pill-trilho{
+  width:100%; max-width:110px; height:6px; border-radius:3px;
+  background:rgba(0,0,0,.32); overflow:hidden;
+}
+.estagio-pill-fill{ height:100%; border-radius:3px; background:linear-gradient(90deg,var(--accent),var(--xp2)); transition:width .4s ease; }
 
 /* ======================================================================
    POOF DE DERROTA DO MONSTRO -- nuvem de fumaca (4 frames, pixel art

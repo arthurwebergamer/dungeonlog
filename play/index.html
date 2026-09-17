@@ -178,6 +178,13 @@
 
   <div class="topbar">
     <span class="lvl" id="lvl">Nível I</span>
+    <div class="estagio-pill-wrap" id="estagioPillWrap">
+      <div class="estagio-pill" id="estagioPill">
+        <span class="estagio-pill-lbl" id="estagioTopoLbl">Estágio 1</span>
+        <span class="estagio-pill-num" id="estagioTopoNum"></span>
+      </div>
+      <div class="estagio-pill-trilho"><div class="estagio-pill-fill" id="estagioTopoFill"></div></div>
+    </div>
     <span class="coins">
       <svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="5" y="2" width="6" height="1" fill="#F2C94C"/><rect x="3" y="3" width="10" height="2" fill="#F2C94C"/><rect x="2" y="5" width="12" height="6" fill="#F2C94C"/><rect x="3" y="11" width="10" height="2" fill="#F2C94C"/><rect x="5" y="13" width="6" height="1" fill="#F2C94C"/><rect x="6" y="5" width="2" height="6" fill="#B8942E"/></svg>
       <span id="coinnum">0</span>
@@ -195,7 +202,7 @@
     <div class="tema-arena-dots" id="temaArenaDots"></div>
     <div class="tema-arena-bloqueio" id="temaArenaBloqueio">
       <img class="tema-arena-cadeado-img" src="data:image/png;base64,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" alt="">
-      <span id="temaArenaBloqueioTexto">Desbloqueie na versão Premium</span>
+      <span id="temaArenaBloqueioTexto">Chegue no próximo Estágio pra desbloquear</span>
     </div>
     <div class="fight">
       <div class="fighter">
@@ -538,7 +545,6 @@
           <b data-i18n="cfg.conta">Conta</b>
           <span id="cfgContaInfo">Jogando sem conta</span>
         </div>
-        <button class="cfgbtn perigo oculto" id="cfgSairBtn" data-i18n="cfg.sair">Sair</button>
         <button class="cfgbtn" id="cfgEntrarBtn" data-i18n="cfg.criarConta">Criar conta</button>
       </div>
 
@@ -548,7 +554,6 @@
           <b data-i18n="cfg.apagarDados">Apagar dados</b>
           <span data-i18n="cfg.apagarDadosDesc">Zera nível, moedas, itens e vida. Não tem volta.</span>
         </div>
-        <button class="cfgbtn perigo" id="zerarbtn" data-i18n="cfg.apagarTudo">Apagar tudo</button>
       </div>
 
       <div class="edsec" data-i18n="cfg.app">App</div>
@@ -562,8 +567,8 @@
         <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 3.5l6 6L9 21H3v-6z"/></svg></span>
         <div class="cfgtxt">
           <b data-i18n="cfg.heroi">Herói</b>
-          <span id="cfgHeroiResumo">Aventureiro</span>
         </div>
+        <span class="cfgval" id="cfgHeroiResumo">Aventureiro</span>
         <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
       </div>
 
@@ -571,8 +576,8 @@
         <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a9 9 0 1 1 0-18c4.97 0 9 3.5 9 7.5 0 2-1.5 3-3 3h-2a2 2 0 0 0-1.5 3.2c.3.4.5.9.5 1.3 0 1.6-1.3 3-3 3z"/><circle cx="7.5" cy="10.5" r="1.2" fill="currentColor"/><circle cx="12" cy="7.5" r="1.2" fill="currentColor"/><circle cx="16.5" cy="10.5" r="1.2" fill="currentColor"/></svg></span>
         <div class="cfgtxt">
           <b data-i18n="cfg.aparencia">Aparência</b>
-          <span id="cfgAparenciaResumo">Grafite</span>
         </div>
+        <span class="cfgval" id="cfgAparenciaResumo">Grafite</span>
         <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
       </div>
 
@@ -580,8 +585,8 @@
         <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h14M22 18h0"/><circle cx="14" cy="6" r="2"/><circle cx="7" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></span>
         <div class="cfgtxt">
           <b data-i18n="cfg.preferencias">Preferências</b>
-          <span id="cfgPrefsResumo">Vibrar</span>
         </div>
+        <span class="cfgval" id="cfgPrefsResumo">Vibrar</span>
         <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
       </div>
 
@@ -591,6 +596,25 @@
            Duplicava a mesma função por dois caminhos diferentes. A função
            abrirHistorico() e o overlay #histOverlay não mudaram em nada --
            só esse atalho extra saiu. -->
+
+      <!-- Zona de risco (pedido do usuário, comparando com concorrente):
+           Sair e Apagar tudo saíram de dentro das linhas Conta/Apagar
+           dados (onde eram pílula de 12px) e viraram botão full-width
+           aqui embaixo, mesmo peso visual do padrão "danger zone" de
+           apps de referência. MESMOS id (cfgSairBtn/zerarbtn) e MESMAS
+           classes de estado (oculto) das versões antigas -- só mudou de
+           lugar no HTML, nenhum JS foi tocado (ver blocos "PERFIL — SUB-
+           ABAS" e a IIFE de Conta, ambos usam getElementById puro). -->
+      <div class="zonarisco">
+        <button class="cfgbtnfull perigo oculto" id="cfgSairBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span data-i18n="cfg.sair">Sair</span>
+        </button>
+        <button class="cfgbtnfull perigo" id="zerarbtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          <span data-i18n="cfg.apagarTudo">Apagar tudo</span>
+        </button>
+      </div>
     </div>
   </div>
 
@@ -665,8 +689,8 @@
         <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.7-3.8-9s1.3-6.4 3.8-9z"/></svg></span>
         <div class="cfgtxt">
           <b data-i18n="cfg.idioma">Idioma</b>
-          <span id="cfgIdiomaResumo">🇧🇷 Português</span>
         </div>
+        <span class="cfgval" id="cfgIdiomaResumo">🇧🇷 Português</span>
         <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
       </div>
 
@@ -1212,7 +1236,8 @@
 })();
 </script>
 
-<div class="debugbar"><button class="debugbtn" id="debugbtn">próximo dia →</button><button class="debugbtn" id="pularTutoriaisBtn">pular tutorial</button><button class="debugbtn" id="debugArmasBtn">+ todas armas</button></div>
+<div class="debugbar"><button class="debugbtn" id="debugbtn">próximo dia →</button><button class="debugbtn" id="pularTutoriaisBtn">pular tutorial</button><button class="debugbtn" id="debugArmasBtn">+ todas armas</button><button class="debugbtn" id="debugEstagioBtn">forçar estágio</button></div>
+<div id="estagioDebugPanel" class="estagio-debug-panel"></div>
 <div class="toast" id="toast"></div>
 
 <script src="assets.js"></script>
@@ -1974,7 +1999,9 @@ function diasCorridos(){
 }
 
 function monstroDoDia(){
-  const i = (diasCorridos() + semente) % MONSTROS.length;
+  const pool = (typeof poolMonstrosFiltrado === 'function') ? poolMonstrosFiltrado() : MONSTROS.map((m, i) => i);
+  const n = pool.length || MONSTROS.length;
+  const i = pool.length ? pool[(diasCorridos() + semente) % n] : (diasCorridos() + semente) % MONSTROS.length;
   return MONSTROS[i];
 }
 
@@ -1982,8 +2009,10 @@ function monstroDoDia(){
 // de "hoje" -- usado pro pop-up de tarefas perdidas mostrar o monstro do
 // DIA QUE VIROU (ultimoDia em verificarVirada()), nao o de hoje.
 function monstroDoDiaEm(iso){
-  const i = ((diasCorridos() + diffDias(iso, isoAtual()) + semente) % MONSTROS.length + MONSTROS.length) % MONSTROS.length;
-  return MONSTROS[i];
+  const pool = (typeof poolMonstrosFiltrado === 'function') ? poolMonstrosFiltrado() : MONSTROS.map((m, i) => i);
+  const n = pool.length || MONSTROS.length;
+  const idx = ((diasCorridos() + diffDias(iso, isoAtual()) + semente) % n + n) % n;
+  return MONSTROS[pool.length ? pool[idx] : idx];
 }
 
 function desenharMonstro(){
@@ -1999,6 +2028,127 @@ function desenharMonstro(){
 // a classe e persiste a escolha. Persistencia por CONTA (chaveConta()),
 // nao por aparelho -- ver comentario em CHAVE_TEMA_ARENA. ----------
 const CHAVE_TEMA_ARENA = 'questlog.temaArena.v1';
+
+// ---------- SISTEMA DE ESTAGIOS ----------
+// 4 estagios = os 4 TEMAS_ARENA, na mesma ordem (padrao/deserto/floresta/
+// montanhas = estagio 1/2/3/4). Avanca sozinho conforme totalTarefasConcluidas()
+// (contador lifetime que ja existia, reaproveitado -- ver Estatisticas
+// "Desde o inicio"). LIMIARES_ESTAGIO[i] = total de tarefas pra cruzar do
+// estagio (i+1) pro (i+2) -- 3 valores pra 4 estagios (3 cortes).
+// Curva de dobro em dobro (pedido do usuario, revisado): primeiro corte
+// pede 10 tarefas, e cada corte seguinte pede o DOBRO de tarefas A MAIS
+// que o anterior -- deltas 10 -> +20 -> +40 (mesma convencao de delta do
+// design original, so que agora exatamente em dobro). Cumulativo:
+// 10, 30, 70. Antes era 30/90/200 (+60/+110, crescente mas nao em dobro).
+// ATENCAO: esses 3 valores tem que ficar EXATAMENTE iguais aos
+// desbloqueioGratis.valor de deserto/floresta/montanhas em assets.js
+// (TEMAS_ARENA) -- ja causou um bug real por ficarem dessincronizados
+// (ver aviso espelhado la).
+const LIMIARES_ESTAGIO = [10, 30, 70];
+
+function estagioAtual(){
+  const total = (typeof window.totalTarefasConcluidas === 'function') ? window.totalTarefasConcluidas() : 0;
+  let estagio = 1;
+  for (let i = 0; i < LIMIARES_ESTAGIO.length; i++){
+    if (total >= LIMIARES_ESTAGIO[i]) estagio = i + 2; else break;
+  }
+  return estagio; // 1 a 4
+}
+window.estagioAtual = estagioAtual;
+
+// 0 a 1 -- quanto falta pro PROXIMO estagio. No estagio 4 (ultimo, sem
+// proxima meta) retorna 1 (barra cheia) -- ver renderEstagioBar().
+function progressoEstagio(){
+  const total = (typeof window.totalTarefasConcluidas === 'function') ? window.totalTarefasConcluidas() : 0;
+  const estagio = estagioAtual();
+  if (estagio >= 4) return 1;
+  const inicio = estagio === 1 ? 0 : LIMIARES_ESTAGIO[estagio - 2];
+  const alvo = LIMIARES_ESTAGIO[estagio - 1];
+  if (alvo === inicio) return 1;
+  return Math.max(0, Math.min(1, (total - inicio) / (alvo - inicio)));
+}
+window.progressoEstagio = progressoEstagio;
+
+// bioma (id de TEMAS_ARENA) correspondente a um numero de estagio (1-4).
+// A ordem de TEMAS_ARENA FOI DEFINIDA pra bater com a trilha de estagio --
+// se a ordem da lista mudar um dia, isso quebra junto (de proposito, pra
+// nao ter 2 fontes de verdade pra mesma ordem).
+function biomaDoEstagio(estagio){
+  const tema = (typeof TEMAS_ARENA !== 'undefined') ? TEMAS_ARENA[estagio - 1] : null;
+  return tema ? tema.id : null;
+}
+window.biomaDoEstagio = biomaDoEstagio;
+
+// Pool de INDICES de MONSTROS disponiveis no bioma do estagio ATUAL --
+// genericos (sem tag de bioma) + os marcados com o bioma do estagio.
+// FONTE UNICA DE VERDADE pro sorteio -- monstroDoDia(), monstroDoDiaEm()
+// e monstroIdDoDia() (Historico) usam TODOS esta mesma funcao.
+//
+// BUG CORRIGIDO (relatado pelo usuario, print: "Criatura cogumelo" --
+// exclusiva da Floresta -- aparecendo no Estagio 2/Deserto): a 1a versao
+// do Sistema de Estagios so filtrou monstroIdDoDia() (usada so pelo
+// Historico de Estatisticas). monstroDoDia() -- a funcao que de fato
+// escolhe o monstro desenhado na Arena (via desenharMonstro()) -- e uma
+// implementacao SEPARADA e continuava sorteando entre os 63 sem filtro
+// nenhum. Consolidado aqui pra nunca mais divergir.
+function poolMonstrosFiltrado(){
+  if (typeof MONSTROS === 'undefined') return [];
+  // BUG CORRIGIDO (relatado pelo usuario: monstro de Montanhas/gelo
+  // aparecendo no Deserto depois de desbloquear o modo de escolha
+  // livre): antes filtrava pelo bioma do ESTAGIO NUMERICO
+  // (biomaDoEstagio(estagioAtual())) -- durante a progressao guiada isso
+  // sempre bate com o tema exibido (o self-heal garante), mas no modo
+  // livre o jogador pode estar VENDO um bioma diferente do estagio atual
+  // (ex.: estagioAtual()=4/Montanhas, mas arrastou pra ver o Deserto) --
+  // o sorteio continuava usando Montanhas, entao monstro de gelo caia no
+  // cenario de deserto. Fix: filtra pelo bioma REALMENTE exibido
+  // (temaArenaAtual(), que reflete temaArenaSalvo() -- a mesma fonte que
+  // o fundo da Arena usa), nao mais pelo numero do estagio. Durante a
+  // progressao guiada isso da o mesmo resultado de antes (os dois
+  // sempre batem ate tudo desbloquear); a diferenca so aparece no modo
+  // livre, exatamente onde precisava.
+  const bioma = (typeof temaArenaAtual === 'function')
+    ? temaArenaAtual().id
+    : ((typeof biomaDoEstagio === 'function' && typeof estagioAtual === 'function') ? biomaDoEstagio(estagioAtual()) : null);
+  if (!bioma) return MONSTROS.map((m, i) => i);
+  return MONSTROS.reduce((acc, m, i) => { if (!m.bioma || m.bioma === bioma) acc.push(i); return acc; }, []);
+}
+window.poolMonstrosFiltrado = poolMonstrosFiltrado;
+
+// atualiza a barrinha "Estagio N" na topbar. Chamada dentro de render()
+// (mesmo lugar que atualiza #lvl), entao acompanha a mesma cadencia de
+// qualquer outro contador do topo.
+function renderEstagioBar(){
+  const lblEl = document.getElementById('estagioTopoLbl');
+  const fillEl = document.getElementById('estagioTopoFill');
+  const numEl = document.getElementById('estagioTopoNum');
+  if (!lblEl || !fillEl) return;
+  const emIngles = typeof idiomaApp === 'function' && idiomaApp() === 'en';
+  const estagio = estagioAtual();
+  const max = estagio >= 4; // ultimo estagio -- sem proxima meta, barra so fica cheia
+  lblEl.textContent = max
+    ? (emIngles ? 'Stage ' + estagio + ' · MAX' : 'Estágio ' + estagio + ' · MAX')
+    : (emIngles ? 'Stage ' + estagio : 'Estágio ' + estagio);
+  fillEl.style.width = Math.round(progressoEstagio() * 100) + '%';
+
+  // Contagem numerica (pedido do usuario: mostrar o numero na barra, tipo
+  // "7/10") -- relativa ao corte do estagio ATUAL (quantas tarefas desde
+  // o inicio deste estagio / quantas faltam pro proximo), nao o total
+  // lifetime bruto -- mesma conta que progressoEstagio() ja faz por
+  // baixo dos panos, so exposta em numero em vez de so % da barra.
+  if (numEl){
+    if (max){
+      numEl.textContent = '';
+    } else {
+      const total = (typeof window.totalTarefasConcluidas === 'function') ? window.totalTarefasConcluidas() : 0;
+      const inicio = estagio === 1 ? 0 : LIMIARES_ESTAGIO[estagio - 2];
+      const alvo = LIMIARES_ESTAGIO[estagio - 1];
+      numEl.textContent = Math.max(0, Math.min(alvo - inicio, total - inicio)) + '/' + (alvo - inicio);
+    }
+  }
+}
+window.renderEstagioBar = renderEstagioBar;
+
 
 function assinaturaAtiva(){
   // FIX: o alternador real de modo debug (clicar no icone das moedas,
@@ -2032,96 +2182,133 @@ function marcarTemaDesbloqueado(id){
   return true;
 }
 
+// BUG CORRIGIDO (relatado pelo usuario: cerimonia reabrindo ao trocar de
+// tema manualmente, DEPOIS de todos desbloqueados -- E, na tentativa de
+// consertar isso, o oposto: a cerimonia parou de aparecer NA PRIMEIRA
+// VEZ que o ultimo estagio e alcancado, porque "todos desbloqueados"
+// vira verdade no EXATO mesmo instante em que a cerimonia deveria
+// disparar, entao a trava anterior bloqueava os dois casos ao mesmo
+// tempo). A causa raiz de tudo isso: usar temaArenaSalvo() (que muda
+// livremente com o swipe manual) como sinal de "a cerimonia ja foi
+// mostrada" nunca foi a comparacao certa -- sao dois conceitos
+// diferentes (qual tema esta sendo EXIBIDO agora vs. ate qual estagio a
+// cerimonia ja foi CELEBRADA). Flag dedicada, monotonica, que so anda
+// pra frente e nunca e afetada por swipe: reflete puramente "o jogador
+// ja viu a cerimonia do estagio N", nada mais.
+const CHAVE_ESTAGIO_CERIMONIA_MOSTRADA = 'questlog.estagioCerimoniaMostrada.v1';
+function estagioCerimoniaMostradaAte(){
+  try { return Number(localStorage.getItem(window.chaveConta(CHAVE_ESTAGIO_CERIMONIA_MOSTRADA))) || 1; }
+  catch(e){ return 1; }
+}
+function definirEstagioCerimoniaMostradaAte(n){
+  try { localStorage.setItem(window.chaveConta(CHAVE_ESTAGIO_CERIMONIA_MOSTRADA), String(n)); } catch(e){}
+}
+
 function temaArenaDesbloqueado(t){
   if (t.gratuito) return true;
   if (assinaturaAtiva()) return true;
+  // BUG CORRIGIDO (cadeado aparecia no tema mesmo com o Estagio ja
+  // alcancado -- print do usuario): antes, temas do tipo 'tarefasTotais'
+  // so eram considerados desbloqueados via temasDesbloqueadosSalvos(),
+  // uma flag persistida SEPARADA, marcada por marcarTemaDesbloqueado().
+  // Essa flag podia ficar fora de sincronia com o total real de tarefas
+  // (ex: sync da nuvem restaurando temaArena.v1 sem restaurar
+  // temasDesbloqueados.v1 no mesmo instante) -- resultado: estagioAtual()
+  // (calculado ao vivo) ja dizia Estagio 2, mas o cadeado do Deserto
+  // continuava aparecendo porque so aquela flag persistida era checada.
+  // Fix: pra esse tipo de desbloqueio, calcula direto da MESMA fonte que
+  // estagioAtual() usa (totalTarefasConcluidas()) -- nao depende mais de
+  // uma segunda flag que pode divergir. Monotonico (contador lifetime),
+  // entao continua "desbloqueado pra sempre" uma vez alcancado, sem
+  // nenhuma regressao de comportamento.
+  if (t.desbloqueioGratis && t.desbloqueioGratis.tipo === 'tarefasTotais'){
+    const total = (typeof window.totalTarefasConcluidas === 'function') ? window.totalTarefasConcluidas() : 0;
+    if (total >= t.desbloqueioGratis.valor) return true;
+  }
   if (t.desbloqueioGratis && temasDesbloqueadosSalvos().includes(t.id)) return true;
   return false;
 }
 
-// mesma logica de melhorSequenciaDeVitorias() do modulo Conquistas
-// (linha ~6648) -- duplicada aqui de proposito em vez de reaproveitada:
-// aquela funcao vive dentro da IIFE do modulo e nao esta exposta em
-// window, e e pequena/pura o suficiente (so depende de diffDias(), ja
-// global) pra nao valer a pena abrir aquele modulo so pra exportar 1
-// funcao. Se um dia divergir, e sinal de que precisa virar utilitario
-// global de verdade.
-//
-// FIX (bug reportado: desbloqueio acontecia no dia 6, nao no dia 5):
-// window.obterHistorico() so grava o resultado de um dia na VIRADA --
-// vencer HOJE nao aparece ali ate amanha. Mesmo problema que o modulo
-// Conquistas ja tinha resolvido com o padrao "comHoje" em
-// montarContexto() (linha ~6818): anexa uma entrada SINTETICA de hoje
-// (nunca persistida, recalculada a cada chamada) se monstroJaCaiu(),
-// pra o desbloqueio contar o dia atual na hora, nao 1 dia atrasado.
-function _melhorSequenciaParaTemaArena(){
-  if (typeof window.obterHistorico !== 'function' || typeof diffDias !== 'function') return 0;
-  let hist = window.obterHistorico();
-  if (typeof monstroJaCaiu === 'function' && monstroJaCaiu() &&
-      typeof isoAtual === 'function' && !hist.some(h => h.data === isoAtual())){
-    hist = hist.concat([{ data: isoAtual(), resultado: 'vitoria' }]);
-  }
-  const ord = hist.slice().sort((a, b) => a.data < b.data ? -1 : (a.data > b.data ? 1 : 0));
-  let atual = 0, melhor = 0, anterior = null;
-  ord.forEach(h => {
-    const seguidoDoAnterior = anterior !== null && diffDias(h.data, anterior) === 1;
-    if (h.resultado === 'vitoria'){
-      atual = seguidoDoAnterior ? atual + 1 : 1;
-      if (atual > melhor) melhor = atual;
-    } else {
-      atual = 0;
-    }
-    anterior = h.data;
-  });
-  return melhor;
-}
-
 // roda a cada render() (ver wrap no fim do arquivo) + 1x no boot.
-// Quando uma condicao de desbloqueio gratis e atingida pela 1a vez,
-// marca o tema como desbloqueado e deixa uma "dica pendente" salva --
-// ela dispara a espiada a proxima vez que a arena for exibida (ver
-// mostrarDicaSwipeArenaSeNecessario), em vez de tentar mostrar a
-// animacao no meio de um render qualquer.
+// Sistema de Estagios: verifica os 3 temas com desbloqueioGratis
+// (tipo 'tarefasTotais' -- unico tipo que existe agora) contra
+// totalTarefasConcluidas(). Marca TODOS os que ja foram alcancados
+// nesta passada ANTES de animar qualquer coisa -- ver motivo no
+// comentario dentro de viajarParaTemaEstagio().
+//
+// REMOVIDO: sistema antigo de desbloqueio por streak
+// (_melhorSequenciaParaTemaArena() + tipo:'streak') -- nenhum tema usa
+// mais isso, foi totalmente substituido pelo Sistema de Estagios
+// (tipo:'tarefasTotais'). Excluido de proposito, nao so desativado,
+// pra nao deixar codigo morto por aqui.
 function verificarDesbloqueiosTemaArena(){
+  let desbloqueouAlgumAgora = false;
   TEMAS_ARENA.forEach(t => {
-    if (!t.desbloqueioGratis) return;
+    if (!t.desbloqueioGratis || t.desbloqueioGratis.tipo !== 'tarefasTotais') return;
     if (temasDesbloqueadosSalvos().includes(t.id)) return;
-    let atingiu = false;
-    if (t.desbloqueioGratis.tipo === 'streak'){
-      atingiu = _melhorSequenciaParaTemaArena() >= t.desbloqueioGratis.valor;
-    }
-    if (atingiu && marcarTemaDesbloqueado(t.id)){
-      try { localStorage.setItem(window.chaveConta('questlog.temaArenaDicaPendente.v1'), t.id); } catch(e){}
-
-      // aviso visivel -- reaproveita o mesmo flutuante ja usado pra
-      // +XP/+moeda etc., ancorado na propria arena. Atrasado ~2.2s: o
-      // desbloqueio costuma coincidir com a virada do dia, que ja
-      // dispara +XP, possivel level up e a conquista "Pegando o Jeito"
-      // tudo de uma vez -- competir com esse monte de texto simultaneo
-      // (queixa do usuario: "nem da pra ler direito") deixando esse
-      // aviso pra depois, quando a poeira baixou, resolve sem precisar
-      // mexer nos outros sistemas de notificacao.
-      const emIngles = typeof idiomaApp === 'function' && idiomaApp() === 'en';
-      setTimeout(() => {
-        const arena = document.querySelector('.arena');
-        if (arena && typeof notificarFlutuante === 'function'){
-          notificarFlutuante(
-            arena,
-            emIngles ? 'New theme:' : 'Novo tema:',
-            emIngles ? t.nome_en : t.nome,
-            '#F2C94C'
-          );
-        }
-      }, 2200);
-
-      // dispara a dica JA -- verificarDesbloqueiosTemaArena() roda a
-      // cada render() (frequente), mas mostrarDicaSwipeArenaSeNecessario()
-      // antes so era chamada 1x no boot. Um desbloqueio no MEIO da
-      // sessao (ex: debug "proximo dia" repetido) nunca disparava a
-      // dica ate a pagina recarregar -- chamar aqui corrige isso.
-      if (typeof mostrarDicaSwipeArenaSeNecessario === 'function') mostrarDicaSwipeArenaSeNecessario();
-    }
+    const total = (typeof window.totalTarefasConcluidas === 'function') ? window.totalTarefasConcluidas() : 0;
+    if (total < t.desbloqueioGratis.valor) return;
+    if (!marcarTemaDesbloqueado(t.id)) return;
+    desbloqueouAlgumAgora = true;
+    // Aviso flutuante removido daqui -- substituido pelo popup de verdade
+    // (mostrarEstagioDesbloqueado(), enfileirado via viajarParaTemaEstagio()
+    // abaixo, mesma fila do Level Up/Bau). Pedido do usuario: queria um
+    // popup, nao so um texto pequeno passando rapido.
   });
+
+  // BUG CORRIGIDO (relatado pelo usuario: "nao funcionou, nao teve nem
+  // transicao nada"): a versao anterior chamava mudarTemaArena(1) DENTRO
+  // do forEach, uma vez por tema desbloqueado nesta mesma passada. Quem
+  // ja tinha tarefas acumuladas o suficiente pra cruzar 2+ limiares de
+  // uma vez (bem provavel character com bastante historico) desbloqueava
+  // os 3 temas no mesmo render() -- mas a 2a/3a chamada de
+  // mudarTemaArena(1) caia direto no "if (_arenaBgEmTransicao) return;"
+  // do topo da funcao (a 1a chamada ainda estava animando) e retornava
+  // SEM persistir o novo tema nem animar nada. Como marcarTemaDesbloqueado
+  // ja tinha marcado os 3 como desbloqueados, o proximo render() nunca
+  // tentava de novo (guarda "if (temasDesbloqueadosSalvos().includes(t.id))
+  // return;" no topo do forEach) -- a viagem ficava presa no meio do
+  // caminho pra sempre, sem erro nenhum no console.
+  //
+  // Fix: SEPARAR marcar de animar. O forEach acima so marca. Aqui, UMA
+  // unica vez por passada, calcula o estagio REAL (estagioAtual(), fonte
+  // da verdade) e viaja direto pra ele -- nao importa quantos limiares
+  // foram cruzados de uma vez.
+  //
+  // BUG CORRIGIDO (relatado pelo usuario: a tela de "Estagio concluido"
+  // reaparecendo sozinha em QUALQUER acao, nao so ao cruzar um limiar de
+  // verdade): a condicao antiga era so `desbloqueouAlgumAgora` -- ou
+  // seja, QUALQUER tema marcado nesta passada disparava a cerimonia pro
+  // estagio ATUAL (estagioAtual()-1), mesmo que esse estagio ja
+  // estivesse corretamente mostrado/salvo ha muito tempo. Isso reabria a
+  // cerimonia inteira sempre que um tema ANTIGO fosse marcado de forma
+  // atrasada/retroativa -- por exemplo, o Deserto tinha um bug (chave
+  // desbloqueioGratis duplicada em assets.js, ja corrigido) que
+  // impedia ele de ser marcado no momento certo; ao corrigir esse bug, o
+  // Deserto passou a ser marcado "atrasado" (retroativamente) em
+  // qualquer render() depois disso -- e cada marcacao retroativa dessas
+  // reabria a tela do estagio ATUAL (Montanhas), mesmo o jogador ja
+  // tendo visto essa cerimonia fazia tempo.
+  //
+  // BUG CORRIGIDO DE NOVO (relatado pelo usuario: cerimonia sumiu de vez
+  // depois da tentativa anterior): a trava "todosOsTemasDesbloqueados"
+  // tinha um furo -- no exato instante em que o ULTIMO estagio e
+  // alcancado, "todos desbloqueados" ja vira verdade no MESMO passo que
+  // desbloqueouAlgumAgora, entao a trava bloqueava a cerimonia de
+  // aparecer nem essa primeira vez. Fix definitivo: compara direto com
+  // estagioCerimoniaMostradaAte() -- so dispara se o estagio atual for
+  // MAIOR do que o maior estagio ja celebrado, sem depender de
+  // temaArenaSalvo() (que muda livremente com o swipe) nem de quantos
+  // temas estao desbloqueados.
+  if (desbloqueouAlgumAgora && typeof viajarParaTemaEstagio === 'function'){
+    const estagioReal = (typeof estagioAtual === 'function') ? estagioAtual() : 1;
+    if (estagioReal > estagioCerimoniaMostradaAte()){
+      debugEstagio('verificarDesbloqueiosTemaArena: estagio ' + estagioReal + ' ainda nao foi celebrado, chamando viajarParaTemaEstagio()');
+      viajarParaTemaEstagio();
+    } else {
+      debugEstagio('verificarDesbloqueiosTemaArena: marcou tema(s) retroativamente, mas o estagio atual ja foi celebrado -- nao reabre a cerimonia');
+    }
+  }
 }
 window.verificarDesbloqueiosTemaArena = verificarDesbloqueiosTemaArena;
 
@@ -2188,6 +2375,58 @@ function renderTemaArena(){
   const elA = document.getElementById('arenaBgA');
   const elB = document.getElementById('arenaBgB');
   if (!elA || !elB) return;
+
+  // Sistema de Estagios: SINCRONIZACAO defensiva. Se o estagio atual ja
+  // desbloqueou um tema mais avancado do que o persistido em
+  // temaArenaSalvo() -- por exemplo, a pagina recarregou depois do
+  // desbloqueio ja ter sido marcado numa sessao/teste anterior, ou
+  // qualquer outro motivo do tema salvo estar desatualizado -- chama
+  // viajarParaTemaEstagio() (a MESMA funcao com a cerimonia completa:
+  // heroi corre, fundo troca, popup "Novo Estagio Desbloqueado").
+  //
+  // BUG CORRIGIDO (relatado pelo usuario, com print do painel de debug):
+  // antes esse bloco chamava definirTemaArenaSalvo() DIRETO, silencioso,
+  // sem cerimonia nenhuma -- e essa era a UNICA coisa que rodava sempre
+  // que o desbloqueio ja tinha sido marcado numa passada anterior
+  // (ex: verificarDesbloqueiosTemaArena ja tinha marcado o tema, entao
+  // desbloqueouAlgumAgora nunca virava true de novo, e
+  // viajarParaTemaEstagio() nunca era chamada por aquele caminho). Como
+  // isso acontece toda vez que a pagina recarrega DEPOIS do momento
+  // exato do desbloqueio (o que e o caso comum -- poucas pessoas ficam
+  // olhando pra tela no exato milissegundo do desbloqueio), o jogador
+  // via o tema mudar mas NUNCA via a cerimonia. viajarParaTemaEstagio()
+  // ja tem sua propria guarda de "ja esta la, nada a fazer" (linha
+  // logo no topo dela), entao chama-la aqui e seguro e idempotente --
+  // so faz alguma coisa quando o tema salvo realmente esta desatualizado.
+  if (typeof estagioAtual === 'function' && typeof TEMAS_ARENA !== 'undefined' && typeof temaArenaDesbloqueado === 'function'){
+    // BUG CORRIGIDO DUAS VEZES (relatado pelo usuario): v1 comparava
+    // temaArenaSalvo() com o tema "oficial" do estagio -- quebrava no
+    // swipe manual depois de tudo desbloqueado (reabria a cerimonia
+    // sempre). v2 tentou consertar com "todosOsTemasDesbloqueados", mas
+    // isso tem um furo -- no EXATO instante em que o ultimo estagio e
+    // alcancado, "todos desbloqueados" ja vira verdade junto, entao a
+    // cerimonia parou de aparecer ate a primeira vez. Fix definitivo:
+    // compara com estagioCerimoniaMostradaAte(), uma flag dedicada que
+    // so anda pra frente e nunca e afetada por qual tema esta sendo
+    // EXIBIDO no momento (isso e responsabilidade separada, do swipe).
+    const estagioReal = estagioAtual();
+    if (estagioReal > estagioCerimoniaMostradaAte()){
+      debugEstagio('renderTemaArena() detectou estagio ' + estagioReal + ' ainda nao celebrado -- chamando viajarParaTemaEstagio() (com cerimonia)');
+      if (typeof viajarParaTemaEstagio === 'function'){
+        viajarParaTemaEstagio();
+        // sai cedo -- o resto desta funcao (mais abaixo) reseta
+        // _arenaBgFrente/transform incondicionalmente. Nao tem mais
+        // problema chamar de novo (a cerimonia atual e so tela cheia +
+        // renderTemaArena() escondido atras dela, sem sprite correndo
+        // pra brigar), mas sair cedo aqui continua correto: essa
+        // segunda pintura seria redundante, ja que a cerimonia vai
+        // chamar renderTemaArena() de novo por conta propria mais abaixo
+        // na sequencia dela.
+        return;
+      }
+    }
+  }
+
   const tema = temaArenaAtual();
   aplicarFundoTemaArena(elA, tema);
   aplicarFundoTemaArena(elB, tema);
@@ -2226,9 +2465,15 @@ function atualizarBloqueioArena(temaForcado){
     const emIngles = typeof idiomaApp === 'function' && idiomaApp() === 'en';
     const texto = document.getElementById('temaArenaBloqueioTexto');
     if (texto){
+      // Sistema de Estagios: nao existe mais compra/assinatura por tras
+      // desses temas -- desbloqueio e so chegar no estagio certo (ver
+      // desbloqueioGratis.tipo==='tarefasTotais' em TEMAS_ARENA). A
+      // posicao do tema na lista (indexOf+1) E o numero do estagio, ja
+      // que a ordem da lista foi definida pra bater com a trilha.
+      const numEstagio = TEMAS_ARENA.findIndex(x => x.id === tema.id) + 1;
       texto.textContent = emIngles
-        ? 'Unlock ' + tema.nome_en + ' in Premium'
-        : 'Desbloqueie ' + tema.nome + ' na versão Premium';
+        ? 'Reach Stage ' + numEstagio + ' to unlock ' + tema.nome_en
+        : 'Chegue no Estágio ' + numEstagio + ' pra desbloquear ' + tema.nome;
     }
   }
 }
@@ -2447,6 +2692,164 @@ function mudarTemaArena(direcao){
 }
 window.mudarTemaArena = mudarTemaArena;
 
+// ---------- Sistema de Estagios: transicao de "viagem" ----------
+// Dedicada, separada do slide de swipe (mudarTemaArena/touch handlers
+// mais abaixo) -- o swipe move 1 casa lateral (esquerda/direita) e
+// pressupoe que voce sabe pra qual lado esta indo; a viagem de estagio
+// pode pular direto pro estagio real atual (estagioAtual(), fonte da
+// verdade), nao "+1 tema", entao um slide direcional fixo nao serve
+// aqui. Coreografia pedida pelo usuario: heroi corre pra fora de cena
+// (direita) -> troca o fundo enquanto ele esta fora -> heroi corre de
+// volta (entrando pela esquerda), como se tivesse chegado num lugar novo.
+// Painel de debug VISIVEL NA TELA (nao so console.log) pro Sistema de
+// Estagios -- pedido depois que o usuario relatou "ainda sem animacao/
+// popup" testando no CELULAR, onde abrir o console do navegador nao e
+// pratico. Escreve no #estagioDebugPanel (so visivel em modo-debug,
+// mesmo gate que .debugbar).
+//
+// FIX (pedido do usuario: "tira o console dos estagios") -- o
+// console.log rodava SEMPRE, pra qualquer jogador, mesmo fora do modo
+// debug (poluindo o console de quem abrisse o devtools por qualquer
+// outro motivo). Agora so loga no console quando o painel visivel
+// tambem existe -- ou seja, so em modo debug, os dois juntos.
+function debugEstagio(msg){
+  const painel = document.getElementById('estagioDebugPanel');
+  if (!painel) return;
+  console.log('[ESTAGIO-DEBUG]', msg);
+  const hora = new Date().toLocaleTimeString('pt-BR', { hour12:false, minute:'2-digit', second:'2-digit', fractionalSecondDigits:3 });
+  const linha = document.createElement('div');
+  linha.textContent = hora + ' ' + msg;
+  painel.appendChild(linha);
+  painel.scrollTop = painel.scrollHeight;
+  // limite de 40 linhas -- evita o painel crescer pra sempre numa sessao de teste longa
+  while (painel.children.length > 40) painel.removeChild(painel.firstChild);
+}
+window.debugEstagio = debugEstagio;
+
+// REESCRITA (pedido do usuario, comparando com video de referencia de
+// outro app): em vez do heroi deslizar DENTRO do card pequeno da Arena
+// (que colidia visualmente com o sprite do monstro -- bug relatado e
+// corrigido numa leva anterior, mas o resultado ainda nao ficava
+// parecido com a referencia), agora abre uma TELA CHEIA (ver
+// mostrarEstagioDesbloqueado()) que cobre a Arena inteira -- a troca de
+// fundo acontece ESCONDIDA atras dela, sem nenhum sprite se movendo
+// dentro do card. Mais simples tambem: nao precisa mais coreografar
+// heroi saindo/entrando com timers separados, e o card pequeno nunca
+// mais precisa lidar com sobreposicao de sprite nenhuma.
+function viajarParaTemaEstagio(){
+  debugEstagio('viajarParaTemaEstagio() chamada. _arenaBgEmTransicao=' + _arenaBgEmTransicao);
+  if (typeof TEMAS_ARENA === 'undefined' || typeof estagioAtual !== 'function'){
+    debugEstagio('saiu cedo: TEMAS_ARENA ou estagioAtual indefinidos');
+    return;
+  }
+  const temaAlvo = TEMAS_ARENA[estagioAtual() - 1];
+  if (!temaAlvo){
+    debugEstagio('saiu cedo: temaAlvo nao encontrado pra estagioAtual()=' + estagioAtual());
+    return;
+  }
+  if (temaArenaSalvo() === temaAlvo.id){
+    debugEstagio('saiu cedo: temaArenaSalvo() ja e ' + temaAlvo.id + ' -- nada a fazer');
+    return;
+  }
+  if (_arenaBgEmTransicao){
+    // ja tem uma viagem rolando -- nao empilha outra tela cheia em cima.
+    // NAO persiste aqui: persistir cedo faz qualquer renderTemaArena()
+    // chamado por outro fluxo (ex: render() do resto do app) pintar o
+    // fundo novo ANTES da tela cheia aparecer -- era exatamente o bug
+    // relatado ("aparece um popup e ja pula pro tema novo"), causado por
+    // essa troca acontecer adiantada em vez de sincronizada com a tela.
+    // Persistencia + pintura agora sao atomicas, dentro de
+    // mostrarEstagioDesbloqueado() (ver BUG CORRIGIDO la).
+    debugEstagio('ja em transicao -- ignorando chamada duplicada');
+    return;
+  }
+
+  debugEstagio('abrindo tela cheia pra ' + temaAlvo.id);
+  _arenaBgEmTransicao = true;
+  atualizarTravaTransicaoEstagio();
+
+  // REDE DE SEGURANCA: se a tela cheia nunca fechar por algum motivo
+  // (popup travado, erro silencioso), forca o reset depois de 8s em vez
+  // de deixar o app travado pro resto da sessao.
+  let finalizado = false;
+  const seguranca = setTimeout(() => {
+    if (finalizado) return;
+    finalizado = true;
+    debugEstagio('REDE DE SEGURANCA disparou (8s sem terminar) -- forcando reset');
+    if (typeof fecharEstagioTelaCompleta === 'function') fecharEstagioTelaCompleta();
+    _arenaBgEmTransicao = false;
+    atualizarTravaTransicaoEstagio();
+  }, 8000);
+
+  // troca o fundo JA -- fica escondido atras da tela cheia que abre no
+  // mesmo instante, entao nao ha frame nenhum onde o jogador veria o
+  // cenario antigo ainda visivel depois de "Continuar".
+  //
+  // BUG CORRIGIDO (relatado pelo usuario: "a primeira passagem pro tema
+  // do deserto nao ia, ficava no dungeon padrao"): essa versao anterior
+  // so pintava aplicarFundoTemaArena() numa camada SO (a que _arenaBgFrente
+  // apontava no momento) -- se por qualquer motivo essa nao fosse
+  // realmente a camada visivel (ex: transform desalinhado de uma
+  // interacao anterior), a troca nunca aparecia. Trocado pra chamar
+  // renderTemaArena() de verdade -- a MESMA funcao robusta usada no boot,
+  // que pinta as 2 camadas (A e B), reseta o transform das 2 pra 0 e
+  // forca _arenaBgFrente='A' -- sem depender de qual camada "deveria"
+  // estar na frente. Seguro chamar aqui: definirTemaArenaSalvo() ja
+  // rodou logo acima, entao o self-heal dentro de renderTemaArena() ve
+  // que o tema salvo ja bate com o esperado e nao entra em loop
+  // chamando viajarParaTemaEstagio() de novo.
+  // BUG CORRIGIDO (relatado pelo usuario: "aparece um popup na tela e
+  // pula direto pro tema novo ja"): essa troca de fundo rodava AQUI, de
+  // forma sincrona, ANTES da tela cheia sequer entrar na fila de popups
+  // (enfileirarPopup). Se ja houvesse outro popup na fila no mesmo
+  // instante (nivel up, bau -- comum, ja que cruzar limiar de tarefas
+  // quase sempre acontece junto com ganho de XP), o fundo novo ja ficava
+  // visivel por baixo dele, bem antes da tela "Estagio Concluido" abrir
+  // -- quando ela finalmente aparecia, o tema ja tinha mudado ha tempo.
+  // Fix: a troca foi MOVIDA pra dentro de mostrarEstagioDesbloqueado(),
+  // sincronizada com o proprio fade de entrada da tela cheia.
+
+  const finalizarViagem = () => {
+    if (finalizado) return;
+    finalizado = true;
+    clearTimeout(seguranca);
+    _arenaBgEmTransicao = false;
+    atualizarTravaTransicaoEstagio();
+    debugEstagio('viagem finalizada normalmente, _arenaBgEmTransicao voltou pra false');
+  };
+
+  debugEstagio('fundo trocado (escondido). enfileirarPopup existe=' + (typeof window.enfileirarPopup === 'function') + ', mostrarEstagioDesbloqueado existe=' + (typeof window.mostrarEstagioDesbloqueado === 'function'));
+  if (typeof window.enfileirarPopup === 'function' && typeof window.mostrarEstagioDesbloqueado === 'function'){
+    window.enfileirarPopup(prox => {
+      debugEstagio('funcao da fila de popups executando -- chamando mostrarEstagioDesbloqueado() (tela cheia) agora');
+      try {
+        window.mostrarEstagioDesbloqueado(temaAlvo, () => { finalizarViagem(); prox(); });
+      } catch(e){
+        debugEstagio('ERRO ao chamar mostrarEstagioDesbloqueado(): ' + (e && e.message));
+        finalizarViagem();
+        prox();
+      }
+    });
+  } else {
+    debugEstagio('fallback SEM tela cheia tomado -- enfileirarPopup ou mostrarEstagioDesbloqueado nao existem');
+    finalizarViagem();
+  }
+}
+window.viajarParaTemaEstagio = viajarParaTemaEstagio;
+
+// so trava/destrava os 2 pontos de entrada de tarefa (+ Adicionar e
+// Criar tarefa do composer) conforme _arenaBgEmTransicao -- ver
+// chamadas em viajarParaTemaEstagio(). Pequeno e isolado de proposito
+// (nao e render()), pra poder ser chamado no meio de outra logica sem
+// risco de reentrancia.
+function atualizarTravaTransicaoEstagio(){
+  const addBtnEl = document.getElementById('addbtn');
+  if (addBtnEl) addBtnEl.disabled = (typeof monstroJaCaiu === 'function' && monstroJaCaiu()) || _arenaBgEmTransicao;
+  if (typeof atualizarEstadoSave === 'function') atualizarEstadoSave();
+}
+window.atualizarTravaTransicaoEstagio = atualizarTravaTransicaoEstagio;
+
+
 // gesto de arrastar na propria arena pra trocar de tema, seguindo o
 // dedo em TEMPO REAL (igual carrossel de foto de verdade) -- sem isso,
 // decidir a direcao so no touchend (versao anterior) criava a sensacao
@@ -2465,11 +2868,14 @@ window.mudarTemaArena = mudarTemaArena;
 
   arena.addEventListener('touchstart', e => {
     if (e.touches.length !== 1 || _arenaBgEmTransicao) return;
-    // arrasto so fica disponivel depois que houver pelo menos 2 temas
-    // desbloqueados (Padrao + o 1o gratis, hoje Deserto via streak) --
-    // com so 1 tema nao ha pra onde ir, e deixar arrastar sem nada pra
-    // mostrar so confunde quem esta comecando.
-    if (TEMAS_ARENA.filter(temaArenaDesbloqueado).length < 2) return;
+    // Sistema de Estagios: arrasto manual so libera quando TODOS os temas
+    // ja foram desbloqueados via progressao (chegou no fim da trilha, ver
+    // verificarDesbloqueiosTemaArena) -- antes disso o tema atual e
+    // sempre o do estagio corrente, sem escolha manual (pedido do
+    // usuario: so no final "voce pode escolher qualquer um dos 4").
+    // Era `< 2` antes do Sistema de Estagios (liberava assim que houvesse
+    // 2 temas desbloqueados) -- trocado pro tamanho total da lista.
+    if (TEMAS_ARENA.filter(temaArenaDesbloqueado).length < TEMAS_ARENA.length) return;
     sx = e.touches[0].clientX; sy = e.touches[0].clientY;
     rastreando = true; decidiu = false; cancelado = false;
     larguraArena = arena.getBoundingClientRect().width || 1;
@@ -2666,8 +3072,10 @@ function render(){
   // Roda a cada render() pra cobrir a virada automatica do dia (watchdog),
   // nao so o clique manual. window.atualizarEstadoSave e definida mais
   // abaixo no mesmo <script>, hoisted (function declaration).
+  // Tambem desabilita durante a transicao de viagem de estagio
+  // (_arenaBgEmTransicao) -- mesmo motivo do guard em alternar().
   const addBtnEl = document.getElementById('addbtn');
-  if (addBtnEl) addBtnEl.disabled = typeof monstroJaCaiu === 'function' && monstroJaCaiu();
+  if (addBtnEl) addBtnEl.disabled = (typeof monstroJaCaiu === 'function' && monstroJaCaiu()) || _arenaBgEmTransicao;
   if (typeof atualizarEstadoSave === 'function') atualizarEstadoSave();
 
   document.getElementById('hoje').textContent = (idiomaApp() === 'en' ? 'Tasks for ' : 'Tarefas de ') + nomeDiaLocal(diaDaSemana());
@@ -2819,6 +3227,7 @@ function render(){
 
   const p = progresso();
   document.getElementById('lvl').textContent = (idiomaApp() === 'en' ? 'Level ' : 'Nível ') + romano(p.nivel);
+  renderEstagioBar();
   // contagem suave em vez de trocar o numero na hora -- so anima
   // quando o valor MUDOU de verdade (compara com o que ja esta
   // exibido), entao um render() redundante com o mesmo numero nao
@@ -3199,6 +3608,12 @@ let _tarefaPopIdx = null;
 function alternar(i){
   const t = tarefas[i];
 
+  // Sistema de Estagios: durante a transicao de viagem (heroi correndo
+  // pra fora/voltando, troca de fundo no meio), o jogador nao pode
+  // completar tarefa nenhuma -- evita mexer no estado do dia (XP/moeda/
+  // virada) bem no meio da cena trocando de lugar embaixo dos pes dele.
+  if (typeof _arenaBgEmTransicao !== 'undefined' && _arenaBgEmTransicao) return false;
+
   // GUARDA REDUNDANTE (defesa em profundidade): alem da trava no clique da
   // caixa (ver el.dataset.travado em render()), alternar() tambem nao pode
   // recompensar duas vezes a MESMA tarefa de meta=1 no mesmo dia -- vale
@@ -3370,7 +3785,10 @@ function atualizarEstadoSave(){
   const semTexto = input.value.trim().length === 0;
   const semDia = modo === 'repete' && diasEscolhidos.length === 0;
   const diaVencido = typeof monstroJaCaiu === 'function' && monstroJaCaiu();
-  btnSave.disabled = semTexto || semDia || diaVencido;
+  // Sistema de Estagios: tambem trava durante a transicao de viagem --
+  // mesmo motivo do guard em alternar() e do botao "+ Adicionar".
+  const emTransicaoEstagio = typeof _arenaBgEmTransicao !== 'undefined' && _arenaBgEmTransicao;
+  btnSave.disabled = semTexto || semDia || diaVencido || emTransicaoEstagio;
 }
 window.atualizarEstadoSave = atualizarEstadoSave;
 
@@ -3574,17 +3992,32 @@ document.getElementById('debugbtn').onclick = () => {
 };
 
 // ---------- nome do heroi ----------
+// FIX (pedido do usuario, print circulado): nome do heroi ("a" no
+// print -- nome curto usado em teste) escondido de vez. Antes essa
+// linha MOVIA o span pro topo, do lado do Nivel (lvl.after(spanNome)).
+// O elemento continua existindo no DOM -- render() (linha ~3039) ainda
+// escreve o texto nele normalmente, sem precisar mexer la -- so nao
+// aparece em lugar nenhum da tela agora.
 const spanNome = document.getElementById('nomeTopo');
-// tira o nome de cima do sprite e leva pro topo, junto do nivel
-document.getElementById('lvl').after(spanNome);
-// renomear agora e feito pela folha modal do Perfil > Config (ver bloco RENOMEAR EM FOLHA)
+if (spanNome) spanNome.style.display = 'none';
+// renomear continua feito pela folha modal do Perfil > Config (ver bloco RENOMEAR EM FOLHA)
 
 // ---------- boas-vindas ----------
 let tarefasIniciais = [];
 
+let _passoAtual = 1;
 function mostrarPasso(n){
+  const direcao = n >= _passoAtual ? 1 : -1;
+  _passoAtual = n;
   ['passo1','passo2','passoHeroi','passo3'].forEach((id, i) => {
-    document.getElementById(id).classList.toggle('on', i === n - 1);
+    const el = document.getElementById(id);
+    const ativar = i === n - 1;
+    el.classList.remove('passoIn', 'passoInVolta');
+    el.classList.toggle('on', ativar);
+    if (ativar){
+      void el.offsetWidth;
+      el.classList.add(direcao > 0 ? 'passoIn' : 'passoInVolta');
+    }
   });
 }
 
@@ -3665,7 +4098,8 @@ document.getElementById('voltarNome').onclick = () => mostrarPasso(2);
 document.getElementById('irPasso3').onclick = () => {
   desenharHeroi();
   mostrarPasso(4);
-  document.getElementById('primeiraTarefa').focus();
+  // v4.153: mesmo fix do handler ativo (ver irPara(8) mais abaixo) --
+  // sem autofocus, usuario sempre toca antes de digitar.
 };
 
 const campoNomeIni = document.getElementById('nomeHeroi');
@@ -3797,6 +4231,119 @@ function estRecorde(hist){
 // em runtime via getComputedStyle. Isso automaticamente respeita qualquer
 // tema visual escolhido pelo jogador (Grafite/Verde/Branco/etc), porque
 // --accent muda de valor conforme o tema ativo.
+// --- Módulo #24 ---
+// Motor de spring fisico compartilhado (pedido do usuario: animacoes mais
+// "premium" tipo v0/Framer Motion, aplicadas aos poucos em varias telas).
+// Massa-mola-amortecedor rodando por requestAnimationFrame -- duracao
+// VARIA conforme distancia/velocidade (fisica de verdade), diferente de
+// uma transition CSS de duracao fixa. So usar em animacoes ISOLADAS que
+// nao dependem de um setTimeout com duracao fixa em outro lugar do codigo
+// (ex.: o carrossel de intro tem uma trava de seguranca contra corrida
+// dedo-vs-clique que depende de duracao fixa -- la a curva foi calibrada
+// via CSS cubic-bezier em vez de spring, de proposito, ver deslizar()).
+// Respeita prefers-reduced-motion: retorna direto pro valor final.
+const _reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function spring({from, to, stiffness=210, damping=20, mass=1, onUpdate, onComplete}){
+  if (_reducedMotion){ onUpdate(to); onComplete && onComplete(); return; }
+  let pos = from, vel = 0, last = performance.now();
+  function frame(now){
+    const dt = Math.min((now - last) / 1000, 0.032);
+    last = now;
+    const acc = (-stiffness * (pos - to) - damping * vel) / mass;
+    vel += acc * dt;
+    pos += vel * dt;
+    onUpdate(pos);
+    if (Math.abs(pos - to) < 0.15 && Math.abs(vel) < 0.15){ onUpdate(to); onComplete && onComplete(); }
+    else requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+window.spring = spring;
+
+// v4.145 (pedido do usuario): squish fisico ao pressionar/soltar qualquer
+// .cfgbtnfull (Sair, Apagar tudo). Delegado no document pra cobrir botoes
+// atuais e futuros sem precisar de listener por elemento.
+(function(){
+  const escala = new WeakMap();
+  function squish(el, alvo, rigidez, atrito){
+    const atual = escala.get(el) ?? 1;
+    spring({from:atual, to:alvo, stiffness:rigidez, damping:atrito,
+      onUpdate:v=>{ escala.set(el, v); el.style.transform = 'scale(' + v + ')'; }});
+  }
+  document.addEventListener('pointerdown', e => {
+    const btn = e.target.closest('.cfgbtnfull');
+    if (btn) squish(btn, 0.94, 420, 26);
+  });
+  ['pointerup','pointerleave','pointercancel'].forEach(ev => {
+    document.addEventListener(ev, e => {
+      const btn = e.target.closest('.cfgbtnfull');
+      if (btn) squish(btn, 1, 260, 13);
+    });
+  });
+})();
+
+// v4.146-fix (pedido do usuario, print real -- badge de notificacao do
+// troféu ficou cortado): a v1 desse ripple fazia overflow:hidden no
+// PROPRIO botao pra conter o circulo, o que corta qualquer badge/icone
+// que vaze de proposito pra fora da borda (ex.: bolinha de notificacao
+// no nav). Corrigido pra nunca tocar no botao real -- o ripple mora
+// num wrapper proprio, fixed, sobreposto por cima, criado e destruido
+// a cada clique.
+document.addEventListener('pointerdown', e => {
+  const btn = e.target.closest('button');
+  if (!btn || btn.disabled) return;
+  const rect = btn.getBoundingClientRect();
+  const raio = getComputedStyle(btn).borderRadius;
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'position:fixed;pointer-events:none;overflow:hidden;z-index:9999;' +
+    'left:' + rect.left + 'px;top:' + rect.top + 'px;' +
+    'width:' + rect.width + 'px;height:' + rect.height + 'px;' +
+    'border-radius:' + raio + ';';
+  const size = Math.max(rect.width, rect.height) * 1.3;
+  const r = document.createElement('span');
+  r.style.cssText = 'position:absolute;border-radius:50%;background:rgba(255,255,255,.35);' +
+    'transform:scale(0);opacity:.6;' +
+    'width:' + size + 'px;height:' + size + 'px;' +
+    'left:' + (e.clientX - rect.left - size/2) + 'px;' +
+    'top:' + (e.clientY - rect.top - size/2) + 'px;' +
+    'transition:transform .5s var(--expo), opacity .5s var(--expo);';
+  wrap.appendChild(r);
+  document.body.appendChild(wrap);
+  requestAnimationFrame(() => { r.style.transform = 'scale(1)'; r.style.opacity = '0'; });
+  setTimeout(() => wrap.remove(), 550);
+});
+
+// v4.149 (pedido do usuario): particulas ao subir de nivel / abrir bau.
+// Utilitario generico, reaproveitavel -- so cria elementos e some com
+// eles sozinho via setTimeout, nao guarda estado, nao interfere em mais
+// nada. Respeita prefers-reduced-motion.
+function spawnParticulas(origemEl, opcoes){
+  if (_reducedMotion) return;
+  opcoes = opcoes || {};
+  const cores = opcoes.cores || ['#F2C94C','#F2A65A','#63C99A','#E5698A','#7FCBF3'];
+  const qtd = opcoes.qtd || 22;
+  const rect = origemEl.getBoundingClientRect();
+  const cx = rect.left + rect.width/2, cy = rect.top + rect.height/2;
+  for (let i = 0; i < qtd; i++){
+    const p = document.createElement('div');
+    const ang = Math.random()*Math.PI*2, dist = 50+Math.random()*70;
+    const dx = Math.cos(ang)*dist, dy = Math.sin(ang)*dist;
+    const rot = (Math.random()*720-360);
+    p.style.cssText = 'position:fixed;left:' + cx + 'px;top:' + cy + 'px;' +
+      'width:6px;height:10px;border-radius:1px;pointer-events:none;z-index:999;' +
+      'background:' + cores[i % cores.length] + ';' +
+      'transform:translate(-50%,-50%);opacity:1;' +
+      'transition:transform .9s var(--expo), opacity .9s var(--expo);';
+    document.body.appendChild(p);
+    requestAnimationFrame(() => {
+      p.style.transform = 'translate(calc(-50% + ' + dx + 'px), calc(-50% + ' + dy + 'px)) rotate(' + rot + 'deg) scale(.4)';
+      p.style.opacity = '0';
+    });
+    setTimeout(() => p.remove(), 950);
+  }
+}
+window.spawnParticulas = spawnParticulas;
+
 function corAccentComOpacidade(alpha){
   const hex = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
   const m = hex.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i);
@@ -3857,31 +4404,80 @@ function renderUltimos7Dias(hist){
   linhaEl.setAttribute('d', dLinha);
   areaEl.setAttribute('d', dArea);
 
+  // v4.152 (pedido do usuario): grafico desenhava tudo de uma vez, sem
+  // nenhuma entrada. Linha "desenha" da esquerda pra direita via
+  // stroke-dashoffset (tecnica padrao de SVG, usa o comprimento real do
+  // path -- funciona igual não importa quantos pontos existam), area
+  // some/aparece com fade, pontos entram com leve atraso em cascata.
+  const reduzido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduzido){
+    linhaEl.style.strokeDasharray = 'none';
+    linhaEl.style.strokeDashoffset = '0';
+    areaEl.style.opacity = '1';
+  } else {
+    const comprimento = linhaEl.getTotalLength();
+    linhaEl.style.transition = 'none';
+    linhaEl.style.strokeDasharray = comprimento;
+    linhaEl.style.strokeDashoffset = comprimento;
+    areaEl.style.transition = 'none';
+    areaEl.style.opacity = '0';
+    void linhaEl.getBoundingClientRect();
+    linhaEl.style.transition = 'stroke-dashoffset .65s var(--expo)';
+    linhaEl.style.strokeDashoffset = '0';
+    areaEl.style.transition = 'opacity .5s var(--expo) .3s';
+    areaEl.style.opacity = '1';
+  }
+
   // remove os circulos-marcador da rodada anterior antes de redesenhar
   svgEl.querySelectorAll('.est-chartponto').forEach(c => c.remove());
-  pontos.forEach(p => {
+  pontos.forEach((p, i) => {
     const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     c.setAttribute('cx', p.x);
     c.setAttribute('cy', p.y);
     c.setAttribute('r', 4);
     c.setAttribute('fill', p.cor);
     c.setAttribute('class', 'est-chartponto');
+    if (!reduzido){
+      c.style.opacity = '0';
+      c.style.transform = 'scale(0)';
+      c.style.transformOrigin = p.x + 'px ' + p.y + 'px';
+      c.style.transition = 'opacity .3s var(--expo), transform .3s var(--spring-curve)';
+      c.style.transitionDelay = (0.5 + i * 0.05) + 's';
+    }
     svgEl.appendChild(c);
+    if (!reduzido) requestAnimationFrame(() => { c.style.opacity = '1'; c.style.transform = 'scale(1)'; });
   });
 }
 
 // donut de composicao do mes (vitoria/fuga/sem_tarefa) -- SEMPRE desenha o
 // anel cheio, mesmo com 0 dias decorridos: nesse caso fica 100% neutro (cor
 // de fundo) em vez de sumir o card inteiro.
+// v4.151 (pedido do usuario): guarda o ultimo estado desenhado pra
+// interpolar a partir dele, em vez de saltar direto pro valor novo.
+let _donutMesAnterior = {pVit:0, pFuga:0};
 function renderDonutMes(vitorias, fugas, semTarefa){
   const el = document.getElementById('estDonutMes');
   const total = vitorias + fugas + semTarefa;
   if (total === 0){
     el.style.background = 'var(--panel-3)';
+    _donutMesAnterior = {pVit:0, pFuga:0};
   } else {
-    const pVit = (vitorias / total) * 100;
-    const pFuga = pVit + (fugas / total) * 100;
-    el.style.background = 'conic-gradient(var(--accent) 0% ' + pVit + '%, color-mix(in srgb, var(--accent) 40%, transparent) ' + pVit + '% ' + pFuga + '%, var(--panel-3) ' + pFuga + '% 100%)';
+    const pVitAlvo = (vitorias / total) * 100;
+    const pFugaAlvo = pVitAlvo + (fugas / total) * 100;
+    const de = _donutMesAnterior;
+    function pintar(pVit, pFuga){
+      el.style.background = 'conic-gradient(var(--accent) 0% ' + pVit + '%, color-mix(in srgb, var(--accent) 40%, transparent) ' + pVit + '% ' + pFuga + '%, var(--panel-3) ' + pFuga + '% 100%)';
+    }
+    if (typeof window.spring === 'function'){
+      let atualPVit = de.pVit, atualPFuga = de.pFuga;
+      window.spring({from:de.pVit, to:pVitAlvo, stiffness:120, damping:20,
+        onUpdate:v => { atualPVit = v; pintar(atualPVit, atualPFuga); }});
+      window.spring({from:de.pFuga, to:pFugaAlvo, stiffness:120, damping:20,
+        onUpdate:v => { atualPFuga = v; pintar(atualPVit, atualPFuga); }});
+    } else {
+      pintar(pVitAlvo, pFugaAlvo);
+    }
+    _donutMesAnterior = {pVit:pVitAlvo, pFuga:pFugaAlvo};
   }
   document.getElementById('estDonutTotal').textContent = total;
   document.getElementById('estQtdVitoria').textContent = vitorias;
@@ -4100,7 +4696,17 @@ function renderEstatisticas(){
   // 0% no conic-gradient deixa um traco fino de antialiasing na borda; sem
   // valor nenhum, o .est-ringbg neutro por baixo fica visivel sozinho.
   trackEl.style.background = taxa === 0 ? 'none' : '';
-  ringEl.style.setProperty('--pct', taxa);
+  // v4.151 (pedido do usuario): --pct saltava direto pro valor final
+  // (custom property CSS nao anima sozinha sem @property, que nem todo
+  // engine suporta ainda). Interpolado via spring em JS, funciona em
+  // qualquer navegador -- nao mexe em mais nada do calculo de taxa.
+  const pctAnterior = Number(ringEl.style.getPropertyValue('--pct')) || 0;
+  if (typeof window.spring === 'function'){
+    window.spring({from:pctAnterior, to:taxa, stiffness:120, damping:20,
+      onUpdate:v => ringEl.style.setProperty('--pct', v)});
+  } else {
+    ringEl.style.setProperty('--pct', taxa);
+  }
   document.getElementById('estTaxaNum').textContent = taxa + '%';
 
   renderUltimos7Dias(hist);
@@ -4603,7 +5209,15 @@ function abrirFicha(id){
       const a = b.dataset.a;
       if (a === 'eq') equipar(id);
       else if (a === 'usar') usarItem(id, fichaOrigemEl || ficha.querySelector('.ibox') || b);
-      else if (a === 'vender') venderItem(id, fichaOrigemEl || ficha.querySelector('.ibox') || b);
+      else if (a === 'vender'){
+        const preco = precoVenda(it);
+        pedirConfirmacao(
+          en ? 'Sell ' + it.nome + '?' : 'Vender ' + it.nome + '?',
+          en ? 'You get ' + preco + ' coins.' : 'Você recebe ' + preco + ' moedas.',
+          en ? 'Sell' : 'Vender',
+          () => venderItem(id, fichaOrigemEl || ficha.querySelector('.ibox') || b)
+        );
+      }
       else if (a === 'abrir'){
         fecharFicha();
         if (typeof window.abrirCatalogoGrimorio === 'function') window.abrirCatalogoGrimorio();
@@ -5240,7 +5854,20 @@ function montarCompra(grid){
   });
 
   grid.querySelectorAll('[data-c]').forEach(b => {
-    b.onclick = () => comprar(+b.dataset.c);
+    b.onclick = () => {
+      const i = +b.dataset.c;
+      const s = lojaEstoque[i];
+      if (!s) return;
+      const it = item(s.id);
+      const preco = precoLoja(s.id, s.oferta);
+      const en = idiomaApp() === 'en';
+      pedirConfirmacao(
+        en ? 'Buy ' + it.nome + '?' : 'Comprar ' + it.nome + '?',
+        en ? 'Costs ' + preco + ' coins.' : 'Custa ' + preco + ' moedas.',
+        en ? 'Buy' : 'Comprar',
+        () => comprar(i)
+      );
+    };
   });
 
   const nota = document.createElement('div');
@@ -5295,7 +5922,22 @@ function montarVenda(grid){
   });
 
   grid.querySelectorAll('[data-v]').forEach(b => {
-    b.onclick = () => { const icone = b.closest('.lrow')?.querySelector('.lbox'); venderItem(+b.dataset.v, icone || b); renderLoja(); };
+    b.onclick = () => {
+      const id = +b.dataset.v;
+      const it = item(id);
+      const preco = precoVenda(it);
+      const en = idiomaApp() === 'en';
+      pedirConfirmacao(
+        en ? 'Sell ' + it.nome + '?' : 'Vender ' + it.nome + '?',
+        en ? 'You get ' + preco + ' coins.' : 'Você recebe ' + preco + ' moedas.',
+        en ? 'Sell' : 'Vender',
+        () => {
+          const icone = b.closest('.lrow')?.querySelector('.lbox');
+          venderItem(id, icone || b);
+          renderLoja();
+        }
+      );
+    };
   });
 
   const tesouros = inventario.filter(s => item(s.id).tipo === 'tesouro');
@@ -6480,6 +7122,21 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 
   /* ---------- Config ---------- */
   const cfgOverlay = document.getElementById('cfgOverlay');
+  /* v4.144 (pedido do usuario): stagger fisico nas linhas ao abrir Config
+     -- aditivo, so roda quando abrirConfig() e chamada, nao mexe em mais
+     nada do fluxo existente. */
+  function animarStaggerCfgRows(){
+    if (!cfgOverlay || typeof window.spring !== 'function') return;
+    cfgOverlay.querySelectorAll('.cfgrow').forEach((row, i) => {
+      row.style.opacity = '0';
+      row.style.transform = 'translateY(6px)';
+      setTimeout(() => {
+        window.spring({from:6, to:0, stiffness:230, damping:22, onUpdate:v=>{ row.style.transform = 'translateY('+v+'px)'; }});
+        window.spring({from:0, to:1, stiffness:230, damping:28, onUpdate:v=>{ row.style.opacity = v; }});
+      }, i*35);
+    });
+  }
+
   function abrirConfig(){
     sincronizarConfig();
     // atualizarLinhaConta() (bloco CONTA — SAIR/CRIAR CONTA, mais abaixo
@@ -6494,6 +7151,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     // acima.
     if (typeof window.atualizarBotaoFeedback === 'function') window.atualizarBotaoFeedback();
     if (cfgOverlay) cfgOverlay.classList.add('on');
+    animarStaggerCfgRows();
   }
   function fecharConfig(){
     if (cfgOverlay) cfgOverlay.classList.remove('on');
@@ -6755,7 +7413,25 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     try { return localStorage.getItem(CHAVE_TEMA) || 'grafite'; } catch(e){ return 'grafite'; }
   }
   function escolherTema(id){
-    document.documentElement.setAttribute('data-tema', id);
+    // v4.150 (pedido do usuario): trocar tema so mudava --accent/--bg/etc
+    // na hora, sem transicao (variavel CSS custom property nao anima
+    // sozinha). Em vez de adicionar transition em cada componente que
+    // consome alguma dessas variaveis (risco alto, dezenas de regras),
+    // um cross-fade no documentElement inteiro resolve pra qualquer tema
+    // atual ou futuro sem tocar em mais nada.
+    const root = document.documentElement;
+    const reduzido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduzido){
+      root.setAttribute('data-tema', id);
+    } else {
+      root.style.transition = 'opacity .16s var(--expo)';
+      root.style.opacity = '0.4';
+      setTimeout(() => {
+        root.setAttribute('data-tema', id);
+        root.style.opacity = '1';
+        setTimeout(() => { root.style.transition = ''; }, 180);
+      }, 160);
+    }
     try { localStorage.setItem(CHAVE_TEMA, id); } catch(e){}
     pintarTemaGrid();
   }
@@ -6944,7 +7620,10 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 
     document.getElementById('bauOk').onclick = fecharBau;
     bauBG.classList.add('on');
-    requestAnimationFrame(() => bauPop.classList.add('on'));
+    requestAnimationFrame(() => {
+      bauPop.classList.add('on');
+      spawnParticulas(bauPop, {cores:['#F2C94C','#F2A65A','#E8D48A']});
+    });
 
     setTimeout(() => {
       const icone = document.getElementById('bauIcone');
@@ -7008,10 +7687,171 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     requestAnimationFrame(() => {
       lvlPop.classList.add('on');
       document.getElementById('lvlNum').classList.add('pulou');
+      spawnParticulas(lvlPop);
     });
   }
 
   window.mostrarNivelUp = mostrarNivelUp;
+})();
+</script>
+
+<script>
+// Tela cheia "Estagio Concluido" -- REESCRITO (pedido do usuario,
+// comparando com video de referencia de outro app: "abre outra tela
+// antes, o heroi so passa direto"). Antes disso era um popup pequeno
+// (.estagiopop) por cima da Arena; agora e uma tela cheia de verdade
+// que cobre TUDO (inclusive a topbar), com o sprite do heroi no meio.
+// Continua usando a fila de popups (enfileirarPopup()) do Level Up/Bau
+// -- mesmo raciocinio de antes, so nao aparecem sobrepostos.
+(function(){
+  const estagioTela = document.createElement('div');
+  estagioTela.className = 'estagio-tela'; estagioTela.id = 'estagioTelaCompleta';
+  document.body.appendChild(estagioTela);
+
+  let _aoFecharEstagioTela = null;
+  function fecharEstagioTelaCompleta(){
+    // FIX (pedido do usuario): a animacao agora acontece AQUI, disparada
+    // pelo clique em "Continuar" -- adiciona a classe de saida (zoom+fade,
+    // .38s, ver CSS), espera ela terminar de verdade, so DEPOIS tira o
+    // ".on" e chama o callback (que revela a Arena por baixo). Antes a
+    // animacao (fade+sobe) tocava sozinha assim que a tela abria, sem
+    // esperar nenhuma acao do usuario -- o contrario do que foi pedido.
+    estagioTela.classList.add('estagio-tela-saindo');
+    setTimeout(() => {
+      estagioTela.classList.remove('on', 'estagio-tela-saindo');
+      const cb = _aoFecharEstagioTela; _aoFecharEstagioTela = null;
+      if (cb) cb();
+    }, 380); // bate com a duracao do transition em .estagio-tela-saindo
+  }
+  window.fecharEstagioTelaCompleta = fecharEstagioTelaCompleta; // exposta pra rede de seguranca em viajarParaTemaEstagio()
+
+  function mostrarEstagioDesbloqueado(tema, aoFechar){
+    // GUARD REDUNDANTE (defesa extra, alem da que ja existe no topo de
+    // viajarParaTemaEstagio()): se o tema salvo ja e este tema, e um
+    // no-op. Ainda assim marca a flag de cerimonia mostrada (ver
+    // estagioCerimoniaMostradaAte() acima) pra nao deixar o estado
+    // inconsistente -- sem isso, os gatilhos em verificarDesbloqueiosTemaArena()/
+    // renderTemaArena() ficariam tentando chamar isso pra sempre, sem
+    // nunca resolver (silencioso, mas desperdicio).
+    if (typeof temaArenaSalvo === 'function' && temaArenaSalvo() === tema.id){
+      debugEstagio('mostrarEstagioDesbloqueado: tema ja e ' + tema.id + ' -- ignorando chamada (guard redundante)');
+      if (typeof estagioAtual === 'function' && typeof definirEstagioCerimoniaMostradaAte === 'function'){
+        definirEstagioCerimoniaMostradaAte(estagioAtual());
+      }
+      if (typeof aoFechar === 'function') aoFechar();
+      return;
+    }
+    _aoFecharEstagioTela = aoFechar || null;
+    // BUG CORRIGIDO (relatado pelo usuario: tela de "todos os biomas
+    // desbloqueados" aparecendo mais de uma vez): definirTemaArenaSalvo()
+    // rodava so dentro do setTimeout de 350ms mais abaixo. Nessa janela
+    // (0-350ms), temaArenaSalvo() ainda apontava pro tema ANTIGO -- se
+    // render() rodasse de novo nesse meio-tempo (comum, roda a cada
+    // interacao), o self-heal em renderTemaArena() via o estado
+    // desatualizado e podia enfileirar a cerimonia de novo. Persistir o
+    // DADO aqui, na hora, fecha essa janela -- so a PINTURA visual
+    // (renderTemaArena(), mais abaixo) continua adiada 350ms, que era o
+    // motivo original de tirar isso da frente (nao pintar o fundo novo
+    // antes da tela cheia cobrir a Arena).
+    //
+    // Junto disso, marca estagioCerimoniaMostradaAte() com o estagio
+    // ATUAL -- e esse o momento real e definitivo em que a cerimonia
+    // deste estagio foi mostrada. Daqui pra frente, nenhum gatilho (nem
+    // swipe manual do jogador) reabre isso de novo pra esse estagio.
+    try {
+      if (typeof definirTemaArenaSalvo === 'function') definirTemaArenaSalvo(tema.id);
+      if (typeof estagioAtual === 'function' && typeof definirEstagioCerimoniaMostradaAte === 'function'){
+        definirEstagioCerimoniaMostradaAte(estagioAtual());
+      }
+    } catch(e){
+      debugEstagio('ERRO ao persistir o tema (mostrarEstagioDesbloqueado): ' + (e && e.message));
+    }
+    const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
+    const heroImg = (typeof heroiAtual === 'function') ? heroiAtual().img : '';
+    // BUG CORRIGIDO (relatado pelo usuario, print: tela mostrava "Estagio 2
+    // Concluido" bem-vindo ao Deserto, mas Deserto E o Estagio 2 -- quem
+    // acabou de ser concluido foi o Estagio 1). numEstagio aqui e o estagio
+    // que o jogador ACABOU de terminar, nao o que esta comecando agora --
+    // por isso -1 em relacao a estagioAtual() (que ja reflete o novo
+    // estagio corrente).
+    const numEstagioConcluido = (typeof estagioAtual === 'function') ? estagioAtual() - 1 : '';
+    // Preview do novo bioma: pedido revisado do usuario -- mostrar a
+    // imagem CHEIA do tema (tema.arte, a mesma arte usada como fundo da
+    // Arena) aqui no popup, nao mais a camada unica flutuante
+    // (tema.arteEstagio). Temas sem arte propria (Padrao) continuam sem
+    // mostrar nada aqui.
+    const previewArte = tema.arte
+      ? '<img class="estagio-tela-preview" src="data:image/png;base64,' + tema.arte + '" alt="">'
+      : '';
+
+    // Pedido do usuario: ao concluir o ULTIMO estagio (hoje Montanhas),
+    // alem da cerimonia normal, avisar explicitamente que todos os biomas
+    // ja estao liberados e que dá pra trocar livremente arrastando a
+    // Arena pro lado -- o gesto (mudarTemaArena/touch handlers) ja existe
+    // e ja funciona pra qualquer tema desbloqueado, so faltava avisar o
+    // jogador que essa liberdade comecou.
+    // BUG CORRIGIDO (relatado pelo usuario: mensagem aparecendo mais de
+    // uma vez): trava dedicada, persistida por conta -- mostra so uma
+    // vez na vida da conta, nunca de novo depois disso, mesmo que a
+    // cerimonia de Montanhas rode de novo por qualquer outro motivo
+    // (reload, resync da nuvem, etc).
+    const CHAVE_AVISO_TODOS_BIOMAS = 'questlog.avisoTodosBiomas.v1';
+    const ehUltimoTema = (typeof TEMAS_ARENA !== 'undefined') && TEMAS_ARENA.length > 0
+      && tema.id === TEMAS_ARENA[TEMAS_ARENA.length - 1].id;
+    let jaAvisado = true;
+    try { jaAvisado = localStorage.getItem(window.chaveConta(CHAVE_AVISO_TODOS_BIOMAS)) === 'true'; } catch(e){}
+    const mostrarAvisoTodosBiomas = ehUltimoTema && !jaAvisado;
+    if (mostrarAvisoTodosBiomas){
+      try { localStorage.setItem(window.chaveConta(CHAVE_AVISO_TODOS_BIOMAS), 'true'); } catch(e){}
+    }
+    const mensagemTodosBiomas = mostrarAvisoTodosBiomas
+      ? '<div class="estagio-tela-todos">' + (en
+          ? 'You\'ve unlocked every biome! Swipe the Arena sideways to use whichever one you like.'
+          : 'Você desbloqueou todos os biomas! Arraste a Arena pro lado pra usar o que você quiser.')
+        + '</div>'
+      : '';
+
+    estagioTela.innerHTML =
+      '<div class="estagio-tela-titulo">' + (en ? 'Stage ' + numEstagioConcluido + ' Complete!' : 'Estágio ' + numEstagioConcluido + ' Concluído!') + '</div>' +
+      (heroImg ? '<img class="estagio-tela-hero" src="' + heroImg + '" alt="">' : '') +
+      previewArte +
+      '<div class="estagio-tela-sub"><span class="estagio-tela-sub-flag" aria-hidden="true">&#127937;</span>' +
+        (en ? 'Welcome to ' + tema.nome_en : 'Bem-vindo ao ' + tema.nome) +
+      '</div>' +
+      mensagemTodosBiomas +
+      '<button class="estagio-tela-continuar" id="estagioTelaContinuarBtn">' + (en ? 'Continue' : 'Continuar') + '</button>';
+
+    document.getElementById('estagioTelaContinuarBtn').onclick = fecharEstagioTelaCompleta;
+    // Som -- so aqui, na cerimonia (pedido do usuario, revisado: NAO no
+    // swipe manual do dia a dia, so na tela cheia de desbloqueio).
+    if (typeof tocarSom === 'function') tocarSom('estagioNovo');
+    // adia pro proximo frame -- mesmo padrao ja usado no popup de nivel/
+    // bau (.baubg/.lvlpop). Sem isso, o navegador pode colapsar "innerHTML
+    // populado + opacity:1 no mesmo tick" numa unica pintura, sem rodar a
+    // transicao (a tela so aparece de repente, sem fade -- exatamente o
+    // "nao ta aparecendo nenhuma animacao" relatado pelo usuario).
+    requestAnimationFrame(() => { estagioTela.classList.add('on'); });
+
+    // BUG CORRIGIDO (relatado pelo usuario: "aparece um popup e ja pula
+    // pro tema novo"): a troca de fundo (definirTemaArenaSalvo +
+    // renderTemaArena) rodava em viajarParaTemaEstagio(), ANTES dessa
+    // tela cheia sequer entrar na fila de popups -- se outro popup
+    // (nivel/bau) ja estivesse na fila, o fundo ja tinha mudado por baixo
+    // dele, visivel, bem antes da tela cheia abrir. Agora a troca so
+    // acontece AQUI, sincronizada com o fade de entrada desta tela --
+    // 350ms de espera (bate com a transicao de opacity de .estagio-tela.on
+    // no CSS) garante que a tela ja esta opaca cobrindo tudo quando o
+    // fundo muda por baixo dela, igual era a intencao original.
+    setTimeout(() => {
+      try {
+        if (typeof renderTemaArena === 'function') renderTemaArena();
+      } catch(e){
+        debugEstagio('ERRO ao pintar o fundo (mostrarEstagioDesbloqueado): ' + (e && e.message));
+      }
+    }, 350);
+  }
+
+  window.mostrarEstagioDesbloqueado = mostrarEstagioDesbloqueado;
 })();
 </script>
 
@@ -7391,7 +8231,9 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       'Cada tarefa concluída é um golpe no monstro, e me recompensa com experiência e moedas.',
       'No final do dia, se eu concluir todas as tarefas, o monstro morre e eu ganho recompensas: armaduras, espadas, acessórios e muitos outros equipamentos.',
       'Se eu não conseguir concluir todas, o monstro me golpeia — o dano é baseado em quantas tarefas eu deixar de fazer.',
-      'Toque em uma tarefa para marcar como feita ou editar. Segure uma tarefa para reordenar a lista.'
+      'Toque em uma tarefa para marcar como feita ou editar. Segure uma tarefa para reordenar a lista.',
+      'E tem mais: quanto mais tarefas eu completo, mais eu avanço de estágio — e o cenário da Arena muda de verdade, não é só decoração.',
+      'Ao alcançar o último estágio, desbloqueio todos os cenários e posso escolher qualquer um deles, arrastando a Arena pro lado.'
     ],
     inventario: [
       'Aqui guardo tudo que saqueei das batalhas: armas, armaduras, acessórios e alguns tesouros raros.',
@@ -7425,7 +8267,9 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       'Every task I finish is a hit on the monster, and rewards me with experience and coins.',
       'By the end of the day, if I finish every task, the monster dies and I get rewards: armor, swords, accessories, and lots of other gear.',
       'If I can\'t finish them all, the monster hits me back — the damage depends on how many tasks I leave undone.',
-      'Tap a task to mark it done or edit it. Hold a task to reorder the list.'
+      'Tap a task to mark it done or edit it. Hold a task to reorder the list.',
+      'There\'s more: the more tasks I complete, the further I advance through stages — and the Arena\'s scenery actually changes, it\'s not just decoration.',
+      'Once I reach the final stage, I unlock every scenery and can pick any of them by dragging the Arena sideways.'
     ],
     inventario: [
       'This is where I keep everything I\'ve looted from battle: weapons, armor, accessories, and a few rare treasures.',
@@ -7902,6 +8746,60 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 </script>
 
 <!-- =====================================================================
+     CONFIRMAR COMPRA/VENDA — folha genérica (pedido do usuário: comprar
+     na Loja e vender (Loja + ficha do inventário) agora pedem confirmação
+     em vez de executar na hora). Reaproveita .edov/.edsheet/.edsalvar,
+     mesmo padrão visual do zerarOverlay logo acima -- so uma folha, texto
+     e callback trocam por chamada via window.pedirConfirmacao().
+     ===================================================================== -->
+<div class="edov" id="confirmOverlay" style="z-index:90">
+  <div class="edsheet" id="confirmSheet">
+    <div class="edpuxador"></div>
+    <div class="edtitulo" id="confirmTitulo">Confirmar?</div>
+    <p id="confirmDesc" style="font-family:'Outfit',sans-serif;font-size:13px;color:var(--dim);line-height:1.5;margin:0 0 16px"></p>
+    <div class="edacoes">
+      <button class="edsalvar" id="confirmCancelar" type="button" style="background:var(--panel-2);color:var(--text)">Cancelar</button>
+      <button class="edsalvar" id="confirmOk" type="button">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const ov = document.getElementById('confirmOverlay');
+  const bC = document.getElementById('confirmCancelar');
+  const bOk = document.getElementById('confirmOk');
+  const elTitulo = document.getElementById('confirmTitulo');
+  const elDesc = document.getElementById('confirmDesc');
+  if (!ov || !bC || !bOk || !elTitulo || !elDesc) return;
+  let _callback = null;
+
+  function fechar(){ ov.classList.remove('on'); _callback = null; }
+  ov.onclick = e => { if (e.target === ov) fechar(); };
+  document.addEventListener('keydown', e => {
+    if (ov.classList.contains('on') && e.key === 'Escape') fechar();
+  });
+  bC.onclick = fechar;
+  bOk.onclick = () => {
+    const cb = _callback;
+    fechar();
+    if (cb) cb();
+  };
+
+  // window.pedirConfirmacao(titulo, desc, textoBotaoOk, aoConfirmar) --
+  // generico, usado por comprar() e venderItem() (ver pontos de chamada
+  // em montarLoja()/montarVenda()/abrirFicha()).
+  window.pedirConfirmacao = function(titulo, desc, textoOk, aoConfirmar){
+    elTitulo.textContent = titulo;
+    elDesc.textContent = desc;
+    bOk.textContent = textoOk;
+    _callback = aoConfirmar;
+    ov.classList.add('on');
+  };
+})();
+</script>
+
+<!-- =====================================================================
      ENTREGA DO GRIMORIO NO NIVEL V E CATALOGO DO GRIMORIO
      bloco autonomo, cole antes do fechamento do body.
      Chave propria: questlog.itensVistos.v1. Nao toca em salvar()/carregar()
@@ -8112,8 +9010,31 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     if (typeof MONSTROS === 'undefined' || typeof semente === 'undefined') return null;
     const dias = diasCorridosDe(iso);
     if (dias === null) return null;
-    const n = MONSTROS.length;
-    return ((dias + semente) % n + n) % n;   // modulo positivo, defensivo
+
+    // Sistema de Estagios: reaproveita o MESMO helper que monstroDoDia()/
+    // monstroDoDiaEm() usam (window.poolMonstrosFiltrado, definido perto
+    // de TEMAS_ARENA) -- antes essa logica de filtro estava DUPLICADA
+    // aqui, e so aqui tinha sido atualizada (bug: monstroDoDia(), que
+    // desenha o monstro de verdade na Arena, continuou sem filtro por
+    // uma leva inteira). Consolidado pra nao divergir de novo.
+    //
+    // PENDENCIA CONHECIDA: pra Historico (Estatisticas > ano/mes,
+    // preencherTileDia() reaproveita window.monstroIdDoDia), isso mostra
+    // o monstro daquele DIA como se o jogador estivesse no estagio de
+    // HOJE, mesmo pra dias passados de um estagio anterior -- o historico
+    // nao grava "em que estagio o jogador estava" por dia. Efeito visual
+    // pequeno (o pool generico e a maioria dos casos) e nao gera erro,
+    // mas nao e 100% historicamente fiel. Resolver isso exigiria salvar o
+    // estagio junto de cada entrada do historico -- fora do escopo desta
+    // leva.
+    const pool = (typeof window.poolMonstrosFiltrado === 'function')
+      ? window.poolMonstrosFiltrado()
+      : MONSTROS.map((m, i) => i);
+    const n = pool.length;
+    if (n === 0) return null; // defensivo -- nao deveria acontecer (sempre sobra o pool generico)
+
+    const idx = ((dias + semente) % n + n) % n; // modulo positivo, defensivo
+    return pool[idx]; // indice ORIGINAL em MONSTROS -- quem chama continua indexando MONSTROS normalmente
   }
   // exposta pra Estatisticas > Historico reaproveitar (pedido do usuario:
   // mostrar o monstro REAL de cada dia "fugiu", em vez de um icone
@@ -8191,6 +9112,14 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   }
 
   window.totalTarefasConcluidas = function(){ return total; };
+  // DEBUG apenas: forca o contador lifetime pra um valor especifico, sem
+  // mexer em XP/moeda/tarefas reais -- usado pelo botao de debug
+  // "forcar estagio" pra testar o Sistema de Estagios sem precisar
+  // completar 30+ tarefas de verdade em sessoes reais.
+  window._debugDefinirTotalTarefas = function(n){
+    total = Math.max(0, Math.round(n));
+    persistir();
+  };
 
   // chamado por puxarNuvem() apos restaurar CHAVE_CONCLUIDAS vinda da
   // nuvem -- mesmo motivo do vidaHeroi.recarregar() (ver bloco VIDA DO
@@ -9161,8 +10090,12 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   }
 
   // ruido curto (buffer de amostras aleatorias com fade) -- da corpo de
-  // "impacto" ao golpe, alem do tom puro
-  function ruido(c, { inicio=0, duracao=0.08, ganho=0.5 }){
+  // "impacto" ao golpe, alem do tom puro. passaAlta (opcional, Hz): filtro
+  // highpass, deixa o ruido mais "assobiado"/fino em vez de chiado cheio
+  // -- adicionado pro som de cerimonia de estagio (tocarSom('estagioNovo')),
+  // parametro default null preserva 100% o comportamento anterior pros
+  // outros efeitos que ja usam ruido() sem esse argumento.
+  function ruido(c, { inicio=0, duracao=0.08, ganho=0.5, passaAlta=null }){
     const tamanho = Math.max(1, Math.floor(c.sampleRate * duracao));
     const buffer = c.createBuffer(1, tamanho, c.sampleRate);
     const dados = buffer.getChannelData(0);
@@ -9172,7 +10105,15 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     const gain = c.createGain();
     gain.gain.setValueAtTime(Math.max(0.0001, volume * ganho), c.currentTime + inicio);
     gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + inicio + duracao);
-    fonte.connect(gain).connect(c.destination);
+    let no = fonte;
+    if (passaAlta){
+      const filtro = c.createBiquadFilter();
+      filtro.type = 'highpass';
+      filtro.frequency.value = passaAlta;
+      fonte.connect(filtro);
+      no = filtro;
+    }
+    no.connect(gain).connect(c.destination);
     fonte.start(c.currentTime + inicio);
   }
 
@@ -9250,6 +10191,11 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     poofBau: c => {                                       // "puf" unico -- bau spawnando na Arena (opcao "O", metade do "poof duplo" do preview de SFX). Pedido do usuario: reaproveitado TAMBEM pro monstro desaparecendo (mostrarPoofMonstro) em vez de criar um som novo pra isso -- ver comentario la
       ruido(c, { duracao:0.05, ganho:0.36 });
       tom(c, { freq:300, freqFinal:600, tipo:'triangle', duracao:0.06, ganho:0.22 });
+    },
+    estagioNovo: c => {                                    // tema de Arena desbloqueado (Sistema de Estagios) -- toca so na tela cheia de cerimonia, nao no swipe manual (pedido do usuario). Opcao "Portal" do preview de SFX aprovado: duas notas deslizando em paralelo + leve ruido de ataque, mais presente que um whoosh simples pra bater com o peso do momento
+      ruido(c, { duracao:0.06, ganho:0.3, passaAlta:800 });
+      tom(c, { freq:440, freqFinal:660, tipo:'triangle', duracao:0.28, ganho:0.26 });
+      tom(c, { freq:660, freqFinal:990, tipo:'sine', inicio:0.03, duracao:0.26, ganho:0.18 });
     }
   };
 
@@ -9595,7 +10541,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   if (!cfg) return;
   cfg.addEventListener('click', e => {
     if (e.target.closest('.swch')) return;
-    if (e.target.closest('.cfgrow.cfglink, .cfgbtn')) window.feedbackClique('clique', 10);
+    if (e.target.closest('.cfgrow.cfglink, .cfgbtn, .cfgbtnfull')) window.feedbackClique('clique', 10);
   });
 })();
 </script>
@@ -10419,7 +11365,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     elDentro.classList.add('on');
     elDentro.getBoundingClientRect(); // forca reflow -- sem isso o browser agrupa a mudanca de
                                        // transform com a linha de baixo e nao anima nada
-    elFora.style.transition = elDentro.style.transition = 'transform ' + DURACAO_SLIDE + 'ms ease';
+    elFora.style.transition = elDentro.style.transition = 'transform ' + DURACAO_SLIDE + 'ms var(--spring-curve)';
     elFora.style.transform = 'translateX(' + (direcao > 0 ? '-100%' : '100%') + ')';
     elDentro.style.transform = 'translateX(0)';
 
@@ -10583,8 +11529,10 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   document.getElementById('irPasso3').onclick = () => {
     if (typeof desenharHeroi === 'function') desenharHeroi();
     irPara(8);                                                     // heroi -> tarefas
-    const campoTarefa = document.getElementById('primeiraTarefa');
-    if (campoTarefa) campoTarefa.focus();
+    // v4.153 (pedido do usuario, bug real no celular): .focus() aqui
+    // abria o teclado sozinho assim que a tela aparecia, sem o usuario
+    // tocar em nada. Removido -- toda tela do onboarding deve exigir
+    // toque no campo antes de digitar, nenhuma excecao.
   };
 
   // ---------- arrastar pro lado (arraste de verdade, acompanha o dedo) ----------
@@ -11955,6 +12903,29 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       if (typeof render === 'function') render();
       if (typeof renderInventario === 'function') renderInventario();
       if (typeof aviso === 'function') aviso(qtd + ' ARMAS ADICIONADAS AO INVENTARIO');
+    };
+  }
+
+  const btnEstagio = document.getElementById('debugEstagioBtn');
+  if (btnEstagio){
+    btnEstagio.onclick = () => {
+      // DEBUG: pula o contador lifetime de tarefas direto pro proximo
+      // limiar de estagio (ver LIMIARES_ESTAGIO/_debugDefinirTotalTarefas),
+      // sem completar tarefa nenhuma de verdade -- so pra testar a
+      // viagem/popup do Sistema de Estagios sem grind.
+      if (typeof window._debugDefinirTotalTarefas !== 'function' || typeof window.totalTarefasConcluidas !== 'function'){
+        console.error('debug forcar estagio: _debugDefinirTotalTarefas indisponivel');
+        return;
+      }
+      const atual = window.totalTarefasConcluidas();
+      const limiares = (typeof LIMIARES_ESTAGIO !== 'undefined') ? LIMIARES_ESTAGIO : [30, 90, 200];
+      const proximo = limiares.find(v => v > atual);
+      if (proximo === undefined){
+        if (typeof aviso === 'function') aviso('JÁ ESTÁ NO ÚLTIMO ESTÁGIO');
+        return;
+      }
+      window._debugDefinirTotalTarefas(proximo);
+      if (typeof render === 'function') render();
     };
   }
 

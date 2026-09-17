@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>DungeonLog · Mockup de Animações</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#1A1526;
+    --panel:#1A1526;
+    --panel-2:#251E38;
+    --panel-3:#2A2240;
+    --line:#3B3057;
+    --text:#F5F0E9;
+    --muted:#B9AED2;
+    --dim:#8779A8;
+    --accent:#F2A65A;
+    --accent-dim:#5A3D20;
+    --gold:#F2C94C;
+    --blood:#E5698A;
+    --verde:#63C99A;
+    --perigo:#F45781;
+    --sel-bg:#342A50;
+    /* modern spring curves */
+    --spring: cubic-bezier(.34,1.56,.64,1);
+    --expo: cubic-bezier(.16,1,.3,1);
+    --smooth: cubic-bezier(.4,0,.2,1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:radial-gradient(1200px 800px at 20% -10%, #2A2148 0%, var(--bg) 55%), var(--bg);
+    color:var(--text);
+    font-family:'Outfit',system-ui,sans-serif;
+    display:flex;justify-content:center;
+    min-height:100vh;min-height:100dvh;
+    padding:24px 16px 60px;
+  }
+  .page{width:100%;max-width:1180px}
+  .head{margin-bottom:28px;text-align:center}
+  .head h1{font-family:'Silkscreen',monospace;font-size:18px;color:var(--accent);letter-spacing:1px;margin-bottom:8px;
+    animation:fadeUp .5s var(--expo) both}
+  .head p{color:var(--muted);font-size:13.5px;max-width:520px;margin:0 auto;
+    animation:fadeUp .5s var(--expo) .05s both}
+  .badge{display:inline-flex;align-items:center;gap:6px;font-family:'Silkscreen',monospace;font-size:9px;color:var(--verde);
+    background:color-mix(in srgb, var(--verde) 14%, transparent);border:1px solid color-mix(in srgb, var(--verde) 35%, transparent);
+    padding:5px 10px;border-radius:999px;margin-bottom:14px;animation:fadeUp .5s var(--expo) both}
+  .badge svg{width:10px;height:10px}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px}
+  .card{
+    background:var(--panel-2);border:1px solid var(--line);border-radius:18px;
+    padding:20px;position:relative;overflow:hidden;
+    animation:fadeUp .55s var(--expo) both;
+  }
+  .card:nth-child(1){animation-delay:.05s}
+  .card:nth-child(2){animation-delay:.1s}
+  .card:nth-child(3){animation-delay:.15s}
+  .card:nth-child(4){animation-delay:.2s}
+  .card:nth-child(5){animation-delay:.25s}
+  .card:nth-child(6){animation-delay:.3s}
+  .card h2{font-family:'Silkscreen',monospace;font-size:11px;color:var(--accent);letter-spacing:.5px;margin-bottom:4px}
+  .card .desc{color:var(--dim);font-size:11.5px;margin-bottom:16px;line-height:1.5}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+  /* ---------- 1. Botao com press + ripple ---------- */
+  .demo-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .btn{
+    position:relative;overflow:hidden;isolation:isolate;
+    background:var(--accent);color:var(--bg);border:none;border-radius:11px;
+    padding:12px 20px;font-family:'Outfit',sans-serif;font-size:13.5px;font-weight:600;
+    cursor:pointer;transition:transform .16s var(--spring), box-shadow .2s var(--smooth), background .2s;
+    box-shadow:0 1px 0 rgba(255,255,255,.15) inset, 0 6px 16px -6px rgba(242,166,90,.5);
+  }
+  .btn:hover{box-shadow:0 1px 0 rgba(255,255,255,.2) inset, 0 10px 22px -6px rgba(242,166,90,.65)}
+  .btn:active{transform:scale(.94)}
+  .btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent-dim);box-shadow:none}
+  .btn.ghost:hover{background:var(--accent-dim)}
+  .ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.5);transform:scale(0);opacity:.6;
+    animation:rippleGo .55s var(--expo) forwards;pointer-events:none;z-index:0}
+  @keyframes rippleGo{to{transform:scale(2.6);opacity:0}}
+
+  /* ---------- 2. Arena / combate ---------- */
+  .arena{background:var(--panel-3);border:1px solid var(--line);border-radius:14px;padding:20px 14px 16px;position:relative;overflow:hidden}
+  .fight{display:flex;align-items:center;justify-content:center;gap:34px;margin-bottom:14px}
+  .fighter{display:flex;flex-direction:column;align-items:center;gap:6px}
+  .sprite{width:56px;height:56px;border-radius:14px;display:grid;place-items:center;font-size:26px;
+    background:linear-gradient(160deg,var(--sel-bg),var(--panel-3));border:1px solid var(--line);
+    transition:transform .12s var(--smooth)}
+  .sprite.hero{transform-origin:70% 90%}
+  .sprite.mob{transform-origin:30% 90%}
+  .sprite.hit{animation:hitShake .32s var(--smooth)}
+  .sprite.dead{animation:mobDie .5s var(--expo) forwards}
+  @keyframes hitShake{
+    0%{transform:translateX(0) rotate(0)}
+    25%{transform:translateX(-6px) rotate(-4deg)}
+    55%{transform:translateX(5px) rotate(3deg)}
+    100%{transform:translateX(0) rotate(0)}
+  }
+  @keyframes mobDie{
+    0%{opacity:1;transform:none}
+    100%{opacity:0;transform:translateY(16px) scale(.55) rotate(14deg)}
+  }
+  .vs{font-family:'Outfit',sans-serif;font-size:11px;color:var(--dim);letter-spacing:1px}
+  .hpbarwrap{width:56px}
+  .hpbar{height:6px;border-radius:3px;background:var(--panel);border:1px solid var(--line);overflow:hidden}
+  .hpfill{height:100%;background:linear-gradient(180deg,#F4899B,var(--perigo));border-radius:2px;width:100%;
+    transition:width .5s var(--expo)}
+  .dmg-float{position:absolute;left:0;top:0;pointer-events:none;font-family:'Silkscreen',monospace;font-size:13px;font-weight:700;color:var(--gold);
+    text-shadow:0 1px 3px rgba(0,0,0,.6);animation:dmgFloat 1s var(--expo) forwards}
+  @keyframes dmgFloat{
+    0%{transform:translate(-50%,-50%) scale(.6);opacity:0}
+    18%{transform:translate(-50%,-50%) scale(1.08);opacity:1}
+    60%{transform:translate(-50%,-50%) scale(1);opacity:1}
+    100%{transform:translate(-50%,calc(-50% - 30px)) scale(1);opacity:0}
+  }
+  .spark{position:absolute;left:0;top:0;width:6px;height:6px;border-radius:50%;background:var(--gold);
+    pointer-events:none;animation:sparkGo .6s var(--expo) forwards}
+  @keyframes sparkGo{
+    0%{transform:translate(-50%,-50%) scale(.4);opacity:1}
+    100%{transform:translate(calc(-50% + var(--sx)),calc(-50% + var(--sy))) scale(0);opacity:0}
+  }
+  .arenactl{display:flex;justify-content:center;gap:8px;margin-top:4px}
+  .vitoria{display:none;text-align:center;flex-direction:column;align-items:center;gap:4px}
+  .vitoria.on{display:flex;animation:vitoriaPop .45s var(--spring) both}
+  @keyframes vitoriaPop{from{opacity:0;transform:translateY(6px) scale(.9)}to{opacity:1;transform:none}}
+  .vitoria .faixa{font-family:'Silkscreen',monospace;font-size:12px;color:var(--gold);letter-spacing:1px;
+    text-shadow:0 0 16px rgba(242,201,76,.55)}
+
+  /* ---------- 3. XP bar com shimmer ---------- */
+  .xprow{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted);margin-bottom:8px}
+  .xprow b{color:var(--text)}
+  .xpbar{height:11px;border-radius:6px;background:var(--panel);border:1px solid var(--line);overflow:hidden;position:relative}
+  .xpfill{height:100%;width:22%;border-radius:5px;position:relative;overflow:hidden;
+    background:linear-gradient(180deg,#7FCBF3,#3F9BD6);
+    transition:width .8s var(--expo)}
+  .xpfill::after{
+    content:'';position:absolute;inset:0;
+    background:linear-gradient(100deg,transparent 30%, rgba(255,255,255,.55) 45%, transparent 60%);
+    transform:translateX(-100%);animation:shimmer 2.2s ease-in-out infinite;
+  }
+  @keyframes shimmer{to{transform:translateX(220%)}}
+
+  /* ---------- 4. Lista de tarefas com stagger + checkbox morph ---------- */
+  .tasklist{display:flex;flex-direction:column;gap:9px}
+  .task{
+    display:flex;align-items:center;gap:11px;background:var(--panel);border:1px solid var(--line);
+    border-left:3px solid var(--accent-dim);border-radius:10px;padding:11px 13px;cursor:pointer;
+    transition:transform .25s var(--expo), opacity .3s, border-color .2s, background .2s;
+    animation:taskIn .4s var(--expo) both;
+  }
+  .task:nth-child(1){animation-delay:.05s}
+  .task:nth-child(2){animation-delay:.12s}
+  .task:nth-child(3){animation-delay:.19s}
+  @keyframes taskIn{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:none}}
+  .task:hover{border-left-color:var(--accent)}
+  .task.done{opacity:.5;border-left-color:var(--verde)}
+  .task.done .label{text-decoration:line-through}
+  .box{
+    width:19px;height:19px;flex:none;border:1.5px solid var(--dim);border-radius:6px;
+    display:grid;place-items:center;transition:all .25s var(--spring);position:relative
+  }
+  .task.done .box{background:var(--verde);border-color:var(--verde);transform:scale(1.05)}
+  .box svg{width:11px;height:11px;stroke:var(--bg);fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;
+    stroke-dasharray:20;stroke-dashoffset:20;transition:stroke-dashoffset .3s var(--expo) .05s}
+  .task.done .box svg{stroke-dashoffset:0}
+  .label{font-size:13.5px;flex:1}
+  .task .pts{font-family:'Silkscreen',monospace;font-size:9.5px;color:var(--accent)}
+
+  /* ---------- 5. Nav com pill spring ---------- */
+  .navdemo{display:flex;position:relative;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:6px;gap:4px}
+  .navpill{position:absolute;top:6px;left:6px;width:calc((100% - 12px)/3);height:calc(100% - 12px);
+    border-radius:10px;background:var(--accent-dim);border:1px solid rgba(255,255,255,.12);
+    transition:transform .4s var(--spring);z-index:0}
+  .navbtn{flex:1;position:relative;z-index:1;background:none;border:none;cursor:pointer;padding:10px 4px;
+    display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--dim);font-size:9.5px;
+    font-family:'Outfit',sans-serif;transition:color .25s, transform .3s var(--spring)}
+  .navbtn.on{color:var(--accent);transform:translateY(-2px)}
+  .navbtn span{font-size:17px}
+
+  /* ---------- 6. Toast moderno ---------- */
+  .toastdemo{position:relative;height:110px;border-radius:12px;background:var(--panel);border:1px dashed var(--line);
+    display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .toast{
+    position:absolute;bottom:16px;left:50%;transform:translate(-50%,26px) scale(.92);
+    background:var(--panel-2);border:1px solid var(--line);color:var(--text);
+    font-size:12px;font-weight:500;padding:10px 16px;border-radius:11px;
+    display:flex;align-items:center;gap:8px;opacity:0;pointer-events:none;
+    box-shadow:0 14px 30px -8px rgba(0,0,0,.5);
+    backdrop-filter:blur(6px);
+    transition:transform .45s var(--spring), opacity .3s;
+  }
+  .toast.on{opacity:1;transform:translate(-50%,0) scale(1)}
+  .toast .dot{width:7px;height:7px;border-radius:50%;background:var(--verde);flex:none;box-shadow:0 0 8px var(--verde)}
+
+  /* ---------- 7. Modal com blur backdrop ---------- */
+  .modaldemo{position:relative;height:170px;border-radius:12px;background:var(--panel);border:1px dashed var(--line);overflow:hidden;
+    display:flex;align-items:center;justify-content:center}
+  .backdrop{position:absolute;inset:0;background:rgba(10,7,18,0);backdrop-filter:blur(0px);
+    display:flex;align-items:center;justify-content:center;transition:background .3s var(--smooth), backdrop-filter .3s var(--smooth);
+    pointer-events:none}
+  .backdrop.on{background:rgba(10,7,18,.55);backdrop-filter:blur(3px);pointer-events:auto}
+  .modal{background:var(--panel-2);border:1px solid var(--line);border-radius:14px;padding:16px 18px;width:80%;
+    text-align:center;transform:translateY(14px) scale(.9);opacity:0;transition:transform .38s var(--spring), opacity .3s}
+  .backdrop.on .modal{transform:none;opacity:1}
+  .modal b{font-family:'Silkscreen',monospace;font-size:11px;color:var(--gold)}
+  .modal p{font-size:11.5px;color:var(--muted);margin:6px 0 12px}
+
+  /* ---------- 8. Level up burst ---------- */
+  .lvldemo{position:relative;height:140px;border-radius:12px;background:var(--panel);border:1px dashed var(--line);
+    display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .lvlpill{
+    font-family:'Silkscreen',monospace;font-size:13px;color:var(--accent);background:var(--accent-dim);
+    padding:9px 16px;border-radius:8px;position:relative;z-index:2
+  }
+  .lvlpill.pop{animation:lvlPop .55s var(--spring)}
+  @keyframes lvlPop{0%{transform:scale(1)}45%{transform:scale(1.35) rotate(-3deg);box-shadow:0 0 24px var(--gold)}100%{transform:scale(1)}}
+  .confetti{position:absolute;width:6px;height:10px;top:50%;left:50%;pointer-events:none;border-radius:1px;
+    animation:confettiGo .9s var(--expo) forwards}
+  @keyframes confettiGo{
+    0%{transform:translate(-50%,-50%) rotate(0deg) scale(1);opacity:1}
+    100%{transform:translate(calc(-50% + var(--cx)),calc(-50% + var(--cy))) rotate(var(--cr)) scale(.4);opacity:0}
+  }
+
+  .footnote{text-align:center;color:var(--dim);font-size:11.5px;margin-top:34px;line-height:1.6}
+  .footnote code{color:var(--muted);background:var(--panel-2);padding:2px 6px;border-radius:5px;font-size:11px}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="head">
+    <div class="badge"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2 2 7l10 5 10-5-10-5Zm0 8L2 15l10 5 10-5-10-5Z"/></svg>MOCKUP · SÓ VISUAL</div>
+    <h1>DUNGEONLOG — Animações</h1>
+    <p>Protótipo isolado pra testar um conjunto de animações mais modernas (spring, shimmer, stagger, blur) antes de levar pro app de verdade. Nada aqui altera o jogo. Interaja com os cards abaixo.</p>
+  </div>
+
+  <div class="grid">
+
+    <!-- Botões -->
+    <div class="card">
+      <h2>BOTÕES</h2>
+      <div class="desc">Press mais tátil (spring no scale) + ripple no clique, em vez de só opacidade.</div>
+      <div class="demo-row">
+        <button class="btn" id="btnRipple">Atacar</button>
+        <button class="btn ghost" id="btnRipple2">Fugir</button>
+      </div>
+    </div>
+
+    <!-- Nav -->
+    <div class="card">
+      <h2>NAVEGAÇÃO</h2>
+      <div class="desc">Pill com curva "spring" (overshoot leve) em vez de ease padrão — sensação de elástico.</div>
+      <div class="navdemo" id="navDemo">
+        <div class="navpill" id="navPill"></div>
+        <button class="navbtn on" data-i="0"><span>⚔️</span>Batalha</button>
+        <button class="navbtn" data-i="1"><span>📜</span>Missões</button>
+        <button class="navbtn" data-i="2"><span>📊</span>Status</button>
+      </div>
+    </div>
+
+    <!-- Arena -->
+    <div class="card" style="grid-column:span 2">
+      <h2>ARENA DE COMBATE</h2>
+      <div class="desc">Hit shake no impacto, dano flutuante com "pop", HP com easing elástico e faíscas na vitória.</div>
+      <div class="arena" id="arena">
+        <div class="fight">
+          <div class="fighter">
+            <div class="sprite hero" id="hero">🧙</div>
+            <div class="hpbarwrap"><div class="hpbar"><div class="hpfill" id="heroHp" style="width:100%"></div></div></div>
+          </div>
+          <div class="vs" id="vsLabel">VS</div>
+          <div class="fighter" id="mobFighter">
+            <div class="sprite mob" id="mob">👾</div>
+            <div class="hpbarwrap"><div class="hpbar"><div class="hpfill" id="mobHp" style="width:100%"></div></div></div>
+          </div>
+        </div>
+        <div class="vitoria" id="vitoria"><div class="faixa">DIA VENCIDO!</div></div>
+        <div class="arenactl">
+          <button class="btn" id="btnAtacar">Golpe</button>
+          <button class="btn ghost" id="btnReset">Reiniciar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- XP bar -->
+    <div class="card">
+      <h2>BARRA DE XP</h2>
+      <div class="desc">Shimmer contínuo + preenchimento com overshoot suave ao ganhar XP.</div>
+      <div class="xprow"><span>Nível 4</span><b id="xpLbl">220 / 1000 XP</b></div>
+      <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
+      <div class="demo-row" style="margin-top:12px"><button class="btn ghost" id="btnXp">+ Ganhar XP</button></div>
+    </div>
+
+    <!-- Tarefas -->
+    <div class="card">
+      <h2>LISTA DE TAREFAS</h2>
+      <div class="desc">Entrada em cascata (stagger) + checkbox com "morph" desenhando o check.</div>
+      <div class="tasklist" id="taskList">
+        <div class="task"><div class="box"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div><div class="label">Treinar 30min</div><div class="pts">+15</div></div>
+        <div class="task"><div class="box"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div><div class="label">Ler 10 páginas</div><div class="pts">+10</div></div>
+        <div class="task"><div class="box"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></div><div class="label">Beber 2L de água</div><div class="pts">+5</div></div>
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="card">
+      <h2>TOAST</h2>
+      <div class="desc">Sobe com leve overshoot elástico e blur no fundo, em vez de só fade.</div>
+      <div class="toastdemo">
+        <div class="toast" id="toastEl"><span class="dot"></span>Tarefa concluída!</div>
+      </div>
+      <div class="demo-row" style="margin-top:12px"><button class="btn ghost" id="btnToast">Mostrar toast</button></div>
+    </div>
+
+    <!-- Modal -->
+    <div class="card">
+      <h2>MODAL / OVERLAY</h2>
+      <div class="desc">Backdrop com blur progressivo + conteúdo entrando com spring, mais premium que um fade simples.</div>
+      <div class="modaldemo">
+        <div class="backdrop" id="backdrop">
+          <div class="modal">
+            <b>LOJA DA MASMORRA</b>
+            <p>Comprar Poção de Vida por 30 moedas?</p>
+            <button class="btn" id="btnCloseModal" style="width:100%">Confirmar</button>
+          </div>
+        </div>
+        <button class="btn ghost" id="btnOpenModal">Abrir loja</button>
+      </div>
+    </div>
+
+    <!-- Level up -->
+    <div class="card">
+      <h2>LEVEL UP</h2>
+      <div class="desc">Selo com "punch" de escala + explosão de confetes nas cores do tema.</div>
+      <div class="lvldemo" id="lvlDemo">
+        <div class="lvlpill" id="lvlPill">NÍVEL 5</div>
+      </div>
+      <div class="demo-row" style="margin-top:12px"><button class="btn ghost" id="btnLvl">Subir de nível</button></div>
+    </div>
+
+  </div>
+
+  <div class="footnote">
+    Gostou de algum efeito específico? Me diga quais (ex: "gosto do hit shake e do toast") e eu já aplico só esses no <code>play/index.html</code> e <code>play/style.css</code> reais.
+  </div>
+</div>
+
+<script>
+  // ---- Ripple nos botões ----
+  document.querySelectorAll('.btn').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      const r = document.createElement('span');
+      r.className='ripple';
+      const rect = btn.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height);
+      r.style.width = r.style.height = size+'px';
+      r.style.left = (e.clientX-rect.left-size/2)+'px';
+      r.style.top = (e.clientY-rect.top-size/2)+'px';
+      btn.appendChild(r);
+      setTimeout(()=>r.remove(), 600);
+    });
+  });
+
+  // ---- Nav pill ----
+  const navDemo = document.getElementById('navDemo');
+  const navPill = document.getElementById('navPill');
+  navDemo.querySelectorAll('.navbtn').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      navDemo.querySelectorAll('.navbtn').forEach(x=>x.classList.remove('on'));
+      b.classList.add('on');
+      navPill.style.transform = `translateX(${100*b.dataset.i}%)`;
+    });
+  });
+
+  // ---- Arena ----
+  const hero=document.getElementById('hero'), mob=document.getElementById('mob');
+  const heroHp=document.getElementById('heroHp'), mobHp=document.getElementById('mobHp');
+  const arena=document.getElementById('arena'), mobFighter=document.getElementById('mobFighter');
+  const vitoria=document.getElementById('vitoria'), vsLabel=document.getElementById('vsLabel');
+  let mobHpPct=100, heroHpPct=100, mobDead=false;
+
+  function spawnDmg(target, val, color){
+    const rect = target.getBoundingClientRect(), arect = arena.getBoundingClientRect();
+    const el = document.createElement('div');
+    el.className='dmg-float';
+    el.textContent = '-'+val;
+    el.style.color = color;
+    el.style.left = (rect.left-arect.left+rect.width/2)+'px';
+    el.style.top = (rect.top-arect.top+rect.height/2)+'px';
+    arena.appendChild(el);
+    setTimeout(()=>el.remove(), 1000);
+  }
+  function spawnSparks(target, count){
+    const rect = target.getBoundingClientRect(), arect = arena.getBoundingClientRect();
+    for(let i=0;i<count;i++){
+      const s = document.createElement('div');
+      s.className='spark';
+      const ang = Math.random()*Math.PI*2, dist = 24+Math.random()*30;
+      s.style.setProperty('--sx', Math.cos(ang)*dist+'px');
+      s.style.setProperty('--sy', Math.sin(ang)*dist+'px');
+      s.style.left = (rect.left-arect.left+rect.width/2)+'px';
+      s.style.top = (rect.top-arect.top+rect.height/2)+'px';
+      s.style.background = ['#F2C94C','#F2A65A','#63C99A'][i%3];
+      arena.appendChild(s);
+      setTimeout(()=>s.remove(), 650);
+    }
+  }
+
+  document.getElementById('btnAtacar').addEventListener('click', ()=>{
+    if(mobDead) return;
+    const dmg = 12+Math.floor(Math.random()*10);
+    mobHpPct = Math.max(0, mobHpPct-dmg);
+    mobHp.style.width = mobHpPct+'%';
+    mob.classList.remove('hit'); void mob.offsetWidth; mob.classList.add('hit');
+    spawnDmg(mob, dmg, '#F2C94C');
+
+    setTimeout(()=>{
+      if(mobHpPct<=0){
+        mobDead=true;
+        mob.classList.add('dead');
+        spawnSparks(mobFighter, 8);
+        vsLabel.style.opacity='0';
+        setTimeout(()=>vitoria.classList.add('on'), 250);
+        return;
+      }
+      // contra-ataque
+      const back = 4+Math.floor(Math.random()*8);
+      heroHpPct = Math.max(0, heroHpPct-back);
+      heroHp.style.width = heroHpPct+'%';
+      hero.classList.remove('hit'); void hero.offsetWidth; hero.classList.add('hit');
+      spawnDmg(hero, back, '#F45781');
+    }, 260);
+  });
+
+  document.getElementById('btnReset').addEventListener('click', ()=>{
+    mobHpPct=100; heroHpPct=100; mobDead=false;
+    mobHp.style.width='100%'; heroHp.style.width='100%';
+    mob.classList.remove('dead');
+    vitoria.classList.remove('on');
+    vsLabel.style.opacity='1';
+  });
+
+  // ---- XP bar ----
+  const xpFill = document.getElementById('xpFill'), xpLbl = document.getElementById('xpLbl');
+  let xp = 220;
+  document.getElementById('btnXp').addEventListener('click', ()=>{
+    xp = Math.min(1000, xp+120);
+    xpFill.style.width = (xp/1000*100)+'%';
+    xpLbl.textContent = xp+' / 1000 XP';
+  });
+
+  // ---- Tarefas ----
+  document.querySelectorAll('.task').forEach(t=>{
+    t.addEventListener('click', ()=> t.classList.toggle('done'));
+  });
+
+  // ---- Toast ----
+  const toastEl = document.getElementById('toastEl');
+  document.getElementById('btnToast').addEventListener('click', ()=>{
+    toastEl.classList.remove('on'); void toastEl.offsetWidth;
+    toastEl.classList.add('on');
+    clearTimeout(toastEl._t);
+    toastEl._t = setTimeout(()=>toastEl.classList.remove('on'), 1800);
+  });
+
+  // ---- Modal ----
+  const backdrop = document.getElementById('backdrop');
+  document.getElementById('btnOpenModal').addEventListener('click', ()=>backdrop.classList.add('on'));
+  document.getElementById('btnCloseModal').addEventListener('click', ()=>backdrop.classList.remove('on'));
+  backdrop.addEventListener('click', e=>{ if(e.target===backdrop) backdrop.classList.remove('on'); });
+
+  // ---- Level up ----
+  const lvlPill = document.getElementById('lvlPill'), lvlDemo = document.getElementById('lvlDemo');
+  document.getElementById('btnLvl').addEventListener('click', ()=>{
+    lvlPill.classList.remove('pop'); void lvlPill.offsetWidth;
+    lvlPill.classList.add('pop');
+    const colors = ['#F2C94C','#F2A65A','#63C99A','#E5698A','#7FCBF3'];
+    for(let i=0;i<26;i++){
+      const c = document.createElement('div');
+      c.className='confetti';
+      const ang = Math.random()*Math.PI*2, dist = 60+Math.random()*70;
+      c.style.setProperty('--cx', Math.cos(ang)*dist+'px');
+      c.style.setProperty('--cy', Math.sin(ang)*dist+'px');
+      c.style.setProperty('--cr', (Math.random()*720-360)+'deg');
+      c.style.background = colors[i%colors.length];
+      c.style.animationDelay = (Math.random()*0.08)+'s';
+      lvlDemo.appendChild(c);
+      setTimeout(()=>c.remove(), 1000);
+    }
+  });
+</script>
+</body>
+</html>

@@ -74,13 +74,13 @@
   }
   .hero-sprite.hit{animation:heroLunge .22s var(--expo)}
   .hero-sprite.ferido{animation:spriteShake .2s var(--expo)}
-  .mob-sprite.shake{animation:spriteShake .2s var(--expo)}
-  @keyframes summonPop{
-    0%{transform:scale(0) rotate(-8deg);opacity:0}
-    60%{transform:scale(1.15) rotate(3deg);opacity:1}
-    100%{transform:scale(1) rotate(0);opacity:1}
+  @keyframes mobShakeForte{
+    0%,100%{transform:translateX(0) rotate(0)}
+    22%{transform:translateX(-9px) rotate(-6deg)}
+    50%{transform:translateX(7px) rotate(5deg)}
+    78%{transform:translateX(-3px) rotate(-2deg)}
   }
-  .mob-sprite.summonPop{animation:summonPop .45s var(--spring-curve)}
+  .mob-sprite.shake{animation:mobShakeForte .2s var(--expo)}
   @keyframes fuga{
     0%{opacity:1;transform:none}
     25%{transform:translateX(6px) translateY(-4px)}

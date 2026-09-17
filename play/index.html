@@ -4005,13 +4005,18 @@ if (spanNome) spanNome.style.display = 'none';
 // ---------- boas-vindas ----------
 let tarefasIniciais = [];
 
+let _passoAtual = 1;
 function mostrarPasso(n){
+  const direcao = n >= _passoAtual ? 1 : -1;
+  _passoAtual = n;
   ['passo1','passo2','passoHeroi','passo3'].forEach((id, i) => {
     const el = document.getElementById(id);
     const ativar = i === n - 1;
+    el.classList.remove('passoIn', 'passoInVolta');
     el.classList.toggle('on', ativar);
     if (ativar){
-      el.classList.remove('passoIn'); void el.offsetWidth; el.classList.add('passoIn');
+      void el.offsetWidth;
+      el.classList.add(direcao > 0 ? 'passoIn' : 'passoInVolta');
     }
   });
 }
@@ -4093,7 +4098,8 @@ document.getElementById('voltarNome').onclick = () => mostrarPasso(2);
 document.getElementById('irPasso3').onclick = () => {
   desenharHeroi();
   mostrarPasso(4);
-  document.getElementById('primeiraTarefa').focus();
+  // v4.153: mesmo fix do handler ativo (ver irPara(8) mais abaixo) --
+  // sem autofocus, usuario sempre toca antes de digitar.
 };
 
 const campoNomeIni = document.getElementById('nomeHeroi');
@@ -4125,17 +4131,6 @@ document.getElementById('entrar').onclick = () => {
   jaComecou = true;
   document.getElementById('intro').classList.add('off');
   render();
-  // v4.147 (pedido do usuario, comparando com v0): o monstro so aparecia
-  // estatico ao sair do onboarding, sem nenhuma entrada. Espera o fade
-  // do .intro (300ms, ver .intro.off no style.css) e "invoca" o monstro
-  // com um pop -- nao mexe em render()/mobHp/nenhuma logica de combate.
-  setTimeout(() => {
-    const m = document.getElementById('mobSprite');
-    if (m){
-      m.classList.remove('summonPop'); void m.offsetWidth; m.classList.add('summonPop');
-      setTimeout(() => m.classList.remove('summonPop'), 450);
-    }
-  }, 300);
 };
 
 // ---------- navegacao entre abas ----------
@@ -8757,14 +8752,14 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
      mesmo padrão visual do zerarOverlay logo acima -- so uma folha, texto
      e callback trocam por chamada via window.pedirConfirmacao().
      ===================================================================== -->
-<div class="edov" id="confirmOverlay">
+<div class="edov" id="confirmOverlay" style="z-index:90">
   <div class="edsheet" id="confirmSheet">
     <div class="edpuxador"></div>
     <div class="edtitulo" id="confirmTitulo">Confirmar?</div>
     <p id="confirmDesc" style="font-family:'Outfit',sans-serif;font-size:13px;color:var(--dim);line-height:1.5;margin:0 0 16px"></p>
     <div class="edacoes">
       <button class="edsalvar" id="confirmCancelar" type="button" style="background:var(--panel-2);color:var(--text)">Cancelar</button>
-      <button class="edsalvar" id="confirmOk" type="button" style="font-size:17px;padding:17px;border-radius:999px">Confirmar</button>
+      <button class="edsalvar" id="confirmOk" type="button">Confirmar</button>
     </div>
   </div>
 </div>
@@ -11370,7 +11365,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     elDentro.classList.add('on');
     elDentro.getBoundingClientRect(); // forca reflow -- sem isso o browser agrupa a mudanca de
                                        // transform com a linha de baixo e nao anima nada
-    elFora.style.transition = elDentro.style.transition = 'transform ' + DURACAO_SLIDE + 'ms var(--expo)';
+    elFora.style.transition = elDentro.style.transition = 'transform ' + DURACAO_SLIDE + 'ms var(--spring-curve)';
     elFora.style.transform = 'translateX(' + (direcao > 0 ? '-100%' : '100%') + ')';
     elDentro.style.transform = 'translateX(0)';
 
@@ -11534,8 +11529,10 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   document.getElementById('irPasso3').onclick = () => {
     if (typeof desenharHeroi === 'function') desenharHeroi();
     irPara(8);                                                     // heroi -> tarefas
-    const campoTarefa = document.getElementById('primeiraTarefa');
-    if (campoTarefa) campoTarefa.focus();
+    // v4.153 (pedido do usuario, bug real no celular): .focus() aqui
+    // abria o teclado sozinho assim que a tela aparecia, sem o usuario
+    // tocar em nada. Removido -- toda tela do onboarding deve exigir
+    // toque no campo antes de digitar, nenhuma excecao.
   };
 
   // ---------- arrastar pro lado (arraste de verdade, acompanha o dedo) ----------

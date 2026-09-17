@@ -4287,28 +4287,35 @@ window.spring = spring;
   });
 })();
 
-// v4.146 (pedido do usuario, comparando com v0): ripple universal em
-// TODO <button> do app, delegado no document. Nao mexe em nenhum
-// onclick/handler existente -- so um efeito visual em cima. position/
-// overflow aplicados inline so no elemento clicado, na hora, pra nao
-// alterar CSS de nenhuma classe existente.
+// v4.146-fix (pedido do usuario, print real -- badge de notificacao do
+// troféu ficou cortado): a v1 desse ripple fazia overflow:hidden no
+// PROPRIO botao pra conter o circulo, o que corta qualquer badge/icone
+// que vaze de proposito pra fora da borda (ex.: bolinha de notificacao
+// no nav). Corrigido pra nunca tocar no botao real -- o ripple mora
+// num wrapper proprio, fixed, sobreposto por cima, criado e destruido
+// a cada clique.
 document.addEventListener('pointerdown', e => {
   const btn = e.target.closest('button');
   if (!btn || btn.disabled) return;
-  if (getComputedStyle(btn).position === 'static') btn.style.position = 'relative';
-  btn.style.overflow = 'hidden';
-  const r = document.createElement('span');
   const rect = btn.getBoundingClientRect();
+  const raio = getComputedStyle(btn).borderRadius;
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'position:fixed;pointer-events:none;overflow:hidden;z-index:9999;' +
+    'left:' + rect.left + 'px;top:' + rect.top + 'px;' +
+    'width:' + rect.width + 'px;height:' + rect.height + 'px;' +
+    'border-radius:' + raio + ';';
   const size = Math.max(rect.width, rect.height) * 1.3;
+  const r = document.createElement('span');
   r.style.cssText = 'position:absolute;border-radius:50%;background:rgba(255,255,255,.35);' +
-    'transform:scale(0);opacity:.6;pointer-events:none;z-index:0;' +
+    'transform:scale(0);opacity:.6;' +
     'width:' + size + 'px;height:' + size + 'px;' +
     'left:' + (e.clientX - rect.left - size/2) + 'px;' +
     'top:' + (e.clientY - rect.top - size/2) + 'px;' +
     'transition:transform .5s var(--expo), opacity .5s var(--expo);';
-  btn.appendChild(r);
+  wrap.appendChild(r);
+  document.body.appendChild(wrap);
   requestAnimationFrame(() => { r.style.transform = 'scale(1)'; r.style.opacity = '0'; });
-  setTimeout(() => r.remove(), 550);
+  setTimeout(() => wrap.remove(), 550);
 });
 
 // v4.149 (pedido do usuario): particulas ao subir de nivel / abrir bau.

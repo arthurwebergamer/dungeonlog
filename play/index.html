@@ -4120,6 +4120,14 @@ document.getElementById('entrar').onclick = () => {
   jaComecou = true;
   document.getElementById('intro').classList.add('off');
   render();
+  // v4.147 (pedido do usuario, comparando com v0): o monstro so aparecia
+  // estatico ao sair do onboarding, sem nenhuma entrada. Espera o fade
+  // do .intro (300ms, ver .intro.off no style.css) e "invoca" o monstro
+  // com um pop -- nao mexe em render()/mobHp/nenhuma logica de combate.
+  setTimeout(() => {
+    const m = document.getElementById('mobSprite');
+    if (m){ m.classList.remove('summonPop'); void m.offsetWidth; m.classList.add('summonPop'); }
+  }, 300);
 };
 
 // ---------- navegacao entre abas ----------

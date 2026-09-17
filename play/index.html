@@ -2070,9 +2070,23 @@ window.biomaDoEstagio = biomaDoEstagio;
 // nenhum. Consolidado aqui pra nunca mais divergir.
 function poolMonstrosFiltrado(){
   if (typeof MONSTROS === 'undefined') return [];
-  const bioma = (typeof biomaDoEstagio === 'function' && typeof estagioAtual === 'function')
-    ? biomaDoEstagio(estagioAtual())
-    : null;
+  // BUG CORRIGIDO (relatado pelo usuario: monstro de Montanhas/gelo
+  // aparecendo no Deserto depois de desbloquear o modo de escolha
+  // livre): antes filtrava pelo bioma do ESTAGIO NUMERICO
+  // (biomaDoEstagio(estagioAtual())) -- durante a progressao guiada isso
+  // sempre bate com o tema exibido (o self-heal garante), mas no modo
+  // livre o jogador pode estar VENDO um bioma diferente do estagio atual
+  // (ex.: estagioAtual()=4/Montanhas, mas arrastou pra ver o Deserto) --
+  // o sorteio continuava usando Montanhas, entao monstro de gelo caia no
+  // cenario de deserto. Fix: filtra pelo bioma REALMENTE exibido
+  // (temaArenaAtual(), que reflete temaArenaSalvo() -- a mesma fonte que
+  // o fundo da Arena usa), nao mais pelo numero do estagio. Durante a
+  // progressao guiada isso da o mesmo resultado de antes (os dois
+  // sempre batem ate tudo desbloquear); a diferenca so aparece no modo
+  // livre, exatamente onde precisava.
+  const bioma = (typeof temaArenaAtual === 'function')
+    ? temaArenaAtual().id
+    : ((typeof biomaDoEstagio === 'function' && typeof estagioAtual === 'function') ? biomaDoEstagio(estagioAtual()) : null);
   if (!bioma) return MONSTROS.map((m, i) => i);
   return MONSTROS.reduce((acc, m, i) => { if (!m.bioma || m.bioma === bioma) acc.push(i); return acc; }, []);
 }

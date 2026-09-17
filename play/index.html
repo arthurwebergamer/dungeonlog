@@ -4905,6 +4905,28 @@ function atualizarBauArena(){
 }
 window.atualizarBauArena = atualizarBauArena;
 
+// pop + faiscas no instante em que um bau eh efetivamente aberto (chave
+// certa/nao trancado) -- chamado pelas 2 funcoes abaixo, nunca no clique
+// que so mostra a dica de "precisa de chave".
+function estourarBau(el){
+  if (!el) return;
+  el.classList.remove('pop');
+  void el.offsetWidth; // reinicia a animacao se clicar de novo rapido
+  el.classList.add('pop');
+  const n = 10;
+  for (let i = 0; i < n; i++){
+    const s = document.createElement('span');
+    s.className = 'bauFaisca';
+    const ang = (Math.PI * 2 * i) / n + (Math.random() * 0.4 - 0.2);
+    const dist = 34 + Math.random() * 26;
+    s.style.setProperty('--fx', (Math.cos(ang) * dist) + 'px');
+    s.style.setProperty('--fy', (Math.sin(ang) * dist - 12) + 'px');
+    s.style.animationDelay = (Math.random() * 60) + 'ms';
+    el.appendChild(s);
+    setTimeout(() => s.remove(), 800);
+  }
+}
+
 function abrirBauPadrao(){
   const estado = lerBauDia();
   if (!estado || estado.dia !== isoAtual() || !estado.padrao) return;
@@ -4912,6 +4934,7 @@ function abrirBauPadrao(){
   const ganhos = estado.padrao.ids.map(id => item(id));
   estado.padrao.aberto = true;
   salvarBauDia(estado);
+  estourarBau(document.getElementById('bauArena'));
   atualizarBauArena();
   if (typeof window.enfileirarPopup === 'function' && typeof mostrarBauLoot === 'function'){
     window.enfileirarPopup(prox => mostrarBauLoot(ganhos, prox, 'baupadrao'));
@@ -4950,6 +4973,7 @@ function abrirBauEspecial(){
   creditarGanhos(esp.ids);
   esp.aberto = true;
   salvarBauDia(estado);
+  estourarBau(document.getElementById('bauArenaEspecial'));
   atualizarBauArena();
 
   const ganhos = esp.ids.map(id => item(id));

@@ -219,7 +219,17 @@
   .empty{text-align:center;color:var(--dim);font-size:13px;padding:26px 12px;border:1px dashed var(--line);border-radius:10px;line-height:1.5}
 
   .composer{display:none;flex-direction:column;gap:10px;margin-top:10px;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:13px}
-  .composer.on{display:flex}
+  /* abre com spring (leve overshoot) em vez de so aparecer -- mesma
+     tecnica do onboarding/modal do mockup-animacoes/ */
+  .composer.on{display:flex;animation:composerIn .32s var(--spring) both}
+  @keyframes composerIn{from{opacity:0;transform:translateY(-10px) scaleY(.92)}to{opacity:1;transform:none}}
+  .composer.on>*{animation:onbFadeUp .32s var(--expo) both}
+  .composer.on>*:nth-child(1){animation-delay:.03s}
+  .composer.on>*:nth-child(2){animation-delay:.07s}
+  .composer.on>*:nth-child(3){animation-delay:.11s}
+  .composer.on>*:nth-child(4){animation-delay:.15s}
+  .composer.on>*:nth-child(5){animation-delay:.19s}
+  .composer.on>*:nth-child(6){animation-delay:.23s}
   .composer input{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:9px;padding:11px 12px;font-family:'Outfit',sans-serif;font-size:14px;outline:none;width:100%}
   .composer input:focus{border-color:var(--accent-dim)}
   .modes{display:flex;gap:6px}
@@ -391,12 +401,25 @@
   /* boas-vindas */
   .intro{position:fixed;inset:0;background:var(--bg);z-index:80;display:flex;justify-content:center;padding:20px;overflow-y:auto}
   .intro.off{display:none}
+  /* halo animado atras do card -- da vida ao fundo (antes era .bg lisa),
+     nao interfere no layout (posicionado fixo, sem afetar fluxo/altura) */
+  .intro::before{
+    content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background:
+      radial-gradient(480px 420px at 50% 18%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%),
+      radial-gradient(420px 380px at 50% 85%, color-mix(in srgb, var(--gold) 8%, transparent), transparent 70%);
+    animation:introGlow 7s ease-in-out infinite;
+  }
+  @keyframes introGlow{0%,100%{opacity:.7;transform:scale(1)}50%{opacity:1;transform:scale(1.08)}}
   .card{width:100%;max-width:400px;display:flex;flex-direction:column;justify-content:center;gap:20px;padding:10px 4px 24px}
   .passo{display:none;flex-direction:column;gap:18px}
   .passo.on{display:flex}
   .marca{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
-  .marca svg{width:80px;height:80px;image-rendering:pixelated}
-  .titulo{font-family:'Silkscreen',monospace;font-size:20px;color:var(--accent);letter-spacing:1px}
+  .marca svg{width:80px;height:80px;image-rendering:pixelated;animation:marcaFlutua 3.6s ease-in-out infinite}
+  @keyframes marcaFlutua{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+  .titulo{font-family:'Silkscreen',monospace;font-size:20px;color:var(--accent);letter-spacing:1px;
+          animation:tituloGlow 2.6s ease-in-out infinite}
+  @keyframes tituloGlow{0%,100%{text-shadow:0 0 0 transparent}50%{text-shadow:0 0 18px color-mix(in srgb, var(--accent) 55%, transparent)}}
   .lema{font-size:15px;color:var(--muted);line-height:1.5;max-width:280px}
   .regras{display:flex;flex-direction:column;gap:11px}
   .regra{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px 14px}
@@ -2358,7 +2381,15 @@
   }
   @media (prefers-reduced-motion:reduce){
     .hero-sprite.temAura::after{animation:none}
+    .cfgOverlay.on,.grimOverlay.on,.histOverlay.on{animation:none}
   }
+
+  /* entrada das telas de tela-cheia (Config/Conquistas+Bestiario/Historico)
+     -- sobe suave em vez de so aparecer com display:flex; regra colada
+     depois das declaracoes .on acima (mesma especificidade, ganha por
+     ordem no arquivo, sem precisar tocar nas 2 copias existentes) */
+  .cfgOverlay.on,.grimOverlay.on,.histOverlay.on{animation:telaEntra .3s var(--expo) both}
+  @keyframes telaEntra{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 
 /* --- Módulo style #8 --- */
 .perfilhero{background:var(--panel-2);border:1px solid var(--line);border-radius:14px;
@@ -3544,6 +3575,22 @@
 }
 .bauArena.mostrar{ display:block; }
 .bauArena.aberto{ background-image:var(--bau-aberto); animation:none; cursor:default; pointer-events:none; }
+/* "pop" no instante da abertura + faiscas (mesma tecnica de particula do
+   mockup-animacoes/ -- spans .bauFaisca criados via JS em abrirBauPadrao/
+   abrirBauEspecial, cada um voando numa direcao/duracao aleatoria e se
+   auto-removendo; nao depende de nenhum estado novo, so decora o clique) */
+.bauArena.pop{ animation:bauPop .45s var(--spring); }
+@keyframes bauPop{ 0%{transform:scale(1)} 45%{transform:scale(1.24) rotate(-6deg)} 100%{transform:scale(1)} }
+.bauFaisca{
+  position:absolute; left:50%; top:50%; width:6px; height:6px; border-radius:50%;
+  background:var(--gold); pointer-events:none; z-index:5;
+  box-shadow:0 0 6px 1px color-mix(in srgb, var(--gold) 70%, transparent);
+  animation:bauFaiscaVoa .6s var(--expo) forwards;
+}
+@keyframes bauFaiscaVoa{
+  0%{transform:translate(-50%,-50%) scale(1); opacity:1}
+  100%{transform:translate(var(--fx,40px),var(--fy,-40px)) scale(0); opacity:0}
+}
 /* especial fica do OUTRO lado do herói (esquerda), nao gruda no padrao */
 .bauArena.bauEspecial{ right:auto; left:-64px; }
 .bauArena.bauEspecial.tier0{ background-image:var(--bau-esp-t0-fechado); }

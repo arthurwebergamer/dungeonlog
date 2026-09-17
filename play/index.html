@@ -180,7 +180,6 @@
     <span class="lvl" id="lvl">Nível I</span>
     <div class="estagio-pill-wrap" id="estagioPillWrap">
       <div class="estagio-pill" id="estagioPill">
-        <span class="estagio-pill-flag" aria-hidden="true">&#127937;</span>
         <span class="estagio-pill-lbl" id="estagioTopoLbl">Estágio 1</span>
       </div>
       <div class="estagio-pill-trilho"><div class="estagio-pill-fill" id="estagioTopoFill"></div></div>
@@ -2665,11 +2664,17 @@ window.mudarTemaArena = mudarTemaArena;
 // Estagios -- pedido depois que o usuario relatou "ainda sem animacao/
 // popup" testando no CELULAR, onde abrir o console do navegador nao e
 // pratico. Escreve no #estagioDebugPanel (so visivel em modo-debug,
-// mesmo gate que .debugbar) E no console, pra servir os dois casos.
+// mesmo gate que .debugbar).
+//
+// FIX (pedido do usuario: "tira o console dos estagios") -- o
+// console.log rodava SEMPRE, pra qualquer jogador, mesmo fora do modo
+// debug (poluindo o console de quem abrisse o devtools por qualquer
+// outro motivo). Agora so loga no console quando o painel visivel
+// tambem existe -- ou seja, so em modo debug, os dois juntos.
 function debugEstagio(msg){
-  console.log('[ESTAGIO-DEBUG]', msg);
   const painel = document.getElementById('estagioDebugPanel');
   if (!painel) return;
+  console.log('[ESTAGIO-DEBUG]', msg);
   const hora = new Date().toLocaleTimeString('pt-BR', { hour12:false, minute:'2-digit', second:'2-digit', fractionalSecondDigits:3 });
   const linha = document.createElement('div');
   linha.textContent = hora + ' ' + msg;
@@ -10251,26 +10256,12 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       if (idxHoje >= 0) derrotados.add(idxHoje);
     }
 
-    // Icone de bioma por monstro (pedido do usuario: mostrar no
-    // Bestiario de qual bioma cada monstro e). So nos JA DESCOBERTOS --
-    // mesma logica de "silhueta esconde tudo" ja aplicada ao nome:
-    // revelar o bioma de um monstro ainda nao derrotado seria dar uma
-    // dica indevida. Monstros sem m.bioma (genericos, aparecem em
-    // qualquer lugar) nao ganham icone nenhum.
-    const BIOMA_ICONE = { deserto:'🏜️', floresta:'🌳', montanhas:'🏔️' };
-    const BIOMA_NOME = { deserto:'Deserto', floresta:'Floresta', montanhas:'Montanhas' };
-
     grid.innerHTML = '';
     MONSTROS.forEach((m, i) => {
       const ok = derrotados.has(i);
       const cel = document.createElement('div');
       cel.className = 'bestcel';
-      const icone = (ok && m.bioma && BIOMA_ICONE[m.bioma]) ? BIOMA_ICONE[m.bioma] : '';
-      const biomaHtml = icone
-        ? '<span class="bestbioma" title="' + (BIOMA_NOME[m.bioma] || m.bioma) + '">' + icone + '</span>'
-        : '';
       cel.innerHTML =
-        biomaHtml +
         '<img class="bestimg' + (ok ? '' : ' bestsilhueta') + '" src="' + m.img + '" alt="' + (ok ? m.nome : '') + '">' +
         (ok ? '<span class="bestnome">' + m.nome + '</span>' : '');
       cel.onclick = ok

@@ -1889,13 +1889,32 @@
                    justify-content:center;gap:18px}
   .carrosselSlide.on{display:flex;touch-action:pan-y}
   .carrosselMeio{flex:1;display:flex;flex-direction:column;justify-content:center;gap:18px}
-  .carrosselMeio > *{opacity:0;transform:translateY(10px);
-    transition:opacity .4s var(--expo), transform .4s var(--expo)}
-  .carrosselSlide.on .carrosselMeio > *{opacity:1;transform:translateY(0)}
-  .carrosselMeio > *:nth-child(1){transition-delay:.08s}
-  .carrosselMeio > *:nth-child(2){transition-delay:.14s}
-  .carrosselMeio > *:nth-child(3){transition-delay:.20s}
-  .carrosselMeio > *:nth-child(4){transition-delay:.26s}
+  /* v4.154-fix (pedido do usuario, ainda sem vida): .carrosselMeio so
+     existe nos slides de marketing (DUNGEONLOG/EVOLUA) -- passo2/
+     passoHeroi/passo3 (nome/heroi/tarefas), que sao os passos que o
+     usuario realmente preenche, tem o conteudo como filho DIRETO de
+     .passo, sem nenhum wrapper. Mirar .carrosselMeio nunca rodava
+     nesses. Corrigido pra mirar o slide em si (.carrosselSlide.on > *),
+     que cobre os dois casos igual, seja o filho .carrosselMeio+botao
+     ou .campo+.palcoNav+.grade+botao+botao. */
+  /* v4.155 (pedido do usuario, escolheu "Camadas" no mockup de opcoes):
+     1o filho entra com pop+giro saindo do blur (tipo icone), os
+     seguintes sobem com blur->nitido em cascata. Container continua
+     deslizando por transform (deslizar(), JS) pro arrastar com o dedo
+     continuar funcionando -- isso aqui so estiliza o CONTEUDO por
+     dentro, nao mexe no slide como um todo. */
+  .carrosselSlide > *{
+    transition:transform .5s cubic-bezier(.16,1,.3,1), opacity .45s ease, filter .45s ease;
+    filter:blur(6px);
+  }
+  .carrosselSlide > *:first-child{transform:scale(.3) rotate(-25deg);opacity:0}
+  .carrosselSlide > *:not(:first-child){transform:translateY(18px);opacity:0}
+  .carrosselSlide.on > *{transform:none;opacity:1;filter:blur(0)}
+  .carrosselSlide.on > *:nth-child(1){transition-delay:0s}
+  .carrosselSlide.on > *:nth-child(2){transition-delay:.08s}
+  .carrosselSlide.on > *:nth-child(3){transition-delay:.14s}
+  .carrosselSlide.on > *:nth-child(4){transition-delay:.20s}
+  .carrosselSlide.on > *:nth-child(5){transition-delay:.26s}
 
   /* legibilidade da descricao reportada como ruim (itálico serifado
      pequeno e apagado) -- escopado só no carrossel via .carrosselMeio,
@@ -3135,13 +3154,32 @@
                    justify-content:center;gap:18px}
   .carrosselSlide.on{display:flex;touch-action:pan-y}
   .carrosselMeio{flex:1;display:flex;flex-direction:column;justify-content:center;gap:18px}
-  .carrosselMeio > *{opacity:0;transform:translateY(10px);
-    transition:opacity .4s var(--expo), transform .4s var(--expo)}
-  .carrosselSlide.on .carrosselMeio > *{opacity:1;transform:translateY(0)}
-  .carrosselMeio > *:nth-child(1){transition-delay:.08s}
-  .carrosselMeio > *:nth-child(2){transition-delay:.14s}
-  .carrosselMeio > *:nth-child(3){transition-delay:.20s}
-  .carrosselMeio > *:nth-child(4){transition-delay:.26s}
+  /* v4.154-fix (pedido do usuario, ainda sem vida): .carrosselMeio so
+     existe nos slides de marketing (DUNGEONLOG/EVOLUA) -- passo2/
+     passoHeroi/passo3 (nome/heroi/tarefas), que sao os passos que o
+     usuario realmente preenche, tem o conteudo como filho DIRETO de
+     .passo, sem nenhum wrapper. Mirar .carrosselMeio nunca rodava
+     nesses. Corrigido pra mirar o slide em si (.carrosselSlide.on > *),
+     que cobre os dois casos igual, seja o filho .carrosselMeio+botao
+     ou .campo+.palcoNav+.grade+botao+botao. */
+  /* v4.155 (pedido do usuario, escolheu "Camadas" no mockup de opcoes):
+     1o filho entra com pop+giro saindo do blur (tipo icone), os
+     seguintes sobem com blur->nitido em cascata. Container continua
+     deslizando por transform (deslizar(), JS) pro arrastar com o dedo
+     continuar funcionando -- isso aqui so estiliza o CONTEUDO por
+     dentro, nao mexe no slide como um todo. */
+  .carrosselSlide > *{
+    transition:transform .5s cubic-bezier(.16,1,.3,1), opacity .45s ease, filter .45s ease;
+    filter:blur(6px);
+  }
+  .carrosselSlide > *:first-child{transform:scale(.3) rotate(-25deg);opacity:0}
+  .carrosselSlide > *:not(:first-child){transform:translateY(18px);opacity:0}
+  .carrosselSlide.on > *{transform:none;opacity:1;filter:blur(0)}
+  .carrosselSlide.on > *:nth-child(1){transition-delay:0s}
+  .carrosselSlide.on > *:nth-child(2){transition-delay:.08s}
+  .carrosselSlide.on > *:nth-child(3){transition-delay:.14s}
+  .carrosselSlide.on > *:nth-child(4){transition-delay:.20s}
+  .carrosselSlide.on > *:nth-child(5){transition-delay:.26s}
 
   /* legibilidade da descricao reportada como ruim (itálico serifado
      pequeno e apagado) -- escopado só no carrossel via .carrosselMeio,

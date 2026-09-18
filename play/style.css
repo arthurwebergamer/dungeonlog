@@ -33,7 +33,7 @@
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{background:var(--bg);color:var(--text);font-family:'Outfit',system-ui,sans-serif;display:flex;justify-content:center;min-height:100vh;min-height:100dvh;padding:16px}
-  .app{width:100%;max-width:400px;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);border-radius:20px;overflow:hidden}
+  .app{width:100%;max-width:400px;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);border-radius:20px;overflow:hidden;touch-action:pan-y}
   .tasks{flex:1}
   .nav{margin-top:auto}
 
@@ -1909,15 +1909,11 @@
      nesses. Corrigido pra mirar o slide em si (.carrosselSlide.on > *),
      que cobre os dois casos igual, seja o filho .carrosselMeio+botao
      ou .campo+.palcoNav+.grade+botao+botao. */
-  /* v4.155-fix (pedido do usuario, print real -- v1 borrava os sprites
-     pixel-art com filter:blur, contra o crispEdges usado no jogo
-     inteiro, e tratava icone+texto como um bloco so porque os dois
-     moram dentro do mesmo .carrosselMeio). Corrigido: sem blur, e a
-     imagem/icone (.carrosselImgWrap/.carrosselTrioLogo, ONDE QUER que
-     esteja aninhada) anima separada do texto (.marca) e dos campos de
-     formulario -- ai sim fica igual ao mockup "Camadas" que foi
-     aprovado. Container continua deslizando por transform (JS,
-     deslizar()) pro arrastar com o dedo continuar funcionando. */
+  /* v4.155-fix2 (pedido do usuario: "Camadas" ficou exagerada -- giro,
+     escala grande e 5 tempos de atraso diferentes). Trocado por algo
+     bem mais contido: so fade + leve subida (8px), sem rotacao, sem
+     escala, um unico atraso curto pro icone sair na frente do resto.
+     Mais perto do que apps tipo iOS/Material fazem hoje. */
   .carrosselSlide .marca,
   .carrosselSlide .campo,
   .carrosselSlide .palcoNav,
@@ -1927,15 +1923,12 @@
   .carrosselSlide .carrosselTransicao,
   .carrosselSlide .carrosselIdiomaEscolha,
   .carrosselSlide .carrosselTarefasDemo,
+  .carrosselSlide .carrosselImgWrap,
+  .carrosselSlide .carrosselTrioLogo,
   .carrosselSlide > .primario,
   .carrosselSlide > .secundario{
-    transition:transform .5s cubic-bezier(.16,1,.3,1), opacity .45s ease;
-    transform:translateY(18px);opacity:0;
-  }
-  .carrosselSlide .carrosselImgWrap,
-  .carrosselSlide .carrosselTrioLogo{
-    transition:transform .5s cubic-bezier(.16,1,.3,1), opacity .45s ease;
-    transform:scale(.5) rotate(-14deg);opacity:0;
+    transition:transform .32s var(--expo), opacity .3s var(--expo);
+    transform:translateY(8px);opacity:0;
   }
   .carrosselSlide.on.conteudoIn .marca,
   .carrosselSlide.on.conteudoIn .campo,
@@ -1946,20 +1939,23 @@
   .carrosselSlide.on.conteudoIn .carrosselTransicao,
   .carrosselSlide.on.conteudoIn .carrosselIdiomaEscolha,
   .carrosselSlide.on.conteudoIn .carrosselTarefasDemo,
-  .carrosselSlide.on.conteudoIn > .primario,
-  .carrosselSlide.on.conteudoIn > .secundario,
   .carrosselSlide.on.conteudoIn .carrosselImgWrap,
-  .carrosselSlide.on.conteudoIn .carrosselTrioLogo{transform:none;opacity:1}
+  .carrosselSlide.on.conteudoIn .carrosselTrioLogo,
+  .carrosselSlide.on.conteudoIn > .primario,
+  .carrosselSlide.on.conteudoIn > .secundario{transform:none;opacity:1}
   .carrosselSlide.on.conteudoIn .carrosselImgWrap,
   .carrosselSlide.on.conteudoIn .carrosselTrioLogo{transition-delay:0s}
-  .carrosselSlide.on.conteudoIn .marca{transition-delay:.10s}
+  .carrosselSlide.on.conteudoIn .marca,
   .carrosselSlide.on.conteudoIn .campo,
   .carrosselSlide.on.conteudoIn .palcoNav,
-  .carrosselSlide.on.conteudoIn .grade{transition-delay:.16s}
+  .carrosselSlide.on.conteudoIn .grade,
   .carrosselSlide.on.conteudoIn .listaini,
-  .carrosselSlide.on.conteudoIn .dica{transition-delay:.20s}
+  .carrosselSlide.on.conteudoIn .dica,
+  .carrosselSlide.on.conteudoIn .carrosselTransicao,
+  .carrosselSlide.on.conteudoIn .carrosselIdiomaEscolha,
+  .carrosselSlide.on.conteudoIn .carrosselTarefasDemo{transition-delay:.06s}
   .carrosselSlide.on.conteudoIn > .primario,
-  .carrosselSlide.on.conteudoIn > .secundario{transition-delay:.26s}
+  .carrosselSlide.on.conteudoIn > .secundario{transition-delay:.10s}
 
   /* legibilidade da descricao reportada como ruim (itálico serifado
      pequeno e apagado) -- escopado só no carrossel via .carrosselMeio,
@@ -3207,15 +3203,11 @@
      nesses. Corrigido pra mirar o slide em si (.carrosselSlide.on > *),
      que cobre os dois casos igual, seja o filho .carrosselMeio+botao
      ou .campo+.palcoNav+.grade+botao+botao. */
-  /* v4.155-fix (pedido do usuario, print real -- v1 borrava os sprites
-     pixel-art com filter:blur, contra o crispEdges usado no jogo
-     inteiro, e tratava icone+texto como um bloco so porque os dois
-     moram dentro do mesmo .carrosselMeio). Corrigido: sem blur, e a
-     imagem/icone (.carrosselImgWrap/.carrosselTrioLogo, ONDE QUER que
-     esteja aninhada) anima separada do texto (.marca) e dos campos de
-     formulario -- ai sim fica igual ao mockup "Camadas" que foi
-     aprovado. Container continua deslizando por transform (JS,
-     deslizar()) pro arrastar com o dedo continuar funcionando. */
+  /* v4.155-fix2 (pedido do usuario: "Camadas" ficou exagerada -- giro,
+     escala grande e 5 tempos de atraso diferentes). Trocado por algo
+     bem mais contido: so fade + leve subida (8px), sem rotacao, sem
+     escala, um unico atraso curto pro icone sair na frente do resto.
+     Mais perto do que apps tipo iOS/Material fazem hoje. */
   .carrosselSlide .marca,
   .carrosselSlide .campo,
   .carrosselSlide .palcoNav,
@@ -3225,15 +3217,12 @@
   .carrosselSlide .carrosselTransicao,
   .carrosselSlide .carrosselIdiomaEscolha,
   .carrosselSlide .carrosselTarefasDemo,
+  .carrosselSlide .carrosselImgWrap,
+  .carrosselSlide .carrosselTrioLogo,
   .carrosselSlide > .primario,
   .carrosselSlide > .secundario{
-    transition:transform .5s cubic-bezier(.16,1,.3,1), opacity .45s ease;
-    transform:translateY(18px);opacity:0;
-  }
-  .carrosselSlide .carrosselImgWrap,
-  .carrosselSlide .carrosselTrioLogo{
-    transition:transform .5s cubic-bezier(.16,1,.3,1), opacity .45s ease;
-    transform:scale(.5) rotate(-14deg);opacity:0;
+    transition:transform .32s var(--expo), opacity .3s var(--expo);
+    transform:translateY(8px);opacity:0;
   }
   .carrosselSlide.on.conteudoIn .marca,
   .carrosselSlide.on.conteudoIn .campo,
@@ -3244,20 +3233,23 @@
   .carrosselSlide.on.conteudoIn .carrosselTransicao,
   .carrosselSlide.on.conteudoIn .carrosselIdiomaEscolha,
   .carrosselSlide.on.conteudoIn .carrosselTarefasDemo,
-  .carrosselSlide.on.conteudoIn > .primario,
-  .carrosselSlide.on.conteudoIn > .secundario,
   .carrosselSlide.on.conteudoIn .carrosselImgWrap,
-  .carrosselSlide.on.conteudoIn .carrosselTrioLogo{transform:none;opacity:1}
+  .carrosselSlide.on.conteudoIn .carrosselTrioLogo,
+  .carrosselSlide.on.conteudoIn > .primario,
+  .carrosselSlide.on.conteudoIn > .secundario{transform:none;opacity:1}
   .carrosselSlide.on.conteudoIn .carrosselImgWrap,
   .carrosselSlide.on.conteudoIn .carrosselTrioLogo{transition-delay:0s}
-  .carrosselSlide.on.conteudoIn .marca{transition-delay:.10s}
+  .carrosselSlide.on.conteudoIn .marca,
   .carrosselSlide.on.conteudoIn .campo,
   .carrosselSlide.on.conteudoIn .palcoNav,
-  .carrosselSlide.on.conteudoIn .grade{transition-delay:.16s}
+  .carrosselSlide.on.conteudoIn .grade,
   .carrosselSlide.on.conteudoIn .listaini,
-  .carrosselSlide.on.conteudoIn .dica{transition-delay:.20s}
+  .carrosselSlide.on.conteudoIn .dica,
+  .carrosselSlide.on.conteudoIn .carrosselTransicao,
+  .carrosselSlide.on.conteudoIn .carrosselIdiomaEscolha,
+  .carrosselSlide.on.conteudoIn .carrosselTarefasDemo{transition-delay:.06s}
   .carrosselSlide.on.conteudoIn > .primario,
-  .carrosselSlide.on.conteudoIn > .secundario{transition-delay:.26s}
+  .carrosselSlide.on.conteudoIn > .secundario{transition-delay:.10s}
 
   /* legibilidade da descricao reportada como ruim (itálico serifado
      pequeno e apagado) -- escopado só no carrossel via .carrosselMeio,

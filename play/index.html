@@ -4197,7 +4197,7 @@ function mostrarAba(nome, direcao){
     // mesma guarda do onboarding -- nao intercepta gesto que comeca em
     // cima de campo/botao/elemento interativo (senão selecionar texto
     // ou tocar em botao vira "arraste" sem querer).
-    if (e.target.closest('input, textarea, select, button, .task, .ilinha, .lrow, a')) return;
+    if (e.target.closest('input, textarea, select, button, a')) return;
     ix = e.clientX; iy = e.clientY; dx = 0; resolvido = false; horizontal = false; ativo = true;
   });
   areaApp.addEventListener('pointermove', e => {

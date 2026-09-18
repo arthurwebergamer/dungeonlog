@@ -1909,11 +1909,12 @@
      nesses. Corrigido pra mirar o slide em si (.carrosselSlide.on > *),
      que cobre os dois casos igual, seja o filho .carrosselMeio+botao
      ou .campo+.palcoNav+.grade+botao+botao. */
-  /* v4.155-fix2 (pedido do usuario: "Camadas" ficou exagerada -- giro,
-     escala grande e 5 tempos de atraso diferentes). Trocado por algo
-     bem mais contido: so fade + leve subida (8px), sem rotacao, sem
-     escala, um unico atraso curto pro icone sair na frente do resto.
-     Mais perto do que apps tipo iOS/Material fazem hoje. */
+  /* v4.155-fix3 (pedido do usuario: testar o estilo "Ima" do mockup --
+     minimo, sem escalonamento, sem rotacao/escala em nada, um unico
+     tempo pra tudo, rapido e seco. Filosofia oposta ao "Camadas":
+     menos e' mais aqui. O proprio container ja desliza via transform
+     (JS, deslizar()) -- isso so da uma leve entrada uniforme pro
+     conteudo por dentro, sem cascata de atrasos. */
   .carrosselSlide .marca,
   .carrosselSlide .campo,
   .carrosselSlide .palcoNav,
@@ -1927,8 +1928,8 @@
   .carrosselSlide .carrosselTrioLogo,
   .carrosselSlide > .primario,
   .carrosselSlide > .secundario{
-    transition:transform .32s var(--expo), opacity .3s var(--expo);
-    transform:translateY(8px);opacity:0;
+    transition:transform .22s cubic-bezier(.2,.7,.3,1), opacity .18s ease;
+    transform:translateY(6px);opacity:0;
   }
   .carrosselSlide.on.conteudoIn .marca,
   .carrosselSlide.on.conteudoIn .campo,
@@ -1943,19 +1944,6 @@
   .carrosselSlide.on.conteudoIn .carrosselTrioLogo,
   .carrosselSlide.on.conteudoIn > .primario,
   .carrosselSlide.on.conteudoIn > .secundario{transform:none;opacity:1}
-  .carrosselSlide.on.conteudoIn .carrosselImgWrap,
-  .carrosselSlide.on.conteudoIn .carrosselTrioLogo{transition-delay:0s}
-  .carrosselSlide.on.conteudoIn .marca,
-  .carrosselSlide.on.conteudoIn .campo,
-  .carrosselSlide.on.conteudoIn .palcoNav,
-  .carrosselSlide.on.conteudoIn .grade,
-  .carrosselSlide.on.conteudoIn .listaini,
-  .carrosselSlide.on.conteudoIn .dica,
-  .carrosselSlide.on.conteudoIn .carrosselTransicao,
-  .carrosselSlide.on.conteudoIn .carrosselIdiomaEscolha,
-  .carrosselSlide.on.conteudoIn .carrosselTarefasDemo{transition-delay:.06s}
-  .carrosselSlide.on.conteudoIn > .primario,
-  .carrosselSlide.on.conteudoIn > .secundario{transition-delay:.10s}
 
   /* legibilidade da descricao reportada como ruim (itálico serifado
      pequeno e apagado) -- escopado só no carrossel via .carrosselMeio,
@@ -3203,11 +3191,12 @@
      nesses. Corrigido pra mirar o slide em si (.carrosselSlide.on > *),
      que cobre os dois casos igual, seja o filho .carrosselMeio+botao
      ou .campo+.palcoNav+.grade+botao+botao. */
-  /* v4.155-fix2 (pedido do usuario: "Camadas" ficou exagerada -- giro,
-     escala grande e 5 tempos de atraso diferentes). Trocado por algo
-     bem mais contido: so fade + leve subida (8px), sem rotacao, sem
-     escala, um unico atraso curto pro icone sair na frente do resto.
-     Mais perto do que apps tipo iOS/Material fazem hoje. */
+  /* v4.155-fix3 (pedido do usuario: testar o estilo "Ima" do mockup --
+     minimo, sem escalonamento, sem rotacao/escala em nada, um unico
+     tempo pra tudo, rapido e seco. Filosofia oposta ao "Camadas":
+     menos e' mais aqui. O proprio container ja desliza via transform
+     (JS, deslizar()) -- isso so da uma leve entrada uniforme pro
+     conteudo por dentro, sem cascata de atrasos. */
   .carrosselSlide .marca,
   .carrosselSlide .campo,
   .carrosselSlide .palcoNav,
@@ -3221,8 +3210,8 @@
   .carrosselSlide .carrosselTrioLogo,
   .carrosselSlide > .primario,
   .carrosselSlide > .secundario{
-    transition:transform .32s var(--expo), opacity .3s var(--expo);
-    transform:translateY(8px);opacity:0;
+    transition:transform .22s cubic-bezier(.2,.7,.3,1), opacity .18s ease;
+    transform:translateY(6px);opacity:0;
   }
   .carrosselSlide.on.conteudoIn .marca,
   .carrosselSlide.on.conteudoIn .campo,
@@ -3237,19 +3226,6 @@
   .carrosselSlide.on.conteudoIn .carrosselTrioLogo,
   .carrosselSlide.on.conteudoIn > .primario,
   .carrosselSlide.on.conteudoIn > .secundario{transform:none;opacity:1}
-  .carrosselSlide.on.conteudoIn .carrosselImgWrap,
-  .carrosselSlide.on.conteudoIn .carrosselTrioLogo{transition-delay:0s}
-  .carrosselSlide.on.conteudoIn .marca,
-  .carrosselSlide.on.conteudoIn .campo,
-  .carrosselSlide.on.conteudoIn .palcoNav,
-  .carrosselSlide.on.conteudoIn .grade,
-  .carrosselSlide.on.conteudoIn .listaini,
-  .carrosselSlide.on.conteudoIn .dica,
-  .carrosselSlide.on.conteudoIn .carrosselTransicao,
-  .carrosselSlide.on.conteudoIn .carrosselIdiomaEscolha,
-  .carrosselSlide.on.conteudoIn .carrosselTarefasDemo{transition-delay:.06s}
-  .carrosselSlide.on.conteudoIn > .primario,
-  .carrosselSlide.on.conteudoIn > .secundario{transition-delay:.10s}
 
   /* legibilidade da descricao reportada como ruim (itálico serifado
      pequeno e apagado) -- escopado só no carrossel via .carrosselMeio,

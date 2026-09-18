@@ -4181,12 +4181,10 @@ function mostrarAba(nome, direcao){
   if (nome === 'estatisticas') renderEstatisticas();
 }
 
-// v4.157 (pedido do usuario): troca de aba arrastando pro lado, mesma
-// ideia do carrossel do onboarding mas SEM seguir o dedo em tempo real
-// (essas telas tem scroll proprio -- overflow-y:auto -- entao um
-// arrastar-em-tempo-real horizontal ia brigar com o rolar vertical de
-// cada uma; aqui so detecta o gesto e troca de aba direto, sem posicao
-// intermediaria). Ordem segue a propria nav de baixo.
+// v4.158 (pedido do usuario: nao funcionou direito, removido). Bloco
+// comentado, nao apagado -- mostrarAba(nome, direcao) continua aceitando
+// direcao opcional sem quebrar nada, so ninguem mais chama com ela.
+/*
 (function(){
   const ORDEM_ABAS = ['tarefas','inventario','loja','perfil','estatisticas'];
   const areaApp = document.querySelector('.app');
@@ -4223,6 +4221,7 @@ function mostrarAba(nome, direcao){
   areaApp.addEventListener('pointerup', finalizar);
   areaApp.addEventListener('pointercancel', finalizar);
 })();
+*/
 
 // pilula que fica atras do icone selecionado na nav e desliza ate ele --
 // usa offsetLeft/offsetWidth do proprio botao (em vez de dividir 100%/N),
@@ -7143,9 +7142,11 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 
   /* ---------- Config ---------- */
   const cfgOverlay = document.getElementById('cfgOverlay');
-  /* v4.144 (pedido do usuario): stagger fisico nas linhas ao abrir Config
-     -- aditivo, so roda quando abrirConfig() e chamada, nao mexe em mais
-     nada do fluxo existente. */
+  /* v4.144-fix (pedido do usuario: "sem o texto fazer isso" -- o
+     stagger linha-por-linha foi removido. Funcao mantida comentada
+     (nao apagada) caso queira religar depois; agora abrirConfig() so
+     usa a entrada do proprio .cfgOverlay (fade+slide, ver style.css),
+     que ja e a animacao "Imã"-like que ficou boa no carrossel. */
   function animarStaggerCfgRows(){
     if (!cfgOverlay || typeof window.spring !== 'function') return;
     cfgOverlay.querySelectorAll('.cfgrow').forEach((row, i) => {
@@ -7172,7 +7173,6 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     // acima.
     if (typeof window.atualizarBotaoFeedback === 'function') window.atualizarBotaoFeedback();
     if (cfgOverlay) cfgOverlay.classList.add('on');
-    animarStaggerCfgRows();
   }
   function fecharConfig(){
     if (cfgOverlay) cfgOverlay.classList.remove('on');
@@ -11393,7 +11393,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     elDentro.classList.add('on');
     elDentro.getBoundingClientRect(); // forca reflow -- sem isso o browser agrupa a mudanca de
                                        // transform com a linha de baixo e nao anima nada
-    elFora.style.transition = elDentro.style.transition = 'transform ' + DURACAO_SLIDE + 'ms var(--spring-curve)';
+    elFora.style.transition = elDentro.style.transition = 'transform ' + DURACAO_SLIDE + 'ms var(--expo)';
     elFora.style.transform = 'translateX(' + (direcao > 0 ? '-100%' : '100%') + ')';
     elDentro.style.transform = 'translateX(0)';
     // v4.155-fix2 (pedido do usuario, print real -- "nao teve animacao

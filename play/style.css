@@ -157,8 +157,8 @@
   .arena.venceu .vs{opacity:0;width:0;padding:0;overflow:hidden}
   .arena.venceu .fighter.mob{width:0;overflow:hidden}
   .vitoria{display:none;flex-direction:column;align-items:center;gap:5px;margin-top:2px}
-  .vitoria.on{display:flex;animation:subir .4s ease-out}
-  .vitoria.on .faixa{animation:faixaPunch .5s ease-out .35s both}
+  .vitoria.on{display:flex;animation:subir .4s ease-out .3s backwards}
+  .vitoria.on .faixa{animation:faixaPunch .5s ease-out .65s both}
   @keyframes faixaPunch{
     0%{transform:scale(1);text-shadow:none}
     40%{transform:scale(1.28);text-shadow:0 0 14px var(--gold)}

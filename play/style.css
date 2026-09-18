@@ -3552,26 +3552,27 @@
 .temalinha{
   display:flex;
   align-items:center;
-  gap:14px;
-  padding:12px 4px;
+  gap:12px;
+  padding:16px 2px;
   cursor:pointer;
   border-bottom:1px solid var(--line);
-  transition:background .12s;
+  transition:background .2s var(--expo);
 }
 .temalinha:last-child{ border-bottom:none }
 .temalinha:active{ background:var(--panel-3) }
 .temaDot{
-  width:30px;
-  height:30px;
+  width:32px;
+  height:32px;
   border-radius:50%;
   flex:none;
   border:2px solid var(--line);
   box-sizing:border-box;
+  transition:border-color .2s var(--expo);
 }
 .temaNome{
   flex:1;
   font-family:'Outfit',sans-serif;
-  font-size:14px;
+  font-size:16px;
   font-weight:600;
   color:var(--text);
 }
@@ -3582,7 +3583,7 @@
   color:var(--accent);
   opacity:0;
   transform:scale(.6);
-  transition:opacity .12s, transform .12s;
+  transition:opacity .25s var(--expo), transform .3s var(--spring-curve);
 }
 .temalinha.sel .temaCheck{
   opacity:1;

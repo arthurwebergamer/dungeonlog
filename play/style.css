@@ -945,6 +945,17 @@
   .view{display:none;flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
         flex-direction:column;padding:16px 18px 8px}
   .view.on{display:flex}
+  /* v4.157 (pedido do usuario): entrada animada com direcao ao trocar
+     de aba (arrastar OU tocar no icone, ver mostrarAba()/detectorArraste
+     mais abaixo no index.html). Entrance de um tiro (nao e transition
+     reversivel tipo .edov) porque essas telas rolam por conta propria
+     (overflow-y:auto) -- vira position:absolute pra fazer slide de
+     verdade ia exigir redesenhar a altura do container pai, risco alto
+     pra esse ganho. */
+  @keyframes viewEntraDir{from{opacity:0;transform:translateX(22px)}to{opacity:1;transform:translateX(0)}}
+  @keyframes viewEntraEsq{from{opacity:0;transform:translateX(-22px)}to{opacity:1;transform:translateX(0)}}
+  .view.on.entra-dir{animation:viewEntraDir .32s var(--expo)}
+  .view.on.entra-esq{animation:viewEntraEsq .32s var(--expo)}
 
   .vhead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:14px}
   .vhead .vtitle{font-family:'Outfit',sans-serif;font-size:16px;font-weight:600;color:var(--text)}

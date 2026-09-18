@@ -1897,24 +1897,57 @@
      nesses. Corrigido pra mirar o slide em si (.carrosselSlide.on > *),
      que cobre os dois casos igual, seja o filho .carrosselMeio+botao
      ou .campo+.palcoNav+.grade+botao+botao. */
-  /* v4.155 (pedido do usuario, escolheu "Camadas" no mockup de opcoes):
-     1o filho entra com pop+giro saindo do blur (tipo icone), os
-     seguintes sobem com blur->nitido em cascata. Container continua
-     deslizando por transform (deslizar(), JS) pro arrastar com o dedo
-     continuar funcionando -- isso aqui so estiliza o CONTEUDO por
-     dentro, nao mexe no slide como um todo. */
-  .carrosselSlide > *{
-    transition:transform .5s cubic-bezier(.16,1,.3,1), opacity .45s ease, filter .45s ease;
-    filter:blur(6px);
+  /* v4.155-fix (pedido do usuario, print real -- v1 borrava os sprites
+     pixel-art com filter:blur, contra o crispEdges usado no jogo
+     inteiro, e tratava icone+texto como um bloco so porque os dois
+     moram dentro do mesmo .carrosselMeio). Corrigido: sem blur, e a
+     imagem/icone (.carrosselImgWrap/.carrosselTrioLogo, ONDE QUER que
+     esteja aninhada) anima separada do texto (.marca) e dos campos de
+     formulario -- ai sim fica igual ao mockup "Camadas" que foi
+     aprovado. Container continua deslizando por transform (JS,
+     deslizar()) pro arrastar com o dedo continuar funcionando. */
+  .carrosselSlide .marca,
+  .carrosselSlide .campo,
+  .carrosselSlide .palcoNav,
+  .carrosselSlide .grade,
+  .carrosselSlide .listaini,
+  .carrosselSlide .dica,
+  .carrosselSlide .carrosselTransicao,
+  .carrosselSlide .carrosselIdiomaEscolha,
+  .carrosselSlide .carrosselTarefasDemo,
+  .carrosselSlide > .primario,
+  .carrosselSlide > .secundario{
+    transition:transform .5s cubic-bezier(.16,1,.3,1), opacity .45s ease;
+    transform:translateY(18px);opacity:0;
   }
-  .carrosselSlide > *:first-child{transform:scale(.3) rotate(-25deg);opacity:0}
-  .carrosselSlide > *:not(:first-child){transform:translateY(18px);opacity:0}
-  .carrosselSlide.on > *{transform:none;opacity:1;filter:blur(0)}
-  .carrosselSlide.on > *:nth-child(1){transition-delay:0s}
-  .carrosselSlide.on > *:nth-child(2){transition-delay:.08s}
-  .carrosselSlide.on > *:nth-child(3){transition-delay:.14s}
-  .carrosselSlide.on > *:nth-child(4){transition-delay:.20s}
-  .carrosselSlide.on > *:nth-child(5){transition-delay:.26s}
+  .carrosselSlide .carrosselImgWrap,
+  .carrosselSlide .carrosselTrioLogo{
+    transition:transform .5s cubic-bezier(.16,1,.3,1), opacity .45s ease;
+    transform:scale(.5) rotate(-14deg);opacity:0;
+  }
+  .carrosselSlide.on .marca,
+  .carrosselSlide.on .campo,
+  .carrosselSlide.on .palcoNav,
+  .carrosselSlide.on .grade,
+  .carrosselSlide.on .listaini,
+  .carrosselSlide.on .dica,
+  .carrosselSlide.on .carrosselTransicao,
+  .carrosselSlide.on .carrosselIdiomaEscolha,
+  .carrosselSlide.on .carrosselTarefasDemo,
+  .carrosselSlide.on > .primario,
+  .carrosselSlide.on > .secundario,
+  .carrosselSlide.on .carrosselImgWrap,
+  .carrosselSlide.on .carrosselTrioLogo{transform:none;opacity:1}
+  .carrosselSlide.on .carrosselImgWrap,
+  .carrosselSlide.on .carrosselTrioLogo{transition-delay:0s}
+  .carrosselSlide.on .marca{transition-delay:.10s}
+  .carrosselSlide.on .campo,
+  .carrosselSlide.on .palcoNav,
+  .carrosselSlide.on .grade{transition-delay:.16s}
+  .carrosselSlide.on .listaini,
+  .carrosselSlide.on .dica{transition-delay:.20s}
+  .carrosselSlide.on > .primario,
+  .carrosselSlide.on > .secundario{transition-delay:.26s}
 
   /* legibilidade da descricao reportada como ruim (itálico serifado
      pequeno e apagado) -- escopado só no carrossel via .carrosselMeio,
@@ -3162,24 +3195,57 @@
      nesses. Corrigido pra mirar o slide em si (.carrosselSlide.on > *),
      que cobre os dois casos igual, seja o filho .carrosselMeio+botao
      ou .campo+.palcoNav+.grade+botao+botao. */
-  /* v4.155 (pedido do usuario, escolheu "Camadas" no mockup de opcoes):
-     1o filho entra com pop+giro saindo do blur (tipo icone), os
-     seguintes sobem com blur->nitido em cascata. Container continua
-     deslizando por transform (deslizar(), JS) pro arrastar com o dedo
-     continuar funcionando -- isso aqui so estiliza o CONTEUDO por
-     dentro, nao mexe no slide como um todo. */
-  .carrosselSlide > *{
-    transition:transform .5s cubic-bezier(.16,1,.3,1), opacity .45s ease, filter .45s ease;
-    filter:blur(6px);
+  /* v4.155-fix (pedido do usuario, print real -- v1 borrava os sprites
+     pixel-art com filter:blur, contra o crispEdges usado no jogo
+     inteiro, e tratava icone+texto como um bloco so porque os dois
+     moram dentro do mesmo .carrosselMeio). Corrigido: sem blur, e a
+     imagem/icone (.carrosselImgWrap/.carrosselTrioLogo, ONDE QUER que
+     esteja aninhada) anima separada do texto (.marca) e dos campos de
+     formulario -- ai sim fica igual ao mockup "Camadas" que foi
+     aprovado. Container continua deslizando por transform (JS,
+     deslizar()) pro arrastar com o dedo continuar funcionando. */
+  .carrosselSlide .marca,
+  .carrosselSlide .campo,
+  .carrosselSlide .palcoNav,
+  .carrosselSlide .grade,
+  .carrosselSlide .listaini,
+  .carrosselSlide .dica,
+  .carrosselSlide .carrosselTransicao,
+  .carrosselSlide .carrosselIdiomaEscolha,
+  .carrosselSlide .carrosselTarefasDemo,
+  .carrosselSlide > .primario,
+  .carrosselSlide > .secundario{
+    transition:transform .5s cubic-bezier(.16,1,.3,1), opacity .45s ease;
+    transform:translateY(18px);opacity:0;
   }
-  .carrosselSlide > *:first-child{transform:scale(.3) rotate(-25deg);opacity:0}
-  .carrosselSlide > *:not(:first-child){transform:translateY(18px);opacity:0}
-  .carrosselSlide.on > *{transform:none;opacity:1;filter:blur(0)}
-  .carrosselSlide.on > *:nth-child(1){transition-delay:0s}
-  .carrosselSlide.on > *:nth-child(2){transition-delay:.08s}
-  .carrosselSlide.on > *:nth-child(3){transition-delay:.14s}
-  .carrosselSlide.on > *:nth-child(4){transition-delay:.20s}
-  .carrosselSlide.on > *:nth-child(5){transition-delay:.26s}
+  .carrosselSlide .carrosselImgWrap,
+  .carrosselSlide .carrosselTrioLogo{
+    transition:transform .5s cubic-bezier(.16,1,.3,1), opacity .45s ease;
+    transform:scale(.5) rotate(-14deg);opacity:0;
+  }
+  .carrosselSlide.on .marca,
+  .carrosselSlide.on .campo,
+  .carrosselSlide.on .palcoNav,
+  .carrosselSlide.on .grade,
+  .carrosselSlide.on .listaini,
+  .carrosselSlide.on .dica,
+  .carrosselSlide.on .carrosselTransicao,
+  .carrosselSlide.on .carrosselIdiomaEscolha,
+  .carrosselSlide.on .carrosselTarefasDemo,
+  .carrosselSlide.on > .primario,
+  .carrosselSlide.on > .secundario,
+  .carrosselSlide.on .carrosselImgWrap,
+  .carrosselSlide.on .carrosselTrioLogo{transform:none;opacity:1}
+  .carrosselSlide.on .carrosselImgWrap,
+  .carrosselSlide.on .carrosselTrioLogo{transition-delay:0s}
+  .carrosselSlide.on .marca{transition-delay:.10s}
+  .carrosselSlide.on .campo,
+  .carrosselSlide.on .palcoNav,
+  .carrosselSlide.on .grade{transition-delay:.16s}
+  .carrosselSlide.on .listaini,
+  .carrosselSlide.on .dica{transition-delay:.20s}
+  .carrosselSlide.on > .primario,
+  .carrosselSlide.on > .secundario{transition-delay:.26s}
 
   /* legibilidade da descricao reportada como ruim (itálico serifado
      pequeno e apagado) -- escopado só no carrossel via .carrosselMeio,

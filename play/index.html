@@ -4139,7 +4139,7 @@ let abaAtual = 'tarefas';
 // grupo de elementos que formam a aba "tarefas"
 const blocosTarefas = ['.arena', '.xpwrap', '.tasks'].map(s => document.querySelector(s));
 
-function mostrarAba(nome, direcao){
+function mostrarAba(nome){
   abaAtual = nome;
 
   // mesmo motivo do gancho identico em render() (Tarefas) -- troca de
@@ -4157,20 +4157,10 @@ function mostrarAba(nome, direcao){
   if (nome !== 'tarefas') composer.classList.remove('on');
 
   blocosTarefas.forEach(el => { if (el) el.classList.toggle('oculto', nome !== 'tarefas'); });
-  // v4.157 (pedido do usuario, arrastar entre abas): quando ha direcao
-  // (veio do gesto de arrastar, ou de trocarAbaComDirecao() no toque do
-  // icone), a view que vai aparecer ganha a animacao de entrada com
-  // direcao -- classe de um tiro, removida no proximo troca pra poder
-  // tocar de novo. Sem direcao (chamada direta antiga, ex. boot inicial)
-  // continua sem animacao, igual sempre foi.
-  ['viewInventario','viewLoja','viewPerfil','viewEstatisticas'].forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    const vaiMostrar = ('view' + nome.charAt(0).toUpperCase() + nome.slice(1)) === id;
-    el.classList.remove('entra-dir', 'entra-esq');
-    if (vaiMostrar && direcao) el.classList.add(direcao > 0 ? 'entra-dir' : 'entra-esq');
-    el.classList.toggle('on', vaiMostrar);
-  });
+  document.getElementById('viewInventario').classList.toggle('on', nome === 'inventario');
+  document.getElementById('viewLoja').classList.toggle('on', nome === 'loja');
+  document.getElementById('viewPerfil').classList.toggle('on', nome === 'perfil');
+  document.getElementById('viewEstatisticas').classList.toggle('on', nome === 'estatisticas');
 
   document.querySelectorAll('#nav button').forEach(b => {
     b.classList.toggle('on', b.dataset.aba === nome);
@@ -4180,48 +4170,6 @@ function mostrarAba(nome, direcao){
   if (nome === 'loja') document.getElementById('saldoLoja').textContent = moedas;
   if (nome === 'estatisticas') renderEstatisticas();
 }
-
-// v4.158 (pedido do usuario: nao funcionou direito, removido). Bloco
-// comentado, nao apagado -- mostrarAba(nome, direcao) continua aceitando
-// direcao opcional sem quebrar nada, so ninguem mais chama com ela.
-/*
-(function(){
-  const ORDEM_ABAS = ['tarefas','inventario','loja','perfil','estatisticas'];
-  const areaApp = document.querySelector('.app');
-  if (!areaApp) return;
-  let ix=0, iy=0, dx=0, resolvido=false, horizontal=false, ativo=false;
-
-  areaApp.addEventListener('pointerdown', e => {
-    // mesma guarda do onboarding -- nao intercepta gesto que comeca em
-    // cima de campo/botao/elemento interativo (senão selecionar texto
-    // ou tocar em botao vira "arraste" sem querer).
-    if (e.target.closest('input, textarea, select, button, a')) return;
-    ix = e.clientX; iy = e.clientY; dx = 0; resolvido = false; horizontal = false; ativo = true;
-  });
-  areaApp.addEventListener('pointermove', e => {
-    if (!ativo) return;
-    dx = e.clientX - ix;
-    const dy = e.clientY - iy;
-    if (!resolvido){
-      if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
-      resolvido = true;
-      horizontal = Math.abs(dx) > Math.abs(dy) * 1.3; // exige claramente mais horizontal que vertical
-      if (!horizontal) ativo = false; // vertical -> deixa rolar normal
-    }
-  });
-  function finalizar(){
-    if (!ativo || !horizontal){ ativo = false; return; }
-    ativo = false;
-    if (Math.abs(dx) < 60) return; // arraste curto demais, ignora
-    const i = ORDEM_ABAS.indexOf(abaAtual);
-    if (i === -1) return;
-    if (dx < 0 && i < ORDEM_ABAS.length - 1) mostrarAba(ORDEM_ABAS[i + 1], 1);
-    else if (dx > 0 && i > 0) mostrarAba(ORDEM_ABAS[i - 1], -1);
-  }
-  areaApp.addEventListener('pointerup', finalizar);
-  areaApp.addEventListener('pointercancel', finalizar);
-})();
-*/
 
 // pilula que fica atras do icone selecionado na nav e desliza ate ele --
 // usa offsetLeft/offsetWidth do proprio botao (em vez de dividir 100%/N),
@@ -5261,7 +5209,15 @@ function abrirFicha(id){
       const a = b.dataset.a;
       if (a === 'eq') equipar(id);
       else if (a === 'usar') usarItem(id, fichaOrigemEl || ficha.querySelector('.ibox') || b);
-      else if (a === 'vender') venderItem(id, fichaOrigemEl || ficha.querySelector('.ibox') || b);
+      else if (a === 'vender'){
+        const preco = precoVenda(it);
+        pedirConfirmacao(
+          en ? 'Sell ' + it.nome + '?' : 'Vender ' + it.nome + '?',
+          en ? 'You get ' + preco + ' coins.' : 'Você recebe ' + preco + ' moedas.',
+          en ? 'Sell' : 'Vender',
+          () => venderItem(id, fichaOrigemEl || ficha.querySelector('.ibox') || b)
+        );
+      }
       else if (a === 'abrir'){
         fecharFicha();
         if (typeof window.abrirCatalogoGrimorio === 'function') window.abrirCatalogoGrimorio();
@@ -5898,7 +5854,20 @@ function montarCompra(grid){
   });
 
   grid.querySelectorAll('[data-c]').forEach(b => {
-    b.onclick = () => comprar(+b.dataset.c);
+    b.onclick = () => {
+      const i = +b.dataset.c;
+      const s = lojaEstoque[i];
+      if (!s) return;
+      const it = item(s.id);
+      const preco = precoLoja(s.id, s.oferta);
+      const en = idiomaApp() === 'en';
+      pedirConfirmacao(
+        en ? 'Buy ' + it.nome + '?' : 'Comprar ' + it.nome + '?',
+        en ? 'Costs ' + preco + ' coins.' : 'Custa ' + preco + ' moedas.',
+        en ? 'Buy' : 'Comprar',
+        () => comprar(i)
+      );
+    };
   });
 
   const nota = document.createElement('div');
@@ -5954,9 +5923,20 @@ function montarVenda(grid){
 
   grid.querySelectorAll('[data-v]').forEach(b => {
     b.onclick = () => {
-      const icone = b.closest('.lrow')?.querySelector('.lbox');
-      venderItem(+b.dataset.v, icone || b);
-      renderLoja();
+      const id = +b.dataset.v;
+      const it = item(id);
+      const preco = precoVenda(it);
+      const en = idiomaApp() === 'en';
+      pedirConfirmacao(
+        en ? 'Sell ' + it.nome + '?' : 'Vender ' + it.nome + '?',
+        en ? 'You get ' + preco + ' coins.' : 'Você recebe ' + preco + ' moedas.',
+        en ? 'Sell' : 'Vender',
+        () => {
+          const icone = b.closest('.lrow')?.querySelector('.lbox');
+          venderItem(id, icone || b);
+          renderLoja();
+        }
+      );
     };
   });
 
@@ -7142,11 +7122,9 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 
   /* ---------- Config ---------- */
   const cfgOverlay = document.getElementById('cfgOverlay');
-  /* v4.144-fix (pedido do usuario: "sem o texto fazer isso" -- o
-     stagger linha-por-linha foi removido. Funcao mantida comentada
-     (nao apagada) caso queira religar depois; agora abrirConfig() so
-     usa a entrada do proprio .cfgOverlay (fade+slide, ver style.css),
-     que ja e a animacao "Imã"-like que ficou boa no carrossel. */
+  /* v4.144 (pedido do usuario): stagger fisico nas linhas ao abrir Config
+     -- aditivo, so roda quando abrirConfig() e chamada, nao mexe em mais
+     nada do fluxo existente. */
   function animarStaggerCfgRows(){
     if (!cfgOverlay || typeof window.spring !== 'function') return;
     cfgOverlay.querySelectorAll('.cfgrow').forEach((row, i) => {
@@ -7173,6 +7151,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     // acima.
     if (typeof window.atualizarBotaoFeedback === 'function') window.atualizarBotaoFeedback();
     if (cfgOverlay) cfgOverlay.classList.add('on');
+    animarStaggerCfgRows();
   }
   function fecharConfig(){
     if (cfgOverlay) cfgOverlay.classList.remove('on');
@@ -7434,30 +7413,24 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     try { return localStorage.getItem(CHAVE_TEMA) || 'grafite'; } catch(e){ return 'grafite'; }
   }
   function escolherTema(id){
-    // v4.150-fix (pedido do usuario, bug real: piscao branco): a v1
-    // desse cross-fade usava opacity no <html>, que fica transparente
-    // contra o fundo BRANCO padrao do navegador/webview por tras da
-    // pagina, nao contra a cor do app -- resultado era um flash branco
-    // em vez de um fade suave. Corrigido: cobre a tela com um overlay
-    // solido (cor do tema ATUAL, antes de trocar) e some ele depois,
-    // sem nunca deixar nada transparente.
+    // v4.150 (pedido do usuario): trocar tema so mudava --accent/--bg/etc
+    // na hora, sem transicao (variavel CSS custom property nao anima
+    // sozinha). Em vez de adicionar transition em cada componente que
+    // consome alguma dessas variaveis (risco alto, dezenas de regras),
+    // um cross-fade no documentElement inteiro resolve pra qualquer tema
+    // atual ou futuro sem tocar em mais nada.
     const root = document.documentElement;
     const reduzido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduzido){
       root.setAttribute('data-tema', id);
     } else {
-      const overlay = document.createElement('div');
-      overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;pointer-events:none;' +
-        'background:' + getComputedStyle(root).getPropertyValue('--bg') + ';' +
-        'opacity:0;transition:opacity .18s var(--expo);';
-      document.body.appendChild(overlay);
-      requestAnimationFrame(() => { overlay.style.opacity = '1'; });
+      root.style.transition = 'opacity .16s var(--expo)';
+      root.style.opacity = '0.4';
       setTimeout(() => {
         root.setAttribute('data-tema', id);
-        overlay.style.background = getComputedStyle(root).getPropertyValue('--bg');
-        overlay.style.opacity = '0';
-        setTimeout(() => overlay.remove(), 220);
-      }, 180);
+        root.style.opacity = '1';
+        setTimeout(() => { root.style.transition = ''; }, 180);
+      }, 160);
     }
     try { localStorage.setItem(CHAVE_TEMA, id); } catch(e){}
     pintarTemaGrid();
@@ -11365,7 +11338,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // transicao (~300ms), exatamente o efeito visto no video de
   // referencia do Habitica. direcao 1 = avança (elFora sai pela
   // esquerda, elDentro entra pela direita); -1 = volta (invertido).
-  const DURACAO_SLIDE = 420; // ms, deve bater com a transition do CSS inline abaixo (era 300, pedido do usuario: ficou rápido demais)
+  const DURACAO_SLIDE = 300; // ms, deve bater com a transition do CSS inline abaixo
   function garantirSlideUnico(manter){
     // v4.118 (item 42-i do roadmap): trava de seguranca contra o bug
     // visto em video real do usuario -- slides sobrepostos (dois com
@@ -11389,26 +11362,16 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   function deslizar(elFora, elDentro, direcao){
     elDentro.style.transition = 'none';
     elDentro.style.transform = 'translateX(' + (direcao > 0 ? '100%' : '-100%') + ')';
-    elDentro.classList.remove('conteudoIn');
     elDentro.classList.add('on');
     elDentro.getBoundingClientRect(); // forca reflow -- sem isso o browser agrupa a mudanca de
                                        // transform com a linha de baixo e nao anima nada
-    elFora.style.transition = elDentro.style.transition = 'transform ' + DURACAO_SLIDE + 'ms var(--expo)';
+    elFora.style.transition = elDentro.style.transition = 'transform ' + DURACAO_SLIDE + 'ms var(--spring-curve)';
     elFora.style.transform = 'translateX(' + (direcao > 0 ? '-100%' : '100%') + ')';
     elDentro.style.transform = 'translateX(0)';
-    // v4.155-fix2 (pedido do usuario, print real -- "nao teve animacao
-    // nenhuma"): .on liga display:none->flex E a opacidade dos filhos
-    // (.marca/.campo/etc, ver style.css) na MESMA reflow -- o navegador
-    // nunca pinta o estado escondido antes de ja mostrar tudo, entao a
-    // transicao nao tem de onde partir e so aparece direto. Corrigido:
-    // .conteudoIn e uma classe SEPARADA, adicionada só depois do reflow
-    // acima (que ja confirma o filho escondido/pintado), entao ela sim
-    // tem um "antes" de verdade pra transicionar a partir dele.
-    requestAnimationFrame(() => elDentro.classList.add('conteudoIn'));
 
     emTransicao = true;
     setTimeout(() => {
-      elFora.classList.remove('on', 'conteudoIn');
+      elFora.classList.remove('on');
       elFora.style.transition = elFora.style.transform = '';
       elDentro.style.transition = elDentro.style.transform = '';
       garantirSlideUnico(elDentro);
@@ -11458,7 +11421,6 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     if (!atualEl || atualEl === novoEl){
       // primeira vez (vindo do splash, sem slide anterior pra deslizar)
       novoEl.classList.add('on');
-      requestAnimationFrame(() => novoEl.classList.add('conteudoIn')); // mesmo fix de deslizar()
       return;
     }
     const atualNum = parseInt(atualEl.dataset.slide, 10) || ultimoSlideAntesLogin;
@@ -11617,13 +11579,6 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     return palco.getBoundingClientRect().width || 1;
   }
 
-  // v4.156 (pedido do usuario): arrastar pro lado removido do onboarding
-  // -- os 4 listeners abaixo ficam COMENTADOS, nao apagados (convencao
-  // wrap-not-rewrite), caso queira religar um dia. deslizar()/irPara()
-  // (usados pelos botoes Continuar/Voltar) nao dependem de nenhum
-  // desses listeners, entao a navegacao por botao continua 100% normal
-  // sem eles.
-  /*
   card.addEventListener('pointerdown', e => {
     // v4.114-4.117: nome/heroi/tarefas (slides 5-7) e o desvio de
     // login tem campos de
@@ -11667,16 +11622,13 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       if (elVizinhoArraste){
         elVizinhoArraste.style.transition = '';
         elVizinhoArraste.style.transform = '';
-        elVizinhoArraste.classList.remove('on', 'conteudoIn');
+        elVizinhoArraste.classList.remove('on');
       }
       direcaoVizinho = dir;
       elVizinhoArraste = pegarVizinho(atualNum, dir);
       if (elVizinhoArraste){
         elVizinhoArraste.style.transition = 'none';
-        elVizinhoArraste.classList.remove('conteudoIn');
         elVizinhoArraste.classList.add('on');
-        elVizinhoArraste.getBoundingClientRect(); // mesmo fix de deslizar() -- commita o estado escondido antes de revelar
-        elVizinhoArraste.classList.add('conteudoIn');
       }
     }
     if (!elVizinhoArraste) return; // ponta do carrossel (1o ou ultimo slide) -- sem pra onde ir, ignora
@@ -11719,7 +11671,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       elEntra.style.transform = 'translateX(0)';
       atualizarTopo(dir === 1 ? atualNum + 1 : atualNum - 1);
       setTimeout(() => {
-        elSai.classList.remove('on', 'conteudoIn');
+        elSai.classList.remove('on');
         elSai.style.transition = elSai.style.transform = '';
         elEntra.style.transition = elEntra.style.transform = '';
         garantirSlideUnico(elEntra);
@@ -11744,7 +11696,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       setTimeout(() => {
         elSai.style.transition = elSai.style.transform = '';
         if (elEntra){
-          elEntra.classList.remove('on', 'conteudoIn');
+          elEntra.classList.remove('on');
           elEntra.style.transition = elEntra.style.transform = '';
         }
         garantirSlideUnico(elSai);
@@ -11757,7 +11709,6 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   }
   card.addEventListener('pointerup', finalizarArraste);
   card.addEventListener('pointercancel', finalizarArraste);
-  */
 })();
 </script>
 

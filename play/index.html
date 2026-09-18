@@ -5209,15 +5209,7 @@ function abrirFicha(id){
       const a = b.dataset.a;
       if (a === 'eq') equipar(id);
       else if (a === 'usar') usarItem(id, fichaOrigemEl || ficha.querySelector('.ibox') || b);
-      else if (a === 'vender'){
-        const preco = precoVenda(it);
-        pedirConfirmacao(
-          en ? 'Sell ' + it.nome + '?' : 'Vender ' + it.nome + '?',
-          en ? 'You get ' + preco + ' coins.' : 'Você recebe ' + preco + ' moedas.',
-          en ? 'Sell' : 'Vender',
-          () => venderItem(id, fichaOrigemEl || ficha.querySelector('.ibox') || b)
-        );
-      }
+      else if (a === 'vender') venderItem(id, fichaOrigemEl || ficha.querySelector('.ibox') || b);
       else if (a === 'abrir'){
         fecharFicha();
         if (typeof window.abrirCatalogoGrimorio === 'function') window.abrirCatalogoGrimorio();
@@ -5854,20 +5846,7 @@ function montarCompra(grid){
   });
 
   grid.querySelectorAll('[data-c]').forEach(b => {
-    b.onclick = () => {
-      const i = +b.dataset.c;
-      const s = lojaEstoque[i];
-      if (!s) return;
-      const it = item(s.id);
-      const preco = precoLoja(s.id, s.oferta);
-      const en = idiomaApp() === 'en';
-      pedirConfirmacao(
-        en ? 'Buy ' + it.nome + '?' : 'Comprar ' + it.nome + '?',
-        en ? 'Costs ' + preco + ' coins.' : 'Custa ' + preco + ' moedas.',
-        en ? 'Buy' : 'Comprar',
-        () => comprar(i)
-      );
-    };
+    b.onclick = () => comprar(+b.dataset.c);
   });
 
   const nota = document.createElement('div');
@@ -5923,20 +5902,9 @@ function montarVenda(grid){
 
   grid.querySelectorAll('[data-v]').forEach(b => {
     b.onclick = () => {
-      const id = +b.dataset.v;
-      const it = item(id);
-      const preco = precoVenda(it);
-      const en = idiomaApp() === 'en';
-      pedirConfirmacao(
-        en ? 'Sell ' + it.nome + '?' : 'Vender ' + it.nome + '?',
-        en ? 'You get ' + preco + ' coins.' : 'Você recebe ' + preco + ' moedas.',
-        en ? 'Sell' : 'Vender',
-        () => {
-          const icone = b.closest('.lrow')?.querySelector('.lbox');
-          venderItem(id, icone || b);
-          renderLoja();
-        }
-      );
+      const icone = b.closest('.lrow')?.querySelector('.lbox');
+      venderItem(+b.dataset.v, icone || b);
+      renderLoja();
     };
   });
 
@@ -7413,24 +7381,30 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     try { return localStorage.getItem(CHAVE_TEMA) || 'grafite'; } catch(e){ return 'grafite'; }
   }
   function escolherTema(id){
-    // v4.150 (pedido do usuario): trocar tema so mudava --accent/--bg/etc
-    // na hora, sem transicao (variavel CSS custom property nao anima
-    // sozinha). Em vez de adicionar transition em cada componente que
-    // consome alguma dessas variaveis (risco alto, dezenas de regras),
-    // um cross-fade no documentElement inteiro resolve pra qualquer tema
-    // atual ou futuro sem tocar em mais nada.
+    // v4.150-fix (pedido do usuario, bug real: piscao branco): a v1
+    // desse cross-fade usava opacity no <html>, que fica transparente
+    // contra o fundo BRANCO padrao do navegador/webview por tras da
+    // pagina, nao contra a cor do app -- resultado era um flash branco
+    // em vez de um fade suave. Corrigido: cobre a tela com um overlay
+    // solido (cor do tema ATUAL, antes de trocar) e some ele depois,
+    // sem nunca deixar nada transparente.
     const root = document.documentElement;
     const reduzido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduzido){
       root.setAttribute('data-tema', id);
     } else {
-      root.style.transition = 'opacity .16s var(--expo)';
-      root.style.opacity = '0.4';
+      const overlay = document.createElement('div');
+      overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;pointer-events:none;' +
+        'background:' + getComputedStyle(root).getPropertyValue('--bg') + ';' +
+        'opacity:0;transition:opacity .18s var(--expo);';
+      document.body.appendChild(overlay);
+      requestAnimationFrame(() => { overlay.style.opacity = '1'; });
       setTimeout(() => {
         root.setAttribute('data-tema', id);
-        root.style.opacity = '1';
-        setTimeout(() => { root.style.transition = ''; }, 180);
-      }, 160);
+        overlay.style.background = getComputedStyle(root).getPropertyValue('--bg');
+        overlay.style.opacity = '0';
+        setTimeout(() => overlay.remove(), 220);
+      }, 180);
     }
     try { localStorage.setItem(CHAVE_TEMA, id); } catch(e){}
     pintarTemaGrid();

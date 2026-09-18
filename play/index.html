@@ -1766,24 +1766,24 @@ function dispararVitoriaDoDia(doDia, nivelAntes, xpGanho, moedasGanhas){
     }
   };
 
-  // item 3: moeda+XP nascem no meio da animacao do poof (180ms -- ainda
-  // visivel/dissipando, mas ja da tempo da recompensa "emergir" dele em
-  // vez de nascer simultaneo), voam ate o HEROI, e SO DEPOIS que "+X"
-  // aparece em cima da cabeca dele (dentro de voarRecompensaFinal) e
-  // que o bau/contadores sao liberados -- com uma folga BEM maior
+  // item 3: moeda+XP so nascem DEPOIS que a nuvem do poof terminou de
+  // vez (420ms -- poof dura 400ms), voam ate o HEROI, e SO DEPOIS que
+  // "+X" aparece em cima da cabeca dele (dentro de voarRecompensaFinal)
+  // e que o bau/contadores sao liberados -- com uma folga BEM maior
   // (900ms, era 350ms) pra dar tempo de LER o "+X" antes do bau/
   // contador roubarem a atencao. 350ms tava curto demais pra separar
   // visualmente os dois momentos (confirmado em video: parecia tudo
   // simultaneo).
   //
-  // v4.144-fix (pedido do usuario, video real): esses 180ms/420ms eram
-  // 450ms/560ms, calibrados pro poof ANTIGO (560ms de duracao total).
-  // Depois que o poof do smoke pack foi encurtado pra 400ms (nuvem ja
-  // nasce "cheia" em vez de crescer), esses timers ficaram esperando
-  // tempo demais: a recompensa "emergia" DEPOIS da nuvem ja ter sumido
-  // (gap vazio, parecia bugado) e o bau (caminho sem reward) esperava
-  // 160ms a mais que o necessario. Recalculados pra bater com os 400ms
-  // atuais do poof.
+  // v4.145-fix (pedido do usuario, video real): antes a recompensa
+  // nascia em 180ms, ENQUANTO a nuvem ainda estava visivel/dissipando
+  // (era proposital -- ideia de "emergir" da fumaca) -- na pratica
+  // ficava um resquicio da nuvem (as particulas mais espalhadas do
+  // fim da animacao) visivel no canto AO MESMO TEMPO que a moeda/gema
+  // ja apareciam voando, o que parecia sobra/bug (confirmado em
+  // video: "aparece um pouco dela no final ainda"). Removida a
+  // sobreposicao: a recompensa so nasce depois da nuvem ter sumido
+  // por completo.
   //
   // Se nao tem reward pra mostrar (veio do caminho de exclusao de
   // tarefa, que chama esta funcao sem xpGanho/moedasGanhas), pula
@@ -1793,7 +1793,7 @@ function dispararVitoriaDoDia(doDia, nivelAntes, xpGanho, moedasGanhas){
       voarRecompensaFinal(xpGanho || 0, moedasGanhas || 0, () => {
         setTimeout(mostrarBauEContadores, 900);
       });
-    }, 180);
+    }, 420);
   } else {
     setTimeout(mostrarBauEContadores, 420);
   }

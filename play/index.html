@@ -11312,7 +11312,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // transicao (~300ms), exatamente o efeito visto no video de
   // referencia do Habitica. direcao 1 = avança (elFora sai pela
   // esquerda, elDentro entra pela direita); -1 = volta (invertido).
-  const DURACAO_SLIDE = 300; // ms, deve bater com a transition do CSS inline abaixo
+  const DURACAO_SLIDE = 420; // ms, deve bater com a transition do CSS inline abaixo (era 300, pedido do usuario: ficou rápido demais)
   function garantirSlideUnico(manter){
     // v4.118 (item 42-i do roadmap): trava de seguranca contra o bug
     // visto em video real do usuario -- slides sobrepostos (dois com

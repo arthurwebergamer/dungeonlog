@@ -1766,7 +1766,7 @@ function dispararVitoriaDoDia(doDia, nivelAntes, xpGanho, moedasGanhas){
     }
   };
 
-  // item 3: moeda+XP nascem no meio da animacao do poof (250ms -- ainda
+  // item 3: moeda+XP nascem no meio da animacao do poof (180ms -- ainda
   // visivel/dissipando, mas ja da tempo da recompensa "emergir" dele em
   // vez de nascer simultaneo), voam ate o HEROI, e SO DEPOIS que "+X"
   // aparece em cima da cabeca dele (dentro de voarRecompensaFinal) e
@@ -1776,17 +1776,26 @@ function dispararVitoriaDoDia(doDia, nivelAntes, xpGanho, moedasGanhas){
   // visualmente os dois momentos (confirmado em video: parecia tudo
   // simultaneo).
   //
+  // v4.144-fix (pedido do usuario, video real): esses 180ms/420ms eram
+  // 450ms/560ms, calibrados pro poof ANTIGO (560ms de duracao total).
+  // Depois que o poof do smoke pack foi encurtado pra 400ms (nuvem ja
+  // nasce "cheia" em vez de crescer), esses timers ficaram esperando
+  // tempo demais: a recompensa "emergia" DEPOIS da nuvem ja ter sumido
+  // (gap vazio, parecia bugado) e o bau (caminho sem reward) esperava
+  // 160ms a mais que o necessario. Recalculados pra bater com os 400ms
+  // atuais do poof.
+  //
   // Se nao tem reward pra mostrar (veio do caminho de exclusao de
   // tarefa, que chama esta funcao sem xpGanho/moedasGanhas), pula
-  // direto pro bau, so esperando o poof terminar (560ms).
+  // direto pro bau, so esperando o poof terminar (400ms).
   if ((xpGanho || moedasGanhas) && typeof voarRecompensaFinal === 'function'){
     setTimeout(() => {
       voarRecompensaFinal(xpGanho || 0, moedasGanhas || 0, () => {
         setTimeout(mostrarBauEContadores, 900);
       });
-    }, 450);
+    }, 180);
   } else {
-    setTimeout(mostrarBauEContadores, 560);
+    setTimeout(mostrarBauEContadores, 420);
   }
 }
 

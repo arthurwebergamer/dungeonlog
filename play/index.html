@@ -11336,16 +11336,26 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   function deslizar(elFora, elDentro, direcao){
     elDentro.style.transition = 'none';
     elDentro.style.transform = 'translateX(' + (direcao > 0 ? '100%' : '-100%') + ')';
+    elDentro.classList.remove('conteudoIn');
     elDentro.classList.add('on');
     elDentro.getBoundingClientRect(); // forca reflow -- sem isso o browser agrupa a mudanca de
                                        // transform com a linha de baixo e nao anima nada
     elFora.style.transition = elDentro.style.transition = 'transform ' + DURACAO_SLIDE + 'ms var(--spring-curve)';
     elFora.style.transform = 'translateX(' + (direcao > 0 ? '-100%' : '100%') + ')';
     elDentro.style.transform = 'translateX(0)';
+    // v4.155-fix2 (pedido do usuario, print real -- "nao teve animacao
+    // nenhuma"): .on liga display:none->flex E a opacidade dos filhos
+    // (.marca/.campo/etc, ver style.css) na MESMA reflow -- o navegador
+    // nunca pinta o estado escondido antes de ja mostrar tudo, entao a
+    // transicao nao tem de onde partir e so aparece direto. Corrigido:
+    // .conteudoIn e uma classe SEPARADA, adicionada só depois do reflow
+    // acima (que ja confirma o filho escondido/pintado), entao ela sim
+    // tem um "antes" de verdade pra transicionar a partir dele.
+    requestAnimationFrame(() => elDentro.classList.add('conteudoIn'));
 
     emTransicao = true;
     setTimeout(() => {
-      elFora.classList.remove('on');
+      elFora.classList.remove('on', 'conteudoIn');
       elFora.style.transition = elFora.style.transform = '';
       elDentro.style.transition = elDentro.style.transform = '';
       garantirSlideUnico(elDentro);
@@ -11395,6 +11405,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     if (!atualEl || atualEl === novoEl){
       // primeira vez (vindo do splash, sem slide anterior pra deslizar)
       novoEl.classList.add('on');
+      requestAnimationFrame(() => novoEl.classList.add('conteudoIn')); // mesmo fix de deslizar()
       return;
     }
     const atualNum = parseInt(atualEl.dataset.slide, 10) || ultimoSlideAntesLogin;
@@ -11596,13 +11607,16 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       if (elVizinhoArraste){
         elVizinhoArraste.style.transition = '';
         elVizinhoArraste.style.transform = '';
-        elVizinhoArraste.classList.remove('on');
+        elVizinhoArraste.classList.remove('on', 'conteudoIn');
       }
       direcaoVizinho = dir;
       elVizinhoArraste = pegarVizinho(atualNum, dir);
       if (elVizinhoArraste){
         elVizinhoArraste.style.transition = 'none';
+        elVizinhoArraste.classList.remove('conteudoIn');
         elVizinhoArraste.classList.add('on');
+        elVizinhoArraste.getBoundingClientRect(); // mesmo fix de deslizar() -- commita o estado escondido antes de revelar
+        elVizinhoArraste.classList.add('conteudoIn');
       }
     }
     if (!elVizinhoArraste) return; // ponta do carrossel (1o ou ultimo slide) -- sem pra onde ir, ignora
@@ -11645,7 +11659,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       elEntra.style.transform = 'translateX(0)';
       atualizarTopo(dir === 1 ? atualNum + 1 : atualNum - 1);
       setTimeout(() => {
-        elSai.classList.remove('on');
+        elSai.classList.remove('on', 'conteudoIn');
         elSai.style.transition = elSai.style.transform = '';
         elEntra.style.transition = elEntra.style.transform = '';
         garantirSlideUnico(elEntra);
@@ -11670,7 +11684,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       setTimeout(() => {
         elSai.style.transition = elSai.style.transform = '';
         if (elEntra){
-          elEntra.classList.remove('on');
+          elEntra.classList.remove('on', 'conteudoIn');
           elEntra.style.transition = elEntra.style.transform = '';
         }
         garantirSlideUnico(elSai);

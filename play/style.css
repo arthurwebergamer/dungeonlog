@@ -1925,29 +1925,29 @@
     transition:transform .5s cubic-bezier(.16,1,.3,1), opacity .45s ease;
     transform:scale(.5) rotate(-14deg);opacity:0;
   }
-  .carrosselSlide.on .marca,
-  .carrosselSlide.on .campo,
-  .carrosselSlide.on .palcoNav,
-  .carrosselSlide.on .grade,
-  .carrosselSlide.on .listaini,
-  .carrosselSlide.on .dica,
-  .carrosselSlide.on .carrosselTransicao,
-  .carrosselSlide.on .carrosselIdiomaEscolha,
-  .carrosselSlide.on .carrosselTarefasDemo,
-  .carrosselSlide.on > .primario,
-  .carrosselSlide.on > .secundario,
-  .carrosselSlide.on .carrosselImgWrap,
-  .carrosselSlide.on .carrosselTrioLogo{transform:none;opacity:1}
-  .carrosselSlide.on .carrosselImgWrap,
-  .carrosselSlide.on .carrosselTrioLogo{transition-delay:0s}
-  .carrosselSlide.on .marca{transition-delay:.10s}
-  .carrosselSlide.on .campo,
-  .carrosselSlide.on .palcoNav,
-  .carrosselSlide.on .grade{transition-delay:.16s}
-  .carrosselSlide.on .listaini,
-  .carrosselSlide.on .dica{transition-delay:.20s}
-  .carrosselSlide.on > .primario,
-  .carrosselSlide.on > .secundario{transition-delay:.26s}
+  .carrosselSlide.on.conteudoIn .marca,
+  .carrosselSlide.on.conteudoIn .campo,
+  .carrosselSlide.on.conteudoIn .palcoNav,
+  .carrosselSlide.on.conteudoIn .grade,
+  .carrosselSlide.on.conteudoIn .listaini,
+  .carrosselSlide.on.conteudoIn .dica,
+  .carrosselSlide.on.conteudoIn .carrosselTransicao,
+  .carrosselSlide.on.conteudoIn .carrosselIdiomaEscolha,
+  .carrosselSlide.on.conteudoIn .carrosselTarefasDemo,
+  .carrosselSlide.on.conteudoIn > .primario,
+  .carrosselSlide.on.conteudoIn > .secundario,
+  .carrosselSlide.on.conteudoIn .carrosselImgWrap,
+  .carrosselSlide.on.conteudoIn .carrosselTrioLogo{transform:none;opacity:1}
+  .carrosselSlide.on.conteudoIn .carrosselImgWrap,
+  .carrosselSlide.on.conteudoIn .carrosselTrioLogo{transition-delay:0s}
+  .carrosselSlide.on.conteudoIn .marca{transition-delay:.10s}
+  .carrosselSlide.on.conteudoIn .campo,
+  .carrosselSlide.on.conteudoIn .palcoNav,
+  .carrosselSlide.on.conteudoIn .grade{transition-delay:.16s}
+  .carrosselSlide.on.conteudoIn .listaini,
+  .carrosselSlide.on.conteudoIn .dica{transition-delay:.20s}
+  .carrosselSlide.on.conteudoIn > .primario,
+  .carrosselSlide.on.conteudoIn > .secundario{transition-delay:.26s}
 
   /* legibilidade da descricao reportada como ruim (itálico serifado
      pequeno e apagado) -- escopado só no carrossel via .carrosselMeio,
@@ -3223,29 +3223,29 @@
     transition:transform .5s cubic-bezier(.16,1,.3,1), opacity .45s ease;
     transform:scale(.5) rotate(-14deg);opacity:0;
   }
-  .carrosselSlide.on .marca,
-  .carrosselSlide.on .campo,
-  .carrosselSlide.on .palcoNav,
-  .carrosselSlide.on .grade,
-  .carrosselSlide.on .listaini,
-  .carrosselSlide.on .dica,
-  .carrosselSlide.on .carrosselTransicao,
-  .carrosselSlide.on .carrosselIdiomaEscolha,
-  .carrosselSlide.on .carrosselTarefasDemo,
-  .carrosselSlide.on > .primario,
-  .carrosselSlide.on > .secundario,
-  .carrosselSlide.on .carrosselImgWrap,
-  .carrosselSlide.on .carrosselTrioLogo{transform:none;opacity:1}
-  .carrosselSlide.on .carrosselImgWrap,
-  .carrosselSlide.on .carrosselTrioLogo{transition-delay:0s}
-  .carrosselSlide.on .marca{transition-delay:.10s}
-  .carrosselSlide.on .campo,
-  .carrosselSlide.on .palcoNav,
-  .carrosselSlide.on .grade{transition-delay:.16s}
-  .carrosselSlide.on .listaini,
-  .carrosselSlide.on .dica{transition-delay:.20s}
-  .carrosselSlide.on > .primario,
-  .carrosselSlide.on > .secundario{transition-delay:.26s}
+  .carrosselSlide.on.conteudoIn .marca,
+  .carrosselSlide.on.conteudoIn .campo,
+  .carrosselSlide.on.conteudoIn .palcoNav,
+  .carrosselSlide.on.conteudoIn .grade,
+  .carrosselSlide.on.conteudoIn .listaini,
+  .carrosselSlide.on.conteudoIn .dica,
+  .carrosselSlide.on.conteudoIn .carrosselTransicao,
+  .carrosselSlide.on.conteudoIn .carrosselIdiomaEscolha,
+  .carrosselSlide.on.conteudoIn .carrosselTarefasDemo,
+  .carrosselSlide.on.conteudoIn > .primario,
+  .carrosselSlide.on.conteudoIn > .secundario,
+  .carrosselSlide.on.conteudoIn .carrosselImgWrap,
+  .carrosselSlide.on.conteudoIn .carrosselTrioLogo{transform:none;opacity:1}
+  .carrosselSlide.on.conteudoIn .carrosselImgWrap,
+  .carrosselSlide.on.conteudoIn .carrosselTrioLogo{transition-delay:0s}
+  .carrosselSlide.on.conteudoIn .marca{transition-delay:.10s}
+  .carrosselSlide.on.conteudoIn .campo,
+  .carrosselSlide.on.conteudoIn .palcoNav,
+  .carrosselSlide.on.conteudoIn .grade{transition-delay:.16s}
+  .carrosselSlide.on.conteudoIn .listaini,
+  .carrosselSlide.on.conteudoIn .dica{transition-delay:.20s}
+  .carrosselSlide.on.conteudoIn > .primario,
+  .carrosselSlide.on.conteudoIn > .secundario{transition-delay:.26s}
 
   /* legibilidade da descricao reportada como ruim (itálico serifado
      pequeno e apagado) -- escopado só no carrossel via .carrosselMeio,

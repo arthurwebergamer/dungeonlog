@@ -1806,7 +1806,13 @@ function dispararVitoriaDoDia(doDia, nivelAntes, xpGanho, moedasGanhas){
   if ((xpGanho || moedasGanhas) && typeof voarRecompensaFinal === 'function'){
     setTimeout(() => {
       voarRecompensaFinal(xpGanho || 0, moedasGanhas || 0, () => {
-        setTimeout(mostrarBauEContadores, 900);
+        // ERA 900ms -- cortado pra 600ms (pedido do usuario: cadeia
+        // toque->bau tava demorando demais no total, ~2.9s). O "+X"
+        // (numeroFlutuanteHeroi) fica visivel na tela por 1100ms, entao
+        // 600ms de folga ainda mostra ele sozinho na tela por bastante
+        // tempo antes do bau entrar, sem voltar ao problema antigo de
+        // parecer tudo simultaneo.
+        setTimeout(mostrarBauEContadores, 600);
       });
     }, 420);
   } else {
@@ -3748,16 +3754,19 @@ function alternar(i){
   if (suprimirContadores) window._adiarContadoresRecompensa = false; // so vale por ESSE render() -- o de dentro da sequencia atrasada (mostrarBauEContadores) roda com a flag ja desligada
 
   if (ehGolpeFinal){
-    // atraso proposital: animarGolpe() (chamada logo acima) leva 320ms
-    // pra terminar (hero bate, monstro treme, os dois voltam ao
-    // normal -- ver a funcao). dispararVitoriaDoDia() faz o proprio
-    // render(), que troca a visual pro estado "derrotado" (esconde o
-    // monstro). Sem esse atraso, essa troca acontecia quase instantanea
-    // -- ainda no mesmo tick -- cortando a animacao de golpe pela
-    // metade, dando a impressao de que o golpe acertou o bau em vez do
-    // monstro (queixa do usuario, dava pra perceber facil).
+    // ERA 400ms (pra esperar animarGolpe(), 320ms, terminar antes do
+    // render() trocar a tela e esconder o monstro no meio do golpe --
+    // ver historico). Esse motivo caiu: animarGolpe() agora e chamado
+    // NA HORA DO TOQUE (onclick da caixa, nao mais aqui dentro), e
+    // alternar() so roda 350ms depois do toque -- ou seja, o golpe
+    // (320ms) SEMPRE ja terminou antes de alternar() sequer comecar a
+    // rodar. Os 400ms viraram espera morta, sem nada esperando de
+    // verdade -- reduzidos a uma folga minima so pro navegador assentar
+    // o paint do render() logo acima antes do poof comecar. Medido em
+    // video: cadeia toque-final -> bau caiu de ~2.9s pra ~2.5s so com
+    // este corte.
     _vitoriaSequenciaEmAndamento = true; // travado JA, antes do timer -- ver comentario na declaracao
-    setTimeout(() => dispararVitoriaDoDia(doDia, nivelAntes, xpGanho, moedasGanhas), 400);
+    setTimeout(() => dispararVitoriaDoDia(doDia, nivelAntes, xpGanho, moedasGanhas), 50);
     return true;
   }
   if (!venceuAgora) derrotadoEm = null;

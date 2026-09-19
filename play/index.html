@@ -2338,6 +2338,13 @@ function verificarDesbloqueiosTemaArena(){
   if (desbloqueouAlgumAgora && typeof viajarParaTemaEstagio === 'function'){
     const estagioReal = (typeof estagioAtual === 'function') ? estagioAtual() : 1;
     if (estagioReal > estagioCerimoniaMostradaAte()){
+      // A trava contra a cerimonia de estagio abrir NO MEIO da sequencia
+      // de vitoria do dia mora dentro de viajarParaTemaEstagio() (guarda
+      // central -- ver comentario la), nao aqui: este NAO e o unico
+      // caminho que chama ela (renderTemaArena() tem o proprio, ver
+      // comentario "SINCRONIZACAO defensiva" perto dela), entao a trava
+      // tem que estar no ponto que os dois passam, nao duplicada em cada
+      // chamador.
       debugEstagio('verificarDesbloqueiosTemaArena: estagio ' + estagioReal + ' ainda nao foi celebrado, chamando viajarParaTemaEstagio()');
       viajarParaTemaEstagio();
     } else {
@@ -2784,6 +2791,19 @@ function viajarParaTemaEstagio(){
   }
   if (temaArenaSalvo() === temaAlvo.id){
     debugEstagio('saiu cedo: temaArenaSalvo() ja e ' + temaAlvo.id + ' -- nada a fazer');
+    return;
+  }
+  if (_vitoriaSequenciaEmAndamento){
+    // BUG CORRIGIDO: a cerimonia de estagio nao pode abrir NO MEIO da
+    // sequencia de vitoria do dia (poof -> tela cheia -> bau/contadores).
+    // As duas sao telas cheias independentes competindo pela mesma Arena,
+    // e existem DOIS caminhos que chegam aqui (verificarDesbloqueiosTemaArena()
+    // e renderTemaArena()), entao a trava mora aqui, no ponto que os dois
+    // passam, em vez de duplicada em cada chamador. Quando a sequencia de
+    // vitoria terminar (mostrarBauEContadores() zera a flag), o proximo
+    // render() vai chamar viajarParaTemaEstagio() de novo e a cerimonia
+    // abre normalmente, so que depois do bau.
+    debugEstagio('saiu cedo: vitoria do dia em andamento -- cerimonia de estagio adiada');
     return;
   }
   if (_arenaBgEmTransicao){

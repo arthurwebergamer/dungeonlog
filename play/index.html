@@ -3188,9 +3188,13 @@ function render(){
 
       const seraFinal = (vezesAtual + 1) >= meta;
       if (seraFinal){
+        // ERAM 180ms/460ms -- cortados pra 80ms/280ms (pedido do
+        // usuario: saida da tarefa da lista tava demorando). O .vanish
+        // agora tambem dura .2s em vez de .3s (ver style.css), entao
+        // 80+200=280ms bate exato com o novo alternar(i).
         el.classList.add('done');
-        setTimeout(() => el.classList.add('vanish'), 180);
-        setTimeout(() => alternar(i), 460);
+        setTimeout(() => el.classList.add('vanish'), 80);
+        setTimeout(() => alternar(i), 280);
       } else {
         // pedido do usuario: tirar a animacao de saida/entrada (.saiu/
         // .entrou) -- nao ficou legal. Mantido o som (pedido anterior,

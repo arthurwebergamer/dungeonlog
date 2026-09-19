@@ -225,7 +225,7 @@
   .task.done .box svg{opacity:1}
   .task.done .label{color:var(--dim);text-decoration:line-through}
   .task.done{opacity:.6}
-  .task.vanish{opacity:0;transform:translateX(40px);transition:opacity .3s,transform .3s}
+  .task.vanish{opacity:0;transform:translateX(40px);transition:opacity .2s,transform .2s}
   .task.tap{transform:scale(.97);transition:transform .12s}
   /* pedido do usuario: animacao de saida/entrada no toque parcial
      (.saiu/.entrou) removida -- nao ficou legal, revertido pro toque

@@ -3234,6 +3234,15 @@ function render(){
     mobHpEl.classList.remove('golpe');
     void mobHpEl.offsetWidth;
     mobHpEl.classList.add('golpe');
+    // BUG CORRIGIDO (relatado pelo usuario: "numeros ficam vermelho" ao
+    // sair/voltar pra aba Tarefas): .golpe nunca era removida sozinha,
+    // so no proximo golpe (remove+add acima). Se a troca de aba
+    // acontecia logo apos um golpe, a Arena virava display:none com
+    // .golpe ainda grudada -- e o navegador REINICIA a animacao CSS
+    // presa numa classe quando o elemento volta a ser exibido, piscando
+    // vermelho de novo sem nenhum golpe de verdade ter acontecido.
+    // {once:true} garante que a classe some sozinha ao fim do .35s.
+    mobHpEl.addEventListener('animationend', () => mobHpEl.classList.remove('golpe'), { once: true });
   }
   mobHpEl.textContent = hpTexto;
   mobHpEl.dataset.pronto = '1';

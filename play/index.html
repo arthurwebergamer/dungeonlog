@@ -3169,6 +3169,17 @@ function render(){
       if (el.dataset.travado) return;
       el.dataset.travado = '1';
 
+      // GOLPE NA HORA: animarGolpe() so mexe em classes CSS do heroi/
+      // monstro (ver funcao), nao depende de nada que alternar() calcula
+      // -- so podia ser chamado direto no clique. Antes ficava preso
+      // dentro de alternar(), que so roda 350/460ms depois (setTimeouts
+      // abaixo), entao o "golpe" so aparecia quase meio segundo depois
+      // do toque (medido em video, reclamacao do usuario comparando com
+      // concorrente). Chamando aqui, o bicho reage no mesmo frame do
+      // toque; os 350/460ms continuam so pra dar tempo da animacao da
+      // LISTA (vanish) terminar antes do render() trocar a tela.
+      animarGolpe();
+
       const seraFinal = (vezesAtual + 1) >= meta;
       if (seraFinal){
         el.classList.add('done');
@@ -3176,10 +3187,9 @@ function render(){
         setTimeout(() => alternar(i), 460);
       } else {
         // pedido do usuario: tirar a animacao de saida/entrada (.saiu/
-        // .entrou) -- nao ficou legal. Mantido animarGolpe()+som (pedido
-        // anterior, esse funcionou), so sem efeito visual de saida.
-        // 350ms da tempo do animarGolpe() (320ms) terminar antes do
-        // render() (dentro de alternar()) trocar a tela.
+        // .entrou) -- nao ficou legal. Mantido o som (pedido anterior,
+        // esse funcionou), so sem efeito visual de saida. animarGolpe()
+        // ja rodou acima, na hora do toque.
         setTimeout(() => alternar(i), 350);
       }
     };
@@ -3666,10 +3676,11 @@ function alternar(i){
       // toque parcial (meta>1, ainda nao completou) ainda representa um
       // golpe de verdade no monstro (mesma fantasia do resto do app:
       // "toda tarefa concluida e um golpe"), so nao fecha o dia -- por
-      // isso chama os dois AQUI direto, sem depender do hook externo de
+      // isso chama o som AQUI direto, sem depender do hook externo de
       // SFX (que so dispara quando alternar() NAO retorna false, e este
-      // caminho sempre retorna false de proposito).
-      animarGolpe();
+      // caminho sempre retorna false de proposito). animarGolpe() NAO e
+      // chamado aqui -- ja rodou na hora do toque, no onclick da caixa
+      // (ver comentario la), pra nao esperar alternar() pra reagir.
       window.tocarSom?.('golpe');
       // mesma trava _adiarContadoresRecompensa do golpe final -- sem
       // isso a barra de XP/moeda ja aparecia cheia ANTES do icone
@@ -3721,7 +3732,9 @@ function alternar(i){
   const nivelDepois = progresso().nivel;
   const subiuNivel = nivelDepois > nivelAntes;
 
-  animarGolpe();
+  // animarGolpe() NAO e chamado aqui -- ja rodou na hora do toque, no
+  // onclick da caixa (render()), pra reagir no mesmo frame do clique em
+  // vez de esperar os 350/460ms de alternar() (ver comentario la).
   // suprime contadores no render() sempre que a barra so deve andar
   // DEPOIS de um icone chegar no heroi (golpe final OU tarefa normal
   // via voarRecompensaFinal, logo abaixo) -- pedido do usuario, mesmo

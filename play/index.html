@@ -3772,19 +3772,28 @@ function alternar(i){
   if (suprimirContadores) window._adiarContadoresRecompensa = false; // so vale por ESSE render() -- o de dentro da sequencia atrasada (mostrarBauEContadores) roda com a flag ja desligada
 
   if (ehGolpeFinal){
-    // ERA 400ms (pra esperar animarGolpe(), 320ms, terminar antes do
-    // render() trocar a tela e esconder o monstro no meio do golpe --
-    // ver historico). Esse motivo caiu: animarGolpe() agora e chamado
-    // NA HORA DO TOQUE (onclick da caixa, nao mais aqui dentro), e
-    // alternar() so roda 350ms depois do toque -- ou seja, o golpe
-    // (320ms) SEMPRE ja terminou antes de alternar() sequer comecar a
-    // rodar. Os 400ms viraram espera morta, sem nada esperando de
-    // verdade -- reduzidos a uma folga minima so pro navegador assentar
-    // o paint do render() logo acima antes do poof comecar. Medido em
-    // video: cadeia toque-final -> bau caiu de ~2.9s pra ~2.5s so com
-    // este corte.
+    // BUG CORRIGIDO (relatado pelo usuario: "animacao do monstro morrendo
+    // ainda buga as vezes"): o corte de 400ms->50ms feito antes assumia
+    // que alternar() so roda 350ms depois do toque -- mas esse numero
+    // ficou desatualizado numa mexida POSTERIOR (saida da tarefa da
+    // lista foi de 460/350ms pra 280ms, ver onclick da caixa). Com
+    // alternar() rodando em 280ms e so mais 50ms de espera aqui, o poof
+    // (mostrarPoofMonstro(), logo abaixo, dentro de dispararVitoriaDoDia)
+    // disparava em ~330ms -- mas o .shake do monstro (animarGolpe(),
+    // chamado no toque) so termina de verdade em 320ms (100ms de attraso
+    // pro shake comecar + .2s de animacao CSS, ver mob-sprite.shake).
+    // Margem de so 10ms contra um timer de navegador: sob qualquer
+    // jitter (2 tarefas quase juntas, celular mais lento, etc.) o poof
+    // as vezes capturava a posicao do monstro AINDA com o transform do
+    // shake aplicado (getBoundingClientRect deslocado/rotacionado),
+    // fazendo a nuvem nascer fora do lugar -- exatamente o "bugado as
+    // vezes" relatado, so que so quando a corrida dava errado.
+    // Restaurada uma folga de verdade (200ms): alternar() em 280ms +
+    // 200ms aqui = 480ms, bem acima dos 320ms do shake, com margem
+    // segura contra jitter. Cadeia toque-final -> bau fica em ~2,65s
+    // (era ~2,5s com o corte quebrado, ~2,9s antes de qualquer corte).
     _vitoriaSequenciaEmAndamento = true; // travado JA, antes do timer -- ver comentario na declaracao
-    setTimeout(() => dispararVitoriaDoDia(doDia, nivelAntes, xpGanho, moedasGanhas), 50);
+    setTimeout(() => dispararVitoriaDoDia(doDia, nivelAntes, xpGanho, moedasGanhas), 200);
     return true;
   }
   if (!venceuAgora) derrotadoEm = null;

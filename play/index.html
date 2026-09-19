@@ -1704,6 +1704,20 @@ lerOffsetDia();   // precisa rodar antes de qualquer isoAtual()
 let tarefas = [];
 let dragArmado = false;   // true enquanto um card esta sendo arrastado (bloqueia o click de abrir editor)
 let xpTotal = 0, moedas = 0, derrotadoEm = null, jaComecou = false;
+// trava contra disparo duplo do golpe final (BUG real, confirmado em
+// mockup isolado): monstroJaCaiu() so vira true quando derrotadoEm e
+// setado dentro de mostrarBauEContadores(), que so roda 400ms (delay do
+// golpe) + 420ms (poof) -- ou +840+900ms se tem recompensa voando --
+// DEPOIS do momento em que o dia foi vencido. Nessa janela toda,
+// monstroJaCaiu() ainda retorna false. Se o usuario marcar/desmarcar
+// QUALQUER tarefa de novo dentro desse intervalo (ex: 2 checkboxes
+// proximos, ou um double-tap sem querer), avaliarVitoriaDoDia() avalia
+// de novo e ehGolpeFinal fica true UMA SEGUNDA VEZ -- dispara um
+// SEGUNDO dispararVitoriaDoDia() em paralelo (segunda nuvem/segunda
+// troca de .vitoria por cima da primeira ainda rodando). Essa flag e
+// setada SINCRONAMENTE no instante que o golpe final e detectado (nao
+// espera o timer), entao a segunda chamada ve a trava ligada e ignora.
+let _vitoriaSequenciaEmAndamento = false;
 function monstroJaCaiu(){ return derrotadoEm === isoAtual(); }
 
 // fonte da verdade da vitoria do dia -- desacoplada de hpTotal/hpDano
@@ -1739,6 +1753,7 @@ function dispararVitoriaDoDia(doDia, nivelAntes, xpGanho, moedasGanhas){
   // paralelo, sem um esperar o outro de verdade (confirmado em video).
   const mostrarBauEContadores = () => {
     derrotadoEm = isoAtual();
+    _vitoriaSequenciaEmAndamento = false; // so libera a trava aqui -- monstroJaCaiu() ja responde true a partir de agora, entao nao precisa mais dela
     const ganho = recompensaVitoria(doDia.length);
     moedas += ganho;
     ultimoGanho = ganho;
@@ -1766,27 +1781,36 @@ function dispararVitoriaDoDia(doDia, nivelAntes, xpGanho, moedasGanhas){
     }
   };
 
-  // item 3: moeda+XP nascem no meio da animacao do poof (250ms -- ainda
-  // visivel/dissipando, mas ja da tempo da recompensa "emergir" dele em
-  // vez de nascer simultaneo), voam ate o HEROI, e SO DEPOIS que "+X"
-  // aparece em cima da cabeca dele (dentro de voarRecompensaFinal) e
-  // que o bau/contadores sao liberados -- com uma folga BEM maior
+  // item 3: moeda+XP so nascem DEPOIS que a nuvem do poof terminou de
+  // vez (420ms -- poof dura 400ms), voam ate o HEROI, e SO DEPOIS que
+  // "+X" aparece em cima da cabeca dele (dentro de voarRecompensaFinal)
+  // e que o bau/contadores sao liberados -- com uma folga BEM maior
   // (900ms, era 350ms) pra dar tempo de LER o "+X" antes do bau/
   // contador roubarem a atencao. 350ms tava curto demais pra separar
   // visualmente os dois momentos (confirmado em video: parecia tudo
   // simultaneo).
   //
+  // v4.145-fix (pedido do usuario, video real): antes a recompensa
+  // nascia em 180ms, ENQUANTO a nuvem ainda estava visivel/dissipando
+  // (era proposital -- ideia de "emergir" da fumaca) -- na pratica
+  // ficava um resquicio da nuvem (as particulas mais espalhadas do
+  // fim da animacao) visivel no canto AO MESMO TEMPO que a moeda/gema
+  // ja apareciam voando, o que parecia sobra/bug (confirmado em
+  // video: "aparece um pouco dela no final ainda"). Removida a
+  // sobreposicao: a recompensa so nasce depois da nuvem ter sumido
+  // por completo.
+  //
   // Se nao tem reward pra mostrar (veio do caminho de exclusao de
   // tarefa, que chama esta funcao sem xpGanho/moedasGanhas), pula
-  // direto pro bau, so esperando o poof terminar (560ms).
+  // direto pro bau, so esperando o poof terminar (400ms).
   if ((xpGanho || moedasGanhas) && typeof voarRecompensaFinal === 'function'){
     setTimeout(() => {
       voarRecompensaFinal(xpGanho || 0, moedasGanhas || 0, () => {
         setTimeout(mostrarBauEContadores, 900);
       });
-    }, 450);
+    }, 420);
   } else {
-    setTimeout(mostrarBauEContadores, 560);
+    setTimeout(mostrarBauEContadores, 420);
   }
 }
 
@@ -1919,7 +1943,7 @@ function mostrarPoofMonstro(){
   // "ressuscitava" visualmente ate o render() de verdade rodar (bug
   // confirmado em video: monstro reaparecia normal enquanto "+X"
   // ainda estava na tela). Um so lugar controla isso agora.
-  setTimeout(() => el.remove(), 560);
+  setTimeout(() => el.remove(), 400);
 }
 window.mostrarPoofMonstro = mostrarPoofMonstro;
 let nomeHeroi = 'Aventureiro';
@@ -3687,7 +3711,7 @@ function alternar(i){
   // a barra/contador nesse render() especifico (ver
   // _adiarContadoresRecompensa em render()).
   const venceuAgora = avaliarVitoriaDoDia();
-  const ehGolpeFinal = venceuAgora && !monstroJaCaiu();
+  const ehGolpeFinal = venceuAgora && !monstroJaCaiu() && !_vitoriaSequenciaEmAndamento;
 
   // MOVIDO pra antes do render() (era depois) -- progresso() e pura, so
   // olha xpTotal (ja somado acima), nao depende de nada que render()
@@ -3719,6 +3743,7 @@ function alternar(i){
     // -- ainda no mesmo tick -- cortando a animacao de golpe pela
     // metade, dando a impressao de que o golpe acertou o bau em vez do
     // monstro (queixa do usuario, dava pra perceber facil).
+    _vitoriaSequenciaEmAndamento = true; // travado JA, antes do timer -- ver comentario na declaracao
     setTimeout(() => dispararVitoriaDoDia(doDia, nivelAntes, xpGanho, moedasGanhas), 400);
     return true;
   }
@@ -3736,9 +3761,11 @@ function alternar(i){
 // So garante que derrotadoEm nao fique com um valor indevido depois da exclusao.
 function verificarVitoriaAoExcluir(){
   if (monstroJaCaiu()) return;   // ja venceu de verdade antes: exclusao nao desfaz
+  if (_vitoriaSequenciaEmAndamento) return; // golpe final ja disparado (por alternar()) e ainda rodando -- ver comentario na declaracao da flag
   if (avaliarVitoriaDoDia()){
     // excluir a ultima pendente fechou o dia (0 pendentes, >=1 concluida)
     const nivelAntes = progresso().nivel;
+    _vitoriaSequenciaEmAndamento = true;
     dispararVitoriaDoDia(tarefas.filter(ehDeHoje), nivelAntes);
     return;
   }

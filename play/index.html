@@ -1237,7 +1237,12 @@
 </script>
 
 <div class="debugbar"><button class="debugbtn" id="debugbtn">próximo dia →</button><button class="debugbtn" id="pularTutoriaisBtn">pular tutorial</button><button class="debugbtn" id="debugArmasBtn">+ todas armas</button><button class="debugbtn" id="debugEstagioBtn">forçar estágio</button></div>
-<div id="estagioDebugPanel" class="estagio-debug-panel"></div>
+<!-- #estagioDebugPanel (terminal verde de log dos Estagios) removido a
+     pedido do usuario -- debugEstagio() ja tem "if (!painel) return"
+     logo no inicio (ver funcao, perto de "Painel de debug VISIVEL NA
+     TELA"), entao vira no-op sozinha sem #estagioDebugPanel no DOM; os
+     varios call sites de debugEstagio(...) espalhados pelo Sistema de
+     Estagios nao precisaram ser tocados. -->
 <div class="toast" id="toast"></div>
 
 <script src="assets.js"></script>

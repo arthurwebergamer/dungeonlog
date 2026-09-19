@@ -462,8 +462,6 @@
     .nav{padding-bottom:max(0px, env(safe-area-inset-bottom))}
   }
     .debugbar{position:fixed;bottom:calc(72px + env(safe-area-inset-bottom));left:8px;display:flex;gap:5px;z-index:50}
-    .estagio-debug-panel{display:none;position:fixed;bottom:calc(72px + env(safe-area-inset-bottom) + 42px);left:8px;right:8px;max-height:170px;overflow-y:auto;z-index:50;background:rgba(0,0,0,.88);border:1px solid #4ADE80;border-radius:8px;padding:8px 10px;font-family:monospace;font-size:10px;color:#4ADE80;line-height:1.45;white-space:pre-wrap;word-break:break-word}
-    body.modo-debug .estagio-debug-panel{display:block}
   .debugbtn{background:rgba(29,34,43,.9);color:var(--dim);border:1px dashed var(--line);border-radius:6px;padding:4px 8px;font-family:'Outfit',sans-serif;font-size:10px;cursor:pointer}
   .debugbtn:hover{color:var(--text);border-color:var(--dim)}
   /* item: TOGGLE DEBUG (clique nas moedas) -- default escondido; body.modo-debug revela.

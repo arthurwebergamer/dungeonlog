@@ -268,6 +268,13 @@
   .mode.on{background:var(--accent-dim);color:var(--accent);border-color:var(--accent-dim)}
   .days{display:none;gap:4px}
   .days.on{display:flex}
+  /* v4.161: stepper "Todo dia N" (recorrencia mensal) -- escondido por
+     padrao como .days, so que via id (maior especificidade que a classe
+     .vezeswrap generica que ele tambem usa pro layout coluna/gap). */
+  #diaMesWrap{display:none}
+  #diaMesWrap.on{display:flex}
+  #edDiaMesWrap{display:none}
+  #edDiaMesWrap.on{display:flex}
   .day{flex:1;background:var(--panel);color:var(--dim);border:1px solid var(--line);border-radius:7px;padding:8px 0;font-family:'Silkscreen',monospace;font-size:8px;cursor:pointer;transition:.15s}
   .day.on{background:var(--accent-dim);color:var(--accent);border-color:var(--accent-dim)}
   .cbtn{background:var(--accent);color:var(--bg);border:none;border-radius:9px;padding:11px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;cursor:pointer}
@@ -369,13 +376,27 @@
      espremendo as 12 linhas do ano numa fatia da largura do card. */
   #estMapaMes.est-mapames-ano{display:block}
 
-  .est-anograde{display:flex;flex-direction:column;gap:5px}
+  /* v4.161 (pedido do usuario -- "o grafico anual tá horrível"): celulas
+     de 8px -> 9px com canto arredondado (3px, igual ao .est-tile da
+     legenda) e gap maior (2px -> 3px), pra dar pra realmente enxergar o
+     grid em vez de uma faixa solida. */
+  .est-anograde{display:flex;flex-direction:column;gap:6px}
   .est-anolinha{display:flex;align-items:center;gap:7px}
   .est-anomeslbl{width:24px;flex:none;font-family:'Outfit',sans-serif;font-size:9.5px;color:var(--dim)}
-  .est-anodias{display:flex;gap:2px;flex:1;min-width:0;height:8px}
-  .est-anodia{display:block;flex:1;min-width:1px;max-width:8px;height:8px;border-radius:1.5px;background:var(--panel-3)}
+  .est-anodias{display:flex;gap:3px;flex:1;min-width:0;flex-wrap:wrap}
+  .est-anodia{display:block;width:9px;height:9px;border-radius:3px;background:var(--panel-3)}
   .est-histchevron{width:14px;height:14px;margin-left:auto;flex:none;color:var(--dim)}
   .est-histsufixo{color:var(--dim);font-weight:400}
+
+  /* seletor de ano da visao "ano" do Historico -- escondido por padrao,
+     so aparece com .on (ligado/desligado em renderHistoricoConteudo). */
+  .est-anoswitcher{display:none;align-items:center;justify-content:center;gap:16px;margin-bottom:14px}
+  .est-anoswitcher.on{display:flex}
+  .est-anobtn{background:none;border:none;padding:6px;cursor:pointer;color:var(--dim);display:flex;align-items:center;justify-content:center}
+  .est-anobtn svg{width:16px;height:16px}
+  .est-anobtn:hover{color:var(--text)}
+  .est-anobtn:disabled{opacity:.3;cursor:default}
+  .est-anonum{font-family:'Silkscreen',monospace;font-size:15px;color:var(--text);min-width:44px;text-align:center}
 
   .est-periodoopc{display:block;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:13px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;margin-bottom:8px;cursor:pointer}
   .est-periodoopc:last-child{margin-bottom:0}

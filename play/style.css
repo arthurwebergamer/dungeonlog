@@ -1343,17 +1343,38 @@
     --gold:#E8E8E8; --blood:#B8B8B8; --mobname:#E0E0E0; --sel-bg:#4A4A4A; --poco:#1C1C1C;
     --arena-1:#454545; --arena-2:#383838; --arena-3:#2C2C2C; --xp2:#EDEDED;
   }
-  /* v4.139 (pedido do usuario, cores especificas fornecidas): Floresta
-     refeito de novo com a paleta exata pedida -- Cor 1 (fundo/blocos) =
-     verde-musgo bem escuro, quase preto; Cor 2 (botoes/destaques) =
-     magenta/rosa-orquidea vibrante. Combinacao mais ousada que as
-     tentativas anteriores (verde+marrom, verde+dourado), de proposito. */
+  /* v4.158 (pedido do usuario -- "o verde-magenta nao combina com o
+     app"): Floresta (id mantido por compatibilidade com localStorage
+     de quem ja tinha esse tema salvo, label no seletor virou so
+     "Verde") refeito do zero via mockup de paleta (Artifact) testado
+     antes de entrar em produto -- usuario aprovou a opcao "Verde
+     Selva": verde-folha desaturado como destaque, sobre fundo
+     verde-musgo bem escuro. Combinacao "natural", sem o contraste
+     roxo/magenta bizarro da versao anterior. */
   :root[data-tema="floresta"]{
-    --bg:#131A0F; --panel:#131A0F; --panel-2:#1E2A19; --panel-3:#25331E;
-    --line:#364A2B; --text:#F4ECF2; --muted:#ACC69F; --dim:#7C9D6C;
-    --accent:#E949CE; --accent-dim:#4F2247; --gold:#EFC348; --blood:#DE546B;
-    --mobname:#EC8EA7; --sel-bg:#2F4026; --poco:#172013;
-    --arena-1:#364A2B; --arena-2:#25331E; --arena-3:#1C2717; --xp2:#EFC348;
+    --bg:#152018; --panel:#152018; --panel-2:#1E2C22; --panel-3:#26392B;
+    --line:#3A5142; --text:#EFEDE4; --muted:#AEC4B2; --dim:#77937D;
+    --accent:#6FAE6F; --accent-dim:#22391F; --gold:#D8B45C; --blood:#C15C4E;
+    --mobname:#D9A05B; --sel-bg:#2A3B2C; --poco:#0F1712;
+    --arena-1:#3A5142; --arena-2:#26392B; --arena-3:#1C2A20; --xp2:#D8B45C;
+  }
+  /* v4.158 (pedido do usuario, mesma sessao): dois temas novos, tambem
+     escolhidos no mockup de paleta -- Arcano (roxo profundo + ciano
+     eletrico, clima de magia/dungeon) e Sangue (vermelho-carmesim
+     escuro + dourado-osso, clima grim de dungeon crawler). */
+  :root[data-tema="arcano"]{
+    --bg:#160B24; --panel:#160B24; --panel-2:#211334; --panel-3:#2B1B42;
+    --line:#432C63; --text:#EFE8FA; --muted:#B9A6D9; --dim:#8A72B3;
+    --accent:#4FE0E8; --accent-dim:#12414A; --gold:#D9C15C; --blood:#D6537A;
+    --mobname:#C48FE8; --sel-bg:#2E1D46; --poco:#0F0619;
+    --arena-1:#432C63; --arena-2:#2B1B42; --arena-3:#1F1330; --xp2:#D9C15C;
+  }
+  :root[data-tema="sangue"]{
+    --bg:#1C0E0E; --panel:#1C0E0E; --panel-2:#2B1414; --panel-3:#3A1A1A;
+    --line:#5A2626; --text:#F2E6D8; --muted:#CBA48E; --dim:#996F5C;
+    --accent:#E0B978; --accent-dim:#4A2E1A; --gold:#E0B978; --blood:#D4392F;
+    --mobname:#E88F6B; --sel-bg:#3A1A1A; --poco:#120808;
+    --arena-1:#5A2626; --arena-2:#3A1A1A; --arena-3:#2B1414; --xp2:#E0B978;
   }
 
 /* ===== Bloco style #27 ===== */
@@ -2624,17 +2645,38 @@
     --gold:#E8E8E8; --blood:#B8B8B8; --mobname:#E0E0E0; --sel-bg:#4A4A4A; --poco:#1C1C1C;
     --arena-1:#454545; --arena-2:#383838; --arena-3:#2C2C2C; --xp2:#EDEDED;
   }
-  /* v4.139 (pedido do usuario, cores especificas fornecidas): Floresta
-     refeito de novo com a paleta exata pedida -- Cor 1 (fundo/blocos) =
-     verde-musgo bem escuro, quase preto; Cor 2 (botoes/destaques) =
-     magenta/rosa-orquidea vibrante. Combinacao mais ousada que as
-     tentativas anteriores (verde+marrom, verde+dourado), de proposito. */
+  /* v4.158 (pedido do usuario -- "o verde-magenta nao combina com o
+     app"): Floresta (id mantido por compatibilidade com localStorage
+     de quem ja tinha esse tema salvo, label no seletor virou so
+     "Verde") refeito do zero via mockup de paleta (Artifact) testado
+     antes de entrar em produto -- usuario aprovou a opcao "Verde
+     Selva": verde-folha desaturado como destaque, sobre fundo
+     verde-musgo bem escuro. Combinacao "natural", sem o contraste
+     roxo/magenta bizarro da versao anterior. */
   :root[data-tema="floresta"]{
-    --bg:#131A0F; --panel:#131A0F; --panel-2:#1E2A19; --panel-3:#25331E;
-    --line:#364A2B; --text:#F4ECF2; --muted:#ACC69F; --dim:#7C9D6C;
-    --accent:#E949CE; --accent-dim:#4F2247; --gold:#EFC348; --blood:#DE546B;
-    --mobname:#EC8EA7; --sel-bg:#2F4026; --poco:#172013;
-    --arena-1:#364A2B; --arena-2:#25331E; --arena-3:#1C2717; --xp2:#EFC348;
+    --bg:#152018; --panel:#152018; --panel-2:#1E2C22; --panel-3:#26392B;
+    --line:#3A5142; --text:#EFEDE4; --muted:#AEC4B2; --dim:#77937D;
+    --accent:#6FAE6F; --accent-dim:#22391F; --gold:#D8B45C; --blood:#C15C4E;
+    --mobname:#D9A05B; --sel-bg:#2A3B2C; --poco:#0F1712;
+    --arena-1:#3A5142; --arena-2:#26392B; --arena-3:#1C2A20; --xp2:#D8B45C;
+  }
+  /* v4.158 (pedido do usuario, mesma sessao): dois temas novos, tambem
+     escolhidos no mockup de paleta -- Arcano (roxo profundo + ciano
+     eletrico, clima de magia/dungeon) e Sangue (vermelho-carmesim
+     escuro + dourado-osso, clima grim de dungeon crawler). */
+  :root[data-tema="arcano"]{
+    --bg:#160B24; --panel:#160B24; --panel-2:#211334; --panel-3:#2B1B42;
+    --line:#432C63; --text:#EFE8FA; --muted:#B9A6D9; --dim:#8A72B3;
+    --accent:#4FE0E8; --accent-dim:#12414A; --gold:#D9C15C; --blood:#D6537A;
+    --mobname:#C48FE8; --sel-bg:#2E1D46; --poco:#0F0619;
+    --arena-1:#432C63; --arena-2:#2B1B42; --arena-3:#1F1330; --xp2:#D9C15C;
+  }
+  :root[data-tema="sangue"]{
+    --bg:#1C0E0E; --panel:#1C0E0E; --panel-2:#2B1414; --panel-3:#3A1A1A;
+    --line:#5A2626; --text:#F2E6D8; --muted:#CBA48E; --dim:#996F5C;
+    --accent:#E0B978; --accent-dim:#4A2E1A; --gold:#E0B978; --blood:#D4392F;
+    --mobname:#E88F6B; --sel-bg:#3A1A1A; --poco:#120808;
+    --arena-1:#5A2626; --arena-2:#3A1A1A; --arena-3:#2B1414; --xp2:#E0B978;
   }
 
 /* --- Módulo style #10 --- */

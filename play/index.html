@@ -5305,15 +5305,14 @@ function abrirFicha(id){
       const a = b.dataset.a;
       if (a === 'eq') equipar(id);
       else if (a === 'usar') usarItem(id, fichaOrigemEl || ficha.querySelector('.ibox') || b);
-      else if (a === 'vender'){
-        const preco = precoVenda(it);
-        pedirConfirmacao(
-          en ? 'Sell ' + it.nome + '?' : 'Vender ' + it.nome + '?',
-          en ? 'You get ' + preco + ' coins.' : 'Você recebe ' + preco + ' moedas.',
-          en ? 'Sell' : 'Vender',
-          () => venderItem(id, fichaOrigemEl || ficha.querySelector('.ibox') || b)
-        );
-      }
+      // pedido do usuario: vender direto da ficha do inventario nao pede
+      // confirmacao -- abrir a ficha ja e o passo deliberado, e o botao
+      // "Vender" (ibox, estilo escuro) abrindo uma folha com OUTRO botao
+      // "Vender" (antes dourado, herdado do .edsalvar generico) parecia
+      // duplicado. Confirmacao continua existindo pra compra na Loja e
+      // pra venda em lote/individual dentro da Loja (pedirConfirmacao),
+      // so este fluxo especifico ficou direto.
+      else if (a === 'vender') venderItem(id, fichaOrigemEl || ficha.querySelector('.ibox') || b);
       else if (a === 'abrir'){
         fecharFicha();
         if (typeof window.abrirCatalogoGrimorio === 'function') window.abrirCatalogoGrimorio();

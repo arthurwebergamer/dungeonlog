@@ -276,6 +276,7 @@
       <div class="modes">
         <button class="mode on" id="modeHoje" data-i18n="jogo.soHoje">Só hoje</button>
         <button class="mode" id="modeRepete" data-i18n="jogo.repeteSemana">Repete toda semana</button>
+        <button class="mode" id="modeMensal" data-i18n="jogo.repeteMes">Repete todo mês</button>
       </div>
 
       <div class="difwrap">
@@ -298,6 +299,18 @@
         <button class="day" data-d="4" data-i18n="dia.qui">Q</button>
         <button class="day" data-d="5" data-i18n="dia.sex">S</button>
         <button class="day" data-d="6" data-i18n="dia.sab">S</button>
+      </div>
+      <!-- v4.161 (pedido do usuario): recorrencia mensal -- dia fixo do mes,
+           mesma linguagem visual do stepper de "Vezes por dia" (- N +), em
+           vez de uma grade de 31 botoes. Mes curto (ex: dia 31 em fevereiro)
+           cai automaticamente no ultimo dia daquele mes -- ver diaMesOcorreNoDia(). -->
+      <div class="vezeswrap" id="diaMesWrap">
+        <span class="diflabel" data-i18n="jogo.todoDia">Todo dia</span>
+        <div class="vezesrow">
+          <button class="vezesbtn" id="diaMesMenos" type="button" aria-label="Diminuir">−</button>
+          <span class="vezesnum" id="diaMesNum"><b>1</b></span>
+          <button class="vezesbtn" id="diaMesMais" type="button" aria-label="Aumentar">+</button>
+        </div>
       </div>
 
       <button type="button" class="advtoggle" id="advToggle">
@@ -831,6 +844,20 @@
         <span class="est-histsufixo" id="estHistSufixo" data-i18n="est.periodoMes">· mês</span>
         <svg class="est-histchevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
       </div>
+      <!-- v4.161 (pedido do usuario -- "o grafico anual tá horrível, dava
+           pra trocar de ano"): seletor de ano, so aparece na visao "ano"
+           (.on, ligado em renderHistoricoConteudo). Botoes tem
+           stopPropagation() no JS pra nao abrir o popup de periodo do
+           card (que escuta clique em qualquer lugar do card). -->
+      <div class="est-anoswitcher" id="estAnoSwitcher">
+        <button type="button" class="est-anobtn" id="estAnoAnterior" aria-label="Ano anterior">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+        </button>
+        <span class="est-anonum" id="estAnoNum">2026</span>
+        <button type="button" class="est-anobtn" id="estAnoProximo" aria-label="Próximo ano">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+      </div>
       <div class="est-mapames" id="estMapaMes"></div>
       <div class="est-mapalegenda" id="estMapaLegenda">
         <div class="est-tile"></div><span data-i18n="est.semTarefa">sem tarefa</span>
@@ -940,6 +967,7 @@
   document.querySelectorAll('.est-periodoopc').forEach(function(btn){
     btn.onclick = function(){
       estPeriodoAtual = btn.dataset.periodo;
+      if (estPeriodoAtual === 'ano') estAnoEscolhido = null; // volta pro ano de hoje ao reabrir "Ano inteiro"
       const chave = estPeriodoAtual === 'semana' ? 'est.periodoSemana'
         : estPeriodoAtual === 'ano' ? 'est.periodoAno' : 'est.periodoMes';
       if (sufixoEl){
@@ -950,6 +978,24 @@
       if (typeof renderEstatisticas === 'function') renderEstatisticas();
     };
   });
+
+  // setas do seletor de ano -- stopPropagation pra nao acionar o
+  // histCard.onclick (abre o popup de periodo em qualquer clique no card).
+  const estAnoAnteriorBtn = document.getElementById('estAnoAnterior');
+  const estAnoProximoBtn = document.getElementById('estAnoProximo');
+  if (estAnoAnteriorBtn) estAnoAnteriorBtn.onclick = function(e){
+    e.stopPropagation();
+    estAnoEscolhido = (estAnoEscolhido || Number(isoAtual().slice(0,4))) - 1;
+    if (typeof renderEstatisticas === 'function') renderEstatisticas();
+  };
+  if (estAnoProximoBtn) estAnoProximoBtn.onclick = function(e){
+    e.stopPropagation();
+    const anoHoje = Number(isoAtual().slice(0,4));
+    if (estAnoEscolhido !== null && estAnoEscolhido < anoHoje){
+      estAnoEscolhido = estAnoEscolhido + 1;
+      if (typeof renderEstatisticas === 'function') renderEstatisticas();
+    }
+  };
 
   const montOverlay = document.getElementById('estMontanhaOverlay');
   const montFechar = document.getElementById('estMontanhaFechar');
@@ -1986,10 +2032,23 @@ let equipado = {arma:null, armadura:null, elmo:null, escudo:null, acess:null};
 
 const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
 
-function ehDeHoje(t){
-  if (t.tipo === 'hoje') return t.data === isoAtual();
-  return t.dias.includes(diaDaSemana());
+// v4.161: helper unico pra "essa tarefa vale nesse dia?", usado por
+// ehDeHoje() (hoje) e por pendentesEm()/tarefasEm() (qualquer dia, pro
+// registro de historico). Mes curto: dia 31 escolhido cai automatico no
+// ultimo dia real do mes (fevereiro, por exemplo) em vez de nunca ocorrer.
+function diaMesOcorreNoDia(t, iso){
+  const d = new Date(iso + 'T12:00:00');
+  const diasNoMes = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+  const alvo = Math.min(t.diaMes || 1, diasNoMes);
+  return d.getDate() === alvo;
 }
+function ocorreNoDia(t, iso){
+  if (t.tipo === 'hoje') return t.data === iso;
+  if (t.tipo === 'mensal') return diaMesOcorreNoDia(t, iso);
+  return (t.dias || []).includes(new Date(iso + 'T12:00:00').getDay());
+}
+window.ocorreNoDia = ocorreNoDia;
+function ehDeHoje(t){ return ocorreNoDia(t, isoAtual()); }
 function feitaHoje(t){ return t.feitaEm === isoAtual(); }
 function romano(n){
   if (n < 1) return 'I';
@@ -2009,6 +2068,7 @@ function progresso(){
 function rotulo(t){
   const en = idiomaApp() === 'en';
   if (t.tipo === 'hoje') return en ? 'today only' : 'só hoje';
+  if (t.tipo === 'mensal') return en ? ('day ' + (t.diaMes || 1) + ' of the month') : ('todo dia ' + (t.diaMes || 1));
   if (t.dias.length === 7) return en ? 'every day' : 'todo dia';
   const siglas = en ? SIGLAS_EN : SIGLAS;
   return t.dias.slice().sort().map(d => siglas[d]).join(', ');
@@ -3863,8 +3923,13 @@ const input = document.getElementById('input');
 const daysEl = document.getElementById('days');
 const btnHoje = document.getElementById('modeHoje');
 const btnRepete = document.getElementById('modeRepete');
+const btnMensal = document.getElementById('modeMensal');
+const diaMesWrap = document.getElementById('diaMesWrap');
+const diaMesNumEl = document.getElementById('diaMesNum');
+const DIA_MES_MIN = 1, DIA_MES_MAX = 31;
 let modo = 'hoje';
 let diasEscolhidos = [];
+let diaMesEscolhido = new Date().getDate(); // sugestao inicial: dia de hoje
 
 const btnSave = document.getElementById('save');
 
@@ -3888,18 +3953,19 @@ window.atualizarEstadoSave = atualizarEstadoSave;
 
 input.addEventListener('input', atualizarEstadoSave);
 
-btnHoje.onclick = () => {
-  modo = 'hoje';
-  btnHoje.classList.add('on'); btnRepete.classList.remove('on');
-  daysEl.classList.remove('on');
-  atualizarEstadoSave();
-};
-btnRepete.onclick = () => {
-  modo = 'repete';
-  btnRepete.classList.add('on'); btnHoje.classList.remove('on');
-  daysEl.classList.add('on');
-  atualizarEstadoSave();
-};
+// v4.161: 3 modos agora (hoje/repete/mensal) -- cada onclick liga o seu
+// botao e o painel correspondente (dias da semana OU stepper de dia do
+// mes), desliga os outros dois. Mesmo padrao ja usado, so estendido.
+function pintarModo(){
+  btnHoje.classList.toggle('on', modo === 'hoje');
+  btnRepete.classList.toggle('on', modo === 'repete');
+  btnMensal.classList.toggle('on', modo === 'mensal');
+  daysEl.classList.toggle('on', modo === 'repete');
+  if (diaMesWrap) diaMesWrap.classList.toggle('on', modo === 'mensal');
+}
+btnHoje.onclick = () => { modo = 'hoje'; pintarModo(); atualizarEstadoSave(); };
+btnRepete.onclick = () => { modo = 'repete'; pintarModo(); atualizarEstadoSave(); };
+if (btnMensal) btnMensal.onclick = () => { modo = 'mensal'; pintarModo(); atualizarEstadoSave(); };
 daysEl.querySelectorAll('.day').forEach(b => {
   b.onclick = () => {
     const d = Number(b.dataset.d);
@@ -3908,6 +3974,14 @@ daysEl.querySelectorAll('.day').forEach(b => {
     atualizarEstadoSave();
   };
 });
+function pintarDiaMes(){
+  if (diaMesNumEl) diaMesNumEl.innerHTML = '<b>' + diaMesEscolhido + '</b>';
+}
+pintarDiaMes();
+const diaMesMenosBtn = document.getElementById('diaMesMenos');
+const diaMesMaisBtn = document.getElementById('diaMesMais');
+if (diaMesMenosBtn) diaMesMenosBtn.onclick = () => { diaMesEscolhido = Math.max(DIA_MES_MIN, diaMesEscolhido - 1); pintarDiaMes(); };
+if (diaMesMaisBtn) diaMesMaisBtn.onclick = () => { diaMesEscolhido = Math.min(DIA_MES_MAX, diaMesEscolhido + 1); pintarDiaMes(); };
 
 document.getElementById('addbtn').onclick = () => {
   composer.classList.toggle('on');
@@ -3936,6 +4010,7 @@ function criar(){
   if (modo === 'repete' && diasEscolhidos.length === 0) return;
 
   if (modo === 'hoje') tarefas.push({ texto, tipo:'hoje', data:isoAtual(), feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined });
+  else if (modo === 'mensal') tarefas.push({ texto, tipo:'mensal', diaMes:diaMesEscolhido, feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined });
   else tarefas.push({ texto, tipo:'repete', dias:[...diasEscolhidos], feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined });
   window.dbgConta && window.dbgConta('criar() -- tarefa "' + texto + '" adicionada | uidAtivo=' + (typeof _uidAtivo!=='undefined'?_uidAtivo:'?') + ' | chave=' + (typeof chaveSaveAtual==='function'?chaveSaveAtual():'?') + ' | tarefas agora: ' + tarefas.length);
 
@@ -4634,6 +4709,11 @@ function renderMapaDoMes(hist, ano, mes){
 // a escolha em memoria (reseta pro padrao "mes" a cada reload, de
 // proposito, mesmo principio que o extinto calendario de Perfil usava). */
 let estPeriodoAtual = 'mes';
+// v4.161 (pedido do usuario): ano escolhido na visao "ano" do Historico --
+// null = ainda nao escolhido, cai no ano de hoje (ver renderHistoricoConteudo).
+// Reseta pra null sempre que o usuario re-seleciona "Ano inteiro" no popup
+// de periodo (mesmo principio de "nao persiste" ja usado por estPeriodoAtual).
+let estAnoEscolhido = null;
 
 const NOMES_MES_CURTO = {
   pt: ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'],
@@ -4707,9 +4787,21 @@ function renderHistoricoConteudo(hist, ano, mes){
   const el = document.getElementById('estMapaMes');
   if (el && estPeriodoAtual !== 'ano') el.classList.remove('est-mapames-ano');
   const legendaEl = document.getElementById('estMapaLegenda');
-  if (legendaEl) legendaEl.style.display = estPeriodoAtual === 'ano' ? 'none' : '';
+  // v4.161 (pedido do usuario): legenda agora fica visivel tambem na
+  // visao "ano" -- antes sumia justamente onde mais fazia falta (grid
+  // sem numero dentro da celula, so cor).
+  if (legendaEl) legendaEl.style.display = '';
+  const switcherEl = document.getElementById('estAnoSwitcher');
+  if (switcherEl) switcherEl.classList.toggle('on', estPeriodoAtual === 'ano');
   if (estPeriodoAtual === 'semana') renderHistoricoSemana(hist);
-  else if (estPeriodoAtual === 'ano') renderHistoricoAno(hist, ano);
+  else if (estPeriodoAtual === 'ano'){
+    if (estAnoEscolhido === null) estAnoEscolhido = ano;
+    const anoNumEl = document.getElementById('estAnoNum');
+    if (anoNumEl) anoNumEl.textContent = estAnoEscolhido;
+    const proxBtn = document.getElementById('estAnoProximo');
+    if (proxBtn) proxBtn.disabled = estAnoEscolhido >= ano;
+    renderHistoricoAno(hist, estAnoEscolhido);
+  }
   else renderMapaDoMes(hist, ano, mes);
 }
 
@@ -6111,6 +6203,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       <div class="modes">
         <button class="mode" id="edModoHoje" type="button" data-i18n="jogo.soHoje">Só hoje</button>
         <button class="mode" id="edModoRepete" type="button" data-i18n="jogo.repeteSemana">Repete toda semana</button>
+        <button class="mode" id="edModoMensal" type="button" data-i18n="jogo.repeteMes">Repete todo mês</button>
       </div>
       <div class="days" id="edDias">
         <button class="day" data-d="0" type="button" data-i18n="dia.dom">D</button>
@@ -6120,6 +6213,14 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
         <button class="day" data-d="4" type="button" data-i18n="dia.qui">Q</button>
         <button class="day" data-d="5" type="button" data-i18n="dia.sex">S</button>
         <button class="day" data-d="6" type="button" data-i18n="dia.sab">S</button>
+      </div>
+      <div class="vezeswrap" id="edDiaMesWrap">
+        <span class="diflabel" data-i18n="jogo.todoDia">Todo dia</span>
+        <div class="vezesrow">
+          <button class="vezesbtn" id="edDiaMesMenos" type="button" aria-label="Diminuir">−</button>
+          <span class="vezesnum" id="edDiaMesNum"><b>1</b></span>
+          <button class="vezesbtn" id="edDiaMesMais" type="button" aria-label="Aumentar">+</button>
+        </div>
       </div>
     </div>
 
@@ -6156,6 +6257,10 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   const gDias = document.getElementById('edDias');
   const bHoje = document.getElementById('edModoHoje');
   const bRep  = document.getElementById('edModoRepete');
+  const bMensal = document.getElementById('edModoMensal');
+  const diaMesWrapEd = document.getElementById('edDiaMesWrap');
+  const diaMesNumEd  = document.getElementById('edDiaMesNum');
+  const DIA_MES_MIN_ED = 1, DIA_MES_MAX_ED = 31;
   const vMenos = document.getElementById('edVezesMenos');
   const vMais  = document.getElementById('edVezesMais');
   const vNum   = document.getElementById('edVezesNum');
@@ -6167,13 +6272,16 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   const corGrupo  = document.getElementById('edCorBoxSwatches');
   const VEZES_MIN_ED = 1, VEZES_MAX_ED = 9;
 
-  let idx = -1, dif = 'media', modo = 'hoje', dias = [], vezes = 1, corBox = null;
+  let idx = -1, dif = 'media', modo = 'hoje', dias = [], diaMes = 1, vezes = 1, corBox = null;
 
   function pintar(){
     gDifs.querySelectorAll('.dif').forEach(b => b.classList.toggle('on', b.dataset.dif === dif));
     bHoje.classList.toggle('on', modo === 'hoje');
     bRep .classList.toggle('on', modo === 'repete');
+    if (bMensal) bMensal.classList.toggle('on', modo === 'mensal');
     gDias.classList.toggle('on', modo === 'repete');
+    if (diaMesWrapEd) diaMesWrapEd.classList.toggle('on', modo === 'mensal');
+    if (diaMesNumEd) diaMesNumEd.innerHTML = '<b>' + diaMes + '</b>';
     gDias.querySelectorAll('.day').forEach(b =>
       b.classList.toggle('on', dias.includes(+b.dataset.d)));
     if (vNum){
@@ -6214,6 +6322,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 
   bHoje.onclick = () => { modo = 'hoje';   pintar(); };
   bRep .onclick = () => { modo = 'repete'; pintar(); };
+  if (bMensal) bMensal.onclick = () => { modo = 'mensal'; pintar(); };
   gDias.querySelectorAll('.day').forEach(b => {
     b.onclick = () => {
       const d = +b.dataset.d;
@@ -6221,6 +6330,10 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       pintar();
     };
   });
+  const diaMesMenosEd = document.getElementById('edDiaMesMenos');
+  const diaMesMaisEd  = document.getElementById('edDiaMesMais');
+  if (diaMesMenosEd) diaMesMenosEd.onclick = () => { diaMes = Math.max(DIA_MES_MIN_ED, diaMes - 1); pintar(); };
+  if (diaMesMaisEd)  diaMesMaisEd.onclick  = () => { diaMes = Math.min(DIA_MES_MAX_ED, diaMes + 1); pintar(); };
   if (vMenos) vMenos.onclick = () => { vezes = Math.max(VEZES_MIN_ED, vezes - 1); pintar(); };
   if (vMais)  vMais.onclick  = () => { vezes = Math.min(VEZES_MAX_ED, vezes + 1); pintar(); };
   if (advToggle) advToggle.onclick = () => {
@@ -6265,9 +6378,16 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       t.tipo = 'hoje';
       if (!t.data) t.data = isoAtual();
       delete t.dias;
+      delete t.diaMes;
+    } else if (modo === 'mensal'){
+      t.tipo = 'mensal';
+      t.diaMes = diaMes;
+      delete t.dias;
+      delete t.data;
     } else {
       t.tipo = 'repete';
       t.dias = dias.slice().sort();
+      delete t.diaMes;
     }
 
     fechar();
@@ -6292,8 +6412,9 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     if (!t) return;
     idx   = i;
     dif   = (typeof difDe === 'function') ? difDe(t) : 'media';
-    modo  = (t.tipo === 'repete') ? 'repete' : 'hoje';
+    modo  = (t.tipo === 'repete') ? 'repete' : (t.tipo === 'mensal') ? 'mensal' : 'hoje';
     dias  = Array.isArray(t.dias) ? t.dias.slice() : [];
+    diaMes = (t.diaMes && t.diaMes >= 1 && t.diaMes <= 31) ? t.diaMes : new Date().getDate();
     vezes = (t.meta && t.meta > 1) ? Math.round(t.meta) : 1;
     corBox = t.corBox || null;
     texto.value = t.texto || '';
@@ -6660,11 +6781,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 
   /* ---------- quais tarefas estavam pendentes num dia qualquer ---------- */
   function pendentesEm(iso){
-    const dow = new Date(iso + 'T12:00:00').getDay();
-    return tarefas.filter(t => {
-      const eraDaquele = (t.tipo === 'hoje') ? (t.data === iso) : ((t.dias || []).includes(dow));
-      return eraDaquele && t.feitaEm !== iso;
-    });
+    return tarefas.filter(t => ocorreNoDia(t, iso) && t.feitaEm !== iso);
   }
 
   /* ---------- todas as tarefas relevantes num dia qualquer (feitas ou nao) ----------
@@ -6672,8 +6789,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
      de historico (ver chamada em verificarVirada), pra saber o total do dia,
      nao so quantas escaparam */
   function tarefasEm(iso){
-    const dow = new Date(iso + 'T12:00:00').getDay();
-    return tarefas.filter(t => (t.tipo === 'hoje') ? (t.data === iso) : ((t.dias || []).includes(dow)));
+    return tarefas.filter(t => ocorreNoDia(t, iso));
   }
 
   /* ---------- desenho ---------- */
@@ -13197,6 +13313,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'jogo.oQuePrecisaSerFeito': { pt:'O que precisa ser feito?', en:'What needs to be done?' },
     'jogo.soHoje':           { pt:'Só hoje', en:'Today only' },
     'jogo.repeteSemana':     { pt:'Repete toda semana', en:'Repeats weekly' },
+    'jogo.repeteMes':        { pt:'Repete todo mês', en:'Repeats monthly' },
+    'jogo.todoDia':          { pt:'Todo dia', en:'Every month, on day' },
     'jogo.dificuldade':      { pt:'Dificuldade', en:'Difficulty' },
     'jogo.vezesPorDia':      { pt:'Vezes por dia', en:'Times per day' },
     'jogo.opcoesAvancadas':  { pt:'Opções avançadas', en:'Advanced options' },

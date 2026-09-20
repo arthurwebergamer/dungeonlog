@@ -4026,8 +4026,6 @@
   from{ background-position-x:0; }
   to{ background-position-x:-1040px; }
 }
-  to{ background-position-x:-960px; }
-}
 
 /* ======================================================================
    RECOMPENSA VOANDO (item 3) -- icone criado dinamicamente por
@@ -4049,3 +4047,4 @@
     transform .75s ease-in,
     opacity .75s ease-in .16s;
 }
+

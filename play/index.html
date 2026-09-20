@@ -727,10 +727,10 @@
     </div>
     <div class="cfgovcorpo">
       <div class="cfgrow cfgcol">
-        <div class="cfgtxt">
-          <b data-i18n="cfg.nomeDoHeroi">Nome do herói</b>
+        <div class="campo">
+          <label data-i18n="cfg.nomeDoHeroi">Nome do herói</label>
+          <input id="novoHeroiNome" placeholder="Aventureiro" data-i18n-placeholder="onb.placeholderNome" maxlength="18" autocomplete="off">
         </div>
-        <input id="novoHeroiNome" placeholder="Aventureiro" data-i18n-placeholder="onb.placeholderNome" maxlength="18" autocomplete="off">
       </div>
 
       <div class="cfgrow cfgcol">
@@ -1531,6 +1531,7 @@ function trocarPersonagem(id){
   _personagemAtivo = id;
   try { localStorage.setItem(chavePersonagemAtivo(), id); } catch(e){}
   if (typeof window.carregar === 'function') window.carregar();
+  if (typeof window.desenharHeroi === 'function') window.desenharHeroi(); // render() sozinho nao redesenha o sprite -- confirmado no handler de pintarGradeConfig()
   if (typeof window.render === 'function') window.render();
   if (typeof window.renderInventario === 'function') window.renderInventario();
   if (typeof window.renderLoja === 'function') window.renderLoja();
@@ -1556,6 +1557,7 @@ function criarPersonagem(nome, heroiIdx){
   if (typeof nomeHeroi !== 'undefined' && nomeFinal) nomeHeroi = nomeFinal;
   if (typeof heroiEscolhido !== 'undefined' && typeof heroiIdx === 'number' && !isNaN(heroiIdx)) heroiEscolhido = heroiIdx;
   if (typeof window.salvar === 'function') window.salvar();
+  if (typeof window.desenharHeroi === 'function') window.desenharHeroi(); // idem trocarPersonagem() -- sprite so atualiza chamando isso
   if (typeof window.render === 'function') window.render();
   return { ok: true, id: id };
 }

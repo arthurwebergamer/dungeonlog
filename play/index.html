@@ -7507,6 +7507,20 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     // Registrado no roadmap como reversao real, nao silenciosa.
     try { return localStorage.getItem(CHAVE_TEMA) || 'grafite'; } catch(e){ return 'grafite'; }
   }
+  // v4.152 (bug real reportado pelo usuario, confirmado com log
+  // instrumentado): escolherTema() antiga disparava 2 setTimeout por
+  // clique sem cancelar os da chamada anterior. Testar temas em sequencia
+  // rapida (o uso normal da folha -- tocar em varios pra comparar) fazia
+  // os timers se atropelarem: um setTimeout tardio de um clique antigo
+  // aplicava um data-tema ja superado DEPOIS do clique novo, e como o
+  // opacity as vezes ja estava de volta em 1 quando isso acontecia, a
+  // troca de cor saia sem NENHUMA transicao -- um corte seco, exatamente
+  // o "pisca" relatado (video do usuario mostrou varios flashes clicando
+  // temas em sequencia). _temaTroca é um contador: cada chamada pega o
+  // proximo numero, e os dois setTimeout so agem se ainda forem os mais
+  // recentes -- qualquer troca mais nova invalida (ignora) os callbacks
+  // de uma troca anterior ainda pendente.
+  let _temaTroca = 0;
   function escolherTema(id){
     // v4.150 (pedido do usuario): trocar tema so mudava --accent/--bg/etc
     // na hora, sem transicao (variavel CSS custom property nao anima
@@ -7516,15 +7530,19 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     // atual ou futuro sem tocar em mais nada.
     const root = document.documentElement;
     const reduzido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const minhaTroca = ++_temaTroca;
     if (reduzido){
       root.setAttribute('data-tema', id);
     } else {
       root.style.transition = 'opacity .16s var(--expo)';
       root.style.opacity = '0.4';
       setTimeout(() => {
+        if (minhaTroca !== _temaTroca) return; // troca mais nova ja assumiu, ignora este callback atrasado
         root.setAttribute('data-tema', id);
         root.style.opacity = '1';
-        setTimeout(() => { root.style.transition = ''; }, 180);
+        setTimeout(() => {
+          if (minhaTroca === _temaTroca) root.style.transition = '';
+        }, 180);
       }, 160);
     }
     try { localStorage.setItem(CHAVE_TEMA, id); } catch(e){}

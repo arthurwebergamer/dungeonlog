@@ -32,6 +32,19 @@
     --spring-curve: cubic-bezier(.34,1.56,.64,1);
   }
   *{box-sizing:border-box;margin:0;padding:0}
+  /* html precisa do mesmo background:var(--bg) que o body -- bug real
+     encontrado (pedido do usuario: "tela pisca ao trocar de tema", ja
+     achava que tinha sido corrigido): escolherTema() faz um cross-fade
+     de opacity no <html> inteiro (documentElement) pra suavizar a troca
+     de --accent/--bg/etc, mas sem background proprio o <html> fica
+     transparente -- durante o mergulho de opacity (chega a ~0.4) o
+     conteudo e composto sobre o canvas padrao do navegador (branco),
+     nao sobre --bg, e isso e o flash/piscar visto. Confirmado
+     instrumentando getComputedStyle(documentElement).backgroundColor
+     durante a transicao real: ficava rgba(0,0,0,0) o tempo todo antes
+     deste fix. Com --bg tambem no html, a opacity anima contra a
+     propria cor de fundo do tema, sem revelar nada por baixo. */
+  html{background:var(--bg)}
   body{background:var(--bg);color:var(--text);font-family:'Outfit',system-ui,sans-serif;display:flex;justify-content:center;min-height:100vh;min-height:100dvh;padding:16px}
   .app{width:100%;max-width:400px;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);border-radius:20px;overflow:hidden}
   .tasks{flex:1}

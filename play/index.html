@@ -177,7 +177,15 @@
 <div class="app">
 
   <div class="topbar">
-    <span class="lvl" id="lvl">Nível I</span>
+    <!-- PLANO PRO: #lvl continua exatamente igual (render() ainda escreve
+         textContent nele direto, linha ~3492 -- por isso o trigger novo
+         ENVOLVE o span antigo em vez de substituir, senao render()
+         apagaria o chevron/nome do personagem a cada frame). -->
+    <button class="pjTrigger" id="pjTrigger" aria-label="Trocar de herói" type="button">
+      <span class="pjNomeTopo" id="pjNomeTopo"></span>
+      <span class="lvl" id="lvl">Nível I</span>
+      <svg class="pjChevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
     <div class="estagio-pill-wrap" id="estagioPillWrap">
       <div class="estagio-pill" id="estagioPill">
         <span class="estagio-pill-lbl" id="estagioTopoLbl">Estágio 1</span>
@@ -193,6 +201,19 @@
       <svg id="topoSomIcone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
     </button>
   </div>
+
+  <!-- PLANO PRO -- dropdown "Meus heróis" (troca de personagem) e a
+       cortina de transicao. Vivem soltos aqui, fora da .topbar, porque
+       sao position:absolute relativos ao .app (que ja e position:relative
+       desde a media query existente -- nao precisou de CSS novo pra isso). -->
+  <div class="pjDropdown" id="pjDropdown">
+    <div class="edsec">Meus heróis</div>
+    <div class="pjLista" id="pjLista"></div>
+    <button class="pjNovoBtn" id="pjNovoBtn" type="button">
+      <span>+ Novo herói</span>
+    </button>
+  </div>
+  <div class="pjCortina" id="pjCortina"></div>
 
   <div class="arena">
     <div class="arena-bg-layer" id="arenaBgA"></div>
@@ -687,6 +708,40 @@
         </div>
         <div class="grade" id="gradeHeroisConfig"></div>
       </div>
+    </div>
+  </div>
+
+  <!-- PLANO PRO -- criar personagem novo. Mesma estrutura de #heroiOverlay
+       acima (nome + grade de sprites), copiada de proposito em vez de
+       reaproveitar os MESMOS ids -- heroiOverlay edita o heroi ATIVO ao
+       vivo (pintarGradeConfig muta heroiEscolhido direto), enquanto aqui
+       a escolha e so uma previa ate confirmar (criarPersonagem() so
+       existe depois do botao "Criar"). IDs proprios evitam that os dois
+       fluxos pisem um no outro. -->
+  <div class="cfgOverlay" id="novoHeroiOverlay">
+    <div class="cfgovhead">
+      <button class="cfgvoltar" id="novoHeroiVoltarBtn" aria-label="Voltar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      </button>
+      <span class="vtitle">Novo herói</span>
+    </div>
+    <div class="cfgovcorpo">
+      <div class="cfgrow cfgcol">
+        <div class="cfgtxt">
+          <b data-i18n="cfg.nomeDoHeroi">Nome do herói</b>
+        </div>
+        <input id="novoHeroiNome" placeholder="Aventureiro" data-i18n-placeholder="onb.placeholderNome" maxlength="18" autocomplete="off">
+      </div>
+
+      <div class="cfgrow cfgcol">
+        <div class="cfgtxt">
+          <b data-i18n="cfg.spriteDoHeroi">Sprite do herói</b>
+          <span data-i18n="cfg.escolhaQuemEnfrenta">Escolha quem enfrenta os monstros</span>
+        </div>
+        <div class="grade" id="gradeNovoHeroi"></div>
+      </div>
+
+      <button class="primario" id="novoHeroiCriarBtn" style="margin-top:8px">Criar herói</button>
     </div>
   </div>
 
@@ -1448,6 +1503,28 @@ function limitePersonagens(){
 }
 window.limitePersonagens = limitePersonagens;
 
+function personagemAtivoId(){ return _personagemAtivo; }
+window.personagemAtivoId = personagemAtivoId;
+
+// le o save de OUTRO personagem sem trocar o ativo -- usado so pra
+// popular o dropdown (avatar/nome de quem nao esta selecionado agora).
+// Mesma logica de sufixo de chaveSaveAtual(), mas com um id explicito
+// em vez de ler _personagemAtivo.
+function chaveSaveDe(pjId){
+  const base = _uidAtivo ? ('questlog.v1.uid.' + _uidAtivo) : 'questlog.v1';
+  return base + '.pj.' + pjId;
+}
+function espiarSaveDe(pjId){
+  try {
+    const bruto = localStorage.getItem(chaveSaveDe(pjId));
+    if (!bruto) return null;
+    const d = JSON.parse(bruto);
+    if (!d || !d.comecou) return null;
+    return { nomeHeroi: d.nomeHeroi || 'Aventureiro', heroi: Number(d.heroi) || 0 };
+  } catch(e){ return null; }
+}
+window.espiarSaveDe = espiarSaveDe;
+
 function trocarPersonagem(id){
   const lista = listarPersonagens();
   if (!lista.some(p => p.id === id)) return false;
@@ -1461,13 +1538,25 @@ function trocarPersonagem(id){
 }
 window.trocarPersonagem = trocarPersonagem;
 
-function criarPersonagem(nome){
+// heroiIdx e opcional (indice em HEROIS) -- quem cria pela tela nova
+// escolhe o sprite antes de confirmar; quem chama so por console (teste)
+// pode omitir e fica no sprite 0 padrao, igual conta nova sempre foi.
+function criarPersonagem(nome, heroiIdx){
   const lista = listarPersonagens();
   if (lista.length >= limitePersonagens()) return { ok: false, motivo: 'limite' };
   const id = 'pj' + Date.now().toString(36);
-  lista.push({ id: id, nome: nome || null, criadoEm: new Date().toISOString() });
+  const nomeFinal = (nome && nome.trim()) ? nome.trim() : null;
+  lista.push({ id: id, nome: nomeFinal, criadoEm: new Date().toISOString() });
   salvarListaPersonagens(lista);
-  trocarPersonagem(id); // save desse id nao existe ainda -- carregar() cai no mesmo caminho ja corrigido de "conta nova"
+  trocarPersonagem(id); // save desse id nao existe ainda -- carregar() cai no mesmo caminho ja corrigido de "conta nova" (resetarEstadoParaPadrao)
+  // resetarEstadoParaPadrao() (dentro de carregar(), acima) ja rodou e
+  // deixou nomeHeroi/heroiEscolhido no default -- agora pisa em cima com
+  // a escolha feita na tela, e persiste ja de cara (senao um F5 antes de
+  // qualquer acao no jogo perderia nome/sprite escolhidos).
+  if (typeof nomeHeroi !== 'undefined' && nomeFinal) nomeHeroi = nomeFinal;
+  if (typeof heroiEscolhido !== 'undefined' && typeof heroiIdx === 'number' && !isNaN(heroiIdx)) heroiEscolhido = heroiIdx;
+  if (typeof window.salvar === 'function') window.salvar();
+  if (typeof window.render === 'function') window.render();
   return { ok: true, id: id };
 }
 window.criarPersonagem = criarPersonagem;
@@ -7605,6 +7694,158 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   if (btnHeroiVoltar) btnHeroiVoltar.onclick = fecharHeroiConfig;
   window.abrirHeroiConfig = abrirHeroiConfig;
   window.fecharHeroiConfig = fecharHeroiConfig;
+
+  /* =====================================================================
+     PLANO PRO -- seletor de personagem (topbar + dropdown "Meus herois")
+     e a tela de criar personagem novo. So UI/wiring aqui -- a logica de
+     dado (trocarPersonagem/criarPersonagem/listarPersonagens) ja existe
+     no topo do arquivo, junto de chaveConta().
+     ===================================================================== */
+  const pjTrigger = document.getElementById('pjTrigger');
+  const pjDropdown = document.getElementById('pjDropdown');
+  const pjLista = document.getElementById('pjLista');
+  const pjNovoBtn = document.getElementById('pjNovoBtn');
+  const pjCortina = document.getElementById('pjCortina');
+  const pjNomeTopoEl = document.getElementById('pjNomeTopo');
+
+  function atualizarNomeTopoPersonagem(){
+    if (!pjNomeTopoEl) return;
+    const ativo = personagemAtivoId();
+    const p = listarPersonagens().find(x => x.id === ativo);
+    // so mostra rotulo quando o personagem tem NOME PROPRIO dado na
+    // criacao -- grátis com 1 personagem só fica igual sempre foi
+    // (so "Nível X"), sem rotulo extra poluindo a topbar.
+    pjNomeTopoEl.textContent = (p && p.nome) ? p.nome : '';
+  }
+  window.atualizarNomeTopoPersonagem = atualizarNomeTopoPersonagem;
+
+  function pintarDropdownPersonagens(){
+    if (!pjLista) return;
+    const ativo = personagemAtivoId();
+    const lista = listarPersonagens();
+    const en = idiomaApp() === 'en';
+    pjLista.innerHTML = '';
+    lista.forEach(p => {
+      const ehAtivo = p.id === ativo;
+      const dados = ehAtivo
+        ? { nomeHeroi: (typeof nomeHeroi !== 'undefined' && nomeHeroi) || 'Aventureiro', heroi: typeof heroiEscolhido === 'number' ? heroiEscolhido : 0 }
+        : espiarSaveDe(p.id);
+      const heroiImg = (dados && typeof HEROIS !== 'undefined' && HEROIS[dados.heroi]) ? HEROIS[dados.heroi].img : '';
+      const nomeMostrado = p.nome || (dados ? dados.nomeHeroi : (en ? 'Adventurer' : 'Aventureiro'));
+      const btn = document.createElement('button');
+      btn.className = 'pjItem' + (ehAtivo ? ' ativo' : '');
+      btn.type = 'button';
+      btn.innerHTML =
+        '<span class="pjAvatar">' + (heroiImg ? ('<img src="' + heroiImg + '" alt="">') : '') + '</span>' +
+        '<span class="pjTxt"><b>' + nomeMostrado + '</b>' +
+        (ehAtivo ? ('<span>' + (en ? 'active now' : 'ativo agora') + '</span>') : '') + '</span>';
+      if (!ehAtivo) btn.onclick = () => trocarPersonagemComTransicao(p.id);
+      pjLista.appendChild(btn);
+    });
+
+    const pro = (typeof assinaturaAtiva === 'function' && assinaturaAtiva());
+    const cheio = lista.length >= limitePersonagens();
+    if (pjNovoBtn){
+      pjNovoBtn.classList.toggle('bloqueado', cheio && !pro);
+      pjNovoBtn.innerHTML = (en ? '+ New hero' : '+ Novo herói') + (!pro ? ' <span class="pjSelo">PRO</span>' : '');
+    }
+  }
+  window.pintarDropdownPersonagens = pintarDropdownPersonagens;
+
+  function abrirDropdownPersonagens(){
+    pintarDropdownPersonagens();
+    if (pjDropdown) pjDropdown.classList.add('on');
+    if (pjTrigger) pjTrigger.classList.add('aberto');
+  }
+  function fecharDropdownPersonagens(){
+    if (pjDropdown) pjDropdown.classList.remove('on');
+    if (pjTrigger) pjTrigger.classList.remove('aberto');
+  }
+  if (pjTrigger) pjTrigger.onclick = (e) => {
+    e.stopPropagation();
+    if (pjDropdown && pjDropdown.classList.contains('on')) fecharDropdownPersonagens();
+    else abrirDropdownPersonagens();
+  };
+  // fecha ao clicar fora -- guarda defensiva (e.target.closest as vezes
+  // nao existe, ver bug pre-existente ja catalogado do listener de
+  // .cfgbtnfull) pra esse listener novo nunca lancar erro no Console.
+  document.addEventListener('pointerdown', (e) => {
+    if (!pjDropdown || !pjDropdown.classList.contains('on')) return;
+    if (!e.target || typeof e.target.closest !== 'function') return;
+    if (e.target.closest('#pjDropdown') || e.target.closest('#pjTrigger')) return;
+    fecharDropdownPersonagens();
+  });
+
+  // transicao: cortina cobre o .app, SO ENTAO troca o personagem por
+  // baixo, SO ENTAO revela -- mesma ordem (nunca revelar antes do
+  // conteudo novo estar pronto) que ja resolveu o bug de flash de tema.
+  function trocarPersonagemComTransicao(id){
+    fecharDropdownPersonagens();
+    if (!pjCortina){ trocarPersonagem(id); atualizarNomeTopoPersonagem(); return; }
+    pjCortina.classList.add('on');
+    setTimeout(() => {
+      trocarPersonagem(id);
+      atualizarNomeTopoPersonagem();
+      requestAnimationFrame(() => pjCortina.classList.remove('on'));
+    }, 220); // mesma duracao de .pjCortina no style.css -- se mudar la, mudar aqui tambem
+  }
+  window.trocarPersonagemComTransicao = trocarPersonagemComTransicao;
+
+  /* ---------- criar personagem novo ---------- */
+  const novoHeroiOverlay = document.getElementById('novoHeroiOverlay');
+  // selecao LOCAL, separada de heroiEscolhido de proposito -- heroiEscolhido
+  // e o sprite do personagem ATIVO agora; aqui e so previa ate confirmar
+  // (personagem novo nem existe ainda enquanto essa tela ta aberta).
+  let _novoHeroiSelecao = 0;
+  function pintarGradeNovoHeroi(){
+    const g = document.getElementById('gradeNovoHeroi');
+    if (!g || typeof HEROIS === 'undefined') return;
+    g.innerHTML = '';
+    HEROIS.forEach((hh, i) => {
+      const b = document.createElement('div');
+      b.className = 'opcao' + (i === _novoHeroiSelecao ? ' sel' : '');
+      b.innerHTML = '<img src="' + hh.img + '" alt="' + hh.nome + '">';
+      b.onclick = () => { _novoHeroiSelecao = i; pintarGradeNovoHeroi(); };
+      g.appendChild(b);
+    });
+  }
+  function abrirNovoHeroiOverlay(){
+    _novoHeroiSelecao = 0;
+    pintarGradeNovoHeroi();
+    const campo = document.getElementById('novoHeroiNome');
+    if (campo) campo.value = '';
+    fecharDropdownPersonagens();
+    if (novoHeroiOverlay) novoHeroiOverlay.classList.add('on');
+  }
+  function fecharNovoHeroiOverlay(){
+    if (novoHeroiOverlay) novoHeroiOverlay.classList.remove('on');
+  }
+  if (pjNovoBtn) pjNovoBtn.onclick = () => {
+    if (listarPersonagens().length >= limitePersonagens()){
+      if (typeof window.aviso === 'function') window.aviso(idiomaApp() === 'en' ? 'Hero limit reached' : 'Limite de heróis atingido');
+      return;
+    }
+    abrirNovoHeroiOverlay();
+  };
+  const btnNovoHeroiVoltar = document.getElementById('novoHeroiVoltarBtn');
+  if (btnNovoHeroiVoltar) btnNovoHeroiVoltar.onclick = fecharNovoHeroiOverlay;
+  const btnNovoHeroiCriar = document.getElementById('novoHeroiCriarBtn');
+  if (btnNovoHeroiCriar) btnNovoHeroiCriar.onclick = () => {
+    const campo = document.getElementById('novoHeroiNome');
+    const r = criarPersonagem(campo ? campo.value : '', _novoHeroiSelecao);
+    const en = idiomaApp() === 'en';
+    if (r && r.ok){
+      fecharNovoHeroiOverlay();
+      atualizarNomeTopoPersonagem();
+      if (typeof window.aviso === 'function') window.aviso(en ? 'New hero created' : 'Herói novo criado');
+    } else if (typeof window.aviso === 'function'){
+      window.aviso(en ? 'Hero limit reached' : 'Limite de heróis atingido');
+    }
+  };
+  window.abrirNovoHeroiOverlay = abrirNovoHeroiOverlay;
+  window.fecharNovoHeroiOverlay = fecharNovoHeroiOverlay;
+
+  atualizarNomeTopoPersonagem(); // primeira pintura, no boot
 
   /* ---------- Config: sub-tela Aparência (item 39) ---------- */
   const aparenciaOverlay = document.getElementById('aparenciaOverlay');

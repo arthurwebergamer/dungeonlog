@@ -8078,7 +8078,8 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     // PLANO PRO -- item 2 do escopo fechado. `pro:true` e a UNICA
     // diferenca de shape vs os temas gratis acima -- pintarTemaGrid()
     // e escolherTema() leem essa flag pra bloquear quem nao assina.
-    {id:'azul',       nome:'Azul',       nome_en:'Blue',       cor:'#5C9DF2', pro:true},
+    // (id 'esmeralda' -- substituiu 'azul', rejeitado pelo usuario)
+    {id:'esmeralda',  nome:'Esmeralda',  nome_en:'Emerald',    cor:'#22C55E', pro:true},
     {id:'terracota',  nome:'Terracota',  nome_en:'Terracotta', cor:'#C96A4A', pro:true}
   ];
   const CHAVE_TEMA = 'questlog.tema.v1';

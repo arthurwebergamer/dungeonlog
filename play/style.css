@@ -1371,23 +1371,28 @@
     --arena-1:#3D2830; --arena-2:#2C1E24; --arena-3:#1F151A;
     --xp2:#E0A5AE;
   }
-  /* PLANO PRO -- Azul e Terracota: os 2 temas exclusivos do plano (item 2
-     do escopo fechado). Aprovados via mockup de comparacao (Artifact)
-     antes de entrar aqui, mesmo fluxo das rodadas de tema anteriores.
-     Azul inverte a formula do Laranja/Dourado (fundo QUENTE quase-preto
-     + destaque FRIO) -- hue de azul inedito no app ate aqui. Terracota
-     segue a formula ja aprovada (fundo frio + destaque quente), mas num
-     tom terracota/cobre, mais avermelhado que o Laranja e mais terroso
-     que o Sangue. Bloqueio de uso (nao-assinante) fica no JS/CSS do
-     seletor (TEMAS[].pro + pintarTemaGrid()), nao aqui -- esses blocos
-     de cor sao neutros a assinatura. */
-  :root[data-tema="azul"]{
-    --bg:#1C140F; --panel:#1C140F; --panel-2:#271C15; --line:#4A3A2C;
-    --text:#F3ECE3; --muted:#C7B6A4; --dim:#8F7B67;
-    --accent:#5C9DF2; --accent-dim:#1C314F; --gold:#E8C97A; --blood:#E0644F;
-    --panel-3:#33261B; --poco:#120D09; --sel-bg:#1C314F; --mobname:#8FB8F5;
-    --arena-1:#33261B; --arena-2:#241A12; --arena-3:#17110C;
-    --xp2:#5C9DF2;
+  /* PLANO PRO -- Esmeralda e Terracota: os 2 temas exclusivos do plano
+     (item 2 do escopo fechado). Aprovados via mockup de comparacao
+     (Artifact) antes de entrar aqui, mesmo fluxo das rodadas de tema
+     anteriores. 1a tentativa do 2o tema foi "Azul" (fundo quente +
+     destaque frio) -- rejeitado pelo usuario ("nao quero azul de jeito
+     nenhum"), substituido por Esmeralda: verde vivo/saturado (bem mais
+     vibrante que o antigo tema Floresta/Verde, que era um verde-folha
+     desbotado) sobre fundo GRAFITE NEUTRO (nao verde), pra nao repetir
+     o problema de fundo-e-destaque-na-mesma-familia que os primeiros
+     temas coloridos tiveram. Terracota segue a formula ja aprovada
+     (fundo frio + destaque quente), num tom terracota/cobre, mais
+     avermelhado que o Laranja e mais terroso que o Sangue. Bloqueio de
+     uso (nao-assinante) fica no JS/CSS do seletor (TEMAS[].pro +
+     pintarTemaGrid()), nao aqui -- esses blocos de cor sao neutros a
+     assinatura. */
+  :root[data-tema="esmeralda"]{
+    --bg:#12161A; --panel:#12161A; --panel-2:#1A2025; --line:#37414A;
+    --text:#EAF1EE; --muted:#9DB0A8; --dim:#66766E;
+    --accent:#22C55E; --accent-dim:#123424; --gold:#D9C15C; --blood:#E5484D;
+    --panel-3:#232A30; --poco:#0B0D0F; --sel-bg:#1D3327; --mobname:#5EE39A;
+    --arena-1:#232A30; --arena-2:#1A2025; --arena-3:#12161A;
+    --xp2:#22C55E;
   }
   :root[data-tema="terracota"]{
     --bg:#10161C; --panel:#10161C; --panel-2:#18212A; --line:#354655;
@@ -2724,23 +2729,28 @@
     --arena-1:#3D2830; --arena-2:#2C1E24; --arena-3:#1F151A;
     --xp2:#E0A5AE;
   }
-  /* PLANO PRO -- Azul e Terracota: os 2 temas exclusivos do plano (item 2
-     do escopo fechado). Aprovados via mockup de comparacao (Artifact)
-     antes de entrar aqui, mesmo fluxo das rodadas de tema anteriores.
-     Azul inverte a formula do Laranja/Dourado (fundo QUENTE quase-preto
-     + destaque FRIO) -- hue de azul inedito no app ate aqui. Terracota
-     segue a formula ja aprovada (fundo frio + destaque quente), mas num
-     tom terracota/cobre, mais avermelhado que o Laranja e mais terroso
-     que o Sangue. Bloqueio de uso (nao-assinante) fica no JS/CSS do
-     seletor (TEMAS[].pro + pintarTemaGrid()), nao aqui -- esses blocos
-     de cor sao neutros a assinatura. */
-  :root[data-tema="azul"]{
-    --bg:#1C140F; --panel:#1C140F; --panel-2:#271C15; --line:#4A3A2C;
-    --text:#F3ECE3; --muted:#C7B6A4; --dim:#8F7B67;
-    --accent:#5C9DF2; --accent-dim:#1C314F; --gold:#E8C97A; --blood:#E0644F;
-    --panel-3:#33261B; --poco:#120D09; --sel-bg:#1C314F; --mobname:#8FB8F5;
-    --arena-1:#33261B; --arena-2:#241A12; --arena-3:#17110C;
-    --xp2:#5C9DF2;
+  /* PLANO PRO -- Esmeralda e Terracota: os 2 temas exclusivos do plano
+     (item 2 do escopo fechado). Aprovados via mockup de comparacao
+     (Artifact) antes de entrar aqui, mesmo fluxo das rodadas de tema
+     anteriores. 1a tentativa do 2o tema foi "Azul" (fundo quente +
+     destaque frio) -- rejeitado pelo usuario ("nao quero azul de jeito
+     nenhum"), substituido por Esmeralda: verde vivo/saturado (bem mais
+     vibrante que o antigo tema Floresta/Verde, que era um verde-folha
+     desbotado) sobre fundo GRAFITE NEUTRO (nao verde), pra nao repetir
+     o problema de fundo-e-destaque-na-mesma-familia que os primeiros
+     temas coloridos tiveram. Terracota segue a formula ja aprovada
+     (fundo frio + destaque quente), num tom terracota/cobre, mais
+     avermelhado que o Laranja e mais terroso que o Sangue. Bloqueio de
+     uso (nao-assinante) fica no JS/CSS do seletor (TEMAS[].pro +
+     pintarTemaGrid()), nao aqui -- esses blocos de cor sao neutros a
+     assinatura. */
+  :root[data-tema="esmeralda"]{
+    --bg:#12161A; --panel:#12161A; --panel-2:#1A2025; --line:#37414A;
+    --text:#EAF1EE; --muted:#9DB0A8; --dim:#66766E;
+    --accent:#22C55E; --accent-dim:#123424; --gold:#D9C15C; --blood:#E5484D;
+    --panel-3:#232A30; --poco:#0B0D0F; --sel-bg:#1D3327; --mobname:#5EE39A;
+    --arena-1:#232A30; --arena-2:#1A2025; --arena-3:#12161A;
+    --xp2:#22C55E;
   }
   :root[data-tema="terracota"]{
     --bg:#10161C; --panel:#10161C; --panel-2:#18212A; --line:#354655;

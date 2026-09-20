@@ -9397,3 +9397,58 @@ Sprite de explosão animado (13 frames, spritesheet) tocando no exato
 instante da derrota, com timing ajustado para leitura rápida e nítida
 do impacto (~390ms) sem atrapalhar a sequência golpe → poof → recompensa
 → baú.
+## [Sessão] Temas Verde Selva/Arcano Espectral/Sangue Rubro, remoção da barra de Estágio em degradê e do sistema de Títulos, recorrência Mensal + Anual e reorganização do menu de tarefas
+
+### Contexto
+Sessão longa, em várias frentes pedidas em sequência pelo usuário. Fluxo de trabalho seguido em todas as decisões visuais: mockup interativo (Artifact tipo Design) **antes** de mexer em `index.html`/`style.css`, só implementando de verdade depois de aprovação explícita de uma opção específica mostrada no mockup — mesmo princípio já registrado em sessões anteriores deste roadmap.
+
+### 1. Paletas de tema — Verde Selva, Arcano Espectral, Sangue Rubro
+- Pedido inicial: revisar o tema "Verde" (antigo verde+magenta, "não combina com o app") e considerar novos temas.
+- Mockup v1 com 9 candidatos → usuário aprovou **Verde Selva** (troca do Verde antigo) e pediu a ADIÇÃO de dois temas novos, "Arcano" e "Sangue" — não só protótipo, implementação real.
+- Depois de implementados, usuário achou que Arcano (azul) não se distinguia bem do tema Roxo (padrão/laranja tem painel roxo-escuro de base) e que Sangue não ficou bom visualmente → voltou pro mockup (não iterou direto no código) com 6 novos candidatos (3 de cada) lado a lado com o tema Laranja de referência, pra comparar contraste de verdade.
+- Aprovação final: **"Sangue Rubro"** e **"Arcano Espectral"**. Implementados nos dois blocos duplicados de `:root[data-tema="..."]` do `style.css` (tema já é definido 2x no arquivo — precisa `replace_all`, achado já documentado em sessões anteriores).
+- **Rótulos exibidos renomeados** depois (ids internos mantidos por compatibilidade com tema já salvo no `localStorage` de quem já tinha escolhido): `arcano` → mostra "Ciano" / `sangue` → mostra "Vermelho" na lista `TEMAS` usada pelo seletor de tema in-app.
+
+### 2. Barra de progresso do Estágio — gradiente removido
+`.estagio-pill-fill` (barra na topbar mostrando progresso até o próximo estágio) trocou de `background:linear-gradient(90deg,var(--accent),var(--xp2))` pra `background:var(--accent)` sólido, em todos os temas — pedido direto do usuário, sem alternativa oferecida (não era uma decisão de design em aberto).
+
+### 3. Sistema de "Títulos equipáveis" (Conquistas → Perfil) — removido por completo
+Feature que deixava escolher um título (conquista) pra exibir no cabeçalho do Perfil. Usuário: "não agrega em nada e é mais uma feature que realmente não tem por que existir". Removido sem substituto:
+- `CHAVE_TITULO`, `obterTituloEquipado()`, `definirTituloEquipado()`, `renderTituloPerfil()` (+ export em `window`).
+- Botão de estrela por conquista (`.conqv2estrela`) dentro de `renderConquistasV2()` e o listener delegado em `#perfilConquistas`.
+- `<div class="perfilTitulo" id="perfilTitulo">` no cabeçalho do Perfil.
+- Chamadas de re-render (`entrarNoApp()`, array de re-render ao trocar idioma) e a chave em `CHAVES_SECUNDARIAS_CONTA`.
+- Cuidado tomado: a conquista "Primeiro Sangue"/"First Blood" (nome de conquista já existente, sobre derrotar o 1º monstro) **não** tem relação com essa feature nem com o tema "Sangue" — confirmado como coincidência de nome antes de mexer, e deixada intacta.
+
+### 4. Recorrência Mensal (tarefa "todo dia N do mês")
+- Novo `t.tipo = 'mensal'` com `t.diaMes` (1-31). Reaproveita a linguagem visual do stepper "Vezes por dia" (- N +) em vez de grade de 31 botões.
+- **Mês curto**: dia 31 escolhido cai automaticamente no último dia real do mês daquele ano específico (cobre fevereiro bissexto/não bissexto) — `diaMesOcorreNoDia(t, iso)`.
+- Toda a lógica de "essa tarefa vale nesse dia?" (antes espalhada e duplicada entre `ehDeHoje()`, `pendentesEm()` e `tarefasEm()`) foi consolidada num único helper `ocorreNoDia(t, iso)` (exposto em `window`), que os três agora chamam — reduz risco de mensal/anual funcionar em um lugar e não no outro.
+- Espelhado no editor de tarefa existente (`abrirEditor`/`edSalvar`).
+
+### 5. Recorrência Anual (tarefa "todo dia N do mês M", tipo aniversário)
+- Pedido junto de uma pergunta sobre viabilidade de recorrência semanal/mensal/anual, inspirada numa captura de outro app. Aprovado com "pode adicionar isso".
+- Novo `t.tipo = 'anual'` com `t.diaAno` (1-31) + `t.mesAno` (1-12). Dois steppers lado a lado (Dia / Mês), mês mostrado por nome curto (`NOMES_MES_CURTO`).
+- `anualOcorreNoDia(t, iso)`: mesmo princípio de clamp de mês curto do Mensal, mas fixando também o mês (dia 31 num mês de 30 cai no dia 30 daquele mês especificamente, não em qualquer mês).
+- Integrado em `ocorreNoDia()` (mesmo helper único do item 4), então `pendentesEm`/`tarefasEm`/histórico anual já herdam suporte sem código extra.
+- **Bug encontrado durante os testes automatizados desta sessão (corrigido antes de entregar)**: `NOMES_MES_CURTO` estava declarado bem mais abaixo no arquivo (perto do código de Histórico), mas o composer de criar tarefa — que roda antes, no mesmo `<script>` contínuo — já chamava `pintarAnual()` (que lê `NOMES_MES_CURTO`) na inicialização da página. Mesmo com guarda `typeof x !== 'undefined'`, referenciar uma `const` antes da linha em que ela é declarada estoura `ReferenceError: Cannot access before initialization` (`typeof` não protege contra TDZ, só contra variável nunca declarada). O erro interrompia silenciosamente o resto daquele bloco `<script>` — sintoma visível era o botão "Criar tarefa" simplesmente não fazer nada, sem nenhum toast ou erro na tela. Fix: `NOMES_MES_CURTO` movido pra cima, antes do bloco do composer.
+
+### 6. Reorganização do menu de criar/editar tarefa
+Pedido explícito de deixar o menu "mais organizado", com captura de outro app (Habitica) como referência de layout (rótulos de seção acima de grupos de botões). Mockup aprovado (comparação lado a lado do menu atual vs. proposta) antes de implementar:
+- Os 4 modos de recorrência (Hoje/Semana/Mês/Ano) ganharam um rótulo de seção **"Repetição"**, no mesmo padrão visual (`.diflabel`) já usado por "Dificuldade" e "Vezes por dia" — antes os botões de modo não tinham nenhum rótulo explicando o que eram.
+- Textos dos botões encurtados ("Só hoje" → "Hoje", "Repete toda semana" → "Semana", "Repete todo mês" → "Mês"), liberando espaço pro 4º botão "Ano" caber na mesma linha sem quebrar.
+- Sub-painéis (grade de dias da semana / stepper de dia do mês / steppers de dia+mês do ano) passaram a morar dentro do mesmo bloco visual do rótulo "Repetição", em vez de soltos no meio do formulário.
+- Chaves i18n novas: `jogo.repeticao`, `jogo.soHojeCurto`, `jogo.repeteSemanaCurto`, `jogo.repeteMesCurto`, `jogo.repeteAnoCurto`, `jogo.diaEMes`. As chaves antigas de texto longo (`jogo.soHoje` etc.) continuam existindo na tabela de traduções (usadas em outro lugar? não — na prática só ficaram órfãs, mas não foram removidas por segurança, já que só ocupam uma linha no dicionário).
+
+### Metodologia de teste desta sessão
+Todas as mudanças de lógica (mensal, anual, seletor de ano) foram verificadas com Playwright rodando contra o app servido localmente, não só `node --check` de sintaxe:
+- Criação de tarefa mensal/anual via composer real (cliques nos botões de verdade, não chamada direta de função).
+- Reabertura no editor, conferindo que o modo e os steppers restauram o estado salvo.
+- Casos de mês curto (dia 31 em fevereiro bissexto/não bissexto, dia 31 em abril pro anual).
+- Recorrência anual testada **atravessando anos** (a mesma tarefa ocorre de novo no ano seguinte na mesma data).
+- Um detalhe de harness: `tarefas` (array de tarefas) é reatribuído inteiro dentro de `carregar()` ao entrar na conta — um teste que guarda a referência do array antes do load fica "órfão" (aponta pro array antigo, vazio) depois que o app troca a referência. Corrigido nos scripts de teste com um getter (`Object.defineProperty` lendo `tarefas` ao vivo) — hook temporário, nunca commitado no arquivo entregue.
+
+### Pendências / decisões em aberto
+- Recorrência **múltiplas vezes por semana com dias específicos** já existia antes desta sessão (`tipo:'repete'` + `t.dias`) — não confundir com pedido novo.
+- Não foi perguntado nem implementado: recorrência anual com **mais de uma data por ano**, ou recorrência "a cada N dias" (só dia fixo do mês/ano, não intervalo).
+- Como sempre no projeto, validação em aparelho real ainda pendente — usuário testa fora do ambiente de sandbox antes de considerar algo definitivamente ok.

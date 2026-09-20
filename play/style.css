@@ -4148,3 +4148,77 @@
     opacity .75s ease-in .16s;
 }
 
+
+/* ======================================================================
+   PLANO PRO -- seletor de personagem (topbar), dropdown "Meus herois" e
+   cortina de transicao ao trocar. Zero token novo -- so reaproveita
+   --panel-2/--panel-3/--line/--accent/--dim/--gold ja existentes, e o
+   mesmo --expo (curva de animacao) que a Arena/tema ja usam pra
+   cross-fade. #lvl (dentro do .pjTrigger) NAO foi tocado -- continua
+   span puro, render() escreve textContent nele igual sempre.
+   ====================================================================== */
+.pjTrigger{
+  display:flex; align-items:center; gap:6px;
+  background:var(--accent-dim); border:none; border-radius:4px;
+  padding:5px 9px; cursor:pointer; font-family:'Outfit',sans-serif;
+}
+.pjTrigger .pjNomeTopo{
+  font-size:13px; font-weight:600; color:var(--accent);
+  max-width:64px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.pjTrigger .pjNomeTopo:empty{ display:none; } /* grátis com 1 personagem só: sem rótulo, so o Nível mesmo */
+.pjTrigger .pjNomeTopo:not(:empty) + .lvl::before{ content:'· '; }
+.pjTrigger .pjChevron{ width:10px; height:10px; color:var(--accent); opacity:.8; flex:none; transition:transform .2s var(--expo); }
+.pjTrigger.aberto .pjChevron{ transform:rotate(180deg); }
+
+.pjDropdown{
+  position:absolute; top:52px; left:18px; width:230px; z-index:20;
+  background:var(--panel-2); border:1px solid var(--line); border-radius:12px;
+  padding:8px; box-shadow:0 12px 28px rgba(0,0,0,.45);
+  opacity:0; visibility:hidden; transform:translateY(-6px);
+  transition:opacity .18s var(--expo), transform .18s var(--expo), visibility 0s .18s;
+}
+.pjDropdown.on{
+  opacity:1; visibility:visible; transform:translateY(0);
+  transition:opacity .18s var(--expo), transform .18s var(--expo), visibility 0s;
+}
+.pjDropdown .edsec{ margin:4px 6px 6px; }
+.pjItem{
+  display:flex; align-items:center; gap:10px; padding:9px 8px; border-radius:8px;
+  cursor:pointer; background:none; border:none; width:100%; text-align:left;
+  font-family:'Outfit',sans-serif; color:var(--text);
+}
+.pjItem:active{ background:rgba(255,255,255,.05); }
+.pjItem.ativo{ background:var(--panel-3); cursor:default; }
+.pjItem .pjAvatar{
+  flex:0 0 30px; width:30px; height:30px; border-radius:50%;
+  background:rgba(255,255,255,.07); display:flex; align-items:center; justify-content:center;
+  overflow:hidden;
+}
+.pjItem.ativo .pjAvatar{ background:var(--accent-dim); }
+.pjItem .pjAvatar img{ width:100%; height:100%; object-fit:contain; image-rendering:pixelated; }
+.pjItem .pjTxt{ flex:1; min-width:0; }
+.pjItem .pjTxt b{ display:block; font-size:12.5px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.pjItem .pjTxt span{ display:block; font-size:10.5px; color:var(--dim); }
+.pjNovoBtn{
+  display:flex; align-items:center; justify-content:center; gap:6px; width:100%;
+  margin-top:4px; padding:9px; border-radius:999px; border:1.5px dashed var(--line);
+  background:transparent; color:var(--dim); font-family:'Outfit',sans-serif;
+  font-size:12px; font-weight:600; cursor:pointer;
+}
+.pjNovoBtn.bloqueado{ opacity:.55; }
+.pjNovoBtn .pjSelo{
+  font-size:8px; font-weight:700; background:var(--accent); color:var(--bg);
+  border-radius:999px; padding:2px 6px; letter-spacing:.3px;
+}
+
+/* cortina cheia -- cobre so o .app (que ja e position:relative, ver
+   media query existente), NAO a tela toda. Opacidade pura, mesma logica
+   ja usada no cross-fade de tema da arena: nunca revela o conteudo novo
+   antes de estar pronto por baixo. */
+.pjCortina{
+  position:absolute; inset:0; z-index:30; background:var(--bg);
+  opacity:0; pointer-events:none;
+  transition:opacity .22s var(--expo);
+}
+.pjCortina.on{ opacity:1; pointer-events:auto; }

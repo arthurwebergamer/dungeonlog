@@ -9391,3 +9391,9 @@ reagir, comparado a apps concorrentes (medido em vídeo, frame a frame).
 
 Nada dessas mudanças mexeu na lógica de XP/moedas/vitória do dia,
 só timing e visual.
+
+✅ Animação de morte do monstro (poof)
+Sprite de explosão animado (13 frames, spritesheet) tocando no exato
+instante da derrota, com timing ajustado para leitura rápida e nítida
+do impacto (~390ms) sem atrapalhar a sequência golpe → poof → recompensa
+→ baú.

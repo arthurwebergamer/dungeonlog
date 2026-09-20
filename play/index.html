@@ -1237,7 +1237,12 @@
 </script>
 
 <div class="debugbar"><button class="debugbtn" id="debugbtn">próximo dia →</button><button class="debugbtn" id="pularTutoriaisBtn">pular tutorial</button><button class="debugbtn" id="debugArmasBtn">+ todas armas</button><button class="debugbtn" id="debugEstagioBtn">forçar estágio</button></div>
-<div id="estagioDebugPanel" class="estagio-debug-panel"></div>
+<!-- #estagioDebugPanel (terminal verde de log dos Estagios) removido a
+     pedido do usuario -- debugEstagio() ja tem "if (!painel) return"
+     logo no inicio (ver funcao, perto de "Painel de debug VISIVEL NA
+     TELA"), entao vira no-op sozinha sem #estagioDebugPanel no DOM; os
+     varios call sites de debugEstagio(...) espalhados pelo Sistema de
+     Estagios nao precisaram ser tocados. -->
 <div class="toast" id="toast"></div>
 
 <script src="assets.js"></script>
@@ -1806,7 +1811,13 @@ function dispararVitoriaDoDia(doDia, nivelAntes, xpGanho, moedasGanhas){
   if ((xpGanho || moedasGanhas) && typeof voarRecompensaFinal === 'function'){
     setTimeout(() => {
       voarRecompensaFinal(xpGanho || 0, moedasGanhas || 0, () => {
-        setTimeout(mostrarBauEContadores, 900);
+        // ERA 900ms -- cortado pra 600ms (pedido do usuario: cadeia
+        // toque->bau tava demorando demais no total, ~2.9s). O "+X"
+        // (numeroFlutuanteHeroi) fica visivel na tela por 1100ms, entao
+        // 600ms de folga ainda mostra ele sozinho na tela por bastante
+        // tempo antes do bau entrar, sem voltar ao problema antigo de
+        // parecer tudo simultaneo.
+        setTimeout(mostrarBauEContadores, 600);
       });
     }, 420);
   } else {
@@ -2327,6 +2338,13 @@ function verificarDesbloqueiosTemaArena(){
   if (desbloqueouAlgumAgora && typeof viajarParaTemaEstagio === 'function'){
     const estagioReal = (typeof estagioAtual === 'function') ? estagioAtual() : 1;
     if (estagioReal > estagioCerimoniaMostradaAte()){
+      // A trava contra a cerimonia de estagio abrir NO MEIO da sequencia
+      // de vitoria do dia mora dentro de viajarParaTemaEstagio() (guarda
+      // central -- ver comentario la), nao aqui: este NAO e o unico
+      // caminho que chama ela (renderTemaArena() tem o proprio, ver
+      // comentario "SINCRONIZACAO defensiva" perto dela), entao a trava
+      // tem que estar no ponto que os dois passam, nao duplicada em cada
+      // chamador.
       debugEstagio('verificarDesbloqueiosTemaArena: estagio ' + estagioReal + ' ainda nao foi celebrado, chamando viajarParaTemaEstagio()');
       viajarParaTemaEstagio();
     } else {
@@ -2775,6 +2793,19 @@ function viajarParaTemaEstagio(){
     debugEstagio('saiu cedo: temaArenaSalvo() ja e ' + temaAlvo.id + ' -- nada a fazer');
     return;
   }
+  if (_vitoriaSequenciaEmAndamento){
+    // BUG CORRIGIDO: a cerimonia de estagio nao pode abrir NO MEIO da
+    // sequencia de vitoria do dia (poof -> tela cheia -> bau/contadores).
+    // As duas sao telas cheias independentes competindo pela mesma Arena,
+    // e existem DOIS caminhos que chegam aqui (verificarDesbloqueiosTemaArena()
+    // e renderTemaArena()), entao a trava mora aqui, no ponto que os dois
+    // passam, em vez de duplicada em cada chamador. Quando a sequencia de
+    // vitoria terminar (mostrarBauEContadores() zera a flag), o proximo
+    // render() vai chamar viajarParaTemaEstagio() de novo e a cerimonia
+    // abre normalmente, so que depois do bau.
+    debugEstagio('saiu cedo: vitoria do dia em andamento -- cerimonia de estagio adiada');
+    return;
+  }
   if (_arenaBgEmTransicao){
     // ja tem uma viagem rolando -- nao empilha outra tela cheia em cima.
     // NAO persiste aqui: persistir cedo faz qualquer renderTemaArena()
@@ -3169,17 +3200,31 @@ function render(){
       if (el.dataset.travado) return;
       el.dataset.travado = '1';
 
+      // GOLPE NA HORA: animarGolpe() so mexe em classes CSS do heroi/
+      // monstro (ver funcao), nao depende de nada que alternar() calcula
+      // -- so podia ser chamado direto no clique. Antes ficava preso
+      // dentro de alternar(), que so roda 350/460ms depois (setTimeouts
+      // abaixo), entao o "golpe" so aparecia quase meio segundo depois
+      // do toque (medido em video, reclamacao do usuario comparando com
+      // concorrente). Chamando aqui, o bicho reage no mesmo frame do
+      // toque; os 350/460ms continuam so pra dar tempo da animacao da
+      // LISTA (vanish) terminar antes do render() trocar a tela.
+      animarGolpe();
+
       const seraFinal = (vezesAtual + 1) >= meta;
       if (seraFinal){
+        // ERAM 180ms/460ms -- cortados pra 80ms/280ms (pedido do
+        // usuario: saida da tarefa da lista tava demorando). O .vanish
+        // agora tambem dura .2s em vez de .3s (ver style.css), entao
+        // 80+200=280ms bate exato com o novo alternar(i).
         el.classList.add('done');
-        setTimeout(() => el.classList.add('vanish'), 180);
-        setTimeout(() => alternar(i), 460);
+        setTimeout(() => el.classList.add('vanish'), 80);
+        setTimeout(() => alternar(i), 280);
       } else {
         // pedido do usuario: tirar a animacao de saida/entrada (.saiu/
-        // .entrou) -- nao ficou legal. Mantido animarGolpe()+som (pedido
-        // anterior, esse funcionou), so sem efeito visual de saida.
-        // 350ms da tempo do animarGolpe() (320ms) terminar antes do
-        // render() (dentro de alternar()) trocar a tela.
+        // .entrou) -- nao ficou legal. Mantido o som (pedido anterior,
+        // esse funcionou), so sem efeito visual de saida. animarGolpe()
+        // ja rodou acima, na hora do toque.
         setTimeout(() => alternar(i), 350);
       }
     };
@@ -3209,6 +3254,15 @@ function render(){
     mobHpEl.classList.remove('golpe');
     void mobHpEl.offsetWidth;
     mobHpEl.classList.add('golpe');
+    // BUG CORRIGIDO (relatado pelo usuario: "numeros ficam vermelho" ao
+    // sair/voltar pra aba Tarefas): .golpe nunca era removida sozinha,
+    // so no proximo golpe (remove+add acima). Se a troca de aba
+    // acontecia logo apos um golpe, a Arena virava display:none com
+    // .golpe ainda grudada -- e o navegador REINICIA a animacao CSS
+    // presa numa classe quando o elemento volta a ser exibido, piscando
+    // vermelho de novo sem nenhum golpe de verdade ter acontecido.
+    // {once:true} garante que a classe some sozinha ao fim do .35s.
+    mobHpEl.addEventListener('animationend', () => mobHpEl.classList.remove('golpe'), { once: true });
   }
   mobHpEl.textContent = hpTexto;
   mobHpEl.dataset.pronto = '1';
@@ -3666,10 +3720,11 @@ function alternar(i){
       // toque parcial (meta>1, ainda nao completou) ainda representa um
       // golpe de verdade no monstro (mesma fantasia do resto do app:
       // "toda tarefa concluida e um golpe"), so nao fecha o dia -- por
-      // isso chama os dois AQUI direto, sem depender do hook externo de
+      // isso chama o som AQUI direto, sem depender do hook externo de
       // SFX (que so dispara quando alternar() NAO retorna false, e este
-      // caminho sempre retorna false de proposito).
-      animarGolpe();
+      // caminho sempre retorna false de proposito). animarGolpe() NAO e
+      // chamado aqui -- ja rodou na hora do toque, no onclick da caixa
+      // (ver comentario la), pra nao esperar alternar() pra reagir.
       window.tocarSom?.('golpe');
       // mesma trava _adiarContadoresRecompensa do golpe final -- sem
       // isso a barra de XP/moeda ja aparecia cheia ANTES do icone
@@ -3721,7 +3776,9 @@ function alternar(i){
   const nivelDepois = progresso().nivel;
   const subiuNivel = nivelDepois > nivelAntes;
 
-  animarGolpe();
+  // animarGolpe() NAO e chamado aqui -- ja rodou na hora do toque, no
+  // onclick da caixa (render()), pra reagir no mesmo frame do clique em
+  // vez de esperar os 350/460ms de alternar() (ver comentario la).
   // suprime contadores no render() sempre que a barra so deve andar
   // DEPOIS de um icone chegar no heroi (golpe final OU tarefa normal
   // via voarRecompensaFinal, logo abaixo) -- pedido do usuario, mesmo
@@ -3735,16 +3792,28 @@ function alternar(i){
   if (suprimirContadores) window._adiarContadoresRecompensa = false; // so vale por ESSE render() -- o de dentro da sequencia atrasada (mostrarBauEContadores) roda com a flag ja desligada
 
   if (ehGolpeFinal){
-    // atraso proposital: animarGolpe() (chamada logo acima) leva 320ms
-    // pra terminar (hero bate, monstro treme, os dois voltam ao
-    // normal -- ver a funcao). dispararVitoriaDoDia() faz o proprio
-    // render(), que troca a visual pro estado "derrotado" (esconde o
-    // monstro). Sem esse atraso, essa troca acontecia quase instantanea
-    // -- ainda no mesmo tick -- cortando a animacao de golpe pela
-    // metade, dando a impressao de que o golpe acertou o bau em vez do
-    // monstro (queixa do usuario, dava pra perceber facil).
+    // BUG CORRIGIDO (relatado pelo usuario: "animacao do monstro morrendo
+    // ainda buga as vezes"): o corte de 400ms->50ms feito antes assumia
+    // que alternar() so roda 350ms depois do toque -- mas esse numero
+    // ficou desatualizado numa mexida POSTERIOR (saida da tarefa da
+    // lista foi de 460/350ms pra 280ms, ver onclick da caixa). Com
+    // alternar() rodando em 280ms e so mais 50ms de espera aqui, o poof
+    // (mostrarPoofMonstro(), logo abaixo, dentro de dispararVitoriaDoDia)
+    // disparava em ~330ms -- mas o .shake do monstro (animarGolpe(),
+    // chamado no toque) so termina de verdade em 320ms (100ms de attraso
+    // pro shake comecar + .2s de animacao CSS, ver mob-sprite.shake).
+    // Margem de so 10ms contra um timer de navegador: sob qualquer
+    // jitter (2 tarefas quase juntas, celular mais lento, etc.) o poof
+    // as vezes capturava a posicao do monstro AINDA com o transform do
+    // shake aplicado (getBoundingClientRect deslocado/rotacionado),
+    // fazendo a nuvem nascer fora do lugar -- exatamente o "bugado as
+    // vezes" relatado, so que so quando a corrida dava errado.
+    // Restaurada uma folga de verdade (200ms): alternar() em 280ms +
+    // 200ms aqui = 480ms, bem acima dos 320ms do shake, com margem
+    // segura contra jitter. Cadeia toque-final -> bau fica em ~2,65s
+    // (era ~2,5s com o corte quebrado, ~2,9s antes de qualquer corte).
     _vitoriaSequenciaEmAndamento = true; // travado JA, antes do timer -- ver comentario na declaracao
-    setTimeout(() => dispararVitoriaDoDia(doDia, nivelAntes, xpGanho, moedasGanhas), 400);
+    setTimeout(() => dispararVitoriaDoDia(doDia, nivelAntes, xpGanho, moedasGanhas), 200);
     return true;
   }
   if (!venceuAgora) derrotadoEm = null;

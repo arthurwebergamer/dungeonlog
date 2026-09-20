@@ -9366,3 +9366,34 @@ Chamava `console.log` incondicionalmente pra qualquer jogador, mesmo fora do mod
 - O experimento de "montanha flutuante" no card Sequência Atual (Estatísticas), mencionado pelo usuário como algo já testado, **não existe no código do repo** — ficou numa sessão não commitada.
 - Pack `Free.rar` (Desert/Jungle/Mountain) usado só pra escolher a arte de fundo de cada tema — ainda tem camadas soltas (parallax) não utilizadas.
 - **Origem dos assets de monstro**: "64x Tiny Monsters" (Pixel-Deck) — já documentado na seção de licenças, não precisa registrar de novo.
+
+## Golpe/vitória — latência percebida (19/09)
+
+Problema relatado: sensação de atraso entre tocar a tarefa e o jogo
+reagir, comparado a apps concorrentes (medido em vídeo, frame a frame).
+
+- animarGolpe() (shake do herói/monstro) saiu de dentro de alternar()
+  e passou a disparar direto no onclick da caixa -- antes só rodava
+  350/460ms depois do toque (preso atrás da trava de clique duplo),
+  agora reage no mesmo frame.
+- Golpe final -> baú: cadeia de setTimeout's encadeados cortada de
+  ~2,9s pra ~2,5s (o delay de 400ms antes de dispararVitoriaDoDia()
+  virou espera morta depois do fix acima e foi reduzido a 50ms; folga
+  de leitura do "+XP" antes do baú caiu de 900ms pra 600ms).
+- Saída da tarefa da lista (fade+slide ao concluir): 460ms -> 280ms
+  (delay do .vanish 180->80ms, duração da transição CSS .3s->.2s).
+- Efeito de poof do monstro (nuvem de fumaça) trocado por um novo
+  sprite (13 frames) extraído direto do GIF original do pacote de
+  efeitos, chroma-key aplicado -- substitui o de 12 frames anterior.
+- Removido o terminal de debug dos Estágios (#estagioDebugPanel,
+  painel verde fixo que aparecia com o modo debug ligado) -- não
+  tinha mais uso prático, debugEstagio() virou no-op.
+
+Nada dessas mudanças mexeu na lógica de XP/moedas/vitória do dia,
+só timing e visual.
+
+✅ Animação de morte do monstro (poof)
+Sprite de explosão animado (13 frames, spritesheet) tocando no exato
+instante da derrota, com timing ajustado para leitura rápida e nítida
+do impacto (~390ms) sem atrapalhar a sequência golpe → poof → recompensa
+→ baú.

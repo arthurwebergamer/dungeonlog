@@ -3542,17 +3542,22 @@
    Escopado por ID (#gradeHeroisConfig / #temaGrid) de proposito: tanto
    .grade/.opcao quanto .temaswatch sao reaproveitados em outro lugar
    do app (#gradeHerois no onboarding usa a mesma .grade/.opcao) -- so
-   o container de Config muda de layout, o resto do app continua igual. */
+   o container de Config muda de layout, o resto do app continua igual.
+   #gradeNovoHeroi (tela "Novo herói" do Plano Pro) entrou na mesma
+   regra -- mesmo card grande, sem duplicar CSS. */
 
-#gradeHeroisConfig.grade{
+#gradeHeroisConfig.grade,
+#gradeNovoHeroi.grade{
   grid-template-columns:repeat(3,1fr);
   gap:12px;
 }
-#gradeHeroisConfig .opcao{
+#gradeHeroisConfig .opcao,
+#gradeNovoHeroi .opcao{
   padding:16px 4px;
   border-radius:16px;
 }
-#gradeHeroisConfig .opcao img{
+#gradeHeroisConfig .opcao img,
+#gradeNovoHeroi .opcao img{
   width:64px;
   height:64px;
 }
@@ -4168,6 +4173,13 @@
 }
 .pjTrigger .pjNomeTopo:empty{ display:none; } /* grátis com 1 personagem só: sem rótulo, so o Nível mesmo */
 .pjTrigger .pjNomeTopo:not(:empty) + .lvl::before{ content:'· '; }
+/* FIX (borda escura estranha): .lvl ja tem seu proprio background+padding+
+   radius (regra original, linha ~54). Botar ele dentro do .pjTrigger --
+   que TAMBEM tem background+padding+radius -- criava um "pill dentro de
+   pill" (a caixa escura extra que apareceu no print). Zera soh dentro do
+   .pjTrigger; a regra .lvl{} original continua intacta pra quem usa
+   fora daqui. */
+.pjTrigger .lvl{ background:none; padding:0; border-radius:0; }
 .pjTrigger .pjChevron{ width:10px; height:10px; color:var(--accent); opacity:.8; flex:none; transition:transform .2s var(--expo); }
 .pjTrigger.aberto .pjChevron{ transform:rotate(180deg); }
 

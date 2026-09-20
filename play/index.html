@@ -8074,7 +8074,12 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     {id:'branco',     nome:'Branco',   nome_en:'White',  cor:'#FFFFFF'},
     {id:'grafite',    nome:'Escuro',   nome_en:'Dark',   cor:'#8B8B93'},
     {id:'padrao',     nome:'Laranja',  nome_en:'Orange', cor:'#F2A65A'},
-    {id:'pergaminho', nome:'Dourado',  nome_en:'Gold',   cor:'#C9A961'}
+    {id:'pergaminho', nome:'Dourado',  nome_en:'Gold',   cor:'#C9A961'},
+    // PLANO PRO -- item 2 do escopo fechado. `pro:true` e a UNICA
+    // diferenca de shape vs os temas gratis acima -- pintarTemaGrid()
+    // e escolherTema() leem essa flag pra bloquear quem nao assina.
+    {id:'azul',       nome:'Azul',       nome_en:'Blue',       cor:'#5C9DF2', pro:true},
+    {id:'terracota',  nome:'Terracota',  nome_en:'Terracotta', cor:'#C96A4A', pro:true}
   ];
   const CHAVE_TEMA = 'questlog.tema.v1';
 
@@ -8186,6 +8191,16 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   }
 
   function escolherTema(id){
+    // PLANO PRO -- bloqueia troca pra tema pago se nao assina. Checa
+    // pelo id direto (nao pelo objeto de TEMAS) pra funcionar mesmo se
+    // chamado de fora do clique da lista (ex.: futuro deep-link).
+    const temaAlvo = TEMAS.find(t => t.id === id);
+    if (temaAlvo && temaAlvo.pro && typeof assinaturaAtiva === 'function' && !assinaturaAtiva()){
+      if (typeof window.aviso === 'function'){
+        window.aviso(idiomaApp() === 'en' ? 'Pro plan theme' : 'Tema do Plano Pro');
+      }
+      return;
+    }
     const root = document.documentElement;
     const reduzido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduzido || id === root.getAttribute('data-tema')){
@@ -8231,15 +8246,23 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     // pedido do usuario pra tentar algo diferente. Virou lista de linhas
     // (bolinha de cor + nome + check quando selecionado), mesmo padrao
     // visual do resto de Config em vez de um grid de blocos isolado.
+    // PLANO PRO -- Azul/Terracota (t.pro) ficam com opacidade reduzida +
+    // selo "PRO" pra quem nao assina, mesma linguagem visual do dropdown
+    // de personagens (.pjNovoBtn.bloqueado). Continuam clicaveis (o
+    // aviso quem barra e escolherTema()), assim o usuario ve a cor e
+    // entende o que esta perdendo, igual o "+ Novo herói" bloqueado.
+    const bloqueado = typeof assinaturaAtiva === 'function' && !assinaturaAtiva();
     TEMAS.forEach(t => {
       const b = document.createElement('div');
-      b.className = 'temalinha' + (t.id === atual ? ' sel' : '');
+      const travado = t.pro && bloqueado;
+      b.className = 'temalinha' + (t.id === atual ? ' sel' : '') + (travado ? ' bloqueado' : '');
       let langAtual = 'pt';
       try { langAtual = localStorage.getItem('questlog.idioma.v1') || 'pt'; } catch(e){}
       const nomeTema = langAtual === 'en' ? (t.nome_en || t.nome) : t.nome;
       b.innerHTML =
         '<span class="temaDot" style="background:' + t.cor + '"></span>' +
         '<span class="temaNome">' + nomeTema + '</span>' +
+        (travado ? '<span class="temaSelo">PRO</span>' : '') +
         '<svg class="temaCheck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
       b.onclick = () => escolherTema(t.id);
       g.appendChild(b);

@@ -1371,6 +1371,32 @@
     --arena-1:#3D2830; --arena-2:#2C1E24; --arena-3:#1F151A;
     --xp2:#E0A5AE;
   }
+  /* PLANO PRO -- Azul e Terracota: os 2 temas exclusivos do plano (item 2
+     do escopo fechado). Aprovados via mockup de comparacao (Artifact)
+     antes de entrar aqui, mesmo fluxo das rodadas de tema anteriores.
+     Azul inverte a formula do Laranja/Dourado (fundo QUENTE quase-preto
+     + destaque FRIO) -- hue de azul inedito no app ate aqui. Terracota
+     segue a formula ja aprovada (fundo frio + destaque quente), mas num
+     tom terracota/cobre, mais avermelhado que o Laranja e mais terroso
+     que o Sangue. Bloqueio de uso (nao-assinante) fica no JS/CSS do
+     seletor (TEMAS[].pro + pintarTemaGrid()), nao aqui -- esses blocos
+     de cor sao neutros a assinatura. */
+  :root[data-tema="azul"]{
+    --bg:#1C140F; --panel:#1C140F; --panel-2:#271C15; --line:#4A3A2C;
+    --text:#F3ECE3; --muted:#C7B6A4; --dim:#8F7B67;
+    --accent:#5C9DF2; --accent-dim:#1C314F; --gold:#E8C97A; --blood:#E0644F;
+    --panel-3:#33261B; --poco:#120D09; --sel-bg:#1C314F; --mobname:#8FB8F5;
+    --arena-1:#33261B; --arena-2:#241A12; --arena-3:#17110C;
+    --xp2:#5C9DF2;
+  }
+  :root[data-tema="terracota"]{
+    --bg:#10161C; --panel:#10161C; --panel-2:#18212A; --line:#354655;
+    --text:#EDEEEF; --muted:#9DACB9; --dim:#647686;
+    --accent:#C96A4A; --accent-dim:#3D2318; --gold:#D9A45C; --blood:#D64B4B;
+    --panel-3:#212C37; --poco:#0B1116; --sel-bg:#3D2318; --mobname:#E29676;
+    --arena-1:#212C37; --arena-2:#18212A; --arena-3:#111820;
+    --xp2:#C96A4A;
+  }
   /* item 25 do roadmap — spec fechada em sessao de brainstorm (21/08) */
   /* v4.133 (pedido do usuario, comparando com Habitica real): primeira
      tentativa (--bg #0A0A0A -> #141414) foi tao sutil que na tela real
@@ -2698,6 +2724,32 @@
     --arena-1:#3D2830; --arena-2:#2C1E24; --arena-3:#1F151A;
     --xp2:#E0A5AE;
   }
+  /* PLANO PRO -- Azul e Terracota: os 2 temas exclusivos do plano (item 2
+     do escopo fechado). Aprovados via mockup de comparacao (Artifact)
+     antes de entrar aqui, mesmo fluxo das rodadas de tema anteriores.
+     Azul inverte a formula do Laranja/Dourado (fundo QUENTE quase-preto
+     + destaque FRIO) -- hue de azul inedito no app ate aqui. Terracota
+     segue a formula ja aprovada (fundo frio + destaque quente), mas num
+     tom terracota/cobre, mais avermelhado que o Laranja e mais terroso
+     que o Sangue. Bloqueio de uso (nao-assinante) fica no JS/CSS do
+     seletor (TEMAS[].pro + pintarTemaGrid()), nao aqui -- esses blocos
+     de cor sao neutros a assinatura. */
+  :root[data-tema="azul"]{
+    --bg:#1C140F; --panel:#1C140F; --panel-2:#271C15; --line:#4A3A2C;
+    --text:#F3ECE3; --muted:#C7B6A4; --dim:#8F7B67;
+    --accent:#5C9DF2; --accent-dim:#1C314F; --gold:#E8C97A; --blood:#E0644F;
+    --panel-3:#33261B; --poco:#120D09; --sel-bg:#1C314F; --mobname:#8FB8F5;
+    --arena-1:#33261B; --arena-2:#241A12; --arena-3:#17110C;
+    --xp2:#5C9DF2;
+  }
+  :root[data-tema="terracota"]{
+    --bg:#10161C; --panel:#10161C; --panel-2:#18212A; --line:#354655;
+    --text:#EDEEEF; --muted:#9DACB9; --dim:#647686;
+    --accent:#C96A4A; --accent-dim:#3D2318; --gold:#D9A45C; --blood:#D64B4B;
+    --panel-3:#212C37; --poco:#0B1116; --sel-bg:#3D2318; --mobname:#E29676;
+    --arena-1:#212C37; --arena-2:#18212A; --arena-3:#111820;
+    --xp2:#C96A4A;
+  }
   /* item 25 do roadmap — spec fechada em sessao de brainstorm (21/08) */
   /* v4.133 (pedido do usuario, comparando com Habitica real): primeira
      tentativa (--bg #0A0A0A -> #141414) foi tao sutil que na tela real
@@ -3611,6 +3663,18 @@
 }
 .temalinha.sel .temaDot{
   border-color:var(--text);
+}
+
+/* PLANO PRO -- tema bloqueado (Azul/Terracota pra quem nao assina).
+   Mesma linguagem visual ja usada no dropdown de personagens
+   (.pjNovoBtn.bloqueado + .pjSelo) -- opacidade reduzida + selo "PRO",
+   copiado em vez de reaproveitar a classe de la de proposito (contextos
+   diferentes, ver comentario do #novoHeroiOverlay sobre nao juntar
+   fluxos que nao devem se pisar). */
+.temalinha.bloqueado{ opacity:.55; }
+.temaSelo{
+  font-size:8px; font-weight:700; background:var(--accent); color:var(--bg);
+  border-radius:999px; padding:2px 6px; letter-spacing:.3px; flex:none;
 }
 
 /* --- Módulo style #23 --- */

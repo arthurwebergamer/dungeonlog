@@ -3736,53 +3736,11 @@
 }
 
 /* ---------------------------------------------------------------------
-   Sistema de titulos (pedido do usuario) -- cada conquista desbloqueada
-   pode ser equipada como titulo, mostrado embaixo do nome no cabecalho
-   do Perfil (#perfilTitulo). Bloco novo no fim do arquivo, mesmo motivo
-   de sempre (modulos 1-20 duplicados). */
-
-/* .perfilnome ja tem margin-bottom:10px (modulos duplicados, nao mexido)
-   -- puxa o titulo pra logo abaixo do nome com margin-top negativo, e
-   da o respiro antes do resto do cabecalho (xpwrap) com margin-bottom
-   proprio, em vez de depender do gap que sobrava pro nome sozinho. */
-.perfilTitulo{
-  display:none; /* JS liga via style.display quando ha titulo equipado */
-  font-family:'Cormorant Garamond',serif;
-  font-style:italic;
-  font-weight:600;
-  font-size:13px;
-  color:var(--tit-cor, var(--dim));
-  margin-top:-6px;
-  margin-bottom:8px;
-}
-
-/* estrela de equipar, dentro de cada linha da lista de Conquistas --
-   contorno neutro quando nao equipada, preenchida na cor da categoria
-   quando e o titulo atual (fill/stroke controlados no JS via renderConquistasV2). */
-.conqv2estrela{
-  flex:none;
-  width:28px;
-  height:28px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:transparent;
-  border:none;
-  padding:0;
-  cursor:pointer;
-  color:var(--dim);
-  -webkit-tap-highlight-color:transparent;
-}
-.conqv2estrela svg{
-  width:18px;
-  height:18px;
-}
-.conqv2estrela.on{
-  color:var(--tit-cor, var(--accent));
-}
-.conqv2estrela:active{
-  transform:scale(.88);
-}
+   v4.160 (pedido do usuario): sistema de titulos equipaveis REMOVIDO
+   por completo -- ficava aqui o CSS de #perfilTitulo e .conqv2estrela
+   (a estrela de equipar em cada linha de Conquistas). Ver comentario
+   equivalente no index.html, perto de renderConquistasV2().
+   --------------------------------------------------------------------- */
 
 /* ---------------------------------------------------------------------
    Logo do app (portal de pedra) usado em toda tela que mostra o nome
@@ -4075,7 +4033,9 @@
   width:100%; max-width:110px; height:6px; border-radius:3px;
   background:rgba(0,0,0,.32); overflow:hidden;
 }
-.estagio-pill-fill{ height:100%; border-radius:3px; background:linear-gradient(90deg,var(--accent),var(--xp2)); transition:width .4s ease; }
+/* v4.160 (pedido do usuario): tirado o gradiente accent->xp2 da barra
+   de estagio -- agora cor solida (var(--accent)) em todos os temas. */
+.estagio-pill-fill{ height:100%; border-radius:3px; background:var(--accent); transition:width .4s ease; }
 
 /* ======================================================================
    POOF DE DERROTA DO MONSTRO -- nuvem de fumaca (16 frames, extraida

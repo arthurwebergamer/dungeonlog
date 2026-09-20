@@ -9452,3 +9452,33 @@ Todas as mudanças de lógica (mensal, anual, seletor de ano) foram verificadas 
 - Recorrência **múltiplas vezes por semana com dias específicos** já existia antes desta sessão (`tipo:'repete'` + `t.dias`) — não confundir com pedido novo.
 - Não foi perguntado nem implementado: recorrência anual com **mais de uma data por ano**, ou recorrência "a cada N dias" (só dia fixo do mês/ano, não intervalo).
 - Como sempre no projeto, validação em aparelho real ainda pendente — usuário testa fora do ambiente de sandbox antes de considerar algo definitivamente ok.
+## [Sessão] Diagnóstico de contraste dos temas, temas Ametista/Rosé (estilo Dourado) e simplificação do seletor pra 4 temas
+
+### Contexto
+Sessão iniciada com feedback crítico do usuário sobre a leva de temas da sessão anterior (Verde Selva/Arcano Espectral/Sangue Rubro): "nenhum ficou realmente muito bom", com Laranja/Grafite/Dourado citados como os que funcionam de verdade. Fluxo de trabalho de mockup-antes-de-implementar mantido, mas com uma correção de método no meio do caminho (ver "Erro de estratégia" abaixo).
+
+### 1. Diagnóstico de por que Verde/Ciano/Vermelho "perderam a mão"
+Comparando os valores hex reais dos 7 temas então existentes: Laranja, Grafite e Dourado funcionam porque o fundo é de uma família de cor DIFERENTE da do destaque (ex.: Laranja = fundo roxo-violeta + destaque laranja; Dourado = fundo azul-carvão quase preto + destaque dourado). Verde Selva, Arcano e Sangue usam fundo e destaque da MESMA família de cor (verde-no-verde, azul-no-ciano, vermelho-no-vermelho) — resultado mais "apagado"/monocromático mesmo com boas cores individuais. Regra prática registrada: fundo frio + destaque quente (ou vice-versa), nunca os dois da mesma família.
+
+### 2. Mockup interativo — evolução de fidelidade dentro da própria sessão
+Pedido inicial era só visual (Artifact tipo Design, estático, com swatches de cor). O usuário foi pedindo mais fidelidade em 3 rodadas:
+1. Swatches abstratos (cores em blocos, sem UI real) → considerado insuficiente.
+2. Screenshots reais via Playwright do app rodando (`data-tema` real vs. override de CSS var pra simular a "proposta") → ainda não era o que quis dizer.
+3. Pedido explícito: "quero aquele mockup em HTML que eu possa mudar entre os temas eu mesmo" — tentativa de copiar o `index.html`/`style.css` reais pra uma pasta separada (`mockup-temas/`) e adicionar uma barra de troca de tema, pra entregar como arquivo. **Essa tentativa deu errado**: (a) demorou muito rodando testes automatizados de verificação repetidos, gerando reclamação direta do usuário sobre lentidão; (b) quando finalmente entregue, faltava copiar o `assets.js` (onde ficam os monstros/heróis) pra pasta nova, causando `ReferenceError: MONSTROS is not defined` que travava o app inteiro assim que o usuário abriu o arquivo.
+
+### Erro de estratégia corrigido: mockup como Artifact, não como arquivo baixável
+Depois do erro do `assets.js`, o usuário deixou claro (irritado, e com razão): ele queria ver os temas **aqui no chat, como Artifact**, não copiar 3 arquivos pra uma pasta local. Mudança de abordagem: em vez de clonar o app inteiro, foi construída uma tela de Arena **estilizada à mão** (HTML/CSS autocontido, ~200 linhas, sem dependência de `assets.js` nem do app real) reproduzindo a topbar/XP/arena/lista de tarefas com as mesmas CSS custom properties do app de verdade, publicada como Artifact único com botões de troca de tema em JS puro. Essa é a abordagem correta pra esse tipo de pedido daqui pra frente: **comparação visual = Artifact leve e autocontido, nunca cópia do app real**; só o `index.html`/`style.css`/`assets.js` reais quando o pedido for efetivamente rodar o app de verdade.
+
+### 3. Temas Ametista e Rosé — implementados no app real
+Aprovação: manter a estrutura do tema Dourado (fundo azul-carvão `#0F1216`, texto/cinzas idênticos) e só trocar a cor do destaque.
+- **Ametista**: `--accent:#A98FDE` (violeta).
+- **Rosé**: `--accent:#E0A5AE` (rosa antigo).
+- **Bug encontrado e corrigido na primeira implementação**: os tons de `--panel-3`/`--sel-bg`/`--arena-1/2/3` do Dourado são marrom/oliva (pensados pra combinar com tocha dourada num calabouço), não neutros — foram copiados literalmente pros dois temas novos e ficaram parecendo "resíduo de dourado" mesmo depois de trocar o `--accent` principal (usuário: "por que caralhos tem dourado"). Corrigido recolorindo esses tons pra acompanhar a família de cor de cada tema novo (roxo-escuro no Ametista, rosa-escuro no Rosé), mantendo luminosidade equivalente ao original.
+- Implementado nos dois blocos duplicados de `:root[data-tema="..."]` do `style.css` (`replace_all`, mesmo achado de sessões anteriores) + entradas novas no array `TEMAS` do `index.html` (usado pelo seletor de tema in-app).
+
+### 4. Simplificação final do seletor — só 4 temas
+Pedido final da sessão: mudar de estratégia e deixar visível no seletor **só** Branco, Escuro (`grafite`), Laranja (`padrao`) e Dourado (`pergaminho`). Removidos do array `TEMAS` do `index.html`: Verde (`floresta`), Ciano (`arcano`), Vermelho (`sangue`), Ametista e Rosé. **Os blocos CSS desses temas continuam existindes no `style.css`** (não foram apagados) — só não aparecem mais como opção pro usuário escolher; se alguém já tinha um desses temas salvo no `localStorage`, o app ainda tem o CSS pra renderizá-lo, só não tem como reselecionar via UI.
+
+### Pendências / decisões em aberto
+- CSS dos temas removidos do seletor (Verde/Ciano/Vermelho/Ametista/Rosé) ficou órfão no `style.css` — não foi feita limpeza; considerar remover de vez numa sessão futura se não for pra voltar a usá-los.
+- Nenhuma verificação em aparelho real feita nesta sessão (mudança é só de paleta/array, risco baixo) — usuário testa por conta própria como de costume.

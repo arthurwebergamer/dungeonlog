@@ -2333,6 +2333,13 @@
   .edexcluir:active{background:rgba(244,87,129,.15)}
   .edsalvar:active,.edexcluir:active{transform:scale(.97)}
 
+  /* botao de confirmar comprar/vender (#confirmOk, folha generica de
+     pedirConfirmacao): pedido do usuario -- mesmo visual escuro/neutro do
+     botao "Vender" do inventario (.iacts button, sem .prim) em vez do
+     dourado padrao do .edsalvar, tanto pra compra quanto pra venda na Loja
+     (os dois fluxos reaproveitam o mesmo #confirmOk) */
+  #confirmOk{background:var(--poco); border:1px solid var(--line); color:var(--muted)}
+
   /* botao destrutivo de largura cheia, pra folhas de confirmacao com texto
      (diferente de .edexcluir, que e so pra icone unico tipo "x", 54px fixo) */
   .edperigo{

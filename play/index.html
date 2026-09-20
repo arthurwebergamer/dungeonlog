@@ -7507,66 +7507,138 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     // Registrado no roadmap como reversao real, nao silenciosa.
     try { return localStorage.getItem(CHAVE_TEMA) || 'grafite'; } catch(e){ return 'grafite'; }
   }
-  // v4.154 (bug real, 3a rodada -- video do usuario + confirmacao via
-  // console de que os fixes anteriores estavam mesmo no ar, e AINDA
-  // assim piscava branco num celular real, nao so no emulador do
-  // DevTools). As duas correcoes anteriores (v4.150 cross-fade e v4.152
-  // guard de corrida) ficam de historico abaixo, mas a raiz real era
-  // outra: animar `opacity` no PROPRIO <html> arrisca o motor tratar
-  // aquilo como uma camada composta na GPU que nao re-rasteriza o
-  // "canvas" de fundo da pagina a cada frame (o canvas de pagina e uma
-  // pintura separada da arvore do documento em si) -- em alguns
-  // navegadores mobile isso deixa uma rasterizacao antiga (branca, de
-  // antes do CSS/JS aplicar) vazar durante o mergulho de opacity, mesmo
-  // com `html{background:var(--bg)}` certo no CSS (confirmado presente
-  // no deploy testado). Nao reproduziu no teste headless porque aquele
-  // motor rasteriza esse caso de outro jeito.
+  // v4.156 (bug real, 4a rodada). Historico completo, porque cada
+  // rodada anterior corrigiu uma causa real e revelou a proxima:
+  // - v4.150: troca instantanea de --accent/--bg/etc sem nenhuma
+  //   transicao -- cross-fade via opacity no <html> inteiro.
+  // - v4.152: cliques em sequencia rapida atropelavam os setTimeout do
+  //   cross-fade (um callback atrasado aplicava tema ja superado) --
+  //   guard por contador (_temaTroca).
+  // - v4.154: MESMO com o guard, o cross-fade de opacity no <html>
+  //   vazava um flash BRANCO em celular real (confirmado com video +
+  //   deploy verificado via console) -- provavel comportamento de
+  //   camada composta/canvas especifico de motor mobile. Troca pra um
+  //   <div> solido cobrindo a tela (_temaFadeEl) em vez do <html> ficar
+  //   semi-transparente.
+  // - v4.156 (esta): o overlay solido parou de vazar branco, mas
+  //   continuava "piscando" -- cobrir a tela inteira com uma cor solida
+  //   e revelar depois AINDA e uma interrupcao visivel (~320ms de
+  //   blackout), so que na cor certa em vez de branca. O pedido original
+  //   (v4.150) era um cross-fade sem interrupcao nenhuma -- as tentativas
+  //   anteriores tentaram simular isso com opacity/overlay, mas qualquer
+  //   tecnica que passa por um estado semi-transparente ou totalmente
+  //   coberto sempre arrisca esse tipo de flash dependendo do motor.
   //
-  // Troca de abordagem pra eliminar a causa em vez de tentar contornar
-  // o comportamento do motor: em vez do <html> INTEIRO ficar
-  // semi-transparente (com toda a ambiguidade de canvas/camada disso),
-  // um <div> comum e solido (_temaFadeEl) cobre a tela por cima de
-  // tudo. A troca de tema acontece por baixo dele, TOTALMENTE opaco --
-  // o app em si nunca fica semi-transparente, entao nao tem cor nenhuma
-  // pra "vazar" de lugar nenhum, independente de como o motor otimiza a
-  // animacao. Opacity de um div comum (nao o root) e o caso mais trivial
-  // e mais testado que existe em qualquer motor de navegador.
-  let _temaFadeEl = document.getElementById('temaFadeOverlay');
-  if (!_temaFadeEl){
-    _temaFadeEl = document.createElement('div');
-    _temaFadeEl.id = 'temaFadeOverlay';
-    // inline de proposito (mesmo padrao que o codigo antigo ja usava pra
-    // isso) -- z-index 10000 fica acima de tudo, incluindo os overlays de
-    // 9999 (#bloqueioVerificacaoEmail); pointer-events:none pra nunca
-    // bloquear clique, mesmo que algum callback atrase
-    _temaFadeEl.style.cssText =
-      'position:fixed;inset:0;z-index:10000;background:var(--bg);' +
-      'opacity:0;pointer-events:none;transition:opacity .16s var(--expo)';
-    document.body.appendChild(_temaFadeEl);
+  // Solucao definitiva: nao usar opacity em NADA. Anima as PROPRIAS
+  // variaveis CSS de tema (TEMA_VARS abaixo), interpolando de hex-A pra
+  // hex-B frame a frame via requestAnimationFrame e escrevendo direto
+  // com root.style.setProperty(). Como todo componente do app ja
+  // consome cor exclusivamente via var(--bg) etc, a re-pintura de cada
+  // um acontece sozinha a cada frame -- nenhuma opacity, nenhum overlay,
+  // nenhuma camada composta especial. Nunca existe um pixel
+  // semi-transparente ou uma tela coberta: sempre cores solidas
+  // interpoladas, entao nao tem nada pra "vazar" de baixo, seja qual for
+  // o motor/dispositivo.
+  //
+  // Lista TEMA_VARS precisa bater com as variaveis que os 4 blocos
+  // :root[data-tema="..."] do CSS realmente sobrescrevem -- se um tema
+  // novo mexer numa variavel que nao esta nesta lista, ela vai trocar
+  // na hora (sem animar) em vez de interpolar. --verde/--perigo/
+  // --perigo2 ficam de fora de proposito: nao sao tocadas por nenhum
+  // tema (cores de estado do jogo, nao de paleta).
+  const TEMA_VARS = ['--bg','--panel','--panel-2','--panel-3','--line','--text',
+    '--muted','--dim','--accent','--accent-dim','--gold','--blood','--mobname',
+    '--sel-bg','--poco','--arena-1','--arena-2','--arena-3','--xp2'];
+
+  // bug real encontrado com instrumentacao (nao suposicao): durante uma
+  // troca de tema em andamento, a variavel CSS ja esta em formato
+  // "rgb(r,g,b)" (escrito pela propria interpolacao via
+  // root.style.setProperty) em vez de "#RRGGBB" (o formato cru das
+  // regras :root[data-tema=...] no CSS). Uma troca nova clicada NO MEIO
+  // de uma animacao em andamento lia esse "rgb(...)" como "de" e a
+  // versao antiga desta funcao (so entendia hex) devolvia null pra ela
+  // -- dai o loop de interpolacao pulava aquela variavel pra sempre
+  // (guard `if (!a || !b) return`), congelando a cor exatamente onde
+  // estava ate uma troca finalmente terminar sem ser interrompida e
+  // limpar tudo com removeProperty(). Por isso testar varios temas em
+  // sequencia rapida (uso normal da folha) parecia "travar" por um
+  // instante e so entao pular pro tema certo. Corrigido reconhecendo os
+  // dois formatos.
+  function _temaCorParaRgb(cor){
+    cor = (cor || '').trim();
+    if (!cor) return null;
+    const m = cor.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
+    if (m) return [+m[1], +m[2], +m[3]];
+    let hex = cor.replace('#', '');
+    if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+    if (!/^[0-9a-fA-F]{6}$/.test(hex)) return null;
+    const n = parseInt(hex, 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
   }
-  // v4.152 (bug real reportado pelo usuario, confirmado com log
-  // instrumentado): escolherTema() antiga disparava 2 setTimeout por
-  // clique sem cancelar os da chamada anterior. Testar temas em sequencia
-  // rapida (o uso normal da folha -- tocar em varios pra comparar) fazia
-  // os timers se atropelarem: um setTimeout tardio de um clique antigo
-  // aplicava um data-tema ja superado DEPOIS do clique novo. Guard
-  // continua valendo do mesmo jeito com o overlay novo -- _temaTroca é
-  // um contador: cada chamada pega o proximo numero, e o setTimeout so
-  // age se ainda for o mais recente.
-  let _temaTroca = 0;
+
+  // contador de animacao: cada chamada de escolherTema() pega o proximo
+  // numero, e o loop de rAF de uma chamada anterior para sozinho assim
+  // que uma troca mais nova comecar (sem isso, cliques em sequencia
+  // rapida fariam duas animacoes escreverem na mesma variavel ao mesmo
+  // tempo, disputando o valor a cada frame).
+  let _temaAnimId = 0;
+  function _temaAnimarInterpolando(de, para){
+    const root = document.documentElement;
+    const minhaAnim = ++_temaAnimId;
+    const duracaoMs = 220;
+    const t0 = performance.now();
+    function passo(agora){
+      if (minhaAnim !== _temaAnimId) return; // troca mais nova ja assumiu, aborta este loop
+      const t = Math.min(1, (agora - t0) / duracaoMs);
+      TEMA_VARS.forEach((v, i) => {
+        const a = de[i], b = para[i];
+        if (!a || !b) return;
+        const r = Math.round(a[0] + (b[0] - a[0]) * t);
+        const g = Math.round(a[1] + (b[1] - a[1]) * t);
+        const bl = Math.round(a[2] + (b[2] - a[2]) * t);
+        root.style.setProperty(v, 'rgb(' + r + ',' + g + ',' + bl + ')');
+      });
+      if (t < 1) requestAnimationFrame(passo);
+      // anima acabou: remove os overrides inline, volta a herdar limpo
+      // do seletor :root[data-tema=...] (mesmo valor final, sem sujeira)
+      else TEMA_VARS.forEach(v => root.style.removeProperty(v));
+    }
+    requestAnimationFrame(passo);
+  }
+
   function escolherTema(id){
     const root = document.documentElement;
     const reduzido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const minhaTroca = ++_temaTroca;
-    if (reduzido){
+    if (reduzido || id === root.getAttribute('data-tema')){
       root.setAttribute('data-tema', id);
     } else {
-      _temaFadeEl.style.opacity = '1';        // cobre a tela (cor do tema ATUAL, sem mudar nada visualmente ainda)
-      setTimeout(() => {
-        if (minhaTroca !== _temaTroca) return; // troca mais nova ja assumiu, ignora este callback atrasado
-        root.setAttribute('data-tema', id);    // troca por baixo do overlay, 100% opaco -- nada visivel muda ainda
-        _temaFadeEl.style.opacity = '0';        // revela o app ja no tema novo
-      }, 160);
+      // le as cores ATUAIS (o que esta na tela agora -- se ja tiver uma
+      // animacao em andamento, getComputedStyle enxerga o valor inline
+      // dela nesse instante, entao uma troca nova sempre continua de
+      // onde a tela estava de verdade, sem pulo)
+      const csAntes = getComputedStyle(root);
+      const de = TEMA_VARS.map(v => _temaCorParaRgb(csAntes.getPropertyValue(v)));
+      // bug real (2a causa desta rodada, achada com instrumentacao):
+      // se uma troca anterior foi interrompida no meio, o <html> ainda
+      // tem os overrides INLINE dela (setProperty). Inline tem
+      // especificidade maior que :root[data-tema=...], entao ler "para"
+      // com getComputedStyle DEPOIS de so trocar o atributo continuava
+      // devolvendo o valor inline antigo, mascarando a regra nova -- o
+      // alvo saia igual (ou quase) ao atual, e a "animacao" nao tinha
+      // nada de verdade pra interpolar (parecia travada ate uma troca
+      // finalmente terminar sem interrupcao e limpar o inline). Por
+      // isso remove os overrides ANTES de trocar o atributo e ler o
+      // alvo puro da regra CSS.
+      TEMA_VARS.forEach(v => root.style.removeProperty(v));
+      root.setAttribute('data-tema', id); // muda a regra que resolve as variaveis...
+      const csDepois = getComputedStyle(root);
+      const para = TEMA_VARS.map(v => _temaCorParaRgb(csDepois.getPropertyValue(v)));
+      // ...mas nada foi pintado na tela ainda: um script sincrono nunca
+      // e interrompido por um paint no meio. _temaAnimarInterpolando ja
+      // comeca escrevendo os valores de "de" via inline style (trava
+      // visualmente onde estava) antes do primeiro rAF avancar o t --
+      // entao o app nunca chega a mostrar o tema novo cru, sem transicao
+      _temaAnimarInterpolando(de, para);
     }
     try { localStorage.setItem(CHAVE_TEMA, id); } catch(e){}
     pintarTemaGrid();

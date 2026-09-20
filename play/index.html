@@ -7507,42 +7507,65 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     // Registrado no roadmap como reversao real, nao silenciosa.
     try { return localStorage.getItem(CHAVE_TEMA) || 'grafite'; } catch(e){ return 'grafite'; }
   }
+  // v4.154 (bug real, 3a rodada -- video do usuario + confirmacao via
+  // console de que os fixes anteriores estavam mesmo no ar, e AINDA
+  // assim piscava branco num celular real, nao so no emulador do
+  // DevTools). As duas correcoes anteriores (v4.150 cross-fade e v4.152
+  // guard de corrida) ficam de historico abaixo, mas a raiz real era
+  // outra: animar `opacity` no PROPRIO <html> arrisca o motor tratar
+  // aquilo como uma camada composta na GPU que nao re-rasteriza o
+  // "canvas" de fundo da pagina a cada frame (o canvas de pagina e uma
+  // pintura separada da arvore do documento em si) -- em alguns
+  // navegadores mobile isso deixa uma rasterizacao antiga (branca, de
+  // antes do CSS/JS aplicar) vazar durante o mergulho de opacity, mesmo
+  // com `html{background:var(--bg)}` certo no CSS (confirmado presente
+  // no deploy testado). Nao reproduziu no teste headless porque aquele
+  // motor rasteriza esse caso de outro jeito.
+  //
+  // Troca de abordagem pra eliminar a causa em vez de tentar contornar
+  // o comportamento do motor: em vez do <html> INTEIRO ficar
+  // semi-transparente (com toda a ambiguidade de canvas/camada disso),
+  // um <div> comum e solido (_temaFadeEl) cobre a tela por cima de
+  // tudo. A troca de tema acontece por baixo dele, TOTALMENTE opaco --
+  // o app em si nunca fica semi-transparente, entao nao tem cor nenhuma
+  // pra "vazar" de lugar nenhum, independente de como o motor otimiza a
+  // animacao. Opacity de um div comum (nao o root) e o caso mais trivial
+  // e mais testado que existe em qualquer motor de navegador.
+  let _temaFadeEl = document.getElementById('temaFadeOverlay');
+  if (!_temaFadeEl){
+    _temaFadeEl = document.createElement('div');
+    _temaFadeEl.id = 'temaFadeOverlay';
+    // inline de proposito (mesmo padrao que o codigo antigo ja usava pra
+    // isso) -- z-index 10000 fica acima de tudo, incluindo os overlays de
+    // 9999 (#bloqueioVerificacaoEmail); pointer-events:none pra nunca
+    // bloquear clique, mesmo que algum callback atrase
+    _temaFadeEl.style.cssText =
+      'position:fixed;inset:0;z-index:10000;background:var(--bg);' +
+      'opacity:0;pointer-events:none;transition:opacity .16s var(--expo)';
+    document.body.appendChild(_temaFadeEl);
+  }
   // v4.152 (bug real reportado pelo usuario, confirmado com log
   // instrumentado): escolherTema() antiga disparava 2 setTimeout por
   // clique sem cancelar os da chamada anterior. Testar temas em sequencia
   // rapida (o uso normal da folha -- tocar em varios pra comparar) fazia
   // os timers se atropelarem: um setTimeout tardio de um clique antigo
-  // aplicava um data-tema ja superado DEPOIS do clique novo, e como o
-  // opacity as vezes ja estava de volta em 1 quando isso acontecia, a
-  // troca de cor saia sem NENHUMA transicao -- um corte seco, exatamente
-  // o "pisca" relatado (video do usuario mostrou varios flashes clicando
-  // temas em sequencia). _temaTroca é um contador: cada chamada pega o
-  // proximo numero, e os dois setTimeout so agem se ainda forem os mais
-  // recentes -- qualquer troca mais nova invalida (ignora) os callbacks
-  // de uma troca anterior ainda pendente.
+  // aplicava um data-tema ja superado DEPOIS do clique novo. Guard
+  // continua valendo do mesmo jeito com o overlay novo -- _temaTroca é
+  // um contador: cada chamada pega o proximo numero, e o setTimeout so
+  // age se ainda for o mais recente.
   let _temaTroca = 0;
   function escolherTema(id){
-    // v4.150 (pedido do usuario): trocar tema so mudava --accent/--bg/etc
-    // na hora, sem transicao (variavel CSS custom property nao anima
-    // sozinha). Em vez de adicionar transition em cada componente que
-    // consome alguma dessas variaveis (risco alto, dezenas de regras),
-    // um cross-fade no documentElement inteiro resolve pra qualquer tema
-    // atual ou futuro sem tocar em mais nada.
     const root = document.documentElement;
     const reduzido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const minhaTroca = ++_temaTroca;
     if (reduzido){
       root.setAttribute('data-tema', id);
     } else {
-      root.style.transition = 'opacity .16s var(--expo)';
-      root.style.opacity = '0.4';
+      _temaFadeEl.style.opacity = '1';        // cobre a tela (cor do tema ATUAL, sem mudar nada visualmente ainda)
       setTimeout(() => {
         if (minhaTroca !== _temaTroca) return; // troca mais nova ja assumiu, ignora este callback atrasado
-        root.setAttribute('data-tema', id);
-        root.style.opacity = '1';
-        setTimeout(() => {
-          if (minhaTroca === _temaTroca) root.style.transition = '';
-        }, 180);
+        root.setAttribute('data-tema', id);    // troca por baixo do overlay, 100% opaco -- nada visivel muda ainda
+        _temaFadeEl.style.opacity = '0';        // revela o app ja no tema novo
       }, 160);
     }
     try { localStorage.setItem(CHAVE_TEMA, id); } catch(e){}

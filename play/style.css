@@ -1358,23 +1358,29 @@
     --mobname:#D9A05B; --sel-bg:#2A3B2C; --poco:#0F1712;
     --arena-1:#3A5142; --arena-2:#26392B; --arena-3:#1C2A20; --xp2:#D8B45C;
   }
-  /* v4.158 (pedido do usuario, mesma sessao): dois temas novos, tambem
-     escolhidos no mockup de paleta -- Arcano (roxo profundo + ciano
-     eletrico, clima de magia/dungeon) e Sangue (vermelho-carmesim
-     escuro + dourado-osso, clima grim de dungeon crawler). */
+  /* v4.159 (pedido do usuario -- primeira versao de Arcano/Sangue nao
+     ficou boa: "azul arcano nao tem distincao boa sobre o roxo" e
+     "sangue nao ficou legal"). Segunda rodada no mockup de paleta,
+     com um preview MUITO mais realista (medidas e cores reais tiradas
+     do app rodando via getComputedStyle, incluindo elementos que NAO
+     mudam de cor com o tema -- pip de dificuldade, barra de vida,
+     gradiente da barra de XP, check verde). Usuario aprovou "Sangue
+     Rubro" (vermelho vivo/escarlate como destaque, saiu do
+     dourado-osso apagado da v1) e "Arcano Espectral" (verde-agua/teal
+     neon, saiu de vez da familia roxo/azul que colidia com o Laranja). */
   :root[data-tema="arcano"]{
-    --bg:#160B24; --panel:#160B24; --panel-2:#211334; --panel-3:#2B1B42;
-    --line:#432C63; --text:#EFE8FA; --muted:#B9A6D9; --dim:#8A72B3;
-    --accent:#4FE0E8; --accent-dim:#12414A; --gold:#D9C15C; --blood:#D6537A;
-    --mobname:#C48FE8; --sel-bg:#2E1D46; --poco:#0F0619;
-    --arena-1:#432C63; --arena-2:#2B1B42; --arena-3:#1F1330; --xp2:#D9C15C;
+    --bg:#0C1620; --panel:#0C1620; --panel-2:#13222F; --panel-3:#1B303F;
+    --line:#2E4C5C; --text:#E4F3F2; --muted:#9DC2C4; --dim:#5F8C90;
+    --accent:#5EEBD1; --accent-dim:#0F3A38; --gold:#D9C15C; --blood:#D6537A;
+    --mobname:#7ED4C8; --sel-bg:#1B303F; --poco:#070E14;
+    --arena-1:#2E4C5C; --arena-2:#1B303F; --arena-3:#13222F; --xp2:#D9C15C;
   }
   :root[data-tema="sangue"]{
-    --bg:#1C0E0E; --panel:#1C0E0E; --panel-2:#2B1414; --panel-3:#3A1A1A;
-    --line:#5A2626; --text:#F2E6D8; --muted:#CBA48E; --dim:#996F5C;
-    --accent:#E0B978; --accent-dim:#4A2E1A; --gold:#E0B978; --blood:#D4392F;
-    --mobname:#E88F6B; --sel-bg:#3A1A1A; --poco:#120808;
-    --arena-1:#5A2626; --arena-2:#3A1A1A; --arena-3:#2B1414; --xp2:#E0B978;
+    --bg:#190B0B; --panel:#190B0B; --panel-2:#291010; --panel-3:#391616;
+    --line:#5C2020; --text:#F5E8DC; --muted:#D6A08E; --dim:#A16B57;
+    --accent:#E8433A; --accent-dim:#4A1512; --gold:#E0B978; --blood:#E8433A;
+    --mobname:#E8896F; --sel-bg:#391616; --poco:#120707;
+    --arena-1:#5C2020; --arena-2:#391616; --arena-3:#291010; --xp2:#E0B978;
   }
 
 /* ===== Bloco style #27 ===== */
@@ -2660,23 +2666,29 @@
     --mobname:#D9A05B; --sel-bg:#2A3B2C; --poco:#0F1712;
     --arena-1:#3A5142; --arena-2:#26392B; --arena-3:#1C2A20; --xp2:#D8B45C;
   }
-  /* v4.158 (pedido do usuario, mesma sessao): dois temas novos, tambem
-     escolhidos no mockup de paleta -- Arcano (roxo profundo + ciano
-     eletrico, clima de magia/dungeon) e Sangue (vermelho-carmesim
-     escuro + dourado-osso, clima grim de dungeon crawler). */
+  /* v4.159 (pedido do usuario -- primeira versao de Arcano/Sangue nao
+     ficou boa: "azul arcano nao tem distincao boa sobre o roxo" e
+     "sangue nao ficou legal"). Segunda rodada no mockup de paleta,
+     com um preview MUITO mais realista (medidas e cores reais tiradas
+     do app rodando via getComputedStyle, incluindo elementos que NAO
+     mudam de cor com o tema -- pip de dificuldade, barra de vida,
+     gradiente da barra de XP, check verde). Usuario aprovou "Sangue
+     Rubro" (vermelho vivo/escarlate como destaque, saiu do
+     dourado-osso apagado da v1) e "Arcano Espectral" (verde-agua/teal
+     neon, saiu de vez da familia roxo/azul que colidia com o Laranja). */
   :root[data-tema="arcano"]{
-    --bg:#160B24; --panel:#160B24; --panel-2:#211334; --panel-3:#2B1B42;
-    --line:#432C63; --text:#EFE8FA; --muted:#B9A6D9; --dim:#8A72B3;
-    --accent:#4FE0E8; --accent-dim:#12414A; --gold:#D9C15C; --blood:#D6537A;
-    --mobname:#C48FE8; --sel-bg:#2E1D46; --poco:#0F0619;
-    --arena-1:#432C63; --arena-2:#2B1B42; --arena-3:#1F1330; --xp2:#D9C15C;
+    --bg:#0C1620; --panel:#0C1620; --panel-2:#13222F; --panel-3:#1B303F;
+    --line:#2E4C5C; --text:#E4F3F2; --muted:#9DC2C4; --dim:#5F8C90;
+    --accent:#5EEBD1; --accent-dim:#0F3A38; --gold:#D9C15C; --blood:#D6537A;
+    --mobname:#7ED4C8; --sel-bg:#1B303F; --poco:#070E14;
+    --arena-1:#2E4C5C; --arena-2:#1B303F; --arena-3:#13222F; --xp2:#D9C15C;
   }
   :root[data-tema="sangue"]{
-    --bg:#1C0E0E; --panel:#1C0E0E; --panel-2:#2B1414; --panel-3:#3A1A1A;
-    --line:#5A2626; --text:#F2E6D8; --muted:#CBA48E; --dim:#996F5C;
-    --accent:#E0B978; --accent-dim:#4A2E1A; --gold:#E0B978; --blood:#D4392F;
-    --mobname:#E88F6B; --sel-bg:#3A1A1A; --poco:#120808;
-    --arena-1:#5A2626; --arena-2:#3A1A1A; --arena-3:#2B1414; --xp2:#E0B978;
+    --bg:#190B0B; --panel:#190B0B; --panel-2:#291010; --panel-3:#391616;
+    --line:#5C2020; --text:#F5E8DC; --muted:#D6A08E; --dim:#A16B57;
+    --accent:#E8433A; --accent-dim:#4A1512; --gold:#E0B978; --blood:#E8433A;
+    --mobname:#E8896F; --sel-bg:#391616; --poco:#120707;
+    --arena-1:#5C2020; --arena-2:#391616; --arena-3:#291010; --xp2:#E0B978;
   }
 
 /* --- Módulo style #10 --- */

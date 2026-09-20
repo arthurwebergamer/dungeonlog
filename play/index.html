@@ -273,9 +273,56 @@
 
     <div class="composer" id="composer">
       <input id="input" placeholder="O que precisa ser feito?" data-i18n-placeholder="jogo.oQuePrecisaSerFeito" autocomplete="off">
-      <div class="modes">
-        <button class="mode on" id="modeHoje" data-i18n="jogo.soHoje">Só hoje</button>
-        <button class="mode" id="modeRepete" data-i18n="jogo.repeteSemana">Repete toda semana</button>
+      <!-- v4.162 (pedido do usuario): secao "Repeticao" reorganizada -- rotulo
+           igual ao padrao ja usado por "Dificuldade"/"Vezes por dia" (antes os
+           3 botoes de modo nao tinham nenhum rotulo acima), textos curtos pra
+           caber 4 opcoes lado a lado (agora incluindo Ano), e cada sub-painel
+           (dias da semana / dia do mes / dia+mes do ano) mora dentro do mesmo
+           bloco visual do modo que o usa. -->
+      <div class="difwrap">
+        <span class="diflabel" data-i18n="jogo.repeticao">Repetição</span>
+        <div class="modes">
+          <button class="mode on" id="modeHoje" data-i18n="jogo.soHojeCurto">Hoje</button>
+          <button class="mode" id="modeRepete" data-i18n="jogo.repeteSemanaCurto">Semana</button>
+          <button class="mode" id="modeMensal" data-i18n="jogo.repeteMesCurto">Mês</button>
+          <button class="mode" id="modeAnual" data-i18n="jogo.repeteAnoCurto">Ano</button>
+        </div>
+        <div class="days" id="days">
+          <button class="day" data-d="0" data-i18n="dia.dom">D</button>
+          <button class="day" data-d="1" data-i18n="dia.seg">S</button>
+          <button class="day" data-d="2" data-i18n="dia.ter">T</button>
+          <button class="day" data-d="3" data-i18n="dia.qua">Q</button>
+          <button class="day" data-d="4" data-i18n="dia.qui">Q</button>
+          <button class="day" data-d="5" data-i18n="dia.sex">S</button>
+          <button class="day" data-d="6" data-i18n="dia.sab">S</button>
+        </div>
+        <!-- v4.161: recorrencia mensal -- dia fixo do mes, mesma linguagem
+             visual do stepper de "Vezes por dia" (- N +), em vez de uma grade
+             de 31 botoes. Mes curto (ex: dia 31 em fevereiro) cai
+             automaticamente no ultimo dia daquele mes -- ver diaMesOcorreNoDia(). -->
+        <div class="vezeswrap" id="diaMesWrap">
+          <span class="diflabel" data-i18n="jogo.todoDia">Todo dia</span>
+          <div class="vezesrow">
+            <button class="vezesbtn" id="diaMesMenos" type="button" aria-label="Diminuir">−</button>
+            <span class="vezesnum" id="diaMesNum"><b>1</b></span>
+            <button class="vezesbtn" id="diaMesMais" type="button" aria-label="Aumentar">+</button>
+          </div>
+        </div>
+        <!-- v4.162: recorrencia anual -- dia + mes fixos (ex.: aniversario,
+             "todo 25/12"). Mesmo clamp de mes curto do mensal, ver anualOcorreNoDia(). -->
+        <div class="vezeswrap" id="anualWrap">
+          <span class="diflabel" data-i18n="jogo.diaEMes">Dia e mês</span>
+          <div class="vezesrow">
+            <button class="vezesbtn" id="anualDiaMenos" type="button" aria-label="Diminuir dia">−</button>
+            <span class="vezesnum" id="anualDiaNum"><b>1</b></span>
+            <button class="vezesbtn" id="anualDiaMais" type="button" aria-label="Aumentar dia">+</button>
+          </div>
+          <div class="vezesrow">
+            <button class="vezesbtn" id="anualMesMenos" type="button" aria-label="Diminuir mês">−</button>
+            <span class="vezesnum" id="anualMesNum"><b>Jan</b></span>
+            <button class="vezesbtn" id="anualMesMais" type="button" aria-label="Aumentar mês">+</button>
+          </div>
+        </div>
       </div>
 
       <div class="difwrap">
@@ -289,15 +336,6 @@
           <span class="vezesnum" id="vezesNum"><b>1</b>×</span>
           <button class="vezesbtn" id="vezesMais" type="button" aria-label="Aumentar">+</button>
         </div>
-      </div>
-      <div class="days" id="days">
-        <button class="day" data-d="0" data-i18n="dia.dom">D</button>
-        <button class="day" data-d="1" data-i18n="dia.seg">S</button>
-        <button class="day" data-d="2" data-i18n="dia.ter">T</button>
-        <button class="day" data-d="3" data-i18n="dia.qua">Q</button>
-        <button class="day" data-d="4" data-i18n="dia.qui">Q</button>
-        <button class="day" data-d="5" data-i18n="dia.sex">S</button>
-        <button class="day" data-d="6" data-i18n="dia.sab">S</button>
       </div>
 
       <button type="button" class="advtoggle" id="advToggle">
@@ -368,7 +406,6 @@
           <div class="hero-sprite" id="perfilHeroSprite"></div>
           <div class="perfilheroInfo">
             <div class="perfilnome" id="perfilNome">Aventureiro</div>
-            <div class="perfilTitulo" id="perfilTitulo"></div>
             <div class="xpwrap">
               <div class="xprow hprow">
                 <span class="xplabel" data-i18n="jogo.vida">Vida</span>
@@ -832,6 +869,20 @@
         <span class="est-histsufixo" id="estHistSufixo" data-i18n="est.periodoMes">· mês</span>
         <svg class="est-histchevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
       </div>
+      <!-- v4.161 (pedido do usuario -- "o grafico anual tá horrível, dava
+           pra trocar de ano"): seletor de ano, so aparece na visao "ano"
+           (.on, ligado em renderHistoricoConteudo). Botoes tem
+           stopPropagation() no JS pra nao abrir o popup de periodo do
+           card (que escuta clique em qualquer lugar do card). -->
+      <div class="est-anoswitcher" id="estAnoSwitcher">
+        <button type="button" class="est-anobtn" id="estAnoAnterior" aria-label="Ano anterior">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+        </button>
+        <span class="est-anonum" id="estAnoNum">2026</span>
+        <button type="button" class="est-anobtn" id="estAnoProximo" aria-label="Próximo ano">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+      </div>
       <div class="est-mapames" id="estMapaMes"></div>
       <div class="est-mapalegenda" id="estMapaLegenda">
         <div class="est-tile"></div><span data-i18n="est.semTarefa">sem tarefa</span>
@@ -941,6 +992,7 @@
   document.querySelectorAll('.est-periodoopc').forEach(function(btn){
     btn.onclick = function(){
       estPeriodoAtual = btn.dataset.periodo;
+      if (estPeriodoAtual === 'ano') estAnoEscolhido = null; // volta pro ano de hoje ao reabrir "Ano inteiro"
       const chave = estPeriodoAtual === 'semana' ? 'est.periodoSemana'
         : estPeriodoAtual === 'ano' ? 'est.periodoAno' : 'est.periodoMes';
       if (sufixoEl){
@@ -951,6 +1003,24 @@
       if (typeof renderEstatisticas === 'function') renderEstatisticas();
     };
   });
+
+  // setas do seletor de ano -- stopPropagation pra nao acionar o
+  // histCard.onclick (abre o popup de periodo em qualquer clique no card).
+  const estAnoAnteriorBtn = document.getElementById('estAnoAnterior');
+  const estAnoProximoBtn = document.getElementById('estAnoProximo');
+  if (estAnoAnteriorBtn) estAnoAnteriorBtn.onclick = function(e){
+    e.stopPropagation();
+    estAnoEscolhido = (estAnoEscolhido || Number(isoAtual().slice(0,4))) - 1;
+    if (typeof renderEstatisticas === 'function') renderEstatisticas();
+  };
+  if (estAnoProximoBtn) estAnoProximoBtn.onclick = function(e){
+    e.stopPropagation();
+    const anoHoje = Number(isoAtual().slice(0,4));
+    if (estAnoEscolhido !== null && estAnoEscolhido < anoHoje){
+      estAnoEscolhido = estAnoEscolhido + 1;
+      if (typeof renderEstatisticas === 'function') renderEstatisticas();
+    }
+  };
 
   const montOverlay = document.getElementById('estMontanhaOverlay');
   const montFechar = document.getElementById('estMontanhaFechar');
@@ -1306,7 +1376,6 @@ const CHAVES_SECUNDARIAS_CONTA = [
   'questlog.tarefasConcluidas.v1',
   'questlog.temaArena.v1',
   'questlog.temasDesbloqueados.v1',
-  'questlog.tituloEquipado.v1',
   'questlog.vida.v1'
 ];
 window.CHAVES_SECUNDARIAS_CONTA = CHAVES_SECUNDARIAS_CONTA;
@@ -1988,10 +2057,36 @@ let equipado = {arma:null, armadura:null, elmo:null, escudo:null, acess:null};
 
 const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
 
-function ehDeHoje(t){
-  if (t.tipo === 'hoje') return t.data === isoAtual();
-  return t.dias.includes(diaDaSemana());
+// v4.161: helper unico pra "essa tarefa vale nesse dia?", usado por
+// ehDeHoje() (hoje) e por pendentesEm()/tarefasEm() (qualquer dia, pro
+// registro de historico). Mes curto: dia 31 escolhido cai automatico no
+// ultimo dia real do mes (fevereiro, por exemplo) em vez de nunca ocorrer.
+function diaMesOcorreNoDia(t, iso){
+  const d = new Date(iso + 'T12:00:00');
+  const diasNoMes = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+  const alvo = Math.min(t.diaMes || 1, diasNoMes);
+  return d.getDate() === alvo;
 }
+// mesma ideia do diaMesOcorreNoDia, so que tambem fixando o MES -- pra
+// recorrencia anual (aniversario, data fixa tipo "todo 31/12"). Dia 31
+// escolhido num mes de 30 (ou fevereiro) cai automatico no ultimo dia
+// real daquele mes NAQUELE ano (cobre ano bissexto tambem).
+function anualOcorreNoDia(t, iso){
+  const d = new Date(iso + 'T12:00:00');
+  const mesAlvo = Math.min(Math.max(t.mesAno || 1, 1), 12);
+  if (d.getMonth() + 1 !== mesAlvo) return false;
+  const diasNoMes = new Date(d.getFullYear(), mesAlvo, 0).getDate();
+  const alvo = Math.min(t.diaAno || 1, diasNoMes);
+  return d.getDate() === alvo;
+}
+function ocorreNoDia(t, iso){
+  if (t.tipo === 'hoje') return t.data === iso;
+  if (t.tipo === 'mensal') return diaMesOcorreNoDia(t, iso);
+  if (t.tipo === 'anual') return anualOcorreNoDia(t, iso);
+  return (t.dias || []).includes(new Date(iso + 'T12:00:00').getDay());
+}
+window.ocorreNoDia = ocorreNoDia;
+function ehDeHoje(t){ return ocorreNoDia(t, isoAtual()); }
 function feitaHoje(t){ return t.feitaEm === isoAtual(); }
 function romano(n){
   if (n < 1) return 'I';
@@ -2011,6 +2106,12 @@ function progresso(){
 function rotulo(t){
   const en = idiomaApp() === 'en';
   if (t.tipo === 'hoje') return en ? 'today only' : 'só hoje';
+  if (t.tipo === 'mensal') return en ? ('day ' + (t.diaMes || 1) + ' of the month') : ('todo dia ' + (t.diaMes || 1));
+  if (t.tipo === 'anual'){
+    const nomes = (typeof NOMES_MES_CURTO !== 'undefined') ? NOMES_MES_CURTO[en ? 'en' : 'pt'] : null;
+    const nomeMes = nomes ? nomes[Math.min(Math.max((t.mesAno || 1) - 1, 0), 11)] : String(t.mesAno || 1);
+    return en ? (nomeMes + ' ' + (t.diaAno || 1)) : ((t.diaAno || 1) + ' de ' + nomeMes);
+  }
   if (t.dias.length === 7) return en ? 'every day' : 'todo dia';
   const siglas = en ? SIGLAS_EN : SIGLAS;
   return t.dias.slice().sort().map(d => siglas[d]).join(', ');
@@ -3860,13 +3961,35 @@ function aviso(msg, ouro, fuga){
   timer = setTimeout(()=>t.classList.remove('on'), 1800);
 }
 
+// v4.162: movido pra cima (era declarado la embaixo, perto do Historico) --
+// o composer/editor de tarefa (secao logo abaixo) tambem precisa dos nomes
+// curtos de mes pro stepper do modo Anual, e roda ANTES daquele trecho no
+// mesmo <script> continuo. Referenciar uma const mais abaixo no arquivo
+// antes dela ser declarada estoura "Cannot access before initialization"
+// mesmo dentro de um typeof -- por isso subiu pra cima de tudo que usa.
+const NOMES_MES_CURTO = {
+  pt: ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'],
+  en: ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec']
+};
+
 const composer = document.getElementById('composer');
 const input = document.getElementById('input');
 const daysEl = document.getElementById('days');
 const btnHoje = document.getElementById('modeHoje');
 const btnRepete = document.getElementById('modeRepete');
+const btnMensal = document.getElementById('modeMensal');
+const btnAnual = document.getElementById('modeAnual');
+const diaMesWrap = document.getElementById('diaMesWrap');
+const diaMesNumEl = document.getElementById('diaMesNum');
+const anualWrap = document.getElementById('anualWrap');
+const anualDiaNumEl = document.getElementById('anualDiaNum');
+const anualMesNumEl = document.getElementById('anualMesNum');
+const DIA_MES_MIN = 1, DIA_MES_MAX = 31;
 let modo = 'hoje';
 let diasEscolhidos = [];
+let diaMesEscolhido = new Date().getDate(); // sugestao inicial: dia de hoje
+let diaAnoEscolhido = new Date().getDate();  // v4.162: recorrencia anual -- sugestao inicial: hoje
+let mesAnoEscolhido = new Date().getMonth() + 1;
 
 const btnSave = document.getElementById('save');
 
@@ -3890,18 +4013,23 @@ window.atualizarEstadoSave = atualizarEstadoSave;
 
 input.addEventListener('input', atualizarEstadoSave);
 
-btnHoje.onclick = () => {
-  modo = 'hoje';
-  btnHoje.classList.add('on'); btnRepete.classList.remove('on');
-  daysEl.classList.remove('on');
-  atualizarEstadoSave();
-};
-btnRepete.onclick = () => {
-  modo = 'repete';
-  btnRepete.classList.add('on'); btnHoje.classList.remove('on');
-  daysEl.classList.add('on');
-  atualizarEstadoSave();
-};
+// v4.162: 4 modos agora (hoje/repete/mensal/anual) -- cada onclick liga o
+// seu botao e o painel correspondente (dias da semana OU stepper de dia do
+// mes OU stepper de dia+mes do ano), desliga os outros tres. Mesmo padrao
+// ja usado, so estendido.
+function pintarModo(){
+  btnHoje.classList.toggle('on', modo === 'hoje');
+  btnRepete.classList.toggle('on', modo === 'repete');
+  btnMensal.classList.toggle('on', modo === 'mensal');
+  if (btnAnual) btnAnual.classList.toggle('on', modo === 'anual');
+  daysEl.classList.toggle('on', modo === 'repete');
+  if (diaMesWrap) diaMesWrap.classList.toggle('on', modo === 'mensal');
+  if (anualWrap) anualWrap.classList.toggle('on', modo === 'anual');
+}
+btnHoje.onclick = () => { modo = 'hoje'; pintarModo(); atualizarEstadoSave(); };
+btnRepete.onclick = () => { modo = 'repete'; pintarModo(); atualizarEstadoSave(); };
+if (btnMensal) btnMensal.onclick = () => { modo = 'mensal'; pintarModo(); atualizarEstadoSave(); };
+if (btnAnual) btnAnual.onclick = () => { modo = 'anual'; pintarModo(); atualizarEstadoSave(); };
 daysEl.querySelectorAll('.day').forEach(b => {
   b.onclick = () => {
     const d = Number(b.dataset.d);
@@ -3910,6 +4038,35 @@ daysEl.querySelectorAll('.day').forEach(b => {
     atualizarEstadoSave();
   };
 });
+function pintarDiaMes(){
+  if (diaMesNumEl) diaMesNumEl.innerHTML = '<b>' + diaMesEscolhido + '</b>';
+}
+pintarDiaMes();
+const diaMesMenosBtn = document.getElementById('diaMesMenos');
+const diaMesMaisBtn = document.getElementById('diaMesMais');
+if (diaMesMenosBtn) diaMesMenosBtn.onclick = () => { diaMesEscolhido = Math.max(DIA_MES_MIN, diaMesEscolhido - 1); pintarDiaMes(); };
+if (diaMesMaisBtn) diaMesMaisBtn.onclick = () => { diaMesEscolhido = Math.min(DIA_MES_MAX, diaMesEscolhido + 1); pintarDiaMes(); };
+
+// v4.162: recorrencia anual -- stepper de dia (1-31) + stepper de mes
+// (nome curto, ver NOMES_MES_CURTO declarado mais abaixo no arquivo --
+// so e lido dentro de uma funcao chamada depois do load, entao ja existe).
+function pintarAnual(){
+  if (anualDiaNumEl) anualDiaNumEl.innerHTML = '<b>' + diaAnoEscolhido + '</b>';
+  if (anualMesNumEl){
+    const en = idiomaApp() === 'en';
+    const nomes = (typeof NOMES_MES_CURTO !== 'undefined') ? NOMES_MES_CURTO[en ? 'en' : 'pt'] : null;
+    anualMesNumEl.innerHTML = '<b>' + (nomes ? nomes[mesAnoEscolhido - 1] : mesAnoEscolhido) + '</b>';
+  }
+}
+pintarAnual();
+const anualDiaMenosBtn = document.getElementById('anualDiaMenos');
+const anualDiaMaisBtn = document.getElementById('anualDiaMais');
+const anualMesMenosBtn = document.getElementById('anualMesMenos');
+const anualMesMaisBtn = document.getElementById('anualMesMais');
+if (anualDiaMenosBtn) anualDiaMenosBtn.onclick = () => { diaAnoEscolhido = Math.max(1, diaAnoEscolhido - 1); pintarAnual(); };
+if (anualDiaMaisBtn) anualDiaMaisBtn.onclick = () => { diaAnoEscolhido = Math.min(31, diaAnoEscolhido + 1); pintarAnual(); };
+if (anualMesMenosBtn) anualMesMenosBtn.onclick = () => { mesAnoEscolhido = mesAnoEscolhido <= 1 ? 12 : mesAnoEscolhido - 1; pintarAnual(); };
+if (anualMesMaisBtn) anualMesMaisBtn.onclick = () => { mesAnoEscolhido = mesAnoEscolhido >= 12 ? 1 : mesAnoEscolhido + 1; pintarAnual(); };
 
 document.getElementById('addbtn').onclick = () => {
   composer.classList.toggle('on');
@@ -3938,6 +4095,8 @@ function criar(){
   if (modo === 'repete' && diasEscolhidos.length === 0) return;
 
   if (modo === 'hoje') tarefas.push({ texto, tipo:'hoje', data:isoAtual(), feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined });
+  else if (modo === 'mensal') tarefas.push({ texto, tipo:'mensal', diaMes:diaMesEscolhido, feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined });
+  else if (modo === 'anual') tarefas.push({ texto, tipo:'anual', diaAno:diaAnoEscolhido, mesAno:mesAnoEscolhido, feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined });
   else tarefas.push({ texto, tipo:'repete', dias:[...diasEscolhidos], feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined });
   window.dbgConta && window.dbgConta('criar() -- tarefa "' + texto + '" adicionada | uidAtivo=' + (typeof _uidAtivo!=='undefined'?_uidAtivo:'?') + ' | chave=' + (typeof chaveSaveAtual==='function'?chaveSaveAtual():'?') + ' | tarefas agora: ' + tarefas.length);
 
@@ -4636,11 +4795,11 @@ function renderMapaDoMes(hist, ano, mes){
 // a escolha em memoria (reseta pro padrao "mes" a cada reload, de
 // proposito, mesmo principio que o extinto calendario de Perfil usava). */
 let estPeriodoAtual = 'mes';
-
-const NOMES_MES_CURTO = {
-  pt: ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'],
-  en: ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec']
-};
+// v4.161 (pedido do usuario): ano escolhido na visao "ano" do Historico --
+// null = ainda nao escolhido, cai no ano de hoje (ver renderHistoricoConteudo).
+// Reseta pra null sempre que o usuario re-seleciona "Ano inteiro" no popup
+// de periodo (mesmo principio de "nao persiste" ja usado por estPeriodoAtual).
+let estAnoEscolhido = null;
 
 function renderHistoricoSemana(hist){
   const el = document.getElementById('estMapaMes');
@@ -4709,9 +4868,21 @@ function renderHistoricoConteudo(hist, ano, mes){
   const el = document.getElementById('estMapaMes');
   if (el && estPeriodoAtual !== 'ano') el.classList.remove('est-mapames-ano');
   const legendaEl = document.getElementById('estMapaLegenda');
-  if (legendaEl) legendaEl.style.display = estPeriodoAtual === 'ano' ? 'none' : '';
+  // v4.161 (pedido do usuario): legenda agora fica visivel tambem na
+  // visao "ano" -- antes sumia justamente onde mais fazia falta (grid
+  // sem numero dentro da celula, so cor).
+  if (legendaEl) legendaEl.style.display = '';
+  const switcherEl = document.getElementById('estAnoSwitcher');
+  if (switcherEl) switcherEl.classList.toggle('on', estPeriodoAtual === 'ano');
   if (estPeriodoAtual === 'semana') renderHistoricoSemana(hist);
-  else if (estPeriodoAtual === 'ano') renderHistoricoAno(hist, ano);
+  else if (estPeriodoAtual === 'ano'){
+    if (estAnoEscolhido === null) estAnoEscolhido = ano;
+    const anoNumEl = document.getElementById('estAnoNum');
+    if (anoNumEl) anoNumEl.textContent = estAnoEscolhido;
+    const proxBtn = document.getElementById('estAnoProximo');
+    if (proxBtn) proxBtn.disabled = estAnoEscolhido >= ano;
+    renderHistoricoAno(hist, estAnoEscolhido);
+  }
   else renderMapaDoMes(hist, ano, mes);
 }
 
@@ -5305,15 +5476,14 @@ function abrirFicha(id){
       const a = b.dataset.a;
       if (a === 'eq') equipar(id);
       else if (a === 'usar') usarItem(id, fichaOrigemEl || ficha.querySelector('.ibox') || b);
-      else if (a === 'vender'){
-        const preco = precoVenda(it);
-        pedirConfirmacao(
-          en ? 'Sell ' + it.nome + '?' : 'Vender ' + it.nome + '?',
-          en ? 'You get ' + preco + ' coins.' : 'Você recebe ' + preco + ' moedas.',
-          en ? 'Sell' : 'Vender',
-          () => venderItem(id, fichaOrigemEl || ficha.querySelector('.ibox') || b)
-        );
-      }
+      // pedido do usuario: vender direto da ficha do inventario nao pede
+      // confirmacao -- abrir a ficha ja e o passo deliberado, e o botao
+      // "Vender" (ibox, estilo escuro) abrindo uma folha com OUTRO botao
+      // "Vender" (antes dourado, herdado do .edsalvar generico) parecia
+      // duplicado. Confirmacao continua existindo pra compra na Loja e
+      // pra venda em lote/individual dentro da Loja (pedirConfirmacao),
+      // so este fluxo especifico ficou direto.
+      else if (a === 'vender') venderItem(id, fichaOrigemEl || ficha.querySelector('.ibox') || b);
       else if (a === 'abrir'){
         fecharFicha();
         if (typeof window.abrirCatalogoGrimorio === 'function') window.abrirCatalogoGrimorio();
@@ -6112,8 +6282,10 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     <div class="edbloco">
       <div class="edsec" data-i18n="ed.quando">Quando</div>
       <div class="modes">
-        <button class="mode" id="edModoHoje" type="button" data-i18n="jogo.soHoje">Só hoje</button>
-        <button class="mode" id="edModoRepete" type="button" data-i18n="jogo.repeteSemana">Repete toda semana</button>
+        <button class="mode" id="edModoHoje" type="button" data-i18n="jogo.soHojeCurto">Hoje</button>
+        <button class="mode" id="edModoRepete" type="button" data-i18n="jogo.repeteSemanaCurto">Semana</button>
+        <button class="mode" id="edModoMensal" type="button" data-i18n="jogo.repeteMesCurto">Mês</button>
+        <button class="mode" id="edModoAnual" type="button" data-i18n="jogo.repeteAnoCurto">Ano</button>
       </div>
       <div class="days" id="edDias">
         <button class="day" data-d="0" type="button" data-i18n="dia.dom">D</button>
@@ -6123,6 +6295,27 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
         <button class="day" data-d="4" type="button" data-i18n="dia.qui">Q</button>
         <button class="day" data-d="5" type="button" data-i18n="dia.sex">S</button>
         <button class="day" data-d="6" type="button" data-i18n="dia.sab">S</button>
+      </div>
+      <div class="vezeswrap" id="edDiaMesWrap">
+        <span class="diflabel" data-i18n="jogo.todoDia">Todo dia</span>
+        <div class="vezesrow">
+          <button class="vezesbtn" id="edDiaMesMenos" type="button" aria-label="Diminuir">−</button>
+          <span class="vezesnum" id="edDiaMesNum"><b>1</b></span>
+          <button class="vezesbtn" id="edDiaMesMais" type="button" aria-label="Aumentar">+</button>
+        </div>
+      </div>
+      <div class="vezeswrap" id="edAnualWrap">
+        <span class="diflabel" data-i18n="jogo.diaEMes">Dia e mês</span>
+        <div class="vezesrow">
+          <button class="vezesbtn" id="edAnualDiaMenos" type="button" aria-label="Diminuir dia">−</button>
+          <span class="vezesnum" id="edAnualDiaNum"><b>1</b></span>
+          <button class="vezesbtn" id="edAnualDiaMais" type="button" aria-label="Aumentar dia">+</button>
+        </div>
+        <div class="vezesrow">
+          <button class="vezesbtn" id="edAnualMesMenos" type="button" aria-label="Diminuir mês">−</button>
+          <span class="vezesnum" id="edAnualMesNum"><b>Jan</b></span>
+          <button class="vezesbtn" id="edAnualMesMais" type="button" aria-label="Aumentar mês">+</button>
+        </div>
       </div>
     </div>
 
@@ -6159,6 +6352,14 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   const gDias = document.getElementById('edDias');
   const bHoje = document.getElementById('edModoHoje');
   const bRep  = document.getElementById('edModoRepete');
+  const bMensal = document.getElementById('edModoMensal');
+  const bAnual = document.getElementById('edModoAnual');
+  const diaMesWrapEd = document.getElementById('edDiaMesWrap');
+  const diaMesNumEd  = document.getElementById('edDiaMesNum');
+  const anualWrapEd = document.getElementById('edAnualWrap');
+  const anualDiaNumEd = document.getElementById('edAnualDiaNum');
+  const anualMesNumEd = document.getElementById('edAnualMesNum');
+  const DIA_MES_MIN_ED = 1, DIA_MES_MAX_ED = 31;
   const vMenos = document.getElementById('edVezesMenos');
   const vMais  = document.getElementById('edVezesMais');
   const vNum   = document.getElementById('edVezesNum');
@@ -6170,13 +6371,24 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   const corGrupo  = document.getElementById('edCorBoxSwatches');
   const VEZES_MIN_ED = 1, VEZES_MAX_ED = 9;
 
-  let idx = -1, dif = 'media', modo = 'hoje', dias = [], vezes = 1, corBox = null;
+  let idx = -1, dif = 'media', modo = 'hoje', dias = [], diaMes = 1, diaAno = 1, mesAno = 1, vezes = 1, corBox = null;
 
   function pintar(){
     gDifs.querySelectorAll('.dif').forEach(b => b.classList.toggle('on', b.dataset.dif === dif));
     bHoje.classList.toggle('on', modo === 'hoje');
     bRep .classList.toggle('on', modo === 'repete');
+    if (bMensal) bMensal.classList.toggle('on', modo === 'mensal');
+    if (bAnual) bAnual.classList.toggle('on', modo === 'anual');
     gDias.classList.toggle('on', modo === 'repete');
+    if (diaMesWrapEd) diaMesWrapEd.classList.toggle('on', modo === 'mensal');
+    if (diaMesNumEd) diaMesNumEd.innerHTML = '<b>' + diaMes + '</b>';
+    if (anualWrapEd) anualWrapEd.classList.toggle('on', modo === 'anual');
+    if (anualDiaNumEd) anualDiaNumEd.innerHTML = '<b>' + diaAno + '</b>';
+    if (anualMesNumEd){
+      const en = idiomaApp() === 'en';
+      const nomes = (typeof NOMES_MES_CURTO !== 'undefined') ? NOMES_MES_CURTO[en ? 'en' : 'pt'] : null;
+      anualMesNumEd.innerHTML = '<b>' + (nomes ? nomes[mesAno - 1] : mesAno) + '</b>';
+    }
     gDias.querySelectorAll('.day').forEach(b =>
       b.classList.toggle('on', dias.includes(+b.dataset.d)));
     if (vNum){
@@ -6217,6 +6429,8 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 
   bHoje.onclick = () => { modo = 'hoje';   pintar(); };
   bRep .onclick = () => { modo = 'repete'; pintar(); };
+  if (bMensal) bMensal.onclick = () => { modo = 'mensal'; pintar(); };
+  if (bAnual) bAnual.onclick = () => { modo = 'anual'; pintar(); };
   gDias.querySelectorAll('.day').forEach(b => {
     b.onclick = () => {
       const d = +b.dataset.d;
@@ -6224,6 +6438,18 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       pintar();
     };
   });
+  const diaMesMenosEd = document.getElementById('edDiaMesMenos');
+  const diaMesMaisEd  = document.getElementById('edDiaMesMais');
+  if (diaMesMenosEd) diaMesMenosEd.onclick = () => { diaMes = Math.max(DIA_MES_MIN_ED, diaMes - 1); pintar(); };
+  if (diaMesMaisEd)  diaMesMaisEd.onclick  = () => { diaMes = Math.min(DIA_MES_MAX_ED, diaMes + 1); pintar(); };
+  const anualDiaMenosEd = document.getElementById('edAnualDiaMenos');
+  const anualDiaMaisEd  = document.getElementById('edAnualDiaMais');
+  const anualMesMenosEd = document.getElementById('edAnualMesMenos');
+  const anualMesMaisEd  = document.getElementById('edAnualMesMais');
+  if (anualDiaMenosEd) anualDiaMenosEd.onclick = () => { diaAno = Math.max(1, diaAno - 1); pintar(); };
+  if (anualDiaMaisEd)  anualDiaMaisEd.onclick  = () => { diaAno = Math.min(31, diaAno + 1); pintar(); };
+  if (anualMesMenosEd) anualMesMenosEd.onclick = () => { mesAno = mesAno <= 1 ? 12 : mesAno - 1; pintar(); };
+  if (anualMesMaisEd)  anualMesMaisEd.onclick  = () => { mesAno = mesAno >= 12 ? 1 : mesAno + 1; pintar(); };
   if (vMenos) vMenos.onclick = () => { vezes = Math.max(VEZES_MIN_ED, vezes - 1); pintar(); };
   if (vMais)  vMais.onclick  = () => { vezes = Math.min(VEZES_MAX_ED, vezes + 1); pintar(); };
   if (advToggle) advToggle.onclick = () => {
@@ -6268,9 +6494,29 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       t.tipo = 'hoje';
       if (!t.data) t.data = isoAtual();
       delete t.dias;
+      delete t.diaMes;
+      delete t.diaAno;
+      delete t.mesAno;
+    } else if (modo === 'mensal'){
+      t.tipo = 'mensal';
+      t.diaMes = diaMes;
+      delete t.dias;
+      delete t.data;
+      delete t.diaAno;
+      delete t.mesAno;
+    } else if (modo === 'anual'){
+      t.tipo = 'anual';
+      t.diaAno = diaAno;
+      t.mesAno = mesAno;
+      delete t.dias;
+      delete t.data;
+      delete t.diaMes;
     } else {
       t.tipo = 'repete';
       t.dias = dias.slice().sort();
+      delete t.diaMes;
+      delete t.diaAno;
+      delete t.mesAno;
     }
 
     fechar();
@@ -6295,8 +6541,11 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     if (!t) return;
     idx   = i;
     dif   = (typeof difDe === 'function') ? difDe(t) : 'media';
-    modo  = (t.tipo === 'repete') ? 'repete' : 'hoje';
+    modo  = (t.tipo === 'repete') ? 'repete' : (t.tipo === 'mensal') ? 'mensal' : (t.tipo === 'anual') ? 'anual' : 'hoje';
     dias  = Array.isArray(t.dias) ? t.dias.slice() : [];
+    diaMes = (t.diaMes && t.diaMes >= 1 && t.diaMes <= 31) ? t.diaMes : new Date().getDate();
+    diaAno = (t.diaAno && t.diaAno >= 1 && t.diaAno <= 31) ? t.diaAno : new Date().getDate();
+    mesAno = (t.mesAno && t.mesAno >= 1 && t.mesAno <= 12) ? t.mesAno : (new Date().getMonth() + 1);
     vezes = (t.meta && t.meta > 1) ? Math.round(t.meta) : 1;
     corBox = t.corBox || null;
     texto.value = t.texto || '';
@@ -6663,11 +6912,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 
   /* ---------- quais tarefas estavam pendentes num dia qualquer ---------- */
   function pendentesEm(iso){
-    const dow = new Date(iso + 'T12:00:00').getDay();
-    return tarefas.filter(t => {
-      const eraDaquele = (t.tipo === 'hoje') ? (t.data === iso) : ((t.dias || []).includes(dow));
-      return eraDaquele && t.feitaEm !== iso;
-    });
+    return tarefas.filter(t => ocorreNoDia(t, iso) && t.feitaEm !== iso);
   }
 
   /* ---------- todas as tarefas relevantes num dia qualquer (feitas ou nao) ----------
@@ -6675,8 +6920,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
      de historico (ver chamada em verificarVirada), pra saber o total do dia,
      nao so quantas escaparam */
   function tarefasEm(iso){
-    const dow = new Date(iso + 'T12:00:00').getDay();
-    return tarefas.filter(t => (t.tipo === 'hoje') ? (t.data === iso) : ((t.dias || []).includes(dow)));
+    return tarefas.filter(t => ocorreNoDia(t, iso));
   }
 
   /* ---------- desenho ---------- */
@@ -7491,12 +7735,22 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   }
 
   /* ---------- temas ---------- */
+  /* v4.158 (pedido do usuario): Verde (id "floresta") recebeu paleta
+     nova -- cor da bolinha atualizada pro accent novo (verde-folha,
+     era magenta antes). Dois temas novos escolhidos no mockup de
+     paleta testado antes de implementar: ids "arcano"/"sangue"
+     mantidos no codigo (paleta v4.159, Arcano Espectral/Sangue Rubro),
+     mas o LABEL exibido pro usuario e "Ciano"/"Vermelho" (v4.160,
+     pedido do usuario -- nomes mais diretos, descrevendo a cor em vez
+     do tema/vibe). */
   const TEMAS = [
     {id:'branco',     nome:'Branco',   nome_en:'White',  cor:'#FFFFFF'},
     {id:'grafite',    nome:'Escuro',   nome_en:'Dark',   cor:'#8B8B93'},
     {id:'padrao',     nome:'Laranja',  nome_en:'Orange', cor:'#F2A65A'},
     {id:'pergaminho', nome:'Dourado',  nome_en:'Gold',   cor:'#C9A961'},
-    {id:'floresta',   nome:'Verde',    nome_en:'Green',  cor:'#7C9D6C'}
+    {id:'floresta',   nome:'Verde',    nome_en:'Green',  cor:'#6FAE6F'},
+    {id:'arcano',     nome:'Ciano',    nome_en:'Cyan',   cor:'#5EEBD1'},
+    {id:'sangue',     nome:'Vermelho', nome_en:'Red',    cor:'#E8433A'}
   ];
   const CHAVE_TEMA = 'questlog.tema.v1';
 
@@ -7508,25 +7762,138 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     // Registrado no roadmap como reversao real, nao silenciosa.
     try { return localStorage.getItem(CHAVE_TEMA) || 'grafite'; } catch(e){ return 'grafite'; }
   }
+  // v4.156 (bug real, 4a rodada). Historico completo, porque cada
+  // rodada anterior corrigiu uma causa real e revelou a proxima:
+  // - v4.150: troca instantanea de --accent/--bg/etc sem nenhuma
+  //   transicao -- cross-fade via opacity no <html> inteiro.
+  // - v4.152: cliques em sequencia rapida atropelavam os setTimeout do
+  //   cross-fade (um callback atrasado aplicava tema ja superado) --
+  //   guard por contador (_temaTroca).
+  // - v4.154: MESMO com o guard, o cross-fade de opacity no <html>
+  //   vazava um flash BRANCO em celular real (confirmado com video +
+  //   deploy verificado via console) -- provavel comportamento de
+  //   camada composta/canvas especifico de motor mobile. Troca pra um
+  //   <div> solido cobrindo a tela (_temaFadeEl) em vez do <html> ficar
+  //   semi-transparente.
+  // - v4.156 (esta): o overlay solido parou de vazar branco, mas
+  //   continuava "piscando" -- cobrir a tela inteira com uma cor solida
+  //   e revelar depois AINDA e uma interrupcao visivel (~320ms de
+  //   blackout), so que na cor certa em vez de branca. O pedido original
+  //   (v4.150) era um cross-fade sem interrupcao nenhuma -- as tentativas
+  //   anteriores tentaram simular isso com opacity/overlay, mas qualquer
+  //   tecnica que passa por um estado semi-transparente ou totalmente
+  //   coberto sempre arrisca esse tipo de flash dependendo do motor.
+  //
+  // Solucao definitiva: nao usar opacity em NADA. Anima as PROPRIAS
+  // variaveis CSS de tema (TEMA_VARS abaixo), interpolando de hex-A pra
+  // hex-B frame a frame via requestAnimationFrame e escrevendo direto
+  // com root.style.setProperty(). Como todo componente do app ja
+  // consome cor exclusivamente via var(--bg) etc, a re-pintura de cada
+  // um acontece sozinha a cada frame -- nenhuma opacity, nenhum overlay,
+  // nenhuma camada composta especial. Nunca existe um pixel
+  // semi-transparente ou uma tela coberta: sempre cores solidas
+  // interpoladas, entao nao tem nada pra "vazar" de baixo, seja qual for
+  // o motor/dispositivo.
+  //
+  // Lista TEMA_VARS precisa bater com as variaveis que os 4 blocos
+  // :root[data-tema="..."] do CSS realmente sobrescrevem -- se um tema
+  // novo mexer numa variavel que nao esta nesta lista, ela vai trocar
+  // na hora (sem animar) em vez de interpolar. --verde/--perigo/
+  // --perigo2 ficam de fora de proposito: nao sao tocadas por nenhum
+  // tema (cores de estado do jogo, nao de paleta).
+  const TEMA_VARS = ['--bg','--panel','--panel-2','--panel-3','--line','--text',
+    '--muted','--dim','--accent','--accent-dim','--gold','--blood','--mobname',
+    '--sel-bg','--poco','--arena-1','--arena-2','--arena-3','--xp2'];
+
+  // bug real encontrado com instrumentacao (nao suposicao): durante uma
+  // troca de tema em andamento, a variavel CSS ja esta em formato
+  // "rgb(r,g,b)" (escrito pela propria interpolacao via
+  // root.style.setProperty) em vez de "#RRGGBB" (o formato cru das
+  // regras :root[data-tema=...] no CSS). Uma troca nova clicada NO MEIO
+  // de uma animacao em andamento lia esse "rgb(...)" como "de" e a
+  // versao antiga desta funcao (so entendia hex) devolvia null pra ela
+  // -- dai o loop de interpolacao pulava aquela variavel pra sempre
+  // (guard `if (!a || !b) return`), congelando a cor exatamente onde
+  // estava ate uma troca finalmente terminar sem ser interrompida e
+  // limpar tudo com removeProperty(). Por isso testar varios temas em
+  // sequencia rapida (uso normal da folha) parecia "travar" por um
+  // instante e so entao pular pro tema certo. Corrigido reconhecendo os
+  // dois formatos.
+  function _temaCorParaRgb(cor){
+    cor = (cor || '').trim();
+    if (!cor) return null;
+    const m = cor.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
+    if (m) return [+m[1], +m[2], +m[3]];
+    let hex = cor.replace('#', '');
+    if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+    if (!/^[0-9a-fA-F]{6}$/.test(hex)) return null;
+    const n = parseInt(hex, 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  }
+
+  // contador de animacao: cada chamada de escolherTema() pega o proximo
+  // numero, e o loop de rAF de uma chamada anterior para sozinho assim
+  // que uma troca mais nova comecar (sem isso, cliques em sequencia
+  // rapida fariam duas animacoes escreverem na mesma variavel ao mesmo
+  // tempo, disputando o valor a cada frame).
+  let _temaAnimId = 0;
+  function _temaAnimarInterpolando(de, para){
+    const root = document.documentElement;
+    const minhaAnim = ++_temaAnimId;
+    const duracaoMs = 220;
+    const t0 = performance.now();
+    function passo(agora){
+      if (minhaAnim !== _temaAnimId) return; // troca mais nova ja assumiu, aborta este loop
+      const t = Math.min(1, (agora - t0) / duracaoMs);
+      TEMA_VARS.forEach((v, i) => {
+        const a = de[i], b = para[i];
+        if (!a || !b) return;
+        const r = Math.round(a[0] + (b[0] - a[0]) * t);
+        const g = Math.round(a[1] + (b[1] - a[1]) * t);
+        const bl = Math.round(a[2] + (b[2] - a[2]) * t);
+        root.style.setProperty(v, 'rgb(' + r + ',' + g + ',' + bl + ')');
+      });
+      if (t < 1) requestAnimationFrame(passo);
+      // anima acabou: remove os overrides inline, volta a herdar limpo
+      // do seletor :root[data-tema=...] (mesmo valor final, sem sujeira)
+      else TEMA_VARS.forEach(v => root.style.removeProperty(v));
+    }
+    requestAnimationFrame(passo);
+  }
+
   function escolherTema(id){
-    // v4.150 (pedido do usuario): trocar tema so mudava --accent/--bg/etc
-    // na hora, sem transicao (variavel CSS custom property nao anima
-    // sozinha). Em vez de adicionar transition em cada componente que
-    // consome alguma dessas variaveis (risco alto, dezenas de regras),
-    // um cross-fade no documentElement inteiro resolve pra qualquer tema
-    // atual ou futuro sem tocar em mais nada.
     const root = document.documentElement;
     const reduzido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduzido){
+    if (reduzido || id === root.getAttribute('data-tema')){
       root.setAttribute('data-tema', id);
     } else {
-      root.style.transition = 'opacity .16s var(--expo)';
-      root.style.opacity = '0.4';
-      setTimeout(() => {
-        root.setAttribute('data-tema', id);
-        root.style.opacity = '1';
-        setTimeout(() => { root.style.transition = ''; }, 180);
-      }, 160);
+      // le as cores ATUAIS (o que esta na tela agora -- se ja tiver uma
+      // animacao em andamento, getComputedStyle enxerga o valor inline
+      // dela nesse instante, entao uma troca nova sempre continua de
+      // onde a tela estava de verdade, sem pulo)
+      const csAntes = getComputedStyle(root);
+      const de = TEMA_VARS.map(v => _temaCorParaRgb(csAntes.getPropertyValue(v)));
+      // bug real (2a causa desta rodada, achada com instrumentacao):
+      // se uma troca anterior foi interrompida no meio, o <html> ainda
+      // tem os overrides INLINE dela (setProperty). Inline tem
+      // especificidade maior que :root[data-tema=...], entao ler "para"
+      // com getComputedStyle DEPOIS de so trocar o atributo continuava
+      // devolvendo o valor inline antigo, mascarando a regra nova -- o
+      // alvo saia igual (ou quase) ao atual, e a "animacao" nao tinha
+      // nada de verdade pra interpolar (parecia travada ate uma troca
+      // finalmente terminar sem interrupcao e limpar o inline). Por
+      // isso remove os overrides ANTES de trocar o atributo e ler o
+      // alvo puro da regra CSS.
+      TEMA_VARS.forEach(v => root.style.removeProperty(v));
+      root.setAttribute('data-tema', id); // muda a regra que resolve as variaveis...
+      const csDepois = getComputedStyle(root);
+      const para = TEMA_VARS.map(v => _temaCorParaRgb(csDepois.getPropertyValue(v)));
+      // ...mas nada foi pintado na tela ainda: um script sincrono nunca
+      // e interrompido por um paint no meio. _temaAnimarInterpolando ja
+      // comeca escrevendo os valores de "de" via inline style (trava
+      // visualmente onde estava) antes do primeiro rAF avancar o t --
+      // entao o app nunca chega a mostrar o tema novo cru, sem transicao
+      _temaAnimarInterpolando(de, para);
     }
     try { localStorage.setItem(CHAVE_TEMA, id); } catch(e){}
     pintarTemaGrid();
@@ -9894,38 +10261,15 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     try { localStorage.setItem(window.chaveConta(CHAVE_VISTAS_V2), JSON.stringify([...set])); } catch(e){}
   }
 
-  // ---------------------------------------------------------------------
-  // TITULOS -- pedido do usuario (sessao de brainstorm): cada conquista
-  // desbloqueada vira um titulo equipavel, mostrado embaixo do nome do
-  // jogador (#perfilTitulo, no cabecalho do Perfil). So 1 equipado por
-  // vez -- reaproveita 100% o dado que ja existe (CONQUISTAS_V2, nome/
-  // nome_en/cor de cada uma), sem tabela nova. Clicar na estrela de uma
-  // conquista ja desbloqueada equipa; clicar de novo na mesma desequipa
-  // (toggle). Chave propria, separada de desbloqueios/vistas -- e so uma
-  // preferencia de exibicao, nao afeta progresso.
-  const CHAVE_TITULO = 'questlog.tituloEquipado.v1';
-  function obterTituloEquipado(){
-    try { return localStorage.getItem(window.chaveConta(CHAVE_TITULO)) || null; } catch(e){ return null; }
-  }
-  function definirTituloEquipado(id){
-    try {
-      if (id) localStorage.setItem(window.chaveConta(CHAVE_TITULO), id);
-      else localStorage.removeItem(window.chaveConta(CHAVE_TITULO));
-    } catch(e){}
-  }
-  function renderTituloPerfil(){
-    const el = document.getElementById('perfilTitulo');
-    if (!el) return;
-    const id = obterTituloEquipado();
-    const item = (id && typeof CONQUISTAS_V2 !== 'undefined') ? CONQUISTAS_V2.find(c => c.id === id) : null;
-    if (!item){ el.textContent = ''; el.style.display = 'none'; return; }
-    const emIngles = idiomaConquistas() === 'en';
-    el.textContent = emIngles ? (item.nome_en || item.nome) : item.nome;
-    el.style.setProperty('--tit-cor', item.cor);
-    el.style.display = 'block';
-  }
-  window.renderTituloPerfil = renderTituloPerfil;
-  // ---------------------------------------------------------------------
+  // v4.160 (pedido do usuario -- "essa funcao de titulo nas conquistas
+  // nao agrega em nada, nao tem por que existir"): feature de titulo
+  // equipavel REMOVIDA por completo (era o bloco "TITULOS" que existia
+  // aqui: CHAVE_TITULO/obterTituloEquipado/definirTituloEquipado/
+  // renderTituloPerfil, a estrela de equipar em cada linha de
+  // renderConquistasV2() e o listener delegado em #perfilConquistas).
+  // Conquistas continuam existindo normalmente, so pararam de virar
+  // "titulo" exibido no Perfil. #perfilTitulo removido do HTML e do
+  // CSS junto.
 
   // roda a cada render() (mesmo gancho que o resto do app ja usa) --
   // confere as 17 metas curadas contra o contexto AO VIVO (comHoje=true,
@@ -9963,7 +10307,6 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     if (!alvo) return;
     const ctx = montarContexto(true);
     const desbloqueios = obterDesbloqueiosV2();
-    const titAtual = obterTituloEquipado(); // qual estrela vem marcada
     // capturado ANTES de marcar como visto (mais abaixo, no fim desta
     // funcao) -- usado so pra saber quais itens ganham a tag "NOVO" nesta
     // renderizacao. Depois de marcado como visto, a mesma conquista nao
@@ -9988,23 +10331,10 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       // Perfil + "Ver todas"). So aparece pra quem foi desbloqueada e
       // ainda nao tinha sido vista ANTES desta renderizacao.
       const novoHtml = novo ? '<span class="conqv2novo">' + (emIngles ? 'NEW' : 'NOVO') + '</span>' : '';
-      // Estrela de equipar como titulo -- so em conquistas ja desbloqueadas
-      // (data truthy). Preenchida (.on) se for o titulo atualmente
-      // equipado. Clique alterna equipar/desequipar (delegado logo abaixo
-      // de renderConquistasV2, ver [data-titulo]).
-      const equipado = data && titAtual === item.id;
-      const estrelaHtml = data
-        ? '<button class="conqv2estrela' + (equipado ? ' on' : '') + '" type="button" '
-          + 'data-titulo="' + item.id + '" '
-          + 'aria-label="' + (emIngles ? 'Set as title' : 'Usar como título') + '" '
-          + 'style="--tit-cor:' + item.cor + '">'
-          + '<svg viewBox="0 0 24 24" fill="' + (equipado ? 'currentColor' : 'none') + '" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5l2.9 6.6 7.1.7-5.4 4.8 1.6 7-6.2-3.8-6.2 3.8 1.6-7-5.4-4.8 7.1-.7z"/></svg>'
-          + '</button>'
-        : '';
       return '<div class="conqv2item' + (data ? '' : ' trancado') + (novo ? ' conqv2novoitem' : '') + '">' +
         '<div class="conqv2txt"><div class="conqv2nome">' + nomeMostrar + novoHtml + '</div>' +
         '<div class="conqv2desc">' + desc + '</div></div>' +
-        dataHtml + estrelaHtml +
+        dataHtml +
       '</div>';
     }
 
@@ -10033,23 +10363,6 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   }
   window.renderConquistasV2 = renderConquistasV2;
 
-  // Clique na estrela: alterna equipar/desequipar aquele titulo. Listener
-  // fica UMA vez no container pai (#perfilConquistas), delegado -- sobrevive
-  // ao innerHTML ser reescrito a cada renderConquistasV2() (mesmo padrao ja
-  // usado no resgate do sistema V1, mais acima neste arquivo).
-  const alvoTitulos = document.getElementById('perfilConquistas');
-  if (alvoTitulos){
-    alvoTitulos.addEventListener('click', e => {
-      const btn = e.target.closest('[data-titulo]');
-      if (!btn) return;
-      const id = btn.dataset.titulo;
-      const atual = obterTituloEquipado();
-      definirTituloEquipado(atual === id ? null : id); // clicar no ja equipado desequipa
-      renderTituloPerfil();
-      renderConquistasV2(); // redesenha pra mover a marcacao da estrela
-    });
-  }
-
   const _renderConqV2 = window.render;
   if (typeof _renderConqV2 === 'function'){
     window.render = function(){
@@ -10058,7 +10371,6 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     };
   }
   checarDesbloqueiosV2(); // primeira checagem, sem esperar o primeiro render() -- ja chama atualizarBadges() no proprio fim (ver linha acima), entao a primeira pintura do badge acontece aqui, com CONQUISTAS_V2 ja definida (evita o erro de TDZ que aconteceria se atualizarBadges() rodasse antes deste ponto -- ver comentario em contarPendentes())
-  renderTituloPerfil(); // primeira pintura do titulo -- mesmo motivo, so agora que CONQUISTAS_V2 existe
 
   // mesmo padrao de wrap acima, pro desbloqueio gratis de temas de
   // arena (Deserto via streak, ver TEMAS_ARENA em assets.js) -- roda a
@@ -12297,7 +12609,6 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           intro.style.backgroundImage = '';
           if (typeof window.desenharHeroi === 'function') window.desenharHeroi();
           if (typeof window.render === 'function') window.render();
-          if (typeof window.renderTituloPerfil === 'function') window.renderTituloPerfil();
         } else {
           // conta nova, sem save -- fecha boas-vindas e pula DIRETO pro
           // slide de transicao ("vamos te conhecer melhor...", ver
@@ -13133,6 +13444,17 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'jogo.oQuePrecisaSerFeito': { pt:'O que precisa ser feito?', en:'What needs to be done?' },
     'jogo.soHoje':           { pt:'Só hoje', en:'Today only' },
     'jogo.repeteSemana':     { pt:'Repete toda semana', en:'Repeats weekly' },
+    'jogo.repeteMes':        { pt:'Repete todo mês', en:'Repeats monthly' },
+    'jogo.todoDia':          { pt:'Todo dia', en:'Every month, on day' },
+    // v4.162: rotulo da secao ("Repetição", igual padrao de "Dificuldade")
+    // + versoes curtas dos 4 modos, pra caberem lado a lado no mesmo espaco
+    // que antes tinha so 3 botoes de texto longo.
+    'jogo.repeticao':        { pt:'Repetição', en:'Repeat' },
+    'jogo.soHojeCurto':      { pt:'Hoje', en:'Today' },
+    'jogo.repeteSemanaCurto':{ pt:'Semana', en:'Week' },
+    'jogo.repeteMesCurto':   { pt:'Mês', en:'Month' },
+    'jogo.repeteAnoCurto':   { pt:'Ano', en:'Year' },
+    'jogo.diaEMes':          { pt:'Dia e mês', en:'Day and month' },
     'jogo.dificuldade':      { pt:'Dificuldade', en:'Difficulty' },
     'jogo.vezesPorDia':      { pt:'Vezes por dia', en:'Times per day' },
     'jogo.opcoesAvancadas':  { pt:'Opções avançadas', en:'Advanced options' },
@@ -13286,7 +13608,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // typeof-guard em cada uma porque nem toda sessão de jogo passou
     // por todo módulo (ex: quem nunca abriu o Perfil não tem
     // renderConquistas definido ainda nesse ponto do arquivo).
-    ['render','renderInventario','renderLoja','renderConquistasV2','renderBestiario','renderHistorico','renderGrimorio','desenharHeroi','renderTituloPerfil']
+    ['render','renderInventario','renderLoja','renderConquistasV2','renderBestiario','renderHistorico','renderGrimorio','desenharHeroi']
       .forEach(fn => { if (typeof window[fn] === 'function') window[fn](); });
     if (typeof window.atualizarTextosDificuldade === 'function') window.atualizarTextosDificuldade();
     if (typeof window.pintarTemaGrid === 'function') window.pintarTemaGrid();

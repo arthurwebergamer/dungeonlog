@@ -273,10 +273,56 @@
 
     <div class="composer" id="composer">
       <input id="input" placeholder="O que precisa ser feito?" data-i18n-placeholder="jogo.oQuePrecisaSerFeito" autocomplete="off">
-      <div class="modes">
-        <button class="mode on" id="modeHoje" data-i18n="jogo.soHoje">Só hoje</button>
-        <button class="mode" id="modeRepete" data-i18n="jogo.repeteSemana">Repete toda semana</button>
-        <button class="mode" id="modeMensal" data-i18n="jogo.repeteMes">Repete todo mês</button>
+      <!-- v4.162 (pedido do usuario): secao "Repeticao" reorganizada -- rotulo
+           igual ao padrao ja usado por "Dificuldade"/"Vezes por dia" (antes os
+           3 botoes de modo nao tinham nenhum rotulo acima), textos curtos pra
+           caber 4 opcoes lado a lado (agora incluindo Ano), e cada sub-painel
+           (dias da semana / dia do mes / dia+mes do ano) mora dentro do mesmo
+           bloco visual do modo que o usa. -->
+      <div class="difwrap">
+        <span class="diflabel" data-i18n="jogo.repeticao">Repetição</span>
+        <div class="modes">
+          <button class="mode on" id="modeHoje" data-i18n="jogo.soHojeCurto">Hoje</button>
+          <button class="mode" id="modeRepete" data-i18n="jogo.repeteSemanaCurto">Semana</button>
+          <button class="mode" id="modeMensal" data-i18n="jogo.repeteMesCurto">Mês</button>
+          <button class="mode" id="modeAnual" data-i18n="jogo.repeteAnoCurto">Ano</button>
+        </div>
+        <div class="days" id="days">
+          <button class="day" data-d="0" data-i18n="dia.dom">D</button>
+          <button class="day" data-d="1" data-i18n="dia.seg">S</button>
+          <button class="day" data-d="2" data-i18n="dia.ter">T</button>
+          <button class="day" data-d="3" data-i18n="dia.qua">Q</button>
+          <button class="day" data-d="4" data-i18n="dia.qui">Q</button>
+          <button class="day" data-d="5" data-i18n="dia.sex">S</button>
+          <button class="day" data-d="6" data-i18n="dia.sab">S</button>
+        </div>
+        <!-- v4.161: recorrencia mensal -- dia fixo do mes, mesma linguagem
+             visual do stepper de "Vezes por dia" (- N +), em vez de uma grade
+             de 31 botoes. Mes curto (ex: dia 31 em fevereiro) cai
+             automaticamente no ultimo dia daquele mes -- ver diaMesOcorreNoDia(). -->
+        <div class="vezeswrap" id="diaMesWrap">
+          <span class="diflabel" data-i18n="jogo.todoDia">Todo dia</span>
+          <div class="vezesrow">
+            <button class="vezesbtn" id="diaMesMenos" type="button" aria-label="Diminuir">−</button>
+            <span class="vezesnum" id="diaMesNum"><b>1</b></span>
+            <button class="vezesbtn" id="diaMesMais" type="button" aria-label="Aumentar">+</button>
+          </div>
+        </div>
+        <!-- v4.162: recorrencia anual -- dia + mes fixos (ex.: aniversario,
+             "todo 25/12"). Mesmo clamp de mes curto do mensal, ver anualOcorreNoDia(). -->
+        <div class="vezeswrap" id="anualWrap">
+          <span class="diflabel" data-i18n="jogo.diaEMes">Dia e mês</span>
+          <div class="vezesrow">
+            <button class="vezesbtn" id="anualDiaMenos" type="button" aria-label="Diminuir dia">−</button>
+            <span class="vezesnum" id="anualDiaNum"><b>1</b></span>
+            <button class="vezesbtn" id="anualDiaMais" type="button" aria-label="Aumentar dia">+</button>
+          </div>
+          <div class="vezesrow">
+            <button class="vezesbtn" id="anualMesMenos" type="button" aria-label="Diminuir mês">−</button>
+            <span class="vezesnum" id="anualMesNum"><b>Jan</b></span>
+            <button class="vezesbtn" id="anualMesMais" type="button" aria-label="Aumentar mês">+</button>
+          </div>
+        </div>
       </div>
 
       <div class="difwrap">
@@ -289,27 +335,6 @@
           <button class="vezesbtn" id="vezesMenos" type="button" aria-label="Diminuir">−</button>
           <span class="vezesnum" id="vezesNum"><b>1</b>×</span>
           <button class="vezesbtn" id="vezesMais" type="button" aria-label="Aumentar">+</button>
-        </div>
-      </div>
-      <div class="days" id="days">
-        <button class="day" data-d="0" data-i18n="dia.dom">D</button>
-        <button class="day" data-d="1" data-i18n="dia.seg">S</button>
-        <button class="day" data-d="2" data-i18n="dia.ter">T</button>
-        <button class="day" data-d="3" data-i18n="dia.qua">Q</button>
-        <button class="day" data-d="4" data-i18n="dia.qui">Q</button>
-        <button class="day" data-d="5" data-i18n="dia.sex">S</button>
-        <button class="day" data-d="6" data-i18n="dia.sab">S</button>
-      </div>
-      <!-- v4.161 (pedido do usuario): recorrencia mensal -- dia fixo do mes,
-           mesma linguagem visual do stepper de "Vezes por dia" (- N +), em
-           vez de uma grade de 31 botoes. Mes curto (ex: dia 31 em fevereiro)
-           cai automaticamente no ultimo dia daquele mes -- ver diaMesOcorreNoDia(). -->
-      <div class="vezeswrap" id="diaMesWrap">
-        <span class="diflabel" data-i18n="jogo.todoDia">Todo dia</span>
-        <div class="vezesrow">
-          <button class="vezesbtn" id="diaMesMenos" type="button" aria-label="Diminuir">−</button>
-          <span class="vezesnum" id="diaMesNum"><b>1</b></span>
-          <button class="vezesbtn" id="diaMesMais" type="button" aria-label="Aumentar">+</button>
         </div>
       </div>
 
@@ -2042,9 +2067,22 @@ function diaMesOcorreNoDia(t, iso){
   const alvo = Math.min(t.diaMes || 1, diasNoMes);
   return d.getDate() === alvo;
 }
+// mesma ideia do diaMesOcorreNoDia, so que tambem fixando o MES -- pra
+// recorrencia anual (aniversario, data fixa tipo "todo 31/12"). Dia 31
+// escolhido num mes de 30 (ou fevereiro) cai automatico no ultimo dia
+// real daquele mes NAQUELE ano (cobre ano bissexto tambem).
+function anualOcorreNoDia(t, iso){
+  const d = new Date(iso + 'T12:00:00');
+  const mesAlvo = Math.min(Math.max(t.mesAno || 1, 1), 12);
+  if (d.getMonth() + 1 !== mesAlvo) return false;
+  const diasNoMes = new Date(d.getFullYear(), mesAlvo, 0).getDate();
+  const alvo = Math.min(t.diaAno || 1, diasNoMes);
+  return d.getDate() === alvo;
+}
 function ocorreNoDia(t, iso){
   if (t.tipo === 'hoje') return t.data === iso;
   if (t.tipo === 'mensal') return diaMesOcorreNoDia(t, iso);
+  if (t.tipo === 'anual') return anualOcorreNoDia(t, iso);
   return (t.dias || []).includes(new Date(iso + 'T12:00:00').getDay());
 }
 window.ocorreNoDia = ocorreNoDia;
@@ -2069,6 +2107,11 @@ function rotulo(t){
   const en = idiomaApp() === 'en';
   if (t.tipo === 'hoje') return en ? 'today only' : 'só hoje';
   if (t.tipo === 'mensal') return en ? ('day ' + (t.diaMes || 1) + ' of the month') : ('todo dia ' + (t.diaMes || 1));
+  if (t.tipo === 'anual'){
+    const nomes = (typeof NOMES_MES_CURTO !== 'undefined') ? NOMES_MES_CURTO[en ? 'en' : 'pt'] : null;
+    const nomeMes = nomes ? nomes[Math.min(Math.max((t.mesAno || 1) - 1, 0), 11)] : String(t.mesAno || 1);
+    return en ? (nomeMes + ' ' + (t.diaAno || 1)) : ((t.diaAno || 1) + ' de ' + nomeMes);
+  }
   if (t.dias.length === 7) return en ? 'every day' : 'todo dia';
   const siglas = en ? SIGLAS_EN : SIGLAS;
   return t.dias.slice().sort().map(d => siglas[d]).join(', ');
@@ -3918,18 +3961,35 @@ function aviso(msg, ouro, fuga){
   timer = setTimeout(()=>t.classList.remove('on'), 1800);
 }
 
+// v4.162: movido pra cima (era declarado la embaixo, perto do Historico) --
+// o composer/editor de tarefa (secao logo abaixo) tambem precisa dos nomes
+// curtos de mes pro stepper do modo Anual, e roda ANTES daquele trecho no
+// mesmo <script> continuo. Referenciar uma const mais abaixo no arquivo
+// antes dela ser declarada estoura "Cannot access before initialization"
+// mesmo dentro de um typeof -- por isso subiu pra cima de tudo que usa.
+const NOMES_MES_CURTO = {
+  pt: ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'],
+  en: ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec']
+};
+
 const composer = document.getElementById('composer');
 const input = document.getElementById('input');
 const daysEl = document.getElementById('days');
 const btnHoje = document.getElementById('modeHoje');
 const btnRepete = document.getElementById('modeRepete');
 const btnMensal = document.getElementById('modeMensal');
+const btnAnual = document.getElementById('modeAnual');
 const diaMesWrap = document.getElementById('diaMesWrap');
 const diaMesNumEl = document.getElementById('diaMesNum');
+const anualWrap = document.getElementById('anualWrap');
+const anualDiaNumEl = document.getElementById('anualDiaNum');
+const anualMesNumEl = document.getElementById('anualMesNum');
 const DIA_MES_MIN = 1, DIA_MES_MAX = 31;
 let modo = 'hoje';
 let diasEscolhidos = [];
 let diaMesEscolhido = new Date().getDate(); // sugestao inicial: dia de hoje
+let diaAnoEscolhido = new Date().getDate();  // v4.162: recorrencia anual -- sugestao inicial: hoje
+let mesAnoEscolhido = new Date().getMonth() + 1;
 
 const btnSave = document.getElementById('save');
 
@@ -3953,19 +4013,23 @@ window.atualizarEstadoSave = atualizarEstadoSave;
 
 input.addEventListener('input', atualizarEstadoSave);
 
-// v4.161: 3 modos agora (hoje/repete/mensal) -- cada onclick liga o seu
-// botao e o painel correspondente (dias da semana OU stepper de dia do
-// mes), desliga os outros dois. Mesmo padrao ja usado, so estendido.
+// v4.162: 4 modos agora (hoje/repete/mensal/anual) -- cada onclick liga o
+// seu botao e o painel correspondente (dias da semana OU stepper de dia do
+// mes OU stepper de dia+mes do ano), desliga os outros tres. Mesmo padrao
+// ja usado, so estendido.
 function pintarModo(){
   btnHoje.classList.toggle('on', modo === 'hoje');
   btnRepete.classList.toggle('on', modo === 'repete');
   btnMensal.classList.toggle('on', modo === 'mensal');
+  if (btnAnual) btnAnual.classList.toggle('on', modo === 'anual');
   daysEl.classList.toggle('on', modo === 'repete');
   if (diaMesWrap) diaMesWrap.classList.toggle('on', modo === 'mensal');
+  if (anualWrap) anualWrap.classList.toggle('on', modo === 'anual');
 }
 btnHoje.onclick = () => { modo = 'hoje'; pintarModo(); atualizarEstadoSave(); };
 btnRepete.onclick = () => { modo = 'repete'; pintarModo(); atualizarEstadoSave(); };
 if (btnMensal) btnMensal.onclick = () => { modo = 'mensal'; pintarModo(); atualizarEstadoSave(); };
+if (btnAnual) btnAnual.onclick = () => { modo = 'anual'; pintarModo(); atualizarEstadoSave(); };
 daysEl.querySelectorAll('.day').forEach(b => {
   b.onclick = () => {
     const d = Number(b.dataset.d);
@@ -3982,6 +4046,27 @@ const diaMesMenosBtn = document.getElementById('diaMesMenos');
 const diaMesMaisBtn = document.getElementById('diaMesMais');
 if (diaMesMenosBtn) diaMesMenosBtn.onclick = () => { diaMesEscolhido = Math.max(DIA_MES_MIN, diaMesEscolhido - 1); pintarDiaMes(); };
 if (diaMesMaisBtn) diaMesMaisBtn.onclick = () => { diaMesEscolhido = Math.min(DIA_MES_MAX, diaMesEscolhido + 1); pintarDiaMes(); };
+
+// v4.162: recorrencia anual -- stepper de dia (1-31) + stepper de mes
+// (nome curto, ver NOMES_MES_CURTO declarado mais abaixo no arquivo --
+// so e lido dentro de uma funcao chamada depois do load, entao ja existe).
+function pintarAnual(){
+  if (anualDiaNumEl) anualDiaNumEl.innerHTML = '<b>' + diaAnoEscolhido + '</b>';
+  if (anualMesNumEl){
+    const en = idiomaApp() === 'en';
+    const nomes = (typeof NOMES_MES_CURTO !== 'undefined') ? NOMES_MES_CURTO[en ? 'en' : 'pt'] : null;
+    anualMesNumEl.innerHTML = '<b>' + (nomes ? nomes[mesAnoEscolhido - 1] : mesAnoEscolhido) + '</b>';
+  }
+}
+pintarAnual();
+const anualDiaMenosBtn = document.getElementById('anualDiaMenos');
+const anualDiaMaisBtn = document.getElementById('anualDiaMais');
+const anualMesMenosBtn = document.getElementById('anualMesMenos');
+const anualMesMaisBtn = document.getElementById('anualMesMais');
+if (anualDiaMenosBtn) anualDiaMenosBtn.onclick = () => { diaAnoEscolhido = Math.max(1, diaAnoEscolhido - 1); pintarAnual(); };
+if (anualDiaMaisBtn) anualDiaMaisBtn.onclick = () => { diaAnoEscolhido = Math.min(31, diaAnoEscolhido + 1); pintarAnual(); };
+if (anualMesMenosBtn) anualMesMenosBtn.onclick = () => { mesAnoEscolhido = mesAnoEscolhido <= 1 ? 12 : mesAnoEscolhido - 1; pintarAnual(); };
+if (anualMesMaisBtn) anualMesMaisBtn.onclick = () => { mesAnoEscolhido = mesAnoEscolhido >= 12 ? 1 : mesAnoEscolhido + 1; pintarAnual(); };
 
 document.getElementById('addbtn').onclick = () => {
   composer.classList.toggle('on');
@@ -4011,6 +4096,7 @@ function criar(){
 
   if (modo === 'hoje') tarefas.push({ texto, tipo:'hoje', data:isoAtual(), feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined });
   else if (modo === 'mensal') tarefas.push({ texto, tipo:'mensal', diaMes:diaMesEscolhido, feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined });
+  else if (modo === 'anual') tarefas.push({ texto, tipo:'anual', diaAno:diaAnoEscolhido, mesAno:mesAnoEscolhido, feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined });
   else tarefas.push({ texto, tipo:'repete', dias:[...diasEscolhidos], feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined });
   window.dbgConta && window.dbgConta('criar() -- tarefa "' + texto + '" adicionada | uidAtivo=' + (typeof _uidAtivo!=='undefined'?_uidAtivo:'?') + ' | chave=' + (typeof chaveSaveAtual==='function'?chaveSaveAtual():'?') + ' | tarefas agora: ' + tarefas.length);
 
@@ -4714,11 +4800,6 @@ let estPeriodoAtual = 'mes';
 // Reseta pra null sempre que o usuario re-seleciona "Ano inteiro" no popup
 // de periodo (mesmo principio de "nao persiste" ja usado por estPeriodoAtual).
 let estAnoEscolhido = null;
-
-const NOMES_MES_CURTO = {
-  pt: ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'],
-  en: ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec']
-};
 
 function renderHistoricoSemana(hist){
   const el = document.getElementById('estMapaMes');
@@ -6201,9 +6282,10 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     <div class="edbloco">
       <div class="edsec" data-i18n="ed.quando">Quando</div>
       <div class="modes">
-        <button class="mode" id="edModoHoje" type="button" data-i18n="jogo.soHoje">Só hoje</button>
-        <button class="mode" id="edModoRepete" type="button" data-i18n="jogo.repeteSemana">Repete toda semana</button>
-        <button class="mode" id="edModoMensal" type="button" data-i18n="jogo.repeteMes">Repete todo mês</button>
+        <button class="mode" id="edModoHoje" type="button" data-i18n="jogo.soHojeCurto">Hoje</button>
+        <button class="mode" id="edModoRepete" type="button" data-i18n="jogo.repeteSemanaCurto">Semana</button>
+        <button class="mode" id="edModoMensal" type="button" data-i18n="jogo.repeteMesCurto">Mês</button>
+        <button class="mode" id="edModoAnual" type="button" data-i18n="jogo.repeteAnoCurto">Ano</button>
       </div>
       <div class="days" id="edDias">
         <button class="day" data-d="0" type="button" data-i18n="dia.dom">D</button>
@@ -6220,6 +6302,19 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
           <button class="vezesbtn" id="edDiaMesMenos" type="button" aria-label="Diminuir">−</button>
           <span class="vezesnum" id="edDiaMesNum"><b>1</b></span>
           <button class="vezesbtn" id="edDiaMesMais" type="button" aria-label="Aumentar">+</button>
+        </div>
+      </div>
+      <div class="vezeswrap" id="edAnualWrap">
+        <span class="diflabel" data-i18n="jogo.diaEMes">Dia e mês</span>
+        <div class="vezesrow">
+          <button class="vezesbtn" id="edAnualDiaMenos" type="button" aria-label="Diminuir dia">−</button>
+          <span class="vezesnum" id="edAnualDiaNum"><b>1</b></span>
+          <button class="vezesbtn" id="edAnualDiaMais" type="button" aria-label="Aumentar dia">+</button>
+        </div>
+        <div class="vezesrow">
+          <button class="vezesbtn" id="edAnualMesMenos" type="button" aria-label="Diminuir mês">−</button>
+          <span class="vezesnum" id="edAnualMesNum"><b>Jan</b></span>
+          <button class="vezesbtn" id="edAnualMesMais" type="button" aria-label="Aumentar mês">+</button>
         </div>
       </div>
     </div>
@@ -6258,8 +6353,12 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   const bHoje = document.getElementById('edModoHoje');
   const bRep  = document.getElementById('edModoRepete');
   const bMensal = document.getElementById('edModoMensal');
+  const bAnual = document.getElementById('edModoAnual');
   const diaMesWrapEd = document.getElementById('edDiaMesWrap');
   const diaMesNumEd  = document.getElementById('edDiaMesNum');
+  const anualWrapEd = document.getElementById('edAnualWrap');
+  const anualDiaNumEd = document.getElementById('edAnualDiaNum');
+  const anualMesNumEd = document.getElementById('edAnualMesNum');
   const DIA_MES_MIN_ED = 1, DIA_MES_MAX_ED = 31;
   const vMenos = document.getElementById('edVezesMenos');
   const vMais  = document.getElementById('edVezesMais');
@@ -6272,16 +6371,24 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   const corGrupo  = document.getElementById('edCorBoxSwatches');
   const VEZES_MIN_ED = 1, VEZES_MAX_ED = 9;
 
-  let idx = -1, dif = 'media', modo = 'hoje', dias = [], diaMes = 1, vezes = 1, corBox = null;
+  let idx = -1, dif = 'media', modo = 'hoje', dias = [], diaMes = 1, diaAno = 1, mesAno = 1, vezes = 1, corBox = null;
 
   function pintar(){
     gDifs.querySelectorAll('.dif').forEach(b => b.classList.toggle('on', b.dataset.dif === dif));
     bHoje.classList.toggle('on', modo === 'hoje');
     bRep .classList.toggle('on', modo === 'repete');
     if (bMensal) bMensal.classList.toggle('on', modo === 'mensal');
+    if (bAnual) bAnual.classList.toggle('on', modo === 'anual');
     gDias.classList.toggle('on', modo === 'repete');
     if (diaMesWrapEd) diaMesWrapEd.classList.toggle('on', modo === 'mensal');
     if (diaMesNumEd) diaMesNumEd.innerHTML = '<b>' + diaMes + '</b>';
+    if (anualWrapEd) anualWrapEd.classList.toggle('on', modo === 'anual');
+    if (anualDiaNumEd) anualDiaNumEd.innerHTML = '<b>' + diaAno + '</b>';
+    if (anualMesNumEd){
+      const en = idiomaApp() === 'en';
+      const nomes = (typeof NOMES_MES_CURTO !== 'undefined') ? NOMES_MES_CURTO[en ? 'en' : 'pt'] : null;
+      anualMesNumEd.innerHTML = '<b>' + (nomes ? nomes[mesAno - 1] : mesAno) + '</b>';
+    }
     gDias.querySelectorAll('.day').forEach(b =>
       b.classList.toggle('on', dias.includes(+b.dataset.d)));
     if (vNum){
@@ -6323,6 +6430,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   bHoje.onclick = () => { modo = 'hoje';   pintar(); };
   bRep .onclick = () => { modo = 'repete'; pintar(); };
   if (bMensal) bMensal.onclick = () => { modo = 'mensal'; pintar(); };
+  if (bAnual) bAnual.onclick = () => { modo = 'anual'; pintar(); };
   gDias.querySelectorAll('.day').forEach(b => {
     b.onclick = () => {
       const d = +b.dataset.d;
@@ -6334,6 +6442,14 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   const diaMesMaisEd  = document.getElementById('edDiaMesMais');
   if (diaMesMenosEd) diaMesMenosEd.onclick = () => { diaMes = Math.max(DIA_MES_MIN_ED, diaMes - 1); pintar(); };
   if (diaMesMaisEd)  diaMesMaisEd.onclick  = () => { diaMes = Math.min(DIA_MES_MAX_ED, diaMes + 1); pintar(); };
+  const anualDiaMenosEd = document.getElementById('edAnualDiaMenos');
+  const anualDiaMaisEd  = document.getElementById('edAnualDiaMais');
+  const anualMesMenosEd = document.getElementById('edAnualMesMenos');
+  const anualMesMaisEd  = document.getElementById('edAnualMesMais');
+  if (anualDiaMenosEd) anualDiaMenosEd.onclick = () => { diaAno = Math.max(1, diaAno - 1); pintar(); };
+  if (anualDiaMaisEd)  anualDiaMaisEd.onclick  = () => { diaAno = Math.min(31, diaAno + 1); pintar(); };
+  if (anualMesMenosEd) anualMesMenosEd.onclick = () => { mesAno = mesAno <= 1 ? 12 : mesAno - 1; pintar(); };
+  if (anualMesMaisEd)  anualMesMaisEd.onclick  = () => { mesAno = mesAno >= 12 ? 1 : mesAno + 1; pintar(); };
   if (vMenos) vMenos.onclick = () => { vezes = Math.max(VEZES_MIN_ED, vezes - 1); pintar(); };
   if (vMais)  vMais.onclick  = () => { vezes = Math.min(VEZES_MAX_ED, vezes + 1); pintar(); };
   if (advToggle) advToggle.onclick = () => {
@@ -6379,15 +6495,28 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       if (!t.data) t.data = isoAtual();
       delete t.dias;
       delete t.diaMes;
+      delete t.diaAno;
+      delete t.mesAno;
     } else if (modo === 'mensal'){
       t.tipo = 'mensal';
       t.diaMes = diaMes;
       delete t.dias;
       delete t.data;
+      delete t.diaAno;
+      delete t.mesAno;
+    } else if (modo === 'anual'){
+      t.tipo = 'anual';
+      t.diaAno = diaAno;
+      t.mesAno = mesAno;
+      delete t.dias;
+      delete t.data;
+      delete t.diaMes;
     } else {
       t.tipo = 'repete';
       t.dias = dias.slice().sort();
       delete t.diaMes;
+      delete t.diaAno;
+      delete t.mesAno;
     }
 
     fechar();
@@ -6412,9 +6541,11 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     if (!t) return;
     idx   = i;
     dif   = (typeof difDe === 'function') ? difDe(t) : 'media';
-    modo  = (t.tipo === 'repete') ? 'repete' : (t.tipo === 'mensal') ? 'mensal' : 'hoje';
+    modo  = (t.tipo === 'repete') ? 'repete' : (t.tipo === 'mensal') ? 'mensal' : (t.tipo === 'anual') ? 'anual' : 'hoje';
     dias  = Array.isArray(t.dias) ? t.dias.slice() : [];
     diaMes = (t.diaMes && t.diaMes >= 1 && t.diaMes <= 31) ? t.diaMes : new Date().getDate();
+    diaAno = (t.diaAno && t.diaAno >= 1 && t.diaAno <= 31) ? t.diaAno : new Date().getDate();
+    mesAno = (t.mesAno && t.mesAno >= 1 && t.mesAno <= 12) ? t.mesAno : (new Date().getMonth() + 1);
     vezes = (t.meta && t.meta > 1) ? Math.round(t.meta) : 1;
     corBox = t.corBox || null;
     texto.value = t.texto || '';
@@ -13315,6 +13446,15 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'jogo.repeteSemana':     { pt:'Repete toda semana', en:'Repeats weekly' },
     'jogo.repeteMes':        { pt:'Repete todo mês', en:'Repeats monthly' },
     'jogo.todoDia':          { pt:'Todo dia', en:'Every month, on day' },
+    // v4.162: rotulo da secao ("Repetição", igual padrao de "Dificuldade")
+    // + versoes curtas dos 4 modos, pra caberem lado a lado no mesmo espaco
+    // que antes tinha so 3 botoes de texto longo.
+    'jogo.repeticao':        { pt:'Repetição', en:'Repeat' },
+    'jogo.soHojeCurto':      { pt:'Hoje', en:'Today' },
+    'jogo.repeteSemanaCurto':{ pt:'Semana', en:'Week' },
+    'jogo.repeteMesCurto':   { pt:'Mês', en:'Month' },
+    'jogo.repeteAnoCurto':   { pt:'Ano', en:'Year' },
+    'jogo.diaEMes':          { pt:'Dia e mês', en:'Day and month' },
     'jogo.dificuldade':      { pt:'Dificuldade', en:'Difficulty' },
     'jogo.vezesPorDia':      { pt:'Vezes por dia', en:'Times per day' },
     'jogo.opcoesAvancadas':  { pt:'Opções avançadas', en:'Advanced options' },

@@ -1391,7 +1391,15 @@
     --text:#EAF1EE; --muted:#9DB0A8; --dim:#66766E;
     --accent:#22C55E; --accent-dim:#123424; --gold:#D9C15C; --blood:#E5484D;
     --panel-3:#232A30; --poco:#0B0D0F; --sel-bg:#1D3327; --mobname:#5EE39A;
-    --arena-1:#232A30; --arena-2:#1A2025; --arena-3:#12161A;
+    /* arena-1/2/3 = pedra da masmorra (gradiente atras da textura de
+       tijolo, ver aplicarFundoTemaArena()). 1a versao ficou cinza-neutro
+       quase igual ao Terracota e sem contraste com o --bg -- usuario
+       reparou que a parede "nao mudava nada" comparado com Laranja/
+       Dourado/Escuro, que tem tom proprio e mais claro. Corrigido pra
+       pedra com leve musgo esverdeado, puxando a identidade do tema pra
+       dentro da masmorra tambem (mesmo principio do marrom-quente do
+       Dourado apesar do fundo dele ser frio). */
+    --arena-1:#24352B; --arena-2:#1B2822; --arena-3:#101915;
     --xp2:#22C55E;
   }
   :root[data-tema="terracota"]{
@@ -1399,7 +1407,10 @@
     --text:#EDEEEF; --muted:#9DACB9; --dim:#647686;
     --accent:#C96A4A; --accent-dim:#3D2318; --gold:#D9A45C; --blood:#D64B4B;
     --panel-3:#212C37; --poco:#0B1116; --sel-bg:#3D2318; --mobname:#E29676;
-    --arena-1:#212C37; --arena-2:#18212A; --arena-3:#111820;
+    /* mesmo ajuste do Esmeralda acima -- pedra com tom quente/ferrugem,
+       puxando a cor do destaque pra dentro da masmorra em vez de ficar
+       neutra e parecida com a do Esmeralda. */
+    --arena-1:#3D2B22; --arena-2:#2C1F19; --arena-3:#1C130F;
     --xp2:#C96A4A;
   }
   /* item 25 do roadmap — spec fechada em sessao de brainstorm (21/08) */
@@ -2749,7 +2760,15 @@
     --text:#EAF1EE; --muted:#9DB0A8; --dim:#66766E;
     --accent:#22C55E; --accent-dim:#123424; --gold:#D9C15C; --blood:#E5484D;
     --panel-3:#232A30; --poco:#0B0D0F; --sel-bg:#1D3327; --mobname:#5EE39A;
-    --arena-1:#232A30; --arena-2:#1A2025; --arena-3:#12161A;
+    /* arena-1/2/3 = pedra da masmorra (gradiente atras da textura de
+       tijolo, ver aplicarFundoTemaArena()). 1a versao ficou cinza-neutro
+       quase igual ao Terracota e sem contraste com o --bg -- usuario
+       reparou que a parede "nao mudava nada" comparado com Laranja/
+       Dourado/Escuro, que tem tom proprio e mais claro. Corrigido pra
+       pedra com leve musgo esverdeado, puxando a identidade do tema pra
+       dentro da masmorra tambem (mesmo principio do marrom-quente do
+       Dourado apesar do fundo dele ser frio). */
+    --arena-1:#24352B; --arena-2:#1B2822; --arena-3:#101915;
     --xp2:#22C55E;
   }
   :root[data-tema="terracota"]{
@@ -2757,7 +2776,10 @@
     --text:#EDEEEF; --muted:#9DACB9; --dim:#647686;
     --accent:#C96A4A; --accent-dim:#3D2318; --gold:#D9A45C; --blood:#D64B4B;
     --panel-3:#212C37; --poco:#0B1116; --sel-bg:#3D2318; --mobname:#E29676;
-    --arena-1:#212C37; --arena-2:#18212A; --arena-3:#111820;
+    /* mesmo ajuste do Esmeralda acima -- pedra com tom quente/ferrugem,
+       puxando a cor do destaque pra dentro da masmorra em vez de ficar
+       neutra e parecida com a do Esmeralda. */
+    --arena-1:#3D2B22; --arena-2:#2C1F19; --arena-3:#1C130F;
     --xp2:#C96A4A;
   }
   /* item 25 do roadmap — spec fechada em sessao de brainstorm (21/08) */

@@ -368,7 +368,6 @@
           <div class="hero-sprite" id="perfilHeroSprite"></div>
           <div class="perfilheroInfo">
             <div class="perfilnome" id="perfilNome">Aventureiro</div>
-            <div class="perfilTitulo" id="perfilTitulo"></div>
             <div class="xpwrap">
               <div class="xprow hprow">
                 <span class="xplabel" data-i18n="jogo.vida">Vida</span>
@@ -1306,7 +1305,6 @@ const CHAVES_SECUNDARIAS_CONTA = [
   'questlog.tarefasConcluidas.v1',
   'questlog.temaArena.v1',
   'questlog.temasDesbloqueados.v1',
-  'questlog.tituloEquipado.v1',
   'questlog.vida.v1'
 ];
 window.CHAVES_SECUNDARIAS_CONTA = CHAVES_SECUNDARIAS_CONTA;
@@ -7492,16 +7490,20 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   /* ---------- temas ---------- */
   /* v4.158 (pedido do usuario): Verde (id "floresta") recebeu paleta
      nova -- cor da bolinha atualizada pro accent novo (verde-folha,
-     era magenta antes). Arcano e Sangue sao temas novos, escolhidos
-     junto no mesmo mockup de paleta testado antes de implementar. */
+     era magenta antes). Dois temas novos escolhidos no mockup de
+     paleta testado antes de implementar: ids "arcano"/"sangue"
+     mantidos no codigo (paleta v4.159, Arcano Espectral/Sangue Rubro),
+     mas o LABEL exibido pro usuario e "Ciano"/"Vermelho" (v4.160,
+     pedido do usuario -- nomes mais diretos, descrevendo a cor em vez
+     do tema/vibe). */
   const TEMAS = [
     {id:'branco',     nome:'Branco',   nome_en:'White',  cor:'#FFFFFF'},
     {id:'grafite',    nome:'Escuro',   nome_en:'Dark',   cor:'#8B8B93'},
     {id:'padrao',     nome:'Laranja',  nome_en:'Orange', cor:'#F2A65A'},
     {id:'pergaminho', nome:'Dourado',  nome_en:'Gold',   cor:'#C9A961'},
     {id:'floresta',   nome:'Verde',    nome_en:'Green',  cor:'#6FAE6F'},
-    {id:'arcano',     nome:'Arcano',   nome_en:'Arcane', cor:'#4FE0E8'},
-    {id:'sangue',     nome:'Sangue',   nome_en:'Blood',  cor:'#E0B978'}
+    {id:'arcano',     nome:'Ciano',    nome_en:'Cyan',   cor:'#5EEBD1'},
+    {id:'sangue',     nome:'Vermelho', nome_en:'Red',    cor:'#E8433A'}
   ];
   const CHAVE_TEMA = 'questlog.tema.v1';
 
@@ -10012,38 +10014,15 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     try { localStorage.setItem(window.chaveConta(CHAVE_VISTAS_V2), JSON.stringify([...set])); } catch(e){}
   }
 
-  // ---------------------------------------------------------------------
-  // TITULOS -- pedido do usuario (sessao de brainstorm): cada conquista
-  // desbloqueada vira um titulo equipavel, mostrado embaixo do nome do
-  // jogador (#perfilTitulo, no cabecalho do Perfil). So 1 equipado por
-  // vez -- reaproveita 100% o dado que ja existe (CONQUISTAS_V2, nome/
-  // nome_en/cor de cada uma), sem tabela nova. Clicar na estrela de uma
-  // conquista ja desbloqueada equipa; clicar de novo na mesma desequipa
-  // (toggle). Chave propria, separada de desbloqueios/vistas -- e so uma
-  // preferencia de exibicao, nao afeta progresso.
-  const CHAVE_TITULO = 'questlog.tituloEquipado.v1';
-  function obterTituloEquipado(){
-    try { return localStorage.getItem(window.chaveConta(CHAVE_TITULO)) || null; } catch(e){ return null; }
-  }
-  function definirTituloEquipado(id){
-    try {
-      if (id) localStorage.setItem(window.chaveConta(CHAVE_TITULO), id);
-      else localStorage.removeItem(window.chaveConta(CHAVE_TITULO));
-    } catch(e){}
-  }
-  function renderTituloPerfil(){
-    const el = document.getElementById('perfilTitulo');
-    if (!el) return;
-    const id = obterTituloEquipado();
-    const item = (id && typeof CONQUISTAS_V2 !== 'undefined') ? CONQUISTAS_V2.find(c => c.id === id) : null;
-    if (!item){ el.textContent = ''; el.style.display = 'none'; return; }
-    const emIngles = idiomaConquistas() === 'en';
-    el.textContent = emIngles ? (item.nome_en || item.nome) : item.nome;
-    el.style.setProperty('--tit-cor', item.cor);
-    el.style.display = 'block';
-  }
-  window.renderTituloPerfil = renderTituloPerfil;
-  // ---------------------------------------------------------------------
+  // v4.160 (pedido do usuario -- "essa funcao de titulo nas conquistas
+  // nao agrega em nada, nao tem por que existir"): feature de titulo
+  // equipavel REMOVIDA por completo (era o bloco "TITULOS" que existia
+  // aqui: CHAVE_TITULO/obterTituloEquipado/definirTituloEquipado/
+  // renderTituloPerfil, a estrela de equipar em cada linha de
+  // renderConquistasV2() e o listener delegado em #perfilConquistas).
+  // Conquistas continuam existindo normalmente, so pararam de virar
+  // "titulo" exibido no Perfil. #perfilTitulo removido do HTML e do
+  // CSS junto.
 
   // roda a cada render() (mesmo gancho que o resto do app ja usa) --
   // confere as 17 metas curadas contra o contexto AO VIVO (comHoje=true,
@@ -10081,7 +10060,6 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     if (!alvo) return;
     const ctx = montarContexto(true);
     const desbloqueios = obterDesbloqueiosV2();
-    const titAtual = obterTituloEquipado(); // qual estrela vem marcada
     // capturado ANTES de marcar como visto (mais abaixo, no fim desta
     // funcao) -- usado so pra saber quais itens ganham a tag "NOVO" nesta
     // renderizacao. Depois de marcado como visto, a mesma conquista nao
@@ -10106,23 +10084,10 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       // Perfil + "Ver todas"). So aparece pra quem foi desbloqueada e
       // ainda nao tinha sido vista ANTES desta renderizacao.
       const novoHtml = novo ? '<span class="conqv2novo">' + (emIngles ? 'NEW' : 'NOVO') + '</span>' : '';
-      // Estrela de equipar como titulo -- so em conquistas ja desbloqueadas
-      // (data truthy). Preenchida (.on) se for o titulo atualmente
-      // equipado. Clique alterna equipar/desequipar (delegado logo abaixo
-      // de renderConquistasV2, ver [data-titulo]).
-      const equipado = data && titAtual === item.id;
-      const estrelaHtml = data
-        ? '<button class="conqv2estrela' + (equipado ? ' on' : '') + '" type="button" '
-          + 'data-titulo="' + item.id + '" '
-          + 'aria-label="' + (emIngles ? 'Set as title' : 'Usar como título') + '" '
-          + 'style="--tit-cor:' + item.cor + '">'
-          + '<svg viewBox="0 0 24 24" fill="' + (equipado ? 'currentColor' : 'none') + '" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5l2.9 6.6 7.1.7-5.4 4.8 1.6 7-6.2-3.8-6.2 3.8 1.6-7-5.4-4.8 7.1-.7z"/></svg>'
-          + '</button>'
-        : '';
       return '<div class="conqv2item' + (data ? '' : ' trancado') + (novo ? ' conqv2novoitem' : '') + '">' +
         '<div class="conqv2txt"><div class="conqv2nome">' + nomeMostrar + novoHtml + '</div>' +
         '<div class="conqv2desc">' + desc + '</div></div>' +
-        dataHtml + estrelaHtml +
+        dataHtml +
       '</div>';
     }
 
@@ -10151,23 +10116,6 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   }
   window.renderConquistasV2 = renderConquistasV2;
 
-  // Clique na estrela: alterna equipar/desequipar aquele titulo. Listener
-  // fica UMA vez no container pai (#perfilConquistas), delegado -- sobrevive
-  // ao innerHTML ser reescrito a cada renderConquistasV2() (mesmo padrao ja
-  // usado no resgate do sistema V1, mais acima neste arquivo).
-  const alvoTitulos = document.getElementById('perfilConquistas');
-  if (alvoTitulos){
-    alvoTitulos.addEventListener('click', e => {
-      const btn = e.target.closest('[data-titulo]');
-      if (!btn) return;
-      const id = btn.dataset.titulo;
-      const atual = obterTituloEquipado();
-      definirTituloEquipado(atual === id ? null : id); // clicar no ja equipado desequipa
-      renderTituloPerfil();
-      renderConquistasV2(); // redesenha pra mover a marcacao da estrela
-    });
-  }
-
   const _renderConqV2 = window.render;
   if (typeof _renderConqV2 === 'function'){
     window.render = function(){
@@ -10176,7 +10124,6 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     };
   }
   checarDesbloqueiosV2(); // primeira checagem, sem esperar o primeiro render() -- ja chama atualizarBadges() no proprio fim (ver linha acima), entao a primeira pintura do badge acontece aqui, com CONQUISTAS_V2 ja definida (evita o erro de TDZ que aconteceria se atualizarBadges() rodasse antes deste ponto -- ver comentario em contarPendentes())
-  renderTituloPerfil(); // primeira pintura do titulo -- mesmo motivo, so agora que CONQUISTAS_V2 existe
 
   // mesmo padrao de wrap acima, pro desbloqueio gratis de temas de
   // arena (Deserto via streak, ver TEMAS_ARENA em assets.js) -- roda a
@@ -12415,7 +12362,6 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           intro.style.backgroundImage = '';
           if (typeof window.desenharHeroi === 'function') window.desenharHeroi();
           if (typeof window.render === 'function') window.render();
-          if (typeof window.renderTituloPerfil === 'function') window.renderTituloPerfil();
         } else {
           // conta nova, sem save -- fecha boas-vindas e pula DIRETO pro
           // slide de transicao ("vamos te conhecer melhor...", ver
@@ -13404,7 +13350,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // typeof-guard em cada uma porque nem toda sessão de jogo passou
     // por todo módulo (ex: quem nunca abriu o Perfil não tem
     // renderConquistas definido ainda nesse ponto do arquivo).
-    ['render','renderInventario','renderLoja','renderConquistasV2','renderBestiario','renderHistorico','renderGrimorio','desenharHeroi','renderTituloPerfil']
+    ['render','renderInventario','renderLoja','renderConquistasV2','renderBestiario','renderHistorico','renderGrimorio','desenharHeroi']
       .forEach(fn => { if (typeof window[fn] === 'function') window[fn](); });
     if (typeof window.atualizarTextosDificuldade === 'function') window.atualizarTextosDificuldade();
     if (typeof window.pintarTemaGrid === 'function') window.pintarTemaGrid();

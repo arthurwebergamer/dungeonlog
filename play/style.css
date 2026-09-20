@@ -275,6 +275,13 @@
   #diaMesWrap.on{display:flex}
   #edDiaMesWrap{display:none}
   #edDiaMesWrap.on{display:flex}
+  /* v4.162: recorrencia anual (dia + mes) -- mesmo padrao show/hide via id
+     dos outros sub-paineis de recorrencia (maior especificidade que a
+     classe .vezeswrap generica que reaproveita pro layout coluna/gap). */
+  #anualWrap{display:none}
+  #anualWrap.on{display:flex}
+  #edAnualWrap{display:none}
+  #edAnualWrap.on{display:flex}
   .day{flex:1;background:var(--panel);color:var(--dim);border:1px solid var(--line);border-radius:7px;padding:8px 0;font-family:'Silkscreen',monospace;font-size:8px;cursor:pointer;transition:.15s}
   .day.on{background:var(--accent-dim);color:var(--accent);border-color:var(--accent-dim)}
   .cbtn{background:var(--accent);color:var(--bg);border:none;border-radius:9px;padding:11px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;cursor:pointer}

@@ -1359,16 +1359,16 @@
     --bg:#0F1216; --panel:#0F1216; --panel-2:#151A20; --line:#232A33;
     --text:#E6E9ED; --muted:#8A93A0; --dim:#5A6470;
     --accent:#A98FDE; --accent-dim:#2A2140; --gold:#A98FDE; --blood:#9E3B3B;
-    --panel-3:#1D2318; --poco:#0A0C0F; --sel-bg:#242A1B; --mobname:#C9B3EA;
-    --arena-1:#2A2415; --arena-2:#1E1A10; --arena-3:#14110A;
+    --panel-3:#241E30; --poco:#0A0C0F; --sel-bg:#2C2440; --mobname:#C9B3EA;
+    --arena-1:#362A50; --arena-2:#281F3D; --arena-3:#1C1730;
     --xp2:#A98FDE;
   }
   :root[data-tema="rose"]{
     --bg:#0F1216; --panel:#0F1216; --panel-2:#151A20; --line:#232A33;
     --text:#E6E9ED; --muted:#8A93A0; --dim:#5A6470;
     --accent:#E0A5AE; --accent-dim:#3A2027; --gold:#E0A5AE; --blood:#9E3B3B;
-    --panel-3:#1D2318; --poco:#0A0C0F; --sel-bg:#242A1B; --mobname:#EDC0C6;
-    --arena-1:#2A2415; --arena-2:#1E1A10; --arena-3:#14110A;
+    --panel-3:#2A1D22; --poco:#0A0C0F; --sel-bg:#33232A; --mobname:#EDC0C6;
+    --arena-1:#3D2830; --arena-2:#2C1E24; --arena-3:#1F151A;
     --xp2:#E0A5AE;
   }
   /* item 25 do roadmap — spec fechada em sessao de brainstorm (21/08) */
@@ -2686,16 +2686,16 @@
     --bg:#0F1216; --panel:#0F1216; --panel-2:#151A20; --line:#232A33;
     --text:#E6E9ED; --muted:#8A93A0; --dim:#5A6470;
     --accent:#A98FDE; --accent-dim:#2A2140; --gold:#A98FDE; --blood:#9E3B3B;
-    --panel-3:#1D2318; --poco:#0A0C0F; --sel-bg:#242A1B; --mobname:#C9B3EA;
-    --arena-1:#2A2415; --arena-2:#1E1A10; --arena-3:#14110A;
+    --panel-3:#241E30; --poco:#0A0C0F; --sel-bg:#2C2440; --mobname:#C9B3EA;
+    --arena-1:#362A50; --arena-2:#281F3D; --arena-3:#1C1730;
     --xp2:#A98FDE;
   }
   :root[data-tema="rose"]{
     --bg:#0F1216; --panel:#0F1216; --panel-2:#151A20; --line:#232A33;
     --text:#E6E9ED; --muted:#8A93A0; --dim:#5A6470;
     --accent:#E0A5AE; --accent-dim:#3A2027; --gold:#E0A5AE; --blood:#9E3B3B;
-    --panel-3:#1D2318; --poco:#0A0C0F; --sel-bg:#242A1B; --mobname:#EDC0C6;
-    --arena-1:#2A2415; --arena-2:#1E1A10; --arena-3:#14110A;
+    --panel-3:#2A1D22; --poco:#0A0C0F; --sel-bg:#33232A; --mobname:#EDC0C6;
+    --arena-1:#3D2830; --arena-2:#2C1E24; --arena-3:#1F151A;
     --xp2:#E0A5AE;
   }
   /* item 25 do roadmap — spec fechada em sessao de brainstorm (21/08) */

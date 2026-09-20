@@ -1329,8 +1329,23 @@ try {
   if (uidSalvo) _uidAtivo = uidSalvo;
 } catch(e){}
 
+// PLANO PRO (roadmap: item 1 do Plano de Lancamento) -- personagem ativo
+// dentro da conta. Precisa ser resolvido ANTES de chaveSaveAtual()/
+// chaveConta(), que passam a usar essa variavel -- mesmo motivo de
+// _uidAtivo estar aqui em cima. Toda conta (inclusive sem login) sempre
+// tem pelo menos 1 personagem ('pj1'), sem precisar de setup.
+function chavePersonagemAtivo(){
+  return _uidAtivo ? ('questlog.personagemAtivo.v1.uid.' + _uidAtivo) : 'questlog.personagemAtivo.v1';
+}
+let _personagemAtivo = 'pj1';
+try {
+  const pjSalvo = localStorage.getItem(chavePersonagemAtivo());
+  if (pjSalvo) _personagemAtivo = pjSalvo;
+} catch(e){}
+
 function chaveSaveAtual(){
-  return _uidAtivo ? ('questlog.v1.uid.' + _uidAtivo) : 'questlog.v1';
+  const base = _uidAtivo ? ('questlog.v1.uid.' + _uidAtivo) : 'questlog.v1';
+  return base + '.pj.' + _personagemAtivo;
 }
 window.chaveSaveAtual = chaveSaveAtual;
 
@@ -1345,8 +1360,14 @@ window.chaveSaveAtual = chaveSaveAtual;
 // idioma/tema/sfx ficam de fora de proposito: sao preferencia do
 // APARELHO, nao da conta (ninguem espera o idioma resetar ao trocar de
 // conta no mesmo celular).
+// ATUALIZADO (Plano Pro): ganhou tambem o sufixo de personagem, mesmo
+// motivo de chaveSaveAtual() acima -- as 15 chaves de
+// CHAVES_SECUNDARIAS_CONTA (estagio, tema da arena, atributos,
+// conquistas, historico etc.) sao progresso de JOGO, entao precisam
+// separar por personagem, nao so por conta.
 function chaveConta(chaveBase){
-  return _uidAtivo ? (chaveBase + '.uid.' + _uidAtivo) : chaveBase;
+  const base = _uidAtivo ? (chaveBase + '.uid.' + _uidAtivo) : chaveBase;
+  return base + '.pj.' + _personagemAtivo;
 }
 window.chaveConta = chaveConta;
 
@@ -1386,7 +1407,70 @@ window.definirUidAtivo = function(uid){
     if (_uidAtivo) localStorage.setItem('questlog.uidAtivo.v1', _uidAtivo);
     else localStorage.removeItem('questlog.uidAtivo.v1');
   } catch(e){}
+  // PLANO PRO: personagemAtivo e por CONTA -- troca de uid precisa reler
+  // qual personagem essa conta especifica tinha ativo, senao
+  // _personagemAtivo fica "vazado" da conta anterior (mesma classe de
+  // bug ja documentada no roadmap pra outras chaves nessa troca).
+  try {
+    const pjSalvo = localStorage.getItem(chavePersonagemAtivo());
+    _personagemAtivo = pjSalvo || 'pj1';
+  } catch(e){ _personagemAtivo = 'pj1'; }
 };
+
+// ---------------------------------------------------------------------
+// PLANO PRO -- multiplos herois/personagens por conta (roadmap: Plano de
+// Lancamento, item 1). Gratis = 1 personagem (pj1, sempre existe, zero
+// setup); assinante = ate 4. So a camada de DADO aqui -- sem UI ainda
+// (seletor, onboarding do personagem novo, etc. ficam pra depois).
+// ---------------------------------------------------------------------
+function chavePersonagens(){
+  return _uidAtivo ? ('questlog.personagens.v1.uid.' + _uidAtivo) : 'questlog.personagens.v1';
+}
+
+function listarPersonagens(){
+  try {
+    const bruto = localStorage.getItem(chavePersonagens());
+    const arr = bruto ? JSON.parse(bruto) : null;
+    if (Array.isArray(arr) && arr.length) return arr;
+  } catch(e){}
+  // conta ainda sem lista gravada: personagem default existe do mesmo
+  // jeito que _personagemAtivo comeca em 'pj1' sozinho, sem setup.
+  return [{ id: 'pj1', nome: null, criadoEm: null }];
+}
+window.listarPersonagens = listarPersonagens;
+
+function salvarListaPersonagens(lista){
+  try { localStorage.setItem(chavePersonagens(), JSON.stringify(lista)); } catch(e){}
+}
+
+function limitePersonagens(){
+  return (typeof assinaturaAtiva === 'function' && assinaturaAtiva()) ? 4 : 1;
+}
+window.limitePersonagens = limitePersonagens;
+
+function trocarPersonagem(id){
+  const lista = listarPersonagens();
+  if (!lista.some(p => p.id === id)) return false;
+  _personagemAtivo = id;
+  try { localStorage.setItem(chavePersonagemAtivo(), id); } catch(e){}
+  if (typeof window.carregar === 'function') window.carregar();
+  if (typeof window.render === 'function') window.render();
+  if (typeof window.renderInventario === 'function') window.renderInventario();
+  if (typeof window.renderLoja === 'function') window.renderLoja();
+  return true;
+}
+window.trocarPersonagem = trocarPersonagem;
+
+function criarPersonagem(nome){
+  const lista = listarPersonagens();
+  if (lista.length >= limitePersonagens()) return { ok: false, motivo: 'limite' };
+  const id = 'pj' + Date.now().toString(36);
+  lista.push({ id: id, nome: nome || null, criadoEm: new Date().toISOString() });
+  salvarListaPersonagens(lista);
+  trocarPersonagem(id); // save desse id nao existe ainda -- carregar() cai no mesmo caminho ja corrigido de "conta nova"
+  return { ok: true, id: id };
+}
+window.criarPersonagem = criarPersonagem;
 
 // ---------------------------------------------------------------------
 // PAINEL DE DEBUG -- fluxo de login/troca de conta. Religado temporario

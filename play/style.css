@@ -4178,8 +4178,18 @@
    que TAMBEM tem background+padding+radius -- criava um "pill dentro de
    pill" (a caixa escura extra que apareceu no print). Zera soh dentro do
    .pjTrigger; a regra .lvl{} original continua intacta pra quem usa
-   fora daqui. */
-.pjTrigger .lvl{ background:none; padding:0; border-radius:0; }
+   fora daqui.
+   IMPORTANT necessario: o tema Crepusculo (linha ~753) redefine .lvl
+   com !important (background/padding/radius/cor propria) -- sem
+   !important aqui essa regra nao vencia a do tema, e o quadrado escuro
+   voltava sempre que esse tema (ou qualquer outro com !important) tava
+   ativo. Cor tambem entra na disputa: sem forcar, o texto ficava
+   var(--bg) (escuro) em cima do --accent-dim do botao = quase ilegivel. */
+.pjTrigger .lvl{
+  background:none !important; padding:0 !important; border-radius:0 !important;
+  color:var(--accent) !important; font-size:13px !important; font-weight:600 !important;
+  letter-spacing:normal !important; text-transform:none !important;
+}
 .pjTrigger .pjChevron{ width:10px; height:10px; color:var(--accent); opacity:.8; flex:none; transition:transform .2s var(--expo); }
 .pjTrigger.aberto .pjChevron{ transform:rotate(180deg); }
 

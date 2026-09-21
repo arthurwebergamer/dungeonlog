@@ -1977,6 +1977,83 @@
   .carrosselGrupo{gap:12px}
   .carrosselImgMini{width:72px;height:72px;image-rendering:pixelated}
 
+  /* v4.14x: slides 2/3 do onboarding (golpe/bau) -- loop CSS puro,
+     reaproveitando os mesmos assets/classes do combate real
+     (--spr-slash-comum, --bau-fechado/--bau-aberto, .baucard/.baubox/
+     .bautxt/.baunome/.bauraridade ja existentes acima). Sem JS de
+     timing: cada ciclo e 100% CSS, nao trava/desincroniza. */
+  .obPalco{position:relative;width:100%;height:150px}
+  .obHeroSp{position:absolute;left:6%;bottom:0;height:126px;width:auto;
+            image-rendering:pixelated;animation:obHeroLunge 3.2s ease-in-out infinite}
+  .obMobSp{position:absolute;right:6%;bottom:4px;height:108px;width:auto;
+           image-rendering:pixelated;animation:obMobShake 3.2s ease-in-out infinite}
+  @keyframes obHeroLunge{
+    0%,50%{transform:translateX(0)}
+    55%{transform:translateX(12px)}
+    62%,100%{transform:translateX(0)}
+  }
+  @keyframes obMobShake{
+    0%,53%{transform:translate(0,0) rotate(0);filter:none}
+    56%{transform:translate(-5px,-2px) rotate(-6deg);filter:brightness(0) invert(1)}
+    59%{transform:translate(4px,1px) rotate(5deg);filter:brightness(0) invert(1)}
+    62%{transform:translate(-2px,0) rotate(-2deg);filter:none}
+    66%,100%{transform:translate(0,0) rotate(0);filter:none}
+  }
+  .obSlashFx{position:absolute;right:22%;bottom:34px;width:56px;height:56px;
+             background-image:var(--spr-slash-comum);background-repeat:no-repeat;
+             background-size:504px 56px;background-position:0 0;
+             filter:grayscale(1) brightness(2.4);image-rendering:pixelated;
+             opacity:0;animation:obSlash 3.2s linear infinite}
+  @keyframes obSlash{
+    0%,53%{opacity:0;background-position:0 0}
+    54%{opacity:1;background-position:0 0;animation-timing-function:steps(9)}
+    63%{opacity:1;background-position:-504px 0}
+    64%,100%{opacity:0}
+  }
+  .obRecIcon{position:absolute;width:14px;height:14px;opacity:0;pointer-events:none;
+             right:24%;bottom:64px;animation:obIconVoo 3.2s ease-in infinite}
+  .obRecIcon svg{width:100%;height:100%;image-rendering:pixelated}
+  .obRecIcon.xp{animation-delay:.08s}
+  @keyframes obIconVoo{
+    0%,65%{opacity:0;transform:translate(0,0)}
+    67%{opacity:1;transform:translate(0,0)}
+    80%{opacity:1;transform:translate(-58%,-30px)}
+    81%,100%{opacity:0}
+  }
+  .obRecompensa{position:absolute;left:8%;bottom:80px;display:flex;flex-direction:column;
+                gap:2px;font-size:12px;font-weight:700;opacity:0;pointer-events:none;
+                animation:obRecompensaPop 3.2s ease-out infinite}
+  .obRecompensa .obMoeda,.obRecompensa .obXp{display:flex;align-items:center;gap:3px}
+  .obRecompensa .obMoeda{color:var(--gold)}
+  .obRecompensa .obXp{color:var(--text)}
+  .obRecompensa svg{width:13px;height:13px;image-rendering:pixelated}
+  @keyframes obRecompensaPop{
+    0%,80%{opacity:0;transform:translateY(4px)}
+    84%{opacity:1;transform:translateY(0)}
+    95%{opacity:1;transform:translateY(0)}
+    100%{opacity:0;transform:translateY(-6px)}
+  }
+
+  .obBauWrap{flex-direction:column;gap:12px;width:100%}
+  .obBauImg{width:96px;height:96px;background-size:contain;background-repeat:no-repeat;
+            background-position:center;image-rendering:pixelated;
+            background-image:var(--bau-fechado);
+            animation:obBauAbre 3.4s ease-in-out infinite}
+  @keyframes obBauAbre{
+    0%,29%{background-image:var(--bau-fechado);transform:scale(1)}
+    31%{transform:scale(1.08)}
+    33%,100%{background-image:var(--bau-aberto);transform:scale(1)}
+  }
+  .obBauItens{width:100%;max-width:280px;margin:0 auto}
+  .obBauItens .baucard{opacity:0;transform:translateY(6px);
+                        animation:obBaucardCiclo 3.4s ease infinite}
+  .obBauItens .baucard:nth-child(2){animation-delay:.15s}
+  @keyframes obBaucardCiclo{
+    0%,37%{opacity:0;transform:translateY(6px)}
+    45%,92%{opacity:1;transform:translateY(0)}
+    100%{opacity:0;transform:translateY(6px)}
+  }
+
   /* trio escalonado do slide 1 (marca) -- igual a foto de referencia:
      sprite do meio maior/na frente, laterais menores/atras, um pouco
      mais baixos, sobrepondo o do meio. align-items:flex-end + tamanhos
@@ -3310,6 +3387,83 @@
   .carrosselImgGrande{width:168px;height:168px;image-rendering:pixelated}
   .carrosselGrupo{gap:12px}
   .carrosselImgMini{width:72px;height:72px;image-rendering:pixelated}
+
+  /* v4.14x: slides 2/3 do onboarding (golpe/bau) -- loop CSS puro,
+     reaproveitando os mesmos assets/classes do combate real
+     (--spr-slash-comum, --bau-fechado/--bau-aberto, .baucard/.baubox/
+     .bautxt/.baunome/.bauraridade ja existentes acima). Sem JS de
+     timing: cada ciclo e 100% CSS, nao trava/desincroniza. */
+  .obPalco{position:relative;width:100%;height:150px}
+  .obHeroSp{position:absolute;left:6%;bottom:0;height:126px;width:auto;
+            image-rendering:pixelated;animation:obHeroLunge 3.2s ease-in-out infinite}
+  .obMobSp{position:absolute;right:6%;bottom:4px;height:108px;width:auto;
+           image-rendering:pixelated;animation:obMobShake 3.2s ease-in-out infinite}
+  @keyframes obHeroLunge{
+    0%,50%{transform:translateX(0)}
+    55%{transform:translateX(12px)}
+    62%,100%{transform:translateX(0)}
+  }
+  @keyframes obMobShake{
+    0%,53%{transform:translate(0,0) rotate(0);filter:none}
+    56%{transform:translate(-5px,-2px) rotate(-6deg);filter:brightness(0) invert(1)}
+    59%{transform:translate(4px,1px) rotate(5deg);filter:brightness(0) invert(1)}
+    62%{transform:translate(-2px,0) rotate(-2deg);filter:none}
+    66%,100%{transform:translate(0,0) rotate(0);filter:none}
+  }
+  .obSlashFx{position:absolute;right:22%;bottom:34px;width:56px;height:56px;
+             background-image:var(--spr-slash-comum);background-repeat:no-repeat;
+             background-size:504px 56px;background-position:0 0;
+             filter:grayscale(1) brightness(2.4);image-rendering:pixelated;
+             opacity:0;animation:obSlash 3.2s linear infinite}
+  @keyframes obSlash{
+    0%,53%{opacity:0;background-position:0 0}
+    54%{opacity:1;background-position:0 0;animation-timing-function:steps(9)}
+    63%{opacity:1;background-position:-504px 0}
+    64%,100%{opacity:0}
+  }
+  .obRecIcon{position:absolute;width:14px;height:14px;opacity:0;pointer-events:none;
+             right:24%;bottom:64px;animation:obIconVoo 3.2s ease-in infinite}
+  .obRecIcon svg{width:100%;height:100%;image-rendering:pixelated}
+  .obRecIcon.xp{animation-delay:.08s}
+  @keyframes obIconVoo{
+    0%,65%{opacity:0;transform:translate(0,0)}
+    67%{opacity:1;transform:translate(0,0)}
+    80%{opacity:1;transform:translate(-58%,-30px)}
+    81%,100%{opacity:0}
+  }
+  .obRecompensa{position:absolute;left:8%;bottom:80px;display:flex;flex-direction:column;
+                gap:2px;font-size:12px;font-weight:700;opacity:0;pointer-events:none;
+                animation:obRecompensaPop 3.2s ease-out infinite}
+  .obRecompensa .obMoeda,.obRecompensa .obXp{display:flex;align-items:center;gap:3px}
+  .obRecompensa .obMoeda{color:var(--gold)}
+  .obRecompensa .obXp{color:var(--text)}
+  .obRecompensa svg{width:13px;height:13px;image-rendering:pixelated}
+  @keyframes obRecompensaPop{
+    0%,80%{opacity:0;transform:translateY(4px)}
+    84%{opacity:1;transform:translateY(0)}
+    95%{opacity:1;transform:translateY(0)}
+    100%{opacity:0;transform:translateY(-6px)}
+  }
+
+  .obBauWrap{flex-direction:column;gap:12px;width:100%}
+  .obBauImg{width:96px;height:96px;background-size:contain;background-repeat:no-repeat;
+            background-position:center;image-rendering:pixelated;
+            background-image:var(--bau-fechado);
+            animation:obBauAbre 3.4s ease-in-out infinite}
+  @keyframes obBauAbre{
+    0%,29%{background-image:var(--bau-fechado);transform:scale(1)}
+    31%{transform:scale(1.08)}
+    33%,100%{background-image:var(--bau-aberto);transform:scale(1)}
+  }
+  .obBauItens{width:100%;max-width:280px;margin:0 auto}
+  .obBauItens .baucard{opacity:0;transform:translateY(6px);
+                        animation:obBaucardCiclo 3.4s ease infinite}
+  .obBauItens .baucard:nth-child(2){animation-delay:.15s}
+  @keyframes obBaucardCiclo{
+    0%,37%{opacity:0;transform:translateY(6px)}
+    45%,92%{opacity:1;transform:translateY(0)}
+    100%{opacity:0;transform:translateY(6px)}
+  }
 
   /* trio escalonado do slide 1 (marca) -- igual a foto de referencia:
      sprite do meio maior/na frente, laterais menores/atras, um pouco

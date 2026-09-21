@@ -3850,6 +3850,28 @@ function numeroFlutuanteHeroi(xpGanho, moedasGanhas){
 }
 window.numeroFlutuanteHeroi = numeroFlutuanteHeroi;
 
+// VARIANTE pro carrossel de onboarding (slide "golpe") -- mesma classe
+// dmg-float/pilha, mas com "fixo" (position:fixed, ver style.css) porque
+// ali NAO existe .arena: a origem passa a ser coordenadas de VIEWPORT
+// (getBoundingClientRect direto do heroiEl, sem subtrair offset de arena
+// nenhuma) e o elemento vai pro body em vez de pra dentro da arena.
+function obNumeroFlutuanteHeroi(heroiEl, xpGanho, moedasGanhas){
+  if (!heroiEl) return;
+  const heroiRect = heroiEl.getBoundingClientRect();
+  const originX = heroiRect.left - 30;
+  const originY = heroiRect.top + heroiRect.height / 2;
+
+  const el = document.createElement('div');
+  el.className = 'dmg-float pilha fixo';
+  el.style.left = originX + 'px';
+  el.style.top = originY + 'px';
+  el.innerHTML = '<span class="dmg-moeda">+' + moedasGanhas + ' ' + COIN_SVG + '</span>'
+    + '<span class="dmg-xp">+' + xpGanho + ' XP</span>';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1100);
+}
+window.obNumeroFlutuanteHeroi = obNumeroFlutuanteHeroi;
+
 // NAO USADAS ATUALMENTE (27/08) -- pontoDeElemento/flutuanteFixo eram usadas
 // por usarItem()/venderItem() (Inventario/Loja) e antes disso por
 // equipar()/comprar()/investir(), tudo revertido a pedido do usuario apos
@@ -11435,8 +11457,16 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
   const card = intro.querySelector('.card');
 
+  // v4.119: cenario real (mesmo asset "montanhas" de TEMAS_ARENA, ja
+  // usado no slide estagio do onboarding) atras da marca -- porta o
+  // visual da tela "DEPOIS" do mockup (mockup_onboarding_animado.html,
+  // slide 5) SEM tocar no formulario/logica de auth abaixo, mesma
+  // filosofia de reuso das outras telas (so a casca visual muda).
+  const artMontanhasLogin = (typeof TEMAS_ARENA !== 'undefined') ? TEMAS_ARENA.find(t => t.id === 'montanhas').arte : '';
+
   card.insertAdjacentHTML('afterbegin', `
     <div class="passo on" id="passoLogin">
+      <div class="loginCenario"><img src="data:image/png;base64,${artMontanhasLogin}" alt=""></div>
       <div class="marca">
         <span class="titulo">DUNGEONLOG</span>
         <p class="loginModo" id="loginModo" data-i18n="login.entreNaSuaConta">Entre na sua conta</p>
@@ -11859,26 +11889,33 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // mas nao reparentados no carrossel reduzido). Ultimo slide (estagio)
   // vai direto pro login em vez de continuar a numeracao.
   const SLIDES = [
-    { dataSlide:1, next:2, tipo:'golpeAnim', idx:22,
+    { dataSlide:1, next:2, tipo:'logo',
+      fraca:'Bem-vindo ao', fraca_en:'Welcome to',
+      titulo:'DungeonLog', titulo_en:'DungeonLog',
+      texto:'Suas tarefas do dia viram uma batalha. Complete tarefas, evolua seu herói, vença monstros.',
+      texto_en:'Your daily tasks become a battle. Complete tasks, level up your hero, defeat monsters.',
+      botao:'Começar', botao_en:'Get started', layout:'mockupExato' },
+    { dataSlide:2, next:3, tipo:'golpeAnim', idx:22,
       fraca:'Cada tarefa concluída', fraca_en:'Every task you finish',
       titulo:'é um golpe no monstro', titulo_en:'is a hit on the monster',
       texto:'Termine suas tarefas e veja seu herói acertar o monstro do dia, na hora.',
       texto_en:'Finish your tasks and watch your hero land a hit on today\'s monster, live.',
       botao:'Continuar', botao_en:'Continue', layout:'mockupExato' },
-    { dataSlide:2, next:3, tipo:'bauAnim', idx:1,
+    { dataSlide:3, next:4, tipo:'bauAnim', idx:1,
       fraca:'Vença o dia', fraca_en:'Win the day',
       titulo:'e abra o baú', titulo_en:'and open the chest',
       botao:'Continuar', botao_en:'Continue', layout:'mockupExatoSemCorpo' },
-    { dataSlide:3, next:'login', tipo:'estagioAnim',
+    { dataSlide:4, next:'login', tipo:'estagioAnim',
       fraca:'Avance de estágio', fraca_en:'Advance a stage',
       titulo:'e desbloqueie cenários novos', titulo_en:'and unlock new scenery',
       texto:'A masmorra muda de cara conforme você progride — cada estágio é um cenário diferente.',
       texto_en:'The dungeon changes as you progress — each stage is a different scenery.',
       botao:'Vamos lá', botao_en:'Let\'s go', layout:'mockupExato' }
   ];
-  const SLIDE_TRANSICAO = 5; // slide removido do carrossel reduzido -- nunca mais bate (numero fora do range 1-3), guarda fica inofensiva
+  const SLIDE_TRANSICAO = 5; // slide removido do carrossel reduzido -- nunca mais bate (numero fora do range 1-4), guarda fica inofensiva
   const SLIDE_NOME = 6; // idem -- slide removido, guarda fica inofensiva
-  const TOTAL_SLIDES = 3;
+  const TOTAL_SLIDES = 4;
+  const SLIDE_GOLPE = 2; // usado pra ligar/desligar o ciclo de animacao do golpe (ver iniciarCicloGolpe, mais abaixo)
 
   // item 46 do roadmap: idioma lido direto do localStorage (mesmo padrao
   // ja usado no resto do arquivo -- item()/aplicarIdiomaDados()/
@@ -11909,22 +11946,16 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         '</div>';
     }
     if (s.tipo === 'golpeAnim'){
-      // slide 2 (BATALHA): loop 100% CSS (obHeroLunge/obMobShake/obSlash/
-      // obIconVoo/obRecompensaPop, ver style.css) reaproveitando o
-      // MESMO sprite de slash do combate real (--spr-slash-comum) e os
-      // MESMOS icones de recompensa (COIN_SVG/XP_GEM_SVG) -- sem numero
-      // de dano no monstro (o jogo real nunca mostra isso, so +moedas/+XP
-      // empilhado, ver numeroFlutuanteHeroi()).
+      // slide 2 (BATALHA): hit-flash/slash continua 100% CSS (obHeroSp.hit/
+      // obMobSp.shake + obSlashFx, ver style.css), MAS a recompensa (moeda+XP
+      // voando ate o heroi + popup "+4 / +12 XP") agora reusa as FUNCOES REAIS
+      // do combate (window.voarRecompensa / obNumeroFlutuanteHeroi), disparadas
+      // por iniciarCicloGolpe() -- ver atualizarTopo(). obHeroSp precisa de id
+      // fixo pra servir de destino real pro voo do icone.
       return '<div class="carrosselImgWrap"><div class="obPalco">' +
         '<img class="obMobSp" src="' + MONSTROS[s.idx].img + '" alt="">' +
         '<div class="obSlashFx"></div>' +
-        '<img class="obHeroSp" src="' + HEROIS[1].img + '" alt="">' +
-        '<div class="obRecIcon moeda">' + COIN_SVG + '</div>' +
-        '<div class="obRecIcon xp">' + XP_GEM_SVG + '</div>' +
-        '<div class="obRecompensa">' +
-          '<span class="obMoeda">' + COIN_SVG + '+4</span>' +
-          '<span class="obXp">' + XP_GEM_SVG + '+12 XP</span>' +
-        '</div>' +
+        '<img id="obHeroSp" class="obHeroSp" src="' + HEROIS[1].img + '" alt="">' +
       '</div></div>';
     }
     if (s.tipo === 'estagioAnim'){
@@ -12237,6 +12268,40 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     intro.style.backgroundPosition = 'center';
   }
 
+  // v4.118: recompensa do slide golpe (moeda+XP voando + popup "+4/+12 XP")
+  // agora reusa as MESMAS funcoes do combate real (window.voarRecompensa /
+  // obNumeroFlutuanteHeroi) em vez do CSS-cycle antigo (obRecIcon/
+  // obRecompensa, removidos do markup em imagemSlide) -- so o timing de
+  // QUANDO disparar continua sendo controlado aqui, sincronizado com o
+  // ponto em que o slash "acerta" no loop CSS obSlash/obMobShake (~54% de
+  // 3.2s = ~1728ms). iniciarCicloGolpe alinha o 1o disparo nesse ponto e
+  // repete a cada 3.2s (mesma duracao do loop CSS de hit-flash).
+  let golpeCicloTimeout = null, golpeCicloInterval = null;
+  function dispararRecompensaGolpe(){
+    const heroEl = document.getElementById('obHeroSp');
+    const mobEl = document.querySelector('.carrosselSlide.on .obMobSp');
+    if (!heroEl || !mobEl) return;
+    const mobRect = mobEl.getBoundingClientRect();
+    const origemX = mobRect.left + mobRect.width / 2;
+    const origemY = mobRect.top + mobRect.height / 2;
+    window.voarRecompensa(origemX, origemY, heroEl, COIN_SVG);
+    setTimeout(() => window.voarRecompensa(origemX, origemY, heroEl, XP_GEM_SVG), 90);
+    setTimeout(() => {
+      if (typeof window.obNumeroFlutuanteHeroi === 'function') window.obNumeroFlutuanteHeroi(heroEl, 12, 4);
+    }, 840);
+  }
+  function iniciarCicloGolpe(){
+    pararCicloGolpe(); // guarda -- nunca acumula 2 ciclos em paralelo
+    golpeCicloTimeout = setTimeout(() => {
+      dispararRecompensaGolpe();
+      golpeCicloInterval = setInterval(dispararRecompensaGolpe, 3200);
+    }, 1728);
+  }
+  function pararCicloGolpe(){
+    if (golpeCicloTimeout){ clearTimeout(golpeCicloTimeout); golpeCicloTimeout = null; }
+    if (golpeCicloInterval){ clearInterval(golpeCicloInterval); golpeCicloInterval = null; }
+  }
+
   function atualizarTopo(num){
     pintarFundoOnboarding(num);
     document.querySelectorAll('#carrosselDots .carrosselDot').forEach((d, j) => {
@@ -12252,6 +12317,10 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // completado (finalizarArraste chama atualizarTopo tambem) -- um
     // hook so, cobre os dois jeitos de chegar no slide.
     if (num === SLIDE_TRANSICAO) window.__questlogIniciarTypewriter();
+    // v4.118: liga o ciclo de recompensa so enquanto o slide golpe estiver
+    // ativo -- qualquer outro slide desliga (evita disparo "fantasma" quando
+    // a pessoa ja saiu da tela).
+    if (num === SLIDE_GOLPE) iniciarCicloGolpe(); else pararCicloGolpe();
   }
 
   // v4.114-4.117 (itens 42-b/c/e/f do roadmap): transicao/nome/heroi/
@@ -12295,6 +12364,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // -- sinaliza visualmente que virou um desvio, nao um passo normal.
   function irParaLogin(semVoltar){
     if (emTransicao) return;
+    pararCicloGolpe(); // desvio pro login pode acontecer NO MEIO do slide golpe (link "Ja tem conta?"), nao passa por atualizarTopo
     const atualEl = palco.querySelector('.carrosselSlide.on');
     if (atualEl && atualEl !== passoLogin){
       const n = parseInt(atualEl.dataset.slide, 10);

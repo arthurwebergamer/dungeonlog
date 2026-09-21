@@ -12440,12 +12440,15 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // obNumeroFlutuanteHeroi) em vez do CSS-cycle antigo (obRecIcon/
   // obRecompensa, removidos do markup em imagemSlide) -- so o timing de
   // QUANDO disparar continua sendo controlado aqui, sincronizado com o
-  // ponto em que o slash "acerta" no loop CSS obSlash/obMobShake (~54% de
-  // 1.8s = ~972ms). iniciarCicloGolpe alinha o 1o disparo nesse ponto e
-  // repete a cada 1.8s (mesma duracao do loop CSS de hit-flash).
-  // v4.133 (pedido do usuario): ciclo acelerado de 3.2s -> 1.8s (e o do
-  // bau, so CSS, de 3.4s -> 1.9s) pra quem passa rapido pelo onboarding
-  // ter mais chance de ver a animacao pelo menos uma vez.
+  // ponto em que o slash "acerta" no loop CSS obSlash/obMobShake.
+  // v4.134 (pedido do usuario, corrigindo o v4.133: o problema NAO era o
+  // ciclo repetir devagar, era a demora ATE COMECAR quando a pessoa
+  // entrava no slide -- 1728ms parado). O CSS (obHeroLunge/obMobShake/
+  // obSlash, ver style.css) agora usa animation-delay:-1.536s pra
+  // "adiantar" a animacao pro ponto logo antes do golpe assim que o
+  // slide fica visivel -- o flash aparece em ~190ms em vez de ~1728ms,
+  // e o loop volta a repetir no ritmo normal de 3.2s depois disso. Os
+  // numeros abaixo (190ms/3200ms) tem que bater com esse -1.536s la.
   let golpeCicloTimeout = null, golpeCicloInterval = null;
   function dispararRecompensaGolpe(){
     const heroEl = document.getElementById('obHeroSp');
@@ -12464,8 +12467,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     pararCicloGolpe(); // guarda -- nunca acumula 2 ciclos em paralelo
     golpeCicloTimeout = setTimeout(() => {
       dispararRecompensaGolpe();
-      golpeCicloInterval = setInterval(dispararRecompensaGolpe, 1800);
-    }, 972);
+      golpeCicloInterval = setInterval(dispararRecompensaGolpe, 3200);
+    }, 190);
   }
   function pararCicloGolpe(){
     if (golpeCicloTimeout){ clearTimeout(golpeCicloTimeout); golpeCicloTimeout = null; }

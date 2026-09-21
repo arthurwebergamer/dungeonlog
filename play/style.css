@@ -2176,7 +2176,14 @@
     opacity:0;transition:opacity .45s ease;pointer-events:none}
   #introCenario{position:fixed;left:0;right:0;top:0;bottom:0;z-index:-1;
     overflow:hidden;opacity:0;transition:opacity .35s ease;pointer-events:none}
-  #introCenario.modoLogin{bottom:auto;height:52vh}
+  /* v4.130 (pedido do usuario, com prints do Habitica): ANTES o modoLogin
+     limitava o cenario a 52vh (so um "banner" no topo, resto da tela em
+     cor solida #0B0710 -- ver irParaLogin()). O Habitica cobre a tela
+     INTEIRA com a arte (montanha+castelo) e o conteudo (marca, campos,
+     botoes) flutua por cima dela do topo ao rodape, sem nenhuma faixa
+     solida separada. Tirando este override o modoLogin passa a herdar o
+     inset:0 (tela cheia) que o modoEstagio ja usa -- mesmo mecanismo,
+     so muda o gradiente de escurecimento abaixo. */
   #introCenario.ativo{opacity:1}
   #introCenario .cenarioImg{position:absolute;inset:0;width:100%;height:100%;
     object-fit:cover;image-rendering:pixelated;opacity:0}
@@ -2186,8 +2193,12 @@
   #introCenario::after{content:'';position:absolute;inset:0}
   #introCenario.modoEstagio::after{
     background:linear-gradient(180deg,rgba(10,8,14,.35) 0%,rgba(10,8,14,.55) 55%,rgba(10,8,14,.88) 100%)}
+  /* v4.130: gradiente recalibrado pra tela cheia -- topo (~35%) fica
+     limpo pra mostrar o ceu/montanha como no Habitica, escurece a
+     partir da metade pra garantir contraste dos campos/botoes que
+     flutuam perto do rodape (#passoLogin usa justify-content:flex-end). */
   #introCenario.modoLogin::after{
-    background:linear-gradient(180deg,rgba(11,7,16,0) 35%,#0B0710 100%)}
+    background:linear-gradient(180deg,rgba(11,7,16,0) 0%,rgba(11,7,16,0) 35%,rgba(11,7,16,.58) 68%,rgba(11,7,16,.94) 100%)}
   @keyframes obEstagioFade{0%,45%{opacity:1}55%,100%{opacity:0}}
   .obEstagioPill{position:relative;z-index:2;display:flex;flex-direction:column;
                  align-items:center;gap:6px;margin-bottom:4px}
@@ -3728,7 +3739,14 @@
     opacity:0;transition:opacity .45s ease;pointer-events:none}
   #introCenario{position:fixed;left:0;right:0;top:0;bottom:0;z-index:-1;
     overflow:hidden;opacity:0;transition:opacity .35s ease;pointer-events:none}
-  #introCenario.modoLogin{bottom:auto;height:52vh}
+  /* v4.130 (pedido do usuario, com prints do Habitica): ANTES o modoLogin
+     limitava o cenario a 52vh (so um "banner" no topo, resto da tela em
+     cor solida #0B0710 -- ver irParaLogin()). O Habitica cobre a tela
+     INTEIRA com a arte (montanha+castelo) e o conteudo (marca, campos,
+     botoes) flutua por cima dela do topo ao rodape, sem nenhuma faixa
+     solida separada. Tirando este override o modoLogin passa a herdar o
+     inset:0 (tela cheia) que o modoEstagio ja usa -- mesmo mecanismo,
+     so muda o gradiente de escurecimento abaixo. */
   #introCenario.ativo{opacity:1}
   #introCenario .cenarioImg{position:absolute;inset:0;width:100%;height:100%;
     object-fit:cover;image-rendering:pixelated;opacity:0}
@@ -3738,8 +3756,12 @@
   #introCenario::after{content:'';position:absolute;inset:0}
   #introCenario.modoEstagio::after{
     background:linear-gradient(180deg,rgba(10,8,14,.35) 0%,rgba(10,8,14,.55) 55%,rgba(10,8,14,.88) 100%)}
+  /* v4.130: gradiente recalibrado pra tela cheia -- topo (~35%) fica
+     limpo pra mostrar o ceu/montanha como no Habitica, escurece a
+     partir da metade pra garantir contraste dos campos/botoes que
+     flutuam perto do rodape (#passoLogin usa justify-content:flex-end). */
   #introCenario.modoLogin::after{
-    background:linear-gradient(180deg,rgba(11,7,16,0) 35%,#0B0710 100%)}
+    background:linear-gradient(180deg,rgba(11,7,16,0) 0%,rgba(11,7,16,0) 35%,rgba(11,7,16,.58) 68%,rgba(11,7,16,.94) 100%)}
   @keyframes obEstagioFade{0%,45%{opacity:1}55%,100%{opacity:0}}
   .obEstagioPill{position:relative;z-index:2;display:flex;flex-direction:column;
                  align-items:center;gap:6px;margin-bottom:4px}

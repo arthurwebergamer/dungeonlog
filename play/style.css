@@ -1866,8 +1866,21 @@
      isso a "escala" parecia errada -- nao eram os botoes em si, era o
      cenario ocupando so ~18% da tela em vez de mais da metade). Troca
      pra vh, proporcional a tela de verdade, igual o mockup pretendia. */
-  #passoLogin.carrosselSlide{padding-top:52vh;justify-content:flex-start}
-  .loginEscolha{margin-top:18px}
+  /* FIX (v4.128, bug relatado pelo usuario com video do Habitica): o
+     padding-top:52vh SOMAVA com a altura do conteudo (.loginEscolha,
+     ~228px) -- em celular de verdade, com a barra de endereco do Chrome
+     visivel, a altura util da viewport fica bem menor que window.innerHeight
+     usado pelo "vh" do CSS. Resultado: 52vh + conteudo ultrapassava a
+     tela e #intro (overflow-y:auto) forcava scroll so pra ver os botoes
+     -- exatamente o que o Habitica NUNCA faz (o video mostra os botoes
+     sempre visiveis, sem arrastar nada). #passoLogin (.carrosselSlide)
+     ja tem inset:0 (altura = 100% do espaco disponivel de verdade, nunca
+     maior que a tela) -- entao troca o padding-top fixo por
+     justify-content:flex-end: sem nenhuma reserva de espaco em vh, o
+     conteudo so gruda no fundo do espaco que sobrou, adaptando sozinho a
+     qualquer altura de tela/barra do navegador, sem jamais estourar. */
+  #passoLogin.carrosselSlide{justify-content:flex-end}
+  .loginEscolha{margin-top:18px;margin-bottom:8px}
   #passoLogin .titulo{font-family:'Silkscreen',monospace !important;color:#F2A65A !important;
                        font-size:19px !important;letter-spacing:1px !important;
                        text-transform:none !important;font-style:normal !important;
@@ -3400,8 +3413,21 @@
      isso a "escala" parecia errada -- nao eram os botoes em si, era o
      cenario ocupando so ~18% da tela em vez de mais da metade). Troca
      pra vh, proporcional a tela de verdade, igual o mockup pretendia. */
-  #passoLogin.carrosselSlide{padding-top:52vh;justify-content:flex-start}
-  .loginEscolha{margin-top:18px}
+  /* FIX (v4.128, bug relatado pelo usuario com video do Habitica): o
+     padding-top:52vh SOMAVA com a altura do conteudo (.loginEscolha,
+     ~228px) -- em celular de verdade, com a barra de endereco do Chrome
+     visivel, a altura util da viewport fica bem menor que window.innerHeight
+     usado pelo "vh" do CSS. Resultado: 52vh + conteudo ultrapassava a
+     tela e #intro (overflow-y:auto) forcava scroll so pra ver os botoes
+     -- exatamente o que o Habitica NUNCA faz (o video mostra os botoes
+     sempre visiveis, sem arrastar nada). #passoLogin (.carrosselSlide)
+     ja tem inset:0 (altura = 100% do espaco disponivel de verdade, nunca
+     maior que a tela) -- entao troca o padding-top fixo por
+     justify-content:flex-end: sem nenhuma reserva de espaco em vh, o
+     conteudo so gruda no fundo do espaco que sobrou, adaptando sozinho a
+     qualquer altura de tela/barra do navegador, sem jamais estourar. */
+  #passoLogin.carrosselSlide{justify-content:flex-end}
+  .loginEscolha{margin-top:18px;margin-bottom:8px}
   #passoLogin .titulo{font-family:'Silkscreen',monospace !important;color:#F2A65A !important;
                        font-size:19px !important;letter-spacing:1px !important;
                        text-transform:none !important;font-style:normal !important;

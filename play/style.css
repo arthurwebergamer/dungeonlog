@@ -1858,7 +1858,15 @@
      .carrosselSlide) -- com .loginEscolha (tela de escolha, curta) o
      center deixava uma folga enorme entre o cenario e o conteudo; o
      mockup mostra o conteudo colado logo abaixo do cenario. */
-  #passoLogin.carrosselSlide{padding-top:150px;justify-content:flex-start}
+  /* FIX (v4.123, pedido do usuario com print): o mockup usa
+     .cenarioTopo{height:56%} DENTRO do .telafone (o "celular" em
+     miniatura do mockup, 230px de largura so pra visualizacao lado a
+     lado) -- eu tinha portado o valor em PIXEL (150px) sem escalar pra
+     tela real, o que deixava o cenario minusculo e desproporcional (por
+     isso a "escala" parecia errada -- nao eram os botoes em si, era o
+     cenario ocupando so ~18% da tela em vez de mais da metade). Troca
+     pra vh, proporcional a tela de verdade, igual o mockup pretendia. */
+  #passoLogin.carrosselSlide{padding-top:52vh;justify-content:flex-start}
   .loginEscolha{margin-top:18px}
   #passoLogin .titulo{font-family:'Silkscreen',monospace !important;color:#F2A65A !important;
                        font-size:19px !important;letter-spacing:1px !important;
@@ -1895,12 +1903,20 @@
      cadastro, ja existente, zero mudanca de logica) fica em
      .loginFormWrap, escondido ate a pessoa escolher "Continuar com
      email" ou "Entrar" (ver JS logo apos o insertAdjacentHTML). */
-  .loginEscolha{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center}
+  .loginEscolha{display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;
+                width:100%;padding:0 4px}
   .loginEscolha .marca{margin-bottom:0}
-  .loginEscolhaTagline{font-size:13px;color:var(--dim);text-shadow:0 1px 4px rgba(0,0,0,.85);margin-top:-6px}
-  .loginEscolha .primario,.loginEscolha .loginGoogleBtn{width:100%}
+  .loginEscolha .titulo{font-size:26px !important}
+  .loginEscolhaTagline{font-size:15px;color:var(--dim);text-shadow:0 1px 4px rgba(0,0,0,.85);margin-top:-4px}
+  /* FIX (v4.123): os botoes de escolha (CTA principal da tela) reusam
+     .loginGoogleBtn, mas com padding/fonte proprios, maiores que o botao
+     Google "de dentro" do formulario (.loginFormWrap .loginGoogleBtn,
+     intocado) -- no mockup esses 2 botoes sao o elemento dominante da
+     tela, nao um botao secundario pequeno. */
+  .loginEscolha .primario,.loginEscolha .loginGoogleBtn{width:100%;padding:17px;font-size:16.5px}
   .loginGoogleBtn.email{background:#251E38;color:#F5F0E9;border:1px solid #3B3057}
   .loginGoogleBtn.email svg{color:var(--accent)}
+  .loginEscolha .loginRodape{font-size:14px;margin-top:2px}
   .loginFormWrap{display:flex;flex-direction:column;gap:18px}
 
   .loginTopBtns{position:fixed;top:calc(14px + env(safe-area-inset-top));right:14px;
@@ -2142,7 +2158,7 @@
     opacity:0;transition:opacity .45s ease;pointer-events:none}
   #introCenario{position:fixed;left:0;right:0;top:0;bottom:0;z-index:-1;
     overflow:hidden;opacity:0;transition:opacity .35s ease;pointer-events:none}
-  #introCenario.modoLogin{bottom:auto;height:150px}
+  #introCenario.modoLogin{bottom:auto;height:52vh}
   #introCenario.ativo{opacity:1}
   #introCenario .cenarioImg{position:absolute;inset:0;width:100%;height:100%;
     object-fit:cover;image-rendering:pixelated;opacity:0}
@@ -3376,7 +3392,15 @@
      .carrosselSlide) -- com .loginEscolha (tela de escolha, curta) o
      center deixava uma folga enorme entre o cenario e o conteudo; o
      mockup mostra o conteudo colado logo abaixo do cenario. */
-  #passoLogin.carrosselSlide{padding-top:150px;justify-content:flex-start}
+  /* FIX (v4.123, pedido do usuario com print): o mockup usa
+     .cenarioTopo{height:56%} DENTRO do .telafone (o "celular" em
+     miniatura do mockup, 230px de largura so pra visualizacao lado a
+     lado) -- eu tinha portado o valor em PIXEL (150px) sem escalar pra
+     tela real, o que deixava o cenario minusculo e desproporcional (por
+     isso a "escala" parecia errada -- nao eram os botoes em si, era o
+     cenario ocupando so ~18% da tela em vez de mais da metade). Troca
+     pra vh, proporcional a tela de verdade, igual o mockup pretendia. */
+  #passoLogin.carrosselSlide{padding-top:52vh;justify-content:flex-start}
   .loginEscolha{margin-top:18px}
   #passoLogin .titulo{font-family:'Silkscreen',monospace !important;color:#F2A65A !important;
                        font-size:19px !important;letter-spacing:1px !important;
@@ -3413,12 +3437,20 @@
      cadastro, ja existente, zero mudanca de logica) fica em
      .loginFormWrap, escondido ate a pessoa escolher "Continuar com
      email" ou "Entrar" (ver JS logo apos o insertAdjacentHTML). */
-  .loginEscolha{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center}
+  .loginEscolha{display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;
+                width:100%;padding:0 4px}
   .loginEscolha .marca{margin-bottom:0}
-  .loginEscolhaTagline{font-size:13px;color:var(--dim);text-shadow:0 1px 4px rgba(0,0,0,.85);margin-top:-6px}
-  .loginEscolha .primario,.loginEscolha .loginGoogleBtn{width:100%}
+  .loginEscolha .titulo{font-size:26px !important}
+  .loginEscolhaTagline{font-size:15px;color:var(--dim);text-shadow:0 1px 4px rgba(0,0,0,.85);margin-top:-4px}
+  /* FIX (v4.123): os botoes de escolha (CTA principal da tela) reusam
+     .loginGoogleBtn, mas com padding/fonte proprios, maiores que o botao
+     Google "de dentro" do formulario (.loginFormWrap .loginGoogleBtn,
+     intocado) -- no mockup esses 2 botoes sao o elemento dominante da
+     tela, nao um botao secundario pequeno. */
+  .loginEscolha .primario,.loginEscolha .loginGoogleBtn{width:100%;padding:17px;font-size:16.5px}
   .loginGoogleBtn.email{background:#251E38;color:#F5F0E9;border:1px solid #3B3057}
   .loginGoogleBtn.email svg{color:var(--accent)}
+  .loginEscolha .loginRodape{font-size:14px;margin-top:2px}
   .loginFormWrap{display:flex;flex-direction:column;gap:18px}
 
   .loginTopBtns{position:fixed;top:calc(14px + env(safe-area-inset-top));right:14px;
@@ -3660,7 +3692,7 @@
     opacity:0;transition:opacity .45s ease;pointer-events:none}
   #introCenario{position:fixed;left:0;right:0;top:0;bottom:0;z-index:-1;
     overflow:hidden;opacity:0;transition:opacity .35s ease;pointer-events:none}
-  #introCenario.modoLogin{bottom:auto;height:150px}
+  #introCenario.modoLogin{bottom:auto;height:52vh}
   #introCenario.ativo{opacity:1}
   #introCenario .cenarioImg{position:absolute;inset:0;width:100%;height:100%;
     object-fit:cover;image-rendering:pixelated;opacity:0}

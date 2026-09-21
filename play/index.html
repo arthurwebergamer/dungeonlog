@@ -606,13 +606,10 @@
         <button class="cfgbtn" id="cfgEntrarBtn" data-i18n="cfg.criarConta">Criar conta</button>
       </div>
 
-      <div class="cfgrow">
-        <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13"/><path d="M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/></svg></span>
-        <div class="cfgtxt">
-          <b data-i18n="cfg.apagarDados">Apagar dados</b>
-          <span data-i18n="cfg.apagarDadosDesc">Zera nível, moedas, itens e vida. Não tem volta.</span>
-        </div>
-      </div>
+      <!-- v4.135 (pedido do usuario): linha "Apagar dados" removida daqui --
+           era estatica (sem onclick, sem id) e duplicava o botao "Apagar
+           tudo" no rodape do menu, que ja faz exatamente isso (ver secao
+           35, mais abaixo no arquivo). -->
 
       <div class="edsec" data-i18n="cfg.app">App</div>
 

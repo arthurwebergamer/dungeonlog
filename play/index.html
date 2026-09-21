@@ -13243,22 +13243,33 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           if (typeof window.desenharHeroi === 'function') window.desenharHeroi();
           if (typeof window.render === 'function') window.render();
         } else {
-          // conta nova, sem save -- fecha boas-vindas e pula DIRETO pro
-          // slide de transicao ("vamos te conhecer melhor...", ver
-          // SLIDE_TRANSICAO no bloco do carrossel -- era o slide 4, virou
-          // o 5 no item 46, quando o slide de idioma entrou entre EVOLUA
-          // e a transicao), nao mais de volta pro slide de ONDE A PESSOA
-          // VEIO. v4.130 (pedido do usuario): quem acabou de criar conta
-          // ja viu o motivo de usar o app (senao nao teria se cadastrado)
-          // -- fazer reassistir DUNGEONLOG/BATALHA/EVOLUA/IDIOMA de novo
-          // (caso tenha aberto o login logo no slide 1) e atrito sem
-          // propósito. irParaCarrossel(5) e window.irParaCarrossel,
-          // exposto pelo modulo do carrossel pra uso exatamente assim.
-          // Fundo NAO e limpo aqui -- so limpa de verdade quando #entrar
-          // (fim do slide Tarefas) chamar render().
-          document.getElementById('passoBoasVindas').classList.remove('on');
-          if (typeof window.irParaCarrossel === 'function') window.irParaCarrossel(5);
-          else if (typeof window.voltarDoLoginCarrossel === 'function') window.voltarDoLoginCarrossel(); // fallback defensivo, nao deveria disparar
+          // v4.124: sem save local = conta nova. ANTES pulava pro slide
+          // de nome/heroi (irParaCarrossel(5)) -- esse slide NAO EXISTE
+          // MAIS no carrossel reduzido (item mais recente do roadmap
+          // cortou o carrossel pra so 4 slides + login), entao
+          // irParaCarrossel(5) nao achava nada (slideEl(5) retorna null)
+          // e travava a pessoa numa tela em branco logo apos criar
+          // conta -- bug real, achado implementando o pedido abaixo.
+          // Pedido do usuario: em vez de pedir pra escolher nome/heroi
+          // na hora, segue o padrao do Habitica -- nome padrao tirado do
+          // email, heroi padrao (idx 0), e entra direto no app. Da pra
+          // trocar nome/heroi depois nas Opcoes (campo ja existe).
+          const nomeFromEmail = ((user.email || '').split('@')[0] || '')
+            .replace(/[._-]+/g, ' ')
+            .trim()
+            .split(' ')
+            .filter(Boolean)[0] || '';
+          const nomePadrao = nomeFromEmail
+            ? nomeFromEmail.charAt(0).toUpperCase() + nomeFromEmail.slice(1).toLowerCase()
+            : (idiomaApp() === 'en' ? 'Adventurer' : 'Aventureiro');
+          if (typeof nomeHeroi !== 'undefined') nomeHeroi = nomePadrao;
+          if (typeof heroiEscolhido !== 'undefined') heroiEscolhido = 0;
+          if (typeof window.salvar === 'function') window.salvar();
+          intro.classList.add('off');
+          intro.classList.remove('loginBg');
+          intro.style.backgroundImage = '';
+          if (typeof window.desenharHeroi === 'function') window.desenharHeroi();
+          if (typeof window.render === 'function') window.render();
         }
       }
 

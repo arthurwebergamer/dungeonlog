@@ -2054,6 +2054,26 @@
     100%{opacity:0;transform:translateY(6px)}
   }
 
+  /* v4.15x: redesign visual do onboarding (pedido do usuario) -- dots no
+     rodape (perto do botao, nao mais no topo), titulo em Outfit bold
+     (nao mais Silkscreen, exceto no wordmark DUNGEONLOG do slide 1 e no
+     login, que ficam como estao), botao em pilula translucida. Fundo
+     gradiente por slide fica em JS (pintarFundoOnboarding(), reaproveita
+     o mesmo mecanismo de intro.style.backgroundImage que pintarParede()
+     ja usa) -- via CSS sozinho o gradiente ficaria preso dentro do
+     padding do .card/.intro e sobraria uma borda da parede antiga
+     (era exatamente o "mistura com a tela antiga" reportado). */
+  #passoCarrosselTudo{position:relative}
+  .carrosselDots{position:absolute;left:0;right:0;bottom:78px;justify-content:center;pointer-events:none}
+  .carrosselSlide:not([data-slide="1"]):not([data-slide="login"]) .titulo{
+    font-family:'Outfit',sans-serif !important;font-weight:800 !important;font-size:22px !important;
+    letter-spacing:-.01em !important;color:#fff !important;text-transform:none !important;font-style:normal !important}
+  .carrosselSlide:not([data-slide="1"]):not([data-slide="login"]) .lema{
+    color:rgba(255,255,255,.85) !important;font-style:normal !important;font-family:'Outfit',sans-serif !important}
+  .carrosselSlide:not([data-slide="login"]) .primario{
+    border-radius:999px !important;background:rgba(0,0,0,.28) !important;color:#fff !important;
+    border:none !important;box-shadow:none !important;text-transform:none !important;letter-spacing:normal !important}
+
   /* trio escalonado do slide 1 (marca) -- igual a foto de referencia:
      sprite do meio maior/na frente, laterais menores/atras, um pouco
      mais baixos, sobrepondo o do meio. align-items:flex-end + tamanhos
@@ -3464,6 +3484,26 @@
     45%,92%{opacity:1;transform:translateY(0)}
     100%{opacity:0;transform:translateY(6px)}
   }
+
+  /* v4.15x: redesign visual do onboarding (pedido do usuario) -- dots no
+     rodape (perto do botao, nao mais no topo), titulo em Outfit bold
+     (nao mais Silkscreen, exceto no wordmark DUNGEONLOG do slide 1 e no
+     login, que ficam como estao), botao em pilula translucida. Fundo
+     gradiente por slide fica em JS (pintarFundoOnboarding(), reaproveita
+     o mesmo mecanismo de intro.style.backgroundImage que pintarParede()
+     ja usa) -- via CSS sozinho o gradiente ficaria preso dentro do
+     padding do .card/.intro e sobraria uma borda da parede antiga
+     (era exatamente o "mistura com a tela antiga" reportado). */
+  #passoCarrosselTudo{position:relative}
+  .carrosselDots{position:absolute;left:0;right:0;bottom:78px;justify-content:center;pointer-events:none}
+  .carrosselSlide:not([data-slide="1"]):not([data-slide="login"]) .titulo{
+    font-family:'Outfit',sans-serif !important;font-weight:800 !important;font-size:22px !important;
+    letter-spacing:-.01em !important;color:#fff !important;text-transform:none !important;font-style:normal !important}
+  .carrosselSlide:not([data-slide="1"]):not([data-slide="login"]) .lema{
+    color:rgba(255,255,255,.85) !important;font-style:normal !important;font-family:'Outfit',sans-serif !important}
+  .carrosselSlide:not([data-slide="login"]) .primario{
+    border-radius:999px !important;background:rgba(0,0,0,.28) !important;color:#fff !important;
+    border:none !important;box-shadow:none !important;text-transform:none !important;letter-spacing:normal !important}
 
   /* trio escalonado do slide 1 (marca) -- igual a foto de referencia:
      sprite do meio maior/na frente, laterais menores/atras, um pouco

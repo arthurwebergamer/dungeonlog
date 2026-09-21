@@ -11558,6 +11558,9 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     intro.style.imageRendering = 'pixelated';
   }
   pintarParede();
+  window.pintarParede = pintarParede; // usado pelo carrossel (script separado,
+                                       // mais abaixo) pra restaurar a parede
+                                       // original ao sair do gradiente por slide
 
   // ---------- logo do app REMOVIDO daqui (pedido do usuario: so texto,
   // sem imagem nenhuma nas telas de login/splash/verificacao). Existia
@@ -12176,7 +12179,37 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     return palco.querySelector('.carrosselSlide[data-slide="' + n + '"]');
   }
 
+  // v4.15x: fundo gradiente por slide (pedido do usuario, redesign
+  // completo do onboarding) -- pintarParede() (acima) pinta a MESMA
+  // parede de pedra pro #intro inteiro (splash/carrossel/login), entao
+  // trocar o CSS so do .carrosselSlide deixava uma borda da parede
+  // antiga visivel na moldura do .card/.intro (padding). Repintando o
+  // proprio #intro por cima (mesmo elemento que pintarParede() usa) o
+  // gradiente cobre 100% da tela, sem sobra. Sem tile (so gradiente
+  // liso) pra bater com o mockup aprovado.
+  const GRADIENTES_ONBOARD = {
+    1: 'linear-gradient(160deg,#251E38 0%,#1A1526 100%)',
+    2: 'linear-gradient(160deg,#2C2444 0%,#1A1526 100%)',
+    3: 'linear-gradient(160deg,#3A2F16 0%,#1F1A0C 100%)',
+    4: 'linear-gradient(160deg,#1C2E3A 0%,#101B22 100%)',
+    5: 'linear-gradient(160deg,#251E38 0%,#1A1526 100%)',
+    6: 'linear-gradient(160deg,#251E38 0%,#1A1526 100%)',
+    7: 'linear-gradient(160deg,#2C2444 0%,#1A1526 100%)',
+    8: 'linear-gradient(160deg,#1C2E3A 0%,#101B22 100%)'
+  };
+  function pintarFundoOnboarding(num){
+    const grad = GRADIENTES_ONBOARD[num];
+    // login/desconhecido: volta pra parede de pedra original (funcao
+    // definida num <script> anterior, exposta via window.pintarParede)
+    if (!grad){ if (typeof window.pintarParede === 'function') window.pintarParede(); return; }
+    intro.style.backgroundImage = grad;
+    intro.style.backgroundSize = 'cover';
+    intro.style.backgroundRepeat = 'no-repeat';
+    intro.style.backgroundPosition = 'center';
+  }
+
   function atualizarTopo(num){
+    pintarFundoOnboarding(num);
     document.querySelectorAll('#carrosselDots .carrosselDot').forEach((d, j) => {
       d.classList.toggle('on', j === num - 1);
     });
@@ -12239,6 +12272,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       if (n) ultimoSlideAntesLogin = n;
     }
     containerCarrossel.classList.add('on');
+    if (typeof window.pintarParede === 'function') window.pintarParede(); // login sai do gradiente por slide, volta pra parede de pedra original
     document.querySelectorAll('#carrosselDots .carrosselDot').forEach(d => d.classList.remove('on'));
     // "Criar conta"/"Sair" (Config) recarregam a pagina e forcam essa
     // funcao a rodar ANTES de qualquer slide ter sido mostrado -- nesse

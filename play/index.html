@@ -177,7 +177,15 @@
 <div class="app">
 
   <div class="topbar">
-    <span class="lvl" id="lvl">Nível I</span>
+    <!-- PLANO PRO: #lvl continua exatamente igual (render() ainda escreve
+         textContent nele direto, linha ~3492 -- por isso o trigger novo
+         ENVOLVE o span antigo em vez de substituir, senao render()
+         apagaria o chevron/nome do personagem a cada frame). -->
+    <button class="pjTrigger" id="pjTrigger" aria-label="Trocar de herói" type="button">
+      <span class="pjNomeTopo" id="pjNomeTopo"></span>
+      <span class="lvl" id="lvl">Nível I</span>
+      <svg class="pjChevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
     <div class="estagio-pill-wrap" id="estagioPillWrap">
       <div class="estagio-pill" id="estagioPill">
         <span class="estagio-pill-lbl" id="estagioTopoLbl">Estágio 1</span>
@@ -193,6 +201,19 @@
       <svg id="topoSomIcone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
     </button>
   </div>
+
+  <!-- PLANO PRO -- dropdown "Meus heróis" (troca de personagem) e a
+       cortina de transicao. Vivem soltos aqui, fora da .topbar, porque
+       sao position:absolute relativos ao .app (que ja e position:relative
+       desde a media query existente -- nao precisou de CSS novo pra isso). -->
+  <div class="pjDropdown" id="pjDropdown">
+    <div class="edsec">Meus heróis</div>
+    <div class="pjLista" id="pjLista"></div>
+    <button class="pjNovoBtn" id="pjNovoBtn" type="button">
+      <span>+ Novo herói</span>
+    </button>
+  </div>
+  <div class="pjCortina" id="pjCortina"></div>
 
   <div class="arena">
     <div class="arena-bg-layer" id="arenaBgA"></div>
@@ -585,13 +606,10 @@
         <button class="cfgbtn" id="cfgEntrarBtn" data-i18n="cfg.criarConta">Criar conta</button>
       </div>
 
-      <div class="cfgrow">
-        <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13"/><path d="M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/></svg></span>
-        <div class="cfgtxt">
-          <b data-i18n="cfg.apagarDados">Apagar dados</b>
-          <span data-i18n="cfg.apagarDadosDesc">Zera nível, moedas, itens e vida. Não tem volta.</span>
-        </div>
-      </div>
+      <!-- v4.135 (pedido do usuario): linha "Apagar dados" removida daqui --
+           era estatica (sem onclick, sem id) e duplicava o botao "Apagar
+           tudo" no rodape do menu, que ja faz exatamente isso (ver secao
+           35, mais abaixo no arquivo). -->
 
       <div class="edsec" data-i18n="cfg.app">App</div>
 
@@ -687,6 +705,40 @@
         </div>
         <div class="grade" id="gradeHeroisConfig"></div>
       </div>
+    </div>
+  </div>
+
+  <!-- PLANO PRO -- criar personagem novo. Mesma estrutura de #heroiOverlay
+       acima (nome + grade de sprites), copiada de proposito em vez de
+       reaproveitar os MESMOS ids -- heroiOverlay edita o heroi ATIVO ao
+       vivo (pintarGradeConfig muta heroiEscolhido direto), enquanto aqui
+       a escolha e so uma previa ate confirmar (criarPersonagem() so
+       existe depois do botao "Criar"). IDs proprios evitam that os dois
+       fluxos pisem um no outro. -->
+  <div class="cfgOverlay" id="novoHeroiOverlay">
+    <div class="cfgovhead">
+      <button class="cfgvoltar" id="novoHeroiVoltarBtn" aria-label="Voltar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      </button>
+      <span class="vtitle">Novo herói</span>
+    </div>
+    <div class="cfgovcorpo">
+      <div class="cfgrow cfgcol">
+        <div class="campo">
+          <label data-i18n="cfg.nomeDoHeroi">Nome do herói</label>
+          <input id="novoHeroiNome" placeholder="Aventureiro" data-i18n-placeholder="onb.placeholderNome" maxlength="18" autocomplete="off">
+        </div>
+      </div>
+
+      <div class="cfgrow cfgcol">
+        <div class="cfgtxt">
+          <b data-i18n="cfg.spriteDoHeroi">Sprite do herói</b>
+          <span data-i18n="cfg.escolhaQuemEnfrenta">Escolha quem enfrenta os monstros</span>
+        </div>
+        <div class="grade" id="gradeNovoHeroi"></div>
+      </div>
+
+      <button class="primario" id="novoHeroiCriarBtn" style="margin-top:8px">Criar herói</button>
     </div>
   </div>
 
@@ -1329,8 +1381,23 @@ try {
   if (uidSalvo) _uidAtivo = uidSalvo;
 } catch(e){}
 
+// PLANO PRO (roadmap: item 1 do Plano de Lancamento) -- personagem ativo
+// dentro da conta. Precisa ser resolvido ANTES de chaveSaveAtual()/
+// chaveConta(), que passam a usar essa variavel -- mesmo motivo de
+// _uidAtivo estar aqui em cima. Toda conta (inclusive sem login) sempre
+// tem pelo menos 1 personagem ('pj1'), sem precisar de setup.
+function chavePersonagemAtivo(){
+  return _uidAtivo ? ('questlog.personagemAtivo.v1.uid.' + _uidAtivo) : 'questlog.personagemAtivo.v1';
+}
+let _personagemAtivo = 'pj1';
+try {
+  const pjSalvo = localStorage.getItem(chavePersonagemAtivo());
+  if (pjSalvo) _personagemAtivo = pjSalvo;
+} catch(e){}
+
 function chaveSaveAtual(){
-  return _uidAtivo ? ('questlog.v1.uid.' + _uidAtivo) : 'questlog.v1';
+  const base = _uidAtivo ? ('questlog.v1.uid.' + _uidAtivo) : 'questlog.v1';
+  return base + '.pj.' + _personagemAtivo;
 }
 window.chaveSaveAtual = chaveSaveAtual;
 
@@ -1345,8 +1412,14 @@ window.chaveSaveAtual = chaveSaveAtual;
 // idioma/tema/sfx ficam de fora de proposito: sao preferencia do
 // APARELHO, nao da conta (ninguem espera o idioma resetar ao trocar de
 // conta no mesmo celular).
+// ATUALIZADO (Plano Pro): ganhou tambem o sufixo de personagem, mesmo
+// motivo de chaveSaveAtual() acima -- as 15 chaves de
+// CHAVES_SECUNDARIAS_CONTA (estagio, tema da arena, atributos,
+// conquistas, historico etc.) sao progresso de JOGO, entao precisam
+// separar por personagem, nao so por conta.
 function chaveConta(chaveBase){
-  return _uidAtivo ? (chaveBase + '.uid.' + _uidAtivo) : chaveBase;
+  const base = _uidAtivo ? (chaveBase + '.uid.' + _uidAtivo) : chaveBase;
+  return base + '.pj.' + _personagemAtivo;
 }
 window.chaveConta = chaveConta;
 
@@ -1386,7 +1459,106 @@ window.definirUidAtivo = function(uid){
     if (_uidAtivo) localStorage.setItem('questlog.uidAtivo.v1', _uidAtivo);
     else localStorage.removeItem('questlog.uidAtivo.v1');
   } catch(e){}
+  // PLANO PRO: personagemAtivo e por CONTA -- troca de uid precisa reler
+  // qual personagem essa conta especifica tinha ativo, senao
+  // _personagemAtivo fica "vazado" da conta anterior (mesma classe de
+  // bug ja documentada no roadmap pra outras chaves nessa troca).
+  try {
+    const pjSalvo = localStorage.getItem(chavePersonagemAtivo());
+    _personagemAtivo = pjSalvo || 'pj1';
+  } catch(e){ _personagemAtivo = 'pj1'; }
 };
+
+// ---------------------------------------------------------------------
+// PLANO PRO -- multiplos herois/personagens por conta (roadmap: Plano de
+// Lancamento, item 1). Gratis = 1 personagem (pj1, sempre existe, zero
+// setup); assinante = ate 4. So a camada de DADO aqui -- sem UI ainda
+// (seletor, onboarding do personagem novo, etc. ficam pra depois).
+// ---------------------------------------------------------------------
+function chavePersonagens(){
+  return _uidAtivo ? ('questlog.personagens.v1.uid.' + _uidAtivo) : 'questlog.personagens.v1';
+}
+
+function listarPersonagens(){
+  try {
+    const bruto = localStorage.getItem(chavePersonagens());
+    const arr = bruto ? JSON.parse(bruto) : null;
+    if (Array.isArray(arr) && arr.length) return arr;
+  } catch(e){}
+  // conta ainda sem lista gravada: personagem default existe do mesmo
+  // jeito que _personagemAtivo comeca em 'pj1' sozinho, sem setup.
+  return [{ id: 'pj1', nome: null, criadoEm: null }];
+}
+window.listarPersonagens = listarPersonagens;
+
+function salvarListaPersonagens(lista){
+  try { localStorage.setItem(chavePersonagens(), JSON.stringify(lista)); } catch(e){}
+}
+
+function limitePersonagens(){
+  return (typeof assinaturaAtiva === 'function' && assinaturaAtiva()) ? 4 : 1;
+}
+window.limitePersonagens = limitePersonagens;
+
+function personagemAtivoId(){ return _personagemAtivo; }
+window.personagemAtivoId = personagemAtivoId;
+
+// le o save de OUTRO personagem sem trocar o ativo -- usado so pra
+// popular o dropdown (avatar/nome de quem nao esta selecionado agora).
+// Mesma logica de sufixo de chaveSaveAtual(), mas com um id explicito
+// em vez de ler _personagemAtivo.
+function chaveSaveDe(pjId){
+  const base = _uidAtivo ? ('questlog.v1.uid.' + _uidAtivo) : 'questlog.v1';
+  return base + '.pj.' + pjId;
+}
+function espiarSaveDe(pjId){
+  try {
+    const bruto = localStorage.getItem(chaveSaveDe(pjId));
+    if (!bruto) return null;
+    const d = JSON.parse(bruto);
+    if (!d || !d.comecou) return null;
+    return { nomeHeroi: d.nomeHeroi || 'Aventureiro', heroi: Number(d.heroi) || 0 };
+  } catch(e){ return null; }
+}
+window.espiarSaveDe = espiarSaveDe;
+
+function trocarPersonagem(id){
+  const lista = listarPersonagens();
+  if (!lista.some(p => p.id === id)) return false;
+  _personagemAtivo = id;
+  try { localStorage.setItem(chavePersonagemAtivo(), id); } catch(e){}
+  if (typeof window.carregar === 'function') window.carregar();
+  if (typeof window.desenharHeroi === 'function') window.desenharHeroi(); // render() sozinho nao redesenha o sprite -- confirmado no handler de pintarGradeConfig()
+  if (typeof window.render === 'function') window.render();
+  if (typeof window.renderInventario === 'function') window.renderInventario();
+  if (typeof window.renderLoja === 'function') window.renderLoja();
+  return true;
+}
+window.trocarPersonagem = trocarPersonagem;
+
+// heroiIdx e opcional (indice em HEROIS) -- quem cria pela tela nova
+// escolhe o sprite antes de confirmar; quem chama so por console (teste)
+// pode omitir e fica no sprite 0 padrao, igual conta nova sempre foi.
+function criarPersonagem(nome, heroiIdx){
+  const lista = listarPersonagens();
+  if (lista.length >= limitePersonagens()) return { ok: false, motivo: 'limite' };
+  const id = 'pj' + Date.now().toString(36);
+  const nomeFinal = (nome && nome.trim()) ? nome.trim() : null;
+  lista.push({ id: id, nome: nomeFinal, criadoEm: new Date().toISOString() });
+  salvarListaPersonagens(lista);
+  trocarPersonagem(id); // save desse id nao existe ainda -- carregar() cai no mesmo caminho ja corrigido de "conta nova" (resetarEstadoParaPadrao)
+  // resetarEstadoParaPadrao() (dentro de carregar(), acima) ja rodou e
+  // deixou nomeHeroi/heroiEscolhido no default -- agora pisa em cima com
+  // a escolha feita na tela, e persiste ja de cara (senao um F5 antes de
+  // qualquer acao no jogo perderia nome/sprite escolhidos).
+  if (typeof nomeHeroi !== 'undefined' && nomeFinal) nomeHeroi = nomeFinal;
+  if (typeof heroiEscolhido !== 'undefined' && typeof heroiIdx === 'number' && !isNaN(heroiIdx)) heroiEscolhido = heroiIdx;
+  if (typeof window.salvar === 'function') window.salvar();
+  if (typeof window.desenharHeroi === 'function') window.desenharHeroi(); // idem trocarPersonagem() -- sprite so atualiza chamando isso
+  if (typeof window.render === 'function') window.render();
+  return { ok: true, id: id };
+}
+window.criarPersonagem = criarPersonagem;
 
 // ---------------------------------------------------------------------
 // PAINEL DE DEBUG -- fluxo de login/troca de conta. Religado temporario
@@ -3674,6 +3846,36 @@ function numeroFlutuanteHeroi(xpGanho, moedasGanhas){
   setTimeout(() => el.remove(), 1100); // bate com a nova duracao de dmgFloat (1.9s -> 1.1s)
 }
 window.numeroFlutuanteHeroi = numeroFlutuanteHeroi;
+
+// VARIANTE pro carrossel de onboarding (slide "golpe") -- mesma classe
+// dmg-float/pilha, mas com "fixo" (position:fixed, ver style.css) porque
+// ali NAO existe .arena: a origem passa a ser coordenadas de VIEWPORT
+// (getBoundingClientRect direto do heroiEl, sem subtrair offset de arena
+// nenhuma) e o elemento vai pro body em vez de pra dentro da arena.
+function obNumeroFlutuanteHeroi(heroiEl, xpGanho, moedasGanhas){
+  if (!heroiEl) return;
+  const heroiRect = heroiEl.getBoundingClientRect();
+  // FIX (print do usuario): a v1 copiava o offset do combate real
+  // (heroiRect.left - 30, texto alinhado a direita crescendo pra
+  // ESQUERDA) -- so que no combate o heroi fica mais centralizado na
+  // arena, com sobra de espaco a esquerda. No onboarding o heroi fica
+  // perto da borda esquerda da tela (obHeroSp, left:6%), entao esse
+  // mesmo offset jogava o texto pra FORA da viewport. Aqui o texto sai
+  // do lado DIREITO do heroi (.pilha.direita, ja existente, cresce pra
+  // direita) em vez do esquerdo.
+  const originX = heroiRect.right + 12;
+  const originY = heroiRect.top + heroiRect.height / 2;
+
+  const el = document.createElement('div');
+  el.className = 'dmg-float pilha direita fixo';
+  el.style.left = originX + 'px';
+  el.style.top = originY + 'px';
+  el.innerHTML = '<span class="dmg-moeda">+' + moedasGanhas + ' ' + COIN_SVG + '</span>'
+    + '<span class="dmg-xp">+' + xpGanho + ' XP</span>';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1100);
+}
+window.obNumeroFlutuanteHeroi = obNumeroFlutuanteHeroi;
 
 // NAO USADAS ATUALMENTE (27/08) -- pontoDeElemento/flutuanteFixo eram usadas
 // por usarItem()/venderItem() (Inventario/Loja) e antes disso por
@@ -7522,6 +7724,158 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   window.abrirHeroiConfig = abrirHeroiConfig;
   window.fecharHeroiConfig = fecharHeroiConfig;
 
+  /* =====================================================================
+     PLANO PRO -- seletor de personagem (topbar + dropdown "Meus herois")
+     e a tela de criar personagem novo. So UI/wiring aqui -- a logica de
+     dado (trocarPersonagem/criarPersonagem/listarPersonagens) ja existe
+     no topo do arquivo, junto de chaveConta().
+     ===================================================================== */
+  const pjTrigger = document.getElementById('pjTrigger');
+  const pjDropdown = document.getElementById('pjDropdown');
+  const pjLista = document.getElementById('pjLista');
+  const pjNovoBtn = document.getElementById('pjNovoBtn');
+  const pjCortina = document.getElementById('pjCortina');
+  const pjNomeTopoEl = document.getElementById('pjNomeTopo');
+
+  function atualizarNomeTopoPersonagem(){
+    if (!pjNomeTopoEl) return;
+    const ativo = personagemAtivoId();
+    const p = listarPersonagens().find(x => x.id === ativo);
+    // so mostra rotulo quando o personagem tem NOME PROPRIO dado na
+    // criacao -- grátis com 1 personagem só fica igual sempre foi
+    // (so "Nível X"), sem rotulo extra poluindo a topbar.
+    pjNomeTopoEl.textContent = (p && p.nome) ? p.nome : '';
+  }
+  window.atualizarNomeTopoPersonagem = atualizarNomeTopoPersonagem;
+
+  function pintarDropdownPersonagens(){
+    if (!pjLista) return;
+    const ativo = personagemAtivoId();
+    const lista = listarPersonagens();
+    const en = idiomaApp() === 'en';
+    pjLista.innerHTML = '';
+    lista.forEach(p => {
+      const ehAtivo = p.id === ativo;
+      const dados = ehAtivo
+        ? { nomeHeroi: (typeof nomeHeroi !== 'undefined' && nomeHeroi) || 'Aventureiro', heroi: typeof heroiEscolhido === 'number' ? heroiEscolhido : 0 }
+        : espiarSaveDe(p.id);
+      const heroiImg = (dados && typeof HEROIS !== 'undefined' && HEROIS[dados.heroi]) ? HEROIS[dados.heroi].img : '';
+      const nomeMostrado = p.nome || (dados ? dados.nomeHeroi : (en ? 'Adventurer' : 'Aventureiro'));
+      const btn = document.createElement('button');
+      btn.className = 'pjItem' + (ehAtivo ? ' ativo' : '');
+      btn.type = 'button';
+      btn.innerHTML =
+        '<span class="pjAvatar">' + (heroiImg ? ('<img src="' + heroiImg + '" alt="">') : '') + '</span>' +
+        '<span class="pjTxt"><b>' + nomeMostrado + '</b>' +
+        (ehAtivo ? ('<span>' + (en ? 'active now' : 'ativo agora') + '</span>') : '') + '</span>';
+      if (!ehAtivo) btn.onclick = () => trocarPersonagemComTransicao(p.id);
+      pjLista.appendChild(btn);
+    });
+
+    const pro = (typeof assinaturaAtiva === 'function' && assinaturaAtiva());
+    const cheio = lista.length >= limitePersonagens();
+    if (pjNovoBtn){
+      pjNovoBtn.classList.toggle('bloqueado', cheio && !pro);
+      pjNovoBtn.innerHTML = (en ? '+ New hero' : '+ Novo herói') + (!pro ? ' <span class="pjSelo">PRO</span>' : '');
+    }
+  }
+  window.pintarDropdownPersonagens = pintarDropdownPersonagens;
+
+  function abrirDropdownPersonagens(){
+    pintarDropdownPersonagens();
+    if (pjDropdown) pjDropdown.classList.add('on');
+    if (pjTrigger) pjTrigger.classList.add('aberto');
+  }
+  function fecharDropdownPersonagens(){
+    if (pjDropdown) pjDropdown.classList.remove('on');
+    if (pjTrigger) pjTrigger.classList.remove('aberto');
+  }
+  if (pjTrigger) pjTrigger.onclick = (e) => {
+    e.stopPropagation();
+    if (pjDropdown && pjDropdown.classList.contains('on')) fecharDropdownPersonagens();
+    else abrirDropdownPersonagens();
+  };
+  // fecha ao clicar fora -- guarda defensiva (e.target.closest as vezes
+  // nao existe, ver bug pre-existente ja catalogado do listener de
+  // .cfgbtnfull) pra esse listener novo nunca lancar erro no Console.
+  document.addEventListener('pointerdown', (e) => {
+    if (!pjDropdown || !pjDropdown.classList.contains('on')) return;
+    if (!e.target || typeof e.target.closest !== 'function') return;
+    if (e.target.closest('#pjDropdown') || e.target.closest('#pjTrigger')) return;
+    fecharDropdownPersonagens();
+  });
+
+  // transicao: cortina cobre o .app, SO ENTAO troca o personagem por
+  // baixo, SO ENTAO revela -- mesma ordem (nunca revelar antes do
+  // conteudo novo estar pronto) que ja resolveu o bug de flash de tema.
+  function trocarPersonagemComTransicao(id){
+    fecharDropdownPersonagens();
+    if (!pjCortina){ trocarPersonagem(id); atualizarNomeTopoPersonagem(); return; }
+    pjCortina.classList.add('on');
+    setTimeout(() => {
+      trocarPersonagem(id);
+      atualizarNomeTopoPersonagem();
+      requestAnimationFrame(() => pjCortina.classList.remove('on'));
+    }, 220); // mesma duracao de .pjCortina no style.css -- se mudar la, mudar aqui tambem
+  }
+  window.trocarPersonagemComTransicao = trocarPersonagemComTransicao;
+
+  /* ---------- criar personagem novo ---------- */
+  const novoHeroiOverlay = document.getElementById('novoHeroiOverlay');
+  // selecao LOCAL, separada de heroiEscolhido de proposito -- heroiEscolhido
+  // e o sprite do personagem ATIVO agora; aqui e so previa ate confirmar
+  // (personagem novo nem existe ainda enquanto essa tela ta aberta).
+  let _novoHeroiSelecao = 0;
+  function pintarGradeNovoHeroi(){
+    const g = document.getElementById('gradeNovoHeroi');
+    if (!g || typeof HEROIS === 'undefined') return;
+    g.innerHTML = '';
+    HEROIS.forEach((hh, i) => {
+      const b = document.createElement('div');
+      b.className = 'opcao' + (i === _novoHeroiSelecao ? ' sel' : '');
+      b.innerHTML = '<img src="' + hh.img + '" alt="' + hh.nome + '">';
+      b.onclick = () => { _novoHeroiSelecao = i; pintarGradeNovoHeroi(); };
+      g.appendChild(b);
+    });
+  }
+  function abrirNovoHeroiOverlay(){
+    _novoHeroiSelecao = 0;
+    pintarGradeNovoHeroi();
+    const campo = document.getElementById('novoHeroiNome');
+    if (campo) campo.value = '';
+    fecharDropdownPersonagens();
+    if (novoHeroiOverlay) novoHeroiOverlay.classList.add('on');
+  }
+  function fecharNovoHeroiOverlay(){
+    if (novoHeroiOverlay) novoHeroiOverlay.classList.remove('on');
+  }
+  if (pjNovoBtn) pjNovoBtn.onclick = () => {
+    if (listarPersonagens().length >= limitePersonagens()){
+      if (typeof window.aviso === 'function') window.aviso(idiomaApp() === 'en' ? 'Hero limit reached' : 'Limite de heróis atingido');
+      return;
+    }
+    abrirNovoHeroiOverlay();
+  };
+  const btnNovoHeroiVoltar = document.getElementById('novoHeroiVoltarBtn');
+  if (btnNovoHeroiVoltar) btnNovoHeroiVoltar.onclick = fecharNovoHeroiOverlay;
+  const btnNovoHeroiCriar = document.getElementById('novoHeroiCriarBtn');
+  if (btnNovoHeroiCriar) btnNovoHeroiCriar.onclick = () => {
+    const campo = document.getElementById('novoHeroiNome');
+    const r = criarPersonagem(campo ? campo.value : '', _novoHeroiSelecao);
+    const en = idiomaApp() === 'en';
+    if (r && r.ok){
+      fecharNovoHeroiOverlay();
+      atualizarNomeTopoPersonagem();
+      if (typeof window.aviso === 'function') window.aviso(en ? 'New hero created' : 'Herói novo criado');
+    } else if (typeof window.aviso === 'function'){
+      window.aviso(en ? 'Hero limit reached' : 'Limite de heróis atingido');
+    }
+  };
+  window.abrirNovoHeroiOverlay = abrirNovoHeroiOverlay;
+  window.fecharNovoHeroiOverlay = fecharNovoHeroiOverlay;
+
+  atualizarNomeTopoPersonagem(); // primeira pintura, no boot
+
   /* ---------- Config: sub-tela Aparência (item 39) ---------- */
   const aparenciaOverlay = document.getElementById('aparenciaOverlay');
   function abrirAparenciaConfig(){
@@ -7748,9 +8102,12 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     {id:'grafite',    nome:'Escuro',   nome_en:'Dark',   cor:'#8B8B93'},
     {id:'padrao',     nome:'Laranja',  nome_en:'Orange', cor:'#F2A65A'},
     {id:'pergaminho', nome:'Dourado',  nome_en:'Gold',   cor:'#C9A961'},
-    {id:'floresta',   nome:'Verde',    nome_en:'Green',  cor:'#6FAE6F'},
-    {id:'arcano',     nome:'Ciano',    nome_en:'Cyan',   cor:'#5EEBD1'},
-    {id:'sangue',     nome:'Vermelho', nome_en:'Red',    cor:'#E8433A'}
+    // PLANO PRO -- item 2 do escopo fechado. `pro:true` e a UNICA
+    // diferenca de shape vs os temas gratis acima -- pintarTemaGrid()
+    // e escolherTema() leem essa flag pra bloquear quem nao assina.
+    // (id 'esmeralda' -- substituiu 'azul', rejeitado pelo usuario)
+    {id:'esmeralda',  nome:'Esmeralda',  nome_en:'Emerald',    cor:'#22C55E', pro:true},
+    {id:'terracota',  nome:'Terracota',  nome_en:'Terracotta', cor:'#C96A4A', pro:true}
   ];
   const CHAVE_TEMA = 'questlog.tema.v1';
 
@@ -7862,6 +8219,16 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   }
 
   function escolherTema(id){
+    // PLANO PRO -- bloqueia troca pra tema pago se nao assina. Checa
+    // pelo id direto (nao pelo objeto de TEMAS) pra funcionar mesmo se
+    // chamado de fora do clique da lista (ex.: futuro deep-link).
+    const temaAlvo = TEMAS.find(t => t.id === id);
+    if (temaAlvo && temaAlvo.pro && typeof assinaturaAtiva === 'function' && !assinaturaAtiva()){
+      if (typeof window.aviso === 'function'){
+        window.aviso(idiomaApp() === 'en' ? 'Pro plan theme' : 'Tema do Plano Pro');
+      }
+      return;
+    }
     const root = document.documentElement;
     const reduzido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduzido || id === root.getAttribute('data-tema')){
@@ -7907,15 +8274,23 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     // pedido do usuario pra tentar algo diferente. Virou lista de linhas
     // (bolinha de cor + nome + check quando selecionado), mesmo padrao
     // visual do resto de Config em vez de um grid de blocos isolado.
+    // PLANO PRO -- Azul/Terracota (t.pro) ficam com opacidade reduzida +
+    // selo "PRO" pra quem nao assina, mesma linguagem visual do dropdown
+    // de personagens (.pjNovoBtn.bloqueado). Continuam clicaveis (o
+    // aviso quem barra e escolherTema()), assim o usuario ve a cor e
+    // entende o que esta perdendo, igual o "+ Novo herói" bloqueado.
+    const bloqueado = typeof assinaturaAtiva === 'function' && !assinaturaAtiva();
     TEMAS.forEach(t => {
       const b = document.createElement('div');
-      b.className = 'temalinha' + (t.id === atual ? ' sel' : '');
+      const travado = t.pro && bloqueado;
+      b.className = 'temalinha' + (t.id === atual ? ' sel' : '') + (travado ? ' bloqueado' : '');
       let langAtual = 'pt';
       try { langAtual = localStorage.getItem('questlog.idioma.v1') || 'pt'; } catch(e){}
       const nomeTema = langAtual === 'en' ? (t.nome_en || t.nome) : t.nome;
       b.innerHTML =
         '<span class="temaDot" style="background:' + t.cor + '"></span>' +
         '<span class="temaNome">' + nomeTema + '</span>' +
+        (travado ? '<span class="temaSelo">PRO</span>' : '') +
         '<svg class="temaCheck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
       b.onclick = () => escolherTema(t.id);
       g.appendChild(b);
@@ -11087,8 +11462,37 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
   const card = intro.querySelector('.card');
 
+  // v4.120: cenario real (mesmo asset "montanhas" de TEMAS_ARENA, ja
+  // usado no slide estagio) NAO mora mais aqui dentro -- movido pra
+  // #introCenario (camada fixa, irma de .card, ver mostrarCenarioLogin()
+  // no script do carrossel mais abaixo) pelo mesmo motivo do estagio:
+  // #passoLogin vira .carrosselSlide e leva transform durante o swipe,
+  // o que cortava/deslocava a imagem quando ela morava aqui dentro.
+
   card.insertAdjacentHTML('afterbegin', `
     <div class="passo on" id="passoLogin">
+      <div class="loginEscolha" id="loginEscolha">
+        <div class="marca">
+          <span class="titulo">DUNGEONLOG</span>
+        </div>
+        <p class="loginEscolhaTagline" data-i18n="login.tagline">Suas tarefas viram uma aventura</p>
+        <button class="loginGoogleBtn" id="loginEscolhaGoogle">
+          <svg viewBox="0 0 48 48">
+            <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.7-6 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l6-6C34 5.1 29.3 3 24 3 12.4 3 3 12.4 3 24s9.4 21 21 21 21-9.4 21-21c0-1.4-.1-2.4-.4-3.5z"/>
+            <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.9 18.9 13 24 13c3.1 0 5.8 1.1 8 3l6-6C34 5.1 29.3 3 24 3 16.3 3 9.7 7.3 6.3 14.7z"/>
+            <path fill="#4CAF50" d="M24 45c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 36.4 26.7 37.3 24 37.3c-5.3 0-9.7-3.3-11.3-8l-6.5 5C9.6 40.6 16.2 45 24 45z"/>
+            <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.2 4.2-4.1 5.6l6.2 5.2C40.9 36 44 30.5 44 24c0-1.4-.1-2.4-.4-3.5z"/>
+          </svg>
+          <span data-i18n="login.continuarComGoogle">Continuar com Google</span>
+        </button>
+        <button class="loginGoogleBtn email" id="loginEscolhaEmail">
+          <span class="loginEmailEmoji" aria-hidden="true">📧</span>
+          <span data-i18n="login.continuarComEmail">Continuar com email</span>
+        </button>
+        <p class="loginRodape"><span data-i18n="login.jaTemConta">Já tem conta?</span> <button class="loginLink" id="loginEscolhaEntrar" style="padding:0" data-i18n="login.entrar">Entrar</button></p>
+      </div>
+
+      <div class="loginFormWrap" id="loginFormWrap" style="display:none">
       <div class="marca">
         <span class="titulo">DUNGEONLOG</span>
         <p class="loginModo" id="loginModo" data-i18n="login.entreNaSuaConta">Entre na sua conta</p>
@@ -11151,10 +11555,96 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       </button>
 
       <p class="loginRodape" id="loginRodape"><span data-i18n="login.naoTemConta">Não tem conta?</span> <button class="loginLink" id="loginToggleCadastro" style="padding:0" data-i18n="login.cadastreSeAgora">Cadastre-se agora</button></p>
-
-      <button class="secundario" id="loginContinuarSemConta" data-i18n="login.agoraNao">Agora não</button>
+      </div>
     </div>
   `);
+
+  // v4.121: pedido do usuario -- porta o fluxo de 2 passos do mockup
+  // (1 decisao por tela, igual Habitica): a tela inicial so mostra
+  // wordmark+tagline+2 botoes (Google/email)+link "Entrar"; o formulario
+  // completo (email/senha/cadastro) fica ESCONDIDO ate a pessoa escolher
+  // "Continuar com email" ou "Entrar" -- sem duplicar NENHUMA logica de
+  // auth, so mostra/esconde os blocos que ja existiam.
+  document.getElementById('loginEscolhaGoogle').onclick = () => {
+    const btn = document.getElementById('loginGoogleBtn');
+    if (btn) btn.click();
+  };
+  // v4.129 (pedido do usuario com video do Habitica): a troca de tela
+  // era um display:none/flex INSTANTANEO -- sem transicao nenhuma,
+  // ficava "seco" comparado ao Habitica (que desliza pra tela de
+  // email). Anima os 2 lados: escolha desliza/some pra esquerda, form
+  // aparece deslizando da direita -- mesmo truque de forcar reflow
+  // (void el.offsetHeight) ja usado no crossfade do carrossel
+  // (pintarGradienteCrossfade), senao o navegador funde os 2 estados
+  // numa transicao so e a animacao nao roda.
+  const DURACAO_TRANSICAO_LOGIN = 260;
+  // v4.132 (bug reportado com video: toque duplo rapido no "Voltar"
+  // durante os 260ms da animacao deixava a tela em branco). Causa: o
+  // handler da seta Voltar consultava window.__loginFormAberto pra
+  // decidir entre "volta pra escolha" ou "sai do login", mas essa flag
+  // ja virava false de forma SINCRONA assim que voltarParaEscolhaLogin()
+  // era chamada -- antes do setTimeout dela sequer rodar. Um segundo
+  // toque nesse meio-tempo lia a flag como false e chamava
+  // voltarDoLoginCarrossel() (saindo do login) ENQUANTO o setTimeout do
+  // primeiro toque ainda ia rodar mais tarde e reexibir a escolha com
+  // opacity:0 preso (a transicao nao chega a rodar pq o elemento pai
+  // ja tinha sido escondido pelo voltarDoLoginCarrossel). Fix: uma flag
+  // de "transicao em andamento" que ignora toques repetidos nos 260ms.
+  window.__loginEmTransicao = false;
+  const abrirFormLogin = () => {
+    if (window.__loginEmTransicao) return;
+    window.__loginEmTransicao = true;
+    const escolha = document.getElementById('loginEscolha');
+    const form = document.getElementById('loginFormWrap');
+    escolha.classList.add('loginSlideOut');
+    setTimeout(() => {
+      escolha.style.display = 'none';
+      form.style.display = 'flex';
+      form.classList.add('loginSlideIn');
+      void form.offsetHeight; // forca reflow -- ver comentario acima
+      form.classList.remove('loginSlideIn');
+      window.__loginEmTransicao = false;
+    }, DURACAO_TRANSICAO_LOGIN);
+    window.__loginFormAberto = true;
+  };
+  document.getElementById('loginEscolhaEmail').onclick = abrirFormLogin;
+  document.getElementById('loginEscolhaEntrar').onclick = abrirFormLogin;
+
+  // v4.131 (pedido do usuario, com print do Habitica): a seta "Voltar"
+  // (topo do carrossel) saia DIRETO do login inteiro mesmo quando a
+  // pessoa estava no formulario de email -- devia so voltar pra tela
+  // de escolha (Google/email), igual o proprio Habitica faz. Reverso
+  // exato de abrirFormLogin (mesma duracao/mesmo truque de reflow, so
+  // invertendo direcao e qual classe.slideOut/slideIn cada lado usa).
+  // window.__loginFormAberto (setado acima) e a flag que o handler da
+  // seta Voltar (bloco do carrossel, mais abaixo no arquivo) consulta
+  // pra decidir entre "volta pra escolha" ou "sai do login de vez".
+  window.__loginFormAberto = false;
+  window.voltarParaEscolhaLogin = () => {
+    if (window.__loginEmTransicao) return;
+    window.__loginEmTransicao = true;
+    const escolha = document.getElementById('loginEscolha');
+    const form = document.getElementById('loginFormWrap');
+    form.classList.add('loginSlideOut');
+    setTimeout(() => {
+      form.style.display = 'none';
+      form.classList.remove('loginSlideOut');
+      escolha.style.display = 'flex';
+      // v4.132 (causa real do bug de tela em branco): abrirFormLogin
+      // deixa a classe 'loginSlideOut' (opacity:0) presa em `escolha` e
+      // NUNCA a remove -- so tira ela no reset de irParaLogin(). Sem
+      // este remove aqui, a classe antiga continuava valendo mesmo
+      // depois de tirar 'loginSlideIn', prendendo a opacidade em 0 pra
+      // sempre (a tela de escolha ficava invisivel, so o fundo e a
+      // seta Voltar apareciam).
+      escolha.classList.remove('loginSlideOut');
+      escolha.classList.add('loginSlideIn');
+      void escolha.offsetHeight; // forca reflow -- ver comentario em abrirFormLogin
+      escolha.classList.remove('loginSlideIn');
+      window.__loginEmTransicao = false;
+    }, DURACAO_TRANSICAO_LOGIN);
+    window.__loginFormAberto = false;
+  };
 
   card.insertAdjacentHTML('afterbegin', `
     <div class="passo" id="passoBoasVindas">
@@ -11204,12 +11694,16 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     intro.style.backgroundImage =
       'url("data:image/png;base64,' + TILE_PEDRA_PNG + '"), ' +
       'linear-gradient(180deg, ' + rocha1 + ' 0%, ' + rocha2 + ' 55%, ' + rocha3 + ' 100%)';
+    intro.style.backgroundColor = ''; // limpa o #0B0710 solido que irParaLogin() usa (v4.127) -- senao fica preso por baixo da imagem depois de sair do login
     intro.style.backgroundRepeat = 'repeat, no-repeat';
     intro.style.backgroundPosition = 'center, center';
     intro.style.backgroundSize = '130px 41px, cover';
     intro.style.imageRendering = 'pixelated';
   }
   pintarParede();
+  window.pintarParede = pintarParede; // usado pelo carrossel (script separado,
+                                       // mais abaixo) pra restaurar a parede
+                                       // original ao sair do gradiente por slide
 
   // ---------- logo do app REMOVIDO daqui (pedido do usuario: so texto,
   // sem imagem nenhuma nas telas de login/splash/verificacao). Existia
@@ -11233,26 +11727,11 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // mandaria quem tem progresso de volta pro onboarding por cima dos
   // proprios dados. Mesmo branch de temSaveLocal/entrarNoApp ja usado
   // dentro de aoLogar(), pro mesmo problema.
-  // v4.116 (item 42-e do roadmap): login deixou de ser um PASSO do
-  // carrossel -- virou um desvio opcional, acessivel de qualquer slide
-  // via o link "Ja tem conta?" (ver IIFE do carrossel, mais abaixo).
-  // "Agora nao" so fecha o desvio e volta pro slide de onde a pessoa
-  // veio (window.voltarDoLoginCarrossel, exposto por aquela IIFE) --
-  // nao ha mais um alvo fixo, porque o login pode ser aberto a partir
-  // de qualquer ponto do onboarding agora, nao so depois do heroi.
-  document.getElementById('loginContinuarSemConta').onclick = () => {
-    const temSaveLocal = typeof window.carregar === 'function' && window.carregar();
-    if (temSaveLocal){
-      intro.classList.remove('loginBg');
-      intro.style.backgroundImage = '';
-      document.getElementById('passoLogin').classList.remove('on');
-      intro.classList.add('off');
-      if (typeof window.desenharHeroi === 'function') window.desenharHeroi();
-      if (typeof window.render === 'function') window.render();
-    } else if (typeof window.voltarDoLoginCarrossel === 'function') {
-      window.voltarDoLoginCarrossel();
-    }
-  };
+  // v4.133 (pedido do usuario): botao "Agora nao" removido do formulario --
+  // era redundante com a seta "Voltar" do topo do carrossel, que ja fecha
+  // o desvio do login e volta pro slide de origem (window.voltarDoLoginCarrossel,
+  // ver IIFE do carrossel mais abaixo). Handler antigo removido junto com
+  // o botao (ficava atribuindo onclick a um elemento inexistente).
 
   // ---------- alternar entre "Entrar" e "Cadastre-se" ----------
   let modoCadastro = false;
@@ -11500,31 +11979,41 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // EVOLUA e nome. titulo_en/texto_en/botao_en (pedido do usuario:
   // traduzir o app inteiro) adicionados nesta rodada -- escolhidos na
   // hora de montar htmlSlides, mais abaixo, lendo o idioma ja salvo.
+  // v4.16x (pedido do usuario): onboarding reduzido pra SO as 3 telas
+  // que estao no mockup (golpe/bau/estagio) + login -- DUNGEONLOG
+  // (marca/trioLogo), idioma e transicao tiradas POR ENQUANTO (nao
+  // apagadas do resto do arquivo, so fora de SLIDES -- ver passo1/
+  // passo2/passoHeroi/passo3 mais abaixo, que ficam intocados no DOM
+  // mas nao reparentados no carrossel reduzido). Ultimo slide (estagio)
+  // vai direto pro login em vez de continuar a numeracao.
   const SLIDES = [
-    { dataSlide:1, next:2, tipo:'trioLogo', idxs:[0, 32, 5], titulo:'DUNGEONLOG', titulo_en:'DUNGEONLOG',
+    { dataSlide:1, next:2, tipo:'logo',
+      fraca:'Bem-vindo ao', fraca_en:'Welcome to',
+      titulo:'DungeonLog', titulo_en:'DungeonLog',
       texto:'Suas tarefas do dia viram uma batalha. Complete tarefas, evolua seu herói, vença monstros.',
       texto_en:'Your daily tasks become a battle. Complete tasks, level up your hero, defeat monsters.',
-      botao:'Começar', botao_en:'Get started', layout:'marcaPrimeiro' },
-    { dataSlide:2, next:3, tipo:'monstro', idx:22, titulo:'BATALHA', titulo_en:'BATTLE',
-      texto:'Todo dia aparece um monstro. Ele só morre se você terminar suas tarefas.',
-      texto_en:'A monster shows up every day. It only dies if you finish your tasks.',
-      botao:'Continuar', botao_en:'Continue', layout:'comTarefasDemo' },
-    { dataSlide:3, next:4, tipo:'heroi', idx:1, titulo:'EVOLUA', titulo_en:'LEVEL UP',
-      texto:'Ganhe XP, moedas e itens conforme joga. Da raridade Comum até Lendário.',
-      texto_en:'Earn XP, coins and items as you play. From Common rarity all the way to Legendary.',
-      botao:'Continuar', botao_en:'Continue', layout:'imagemPrimeiro' },
-    { dataSlide:4, next:5, tipo:'idioma', titulo:'IDIOMA · LANGUAGE', titulo_en:'IDIOMA · LANGUAGE',
-      texto:'Escolha o idioma do app. Dá pra trocar depois em Perfil.',
-      texto_en:'Choose the app language. You can change it later in Profile.',
-      botao:'Continuar', botao_en:'Continue', layout:'idiomaEscolha' },
-    { dataSlide:5, next:6, tipo:'transicao',
-      texto:'Antes de começar, vamos te conhecer melhor...',
-      texto_en:'Before we start, let\'s get to know you better...',
-      botao:'Continuar', botao_en:'Continue', layout:'textoSolo' }
+      botao:'Começar', botao_en:'Get started', layout:'mockupExato' },
+    { dataSlide:2, next:3, tipo:'golpeAnim', idx:22,
+      fraca:'Cada tarefa concluída', fraca_en:'Every task you finish',
+      titulo:'é um golpe no monstro', titulo_en:'is a hit on the monster',
+      texto:'Termine suas tarefas e veja seu herói acertar o monstro do dia, na hora.',
+      texto_en:'Finish your tasks and watch your hero land a hit on today\'s monster, live.',
+      botao:'Continuar', botao_en:'Continue', layout:'mockupExato' },
+    { dataSlide:3, next:4, tipo:'bauAnim', idx:1,
+      fraca:'Vença o dia', fraca_en:'Win the day',
+      titulo:'e abra o baú', titulo_en:'and open the chest',
+      botao:'Continuar', botao_en:'Continue', layout:'mockupExatoSemCorpo' },
+    { dataSlide:4, next:'login', tipo:'estagioAnim',
+      fraca:'Avance de estágio', fraca_en:'Advance a stage',
+      titulo:'e desbloqueie cenários novos', titulo_en:'and unlock new scenery',
+      texto:'A masmorra muda de cara conforme você progride — cada estágio é um cenário diferente.',
+      texto_en:'The dungeon changes as you progress — each stage is a different scenery.',
+      botao:'Vamos lá', botao_en:'Let\'s go', layout:'mockupExato' }
   ];
-  const SLIDE_TRANSICAO = 5; // usado pra disparar o typewriter (ver iniciarTypewriter, mais abaixo)
-  const SLIDE_NOME = 6; // usado pra bloquear arraste sem nome preenchido (ver pegarVizinho, mais abaixo)
-  const TOTAL_SLIDES = 8;
+  const SLIDE_TRANSICAO = 5; // slide removido do carrossel reduzido -- nunca mais bate (numero fora do range 1-4), guarda fica inofensiva
+  const SLIDE_NOME = 6; // idem -- slide removido, guarda fica inofensiva
+  const TOTAL_SLIDES = 4;
+  const SLIDE_GOLPE = 2; // usado pra ligar/desligar o ciclo de animacao do golpe (ver iniciarCicloGolpe, mais abaixo)
 
   // item 46 do roadmap: idioma lido direto do localStorage (mesmo padrao
   // ja usado no resto do arquivo -- item()/aplicarIdiomaDados()/
@@ -11553,6 +12042,47 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       return '<div class="carrosselImgWrap carrosselGrupo">' +
         s.idxs.map(i => '<img class="carrosselImgMini" src="' + MONSTROS[i].img + '" alt="">').join('') +
         '</div>';
+    }
+    if (s.tipo === 'golpeAnim'){
+      // slide 2 (BATALHA): hit-flash/slash continua 100% CSS (obHeroSp.hit/
+      // obMobSp.shake + obSlashFx, ver style.css), MAS a recompensa (moeda+XP
+      // voando ate o heroi + popup "+4 / +12 XP") agora reusa as FUNCOES REAIS
+      // do combate (window.voarRecompensa / obNumeroFlutuanteHeroi), disparadas
+      // por iniciarCicloGolpe() -- ver atualizarTopo(). obHeroSp precisa de id
+      // fixo pra servir de destino real pro voo do icone.
+      return '<div class="carrosselImgWrap"><div class="obPalco">' +
+        '<img class="obMobSp" src="' + MONSTROS[s.idx].img + '" alt="">' +
+        '<div class="obSlashFx"></div>' +
+        '<img id="obHeroSp" class="obHeroSp" src="' + HEROIS[1].img + '" alt="">' +
+      '</div></div>';
+    }
+    if (s.tipo === 'estagioAnim'){
+      // v4.120: o cross-fade real (deserto/montanhas, TEMAS_ARENA) NAO
+      // mora mais aqui dentro -- .carrosselSlide leva transform durante o
+      // swipe (deslizar()/arraste), o que quebrava tanto position:fixed
+      // (transform vira containing block novo) quanto o bleed via margem
+      // negativa (corte visivel no topo, reportado pelo usuario). Agora
+      // e uma camada fixa IRMA de .card (#introCenario, ver
+      // mostrarCenarioEstagio() e pintarFundoOnboarding()), ligada/
+      // desligada em atualizarTopo(). Aqui so sobra o texto "Estagio 2"
+      // em cima.
+      return '<div class="obEstagioPill"><span class="obLbl">Estágio</span><span class="obNum">2</span></div>';
+    }
+    if (s.tipo === 'bauAnim'){
+      // slide 3 (EVOLUA): mesma marcacao/classes do loot real de bau
+      // (.baucard/.baubox/.bautxt/.baunome/.bauraridade, ver
+      // mostrarBauLoot()) com item()/spriteHTML()/RARIDADES/COR_RAR
+      // reais -- nao e mais icone desenhado a mao, e o sprite de
+      // verdade recortado da mesma folha (--sheet).
+      const bauItem = it => '<div class="baucard r' + it.rar + '">' +
+        '<div class="baubox">' + spriteHTML(it.sp, 22) + '</div>' +
+        '<div class="bautxt"><div class="baunome">' + it.nome + '</div>' +
+        '<div class="bauraridade" style="color:' + COR_RAR[it.rar] + '">' + RARIDADES[it.rar] + '</div></div>' +
+        '</div>';
+      return '<div class="carrosselImgWrap obBauWrap">' +
+        '<div class="obBauImg"></div>' +
+        '<div class="bauitens obBauItens">' + bauItem(item(0)) + bauItem(item(31)) + '</div>' +
+      '</div>';
     }
     if (s.tipo === 'trioLogo'){
       // composicao escalonada igual a foto de referencia: sprite do
@@ -11584,7 +12114,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       </div>
       <div class="carrosselDots" id="carrosselDots">${dots(0)}</div>
       <div class="carrosselTopoLado carrosselTopoDir">
-        <button class="carrosselEntrarLink" id="carrosselEntrarLink" data-i18n="login.jaTemConta">Já tem conta?</button>
+        <button class="carrosselEntrarLink" id="carrosselEntrarLink" data-i18n="login.pular">Pular</button>
       </div>
     </div>
   `;
@@ -11655,6 +12185,16 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       <div class="carrosselTransicao">
         <p class="carrosselTransicaoTexto" id="carrosselTransicaoTexto" data-texto="${txtSlide(s, 'texto')}"></p>
       </div>`;
+    // headline em 2 linhas (fraca+forte) -- copia exata do layout do
+    // mockup_onboarding_animado.html (pedido do usuario: "quero só as
+    // telas que tão no mockup EXATAMENTE do jeito que tá lá", incluindo
+    // o texto). So usado nos slides golpe/bau (unicos com campo
+    // "fraca" preenchido em SLIDES).
+    const blocoHeadlineMockup = `
+      <div class="obHeadline">
+        <span class="obFraca">${txtSlide(s, 'fraca')}</span>
+        <span class="obForte">${txtSlide(s, 'titulo')}</span>
+      </div>`;
 
     // layout explicito por slide (era baseado em indice/posicao antes
     // da v4.117 -- ficou fragil com um 4o slide de tipo diferente,
@@ -11663,6 +12203,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
                 : s.layout === 'comTarefasDemo' ? (blocoImagem + blocoMarca + htmlTarefasDemo)
                 : s.layout === 'textoSolo' ? blocoTransicao
                 : s.layout === 'idiomaEscolha' ? (blocoMarca + htmlIdiomaEscolha)
+                : s.layout === 'mockupExato' ? (blocoImagem + blocoHeadlineMockup + '<p class="obCorpo">' + txtSlide(s, 'texto') + '</p>')
+                : s.layout === 'mockupExatoSemCorpo' ? (blocoImagem + blocoHeadlineMockup)
                 : (blocoImagem + blocoMarca); // 'imagemPrimeiro' e fallback
 
     return `
@@ -11793,7 +12335,146 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     return palco.querySelector('.carrosselSlide[data-slide="' + n + '"]');
   }
 
+  // v4.15x: fundo gradiente por slide (pedido do usuario, redesign
+  // completo do onboarding) -- pintarParede() (acima) pinta a MESMA
+  // parede de pedra pro #intro inteiro (splash/carrossel/login), entao
+  // trocar o CSS so do .carrosselSlide deixava uma borda da parede
+  // antiga visivel na moldura do .card/.intro (padding). Repintando o
+  // proprio #intro por cima (mesmo elemento que pintarParede() usa) o
+  // gradiente cobre 100% da tela, sem sobra. Sem tile (so gradiente
+  // liso) pra bater com o mockup aprovado.
+  const GRADIENTES_ONBOARD = {
+    1: 'linear-gradient(160deg,#251E38 0%,#1A1526 100%)',
+    2: 'linear-gradient(160deg,#2C2444 0%,#1A1526 100%)',
+    3: 'linear-gradient(160deg,#3A2F16 0%,#1F1A0C 100%)'
+  };
+  // slide estagio identificado pelo tipo (nao hardcoded), assim continua
+  // certo se a ordem/numero dos slides mudar de novo no futuro.
+  const slideEstagioObj = SLIDES.find(s => s.tipo === 'estagioAnim');
+  const SLIDE_ESTAGIO = slideEstagioObj ? slideEstagioObj.dataSlide : null;
+
+  // v4.120: pedido do usuario -- transicao de cor suave entre slides (em
+  // vez de trocar o gradiente na hora) + corrige um bug de "corte" no
+  // topo do cenario real (estagio/login): antes, os fundos (gradiente OU
+  // imagem) viviam DENTRO do .carrosselSlide, que leva transform durante
+  // o swipe/deslizar (ver deslizar()/finalizarArraste()) -- isso quebra
+  // position:fixed (o transform vira containing block novo) e o
+  // position:absolute exigia calcular margem negativa pra compensar TODA
+  // a estrutura de paddings ate o topo real (#intro > .card >
+  // #passoCarrosselTudo > .carrosselPalco), incluindo a barra de topo
+  // (dots/voltar) que nao entrava na conta -- daí o corte visivel.
+  // Solucao: 2 camadas de fundo (gradiente com crossfade) + 1 camada de
+  // "cenario" (estagio/login), todas IRMAS de .card dentro de #intro,
+  // fora do elemento que anima -- sempre position:fixed relativo a
+  // viewport de verdade, nunca sofrem o transform do swipe.
+  let fundoGradAtiva = null; // 'a' | 'b' | null
+  function garantirCamadasFundo(){
+    if (document.getElementById('fundoGradA')) return;
+    intro.insertAdjacentHTML('afterbegin', `
+      <div class="fundoGradCamada" id="fundoGradA"></div>
+      <div class="fundoGradCamada" id="fundoGradB"></div>
+      <div id="introCenario">
+        <img class="cenarioImg" id="cenarioImgA" alt="">
+        <img class="cenarioImg dois" id="cenarioImgB" alt="">
+      </div>
+    `);
+  }
+  function pintarGradienteCrossfade(grad){
+    garantirCamadasFundo();
+    const proxima = fundoGradAtiva === 'a' ? 'b' : 'a';
+    const elProxima = document.getElementById(proxima === 'a' ? 'fundoGradA' : 'fundoGradB');
+    const elAtual = fundoGradAtiva ? document.getElementById(fundoGradAtiva === 'a' ? 'fundoGradA' : 'fundoGradB') : null;
+    elProxima.style.backgroundImage = grad;
+    elProxima.style.opacity = '0';
+    void elProxima.offsetHeight; // forca reflow -- sem isso o navegador as vezes "funde" as 2 mudancas de opacidade numa so, sem animar
+    elProxima.style.opacity = '1';
+    if (elAtual) elAtual.style.opacity = '0';
+    fundoGradAtiva = proxima;
+  }
+  function esconderFundoGrad(){
+    const a = document.getElementById('fundoGradA'), b = document.getElementById('fundoGradB');
+    if (a) a.style.opacity = '0';
+    if (b) b.style.opacity = '0';
+    fundoGradAtiva = null;
+  }
+  function mostrarCenarioEstagio(){
+    garantirCamadasFundo();
+    const el = document.getElementById('introCenario');
+    const a = document.getElementById('cenarioImgA'), b = document.getElementById('cenarioImgB');
+    if (typeof TEMAS_ARENA !== 'undefined'){
+      a.src = 'data:image/png;base64,' + TEMAS_ARENA.find(t => t.id === 'deserto').arte;
+      b.src = 'data:image/png;base64,' + TEMAS_ARENA.find(t => t.id === 'montanhas').arte;
+    }
+    el.classList.remove('modoLogin');
+    el.classList.add('ativo', 'modoEstagio');
+  }
+  function mostrarCenarioLogin(){
+    garantirCamadasFundo();
+    const el = document.getElementById('introCenario');
+    const a = document.getElementById('cenarioImgA');
+    if (typeof TEMAS_ARENA !== 'undefined'){
+      a.src = 'data:image/png;base64,' + TEMAS_ARENA.find(t => t.id === 'montanhas').arte;
+    }
+    el.classList.remove('modoEstagio');
+    el.classList.add('ativo', 'modoLogin');
+  }
+  function esconderCenario(){
+    const el = document.getElementById('introCenario');
+    if (el) el.classList.remove('ativo', 'modoEstagio', 'modoLogin');
+  }
+  function pintarFundoOnboarding(num){
+    if (num === SLIDE_ESTAGIO){ esconderFundoGrad(); mostrarCenarioEstagio(); return; }
+    esconderCenario();
+    const grad = GRADIENTES_ONBOARD[num];
+    // login/desconhecido: volta pra parede de pedra original (funcao
+    // definida num <script> anterior, exposta via window.pintarParede)
+    if (!grad){ esconderFundoGrad(); if (typeof window.pintarParede === 'function') window.pintarParede(); return; }
+    pintarGradienteCrossfade(grad);
+  }
+
+  // v4.118: recompensa do slide golpe (moeda+XP voando + popup "+4/+12 XP")
+  // agora reusa as MESMAS funcoes do combate real (window.voarRecompensa /
+  // obNumeroFlutuanteHeroi) em vez do CSS-cycle antigo (obRecIcon/
+  // obRecompensa, removidos do markup em imagemSlide) -- so o timing de
+  // QUANDO disparar continua sendo controlado aqui, sincronizado com o
+  // ponto em que o slash "acerta" no loop CSS obSlash/obMobShake.
+  // v4.134 (pedido do usuario, corrigindo o v4.133: o problema NAO era o
+  // ciclo repetir devagar, era a demora ATE COMECAR quando a pessoa
+  // entrava no slide -- 1728ms parado). O CSS (obHeroLunge/obMobShake/
+  // obSlash, ver style.css) agora usa animation-delay:-1.536s pra
+  // "adiantar" a animacao pro ponto logo antes do golpe assim que o
+  // slide fica visivel -- o flash aparece em ~190ms em vez de ~1728ms,
+  // e o loop volta a repetir no ritmo normal de 3.2s depois disso. Os
+  // numeros abaixo (190ms/3200ms) tem que bater com esse -1.536s la.
+  let golpeCicloTimeout = null, golpeCicloInterval = null;
+  function dispararRecompensaGolpe(){
+    const heroEl = document.getElementById('obHeroSp');
+    const mobEl = document.querySelector('.carrosselSlide.on .obMobSp');
+    if (!heroEl || !mobEl) return;
+    const mobRect = mobEl.getBoundingClientRect();
+    const origemX = mobRect.left + mobRect.width / 2;
+    const origemY = mobRect.top + mobRect.height / 2;
+    window.voarRecompensa(origemX, origemY, heroEl, COIN_SVG);
+    setTimeout(() => window.voarRecompensa(origemX, origemY, heroEl, XP_GEM_SVG), 90);
+    setTimeout(() => {
+      if (typeof window.obNumeroFlutuanteHeroi === 'function') window.obNumeroFlutuanteHeroi(heroEl, 12, 4);
+    }, 840);
+  }
+  function iniciarCicloGolpe(){
+    pararCicloGolpe(); // guarda -- nunca acumula 2 ciclos em paralelo
+    golpeCicloTimeout = setTimeout(() => {
+      dispararRecompensaGolpe();
+      golpeCicloInterval = setInterval(dispararRecompensaGolpe, 3200);
+    }, 190);
+  }
+  function pararCicloGolpe(){
+    if (golpeCicloTimeout){ clearTimeout(golpeCicloTimeout); golpeCicloTimeout = null; }
+    if (golpeCicloInterval){ clearInterval(golpeCicloInterval); golpeCicloInterval = null; }
+  }
+
   function atualizarTopo(num){
+    pintarFundoOnboarding(num);
+    document.getElementById('carrosselDots').classList.remove('oculto'); // v4.122: sai do login, dots voltam a aparecer
     document.querySelectorAll('#carrosselDots .carrosselDot').forEach((d, j) => {
       d.classList.toggle('on', j === num - 1);
     });
@@ -11807,6 +12488,10 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // completado (finalizarArraste chama atualizarTopo tambem) -- um
     // hook so, cobre os dois jeitos de chegar no slide.
     if (num === SLIDE_TRANSICAO) window.__questlogIniciarTypewriter();
+    // v4.118: liga o ciclo de recompensa so enquanto o slide golpe estiver
+    // ativo -- qualquer outro slide desliga (evita disparo "fantasma" quando
+    // a pessoa ja saiu da tela).
+    if (num === SLIDE_GOLPE) iniciarCicloGolpe(); else pararCicloGolpe();
   }
 
   // v4.114-4.117 (itens 42-b/c/e/f do roadmap): transicao/nome/heroi/
@@ -11850,12 +12535,46 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // -- sinaliza visualmente que virou um desvio, nao um passo normal.
   function irParaLogin(semVoltar){
     if (emTransicao) return;
+    // v4.131: sempre reabre na tela de ESCOLHA (Google/email), nunca
+    // direto no formulario -- sem isso, quem saia do login por "Agora
+    // nao" com o form de email aberto reabria o login (link "Ja tem
+    // conta?") direto no formulario, com a tela de escolha some junto
+    // (estado preso da ultima vez que #passoLogin foi injetado).
+    const escolhaReset = document.getElementById('loginEscolha');
+    const formReset = document.getElementById('loginFormWrap');
+    if (escolhaReset && formReset){
+      escolhaReset.style.display = 'flex';
+      escolhaReset.classList.remove('loginSlideOut', 'loginSlideIn');
+      formReset.style.display = 'none';
+      formReset.classList.remove('loginSlideOut', 'loginSlideIn');
+      window.__loginFormAberto = false;
+      window.__loginEmTransicao = false; // v4.132: garante que um toque duplo na sessao anterior nao deixe isso preso em true
+    }
+    pararCicloGolpe(); // desvio pro login pode acontecer NO MEIO do slide golpe (link "Ja tem conta?"), nao passa por atualizarTopo
     const atualEl = palco.querySelector('.carrosselSlide.on');
     if (atualEl && atualEl !== passoLogin){
       const n = parseInt(atualEl.dataset.slide, 10);
       if (n) ultimoSlideAntesLogin = n;
     }
     containerCarrossel.classList.add('on');
+    // v4.127 (bug relatado pelo usuario -- "corte"/costura visivel logo
+    // abaixo da montanha): ANTES chamava pintarParede() aqui, que pinta
+    // o tijolo+gradiente rocha1->rocha3 (mais CLARO no final) na tela
+    // #intro INTEIRA. So que mostrarCenarioLogin() cobre so os 52vh do
+    // topo com a montanha -- da metade pra baixo, o tijolo/gradiente da
+    // parede ficava visivel, e como ele clareia indo pro rodape (bem
+    // diferente do preto quase solido #0B0710 que o degrade da propria
+    // montanha termina), a costura entre "fim da montanha" e "inicio do
+    // tijolo" ficava bem marcada -- exatamente o corte reportado. O
+    // mockup (.loginNovo) nao usa tijolo nenhum atras do login: e so
+    // background-color:#0B0710 solido. Aqui faz o mesmo -- cor lisa,
+    // identica ao ponto final do degrade de #introCenario.modoLogin,
+    // sem textura nenhuma pra "bater" contra o fim da imagem.
+    esconderFundoGrad();
+    intro.style.backgroundImage = 'none';
+    intro.style.backgroundColor = '#0B0710';
+    mostrarCenarioLogin(); // v4.120: cenario real (montanhas) como camada fixa, ver pintarFundoOnboarding
+    document.getElementById('carrosselDots').classList.add('oculto'); // v4.122: dots nao tem lugar na tela de login, ficavam sobrando la embaixo
     document.querySelectorAll('#carrosselDots .carrosselDot').forEach(d => d.classList.remove('on'));
     // "Criar conta"/"Sair" (Config) recarregam a pagina e forcam essa
     // funcao a rodar ANTES de qualquer slide ter sido mostrado -- nesse
@@ -11894,13 +12613,30 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
   SLIDES.forEach(s => {
     const btn = document.getElementById('carrosselBtn' + s.dataSlide);
-    if (btn) btn.onclick = () => irPara(s.next);
+    if (btn) btn.onclick = () => (s.next === 'login' ? irParaLogin() : irPara(s.next));
   });
 
   document.getElementById('carrosselVoltar').onclick = () => {
     const atualEl = palco.querySelector('.carrosselSlide.on');
     if (!atualEl) return;
     if (atualEl === passoLogin){
+      // v4.132: ignora toque repetido enquanto a animacao de
+      // abrir/fechar o formulario de email ainda esta rodando (260ms) --
+      // sem isso, um segundo toque nesse meio-tempo lia
+      // __loginFormAberto ja como false e saia do login inteiro
+      // enquanto o setTimeout do primeiro toque ainda ia reexibir a
+      // escolha, deixando a tela em branco (opacity presa em 0).
+      if (window.__loginEmTransicao) return;
+      // v4.131 (pedido do usuario, print do Habitica): se o formulario
+      // de email/senha estiver aberto, a seta so volta pra tela de
+      // escolha (Google/email) -- so sai do login de vez quando ja
+      // estiver na propria tela de escolha. window.__loginFormAberto
+      // e setado por abrirFormLogin()/voltarParaEscolhaLogin() no
+      // <script> que injeta #passoLogin, mais acima no arquivo.
+      if (window.__loginFormAberto && typeof window.voltarParaEscolhaLogin === 'function'){
+        window.voltarParaEscolhaLogin();
+        return;
+      }
       voltarDoLoginCarrossel(); // desvio -- volta pro slide de origem
       return;
     }
@@ -12610,22 +13346,33 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           if (typeof window.desenharHeroi === 'function') window.desenharHeroi();
           if (typeof window.render === 'function') window.render();
         } else {
-          // conta nova, sem save -- fecha boas-vindas e pula DIRETO pro
-          // slide de transicao ("vamos te conhecer melhor...", ver
-          // SLIDE_TRANSICAO no bloco do carrossel -- era o slide 4, virou
-          // o 5 no item 46, quando o slide de idioma entrou entre EVOLUA
-          // e a transicao), nao mais de volta pro slide de ONDE A PESSOA
-          // VEIO. v4.130 (pedido do usuario): quem acabou de criar conta
-          // ja viu o motivo de usar o app (senao nao teria se cadastrado)
-          // -- fazer reassistir DUNGEONLOG/BATALHA/EVOLUA/IDIOMA de novo
-          // (caso tenha aberto o login logo no slide 1) e atrito sem
-          // propósito. irParaCarrossel(5) e window.irParaCarrossel,
-          // exposto pelo modulo do carrossel pra uso exatamente assim.
-          // Fundo NAO e limpo aqui -- so limpa de verdade quando #entrar
-          // (fim do slide Tarefas) chamar render().
-          document.getElementById('passoBoasVindas').classList.remove('on');
-          if (typeof window.irParaCarrossel === 'function') window.irParaCarrossel(5);
-          else if (typeof window.voltarDoLoginCarrossel === 'function') window.voltarDoLoginCarrossel(); // fallback defensivo, nao deveria disparar
+          // v4.124: sem save local = conta nova. ANTES pulava pro slide
+          // de nome/heroi (irParaCarrossel(5)) -- esse slide NAO EXISTE
+          // MAIS no carrossel reduzido (item mais recente do roadmap
+          // cortou o carrossel pra so 4 slides + login), entao
+          // irParaCarrossel(5) nao achava nada (slideEl(5) retorna null)
+          // e travava a pessoa numa tela em branco logo apos criar
+          // conta -- bug real, achado implementando o pedido abaixo.
+          // Pedido do usuario: em vez de pedir pra escolher nome/heroi
+          // na hora, segue o padrao do Habitica -- nome padrao tirado do
+          // email, heroi padrao (idx 0), e entra direto no app. Da pra
+          // trocar nome/heroi depois nas Opcoes (campo ja existe).
+          const nomeFromEmail = ((user.email || '').split('@')[0] || '')
+            .replace(/[._-]+/g, ' ')
+            .trim()
+            .split(' ')
+            .filter(Boolean)[0] || '';
+          const nomePadrao = nomeFromEmail
+            ? nomeFromEmail.charAt(0).toUpperCase() + nomeFromEmail.slice(1).toLowerCase()
+            : (idiomaApp() === 'en' ? 'Adventurer' : 'Aventureiro');
+          if (typeof nomeHeroi !== 'undefined') nomeHeroi = nomePadrao;
+          if (typeof heroiEscolhido !== 'undefined') heroiEscolhido = 0;
+          if (typeof window.salvar === 'function') window.salvar();
+          intro.classList.add('off');
+          intro.classList.remove('loginBg');
+          intro.style.backgroundImage = '';
+          if (typeof window.desenharHeroi === 'function') window.desenharHeroi();
+          if (typeof window.render === 'function') window.render();
         }
       }
 
@@ -13552,6 +14299,10 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'login.reenviarEmail':     { pt:'Reenviar email', en:'Resend email' },
     'login.emailErrado':       { pt:'Email errado? Corrigir', en:'Wrong email? Fix it' },
     'login.jaTemConta':        { pt:'Já tem conta?', en:'Already have an account?' },
+    'login.pular':             { pt:'Pular', en:'Skip' },
+    'login.tagline':           { pt:'Suas tarefas viram uma aventura', en:'Your tasks become an adventure' },
+    'login.continuarComGoogle':{ pt:'Continuar com Google', en:'Continue with Google' },
+    'login.continuarComEmail': { pt:'Continuar com email', en:'Continue with email' },
 
     'grim.titulo': { pt:'Grimório', en:'Grimoire' },
 

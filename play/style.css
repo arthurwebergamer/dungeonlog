@@ -1352,6 +1352,67 @@
     --arena-1:#2A2415; --arena-2:#1E1A10; --arena-3:#14110A;
     --xp2:#C9A961;
   }
+  /* Ametista e Rosé: mesmo tema Dourado (fundo/neutros identicos),
+     só o destaque troca de cor -- pedido do usuario apos ver o
+     mockup de comparacao de temas. */
+  :root[data-tema="ametista"]{
+    --bg:#0F1216; --panel:#0F1216; --panel-2:#151A20; --line:#232A33;
+    --text:#E6E9ED; --muted:#8A93A0; --dim:#5A6470;
+    --accent:#A98FDE; --accent-dim:#2A2140; --gold:#A98FDE; --blood:#9E3B3B;
+    --panel-3:#241E30; --poco:#0A0C0F; --sel-bg:#2C2440; --mobname:#C9B3EA;
+    --arena-1:#362A50; --arena-2:#281F3D; --arena-3:#1C1730;
+    --xp2:#A98FDE;
+  }
+  :root[data-tema="rose"]{
+    --bg:#0F1216; --panel:#0F1216; --panel-2:#151A20; --line:#232A33;
+    --text:#E6E9ED; --muted:#8A93A0; --dim:#5A6470;
+    --accent:#E0A5AE; --accent-dim:#3A2027; --gold:#E0A5AE; --blood:#9E3B3B;
+    --panel-3:#2A1D22; --poco:#0A0C0F; --sel-bg:#33232A; --mobname:#EDC0C6;
+    --arena-1:#3D2830; --arena-2:#2C1E24; --arena-3:#1F151A;
+    --xp2:#E0A5AE;
+  }
+  /* PLANO PRO -- Esmeralda e Terracota: os 2 temas exclusivos do plano
+     (item 2 do escopo fechado). Aprovados via mockup de comparacao
+     (Artifact) antes de entrar aqui, mesmo fluxo das rodadas de tema
+     anteriores. 1a tentativa do 2o tema foi "Azul" (fundo quente +
+     destaque frio) -- rejeitado pelo usuario ("nao quero azul de jeito
+     nenhum"), substituido por Esmeralda: verde vivo/saturado (bem mais
+     vibrante que o antigo tema Floresta/Verde, que era um verde-folha
+     desbotado) sobre fundo GRAFITE NEUTRO (nao verde), pra nao repetir
+     o problema de fundo-e-destaque-na-mesma-familia que os primeiros
+     temas coloridos tiveram. Terracota segue a formula ja aprovada
+     (fundo frio + destaque quente), num tom terracota/cobre, mais
+     avermelhado que o Laranja e mais terroso que o Sangue. Bloqueio de
+     uso (nao-assinante) fica no JS/CSS do seletor (TEMAS[].pro +
+     pintarTemaGrid()), nao aqui -- esses blocos de cor sao neutros a
+     assinatura. */
+  :root[data-tema="esmeralda"]{
+    --bg:#12161A; --panel:#12161A; --panel-2:#1A2025; --line:#37414A;
+    --text:#EAF1EE; --muted:#9DB0A8; --dim:#66766E;
+    --accent:#22C55E; --accent-dim:#123424; --gold:#D9C15C; --blood:#E5484D;
+    --panel-3:#232A30; --poco:#0B0D0F; --sel-bg:#1D3327; --mobname:#5EE39A;
+    /* arena-1/2/3 = pedra da masmorra (gradiente atras da textura de
+       tijolo, ver aplicarFundoTemaArena()). 1a versao ficou cinza-neutro
+       quase igual ao Terracota e sem contraste com o --bg -- usuario
+       reparou que a parede "nao mudava nada" comparado com Laranja/
+       Dourado/Escuro, que tem tom proprio e mais claro. Corrigido pra
+       pedra com leve musgo esverdeado, puxando a identidade do tema pra
+       dentro da masmorra tambem (mesmo principio do marrom-quente do
+       Dourado apesar do fundo dele ser frio). */
+    --arena-1:#24352B; --arena-2:#1B2822; --arena-3:#101915;
+    --xp2:#22C55E;
+  }
+  :root[data-tema="terracota"]{
+    --bg:#10161C; --panel:#10161C; --panel-2:#18212A; --line:#354655;
+    --text:#EDEEEF; --muted:#9DACB9; --dim:#647686;
+    --accent:#C96A4A; --accent-dim:#3D2318; --gold:#D9A45C; --blood:#D64B4B;
+    --panel-3:#212C37; --poco:#0B1116; --sel-bg:#3D2318; --mobname:#E29676;
+    /* mesmo ajuste do Esmeralda acima -- pedra com tom quente/ferrugem,
+       puxando a cor do destaque pra dentro da masmorra em vez de ficar
+       neutra e parecida com a do Esmeralda. */
+    --arena-1:#3D2B22; --arena-2:#2C1F19; --arena-3:#1C130F;
+    --xp2:#C96A4A;
+  }
   /* item 25 do roadmap — spec fechada em sessao de brainstorm (21/08) */
   /* v4.133 (pedido do usuario, comparando com Habitica real): primeira
      tentativa (--bg #0A0A0A -> #141414) foi tao sutil que na tela real
@@ -1787,7 +1848,43 @@
   /* cada elemento do formulario se destaca sozinho em cima do tijolo
      (campo com fundo solido + icone, botao Entrar preenchido, sombra
      de texto nos labels/links) */
-  #passoLogin .titulo{text-shadow:0 2px 10px rgba(0,0,0,.85)}
+  /* v4.120: #passoLogin ganha padding-top reservando o espaco onde o
+     cenario real (Montanhas) fica -- a imagem em si NAO mora mais aqui
+     dentro (ver #introCenario/.fundoGradCamada, camadas fixas irmas de
+     .card, mais abaixo neste arquivo) porque #passoLogin vira
+     .carrosselSlide e leva transform durante o swipe, o que cortava a
+     imagem quando ela era filha daqui. */
+  /* justify-content:flex-start (em vez do "center" herdado de
+     .carrosselSlide) -- com .loginEscolha (tela de escolha, curta) o
+     center deixava uma folga enorme entre o cenario e o conteudo; o
+     mockup mostra o conteudo colado logo abaixo do cenario. */
+  /* FIX (v4.123, pedido do usuario com print): o mockup usa
+     .cenarioTopo{height:56%} DENTRO do .telafone (o "celular" em
+     miniatura do mockup, 230px de largura so pra visualizacao lado a
+     lado) -- eu tinha portado o valor em PIXEL (150px) sem escalar pra
+     tela real, o que deixava o cenario minusculo e desproporcional (por
+     isso a "escala" parecia errada -- nao eram os botoes em si, era o
+     cenario ocupando so ~18% da tela em vez de mais da metade). Troca
+     pra vh, proporcional a tela de verdade, igual o mockup pretendia. */
+  /* FIX (v4.128, bug relatado pelo usuario com video do Habitica): o
+     padding-top:52vh SOMAVA com a altura do conteudo (.loginEscolha,
+     ~228px) -- em celular de verdade, com a barra de endereco do Chrome
+     visivel, a altura util da viewport fica bem menor que window.innerHeight
+     usado pelo "vh" do CSS. Resultado: 52vh + conteudo ultrapassava a
+     tela e #intro (overflow-y:auto) forcava scroll so pra ver os botoes
+     -- exatamente o que o Habitica NUNCA faz (o video mostra os botoes
+     sempre visiveis, sem arrastar nada). #passoLogin (.carrosselSlide)
+     ja tem inset:0 (altura = 100% do espaco disponivel de verdade, nunca
+     maior que a tela) -- entao troca o padding-top fixo por
+     justify-content:flex-end: sem nenhuma reserva de espaco em vh, o
+     conteudo so gruda no fundo do espaco que sobrou, adaptando sozinho a
+     qualquer altura de tela/barra do navegador, sem jamais estourar. */
+  #passoLogin.carrosselSlide{justify-content:flex-end}
+  .loginEscolha{margin-top:18px;margin-bottom:8px}
+  #passoLogin .titulo{font-family:'Silkscreen',monospace !important;color:#F2A65A !important;
+                       font-size:19px !important;letter-spacing:1px !important;
+                       text-transform:none !important;font-style:normal !important;
+                       text-shadow:0 2px 10px rgba(0,0,0,.85)}
   #passoLogin .campo label{text-shadow:0 1px 4px rgba(0,0,0,.85)}
   .campoIcone{position:relative}
   .campoIc{position:absolute;left:14px;bottom:13px;width:20px;height:20px;color:var(--dim);pointer-events:none}
@@ -1807,10 +1904,60 @@
      isso some -- aqui, so dentro do login, ele fica preenchido/solido */
   #passoLogin .primario{background:var(--accent) !important;color:#14101c !important;
                          border:none !important;text-transform:none !important;letter-spacing:normal !important;
-                         font-size:15px !important;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.45)}
+                         font-size:15px !important;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.45);
+                         border-radius:999px !important}
+  #passoLogin .loginGoogleBtn{border-radius:999px}
   #passoLogin .primario:hover{background:var(--accent) !important;filter:brightness(1.08)}
   #passoLogin .secundario,#passoLogin .loginLink,#passoLogin .loginRodape,#passoLogin .loginDivisor{
     text-shadow:0 1px 4px rgba(0,0,0,.85)}
+
+  /* v4.121: tela de escolha (1a tela do login, igual ao mockup) -- so
+     wordmark+tagline+2 botoes+link. O formulario completo (email/senha/
+     cadastro, ja existente, zero mudanca de logica) fica em
+     .loginFormWrap, escondido ate a pessoa escolher "Continuar com
+     email" ou "Entrar" (ver JS logo apos o insertAdjacentHTML). */
+  .loginEscolha{display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;
+                width:100%;padding:0 4px}
+  .loginEscolha .marca{margin-bottom:0}
+  .loginEscolha .titulo{font-size:26px !important}
+  .loginEscolhaTagline{font-size:15px;color:var(--dim);text-shadow:0 1px 4px rgba(0,0,0,.85);margin-top:-4px}
+  /* FIX (v4.123): os botoes de escolha (CTA principal da tela) reusam
+     .loginGoogleBtn, mas com padding/fonte proprios, maiores que o botao
+     Google "de dentro" do formulario (.loginFormWrap .loginGoogleBtn,
+     intocado) -- no mockup esses 2 botoes sao o elemento dominante da
+     tela, nao um botao secundario pequeno. */
+  .loginEscolha .primario,.loginEscolha .loginGoogleBtn{width:100%;padding:17px;font-size:16.5px}
+  /* v4.132 (pedido do usuario, print do Habitica: "copiar exatamente
+     assim"): la os DOIS botoes (Google e email) sao pilulas BRANCAS
+     identicas -- so o icone muda (G colorido vs. envelope colorido).
+     Removido o fundo roxo-escuro que esse botao tinha antes -- agora
+     so herda o branco/texto escuro padrao de .loginGoogleBtn, igual
+     ao de cima. O icone virou o emoji nativo "📧" (span.loginEmailEmoji,
+     ver #passoLogin no <script>) em vez de um SVG monocromatico --
+     e exatamente o que renderiza colorido feito no Habitica. */
+  .loginGoogleBtn.email .loginEmailEmoji{font-size:19px;line-height:1}
+  .loginEscolha .loginRodape{font-size:14px;margin-top:2px}
+  .loginFormWrap{display:flex;flex-direction:column;gap:18px}
+  /* v4.129: transicao escolha->form (ver abrirFormLogin() no <script>
+     do #passoLogin) -- desliza+fade em vez da troca seca de display */
+  .loginEscolha,.loginFormWrap{transition:opacity .26s ease,transform .26s ease}
+  .loginEscolha.loginSlideOut{opacity:0;transform:translateX(-26px)}
+  .loginFormWrap.loginSlideIn{opacity:0;transform:translateX(26px)}
+  /* v4.131: reverso (voltar do form pra escolha, ver
+     window.voltarParaEscolhaLogin) -- direcoes trocadas de proposito
+     (form sai pela DIREITA por onde entrou, escolha entra pela
+     ESQUERDA por onde saiu) pra parecer uma navegacao "pra tras" de
+     verdade, nao a mesma animacao tocada ao contrario */
+  .loginFormWrap.loginSlideOut{opacity:0;transform:translateX(26px)}
+  .loginEscolha.loginSlideIn{opacity:0;transform:translateX(-26px)}
+  /* v4.131 (pedido do usuario, print do Habitica): o formulario de
+     email nao precisa repetir o botao Google/divisor "ou" -- a tela de
+     escolha (.loginEscolha) ja oferece Google, e voltar pra ela agora
+     e so apertar a seta (ver window.voltarParaEscolhaLogin). Mantido
+     no DOM (nao removido) porque loginEscolhaGoogle.onclick ainda
+     dispara um .click() nele por baixo dos panos -- so escondido
+     visualmente aqui. */
+  #loginFormWrap #loginGoogleBtn,#loginFormWrap .loginDivisor{display:none}
 
   .loginTopBtns{position:fixed;top:calc(14px + env(safe-area-inset-top));right:14px;
                 display:flex;gap:8px;z-index:90}
@@ -1915,6 +2062,182 @@
   .carrosselImgGrande{width:168px;height:168px;image-rendering:pixelated}
   .carrosselGrupo{gap:12px}
   .carrosselImgMini{width:72px;height:72px;image-rendering:pixelated}
+
+  /* v4.14x: slides 2/3 do onboarding (golpe/bau) -- loop CSS puro,
+     reaproveitando os mesmos assets/classes do combate real
+     (--spr-slash-comum, --bau-fechado/--bau-aberto, .baucard/.baubox/
+     .bautxt/.baunome/.bauraridade ja existentes acima). Sem JS de
+     timing: cada ciclo e 100% CSS, nao trava/desincroniza. */
+  .obPalco{position:relative;width:100%;height:150px}
+  /* v4.134 (pedido do usuario: o golpe demorava pra COMECAR quando a
+     pessoa entrava no slide -- 1728ms parado ate o 1o flash, chance
+     grande de ja ter passado pro proximo slide sem ver nada). Fix NAO e
+     acelerar o ciclo inteiro (isso mudaria o ritmo/duracao do loop de
+     verdade, que continua 3.2s) -- e usar animation-delay NEGATIVO pra
+     "adiantar" a animacao pro ponto logo antes do golpe (48% de 3.2s)
+     assim que o slide fica visivel, entao o 1o flash aparece em ~190ms
+     em vez de ~1728ms. Repeticoes seguintes continuam no ritmo normal
+     de 3.2s (so a largada e que muda). iniciarCicloGolpe() no JS foi
+     ajustado igual, pro popup de moeda+XP continuar sincronizado com o
+     flash (ver comentario la, mais abaixo no arquivo). */
+  .obHeroSp{position:absolute;left:6%;bottom:0;height:126px;width:auto;
+            image-rendering:pixelated;animation:obHeroLunge 3.2s ease-in-out infinite;animation-delay:-1.536s}
+  .obMobSp{position:absolute;right:6%;bottom:4px;height:108px;width:auto;
+           image-rendering:pixelated;animation:obMobShake 3.2s ease-in-out infinite;animation-delay:-1.536s}
+  @keyframes obHeroLunge{
+    0%,50%{transform:translateX(0)}
+    55%{transform:translateX(12px)}
+    62%,100%{transform:translateX(0)}
+  }
+  @keyframes obMobShake{
+    0%,53%{transform:translate(0,0) rotate(0);filter:none}
+    56%{transform:translate(-5px,-2px) rotate(-6deg);filter:brightness(0) invert(1)}
+    59%{transform:translate(4px,1px) rotate(5deg);filter:brightness(0) invert(1)}
+    62%{transform:translate(-2px,0) rotate(-2deg);filter:none}
+    66%,100%{transform:translate(0,0) rotate(0);filter:none}
+  }
+  .obSlashFx{position:absolute;right:22%;bottom:34px;width:56px;height:56px;
+             background-image:var(--spr-slash-comum);background-repeat:no-repeat;
+             background-size:504px 56px;background-position:0 0;
+             filter:grayscale(1) brightness(2.4);image-rendering:pixelated;
+             opacity:0;animation:obSlash 3.2s linear infinite;animation-delay:-1.536s}
+  @keyframes obSlash{
+    0%,53%{opacity:0;background-position:0 0}
+    54%{opacity:1;background-position:0 0;animation-timing-function:steps(9)}
+    63%{opacity:1;background-position:-504px 0}
+    64%,100%{opacity:0}
+  }
+  .obRecIcon{position:absolute;width:14px;height:14px;opacity:0;pointer-events:none;
+             right:24%;bottom:64px;animation:obIconVoo 3.2s ease-in infinite}
+  .obRecIcon svg{width:100%;height:100%;image-rendering:pixelated}
+  .obRecIcon.xp{animation-delay:.08s}
+  @keyframes obIconVoo{
+    0%,65%{opacity:0;transform:translate(0,0)}
+    67%{opacity:1;transform:translate(0,0)}
+    80%{opacity:1;transform:translate(-58%,-30px)}
+    81%,100%{opacity:0}
+  }
+  .obRecompensa{position:absolute;left:8%;bottom:80px;display:flex;flex-direction:column;
+                gap:2px;font-size:12px;font-weight:700;opacity:0;pointer-events:none;
+                animation:obRecompensaPop 3.2s ease-out infinite}
+  .obRecompensa .obMoeda,.obRecompensa .obXp{display:flex;align-items:center;gap:3px}
+  .obRecompensa .obMoeda{color:var(--gold)}
+  .obRecompensa .obXp{color:var(--text)}
+  .obRecompensa svg{width:13px;height:13px;image-rendering:pixelated}
+  @keyframes obRecompensaPop{
+    0%,80%{opacity:0;transform:translateY(4px)}
+    84%{opacity:1;transform:translateY(0)}
+    95%{opacity:1;transform:translateY(0)}
+    100%{opacity:0;transform:translateY(-6px)}
+  }
+
+  .obBauWrap{flex-direction:column;gap:12px;width:100%}
+  .obBauImg{width:96px;height:96px;background-size:contain;background-repeat:no-repeat;
+            background-position:center;image-rendering:pixelated;
+            background-image:var(--bau-fechado);
+            animation:obBauAbre 3.4s ease-in-out infinite;animation-delay:-.85s}
+  @keyframes obBauAbre{
+    0%,29%{background-image:var(--bau-fechado);transform:scale(1)}
+    31%{transform:scale(1.08)}
+    33%,100%{background-image:var(--bau-aberto);transform:scale(1)}
+  }
+  .obBauItens{width:100%;max-width:280px;margin:0 auto}
+  .obBauItens .baucard{opacity:0;transform:translateY(6px);
+                        animation:obBaucardCiclo 3.4s ease infinite;animation-delay:-.85s}
+  .obBauItens .baucard:nth-child(2){animation-delay:-.7s}
+  @keyframes obBaucardCiclo{
+    0%,37%{opacity:0;transform:translateY(6px)}
+    45%,92%{opacity:1;transform:translateY(0)}
+    100%{opacity:0;transform:translateY(6px)}
+  }
+
+  /* v4.15x: redesign visual do onboarding (pedido do usuario) -- dots no
+     rodape (perto do botao, nao mais no topo), titulo em Outfit bold
+     (nao mais Silkscreen, exceto no wordmark DUNGEONLOG do slide 1 e no
+     login, que ficam como estao), botao em pilula translucida. Fundo
+     gradiente por slide fica em JS (pintarFundoOnboarding(), reaproveita
+     o mesmo mecanismo de intro.style.backgroundImage que pintarParede()
+     ja usa) -- via CSS sozinho o gradiente ficaria preso dentro do
+     padding do .card/.intro e sobraria uma borda da parede antiga
+     (era exatamente o "mistura com a tela antiga" reportado). */
+  #passoCarrosselTudo{position:relative}
+  .carrosselDots{position:absolute;left:0;right:0;bottom:78px;justify-content:center;pointer-events:none}
+  .carrosselSlide:not([data-slide="1"]):not([data-slide="login"]) .titulo{
+    font-family:'Outfit',sans-serif !important;font-weight:800 !important;font-size:22px !important;
+    letter-spacing:-.01em !important;color:#fff !important;text-transform:none !important;font-style:normal !important}
+  .carrosselSlide:not([data-slide="1"]):not([data-slide="login"]) .lema{
+    color:rgba(255,255,255,.85) !important;font-style:normal !important;font-family:'Outfit',sans-serif !important}
+  .carrosselSlide:not([data-slide="login"]) .primario{
+    border-radius:999px !important;background:rgba(0,0,0,.28) !important;color:#fff !important;
+    border:none !important;box-shadow:none !important;text-transform:none !important;letter-spacing:normal !important}
+
+  /* headline em 2 linhas (fraca+forte), copia exata do mockup
+     (mockup_onboarding_animado.html: .headline .fraca/.forte) -- usado
+     so nos slides golpe/bau (SLIDES com campo "fraca" preenchido). */
+  .obHeadline{text-align:center;margin-top:4px}
+  .obFraca{display:block;font-family:'Outfit',sans-serif !important;font-size:13px !important;
+           font-weight:500 !important;opacity:.75;margin-bottom:5px;color:#fff !important;font-style:normal !important}
+  .obForte{display:block;font-family:'Outfit',sans-serif !important;font-size:21px !important;
+           font-weight:800 !important;letter-spacing:-.01em !important;color:#fff !important;font-style:normal !important}
+  .obCorpo{text-align:center;font-size:12.5px;line-height:1.55;opacity:.88;margin-top:12px;
+           max-width:260px;margin-left:auto;margin-right:auto;color:#fff;font-family:'Outfit',sans-serif;
+           position:relative;z-index:2}
+  .obHeadline{position:relative;z-index:2}
+
+  /* slide "estagio": cross-fade entre 2 cenarios reais (TEMAS_ARENA),
+     copia exata do mockup (estagioBg/estagioPillDemo). z-index:-1 pra
+     ficar atras do headline/corpo (acima) e dos dots/botao (fora do
+     .carrosselMeio) sem precisar mexer na stacking order deles. */
+  /* v4.120: fundo do onboarding inteiro (gradiente por slide + cenario
+     real do estagio/login) virou 2+1 camadas FIXAS, IRMAS de .card
+     dentro de #intro -- ver pintarFundoOnboarding()/mostrarCenarioEstagio()/
+     mostrarCenarioLogin() no script do carrossel. Antes, tanto o
+     gradiente (via inline style em #intro) quanto o cenario real
+     (.obEstagioBg, filha do .carrosselSlide) tentavam bleedar com margem
+     negativa calculada a mao pra compensar os paddings de .intro/.card --
+     so que .carrosselSlide leva transform durante o swipe (deslizar()),
+     o que quebra esse calculo e cortava a imagem no topo (bug relatado
+     pelo usuario). Camadas fixas, fora do elemento que anima, resolvem
+     os dois problemas de uma vez: bleed sempre exato relativo a
+     viewport, e a troca de gradiente agora cross-fadeia (opacity
+     transition) em vez de trocar na hora.
+     fundoGradCamada = 2 camadas empilhadas pro gradiente por slide
+     (crossfade); introCenario = cenario real (estagio: cross-fade
+     deserto/montanhas; login: montanhas estatica, so o topo). */
+  .fundoGradCamada{position:fixed;inset:0;z-index:-1;background-size:cover;
+    background-repeat:no-repeat;background-position:center;
+    opacity:0;transition:opacity .45s ease;pointer-events:none}
+  #introCenario{position:fixed;left:0;right:0;top:0;bottom:0;z-index:-1;
+    overflow:hidden;opacity:0;transition:opacity .35s ease;pointer-events:none}
+  /* v4.130 (pedido do usuario, com prints do Habitica): ANTES o modoLogin
+     limitava o cenario a 52vh (so um "banner" no topo, resto da tela em
+     cor solida #0B0710 -- ver irParaLogin()). O Habitica cobre a tela
+     INTEIRA com a arte (montanha+castelo) e o conteudo (marca, campos,
+     botoes) flutua por cima dela do topo ao rodape, sem nenhuma faixa
+     solida separada. Tirando este override o modoLogin passa a herdar o
+     inset:0 (tela cheia) que o modoEstagio ja usa -- mesmo mecanismo,
+     so muda o gradiente de escurecimento abaixo. */
+  #introCenario.ativo{opacity:1}
+  #introCenario .cenarioImg{position:absolute;inset:0;width:100%;height:100%;
+    object-fit:cover;image-rendering:pixelated;opacity:0}
+  #introCenario.modoEstagio .cenarioImg{animation:obEstagioFade 3.2s ease-in-out infinite}
+  #introCenario.modoEstagio .cenarioImg.dois{animation-delay:-1.6s}
+  #introCenario.modoLogin .cenarioImg{opacity:1;animation:none}
+  #introCenario::after{content:'';position:absolute;inset:0}
+  #introCenario.modoEstagio::after{
+    background:linear-gradient(180deg,rgba(10,8,14,.35) 0%,rgba(10,8,14,.55) 55%,rgba(10,8,14,.88) 100%)}
+  /* v4.130: gradiente recalibrado pra tela cheia -- topo (~35%) fica
+     limpo pra mostrar o ceu/montanha como no Habitica, escurece a
+     partir da metade pra garantir contraste dos campos/botoes que
+     flutuam perto do rodape (#passoLogin usa justify-content:flex-end). */
+  #introCenario.modoLogin::after{
+    background:linear-gradient(180deg,rgba(11,7,16,0) 0%,rgba(11,7,16,0) 35%,rgba(11,7,16,.58) 68%,rgba(11,7,16,.94) 100%)}
+  @keyframes obEstagioFade{0%,45%{opacity:1}55%,100%{opacity:0}}
+  .obEstagioPill{position:relative;z-index:2;display:flex;flex-direction:column;
+                 align-items:center;gap:6px;margin-bottom:4px}
+  .obEstagioPill .obLbl{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;opacity:.75;color:#fff}
+  .obEstagioPill .obNum{font-family:'Silkscreen',monospace;font-size:22px;color:#fff;
+                         text-shadow:0 2px 8px rgba(0,0,0,.5)}
 
   /* trio escalonado do slide 1 (marca) -- igual a foto de referencia:
      sprite do meio maior/na frente, laterais menores/atras, um pouco
@@ -2660,6 +2983,67 @@
     --arena-1:#2A2415; --arena-2:#1E1A10; --arena-3:#14110A;
     --xp2:#C9A961;
   }
+  /* Ametista e Rosé: mesmo tema Dourado (fundo/neutros identicos),
+     só o destaque troca de cor -- pedido do usuario apos ver o
+     mockup de comparacao de temas. */
+  :root[data-tema="ametista"]{
+    --bg:#0F1216; --panel:#0F1216; --panel-2:#151A20; --line:#232A33;
+    --text:#E6E9ED; --muted:#8A93A0; --dim:#5A6470;
+    --accent:#A98FDE; --accent-dim:#2A2140; --gold:#A98FDE; --blood:#9E3B3B;
+    --panel-3:#241E30; --poco:#0A0C0F; --sel-bg:#2C2440; --mobname:#C9B3EA;
+    --arena-1:#362A50; --arena-2:#281F3D; --arena-3:#1C1730;
+    --xp2:#A98FDE;
+  }
+  :root[data-tema="rose"]{
+    --bg:#0F1216; --panel:#0F1216; --panel-2:#151A20; --line:#232A33;
+    --text:#E6E9ED; --muted:#8A93A0; --dim:#5A6470;
+    --accent:#E0A5AE; --accent-dim:#3A2027; --gold:#E0A5AE; --blood:#9E3B3B;
+    --panel-3:#2A1D22; --poco:#0A0C0F; --sel-bg:#33232A; --mobname:#EDC0C6;
+    --arena-1:#3D2830; --arena-2:#2C1E24; --arena-3:#1F151A;
+    --xp2:#E0A5AE;
+  }
+  /* PLANO PRO -- Esmeralda e Terracota: os 2 temas exclusivos do plano
+     (item 2 do escopo fechado). Aprovados via mockup de comparacao
+     (Artifact) antes de entrar aqui, mesmo fluxo das rodadas de tema
+     anteriores. 1a tentativa do 2o tema foi "Azul" (fundo quente +
+     destaque frio) -- rejeitado pelo usuario ("nao quero azul de jeito
+     nenhum"), substituido por Esmeralda: verde vivo/saturado (bem mais
+     vibrante que o antigo tema Floresta/Verde, que era um verde-folha
+     desbotado) sobre fundo GRAFITE NEUTRO (nao verde), pra nao repetir
+     o problema de fundo-e-destaque-na-mesma-familia que os primeiros
+     temas coloridos tiveram. Terracota segue a formula ja aprovada
+     (fundo frio + destaque quente), num tom terracota/cobre, mais
+     avermelhado que o Laranja e mais terroso que o Sangue. Bloqueio de
+     uso (nao-assinante) fica no JS/CSS do seletor (TEMAS[].pro +
+     pintarTemaGrid()), nao aqui -- esses blocos de cor sao neutros a
+     assinatura. */
+  :root[data-tema="esmeralda"]{
+    --bg:#12161A; --panel:#12161A; --panel-2:#1A2025; --line:#37414A;
+    --text:#EAF1EE; --muted:#9DB0A8; --dim:#66766E;
+    --accent:#22C55E; --accent-dim:#123424; --gold:#D9C15C; --blood:#E5484D;
+    --panel-3:#232A30; --poco:#0B0D0F; --sel-bg:#1D3327; --mobname:#5EE39A;
+    /* arena-1/2/3 = pedra da masmorra (gradiente atras da textura de
+       tijolo, ver aplicarFundoTemaArena()). 1a versao ficou cinza-neutro
+       quase igual ao Terracota e sem contraste com o --bg -- usuario
+       reparou que a parede "nao mudava nada" comparado com Laranja/
+       Dourado/Escuro, que tem tom proprio e mais claro. Corrigido pra
+       pedra com leve musgo esverdeado, puxando a identidade do tema pra
+       dentro da masmorra tambem (mesmo principio do marrom-quente do
+       Dourado apesar do fundo dele ser frio). */
+    --arena-1:#24352B; --arena-2:#1B2822; --arena-3:#101915;
+    --xp2:#22C55E;
+  }
+  :root[data-tema="terracota"]{
+    --bg:#10161C; --panel:#10161C; --panel-2:#18212A; --line:#354655;
+    --text:#EDEEEF; --muted:#9DACB9; --dim:#647686;
+    --accent:#C96A4A; --accent-dim:#3D2318; --gold:#D9A45C; --blood:#D64B4B;
+    --panel-3:#212C37; --poco:#0B1116; --sel-bg:#3D2318; --mobname:#E29676;
+    /* mesmo ajuste do Esmeralda acima -- pedra com tom quente/ferrugem,
+       puxando a cor do destaque pra dentro da masmorra em vez de ficar
+       neutra e parecida com a do Esmeralda. */
+    --arena-1:#3D2B22; --arena-2:#2C1F19; --arena-3:#1C130F;
+    --xp2:#C96A4A;
+  }
   /* item 25 do roadmap — spec fechada em sessao de brainstorm (21/08) */
   /* v4.133 (pedido do usuario, comparando com Habitica real): primeira
      tentativa (--bg #0A0A0A -> #141414) foi tao sutil que na tela real
@@ -3060,7 +3444,43 @@
   /* cada elemento do formulario se destaca sozinho em cima do tijolo
      (campo com fundo solido + icone, botao Entrar preenchido, sombra
      de texto nos labels/links) */
-  #passoLogin .titulo{text-shadow:0 2px 10px rgba(0,0,0,.85)}
+  /* v4.120: #passoLogin ganha padding-top reservando o espaco onde o
+     cenario real (Montanhas) fica -- a imagem em si NAO mora mais aqui
+     dentro (ver #introCenario/.fundoGradCamada, camadas fixas irmas de
+     .card, mais abaixo neste arquivo) porque #passoLogin vira
+     .carrosselSlide e leva transform durante o swipe, o que cortava a
+     imagem quando ela era filha daqui. */
+  /* justify-content:flex-start (em vez do "center" herdado de
+     .carrosselSlide) -- com .loginEscolha (tela de escolha, curta) o
+     center deixava uma folga enorme entre o cenario e o conteudo; o
+     mockup mostra o conteudo colado logo abaixo do cenario. */
+  /* FIX (v4.123, pedido do usuario com print): o mockup usa
+     .cenarioTopo{height:56%} DENTRO do .telafone (o "celular" em
+     miniatura do mockup, 230px de largura so pra visualizacao lado a
+     lado) -- eu tinha portado o valor em PIXEL (150px) sem escalar pra
+     tela real, o que deixava o cenario minusculo e desproporcional (por
+     isso a "escala" parecia errada -- nao eram os botoes em si, era o
+     cenario ocupando so ~18% da tela em vez de mais da metade). Troca
+     pra vh, proporcional a tela de verdade, igual o mockup pretendia. */
+  /* FIX (v4.128, bug relatado pelo usuario com video do Habitica): o
+     padding-top:52vh SOMAVA com a altura do conteudo (.loginEscolha,
+     ~228px) -- em celular de verdade, com a barra de endereco do Chrome
+     visivel, a altura util da viewport fica bem menor que window.innerHeight
+     usado pelo "vh" do CSS. Resultado: 52vh + conteudo ultrapassava a
+     tela e #intro (overflow-y:auto) forcava scroll so pra ver os botoes
+     -- exatamente o que o Habitica NUNCA faz (o video mostra os botoes
+     sempre visiveis, sem arrastar nada). #passoLogin (.carrosselSlide)
+     ja tem inset:0 (altura = 100% do espaco disponivel de verdade, nunca
+     maior que a tela) -- entao troca o padding-top fixo por
+     justify-content:flex-end: sem nenhuma reserva de espaco em vh, o
+     conteudo so gruda no fundo do espaco que sobrou, adaptando sozinho a
+     qualquer altura de tela/barra do navegador, sem jamais estourar. */
+  #passoLogin.carrosselSlide{justify-content:flex-end}
+  .loginEscolha{margin-top:18px;margin-bottom:8px}
+  #passoLogin .titulo{font-family:'Silkscreen',monospace !important;color:#F2A65A !important;
+                       font-size:19px !important;letter-spacing:1px !important;
+                       text-transform:none !important;font-style:normal !important;
+                       text-shadow:0 2px 10px rgba(0,0,0,.85)}
   #passoLogin .campo label{text-shadow:0 1px 4px rgba(0,0,0,.85)}
   .campoIcone{position:relative}
   .campoIc{position:absolute;left:14px;bottom:13px;width:20px;height:20px;color:var(--dim);pointer-events:none}
@@ -3080,10 +3500,60 @@
      isso some -- aqui, so dentro do login, ele fica preenchido/solido */
   #passoLogin .primario{background:var(--accent) !important;color:#14101c !important;
                          border:none !important;text-transform:none !important;letter-spacing:normal !important;
-                         font-size:15px !important;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.45)}
+                         font-size:15px !important;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.45);
+                         border-radius:999px !important}
+  #passoLogin .loginGoogleBtn{border-radius:999px}
   #passoLogin .primario:hover{background:var(--accent) !important;filter:brightness(1.08)}
   #passoLogin .secundario,#passoLogin .loginLink,#passoLogin .loginRodape,#passoLogin .loginDivisor{
     text-shadow:0 1px 4px rgba(0,0,0,.85)}
+
+  /* v4.121: tela de escolha (1a tela do login, igual ao mockup) -- so
+     wordmark+tagline+2 botoes+link. O formulario completo (email/senha/
+     cadastro, ja existente, zero mudanca de logica) fica em
+     .loginFormWrap, escondido ate a pessoa escolher "Continuar com
+     email" ou "Entrar" (ver JS logo apos o insertAdjacentHTML). */
+  .loginEscolha{display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;
+                width:100%;padding:0 4px}
+  .loginEscolha .marca{margin-bottom:0}
+  .loginEscolha .titulo{font-size:26px !important}
+  .loginEscolhaTagline{font-size:15px;color:var(--dim);text-shadow:0 1px 4px rgba(0,0,0,.85);margin-top:-4px}
+  /* FIX (v4.123): os botoes de escolha (CTA principal da tela) reusam
+     .loginGoogleBtn, mas com padding/fonte proprios, maiores que o botao
+     Google "de dentro" do formulario (.loginFormWrap .loginGoogleBtn,
+     intocado) -- no mockup esses 2 botoes sao o elemento dominante da
+     tela, nao um botao secundario pequeno. */
+  .loginEscolha .primario,.loginEscolha .loginGoogleBtn{width:100%;padding:17px;font-size:16.5px}
+  /* v4.132 (pedido do usuario, print do Habitica: "copiar exatamente
+     assim"): la os DOIS botoes (Google e email) sao pilulas BRANCAS
+     identicas -- so o icone muda (G colorido vs. envelope colorido).
+     Removido o fundo roxo-escuro que esse botao tinha antes -- agora
+     so herda o branco/texto escuro padrao de .loginGoogleBtn, igual
+     ao de cima. O icone virou o emoji nativo "📧" (span.loginEmailEmoji,
+     ver #passoLogin no <script>) em vez de um SVG monocromatico --
+     e exatamente o que renderiza colorido feito no Habitica. */
+  .loginGoogleBtn.email .loginEmailEmoji{font-size:19px;line-height:1}
+  .loginEscolha .loginRodape{font-size:14px;margin-top:2px}
+  .loginFormWrap{display:flex;flex-direction:column;gap:18px}
+  /* v4.129: transicao escolha->form (ver abrirFormLogin() no <script>
+     do #passoLogin) -- desliza+fade em vez da troca seca de display */
+  .loginEscolha,.loginFormWrap{transition:opacity .26s ease,transform .26s ease}
+  .loginEscolha.loginSlideOut{opacity:0;transform:translateX(-26px)}
+  .loginFormWrap.loginSlideIn{opacity:0;transform:translateX(26px)}
+  /* v4.131: reverso (voltar do form pra escolha, ver
+     window.voltarParaEscolhaLogin) -- direcoes trocadas de proposito
+     (form sai pela DIREITA por onde entrou, escolha entra pela
+     ESQUERDA por onde saiu) pra parecer uma navegacao "pra tras" de
+     verdade, nao a mesma animacao tocada ao contrario */
+  .loginFormWrap.loginSlideOut{opacity:0;transform:translateX(26px)}
+  .loginEscolha.loginSlideIn{opacity:0;transform:translateX(-26px)}
+  /* v4.131 (pedido do usuario, print do Habitica): o formulario de
+     email nao precisa repetir o botao Google/divisor "ou" -- a tela de
+     escolha (.loginEscolha) ja oferece Google, e voltar pra ela agora
+     e so apertar a seta (ver window.voltarParaEscolhaLogin). Mantido
+     no DOM (nao removido) porque loginEscolhaGoogle.onclick ainda
+     dispara um .click() nele por baixo dos panos -- so escondido
+     visualmente aqui. */
+  #loginFormWrap #loginGoogleBtn,#loginFormWrap .loginDivisor{display:none}
 
   .loginTopBtns{position:fixed;top:calc(14px + env(safe-area-inset-top));right:14px;
                 display:flex;gap:8px;z-index:90}
@@ -3188,6 +3658,182 @@
   .carrosselImgGrande{width:168px;height:168px;image-rendering:pixelated}
   .carrosselGrupo{gap:12px}
   .carrosselImgMini{width:72px;height:72px;image-rendering:pixelated}
+
+  /* v4.14x: slides 2/3 do onboarding (golpe/bau) -- loop CSS puro,
+     reaproveitando os mesmos assets/classes do combate real
+     (--spr-slash-comum, --bau-fechado/--bau-aberto, .baucard/.baubox/
+     .bautxt/.baunome/.bauraridade ja existentes acima). Sem JS de
+     timing: cada ciclo e 100% CSS, nao trava/desincroniza. */
+  .obPalco{position:relative;width:100%;height:150px}
+  /* v4.134 (pedido do usuario: o golpe demorava pra COMECAR quando a
+     pessoa entrava no slide -- 1728ms parado ate o 1o flash, chance
+     grande de ja ter passado pro proximo slide sem ver nada). Fix NAO e
+     acelerar o ciclo inteiro (isso mudaria o ritmo/duracao do loop de
+     verdade, que continua 3.2s) -- e usar animation-delay NEGATIVO pra
+     "adiantar" a animacao pro ponto logo antes do golpe (48% de 3.2s)
+     assim que o slide fica visivel, entao o 1o flash aparece em ~190ms
+     em vez de ~1728ms. Repeticoes seguintes continuam no ritmo normal
+     de 3.2s (so a largada e que muda). iniciarCicloGolpe() no JS foi
+     ajustado igual, pro popup de moeda+XP continuar sincronizado com o
+     flash (ver comentario la, mais abaixo no arquivo). */
+  .obHeroSp{position:absolute;left:6%;bottom:0;height:126px;width:auto;
+            image-rendering:pixelated;animation:obHeroLunge 3.2s ease-in-out infinite;animation-delay:-1.536s}
+  .obMobSp{position:absolute;right:6%;bottom:4px;height:108px;width:auto;
+           image-rendering:pixelated;animation:obMobShake 3.2s ease-in-out infinite;animation-delay:-1.536s}
+  @keyframes obHeroLunge{
+    0%,50%{transform:translateX(0)}
+    55%{transform:translateX(12px)}
+    62%,100%{transform:translateX(0)}
+  }
+  @keyframes obMobShake{
+    0%,53%{transform:translate(0,0) rotate(0);filter:none}
+    56%{transform:translate(-5px,-2px) rotate(-6deg);filter:brightness(0) invert(1)}
+    59%{transform:translate(4px,1px) rotate(5deg);filter:brightness(0) invert(1)}
+    62%{transform:translate(-2px,0) rotate(-2deg);filter:none}
+    66%,100%{transform:translate(0,0) rotate(0);filter:none}
+  }
+  .obSlashFx{position:absolute;right:22%;bottom:34px;width:56px;height:56px;
+             background-image:var(--spr-slash-comum);background-repeat:no-repeat;
+             background-size:504px 56px;background-position:0 0;
+             filter:grayscale(1) brightness(2.4);image-rendering:pixelated;
+             opacity:0;animation:obSlash 3.2s linear infinite;animation-delay:-1.536s}
+  @keyframes obSlash{
+    0%,53%{opacity:0;background-position:0 0}
+    54%{opacity:1;background-position:0 0;animation-timing-function:steps(9)}
+    63%{opacity:1;background-position:-504px 0}
+    64%,100%{opacity:0}
+  }
+  .obRecIcon{position:absolute;width:14px;height:14px;opacity:0;pointer-events:none;
+             right:24%;bottom:64px;animation:obIconVoo 3.2s ease-in infinite}
+  .obRecIcon svg{width:100%;height:100%;image-rendering:pixelated}
+  .obRecIcon.xp{animation-delay:.08s}
+  @keyframes obIconVoo{
+    0%,65%{opacity:0;transform:translate(0,0)}
+    67%{opacity:1;transform:translate(0,0)}
+    80%{opacity:1;transform:translate(-58%,-30px)}
+    81%,100%{opacity:0}
+  }
+  .obRecompensa{position:absolute;left:8%;bottom:80px;display:flex;flex-direction:column;
+                gap:2px;font-size:12px;font-weight:700;opacity:0;pointer-events:none;
+                animation:obRecompensaPop 3.2s ease-out infinite}
+  .obRecompensa .obMoeda,.obRecompensa .obXp{display:flex;align-items:center;gap:3px}
+  .obRecompensa .obMoeda{color:var(--gold)}
+  .obRecompensa .obXp{color:var(--text)}
+  .obRecompensa svg{width:13px;height:13px;image-rendering:pixelated}
+  @keyframes obRecompensaPop{
+    0%,80%{opacity:0;transform:translateY(4px)}
+    84%{opacity:1;transform:translateY(0)}
+    95%{opacity:1;transform:translateY(0)}
+    100%{opacity:0;transform:translateY(-6px)}
+  }
+
+  .obBauWrap{flex-direction:column;gap:12px;width:100%}
+  .obBauImg{width:96px;height:96px;background-size:contain;background-repeat:no-repeat;
+            background-position:center;image-rendering:pixelated;
+            background-image:var(--bau-fechado);
+            animation:obBauAbre 3.4s ease-in-out infinite;animation-delay:-.85s}
+  @keyframes obBauAbre{
+    0%,29%{background-image:var(--bau-fechado);transform:scale(1)}
+    31%{transform:scale(1.08)}
+    33%,100%{background-image:var(--bau-aberto);transform:scale(1)}
+  }
+  .obBauItens{width:100%;max-width:280px;margin:0 auto}
+  .obBauItens .baucard{opacity:0;transform:translateY(6px);
+                        animation:obBaucardCiclo 3.4s ease infinite;animation-delay:-.85s}
+  .obBauItens .baucard:nth-child(2){animation-delay:-.7s}
+  @keyframes obBaucardCiclo{
+    0%,37%{opacity:0;transform:translateY(6px)}
+    45%,92%{opacity:1;transform:translateY(0)}
+    100%{opacity:0;transform:translateY(6px)}
+  }
+
+  /* v4.15x: redesign visual do onboarding (pedido do usuario) -- dots no
+     rodape (perto do botao, nao mais no topo), titulo em Outfit bold
+     (nao mais Silkscreen, exceto no wordmark DUNGEONLOG do slide 1 e no
+     login, que ficam como estao), botao em pilula translucida. Fundo
+     gradiente por slide fica em JS (pintarFundoOnboarding(), reaproveita
+     o mesmo mecanismo de intro.style.backgroundImage que pintarParede()
+     ja usa) -- via CSS sozinho o gradiente ficaria preso dentro do
+     padding do .card/.intro e sobraria uma borda da parede antiga
+     (era exatamente o "mistura com a tela antiga" reportado). */
+  #passoCarrosselTudo{position:relative}
+  .carrosselDots{position:absolute;left:0;right:0;bottom:78px;justify-content:center;pointer-events:none}
+  .carrosselSlide:not([data-slide="1"]):not([data-slide="login"]) .titulo{
+    font-family:'Outfit',sans-serif !important;font-weight:800 !important;font-size:22px !important;
+    letter-spacing:-.01em !important;color:#fff !important;text-transform:none !important;font-style:normal !important}
+  .carrosselSlide:not([data-slide="1"]):not([data-slide="login"]) .lema{
+    color:rgba(255,255,255,.85) !important;font-style:normal !important;font-family:'Outfit',sans-serif !important}
+  .carrosselSlide:not([data-slide="login"]) .primario{
+    border-radius:999px !important;background:rgba(0,0,0,.28) !important;color:#fff !important;
+    border:none !important;box-shadow:none !important;text-transform:none !important;letter-spacing:normal !important}
+
+  /* headline em 2 linhas (fraca+forte), copia exata do mockup
+     (mockup_onboarding_animado.html: .headline .fraca/.forte) -- usado
+     so nos slides golpe/bau (SLIDES com campo "fraca" preenchido). */
+  .obHeadline{text-align:center;margin-top:4px}
+  .obFraca{display:block;font-family:'Outfit',sans-serif !important;font-size:13px !important;
+           font-weight:500 !important;opacity:.75;margin-bottom:5px;color:#fff !important;font-style:normal !important}
+  .obForte{display:block;font-family:'Outfit',sans-serif !important;font-size:21px !important;
+           font-weight:800 !important;letter-spacing:-.01em !important;color:#fff !important;font-style:normal !important}
+  .obCorpo{text-align:center;font-size:12.5px;line-height:1.55;opacity:.88;margin-top:12px;
+           max-width:260px;margin-left:auto;margin-right:auto;color:#fff;font-family:'Outfit',sans-serif;
+           position:relative;z-index:2}
+  .obHeadline{position:relative;z-index:2}
+
+  /* slide "estagio": cross-fade entre 2 cenarios reais (TEMAS_ARENA),
+     copia exata do mockup (estagioBg/estagioPillDemo). z-index:-1 pra
+     ficar atras do headline/corpo (acima) e dos dots/botao (fora do
+     .carrosselMeio) sem precisar mexer na stacking order deles. */
+  /* v4.120: fundo do onboarding inteiro (gradiente por slide + cenario
+     real do estagio/login) virou 2+1 camadas FIXAS, IRMAS de .card
+     dentro de #intro -- ver pintarFundoOnboarding()/mostrarCenarioEstagio()/
+     mostrarCenarioLogin() no script do carrossel. Antes, tanto o
+     gradiente (via inline style em #intro) quanto o cenario real
+     (.obEstagioBg, filha do .carrosselSlide) tentavam bleedar com margem
+     negativa calculada a mao pra compensar os paddings de .intro/.card --
+     so que .carrosselSlide leva transform durante o swipe (deslizar()),
+     o que quebra esse calculo e cortava a imagem no topo (bug relatado
+     pelo usuario). Camadas fixas, fora do elemento que anima, resolvem
+     os dois problemas de uma vez: bleed sempre exato relativo a
+     viewport, e a troca de gradiente agora cross-fadeia (opacity
+     transition) em vez de trocar na hora.
+     fundoGradCamada = 2 camadas empilhadas pro gradiente por slide
+     (crossfade); introCenario = cenario real (estagio: cross-fade
+     deserto/montanhas; login: montanhas estatica, so o topo). */
+  .fundoGradCamada{position:fixed;inset:0;z-index:-1;background-size:cover;
+    background-repeat:no-repeat;background-position:center;
+    opacity:0;transition:opacity .45s ease;pointer-events:none}
+  #introCenario{position:fixed;left:0;right:0;top:0;bottom:0;z-index:-1;
+    overflow:hidden;opacity:0;transition:opacity .35s ease;pointer-events:none}
+  /* v4.130 (pedido do usuario, com prints do Habitica): ANTES o modoLogin
+     limitava o cenario a 52vh (so um "banner" no topo, resto da tela em
+     cor solida #0B0710 -- ver irParaLogin()). O Habitica cobre a tela
+     INTEIRA com a arte (montanha+castelo) e o conteudo (marca, campos,
+     botoes) flutua por cima dela do topo ao rodape, sem nenhuma faixa
+     solida separada. Tirando este override o modoLogin passa a herdar o
+     inset:0 (tela cheia) que o modoEstagio ja usa -- mesmo mecanismo,
+     so muda o gradiente de escurecimento abaixo. */
+  #introCenario.ativo{opacity:1}
+  #introCenario .cenarioImg{position:absolute;inset:0;width:100%;height:100%;
+    object-fit:cover;image-rendering:pixelated;opacity:0}
+  #introCenario.modoEstagio .cenarioImg{animation:obEstagioFade 3.2s ease-in-out infinite}
+  #introCenario.modoEstagio .cenarioImg.dois{animation-delay:-1.6s}
+  #introCenario.modoLogin .cenarioImg{opacity:1;animation:none}
+  #introCenario::after{content:'';position:absolute;inset:0}
+  #introCenario.modoEstagio::after{
+    background:linear-gradient(180deg,rgba(10,8,14,.35) 0%,rgba(10,8,14,.55) 55%,rgba(10,8,14,.88) 100%)}
+  /* v4.130: gradiente recalibrado pra tela cheia -- topo (~35%) fica
+     limpo pra mostrar o ceu/montanha como no Habitica, escurece a
+     partir da metade pra garantir contraste dos campos/botoes que
+     flutuam perto do rodape (#passoLogin usa justify-content:flex-end). */
+  #introCenario.modoLogin::after{
+    background:linear-gradient(180deg,rgba(11,7,16,0) 0%,rgba(11,7,16,0) 35%,rgba(11,7,16,.58) 68%,rgba(11,7,16,.94) 100%)}
+  @keyframes obEstagioFade{0%,45%{opacity:1}55%,100%{opacity:0}}
+  .obEstagioPill{position:relative;z-index:2;display:flex;flex-direction:column;
+                 align-items:center;gap:6px;margin-bottom:4px}
+  .obEstagioPill .obLbl{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;opacity:.75;color:#fff}
+  .obEstagioPill .obNum{font-family:'Silkscreen',monospace;font-size:22px;color:#fff;
+                         text-shadow:0 2px 8px rgba(0,0,0,.5)}
 
   /* trio escalonado do slide 1 (marca) -- igual a foto de referencia:
      sprite do meio maior/na frente, laterais menores/atras, um pouco
@@ -3504,17 +4150,22 @@
    Escopado por ID (#gradeHeroisConfig / #temaGrid) de proposito: tanto
    .grade/.opcao quanto .temaswatch sao reaproveitados em outro lugar
    do app (#gradeHerois no onboarding usa a mesma .grade/.opcao) -- so
-   o container de Config muda de layout, o resto do app continua igual. */
+   o container de Config muda de layout, o resto do app continua igual.
+   #gradeNovoHeroi (tela "Novo herói" do Plano Pro) entrou na mesma
+   regra -- mesmo card grande, sem duplicar CSS. */
 
-#gradeHeroisConfig.grade{
+#gradeHeroisConfig.grade,
+#gradeNovoHeroi.grade{
   grid-template-columns:repeat(3,1fr);
   gap:12px;
 }
-#gradeHeroisConfig .opcao{
+#gradeHeroisConfig .opcao,
+#gradeNovoHeroi .opcao{
   padding:16px 4px;
   border-radius:16px;
 }
-#gradeHeroisConfig .opcao img{
+#gradeHeroisConfig .opcao img,
+#gradeNovoHeroi .opcao img{
   width:64px;
   height:64px;
 }
@@ -3568,6 +4219,18 @@
 }
 .temalinha.sel .temaDot{
   border-color:var(--text);
+}
+
+/* PLANO PRO -- tema bloqueado (Azul/Terracota pra quem nao assina).
+   Mesma linguagem visual ja usada no dropdown de personagens
+   (.pjNovoBtn.bloqueado + .pjSelo) -- opacidade reduzida + selo "PRO",
+   copiado em vez de reaproveitar a classe de la de proposito (contextos
+   diferentes, ver comentario do #novoHeroiOverlay sobre nao juntar
+   fluxos que nao devem se pisar). */
+.temalinha.bloqueado{ opacity:.55; }
+.temaSelo{
+  font-size:8px; font-weight:700; background:var(--accent); color:var(--bg);
+  border-radius:999px; padding:2px 6px; letter-spacing:.3px; flex:none;
 }
 
 /* --- Módulo style #23 --- */
@@ -4110,3 +4773,94 @@
     opacity .75s ease-in .16s;
 }
 
+
+/* ======================================================================
+   PLANO PRO -- seletor de personagem (topbar), dropdown "Meus herois" e
+   cortina de transicao ao trocar. Zero token novo -- so reaproveita
+   --panel-2/--panel-3/--line/--accent/--dim/--gold ja existentes, e o
+   mesmo --expo (curva de animacao) que a Arena/tema ja usam pra
+   cross-fade. #lvl (dentro do .pjTrigger) NAO foi tocado -- continua
+   span puro, render() escreve textContent nele igual sempre.
+   ====================================================================== */
+.pjTrigger{
+  display:flex; align-items:center; gap:6px;
+  background:var(--accent-dim); border:none; border-radius:4px;
+  padding:5px 9px; cursor:pointer; font-family:'Outfit',sans-serif;
+}
+.pjTrigger .pjNomeTopo{
+  font-size:13px; font-weight:600; color:var(--accent);
+  max-width:64px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.pjTrigger .pjNomeTopo:empty{ display:none; } /* grátis com 1 personagem só: sem rótulo, so o Nível mesmo */
+.pjTrigger .pjNomeTopo:not(:empty) + .lvl::before{ content:'· '; }
+/* FIX (borda escura estranha): .lvl ja tem seu proprio background+padding+
+   radius (regra original, linha ~54). Botar ele dentro do .pjTrigger --
+   que TAMBEM tem background+padding+radius -- criava um "pill dentro de
+   pill" (a caixa escura extra que apareceu no print). Zera soh dentro do
+   .pjTrigger; a regra .lvl{} original continua intacta pra quem usa
+   fora daqui.
+   IMPORTANT necessario: o tema Crepusculo (linha ~753) redefine .lvl
+   com !important (background/padding/radius/cor propria) -- sem
+   !important aqui essa regra nao vencia a do tema, e o quadrado escuro
+   voltava sempre que esse tema (ou qualquer outro com !important) tava
+   ativo. Cor tambem entra na disputa: sem forcar, o texto ficava
+   var(--bg) (escuro) em cima do --accent-dim do botao = quase ilegivel. */
+.pjTrigger .lvl{
+  background:none !important; padding:0 !important; border-radius:0 !important;
+  color:var(--accent) !important; font-size:13px !important; font-weight:600 !important;
+  letter-spacing:normal !important; text-transform:none !important;
+}
+.pjTrigger .pjChevron{ width:10px; height:10px; color:var(--accent); opacity:.8; flex:none; transition:transform .2s var(--expo); }
+.pjTrigger.aberto .pjChevron{ transform:rotate(180deg); }
+
+.pjDropdown{
+  position:absolute; top:52px; left:18px; width:230px; z-index:20;
+  background:var(--panel-2); border:1px solid var(--line); border-radius:12px;
+  padding:8px; box-shadow:0 12px 28px rgba(0,0,0,.45);
+  opacity:0; visibility:hidden; transform:translateY(-6px);
+  transition:opacity .18s var(--expo), transform .18s var(--expo), visibility 0s .18s;
+}
+.pjDropdown.on{
+  opacity:1; visibility:visible; transform:translateY(0);
+  transition:opacity .18s var(--expo), transform .18s var(--expo), visibility 0s;
+}
+.pjDropdown .edsec{ margin:4px 6px 6px; }
+.pjItem{
+  display:flex; align-items:center; gap:10px; padding:9px 8px; border-radius:8px;
+  cursor:pointer; background:none; border:none; width:100%; text-align:left;
+  font-family:'Outfit',sans-serif; color:var(--text);
+}
+.pjItem:active{ background:rgba(255,255,255,.05); }
+.pjItem.ativo{ background:var(--panel-3); cursor:default; }
+.pjItem .pjAvatar{
+  flex:0 0 30px; width:30px; height:30px; border-radius:50%;
+  background:rgba(255,255,255,.07); display:flex; align-items:center; justify-content:center;
+  overflow:hidden;
+}
+.pjItem.ativo .pjAvatar{ background:var(--accent-dim); }
+.pjItem .pjAvatar img{ width:100%; height:100%; object-fit:contain; image-rendering:pixelated; }
+.pjItem .pjTxt{ flex:1; min-width:0; }
+.pjItem .pjTxt b{ display:block; font-size:12.5px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.pjItem .pjTxt span{ display:block; font-size:10.5px; color:var(--dim); }
+.pjNovoBtn{
+  display:flex; align-items:center; justify-content:center; gap:6px; width:100%;
+  margin-top:4px; padding:9px; border-radius:999px; border:1.5px dashed var(--line);
+  background:transparent; color:var(--dim); font-family:'Outfit',sans-serif;
+  font-size:12px; font-weight:600; cursor:pointer;
+}
+.pjNovoBtn.bloqueado{ opacity:.55; }
+.pjNovoBtn .pjSelo{
+  font-size:8px; font-weight:700; background:var(--accent); color:var(--bg);
+  border-radius:999px; padding:2px 6px; letter-spacing:.3px;
+}
+
+/* cortina cheia -- cobre so o .app (que ja e position:relative, ver
+   media query existente), NAO a tela toda. Opacidade pura, mesma logica
+   ja usada no cross-fade de tema da arena: nunca revela o conteudo novo
+   antes de estar pronto por baixo. */
+.pjCortina{
+  position:absolute; inset:0; z-index:30; background:var(--bg);
+  opacity:0; pointer-events:none;
+  transition:opacity .22s var(--expo);
+}
+.pjCortina.on{ opacity:1; pointer-events:auto; }

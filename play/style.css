@@ -2074,6 +2074,17 @@
     border-radius:999px !important;background:rgba(0,0,0,.28) !important;color:#fff !important;
     border:none !important;box-shadow:none !important;text-transform:none !important;letter-spacing:normal !important}
 
+  /* headline em 2 linhas (fraca+forte), copia exata do mockup
+     (mockup_onboarding_animado.html: .headline .fraca/.forte) -- usado
+     so nos slides golpe/bau (SLIDES com campo "fraca" preenchido). */
+  .obHeadline{text-align:center;margin-top:4px}
+  .obFraca{display:block;font-family:'Outfit',sans-serif !important;font-size:13px !important;
+           font-weight:500 !important;opacity:.75;margin-bottom:5px;color:#fff !important;font-style:normal !important}
+  .obForte{display:block;font-family:'Outfit',sans-serif !important;font-size:21px !important;
+           font-weight:800 !important;letter-spacing:-.01em !important;color:#fff !important;font-style:normal !important}
+  .obCorpo{text-align:center;font-size:12.5px;line-height:1.55;opacity:.88;margin-top:12px;
+           max-width:260px;margin-left:auto;margin-right:auto;color:#fff;font-family:'Outfit',sans-serif}
+
   /* trio escalonado do slide 1 (marca) -- igual a foto de referencia:
      sprite do meio maior/na frente, laterais menores/atras, um pouco
      mais baixos, sobrepondo o do meio. align-items:flex-end + tamanhos
@@ -3504,6 +3515,17 @@
   .carrosselSlide:not([data-slide="login"]) .primario{
     border-radius:999px !important;background:rgba(0,0,0,.28) !important;color:#fff !important;
     border:none !important;box-shadow:none !important;text-transform:none !important;letter-spacing:normal !important}
+
+  /* headline em 2 linhas (fraca+forte), copia exata do mockup
+     (mockup_onboarding_animado.html: .headline .fraca/.forte) -- usado
+     so nos slides golpe/bau (SLIDES com campo "fraca" preenchido). */
+  .obHeadline{text-align:center;margin-top:4px}
+  .obFraca{display:block;font-family:'Outfit',sans-serif !important;font-size:13px !important;
+           font-weight:500 !important;opacity:.75;margin-bottom:5px;color:#fff !important;font-style:normal !important}
+  .obForte{display:block;font-family:'Outfit',sans-serif !important;font-size:21px !important;
+           font-weight:800 !important;letter-spacing:-.01em !important;color:#fff !important;font-style:normal !important}
+  .obCorpo{text-align:center;font-size:12.5px;line-height:1.55;opacity:.88;margin-top:12px;
+           max-width:260px;margin-left:auto;margin-right:auto;color:#fff;font-family:'Outfit',sans-serif}
 
   /* trio escalonado do slide 1 (marca) -- igual a foto de referencia:
      sprite do meio maior/na frente, laterais menores/atras, um pouco

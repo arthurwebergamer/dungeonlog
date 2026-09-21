@@ -11856,14 +11856,16 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       texto:'Suas tarefas do dia viram uma batalha. Complete tarefas, evolua seu herói, vença monstros.',
       texto_en:'Your daily tasks become a battle. Complete tasks, level up your hero, defeat monsters.',
       botao:'Começar', botao_en:'Get started', layout:'marcaPrimeiro' },
-    { dataSlide:2, next:3, tipo:'golpeAnim', idx:22, titulo:'BATALHA', titulo_en:'BATTLE',
-      texto:'Todo dia aparece um monstro. Ele só morre se você terminar suas tarefas.',
-      texto_en:'A monster shows up every day. It only dies if you finish your tasks.',
-      botao:'Continuar', botao_en:'Continue', layout:'comTarefasDemo' },
-    { dataSlide:3, next:4, tipo:'bauAnim', idx:1, titulo:'EVOLUA', titulo_en:'LEVEL UP',
-      texto:'Ganhe XP, moedas e itens conforme joga. Da raridade Comum até Lendário.',
-      texto_en:'Earn XP, coins and items as you play. From Common rarity all the way to Legendary.',
-      botao:'Continuar', botao_en:'Continue', layout:'imagemPrimeiro' },
+    { dataSlide:2, next:3, tipo:'golpeAnim', idx:22,
+      fraca:'Cada tarefa concluída', fraca_en:'Every task you finish',
+      titulo:'é um golpe no monstro', titulo_en:'is a hit on the monster',
+      texto:'Termine suas tarefas e veja seu herói acertar o monstro do dia, na hora.',
+      texto_en:'Finish your tasks and watch your hero land a hit on today\'s monster, live.',
+      botao:'Continuar', botao_en:'Continue', layout:'mockupExato' },
+    { dataSlide:3, next:4, tipo:'bauAnim', idx:1,
+      fraca:'Vença o dia', fraca_en:'Win the day',
+      titulo:'e abra o baú', titulo_en:'and open the chest',
+      botao:'Continuar', botao_en:'Continue', layout:'mockupExatoSemCorpo' },
     { dataSlide:4, next:5, tipo:'idioma', titulo:'IDIOMA · LANGUAGE', titulo_en:'IDIOMA · LANGUAGE',
       texto:'Escolha o idioma do app. Dá pra trocar depois em Perfil.',
       texto_en:'Choose the app language. You can change it later in Profile.',
@@ -12041,6 +12043,16 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       <div class="carrosselTransicao">
         <p class="carrosselTransicaoTexto" id="carrosselTransicaoTexto" data-texto="${txtSlide(s, 'texto')}"></p>
       </div>`;
+    // headline em 2 linhas (fraca+forte) -- copia exata do layout do
+    // mockup_onboarding_animado.html (pedido do usuario: "quero só as
+    // telas que tão no mockup EXATAMENTE do jeito que tá lá", incluindo
+    // o texto). So usado nos slides golpe/bau (unicos com campo
+    // "fraca" preenchido em SLIDES).
+    const blocoHeadlineMockup = `
+      <div class="obHeadline">
+        <span class="obFraca">${txtSlide(s, 'fraca')}</span>
+        <span class="obForte">${txtSlide(s, 'titulo')}</span>
+      </div>`;
 
     // layout explicito por slide (era baseado em indice/posicao antes
     // da v4.117 -- ficou fragil com um 4o slide de tipo diferente,
@@ -12049,6 +12061,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
                 : s.layout === 'comTarefasDemo' ? (blocoImagem + blocoMarca + htmlTarefasDemo)
                 : s.layout === 'textoSolo' ? blocoTransicao
                 : s.layout === 'idiomaEscolha' ? (blocoMarca + htmlIdiomaEscolha)
+                : s.layout === 'mockupExato' ? (blocoImagem + blocoHeadlineMockup + '<p class="obCorpo">' + txtSlide(s, 'texto') + '</p>')
+                : s.layout === 'mockupExatoSemCorpo' ? (blocoImagem + blocoHeadlineMockup)
                 : (blocoImagem + blocoMarca); // 'imagemPrimeiro' e fallback
 
     return `

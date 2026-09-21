@@ -11583,7 +11583,22 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // (pintarGradienteCrossfade), senao o navegador funde os 2 estados
   // numa transicao so e a animacao nao roda.
   const DURACAO_TRANSICAO_LOGIN = 260;
+  // v4.132 (bug reportado com video: toque duplo rapido no "Voltar"
+  // durante os 260ms da animacao deixava a tela em branco). Causa: o
+  // handler da seta Voltar consultava window.__loginFormAberto pra
+  // decidir entre "volta pra escolha" ou "sai do login", mas essa flag
+  // ja virava false de forma SINCRONA assim que voltarParaEscolhaLogin()
+  // era chamada -- antes do setTimeout dela sequer rodar. Um segundo
+  // toque nesse meio-tempo lia a flag como false e chamava
+  // voltarDoLoginCarrossel() (saindo do login) ENQUANTO o setTimeout do
+  // primeiro toque ainda ia rodar mais tarde e reexibir a escolha com
+  // opacity:0 preso (a transicao nao chega a rodar pq o elemento pai
+  // ja tinha sido escondido pelo voltarDoLoginCarrossel). Fix: uma flag
+  // de "transicao em andamento" que ignora toques repetidos nos 260ms.
+  window.__loginEmTransicao = false;
   const abrirFormLogin = () => {
+    if (window.__loginEmTransicao) return;
+    window.__loginEmTransicao = true;
     const escolha = document.getElementById('loginEscolha');
     const form = document.getElementById('loginFormWrap');
     escolha.classList.add('loginSlideOut');
@@ -11593,6 +11608,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       form.classList.add('loginSlideIn');
       void form.offsetHeight; // forca reflow -- ver comentario acima
       form.classList.remove('loginSlideIn');
+      window.__loginEmTransicao = false;
     }, DURACAO_TRANSICAO_LOGIN);
     window.__loginFormAberto = true;
   };
@@ -11610,6 +11626,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // pra decidir entre "volta pra escolha" ou "sai do login de vez".
   window.__loginFormAberto = false;
   window.voltarParaEscolhaLogin = () => {
+    if (window.__loginEmTransicao) return;
+    window.__loginEmTransicao = true;
     const escolha = document.getElementById('loginEscolha');
     const form = document.getElementById('loginFormWrap');
     form.classList.add('loginSlideOut');
@@ -11617,9 +11635,18 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       form.style.display = 'none';
       form.classList.remove('loginSlideOut');
       escolha.style.display = 'flex';
+      // v4.132 (causa real do bug de tela em branco): abrirFormLogin
+      // deixa a classe 'loginSlideOut' (opacity:0) presa em `escolha` e
+      // NUNCA a remove -- so tira ela no reset de irParaLogin(). Sem
+      // este remove aqui, a classe antiga continuava valendo mesmo
+      // depois de tirar 'loginSlideIn', prendendo a opacidade em 0 pra
+      // sempre (a tela de escolha ficava invisivel, so o fundo e a
+      // seta Voltar apareciam).
+      escolha.classList.remove('loginSlideOut');
       escolha.classList.add('loginSlideIn');
       void escolha.offsetHeight; // forca reflow -- ver comentario em abrirFormLogin
       escolha.classList.remove('loginSlideIn');
+      window.__loginEmTransicao = false;
     }, DURACAO_TRANSICAO_LOGIN);
     window.__loginFormAberto = false;
   };
@@ -12535,6 +12562,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       formReset.style.display = 'none';
       formReset.classList.remove('loginSlideOut', 'loginSlideIn');
       window.__loginFormAberto = false;
+      window.__loginEmTransicao = false; // v4.132: garante que um toque duplo na sessao anterior nao deixe isso preso em true
     }
     pararCicloGolpe(); // desvio pro login pode acontecer NO MEIO do slide golpe (link "Ja tem conta?"), nao passa por atualizarTopo
     const atualEl = palco.querySelector('.carrosselSlide.on');
@@ -12606,6 +12634,13 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     const atualEl = palco.querySelector('.carrosselSlide.on');
     if (!atualEl) return;
     if (atualEl === passoLogin){
+      // v4.132: ignora toque repetido enquanto a animacao de
+      // abrir/fechar o formulario de email ainda esta rodando (260ms) --
+      // sem isso, um segundo toque nesse meio-tempo lia
+      // __loginFormAberto ja como false e saia do login inteiro
+      // enquanto o setTimeout do primeiro toque ainda ia reexibir a
+      // escolha, deixando a tela em branco (opacity presa em 0).
+      if (window.__loginEmTransicao) return;
       // v4.131 (pedido do usuario, print do Habitica): se o formulario
       // de email/senha estiver aberto, a seta so volta pra tela de
       // escolha (Google/email) -- so sai do login de vez quando ja

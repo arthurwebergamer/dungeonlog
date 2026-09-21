@@ -2069,10 +2069,21 @@
      .bautxt/.baunome/.bauraridade ja existentes acima). Sem JS de
      timing: cada ciclo e 100% CSS, nao trava/desincroniza. */
   .obPalco{position:relative;width:100%;height:150px}
+  /* v4.134 (pedido do usuario: o golpe demorava pra COMECAR quando a
+     pessoa entrava no slide -- 1728ms parado ate o 1o flash, chance
+     grande de ja ter passado pro proximo slide sem ver nada). Fix NAO e
+     acelerar o ciclo inteiro (isso mudaria o ritmo/duracao do loop de
+     verdade, que continua 3.2s) -- e usar animation-delay NEGATIVO pra
+     "adiantar" a animacao pro ponto logo antes do golpe (48% de 3.2s)
+     assim que o slide fica visivel, entao o 1o flash aparece em ~190ms
+     em vez de ~1728ms. Repeticoes seguintes continuam no ritmo normal
+     de 3.2s (so a largada e que muda). iniciarCicloGolpe() no JS foi
+     ajustado igual, pro popup de moeda+XP continuar sincronizado com o
+     flash (ver comentario la, mais abaixo no arquivo). */
   .obHeroSp{position:absolute;left:6%;bottom:0;height:126px;width:auto;
-            image-rendering:pixelated;animation:obHeroLunge 1.8s ease-in-out infinite}
+            image-rendering:pixelated;animation:obHeroLunge 3.2s ease-in-out infinite;animation-delay:-1.536s}
   .obMobSp{position:absolute;right:6%;bottom:4px;height:108px;width:auto;
-           image-rendering:pixelated;animation:obMobShake 1.8s ease-in-out infinite}
+           image-rendering:pixelated;animation:obMobShake 3.2s ease-in-out infinite;animation-delay:-1.536s}
   @keyframes obHeroLunge{
     0%,50%{transform:translateX(0)}
     55%{transform:translateX(12px)}
@@ -2089,7 +2100,7 @@
              background-image:var(--spr-slash-comum);background-repeat:no-repeat;
              background-size:504px 56px;background-position:0 0;
              filter:grayscale(1) brightness(2.4);image-rendering:pixelated;
-             opacity:0;animation:obSlash 1.8s linear infinite}
+             opacity:0;animation:obSlash 3.2s linear infinite;animation-delay:-1.536s}
   @keyframes obSlash{
     0%,53%{opacity:0;background-position:0 0}
     54%{opacity:1;background-position:0 0;animation-timing-function:steps(9)}
@@ -2097,7 +2108,7 @@
     64%,100%{opacity:0}
   }
   .obRecIcon{position:absolute;width:14px;height:14px;opacity:0;pointer-events:none;
-             right:24%;bottom:64px;animation:obIconVoo 1.8s ease-in infinite}
+             right:24%;bottom:64px;animation:obIconVoo 3.2s ease-in infinite}
   .obRecIcon svg{width:100%;height:100%;image-rendering:pixelated}
   .obRecIcon.xp{animation-delay:.08s}
   @keyframes obIconVoo{
@@ -2108,7 +2119,7 @@
   }
   .obRecompensa{position:absolute;left:8%;bottom:80px;display:flex;flex-direction:column;
                 gap:2px;font-size:12px;font-weight:700;opacity:0;pointer-events:none;
-                animation:obRecompensaPop 1.8s ease-out infinite}
+                animation:obRecompensaPop 3.2s ease-out infinite}
   .obRecompensa .obMoeda,.obRecompensa .obXp{display:flex;align-items:center;gap:3px}
   .obRecompensa .obMoeda{color:var(--gold)}
   .obRecompensa .obXp{color:var(--text)}
@@ -2124,7 +2135,7 @@
   .obBauImg{width:96px;height:96px;background-size:contain;background-repeat:no-repeat;
             background-position:center;image-rendering:pixelated;
             background-image:var(--bau-fechado);
-            animation:obBauAbre 1.9s ease-in-out infinite}
+            animation:obBauAbre 3.4s ease-in-out infinite;animation-delay:-.85s}
   @keyframes obBauAbre{
     0%,29%{background-image:var(--bau-fechado);transform:scale(1)}
     31%{transform:scale(1.08)}
@@ -2132,8 +2143,8 @@
   }
   .obBauItens{width:100%;max-width:280px;margin:0 auto}
   .obBauItens .baucard{opacity:0;transform:translateY(6px);
-                        animation:obBaucardCiclo 1.9s ease infinite}
-  .obBauItens .baucard:nth-child(2){animation-delay:.084s}
+                        animation:obBaucardCiclo 3.4s ease infinite;animation-delay:-.85s}
+  .obBauItens .baucard:nth-child(2){animation-delay:-.7s}
   @keyframes obBaucardCiclo{
     0%,37%{opacity:0;transform:translateY(6px)}
     45%,92%{opacity:1;transform:translateY(0)}
@@ -3654,10 +3665,21 @@
      .bautxt/.baunome/.bauraridade ja existentes acima). Sem JS de
      timing: cada ciclo e 100% CSS, nao trava/desincroniza. */
   .obPalco{position:relative;width:100%;height:150px}
+  /* v4.134 (pedido do usuario: o golpe demorava pra COMECAR quando a
+     pessoa entrava no slide -- 1728ms parado ate o 1o flash, chance
+     grande de ja ter passado pro proximo slide sem ver nada). Fix NAO e
+     acelerar o ciclo inteiro (isso mudaria o ritmo/duracao do loop de
+     verdade, que continua 3.2s) -- e usar animation-delay NEGATIVO pra
+     "adiantar" a animacao pro ponto logo antes do golpe (48% de 3.2s)
+     assim que o slide fica visivel, entao o 1o flash aparece em ~190ms
+     em vez de ~1728ms. Repeticoes seguintes continuam no ritmo normal
+     de 3.2s (so a largada e que muda). iniciarCicloGolpe() no JS foi
+     ajustado igual, pro popup de moeda+XP continuar sincronizado com o
+     flash (ver comentario la, mais abaixo no arquivo). */
   .obHeroSp{position:absolute;left:6%;bottom:0;height:126px;width:auto;
-            image-rendering:pixelated;animation:obHeroLunge 1.8s ease-in-out infinite}
+            image-rendering:pixelated;animation:obHeroLunge 3.2s ease-in-out infinite;animation-delay:-1.536s}
   .obMobSp{position:absolute;right:6%;bottom:4px;height:108px;width:auto;
-           image-rendering:pixelated;animation:obMobShake 1.8s ease-in-out infinite}
+           image-rendering:pixelated;animation:obMobShake 3.2s ease-in-out infinite;animation-delay:-1.536s}
   @keyframes obHeroLunge{
     0%,50%{transform:translateX(0)}
     55%{transform:translateX(12px)}
@@ -3674,7 +3696,7 @@
              background-image:var(--spr-slash-comum);background-repeat:no-repeat;
              background-size:504px 56px;background-position:0 0;
              filter:grayscale(1) brightness(2.4);image-rendering:pixelated;
-             opacity:0;animation:obSlash 1.8s linear infinite}
+             opacity:0;animation:obSlash 3.2s linear infinite;animation-delay:-1.536s}
   @keyframes obSlash{
     0%,53%{opacity:0;background-position:0 0}
     54%{opacity:1;background-position:0 0;animation-timing-function:steps(9)}
@@ -3682,7 +3704,7 @@
     64%,100%{opacity:0}
   }
   .obRecIcon{position:absolute;width:14px;height:14px;opacity:0;pointer-events:none;
-             right:24%;bottom:64px;animation:obIconVoo 1.8s ease-in infinite}
+             right:24%;bottom:64px;animation:obIconVoo 3.2s ease-in infinite}
   .obRecIcon svg{width:100%;height:100%;image-rendering:pixelated}
   .obRecIcon.xp{animation-delay:.08s}
   @keyframes obIconVoo{
@@ -3693,7 +3715,7 @@
   }
   .obRecompensa{position:absolute;left:8%;bottom:80px;display:flex;flex-direction:column;
                 gap:2px;font-size:12px;font-weight:700;opacity:0;pointer-events:none;
-                animation:obRecompensaPop 1.8s ease-out infinite}
+                animation:obRecompensaPop 3.2s ease-out infinite}
   .obRecompensa .obMoeda,.obRecompensa .obXp{display:flex;align-items:center;gap:3px}
   .obRecompensa .obMoeda{color:var(--gold)}
   .obRecompensa .obXp{color:var(--text)}
@@ -3709,7 +3731,7 @@
   .obBauImg{width:96px;height:96px;background-size:contain;background-repeat:no-repeat;
             background-position:center;image-rendering:pixelated;
             background-image:var(--bau-fechado);
-            animation:obBauAbre 1.9s ease-in-out infinite}
+            animation:obBauAbre 3.4s ease-in-out infinite;animation-delay:-.85s}
   @keyframes obBauAbre{
     0%,29%{background-image:var(--bau-fechado);transform:scale(1)}
     31%{transform:scale(1.08)}
@@ -3717,8 +3739,8 @@
   }
   .obBauItens{width:100%;max-width:280px;margin:0 auto}
   .obBauItens .baucard{opacity:0;transform:translateY(6px);
-                        animation:obBaucardCiclo 1.9s ease infinite}
-  .obBauItens .baucard:nth-child(2){animation-delay:.084s}
+                        animation:obBaucardCiclo 3.4s ease infinite;animation-delay:-.85s}
+  .obBauItens .baucard:nth-child(2){animation-delay:-.7s}
   @keyframes obBaucardCiclo{
     0%,37%{opacity:0;transform:translateY(6px)}
     45%,92%{opacity:1;transform:translateY(0)}

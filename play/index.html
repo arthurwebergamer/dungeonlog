@@ -11574,9 +11574,26 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     const btn = document.getElementById('loginGoogleBtn');
     if (btn) btn.click();
   };
+  // v4.129 (pedido do usuario com video do Habitica): a troca de tela
+  // era um display:none/flex INSTANTANEO -- sem transicao nenhuma,
+  // ficava "seco" comparado ao Habitica (que desliza pra tela de
+  // email). Anima os 2 lados: escolha desliza/some pra esquerda, form
+  // aparece deslizando da direita -- mesmo truque de forcar reflow
+  // (void el.offsetHeight) ja usado no crossfade do carrossel
+  // (pintarGradienteCrossfade), senao o navegador funde os 2 estados
+  // numa transicao so e a animacao nao roda.
+  const DURACAO_TRANSICAO_LOGIN = 260;
   const abrirFormLogin = () => {
-    document.getElementById('loginEscolha').style.display = 'none';
-    document.getElementById('loginFormWrap').style.display = 'flex';
+    const escolha = document.getElementById('loginEscolha');
+    const form = document.getElementById('loginFormWrap');
+    escolha.classList.add('loginSlideOut');
+    setTimeout(() => {
+      escolha.style.display = 'none';
+      form.style.display = 'flex';
+      form.classList.add('loginSlideIn');
+      void form.offsetHeight; // forca reflow -- ver comentario acima
+      form.classList.remove('loginSlideIn');
+    }, DURACAO_TRANSICAO_LOGIN);
   };
   document.getElementById('loginEscolhaEmail').onclick = abrirFormLogin;
   document.getElementById('loginEscolhaEntrar').onclick = abrirFormLogin;

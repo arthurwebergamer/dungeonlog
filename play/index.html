@@ -12417,6 +12417,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
   function atualizarTopo(num){
     pintarFundoOnboarding(num);
+    document.getElementById('carrosselDots').classList.remove('oculto'); // v4.122: sai do login, dots voltam a aparecer
     document.querySelectorAll('#carrosselDots .carrosselDot').forEach((d, j) => {
       d.classList.toggle('on', j === num - 1);
     });
@@ -12487,6 +12488,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     if (typeof window.pintarParede === 'function') window.pintarParede(); // login sai do gradiente por slide, volta pra parede de pedra original
     esconderFundoGrad();
     mostrarCenarioLogin(); // v4.120: cenario real (montanhas) como camada fixa, ver pintarFundoOnboarding
+    document.getElementById('carrosselDots').classList.add('oculto'); // v4.122: dots nao tem lugar na tela de login, ficavam sobrando la embaixo
     document.querySelectorAll('#carrosselDots .carrosselDot').forEach(d => d.classList.remove('on'));
     // "Criar conta"/"Sair" (Config) recarregam a pagina e forcam essa
     // funcao a rodar ANTES de qualquer slide ter sido mostrado -- nesse

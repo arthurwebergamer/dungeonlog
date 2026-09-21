@@ -11457,16 +11457,15 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
   const card = intro.querySelector('.card');
 
-  // v4.119: cenario real (mesmo asset "montanhas" de TEMAS_ARENA, ja
-  // usado no slide estagio do onboarding) atras da marca -- porta o
-  // visual da tela "DEPOIS" do mockup (mockup_onboarding_animado.html,
-  // slide 5) SEM tocar no formulario/logica de auth abaixo, mesma
-  // filosofia de reuso das outras telas (so a casca visual muda).
-  const artMontanhasLogin = (typeof TEMAS_ARENA !== 'undefined') ? TEMAS_ARENA.find(t => t.id === 'montanhas').arte : '';
+  // v4.120: cenario real (mesmo asset "montanhas" de TEMAS_ARENA, ja
+  // usado no slide estagio) NAO mora mais aqui dentro -- movido pra
+  // #introCenario (camada fixa, irma de .card, ver mostrarCenarioLogin()
+  // no script do carrossel mais abaixo) pelo mesmo motivo do estagio:
+  // #passoLogin vira .carrosselSlide e leva transform durante o swipe,
+  // o que cortava/deslocava a imagem quando ela morava aqui dentro.
 
   card.insertAdjacentHTML('afterbegin', `
     <div class="passo on" id="passoLogin">
-      <div class="loginCenario"><img src="data:image/png;base64,${artMontanhasLogin}" alt=""></div>
       <div class="marca">
         <span class="titulo">DUNGEONLOG</span>
         <p class="loginModo" id="loginModo" data-i18n="login.entreNaSuaConta">Entre na sua conta</p>
@@ -11959,18 +11958,16 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       '</div></div>';
     }
     if (s.tipo === 'estagioAnim'){
-      // slide "estagio": cross-fade entre 2 cenarios REAIS do jogo
-      // (TEMAS_ARENA, mesmo array da loja de temas real -- sem
-      // duplicar base64, so aponta pro mesmo dado), tecnica identica a
-      // mockup_onboarding_animado.html (2 <img> alternando opacidade
-      // em loop, delay de meio ciclo entre elas).
-      const artDeserto = TEMAS_ARENA.find(t => t.id === 'deserto').arte;
-      const artMontanhas = TEMAS_ARENA.find(t => t.id === 'montanhas').arte;
-      return '<div class="obEstagioBg">' +
-        '<img class="obCamada" src="data:image/png;base64,' + artDeserto + '" alt="">' +
-        '<img class="obCamada dois" src="data:image/png;base64,' + artMontanhas + '" alt="">' +
-      '</div>' +
-      '<div class="obEstagioPill"><span class="obLbl">Estágio</span><span class="obNum">2</span></div>';
+      // v4.120: o cross-fade real (deserto/montanhas, TEMAS_ARENA) NAO
+      // mora mais aqui dentro -- .carrosselSlide leva transform durante o
+      // swipe (deslizar()/arraste), o que quebrava tanto position:fixed
+      // (transform vira containing block novo) quanto o bleed via margem
+      // negativa (corte visivel no topo, reportado pelo usuario). Agora
+      // e uma camada fixa IRMA de .card (#introCenario, ver
+      // mostrarCenarioEstagio() e pintarFundoOnboarding()), ligada/
+      // desligada em atualizarTopo(). Aqui so sobra o texto "Estagio 2"
+      // em cima.
+      return '<div class="obEstagioPill"><span class="obLbl">Estágio</span><span class="obNum">2</span></div>';
     }
     if (s.tipo === 'bauAnim'){
       // slide 3 (EVOLUA): mesma marcacao/classes do loot real de bau
@@ -12250,22 +12247,90 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   const GRADIENTES_ONBOARD = {
     1: 'linear-gradient(160deg,#251E38 0%,#1A1526 100%)',
     2: 'linear-gradient(160deg,#2C2444 0%,#1A1526 100%)',
-    3: 'linear-gradient(160deg,#3A2F16 0%,#1F1A0C 100%)',
-    4: 'linear-gradient(160deg,#1C2E3A 0%,#101B22 100%)',
-    5: 'linear-gradient(160deg,#251E38 0%,#1A1526 100%)',
-    6: 'linear-gradient(160deg,#251E38 0%,#1A1526 100%)',
-    7: 'linear-gradient(160deg,#2C2444 0%,#1A1526 100%)',
-    8: 'linear-gradient(160deg,#1C2E3A 0%,#101B22 100%)'
+    3: 'linear-gradient(160deg,#3A2F16 0%,#1F1A0C 100%)'
   };
+  // slide estagio identificado pelo tipo (nao hardcoded), assim continua
+  // certo se a ordem/numero dos slides mudar de novo no futuro.
+  const slideEstagioObj = SLIDES.find(s => s.tipo === 'estagioAnim');
+  const SLIDE_ESTAGIO = slideEstagioObj ? slideEstagioObj.dataSlide : null;
+
+  // v4.120: pedido do usuario -- transicao de cor suave entre slides (em
+  // vez de trocar o gradiente na hora) + corrige um bug de "corte" no
+  // topo do cenario real (estagio/login): antes, os fundos (gradiente OU
+  // imagem) viviam DENTRO do .carrosselSlide, que leva transform durante
+  // o swipe/deslizar (ver deslizar()/finalizarArraste()) -- isso quebra
+  // position:fixed (o transform vira containing block novo) e o
+  // position:absolute exigia calcular margem negativa pra compensar TODA
+  // a estrutura de paddings ate o topo real (#intro > .card >
+  // #passoCarrosselTudo > .carrosselPalco), incluindo a barra de topo
+  // (dots/voltar) que nao entrava na conta -- daí o corte visivel.
+  // Solucao: 2 camadas de fundo (gradiente com crossfade) + 1 camada de
+  // "cenario" (estagio/login), todas IRMAS de .card dentro de #intro,
+  // fora do elemento que anima -- sempre position:fixed relativo a
+  // viewport de verdade, nunca sofrem o transform do swipe.
+  let fundoGradAtiva = null; // 'a' | 'b' | null
+  function garantirCamadasFundo(){
+    if (document.getElementById('fundoGradA')) return;
+    intro.insertAdjacentHTML('afterbegin', `
+      <div class="fundoGradCamada" id="fundoGradA"></div>
+      <div class="fundoGradCamada" id="fundoGradB"></div>
+      <div id="introCenario">
+        <img class="cenarioImg" id="cenarioImgA" alt="">
+        <img class="cenarioImg dois" id="cenarioImgB" alt="">
+      </div>
+    `);
+  }
+  function pintarGradienteCrossfade(grad){
+    garantirCamadasFundo();
+    const proxima = fundoGradAtiva === 'a' ? 'b' : 'a';
+    const elProxima = document.getElementById(proxima === 'a' ? 'fundoGradA' : 'fundoGradB');
+    const elAtual = fundoGradAtiva ? document.getElementById(fundoGradAtiva === 'a' ? 'fundoGradA' : 'fundoGradB') : null;
+    elProxima.style.backgroundImage = grad;
+    elProxima.style.opacity = '0';
+    void elProxima.offsetHeight; // forca reflow -- sem isso o navegador as vezes "funde" as 2 mudancas de opacidade numa so, sem animar
+    elProxima.style.opacity = '1';
+    if (elAtual) elAtual.style.opacity = '0';
+    fundoGradAtiva = proxima;
+  }
+  function esconderFundoGrad(){
+    const a = document.getElementById('fundoGradA'), b = document.getElementById('fundoGradB');
+    if (a) a.style.opacity = '0';
+    if (b) b.style.opacity = '0';
+    fundoGradAtiva = null;
+  }
+  function mostrarCenarioEstagio(){
+    garantirCamadasFundo();
+    const el = document.getElementById('introCenario');
+    const a = document.getElementById('cenarioImgA'), b = document.getElementById('cenarioImgB');
+    if (typeof TEMAS_ARENA !== 'undefined'){
+      a.src = 'data:image/png;base64,' + TEMAS_ARENA.find(t => t.id === 'deserto').arte;
+      b.src = 'data:image/png;base64,' + TEMAS_ARENA.find(t => t.id === 'montanhas').arte;
+    }
+    el.classList.remove('modoLogin');
+    el.classList.add('ativo', 'modoEstagio');
+  }
+  function mostrarCenarioLogin(){
+    garantirCamadasFundo();
+    const el = document.getElementById('introCenario');
+    const a = document.getElementById('cenarioImgA');
+    if (typeof TEMAS_ARENA !== 'undefined'){
+      a.src = 'data:image/png;base64,' + TEMAS_ARENA.find(t => t.id === 'montanhas').arte;
+    }
+    el.classList.remove('modoEstagio');
+    el.classList.add('ativo', 'modoLogin');
+  }
+  function esconderCenario(){
+    const el = document.getElementById('introCenario');
+    if (el) el.classList.remove('ativo', 'modoEstagio', 'modoLogin');
+  }
   function pintarFundoOnboarding(num){
+    if (num === SLIDE_ESTAGIO){ esconderFundoGrad(); mostrarCenarioEstagio(); return; }
+    esconderCenario();
     const grad = GRADIENTES_ONBOARD[num];
     // login/desconhecido: volta pra parede de pedra original (funcao
     // definida num <script> anterior, exposta via window.pintarParede)
-    if (!grad){ if (typeof window.pintarParede === 'function') window.pintarParede(); return; }
-    intro.style.backgroundImage = grad;
-    intro.style.backgroundSize = 'cover';
-    intro.style.backgroundRepeat = 'no-repeat';
-    intro.style.backgroundPosition = 'center';
+    if (!grad){ esconderFundoGrad(); if (typeof window.pintarParede === 'function') window.pintarParede(); return; }
+    pintarGradienteCrossfade(grad);
   }
 
   // v4.118: recompensa do slide golpe (moeda+XP voando + popup "+4/+12 XP")
@@ -12372,6 +12437,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     }
     containerCarrossel.classList.add('on');
     if (typeof window.pintarParede === 'function') window.pintarParede(); // login sai do gradiente por slide, volta pra parede de pedra original
+    esconderFundoGrad();
+    mostrarCenarioLogin(); // v4.120: cenario real (montanhas) como camada fixa, ver pintarFundoOnboarding
     document.querySelectorAll('#carrosselDots .carrosselDot').forEach(d => d.classList.remove('on'));
     // "Criar conta"/"Sair" (Config) recarregam a pagina e forcam essa
     // funcao a rodar ANTES de qualquer slide ter sido mostrado -- nesse

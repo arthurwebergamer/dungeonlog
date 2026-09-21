@@ -1848,16 +1848,13 @@
   /* cada elemento do formulario se destaca sozinho em cima do tijolo
      (campo com fundo solido + icone, botao Entrar preenchido, sombra
      de texto nos labels/links) */
-  /* v4.119: cenario real (Montanhas) + wordmark, porta o visual da tela
-     "DEPOIS" do mockup (slide 5) -- bleed total pelas paddings de .intro/
-     .card (mesma tecnica -30/-24 do .obEstagioBg no onboarding), fade pro
-     preto de fundo do login (#0B0710, ver .intro.loginBg acima) em vez de
-     recortar em linha reta. */
-  .loginCenario{position:relative;margin:-30px -24px 0;height:150px;overflow:hidden}
-  .loginCenario img{position:absolute;inset:0;width:100%;height:100%;
-                     object-fit:cover;image-rendering:pixelated}
-  .loginCenario::after{content:'';position:absolute;inset:0;
-                        background:linear-gradient(180deg,rgba(11,7,16,0) 35%,#0B0710 100%)}
+  /* v4.120: #passoLogin ganha padding-top reservando o espaco onde o
+     cenario real (Montanhas) fica -- a imagem em si NAO mora mais aqui
+     dentro (ver #introCenario/.fundoGradCamada, camadas fixas irmas de
+     .card, mais abaixo neste arquivo) porque #passoLogin vira
+     .carrosselSlide e leva transform durante o swipe, o que cortava a
+     imagem quando ela era filha daqui. */
+  #passoLogin.carrosselSlide{padding-top:150px}
   #passoLogin .titulo{font-family:'Silkscreen',monospace !important;color:#F2A65A !important;
                        font-size:19px !important;letter-spacing:1px !important;
                        text-transform:none !important;font-style:normal !important;
@@ -2106,16 +2103,39 @@
      copia exata do mockup (estagioBg/estagioPillDemo). z-index:-1 pra
      ficar atras do headline/corpo (acima) e dos dots/botao (fora do
      .carrosselMeio) sem precisar mexer na stacking order deles. */
-  /* margin negativo compensa o padding de .intro (20px) + .card
-     (10px/4px/24px) -- sem isso sobra uma faixa fina da parede antiga
-     visivel na borda (o .obEstagioBg so preenche inset:0 relativo ao
-     .carrosselSlide, que fica DENTRO desses paddings). */
-  .obEstagioBg{position:absolute;inset:0;margin:-30px -24px -44px;z-index:-1;overflow:hidden}
-  .obEstagioBg .obCamada{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
-    image-rendering:pixelated;animation:obEstagioFade 3.2s ease-in-out infinite}
-  .obEstagioBg .obCamada.dois{animation-delay:-1.6s}
-  .obEstagioBg::after{content:'';position:absolute;inset:0;
+  /* v4.120: fundo do onboarding inteiro (gradiente por slide + cenario
+     real do estagio/login) virou 2+1 camadas FIXAS, IRMAS de .card
+     dentro de #intro -- ver pintarFundoOnboarding()/mostrarCenarioEstagio()/
+     mostrarCenarioLogin() no script do carrossel. Antes, tanto o
+     gradiente (via inline style em #intro) quanto o cenario real
+     (.obEstagioBg, filha do .carrosselSlide) tentavam bleedar com margem
+     negativa calculada a mao pra compensar os paddings de .intro/.card --
+     so que .carrosselSlide leva transform durante o swipe (deslizar()),
+     o que quebra esse calculo e cortava a imagem no topo (bug relatado
+     pelo usuario). Camadas fixas, fora do elemento que anima, resolvem
+     os dois problemas de uma vez: bleed sempre exato relativo a
+     viewport, e a troca de gradiente agora cross-fadeia (opacity
+     transition) em vez de trocar na hora.
+     fundoGradCamada = 2 camadas empilhadas pro gradiente por slide
+     (crossfade); introCenario = cenario real (estagio: cross-fade
+     deserto/montanhas; login: montanhas estatica, so o topo). */
+  .fundoGradCamada{position:fixed;inset:0;z-index:-1;background-size:cover;
+    background-repeat:no-repeat;background-position:center;
+    opacity:0;transition:opacity .45s ease;pointer-events:none}
+  #introCenario{position:fixed;left:0;right:0;top:0;bottom:0;z-index:-1;
+    overflow:hidden;opacity:0;transition:opacity .35s ease;pointer-events:none}
+  #introCenario.modoLogin{bottom:auto;height:150px}
+  #introCenario.ativo{opacity:1}
+  #introCenario .cenarioImg{position:absolute;inset:0;width:100%;height:100%;
+    object-fit:cover;image-rendering:pixelated;opacity:0}
+  #introCenario.modoEstagio .cenarioImg{animation:obEstagioFade 3.2s ease-in-out infinite}
+  #introCenario.modoEstagio .cenarioImg.dois{animation-delay:-1.6s}
+  #introCenario.modoLogin .cenarioImg{opacity:1;animation:none}
+  #introCenario::after{content:'';position:absolute;inset:0}
+  #introCenario.modoEstagio::after{
     background:linear-gradient(180deg,rgba(10,8,14,.35) 0%,rgba(10,8,14,.55) 55%,rgba(10,8,14,.88) 100%)}
+  #introCenario.modoLogin::after{
+    background:linear-gradient(180deg,rgba(11,7,16,0) 35%,#0B0710 100%)}
   @keyframes obEstagioFade{0%,45%{opacity:1}55%,100%{opacity:0}}
   .obEstagioPill{position:relative;z-index:2;display:flex;flex-direction:column;
                  align-items:center;gap:6px;margin-bottom:4px}
@@ -3328,16 +3348,13 @@
   /* cada elemento do formulario se destaca sozinho em cima do tijolo
      (campo com fundo solido + icone, botao Entrar preenchido, sombra
      de texto nos labels/links) */
-  /* v4.119: cenario real (Montanhas) + wordmark, porta o visual da tela
-     "DEPOIS" do mockup (slide 5) -- bleed total pelas paddings de .intro/
-     .card (mesma tecnica -30/-24 do .obEstagioBg no onboarding), fade pro
-     preto de fundo do login (#0B0710, ver .intro.loginBg acima) em vez de
-     recortar em linha reta. */
-  .loginCenario{position:relative;margin:-30px -24px 0;height:150px;overflow:hidden}
-  .loginCenario img{position:absolute;inset:0;width:100%;height:100%;
-                     object-fit:cover;image-rendering:pixelated}
-  .loginCenario::after{content:'';position:absolute;inset:0;
-                        background:linear-gradient(180deg,rgba(11,7,16,0) 35%,#0B0710 100%)}
+  /* v4.120: #passoLogin ganha padding-top reservando o espaco onde o
+     cenario real (Montanhas) fica -- a imagem em si NAO mora mais aqui
+     dentro (ver #introCenario/.fundoGradCamada, camadas fixas irmas de
+     .card, mais abaixo neste arquivo) porque #passoLogin vira
+     .carrosselSlide e leva transform durante o swipe, o que cortava a
+     imagem quando ela era filha daqui. */
+  #passoLogin.carrosselSlide{padding-top:150px}
   #passoLogin .titulo{font-family:'Silkscreen',monospace !important;color:#F2A65A !important;
                        font-size:19px !important;letter-spacing:1px !important;
                        text-transform:none !important;font-style:normal !important;
@@ -3586,16 +3603,39 @@
      copia exata do mockup (estagioBg/estagioPillDemo). z-index:-1 pra
      ficar atras do headline/corpo (acima) e dos dots/botao (fora do
      .carrosselMeio) sem precisar mexer na stacking order deles. */
-  /* margin negativo compensa o padding de .intro (20px) + .card
-     (10px/4px/24px) -- sem isso sobra uma faixa fina da parede antiga
-     visivel na borda (o .obEstagioBg so preenche inset:0 relativo ao
-     .carrosselSlide, que fica DENTRO desses paddings). */
-  .obEstagioBg{position:absolute;inset:0;margin:-30px -24px -44px;z-index:-1;overflow:hidden}
-  .obEstagioBg .obCamada{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
-    image-rendering:pixelated;animation:obEstagioFade 3.2s ease-in-out infinite}
-  .obEstagioBg .obCamada.dois{animation-delay:-1.6s}
-  .obEstagioBg::after{content:'';position:absolute;inset:0;
+  /* v4.120: fundo do onboarding inteiro (gradiente por slide + cenario
+     real do estagio/login) virou 2+1 camadas FIXAS, IRMAS de .card
+     dentro de #intro -- ver pintarFundoOnboarding()/mostrarCenarioEstagio()/
+     mostrarCenarioLogin() no script do carrossel. Antes, tanto o
+     gradiente (via inline style em #intro) quanto o cenario real
+     (.obEstagioBg, filha do .carrosselSlide) tentavam bleedar com margem
+     negativa calculada a mao pra compensar os paddings de .intro/.card --
+     so que .carrosselSlide leva transform durante o swipe (deslizar()),
+     o que quebra esse calculo e cortava a imagem no topo (bug relatado
+     pelo usuario). Camadas fixas, fora do elemento que anima, resolvem
+     os dois problemas de uma vez: bleed sempre exato relativo a
+     viewport, e a troca de gradiente agora cross-fadeia (opacity
+     transition) em vez de trocar na hora.
+     fundoGradCamada = 2 camadas empilhadas pro gradiente por slide
+     (crossfade); introCenario = cenario real (estagio: cross-fade
+     deserto/montanhas; login: montanhas estatica, so o topo). */
+  .fundoGradCamada{position:fixed;inset:0;z-index:-1;background-size:cover;
+    background-repeat:no-repeat;background-position:center;
+    opacity:0;transition:opacity .45s ease;pointer-events:none}
+  #introCenario{position:fixed;left:0;right:0;top:0;bottom:0;z-index:-1;
+    overflow:hidden;opacity:0;transition:opacity .35s ease;pointer-events:none}
+  #introCenario.modoLogin{bottom:auto;height:150px}
+  #introCenario.ativo{opacity:1}
+  #introCenario .cenarioImg{position:absolute;inset:0;width:100%;height:100%;
+    object-fit:cover;image-rendering:pixelated;opacity:0}
+  #introCenario.modoEstagio .cenarioImg{animation:obEstagioFade 3.2s ease-in-out infinite}
+  #introCenario.modoEstagio .cenarioImg.dois{animation-delay:-1.6s}
+  #introCenario.modoLogin .cenarioImg{opacity:1;animation:none}
+  #introCenario::after{content:'';position:absolute;inset:0}
+  #introCenario.modoEstagio::after{
     background:linear-gradient(180deg,rgba(10,8,14,.35) 0%,rgba(10,8,14,.55) 55%,rgba(10,8,14,.88) 100%)}
+  #introCenario.modoLogin::after{
+    background:linear-gradient(180deg,rgba(11,7,16,0) 35%,#0B0710 100%)}
   @keyframes obEstagioFade{0%,45%{opacity:1}55%,100%{opacity:0}}
   .obEstagioPill{position:relative;z-index:2;display:flex;flex-direction:column;
                  align-items:center;gap:6px;margin-bottom:4px}

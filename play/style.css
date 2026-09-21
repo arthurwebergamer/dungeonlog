@@ -1931,6 +1931,11 @@
   .loginGoogleBtn.email svg{color:var(--accent)}
   .loginEscolha .loginRodape{font-size:14px;margin-top:2px}
   .loginFormWrap{display:flex;flex-direction:column;gap:18px}
+  /* v4.129: transicao escolha->form (ver abrirFormLogin() no <script>
+     do #passoLogin) -- desliza+fade em vez da troca seca de display */
+  .loginEscolha,.loginFormWrap{transition:opacity .26s ease,transform .26s ease}
+  .loginEscolha.loginSlideOut{opacity:0;transform:translateX(-26px)}
+  .loginFormWrap.loginSlideIn{opacity:0;transform:translateX(26px)}
 
   .loginTopBtns{position:fixed;top:calc(14px + env(safe-area-inset-top));right:14px;
                 display:flex;gap:8px;z-index:90}
@@ -3478,6 +3483,11 @@
   .loginGoogleBtn.email svg{color:var(--accent)}
   .loginEscolha .loginRodape{font-size:14px;margin-top:2px}
   .loginFormWrap{display:flex;flex-direction:column;gap:18px}
+  /* v4.129: transicao escolha->form (ver abrirFormLogin() no <script>
+     do #passoLogin) -- desliza+fade em vez da troca seca de display */
+  .loginEscolha,.loginFormWrap{transition:opacity .26s ease,transform .26s ease}
+  .loginEscolha.loginSlideOut{opacity:0;transform:translateX(-26px)}
+  .loginFormWrap.loginSlideIn{opacity:0;transform:translateX(26px)}
 
   .loginTopBtns{position:fixed;top:calc(14px + env(safe-area-inset-top));right:14px;
                 display:flex;gap:8px;z-index:90}

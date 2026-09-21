@@ -1854,7 +1854,12 @@
      .card, mais abaixo neste arquivo) porque #passoLogin vira
      .carrosselSlide e leva transform durante o swipe, o que cortava a
      imagem quando ela era filha daqui. */
-  #passoLogin.carrosselSlide{padding-top:150px}
+  /* justify-content:flex-start (em vez do "center" herdado de
+     .carrosselSlide) -- com .loginEscolha (tela de escolha, curta) o
+     center deixava uma folga enorme entre o cenario e o conteudo; o
+     mockup mostra o conteudo colado logo abaixo do cenario. */
+  #passoLogin.carrosselSlide{padding-top:150px;justify-content:flex-start}
+  .loginEscolha{margin-top:18px}
   #passoLogin .titulo{font-family:'Silkscreen',monospace !important;color:#F2A65A !important;
                        font-size:19px !important;letter-spacing:1px !important;
                        text-transform:none !important;font-style:normal !important;
@@ -1884,6 +1889,19 @@
   #passoLogin .primario:hover{background:var(--accent) !important;filter:brightness(1.08)}
   #passoLogin .secundario,#passoLogin .loginLink,#passoLogin .loginRodape,#passoLogin .loginDivisor{
     text-shadow:0 1px 4px rgba(0,0,0,.85)}
+
+  /* v4.121: tela de escolha (1a tela do login, igual ao mockup) -- so
+     wordmark+tagline+2 botoes+link. O formulario completo (email/senha/
+     cadastro, ja existente, zero mudanca de logica) fica em
+     .loginFormWrap, escondido ate a pessoa escolher "Continuar com
+     email" ou "Entrar" (ver JS logo apos o insertAdjacentHTML). */
+  .loginEscolha{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center}
+  .loginEscolha .marca{margin-bottom:0}
+  .loginEscolhaTagline{font-size:13px;color:var(--dim);text-shadow:0 1px 4px rgba(0,0,0,.85);margin-top:-6px}
+  .loginEscolha .primario,.loginEscolha .loginGoogleBtn{width:100%}
+  .loginGoogleBtn.email{background:#251E38;color:#F5F0E9;border:1px solid #3B3057}
+  .loginGoogleBtn.email svg{color:var(--accent)}
+  .loginFormWrap{display:flex;flex-direction:column;gap:18px}
 
   .loginTopBtns{position:fixed;top:calc(14px + env(safe-area-inset-top));right:14px;
                 display:flex;gap:8px;z-index:90}
@@ -3354,7 +3372,12 @@
      .card, mais abaixo neste arquivo) porque #passoLogin vira
      .carrosselSlide e leva transform durante o swipe, o que cortava a
      imagem quando ela era filha daqui. */
-  #passoLogin.carrosselSlide{padding-top:150px}
+  /* justify-content:flex-start (em vez do "center" herdado de
+     .carrosselSlide) -- com .loginEscolha (tela de escolha, curta) o
+     center deixava uma folga enorme entre o cenario e o conteudo; o
+     mockup mostra o conteudo colado logo abaixo do cenario. */
+  #passoLogin.carrosselSlide{padding-top:150px;justify-content:flex-start}
+  .loginEscolha{margin-top:18px}
   #passoLogin .titulo{font-family:'Silkscreen',monospace !important;color:#F2A65A !important;
                        font-size:19px !important;letter-spacing:1px !important;
                        text-transform:none !important;font-style:normal !important;
@@ -3384,6 +3407,19 @@
   #passoLogin .primario:hover{background:var(--accent) !important;filter:brightness(1.08)}
   #passoLogin .secundario,#passoLogin .loginLink,#passoLogin .loginRodape,#passoLogin .loginDivisor{
     text-shadow:0 1px 4px rgba(0,0,0,.85)}
+
+  /* v4.121: tela de escolha (1a tela do login, igual ao mockup) -- so
+     wordmark+tagline+2 botoes+link. O formulario completo (email/senha/
+     cadastro, ja existente, zero mudanca de logica) fica em
+     .loginFormWrap, escondido ate a pessoa escolher "Continuar com
+     email" ou "Entrar" (ver JS logo apos o insertAdjacentHTML). */
+  .loginEscolha{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center}
+  .loginEscolha .marca{margin-bottom:0}
+  .loginEscolhaTagline{font-size:13px;color:var(--dim);text-shadow:0 1px 4px rgba(0,0,0,.85);margin-top:-6px}
+  .loginEscolha .primario,.loginEscolha .loginGoogleBtn{width:100%}
+  .loginGoogleBtn.email{background:#251E38;color:#F5F0E9;border:1px solid #3B3057}
+  .loginGoogleBtn.email svg{color:var(--accent)}
+  .loginFormWrap{display:flex;flex-direction:column;gap:18px}
 
   .loginTopBtns{position:fixed;top:calc(14px + env(safe-area-inset-top));right:14px;
                 display:flex;gap:8px;z-index:90}

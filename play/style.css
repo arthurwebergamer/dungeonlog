@@ -1936,6 +1936,21 @@
   .loginEscolha,.loginFormWrap{transition:opacity .26s ease,transform .26s ease}
   .loginEscolha.loginSlideOut{opacity:0;transform:translateX(-26px)}
   .loginFormWrap.loginSlideIn{opacity:0;transform:translateX(26px)}
+  /* v4.131: reverso (voltar do form pra escolha, ver
+     window.voltarParaEscolhaLogin) -- direcoes trocadas de proposito
+     (form sai pela DIREITA por onde entrou, escolha entra pela
+     ESQUERDA por onde saiu) pra parecer uma navegacao "pra tras" de
+     verdade, nao a mesma animacao tocada ao contrario */
+  .loginFormWrap.loginSlideOut{opacity:0;transform:translateX(26px)}
+  .loginEscolha.loginSlideIn{opacity:0;transform:translateX(-26px)}
+  /* v4.131 (pedido do usuario, print do Habitica): o formulario de
+     email nao precisa repetir o botao Google/divisor "ou" -- a tela de
+     escolha (.loginEscolha) ja oferece Google, e voltar pra ela agora
+     e so apertar a seta (ver window.voltarParaEscolhaLogin). Mantido
+     no DOM (nao removido) porque loginEscolhaGoogle.onclick ainda
+     dispara um .click() nele por baixo dos panos -- so escondido
+     visualmente aqui. */
+  #loginFormWrap #loginGoogleBtn,#loginFormWrap .loginDivisor{display:none}
 
   .loginTopBtns{position:fixed;top:calc(14px + env(safe-area-inset-top));right:14px;
                 display:flex;gap:8px;z-index:90}
@@ -3499,6 +3514,21 @@
   .loginEscolha,.loginFormWrap{transition:opacity .26s ease,transform .26s ease}
   .loginEscolha.loginSlideOut{opacity:0;transform:translateX(-26px)}
   .loginFormWrap.loginSlideIn{opacity:0;transform:translateX(26px)}
+  /* v4.131: reverso (voltar do form pra escolha, ver
+     window.voltarParaEscolhaLogin) -- direcoes trocadas de proposito
+     (form sai pela DIREITA por onde entrou, escolha entra pela
+     ESQUERDA por onde saiu) pra parecer uma navegacao "pra tras" de
+     verdade, nao a mesma animacao tocada ao contrario */
+  .loginFormWrap.loginSlideOut{opacity:0;transform:translateX(26px)}
+  .loginEscolha.loginSlideIn{opacity:0;transform:translateX(-26px)}
+  /* v4.131 (pedido do usuario, print do Habitica): o formulario de
+     email nao precisa repetir o botao Google/divisor "ou" -- a tela de
+     escolha (.loginEscolha) ja oferece Google, e voltar pra ela agora
+     e so apertar a seta (ver window.voltarParaEscolhaLogin). Mantido
+     no DOM (nao removido) porque loginEscolhaGoogle.onclick ainda
+     dispara um .click() nele por baixo dos panos -- so escondido
+     visualmente aqui. */
+  #loginFormWrap #loginGoogleBtn,#loginFormWrap .loginDivisor{display:none}
 
   .loginTopBtns{position:fixed;top:calc(14px + env(safe-area-inset-top));right:14px;
                 display:flex;gap:8px;z-index:90}

@@ -1927,8 +1927,15 @@
      intocado) -- no mockup esses 2 botoes sao o elemento dominante da
      tela, nao um botao secundario pequeno. */
   .loginEscolha .primario,.loginEscolha .loginGoogleBtn{width:100%;padding:17px;font-size:16.5px}
-  .loginGoogleBtn.email{background:#251E38;color:#F5F0E9;border:1px solid #3B3057}
-  .loginGoogleBtn.email svg{color:var(--accent)}
+  /* v4.132 (pedido do usuario, print do Habitica: "copiar exatamente
+     assim"): la os DOIS botoes (Google e email) sao pilulas BRANCAS
+     identicas -- so o icone muda (G colorido vs. envelope colorido).
+     Removido o fundo roxo-escuro que esse botao tinha antes -- agora
+     so herda o branco/texto escuro padrao de .loginGoogleBtn, igual
+     ao de cima. O icone virou o emoji nativo "📧" (span.loginEmailEmoji,
+     ver #passoLogin no <script>) em vez de um SVG monocromatico --
+     e exatamente o que renderiza colorido feito no Habitica. */
+  .loginGoogleBtn.email .loginEmailEmoji{font-size:19px;line-height:1}
   .loginEscolha .loginRodape{font-size:14px;margin-top:2px}
   .loginFormWrap{display:flex;flex-direction:column;gap:18px}
   /* v4.129: transicao escolha->form (ver abrirFormLogin() no <script>
@@ -3505,8 +3512,15 @@
      intocado) -- no mockup esses 2 botoes sao o elemento dominante da
      tela, nao um botao secundario pequeno. */
   .loginEscolha .primario,.loginEscolha .loginGoogleBtn{width:100%;padding:17px;font-size:16.5px}
-  .loginGoogleBtn.email{background:#251E38;color:#F5F0E9;border:1px solid #3B3057}
-  .loginGoogleBtn.email svg{color:var(--accent)}
+  /* v4.132 (pedido do usuario, print do Habitica: "copiar exatamente
+     assim"): la os DOIS botoes (Google e email) sao pilulas BRANCAS
+     identicas -- so o icone muda (G colorido vs. envelope colorido).
+     Removido o fundo roxo-escuro que esse botao tinha antes -- agora
+     so herda o branco/texto escuro padrao de .loginGoogleBtn, igual
+     ao de cima. O icone virou o emoji nativo "📧" (span.loginEmailEmoji,
+     ver #passoLogin no <script>) em vez de um SVG monocromatico --
+     e exatamente o que renderiza colorido feito no Habitica. */
+  .loginGoogleBtn.email .loginEmailEmoji{font-size:19px;line-height:1}
   .loginEscolha .loginRodape{font-size:14px;margin-top:2px}
   .loginFormWrap{display:flex;flex-direction:column;gap:18px}
   /* v4.129: transicao escolha->form (ver abrirFormLogin() no <script>

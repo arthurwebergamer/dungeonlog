@@ -11558,8 +11558,6 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       </button>
 
       <p class="loginRodape" id="loginRodape"><span data-i18n="login.naoTemConta">Não tem conta?</span> <button class="loginLink" id="loginToggleCadastro" style="padding:0" data-i18n="login.cadastreSeAgora">Cadastre-se agora</button></p>
-
-      <button class="secundario" id="loginContinuarSemConta" data-i18n="login.agoraNao">Agora não</button>
       </div>
     </div>
   `);
@@ -11732,26 +11730,11 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // mandaria quem tem progresso de volta pro onboarding por cima dos
   // proprios dados. Mesmo branch de temSaveLocal/entrarNoApp ja usado
   // dentro de aoLogar(), pro mesmo problema.
-  // v4.116 (item 42-e do roadmap): login deixou de ser um PASSO do
-  // carrossel -- virou um desvio opcional, acessivel de qualquer slide
-  // via o link "Ja tem conta?" (ver IIFE do carrossel, mais abaixo).
-  // "Agora nao" so fecha o desvio e volta pro slide de onde a pessoa
-  // veio (window.voltarDoLoginCarrossel, exposto por aquela IIFE) --
-  // nao ha mais um alvo fixo, porque o login pode ser aberto a partir
-  // de qualquer ponto do onboarding agora, nao so depois do heroi.
-  document.getElementById('loginContinuarSemConta').onclick = () => {
-    const temSaveLocal = typeof window.carregar === 'function' && window.carregar();
-    if (temSaveLocal){
-      intro.classList.remove('loginBg');
-      intro.style.backgroundImage = '';
-      document.getElementById('passoLogin').classList.remove('on');
-      intro.classList.add('off');
-      if (typeof window.desenharHeroi === 'function') window.desenharHeroi();
-      if (typeof window.render === 'function') window.render();
-    } else if (typeof window.voltarDoLoginCarrossel === 'function') {
-      window.voltarDoLoginCarrossel();
-    }
-  };
+  // v4.133 (pedido do usuario): botao "Agora nao" removido do formulario --
+  // era redundante com a seta "Voltar" do topo do carrossel, que ja fecha
+  // o desvio do login e volta pro slide de origem (window.voltarDoLoginCarrossel,
+  // ver IIFE do carrossel mais abaixo). Handler antigo removido junto com
+  // o botao (ficava atribuindo onclick a um elemento inexistente).
 
   // ---------- alternar entre "Entrar" e "Cadastre-se" ----------
   let modoCadastro = false;
@@ -12134,7 +12117,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       </div>
       <div class="carrosselDots" id="carrosselDots">${dots(0)}</div>
       <div class="carrosselTopoLado carrosselTopoDir">
-        <button class="carrosselEntrarLink" id="carrosselEntrarLink" data-i18n="login.jaTemConta">Já tem conta?</button>
+        <button class="carrosselEntrarLink" id="carrosselEntrarLink" data-i18n="login.pular">Pular</button>
       </div>
     </div>
   `;
@@ -12458,8 +12441,11 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // obRecompensa, removidos do markup em imagemSlide) -- so o timing de
   // QUANDO disparar continua sendo controlado aqui, sincronizado com o
   // ponto em que o slash "acerta" no loop CSS obSlash/obMobShake (~54% de
-  // 3.2s = ~1728ms). iniciarCicloGolpe alinha o 1o disparo nesse ponto e
-  // repete a cada 3.2s (mesma duracao do loop CSS de hit-flash).
+  // 1.8s = ~972ms). iniciarCicloGolpe alinha o 1o disparo nesse ponto e
+  // repete a cada 1.8s (mesma duracao do loop CSS de hit-flash).
+  // v4.133 (pedido do usuario): ciclo acelerado de 3.2s -> 1.8s (e o do
+  // bau, so CSS, de 3.4s -> 1.9s) pra quem passa rapido pelo onboarding
+  // ter mais chance de ver a animacao pelo menos uma vez.
   let golpeCicloTimeout = null, golpeCicloInterval = null;
   function dispararRecompensaGolpe(){
     const heroEl = document.getElementById('obHeroSp');
@@ -12478,8 +12464,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     pararCicloGolpe(); // guarda -- nunca acumula 2 ciclos em paralelo
     golpeCicloTimeout = setTimeout(() => {
       dispararRecompensaGolpe();
-      golpeCicloInterval = setInterval(dispararRecompensaGolpe, 3200);
-    }, 1728);
+      golpeCicloInterval = setInterval(dispararRecompensaGolpe, 1800);
+    }, 972);
   }
   function pararCicloGolpe(){
     if (golpeCicloTimeout){ clearTimeout(golpeCicloTimeout); golpeCicloTimeout = null; }
@@ -14313,6 +14299,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'login.reenviarEmail':     { pt:'Reenviar email', en:'Resend email' },
     'login.emailErrado':       { pt:'Email errado? Corrigir', en:'Wrong email? Fix it' },
     'login.jaTemConta':        { pt:'Já tem conta?', en:'Already have an account?' },
+    'login.pular':             { pt:'Pular', en:'Skip' },
     'login.tagline':           { pt:'Suas tarefas viram uma aventura', en:'Your tasks become an adventure' },
     'login.continuarComGoogle':{ pt:'Continuar com Google', en:'Continue with Google' },
     'login.continuarComEmail': { pt:'Continuar com email', en:'Continue with email' },

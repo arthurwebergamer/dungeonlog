@@ -11594,9 +11594,35 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       void form.offsetHeight; // forca reflow -- ver comentario acima
       form.classList.remove('loginSlideIn');
     }, DURACAO_TRANSICAO_LOGIN);
+    window.__loginFormAberto = true;
   };
   document.getElementById('loginEscolhaEmail').onclick = abrirFormLogin;
   document.getElementById('loginEscolhaEntrar').onclick = abrirFormLogin;
+
+  // v4.131 (pedido do usuario, com print do Habitica): a seta "Voltar"
+  // (topo do carrossel) saia DIRETO do login inteiro mesmo quando a
+  // pessoa estava no formulario de email -- devia so voltar pra tela
+  // de escolha (Google/email), igual o proprio Habitica faz. Reverso
+  // exato de abrirFormLogin (mesma duracao/mesmo truque de reflow, so
+  // invertendo direcao e qual classe.slideOut/slideIn cada lado usa).
+  // window.__loginFormAberto (setado acima) e a flag que o handler da
+  // seta Voltar (bloco do carrossel, mais abaixo no arquivo) consulta
+  // pra decidir entre "volta pra escolha" ou "sai do login de vez".
+  window.__loginFormAberto = false;
+  window.voltarParaEscolhaLogin = () => {
+    const escolha = document.getElementById('loginEscolha');
+    const form = document.getElementById('loginFormWrap');
+    form.classList.add('loginSlideOut');
+    setTimeout(() => {
+      form.style.display = 'none';
+      form.classList.remove('loginSlideOut');
+      escolha.style.display = 'flex';
+      escolha.classList.add('loginSlideIn');
+      void escolha.offsetHeight; // forca reflow -- ver comentario em abrirFormLogin
+      escolha.classList.remove('loginSlideIn');
+    }, DURACAO_TRANSICAO_LOGIN);
+    window.__loginFormAberto = false;
+  };
 
   card.insertAdjacentHTML('afterbegin', `
     <div class="passo" id="passoBoasVindas">
@@ -12496,6 +12522,20 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // -- sinaliza visualmente que virou um desvio, nao um passo normal.
   function irParaLogin(semVoltar){
     if (emTransicao) return;
+    // v4.131: sempre reabre na tela de ESCOLHA (Google/email), nunca
+    // direto no formulario -- sem isso, quem saia do login por "Agora
+    // nao" com o form de email aberto reabria o login (link "Ja tem
+    // conta?") direto no formulario, com a tela de escolha some junto
+    // (estado preso da ultima vez que #passoLogin foi injetado).
+    const escolhaReset = document.getElementById('loginEscolha');
+    const formReset = document.getElementById('loginFormWrap');
+    if (escolhaReset && formReset){
+      escolhaReset.style.display = 'flex';
+      escolhaReset.classList.remove('loginSlideOut', 'loginSlideIn');
+      formReset.style.display = 'none';
+      formReset.classList.remove('loginSlideOut', 'loginSlideIn');
+      window.__loginFormAberto = false;
+    }
     pararCicloGolpe(); // desvio pro login pode acontecer NO MEIO do slide golpe (link "Ja tem conta?"), nao passa por atualizarTopo
     const atualEl = palco.querySelector('.carrosselSlide.on');
     if (atualEl && atualEl !== passoLogin){
@@ -12566,6 +12606,16 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     const atualEl = palco.querySelector('.carrosselSlide.on');
     if (!atualEl) return;
     if (atualEl === passoLogin){
+      // v4.131 (pedido do usuario, print do Habitica): se o formulario
+      // de email/senha estiver aberto, a seta so volta pra tela de
+      // escolha (Google/email) -- so sai do login de vez quando ja
+      // estiver na propria tela de escolha. window.__loginFormAberto
+      // e setado por abrirFormLogin()/voltarParaEscolhaLogin() no
+      // <script> que injeta #passoLogin, mais acima no arquivo.
+      if (window.__loginFormAberto && typeof window.voltarParaEscolhaLogin === 'function'){
+        window.voltarParaEscolhaLogin();
+        return;
+      }
       voltarDoLoginCarrossel(); // desvio -- volta pro slide de origem
       return;
     }

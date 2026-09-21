@@ -11629,6 +11629,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     intro.style.backgroundImage =
       'url("data:image/png;base64,' + TILE_PEDRA_PNG + '"), ' +
       'linear-gradient(180deg, ' + rocha1 + ' 0%, ' + rocha2 + ' 55%, ' + rocha3 + ' 100%)';
+    intro.style.backgroundColor = ''; // limpa o #0B0710 solido que irParaLogin() usa (v4.127) -- senao fica preso por baixo da imagem depois de sair do login
     intro.style.backgroundRepeat = 'repeat, no-repeat';
     intro.style.backgroundPosition = 'center, center';
     intro.style.backgroundSize = '130px 41px, cover';
@@ -12485,8 +12486,22 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       if (n) ultimoSlideAntesLogin = n;
     }
     containerCarrossel.classList.add('on');
-    if (typeof window.pintarParede === 'function') window.pintarParede(); // login sai do gradiente por slide, volta pra parede de pedra original
+    // v4.127 (bug relatado pelo usuario -- "corte"/costura visivel logo
+    // abaixo da montanha): ANTES chamava pintarParede() aqui, que pinta
+    // o tijolo+gradiente rocha1->rocha3 (mais CLARO no final) na tela
+    // #intro INTEIRA. So que mostrarCenarioLogin() cobre so os 52vh do
+    // topo com a montanha -- da metade pra baixo, o tijolo/gradiente da
+    // parede ficava visivel, e como ele clareia indo pro rodape (bem
+    // diferente do preto quase solido #0B0710 que o degrade da propria
+    // montanha termina), a costura entre "fim da montanha" e "inicio do
+    // tijolo" ficava bem marcada -- exatamente o corte reportado. O
+    // mockup (.loginNovo) nao usa tijolo nenhum atras do login: e so
+    // background-color:#0B0710 solido. Aqui faz o mesmo -- cor lisa,
+    // identica ao ponto final do degrade de #introCenario.modoLogin,
+    // sem textura nenhuma pra "bater" contra o fim da imagem.
     esconderFundoGrad();
+    intro.style.backgroundImage = 'none';
+    intro.style.backgroundColor = '#0B0710';
     mostrarCenarioLogin(); // v4.120: cenario real (montanhas) como camada fixa, ver pintarFundoOnboarding
     document.getElementById('carrosselDots').classList.add('oculto'); // v4.122: dots nao tem lugar na tela de login, ficavam sobrando la embaixo
     document.querySelectorAll('#carrosselDots .carrosselDot').forEach(d => d.classList.remove('on'));

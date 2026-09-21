@@ -11851,33 +11851,34 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // EVOLUA e nome. titulo_en/texto_en/botao_en (pedido do usuario:
   // traduzir o app inteiro) adicionados nesta rodada -- escolhidos na
   // hora de montar htmlSlides, mais abaixo, lendo o idioma ja salvo.
+  // v4.16x (pedido do usuario): onboarding reduzido pra SO as 3 telas
+  // que estao no mockup (golpe/bau/estagio) + login -- DUNGEONLOG
+  // (marca/trioLogo), idioma e transicao tiradas POR ENQUANTO (nao
+  // apagadas do resto do arquivo, so fora de SLIDES -- ver passo1/
+  // passo2/passoHeroi/passo3 mais abaixo, que ficam intocados no DOM
+  // mas nao reparentados no carrossel reduzido). Ultimo slide (estagio)
+  // vai direto pro login em vez de continuar a numeracao.
   const SLIDES = [
-    { dataSlide:1, next:2, tipo:'trioLogo', idxs:[0, 32, 5], titulo:'DUNGEONLOG', titulo_en:'DUNGEONLOG',
-      texto:'Suas tarefas do dia viram uma batalha. Complete tarefas, evolua seu herói, vença monstros.',
-      texto_en:'Your daily tasks become a battle. Complete tasks, level up your hero, defeat monsters.',
-      botao:'Começar', botao_en:'Get started', layout:'marcaPrimeiro' },
-    { dataSlide:2, next:3, tipo:'golpeAnim', idx:22,
+    { dataSlide:1, next:2, tipo:'golpeAnim', idx:22,
       fraca:'Cada tarefa concluída', fraca_en:'Every task you finish',
       titulo:'é um golpe no monstro', titulo_en:'is a hit on the monster',
       texto:'Termine suas tarefas e veja seu herói acertar o monstro do dia, na hora.',
       texto_en:'Finish your tasks and watch your hero land a hit on today\'s monster, live.',
       botao:'Continuar', botao_en:'Continue', layout:'mockupExato' },
-    { dataSlide:3, next:4, tipo:'bauAnim', idx:1,
+    { dataSlide:2, next:3, tipo:'bauAnim', idx:1,
       fraca:'Vença o dia', fraca_en:'Win the day',
       titulo:'e abra o baú', titulo_en:'and open the chest',
       botao:'Continuar', botao_en:'Continue', layout:'mockupExatoSemCorpo' },
-    { dataSlide:4, next:5, tipo:'idioma', titulo:'IDIOMA · LANGUAGE', titulo_en:'IDIOMA · LANGUAGE',
-      texto:'Escolha o idioma do app. Dá pra trocar depois em Perfil.',
-      texto_en:'Choose the app language. You can change it later in Profile.',
-      botao:'Continuar', botao_en:'Continue', layout:'idiomaEscolha' },
-    { dataSlide:5, next:6, tipo:'transicao',
-      texto:'Antes de começar, vamos te conhecer melhor...',
-      texto_en:'Before we start, let\'s get to know you better...',
-      botao:'Continuar', botao_en:'Continue', layout:'textoSolo' }
+    { dataSlide:3, next:'login', tipo:'estagioAnim',
+      fraca:'Avance de estágio', fraca_en:'Advance a stage',
+      titulo:'e desbloqueie cenários novos', titulo_en:'and unlock new scenery',
+      texto:'A masmorra muda de cara conforme você progride — cada estágio é um cenário diferente.',
+      texto_en:'The dungeon changes as you progress — each stage is a different scenery.',
+      botao:'Vamos lá', botao_en:'Let\'s go', layout:'mockupExato' }
   ];
-  const SLIDE_TRANSICAO = 5; // usado pra disparar o typewriter (ver iniciarTypewriter, mais abaixo)
-  const SLIDE_NOME = 6; // usado pra bloquear arraste sem nome preenchido (ver pegarVizinho, mais abaixo)
-  const TOTAL_SLIDES = 8;
+  const SLIDE_TRANSICAO = 5; // slide removido do carrossel reduzido -- nunca mais bate (numero fora do range 1-3), guarda fica inofensiva
+  const SLIDE_NOME = 6; // idem -- slide removido, guarda fica inofensiva
+  const TOTAL_SLIDES = 3;
 
   // item 46 do roadmap: idioma lido direto do localStorage (mesmo padrao
   // ja usado no resto do arquivo -- item()/aplicarIdiomaDados()/
@@ -11925,6 +11926,20 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           '<span class="obXp">' + XP_GEM_SVG + '+12 XP</span>' +
         '</div>' +
       '</div></div>';
+    }
+    if (s.tipo === 'estagioAnim'){
+      // slide "estagio": cross-fade entre 2 cenarios REAIS do jogo
+      // (TEMAS_ARENA, mesmo array da loja de temas real -- sem
+      // duplicar base64, so aponta pro mesmo dado), tecnica identica a
+      // mockup_onboarding_animado.html (2 <img> alternando opacidade
+      // em loop, delay de meio ciclo entre elas).
+      const artDeserto = TEMAS_ARENA.find(t => t.id === 'deserto').arte;
+      const artMontanhas = TEMAS_ARENA.find(t => t.id === 'montanhas').arte;
+      return '<div class="obEstagioBg">' +
+        '<img class="obCamada" src="data:image/png;base64,' + artDeserto + '" alt="">' +
+        '<img class="obCamada dois" src="data:image/png;base64,' + artMontanhas + '" alt="">' +
+      '</div>' +
+      '<div class="obEstagioPill"><span class="obLbl">Estágio</span><span class="obNum">2</span></div>';
     }
     if (s.tipo === 'bauAnim'){
       // slide 3 (EVOLUA): mesma marcacao/classes do loot real de bau
@@ -12325,7 +12340,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
   SLIDES.forEach(s => {
     const btn = document.getElementById('carrosselBtn' + s.dataSlide);
-    if (btn) btn.onclick = () => irPara(s.next);
+    if (btn) btn.onclick = () => (s.next === 'login' ? irParaLogin() : irPara(s.next));
   });
 
   document.getElementById('carrosselVoltar').onclick = () => {

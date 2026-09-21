@@ -2083,7 +2083,30 @@
   .obForte{display:block;font-family:'Outfit',sans-serif !important;font-size:21px !important;
            font-weight:800 !important;letter-spacing:-.01em !important;color:#fff !important;font-style:normal !important}
   .obCorpo{text-align:center;font-size:12.5px;line-height:1.55;opacity:.88;margin-top:12px;
-           max-width:260px;margin-left:auto;margin-right:auto;color:#fff;font-family:'Outfit',sans-serif}
+           max-width:260px;margin-left:auto;margin-right:auto;color:#fff;font-family:'Outfit',sans-serif;
+           position:relative;z-index:2}
+  .obHeadline{position:relative;z-index:2}
+
+  /* slide "estagio": cross-fade entre 2 cenarios reais (TEMAS_ARENA),
+     copia exata do mockup (estagioBg/estagioPillDemo). z-index:-1 pra
+     ficar atras do headline/corpo (acima) e dos dots/botao (fora do
+     .carrosselMeio) sem precisar mexer na stacking order deles. */
+  /* margin negativo compensa o padding de .intro (20px) + .card
+     (10px/4px/24px) -- sem isso sobra uma faixa fina da parede antiga
+     visivel na borda (o .obEstagioBg so preenche inset:0 relativo ao
+     .carrosselSlide, que fica DENTRO desses paddings). */
+  .obEstagioBg{position:absolute;inset:0;margin:-30px -24px -44px;z-index:-1;overflow:hidden}
+  .obEstagioBg .obCamada{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+    image-rendering:pixelated;animation:obEstagioFade 3.2s ease-in-out infinite}
+  .obEstagioBg .obCamada.dois{animation-delay:-1.6s}
+  .obEstagioBg::after{content:'';position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(10,8,14,.35) 0%,rgba(10,8,14,.55) 55%,rgba(10,8,14,.88) 100%)}
+  @keyframes obEstagioFade{0%,45%{opacity:1}55%,100%{opacity:0}}
+  .obEstagioPill{position:relative;z-index:2;display:flex;flex-direction:column;
+                 align-items:center;gap:6px;margin-bottom:4px}
+  .obEstagioPill .obLbl{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;opacity:.75;color:#fff}
+  .obEstagioPill .obNum{font-family:'Silkscreen',monospace;font-size:22px;color:#fff;
+                         text-shadow:0 2px 8px rgba(0,0,0,.5)}
 
   /* trio escalonado do slide 1 (marca) -- igual a foto de referencia:
      sprite do meio maior/na frente, laterais menores/atras, um pouco
@@ -3525,7 +3548,30 @@
   .obForte{display:block;font-family:'Outfit',sans-serif !important;font-size:21px !important;
            font-weight:800 !important;letter-spacing:-.01em !important;color:#fff !important;font-style:normal !important}
   .obCorpo{text-align:center;font-size:12.5px;line-height:1.55;opacity:.88;margin-top:12px;
-           max-width:260px;margin-left:auto;margin-right:auto;color:#fff;font-family:'Outfit',sans-serif}
+           max-width:260px;margin-left:auto;margin-right:auto;color:#fff;font-family:'Outfit',sans-serif;
+           position:relative;z-index:2}
+  .obHeadline{position:relative;z-index:2}
+
+  /* slide "estagio": cross-fade entre 2 cenarios reais (TEMAS_ARENA),
+     copia exata do mockup (estagioBg/estagioPillDemo). z-index:-1 pra
+     ficar atras do headline/corpo (acima) e dos dots/botao (fora do
+     .carrosselMeio) sem precisar mexer na stacking order deles. */
+  /* margin negativo compensa o padding de .intro (20px) + .card
+     (10px/4px/24px) -- sem isso sobra uma faixa fina da parede antiga
+     visivel na borda (o .obEstagioBg so preenche inset:0 relativo ao
+     .carrosselSlide, que fica DENTRO desses paddings). */
+  .obEstagioBg{position:absolute;inset:0;margin:-30px -24px -44px;z-index:-1;overflow:hidden}
+  .obEstagioBg .obCamada{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+    image-rendering:pixelated;animation:obEstagioFade 3.2s ease-in-out infinite}
+  .obEstagioBg .obCamada.dois{animation-delay:-1.6s}
+  .obEstagioBg::after{content:'';position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(10,8,14,.35) 0%,rgba(10,8,14,.55) 55%,rgba(10,8,14,.88) 100%)}
+  @keyframes obEstagioFade{0%,45%{opacity:1}55%,100%{opacity:0}}
+  .obEstagioPill{position:relative;z-index:2;display:flex;flex-direction:column;
+                 align-items:center;gap:6px;margin-bottom:4px}
+  .obEstagioPill .obLbl{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;opacity:.75;color:#fff}
+  .obEstagioPill .obNum{font-family:'Silkscreen',monospace;font-size:22px;color:#fff;
+                         text-shadow:0 2px 8px rgba(0,0,0,.5)}
 
   /* trio escalonado do slide 1 (marca) -- igual a foto de referencia:
      sprite do meio maior/na frente, laterais menores/atras, um pouco

@@ -606,10 +606,13 @@
         <button class="cfgbtn" id="cfgEntrarBtn" data-i18n="cfg.criarConta">Criar conta</button>
       </div>
 
-      <!-- v4.135 (pedido do usuario): linha "Apagar dados" removida daqui --
-           era estatica (sem onclick, sem id) e duplicava o botao "Apagar
-           tudo" no rodape do menu, que ja faz exatamente isso (ver secao
-           35, mais abaixo no arquivo). -->
+      <div class="cfgrow">
+        <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13"/><path d="M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/></svg></span>
+        <div class="cfgtxt">
+          <b data-i18n="cfg.apagarDados">Apagar dados</b>
+          <span data-i18n="cfg.apagarDadosDesc">Zera nível, moedas, itens e vida. Não tem volta.</span>
+        </div>
+      </div>
 
       <div class="edsec" data-i18n="cfg.app">App</div>
 
@@ -1417,15 +1420,11 @@ window.chaveSaveAtual = chaveSaveAtual;
 // CHAVES_SECUNDARIAS_CONTA (estagio, tema da arena, atributos,
 // conquistas, historico etc.) sao progresso de JOGO, entao precisam
 // separar por personagem, nao so por conta.
-function chaveContaDe(chaveBase, pjId){
-  const base = _uidAtivo ? (chaveBase + '.uid.' + _uidAtivo) : chaveBase;
-  return base + '.pj.' + pjId;
-}
 function chaveConta(chaveBase){
-  return chaveContaDe(chaveBase, _personagemAtivo);
+  const base = _uidAtivo ? (chaveBase + '.uid.' + _uidAtivo) : chaveBase;
+  return base + '.pj.' + _personagemAtivo;
 }
 window.chaveConta = chaveConta;
-window.chaveContaDe = chaveContaDe;
 
 // FIX (item novo, bug relatado pelo usuario: contagem de dias/historico/
 // atributos/conquistas resetando toda vez que o app roda numa origem
@@ -1515,7 +1514,6 @@ function chaveSaveDe(pjId){
   const base = _uidAtivo ? ('questlog.v1.uid.' + _uidAtivo) : 'questlog.v1';
   return base + '.pj.' + pjId;
 }
-window.chaveSaveDe = chaveSaveDe;
 function espiarSaveDe(pjId){
   try {
     const bruto = localStorage.getItem(chaveSaveDe(pjId));
@@ -13036,52 +13034,31 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     async function puxarNuvem(uid){
       const ref = doc(db, 'saves', uid);
       const snap = await getDoc(ref);
-      const nuvem = snap.exists() ? snap.data() : null;
-      window.dbgConta && window.dbgConta('puxarNuvem(' + uid.slice(0,6) + ') -- doc existe na nuvem? ' + !!nuvem + (nuvem ? (' | tamanho do data: ' + (nuvem.data||'').length) : ''));
-
-      // Multi-heroi: o documento antigo guardava somente o save do heroi
-      // ativo em `data`. Cada troca sobrescrevia o mesmo campo e apagava o
-      // outro heroi na nuvem. O formato novo guarda todos por id e restaura
-      // lista + ativo antes de calcular as chaves locais.
-      if (nuvem && Array.isArray(nuvem.listaPersonagens) && nuvem.listaPersonagens.length) {
-        try { localStorage.setItem('questlog.personagens.v1.uid.' + uid, JSON.stringify(nuvem.listaPersonagens)); } catch(e){}
+      window.dbgConta && window.dbgConta('puxarNuvem(' + uid.slice(0,6) + ') -- doc existe na nuvem? ' + snap.exists() + (snap.exists() ? (' | tamanho do data: ' + (snap.data().data||'').length) : ''));
+      if (snap.exists() && snap.data().data) {
+        try { localStorage.setItem(window.chaveSaveAtual(), snap.data().data); } catch(e){}
       }
-      if (nuvem && typeof nuvem.personagemAtivo === 'string' && nuvem.personagemAtivo) {
-        try { localStorage.setItem('questlog.personagemAtivo.v1.uid.' + uid, nuvem.personagemAtivo); } catch(e){}
-        window.definirUidAtivo(uid); // rele o personagem ativo restaurado
-      }
-
-      if (nuvem && nuvem.personagens && typeof nuvem.personagens === 'object') {
-        Object.keys(nuvem.personagens).forEach(pjId => {
-          const pj = nuvem.personagens[pjId];
-          if (!pj || typeof pj !== 'object') return;
-          if (typeof pj.data === 'string' && pj.data) {
-            try { localStorage.setItem(window.chaveSaveDe(pjId), pj.data); } catch(e){}
-          }
-          if (pj.extras && typeof pj.extras === 'object') {
-            window.CHAVES_SECUNDARIAS_CONTA.forEach(chaveBase => {
-              if (Object.prototype.hasOwnProperty.call(pj.extras, chaveBase)) {
-                try { localStorage.setItem(window.chaveContaDe(chaveBase, pjId), pj.extras[chaveBase]); } catch(e){}
-              }
-            });
+      // restaura as 15 chaves secundarias (ver empurrarNuvem/
+      // CHAVES_SECUNDARIAS_CONTA) -- so sobrescreve o que realmente veio
+      // da nuvem, nunca apaga uma chave local que a nuvem nao tinha
+      // (ex: conta antiga, empurrada antes deste fix existir).
+      if (snap.exists() && snap.data().extras) {
+        const extras = snap.data().extras;
+        window.CHAVES_SECUNDARIAS_CONTA.forEach(chaveBase => {
+          if (Object.prototype.hasOwnProperty.call(extras, chaveBase)) {
+            try { localStorage.setItem(window.chaveConta(chaveBase), extras[chaveBase]); } catch(e){}
           }
         });
-      } else if (nuvem) {
-        // Compatibilidade com saves anteriores ao multi-heroi.
-        if (nuvem.data) {
-          try { localStorage.setItem(window.chaveSaveAtual(), nuvem.data); } catch(e){}
-        }
-        if (nuvem.extras) {
-          window.CHAVES_SECUNDARIAS_CONTA.forEach(chaveBase => {
-            if (Object.prototype.hasOwnProperty.call(nuvem.extras, chaveBase)) {
-              try { localStorage.setItem(window.chaveConta(chaveBase), nuvem.extras[chaveBase]); } catch(e){}
-            }
-          });
-        }
-      }
-
-      // Modulos com cache em closure precisam reler os extras do ativo.
-      if (nuvem) {
+        // esses modulos ja leram (e persistiram) seu proprio estado do
+        // localStorage de forma SINCRONA, no boot -- bem antes deste
+        // await assincrono terminar. Sem isto, o proximo "gravar()"
+        // interno de qualquer um deles sobrescreveria o dado que
+        // acabamos de restaurar com o estado velho ainda preso na
+        // closure. Lista levantada auditando TODAS as chaves em
+        // CHAVES_SECUNDARIAS_CONTA por esse mesmo padrao (cache
+        // populado 1x no boot da IIFE, nunca relido depois) -- as que
+        // ja leem direto do localStorage a cada chamada (bauDia,
+        // conquistas V2, titulo equipado) nao precisam de gancho.
         if (window.vidaHeroi && typeof window.vidaHeroi.recarregar === 'function') window.vidaHeroi.recarregar();
         if (typeof window.recarregarHistorico === 'function') window.recarregarHistorico();
         if (typeof window.recarregarAtributos === 'function') window.recarregarAtributos();
@@ -13094,27 +13071,17 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
     async function empurrarNuvem(uid){
       try {
-        const listaPersonagens = window.listarPersonagens();
-        const personagemAtivo = window.personagemAtivoId();
-        const personagens = {};
-        listaPersonagens.forEach(p => {
-          const extrasPj = {};
-          window.CHAVES_SECUNDARIAS_CONTA.forEach(chaveBase => {
-            const v = localStorage.getItem(window.chaveContaDe(chaveBase, p.id));
-            if (v !== null) extrasPj[chaveBase] = v;
-          });
-          personagens[p.id] = {
-            data: localStorage.getItem(window.chaveSaveDe(p.id)) || '',
-            extras: extrasPj
-          };
+        const dados = localStorage.getItem(window.chaveSaveAtual()) || '';
+        // FIX bug reset (ver CHAVES_SECUNDARIAS_CONTA, topo do arquivo):
+        // essas 15 chaves nunca iam pra nuvem antes -- empacotadas aqui
+        // num segundo campo do mesmo doc.
+        const extras = {};
+        window.CHAVES_SECUNDARIAS_CONTA.forEach(chaveBase => {
+          const v = localStorage.getItem(window.chaveConta(chaveBase));
+          if (v !== null) extras[chaveBase] = v;
         });
-        const atual = personagens[personagemAtivo] || { data: '', extras: {} };
-        window.dbgConta && window.dbgConta('empurrarNuvem(' + uid.slice(0,6) + ') INICIOU -- personagens: ' + Object.keys(personagens).length + ' | ativo: ' + personagemAtivo);
-        await setDoc(doc(db, 'saves', uid), {
-          data: atual.data, extras: atual.extras, // compatibilidade com versoes antigas
-          personagens, listaPersonagens, personagemAtivo,
-          atualizadoEm: Date.now()
-        });
+        window.dbgConta && window.dbgConta('empurrarNuvem(' + uid.slice(0,6) + ') INICIOU -- chave lida: ' + window.chaveSaveAtual() + ' | tamanho: ' + dados.length + ' | extras: ' + Object.keys(extras).length);
+        await setDoc(doc(db, 'saves', uid), { data: dados, extras: extras, atualizadoEm: Date.now() });
         window.dbgConta && window.dbgConta('empurrarNuvem(' + uid.slice(0,6) + ') TERMINOU com sucesso');
       } catch(e){
         window.dbgConta && window.dbgConta('empurrarNuvem(' + uid.slice(0,6) + ') FALHOU: ' + e.message);
@@ -13186,13 +13153,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           // a versao ANTIGA de volta, apagando a mudanca mais recente.
           // Guarda o Promise aqui pra quem for recarregar a pagina
           // poder esperar ele terminar antes (ver "CONTA — SAIR").
-          // Serializa os writes: criar/trocar heroi dispara varios salvar()
-          // seguidos. Sem fila, um push antigo (nome/sprite default) podia
-          // terminar depois do novo e vencer por ultimo no Firestore.
-          const anterior = window._questlogUltimoPush;
-          window._questlogUltimoPush = Promise.resolve(anterior)
-            .catch(() => {})
-            .then(() => empurrarNuvem(user.uid));
+          window._questlogUltimoPush = empurrarNuvem(user.uid);
           return r;
         };
         window.salvar._questlogSyncGancho = true;
@@ -14589,4 +14550,3 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
 </body>
 </html>
-

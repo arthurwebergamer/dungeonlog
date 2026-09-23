@@ -218,13 +218,15 @@
       <span class="lvl" id="lvl">Nível I</span>
       <svg class="pjChevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
     </button>
+    <!-- v4.20x (pedido do usuario): o botao de mudo saiu daqui e virou
+         uma linha em Preferencias (#cfgRowSom, perto de #cfgRowFeedback)
+         -- .coins volta a ser o ultimo filho da .topbar, entao
+         justify-content:space-between ja empurra ela pro canto direito
+         de novo sozinha, sem CSS novo. -->
     <span class="coins">
       <svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="5" y="2" width="6" height="1" fill="#F2C94C"/><rect x="3" y="3" width="10" height="2" fill="#F2C94C"/><rect x="2" y="5" width="12" height="6" fill="#F2C94C"/><rect x="3" y="11" width="10" height="2" fill="#F2C94C"/><rect x="5" y="13" width="6" height="1" fill="#F2C94C"/><rect x="6" y="5" width="2" height="6" fill="#B8942E"/></svg>
       <span id="coinnum">0</span>
     </span>
-    <button class="somBtn" id="topoSomBtn" aria-label="Som">
-      <svg id="topoSomIcone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
-    </button>
   </div>
 
   <!-- PLANO PRO -- dropdown "Meus heróis" (troca de personagem) e a
@@ -293,7 +295,7 @@
     </div>
   </div>
 
-  <div class="xpwrap">
+  <div class="xpwrap" id="statsBarra">
     <div class="xprow hprow">
       <span class="xplabel" data-i18n="jogo.vida">Vida</span>
       <span class="xpnum hpnum" id="hpnum">0 / 0</span>
@@ -832,6 +834,20 @@
           <span data-i18n="cfg.feedbackDeCliqueDesc">Vibração ou som ao tocar em botões</span>
         </div>
         <button class="swch" id="cfgFeedbackBtn" type="button" role="switch" aria-checked="true" aria-label="Feedback tátil">
+          <span class="swch-bolinha"></span>
+        </button>
+      </div>
+
+      <!-- v4.20x (pedido do usuario): o botao de mudo saiu da topbar e
+           virou esta linha aqui -- mesmo padrao .cfgrow/.swch da linha
+           de cima (#cfgRowFeedback), so troca a API de dados (ver script
+           antes de </body>, wiring identico ao de Feedback). -->
+      <div class="cfgrow" id="cfgRowSom">
+        <div class="cfgtxt">
+          <b data-i18n="cfg.som">Som</b>
+          <span data-i18n="cfg.somDesc">Efeitos sonoros do jogo</span>
+        </div>
+        <button class="swch" id="cfgSomBtn" type="button" role="switch" aria-checked="true" aria-label="Som">
           <span class="swch-bolinha"></span>
         </button>
       </div>
@@ -14318,60 +14334,14 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 </script>
 
 <!-- =====================================================================
-     TOPBAR — MUDO DOS EFEITOS SONOROS  —  bloco autonomo
+     MUDO DOS EFEITOS SONOROS — agora dentro de Preferencias
 
-     Primeira versao (mesma sessao) era um botao de texto dentro de
-     Perfil > Config. Pedido de ajuste: cavar ate Perfil > Config so pra
-     mudar um som que incomoda NA HORA nao faz sentido -- moveu pra um
-     icone na topbar, do lado das moedas, sempre visivel em qualquer
-     aba (nao so dentro de Perfil). Substitui a linha de Config por
-     completo -- nao ficou duplicado de proposito (dois controles pro
-     mesmo toggle seria a mesma "inflar a tela" que motivou o pedido
-     de fazer so o mudo em vez do slider de volume completo).
-
-     Cabe na topbar sem estourar (aprendizado da sub-nav do Perfil,
-     secao 6): #nomeTopo tem flex:1 (`.topbar{gap:10px}`, secao de CSS
-     por volta da linha 500), entao ele absorve o espaco do meio e
-     empurra .coins + este botao pro canto direito, colados um no
-     outro -- exatamente onde o usuario pediu ("em cima ali onde
-     mostra as moedas"), sem precisar de layout novo nenhum.
-
-     So MUDO (liga/desliga), nao volume gradual -- mesma decisao de
-     escopo da versao anterior, so mudou de lugar. API ja existia
-     pronta desde a secao 20 (window.sfxAtivo()/window.definirSfxAtivo(bool),
-     persistida em questlog.sfx.v1) -- este bloco e so a UI, de novo.
-
-     Sempre visivel (topbar nao esconde em nenhuma aba), entao nao
-     precisa do padrao de "segundo addEventListener ao abrir sub-aba"
-     que os controles dentro de Perfil > Config sempre precisaram --
-     so pinta uma vez no carregamento da pagina.
+     v4.20x (pedido do usuario): saiu do icone fixo na topbar e virou
+     mais uma linha em Preferencias, mesmo padrao .cfgrow/.swch de
+     #cfgRowFeedback logo abaixo (ver esse bloco pra wiring identico).
+     API nao mudou -- window.sfxAtivo()/window.definirSfxAtivo(bool),
+     persistida em questlog.sfx.v1 (secao 20).
      ===================================================================== -->
-<script>
-(function(){
-  const btn = document.getElementById('topoSomBtn');
-  const icone = document.getElementById('topoSomIcone');
-  if (!btn || !icone) return;
-
-  const SVG_LIGADO = '<path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M15.5 8.5a5 5 0 010 7"/><path d="M18 6a9 9 0 010 12"/>';
-  const SVG_MUDO   = '<path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 9l6 6"/><path d="M22 9l-6 6"/>';
-
-  function atualizar(){
-    const ligado = (typeof window.sfxAtivo === 'function') ? window.sfxAtivo() : true;
-    icone.innerHTML = ligado ? SVG_LIGADO : SVG_MUDO;
-    btn.classList.toggle('mudo', !ligado);
-  }
-
-  btn.onclick = () => {
-    const ligadoAntes = (typeof window.sfxAtivo === 'function') ? window.sfxAtivo() : true;
-    if (typeof window.definirSfxAtivo === 'function') window.definirSfxAtivo(!ligadoAntes);
-    atualizar();
-    // feedback sonoro so ao LIGAR -- ao desligar nao faria sentido tocar nada
-    if (ligadoAntes === false && typeof window.tocarSom === 'function') window.tocarSom('clique');
-  };
-
-  atualizar(); // primeira pintura -- topbar e sempre visivel, nao precisa esperar abrir aba nenhuma
-})();
-</script>
 
 <!-- =====================================================================
      CONFIG — PREFERENCIA DE FEEDBACK NO CLIQUE (SWITCH TATIL)  —  bloco
@@ -14438,6 +14408,40 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   };
 
   window.atualizarBotaoFeedback(); // primeira pintura, mesmo antes de Config abrir pela 1a vez
+})();
+</script>
+
+<!-- =====================================================================
+     CONFIG — PREFERENCIA DE SOM (SWITCH)  —  bloco autonomo, cole antes
+     de </body>
+
+     v4.20x (pedido do usuario): o mudo que vivia como icone fixo na
+     topbar virou uma linha aqui, mesmo padrao/wiring do switch de
+     Feedback logo acima -- so troca a API de dados (window.sfxAtivo()/
+     window.definirSfxAtivo(bool), ja existente desde a secao 20,
+     persistida em questlog.sfx.v1). Nenhuma logica de audio mudou,
+     so a UI que liga/desliga ela.
+     ===================================================================== -->
+<script>
+(function(){
+  const btn = document.getElementById('cfgSomBtn');
+  if (!btn) return;
+
+  window.atualizarBotaoSom = function(){
+    const ligado = (typeof window.sfxAtivo === 'function') ? window.sfxAtivo() : true;
+    btn.classList.toggle('on', ligado);
+    btn.setAttribute('aria-checked', ligado ? 'true' : 'false');
+  };
+
+  btn.onclick = () => {
+    const ligadoAntes = (typeof window.sfxAtivo === 'function') ? window.sfxAtivo() : true;
+    if (typeof window.definirSfxAtivo === 'function') window.definirSfxAtivo(!ligadoAntes);
+    window.atualizarBotaoSom();
+    // feedback sonoro so ao LIGAR -- ao desligar nao faria sentido tocar nada
+    if (ligadoAntes === false && typeof window.tocarSom === 'function') window.tocarSom('clique');
+  };
+
+  window.atualizarBotaoSom(); // primeira pintura, mesmo antes de Config abrir pela 1a vez
 })();
 </script>
 
@@ -14752,6 +14756,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'cfg.paletaDeCores':   { pt:'Paleta de cores do app', en:'App color palette' },
     'cfg.feedbackDeClique':     { pt:'Feedback de clique', en:'Click feedback' },
     'cfg.feedbackDeCliqueDesc': { pt:'Vibração ou som ao tocar em botões', en:'Vibration or sound when tapping buttons' },
+    'cfg.som':     { pt:'Som', en:'Sound' },
+    'cfg.somDesc': { pt:'Efeitos sonoros do jogo', en:'Game sound effects' },
 
     'loja.comprar': { pt:'Comprar', en:'Buy' },
     'loja.vender':  { pt:'Vender', en:'Sell' },

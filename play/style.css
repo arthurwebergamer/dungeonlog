@@ -5043,3 +5043,13 @@
 }
 .nomeInputElegante::placeholder{color:var(--dim); opacity:.6}
 .nomeInputElegante:focus{border-color:var(--accent)}
+
+/* ===== Bloco style #NOVO4 — espaçamento das barras de status (v4.20x) =====
+   pedido do usuario: espacamento entre Vida/Experiencia/Estagio ficou
+   apertado depois que Estagio virou 3a linha dentro de #statsBarra
+   (.xprow ja tem margin-bottom:6px entre label e barra, mas nao havia
+   nada SEPARANDO um grupo do proximo). So no card de status do topo
+   (id="statsBarra") pra nao mexer no mesmo .xpwrap/.bar reaproveitado
+   em Perfil (.perfilhero ja tem seu proprio ritmo, linha ~1216). */
+#statsBarra .bar{margin-bottom:14px}
+#statsBarra .bar:last-child{margin-bottom:0}

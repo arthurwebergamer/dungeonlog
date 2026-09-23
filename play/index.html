@@ -218,13 +218,6 @@
       <span class="lvl" id="lvl">Nível I</span>
       <svg class="pjChevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
     </button>
-    <div class="estagio-pill-wrap" id="estagioPillWrap">
-      <div class="estagio-pill" id="estagioPill">
-        <span class="estagio-pill-lbl" id="estagioTopoLbl">Estágio 1</span>
-        <span class="estagio-pill-num" id="estagioTopoNum"></span>
-      </div>
-      <div class="estagio-pill-trilho"><div class="estagio-pill-fill" id="estagioTopoFill"></div></div>
-    </div>
     <span class="coins">
       <svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="5" y="2" width="6" height="1" fill="#F2C94C"/><rect x="3" y="3" width="10" height="2" fill="#F2C94C"/><rect x="2" y="5" width="12" height="6" fill="#F2C94C"/><rect x="3" y="11" width="10" height="2" fill="#F2C94C"/><rect x="5" y="13" width="6" height="1" fill="#F2C94C"/><rect x="6" y="5" width="2" height="6" fill="#B8942E"/></svg>
       <span id="coinnum">0</span>
@@ -312,6 +305,21 @@
       <span class="xpnum" id="xpnum">0 / 100</span>
     </div>
     <div class="bar"><div class="fill" id="fill"></div></div>
+
+    <!-- v4.19x (pedido do usuario -- mockup aprovado, ver conversa):
+         Estágio saiu da pilula solta no topbar e virou uma 3a linha
+         aqui, no mesmo padrao visual de Vida/Experiência (xprow+bar+
+         fill) em vez do componente "pilula com trilho" que so ele
+         usava. IDs mantidos (estagioTopoLbl/estagioTopoFill) -- so
+         MOVIDOS de lugar, wrap-not-rewrite: renderEstagioBar() (mais
+         abaixo no arquivo) continua escrevendo neles, so o texto que
+         escreve mudou (a palavra "Estágio" agora vem do label estatico
+         ao lado, nao precisa mais repetir no numero). -->
+    <div class="xprow">
+      <span class="xplabel" data-i18n="jogo.estagio">Estágio</span>
+      <span class="xpnum" id="estagioTopoLbl">1</span>
+    </div>
+    <div class="bar"><div class="fill" id="estagioTopoFill"></div></div>
   </div>
 
   <div class="tasks">
@@ -2483,36 +2491,36 @@ function poolMonstrosFiltrado(){
 }
 window.poolMonstrosFiltrado = poolMonstrosFiltrado;
 
-// atualiza a barrinha "Estagio N" na topbar. Chamada dentro de render()
-// (mesmo lugar que atualiza #lvl), entao acompanha a mesma cadencia de
-// qualquer outro contador do topo.
+// atualiza a linha "Estagio" dentro do .xpwrap (v4.19x: mudou de lugar --
+// era uma pilula solta no topbar, ver comentario no HTML). Chamada dentro
+// de render() (mesmo lugar que atualiza #lvl), entao acompanha a mesma
+// cadencia de qualquer outro contador do topo.
 function renderEstagioBar(){
-  const lblEl = document.getElementById('estagioTopoLbl');
+  const lblEl = document.getElementById('estagioTopoLbl'); // agora e o NUMERO (lado direito da xprow) -- a palavra "Estágio" ja vem do xplabel estatico do HTML
   const fillEl = document.getElementById('estagioTopoFill');
-  const numEl = document.getElementById('estagioTopoNum');
   if (!lblEl || !fillEl) return;
-  const emIngles = typeof idiomaApp === 'function' && idiomaApp() === 'en';
   const estagio = estagioAtual();
   const max = estagio >= 4; // ultimo estagio -- sem proxima meta, barra so fica cheia
-  lblEl.textContent = max
-    ? (emIngles ? 'Stage ' + estagio + ' · MAX' : 'Estágio ' + estagio + ' · MAX')
-    : (emIngles ? 'Stage ' + estagio : 'Estágio ' + estagio);
   fillEl.style.width = Math.round(progressoEstagio() * 100) + '%';
 
-  // Contagem numerica (pedido do usuario: mostrar o numero na barra, tipo
-  // "7/10") -- relativa ao corte do estagio ATUAL (quantas tarefas desde
-  // o inicio deste estagio / quantas faltam pro proximo), nao o total
-  // lifetime bruto -- mesma conta que progressoEstagio() ja faz por
-  // baixo dos panos, so exposta em numero em vez de so % da barra.
-  if (numEl){
-    if (max){
-      numEl.textContent = '';
-    } else {
-      const total = (typeof window.totalTarefasConcluidas === 'function') ? window.totalTarefasConcluidas() : 0;
-      const inicio = estagio === 1 ? 0 : LIMIARES_ESTAGIO[estagio - 2];
-      const alvo = LIMIARES_ESTAGIO[estagio - 1];
-      numEl.textContent = Math.max(0, Math.min(alvo - inicio, total - inicio)) + '/' + (alvo - inicio);
-    }
+  // v4.19x: as 2 informacoes que antes viviam em 2 elementos separados
+  // (label "Estágio N [· MAX]" + badge pequeno "7/10") agora dividem o
+  // UNICO slot de numero que a xprow tem (mesmo padrao de "40 / 64" em
+  // Vida) -- mesmos dados de antes, so texto combinado num lugar so.
+  if (max){
+    lblEl.textContent = estagio + ' · MAX';
+  } else {
+    // Contagem numerica (pedido do usuario: mostrar o numero na barra,
+    // tipo "7/10") -- relativa ao corte do estagio ATUAL (quantas
+    // tarefas desde o inicio deste estagio / quantas faltam pro
+    // proximo), nao o total lifetime bruto -- mesma conta que
+    // progressoEstagio() ja faz por baixo dos panos, so exposta em
+    // numero em vez de so % da barra.
+    const total = (typeof window.totalTarefasConcluidas === 'function') ? window.totalTarefasConcluidas() : 0;
+    const inicio = estagio === 1 ? 0 : LIMIARES_ESTAGIO[estagio - 2];
+    const alvo = LIMIARES_ESTAGIO[estagio - 1];
+    const frac = Math.max(0, Math.min(alvo - inicio, total - inicio)) + '/' + (alvo - inicio);
+    lblEl.textContent = estagio + ' · ' + frac;
   }
 }
 window.renderEstagioBar = renderEstagioBar;
@@ -14663,6 +14671,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
     'jogo.vida':             { pt:'Vida', en:'Health' },
     'jogo.experiencia':      { pt:'Experiência', en:'Experience' },
+    'jogo.estagio':          { pt:'Estágio', en:'Stage' },
     'jogo.addTarefa':        { pt:'+ Adicionar', en:'+ Add' },
     'jogo.oQuePrecisaSerFeito': { pt:'O que precisa ser feito?', en:'What needs to be done?' },
     'jogo.soHoje':           { pt:'Só hoje', en:'Today only' },

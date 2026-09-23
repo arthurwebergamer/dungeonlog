@@ -1618,6 +1618,28 @@ function trocarPersonagem(id){
   _personagemAtivo = id;
   try { localStorage.setItem(chavePersonagemAtivo(), id); } catch(e){}
   if (typeof window.carregar === 'function') window.carregar();
+
+  // FIX (relatado pelo usuario: "o outro personagem já chega automaticamente
+  // no estágio máximo mesmo sem ter completado uma única tarefa"). Causa
+  // raiz: totalTarefasConcluidas() (e vida/atributos/loja/hpMonstro/
+  // itensVistos/historico, mesmo padrao) leem o localStorage so 1x no
+  // BOOT da pagina e guardam o valor numa closure -- chaveConta() ja
+  // separa por personagem certinho, mas _personagemAtivo mudou aqui em
+  // cima e essas closures nunca foram avisadas, entao continuavam
+  // devolvendo o total do personagem ANTERIOR (ex: 50 tarefas), fazendo
+  // qualquer personagem novo nascer com estagio maximo emprestado.
+  // Mesmos 7 ganchos "recarregarX" que puxarNuvem() ja chama depois de
+  // restaurar dado da nuvem (mesma causa raiz, ver bloco la embaixo) --
+  // precisam rodar ANTES de render() (mais abaixo), que e quem le
+  // totalTarefasConcluidas() dentro de renderEstagioBar().
+  if (window.vidaHeroi && typeof window.vidaHeroi.recarregar === 'function') window.vidaHeroi.recarregar();
+  if (typeof window.recarregarHistorico === 'function') window.recarregarHistorico();
+  if (typeof window.recarregarAtributos === 'function') window.recarregarAtributos();
+  if (typeof window.recarregarLoja === 'function') window.recarregarLoja();
+  if (typeof window.recarregarHpMonstro === 'function') window.recarregarHpMonstro();
+  if (typeof window.recarregarItensVistos === 'function') window.recarregarItensVistos();
+  if (typeof window.recarregarTarefasConcluidas === 'function') window.recarregarTarefasConcluidas();
+
   if (typeof window.desenharHeroi === 'function') window.desenharHeroi(); // render() sozinho nao redesenha o sprite -- confirmado no handler de pintarGradeConfig()
   if (typeof window.render === 'function') window.render();
   if (typeof window.renderInventario === 'function') window.renderInventario();

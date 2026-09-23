@@ -127,35 +127,67 @@
       <button class="primario" id="irPasso2" data-i18n="acao.continuar">Continuar</button>
     </div>
 
+    <!-- v4.17x: passo2 (Nome) e passoHeroi (Personagem) ganharam o
+         cabecalho obFraca/obForte + dots do carrossel novo (setupDots),
+         e viraram os 2 passos de setup pos-login pra conta nova
+         (Personagem primeiro, Nome depois -- pedido do usuario). Ver
+         mostrarSetupPersonagemENome() mais abaixo no arquivo, que e
+         quem de fato controla a ordem/navegacao agora -- os onclick
+         estaticos originais destes botoes (irEscolha/irPasso3/voltar1/
+         voltarNome, alguns paragrafos abaixo) ficam mortos, sobrescritos
+         em runtime, por convencao wrap-not-rewrite. -->
+    <!-- v4.18x (pedido do usuario -- "quero telas completamente novas" +
+         "design novo da sua criatividade mas diferente"): markup
+         reescrito do zero pras 2 telas do setup pos-login. #passoHeroi
+         trocou o preview-box fixo + grid estatico de 8 miniaturas por um
+         carrossel horizontal com scroll nativo + snap (heroiCarrossel,
+         ver CSS "#NOVO3" e as funcoes montarCarrosselHerois()/
+         selecionarHeroiCarrossel() mais abaixo) -- arrastar o dedo TROCA
+         o heroi de verdade, sem reimplementar fisica de drag em JS.
+         #passo2 trocou o label+input em caixa por uma "placa de nome"
+         com o avatar do heroi ja escolhido acima do campo, texto do
+         botao mudou pra refletir que agora e o ULTIMO passo (ver
+         mostrarSetupPersonagemENome() -- Nome nao leva mais pra tela de
+         tarefas, entra direto no app). IDs que o JS ja usava
+         (nomeHeroi, gradeHerois, heroiAnterior/Proximo, irEscolha/
+         irPasso3/voltar1/voltarNome) foram MANTIDOS de proposito, so o
+         conteudo interno mudou -- os handlers ja existentes continuam
+         funcionando. -->
     <div class="passo" id="passo2">
-      <div class="campo">
-        <label data-i18n="onb.comoChamar">Como quer ser chamado?</label>
-        <input id="nomeHeroi" placeholder="Aventureiro" data-i18n-placeholder="onb.placeholderNome" maxlength="18" autocomplete="off">
+      <div class="setupDots"><span class="carrosselDot"></span><span class="carrosselDot on"></span></div>
+      <div class="obHeadline setupHeadline">
+        <span class="obFraca" data-i18n="onb.personalizacao">Personalização</span>
       </div>
-      <button class="primario" id="irEscolha" data-i18n="acao.continuar">Continuar</button>
+
+      <div class="nomeAvatarBadge" id="nomeAvatarBadge"></div>
+
+      <div class="campo nomeCampo">
+        <label class="setupLabel" data-i18n="onb.comoChamar">Como quer ser chamado?</label>
+        <input id="nomeHeroi" class="nomeInputElegante" placeholder="Aventureiro" data-i18n-placeholder="onb.placeholderNome" maxlength="18" autocomplete="off">
+      </div>
+      <button class="primario" id="irEscolha" data-i18n="onb.comecarAventura">Começar aventura</button>
       <button class="secundario" id="voltar1" data-i18n="acao.voltar">Voltar</button>
     </div>
 
     <div class="passo" id="passoHeroi">
+      <div class="setupDots"><span class="carrosselDot on"></span><span class="carrosselDot"></span></div>
+      <div class="obHeadline setupHeadline">
+        <span class="obFraca" data-i18n="onb.personalizacao">Personalização</span>
+      </div>
       <div class="campo">
-        <label data-i18n="onb.quemVaiEnfrentar">Quem vai enfrentar os monstros?</label>
+        <label class="setupLabel" data-i18n="onb.quemVaiEnfrentar">Quem vai enfrentar os monstros?</label>
       </div>
 
-      <div class="palcoNav">
-        <button class="palcoSeta" id="heroiAnterior" aria-label="Herói anterior">
+      <div class="heroiCarrosselWrap">
+        <button class="heroiSeta heroiSetaEsq" id="heroiAnterior" aria-label="Herói anterior">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
         </button>
-        <div class="palco">
-          <div class="palco-sprite" id="palcoSprite"></div>
-          <div class="palco-sombra"></div>
-          <span class="palco-nome" id="palcoNome"></span>
-        </div>
-        <button class="palcoSeta" id="heroiProximo" aria-label="Próximo herói">
+        <div class="heroiCarrossel" id="gradeHerois"></div>
+        <button class="heroiSeta heroiSetaDir" id="heroiProximo" aria-label="Próximo herói">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
         </button>
       </div>
-
-      <div class="grade" id="gradeHerois"></div>
+      <span class="heroiNomeGrande" id="heroiNomeGrande"></span>
 
       <button class="primario" id="irPasso3" data-i18n="acao.continuar">Continuar</button>
       <button class="secundario" id="voltarNome" data-i18n="acao.voltar">Voltar</button>
@@ -186,20 +218,15 @@
       <span class="lvl" id="lvl">Nível I</span>
       <svg class="pjChevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
     </button>
-    <div class="estagio-pill-wrap" id="estagioPillWrap">
-      <div class="estagio-pill" id="estagioPill">
-        <span class="estagio-pill-lbl" id="estagioTopoLbl">Estágio 1</span>
-        <span class="estagio-pill-num" id="estagioTopoNum"></span>
-      </div>
-      <div class="estagio-pill-trilho"><div class="estagio-pill-fill" id="estagioTopoFill"></div></div>
-    </div>
+    <!-- v4.20x (pedido do usuario): o botao de mudo saiu daqui e virou
+         uma linha em Preferencias (#cfgRowSom, perto de #cfgRowFeedback)
+         -- .coins volta a ser o ultimo filho da .topbar, entao
+         justify-content:space-between ja empurra ela pro canto direito
+         de novo sozinha, sem CSS novo. -->
     <span class="coins">
       <svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="5" y="2" width="6" height="1" fill="#F2C94C"/><rect x="3" y="3" width="10" height="2" fill="#F2C94C"/><rect x="2" y="5" width="12" height="6" fill="#F2C94C"/><rect x="3" y="11" width="10" height="2" fill="#F2C94C"/><rect x="5" y="13" width="6" height="1" fill="#F2C94C"/><rect x="6" y="5" width="2" height="6" fill="#B8942E"/></svg>
       <span id="coinnum">0</span>
     </span>
-    <button class="somBtn" id="topoSomBtn" aria-label="Som">
-      <svg id="topoSomIcone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
-    </button>
   </div>
 
   <!-- PLANO PRO -- dropdown "Meus heróis" (troca de personagem) e a
@@ -268,7 +295,7 @@
     </div>
   </div>
 
-  <div class="xpwrap">
+  <div class="xpwrap" id="statsBarra">
     <div class="xprow hprow">
       <span class="xplabel" data-i18n="jogo.vida">Vida</span>
       <span class="xpnum hpnum" id="hpnum">0 / 0</span>
@@ -280,6 +307,26 @@
       <span class="xpnum" id="xpnum">0 / 100</span>
     </div>
     <div class="bar"><div class="fill" id="fill"></div></div>
+
+    <!-- v4.19x (pedido do usuario -- mockup aprovado, ver conversa):
+         Estágio saiu da pilula solta no topbar e virou uma 3a linha
+         aqui, no mesmo padrao visual de Vida/Experiência (xprow+bar+
+         fill) em vez do componente "pilula com trilho" que so ele
+         usava. IDs mantidos (estagioTopoLbl/estagioTopoFill) -- so
+         MOVIDOS de lugar, wrap-not-rewrite: renderEstagioBar() (mais
+         abaixo no arquivo) continua escrevendo neles, so o texto que
+         escreve mudou (a palavra "Estágio" agora vem do label estatico
+         ao lado, nao precisa mais repetir no numero). -->
+    <!-- v4.20x (pedido do usuario: "1 · 4/10" ficou confuso) -- o numero
+         do estagio saiu de dentro do valor e foi pro LABEL (mesma ideia
+         de "Nível I" na topbar: o numero identifica QUAL estagio, nao e
+         progresso). O slot de valor (.xpnum) agora mostra so a fracao
+         ("4/10" ou "MAX"), igual ao padrao limpo de Vida/Experiência. -->
+    <div class="xprow">
+      <span class="xplabel"><span data-i18n="jogo.estagio">Estágio</span> <span id="estagioTopoNum">1</span></span>
+      <span class="xpnum" id="estagioTopoLbl">0/10</span>
+    </div>
+    <div class="bar"><div class="fill" id="estagioTopoFill"></div></div>
   </div>
 
   <div class="tasks">
@@ -606,10 +653,13 @@
         <button class="cfgbtn" id="cfgEntrarBtn" data-i18n="cfg.criarConta">Criar conta</button>
       </div>
 
-      <!-- v4.135 (pedido do usuario): linha "Apagar dados" removida daqui --
-           era estatica (sem onclick, sem id) e duplicava o botao "Apagar
-           tudo" no rodape do menu, que ja faz exatamente isso (ver secao
-           35, mais abaixo no arquivo). -->
+      <div class="cfgrow">
+        <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13"/><path d="M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/></svg></span>
+        <div class="cfgtxt">
+          <b data-i18n="cfg.apagarDados">Apagar dados</b>
+          <span data-i18n="cfg.apagarDadosDesc">Zera nível, moedas, itens e vida. Não tem volta.</span>
+        </div>
+      </div>
 
       <div class="edsec" data-i18n="cfg.app">App</div>
 
@@ -789,6 +839,20 @@
           <span data-i18n="cfg.feedbackDeCliqueDesc">Vibração ou som ao tocar em botões</span>
         </div>
         <button class="swch" id="cfgFeedbackBtn" type="button" role="switch" aria-checked="true" aria-label="Feedback tátil">
+          <span class="swch-bolinha"></span>
+        </button>
+      </div>
+
+      <!-- v4.20x (pedido do usuario): o botao de mudo saiu da topbar e
+           virou esta linha aqui -- mesmo padrao .cfgrow/.swch da linha
+           de cima (#cfgRowFeedback), so troca a API de dados (ver script
+           antes de </body>, wiring identico ao de Feedback). -->
+      <div class="cfgrow" id="cfgRowSom">
+        <div class="cfgtxt">
+          <b data-i18n="cfg.som">Som</b>
+          <span data-i18n="cfg.somDesc">Efeitos sonoros do jogo</span>
+        </div>
+        <button class="swch" id="cfgSomBtn" type="button" role="switch" aria-checked="true" aria-label="Som">
           <span class="swch-bolinha"></span>
         </button>
       </div>
@@ -1539,6 +1603,33 @@ window.trocarPersonagem = trocarPersonagem;
 // heroiIdx e opcional (indice em HEROIS) -- quem cria pela tela nova
 // escolhe o sprite antes de confirmar; quem chama so por console (teste)
 // pode omitir e fica no sprite 0 padrao, igual conta nova sempre foi.
+// BUG CRITICO CORRIGIDO (relatado pelo usuario, com repro exato: conta
+// nova -> trocar personagem/nome -> adicionar um novo heroi -> nome e
+// personagem resetam pro padrao). Causa raiz: esta funcao chamava
+// trocarPersonagem(id) ANTES de aplicar nome/heroiIdx escolhidos na
+// tela -- e trocarPersonagem() termina chamando window.render(), que
+// tem "if (jaComecou) salvar();" no proprio final (ver render(), mais
+// acima no arquivo). Como o save do personagem novo ainda nao existe,
+// carregar() (chamado dentro de trocarPersonagem()) deixa nomeHeroi/
+// heroiEscolhido no PADRAO ("Aventureiro"/idx 0) -- e esse render()
+// salvava esse padrao. Só DEPOIS a funcao aplicava a escolha real e
+// chamava salvar() de novo. Dois salvar() quase juntos, e como
+// window.salvar esta com um gancho que dispara empurrarNuvem()
+// (assincrono, sem fila -- ver reconectarEnvio() no bloco Firebase),
+// nao ha garantia de qual dos dois chega por ultimo no Firestore: o
+// padrao podia vencer, sobrescrevendo a escolha real na nuvem (dado
+// local ficava certo, so a nuvem corrompia -- por isso o bug parecia
+// "aleatorio").
+// FIX: troca a chave ativa e reseta o estado em memoria SEM chamar
+// render()/salvar() no meio (trocarPersonagemSemRenderizar, abaixo) --
+// so entao aplica nome/heroi escolhidos e salva, UMA unica vez, ja com
+// o dado final. Sem intermediario, sem corrida.
+function trocarPersonagemSemRenderizar(id){
+  _personagemAtivo = id;
+  try { localStorage.setItem(chavePersonagemAtivo(), id); } catch(e){}
+  if (typeof window.carregar === 'function') window.carregar(); // so estado em memoria -- carregar() nao salva nem renderiza sozinho
+}
+
 function criarPersonagem(nome, heroiIdx){
   const lista = listarPersonagens();
   if (lista.length >= limitePersonagens()) return { ok: false, motivo: 'limite' };
@@ -1546,16 +1637,14 @@ function criarPersonagem(nome, heroiIdx){
   const nomeFinal = (nome && nome.trim()) ? nome.trim() : null;
   lista.push({ id: id, nome: nomeFinal, criadoEm: new Date().toISOString() });
   salvarListaPersonagens(lista);
-  trocarPersonagem(id); // save desse id nao existe ainda -- carregar() cai no mesmo caminho ja corrigido de "conta nova" (resetarEstadoParaPadrao)
-  // resetarEstadoParaPadrao() (dentro de carregar(), acima) ja rodou e
-  // deixou nomeHeroi/heroiEscolhido no default -- agora pisa em cima com
-  // a escolha feita na tela, e persiste ja de cara (senao um F5 antes de
-  // qualquer acao no jogo perderia nome/sprite escolhidos).
+  trocarPersonagemSemRenderizar(id); // save desse id nao existe ainda -- carregar() cai no mesmo caminho ja corrigido de "conta nova" (resetarEstadoParaPadrao), so em memoria, sem side-effect
+  // agora sim pisa em cima do padrao com a escolha feita na tela --
+  // nomeHeroi/heroiEscolhido corretos ANTES do primeiro (e unico) salvar()
   if (typeof nomeHeroi !== 'undefined' && nomeFinal) nomeHeroi = nomeFinal;
   if (typeof heroiEscolhido !== 'undefined' && typeof heroiIdx === 'number' && !isNaN(heroiIdx)) heroiEscolhido = heroiIdx;
-  if (typeof window.salvar === 'function') window.salvar();
-  if (typeof window.desenharHeroi === 'function') window.desenharHeroi(); // idem trocarPersonagem() -- sprite so atualiza chamando isso
-  if (typeof window.render === 'function') window.render();
+  if (typeof window.salvar === 'function') window.salvar(); // UM save so, ja com o dado final
+  if (typeof window.desenharHeroi === 'function') window.desenharHeroi(); // sprite so atualiza chamando isso
+  if (typeof window.render === 'function') window.render(); // re-salva o MESMO dado correto (render() salva sozinho) -- redundante, nao uma corrida
   return { ok: true, id: id };
 }
 window.criarPersonagem = criarPersonagem;
@@ -2423,36 +2512,39 @@ function poolMonstrosFiltrado(){
 }
 window.poolMonstrosFiltrado = poolMonstrosFiltrado;
 
-// atualiza a barrinha "Estagio N" na topbar. Chamada dentro de render()
-// (mesmo lugar que atualiza #lvl), entao acompanha a mesma cadencia de
-// qualquer outro contador do topo.
+// atualiza a linha "Estagio" dentro do .xpwrap (v4.19x: mudou de lugar --
+// era uma pilula solta no topbar, ver comentario no HTML). Chamada dentro
+// de render() (mesmo lugar que atualiza #lvl), entao acompanha a mesma
+// cadencia de qualquer outro contador do topo.
 function renderEstagioBar(){
-  const lblEl = document.getElementById('estagioTopoLbl');
+  const numEl = document.getElementById('estagioTopoLbl'); // slot de VALOR (lado direito da xprow) -- so a fracao/MAX
+  const estagioNumEl = document.getElementById('estagioTopoNum'); // numero do estagio, dentro do LABEL ("Estágio 1")
   const fillEl = document.getElementById('estagioTopoFill');
-  const numEl = document.getElementById('estagioTopoNum');
-  if (!lblEl || !fillEl) return;
-  const emIngles = typeof idiomaApp === 'function' && idiomaApp() === 'en';
+  if (!numEl || !fillEl) return;
   const estagio = estagioAtual();
   const max = estagio >= 4; // ultimo estagio -- sem proxima meta, barra so fica cheia
-  lblEl.textContent = max
-    ? (emIngles ? 'Stage ' + estagio + ' · MAX' : 'Estágio ' + estagio + ' · MAX')
-    : (emIngles ? 'Stage ' + estagio : 'Estágio ' + estagio);
   fillEl.style.width = Math.round(progressoEstagio() * 100) + '%';
 
-  // Contagem numerica (pedido do usuario: mostrar o numero na barra, tipo
-  // "7/10") -- relativa ao corte do estagio ATUAL (quantas tarefas desde
-  // o inicio deste estagio / quantas faltam pro proximo), nao o total
-  // lifetime bruto -- mesma conta que progressoEstagio() ja faz por
-  // baixo dos panos, so exposta em numero em vez de so % da barra.
-  if (numEl){
-    if (max){
-      numEl.textContent = '';
-    } else {
-      const total = (typeof window.totalTarefasConcluidas === 'function') ? window.totalTarefasConcluidas() : 0;
-      const inicio = estagio === 1 ? 0 : LIMIARES_ESTAGIO[estagio - 2];
-      const alvo = LIMIARES_ESTAGIO[estagio - 1];
-      numEl.textContent = Math.max(0, Math.min(alvo - inicio, total - inicio)) + '/' + (alvo - inicio);
-    }
+  if (estagioNumEl) estagioNumEl.textContent = estagio;
+
+  // v4.20x (pedido do usuario: "1 · 4/10" no valor ficou confuso --
+  // misturava QUAL estagio com QUANTO falta). O numero do estagio
+  // agora mora so no label (linha de cima), o valor mostra so a fracao,
+  // mesmo padrao limpo de "40 / 64" em Vida.
+  if (max){
+    numEl.textContent = 'MAX';
+  } else {
+    // Contagem numerica (pedido do usuario: mostrar o numero na barra,
+    // tipo "7/10") -- relativa ao corte do estagio ATUAL (quantas
+    // tarefas desde o inicio deste estagio / quantas faltam pro
+    // proximo), nao o total lifetime bruto -- mesma conta que
+    // progressoEstagio() ja faz por baixo dos panos, so exposta em
+    // numero em vez de so % da barra.
+    const total = (typeof window.totalTarefasConcluidas === 'function') ? window.totalTarefasConcluidas() : 0;
+    const inicio = estagio === 1 ? 0 : LIMIARES_ESTAGIO[estagio - 2];
+    const alvo = LIMIARES_ESTAGIO[estagio - 1];
+    const frac = Math.max(0, Math.min(alvo - inicio, total - inicio)) + '/' + (alvo - inicio);
+    numEl.textContent = frac;
   }
 }
 window.renderEstagioBar = renderEstagioBar;
@@ -4565,6 +4657,231 @@ campoNomeIni.addEventListener('keydown', e => {
   if (e.key === 'Enter') document.getElementById('irEscolha').click();
 });
 
+// ---------------------------------------------------------------------
+// SETUP POS-LOGIN: PERSONAGEM + NOME (v4.17x) -- substitui o sistema de
+// nome/heroi padrao tirado do email (ver comentario em entrarNoApp(),
+// bloco Firebase mais abaixo no arquivo -- bug critico investigado
+// nesta sessao: aquele fluxo fazia um salvar() imediato com valor
+// padrao, que podia entrar numa corrida com o salvar() seguinte de uma
+// troca de nome/heroi feita logo em seguida, porque empurrarNuvem() e
+// assincrono e sem fila -- o padrao podia vencer na nuvem).
+//
+// Pedido do usuario: depois do login confirmado (conta nova, sem save
+// ainda), mostra 2 passos -- Personagem primeiro, Nome depois --
+// reaproveitando os elementos que ja existiam pro wizard antigo
+// (#passoHeroi/#passo2, #gradeHerois, input#nomeHeroi) com estilo novo
+// (obFraca/obForte + setupDots, igual ao carrossel) e onclick
+// REESCRITO aqui: as versoes originais destes botoes (algumas linhas
+// acima) E as do carrossel legado (irPara(5/7/8), na IIFE do carrossel
+// mais abaixo) estao mortas -- apontam pra slides que nao existem mais
+// desde que o onboarding foi reduzido pra 5 slides + login. Como este
+// bloco roda por ULTIMO (só é chamado, nao só definido, depois que a
+// pagina inteira ja carregou), a atribuicao .onclick daqui vence as
+// duas anteriores -- mesma convencao wrap-not-rewrite ja usada no
+// resto do arquivo.
+//
+// IMPORTANTE (o proprio fix do bug critico): nenhum salvar() acontece
+// aqui dentro. O primeiro save de verdade continua sendo so no fim do
+// passo3 (#entrar.onclick, ja existente, intocado), depois que
+// nome+heroi+1a tarefa ja estao TODOS definidos -- um unico save, com
+// o dado final, sem intermediario de valor padrao.
+// v4.18x (pedido do usuario -- "quero telas completamente novas... design
+// novo da sua criatividade mas diferente"): carrossel horizontal de
+// heroi pra #passoHeroi, no lugar do preview-box fixo (#palcoSprite/
+// #palcoNome) + grid estatico de 8 miniaturas que existiam antes.
+// Reaproveita #gradeHerois (mesmo id, agora com CSS/estrutura de
+// carrossel -- ver ".heroiCarrossel" no style.css) e os botoes
+// heroiAnterior/heroiProximo ja existentes no HTML.
+//
+// Decisao de implementacao: SCROLL NATIVO com scroll-snap-type (CSS)
+// em vez de reimplementar arrastar/soltar em JS -- o navegador ja cuida
+// de inercia, elasticidade nas pontas e acessibilidade de teclado de
+// graca. O unico trabalho daqui e: 1) montar os cards, 2) descobrir
+// qual card esta mais perto do centro durante o scroll (pra sincronizar
+// heroiEscolhido com o que a pessoa esta vendo), 3) rolar ate um card
+// quando clicado ou quando as setas sao usadas.
+function montarCarrosselHerois(){
+  const track = document.getElementById('gradeHerois');
+  if (!track || typeof HEROIS === 'undefined') return;
+  track.innerHTML = '';
+  HEROIS.forEach((hh, i) => {
+    const card = document.createElement('div');
+    // ".opcao" mantida de proposito -- e a classe que o bloco de
+    // feedback haptico (secao "SFX/VIBRACAO", delegacao em #gradeHerois
+    // mais abaixo no arquivo) usa pra saber que foi um card de heroi
+    // que recebeu o clique. Sem ela o toque para de vibrar, silenciosamente.
+    card.className = 'heroiCard opcao' + (i === heroiEscolhido ? ' sel' : '');
+    card.dataset.idx = i;
+    card.innerHTML = '<img src="' + hh.img + '" alt="' + hh.nome + '">';
+    card.onclick = () => selecionarHeroiCarrossel(i, true);
+    track.appendChild(card);
+  });
+  atualizarNomeCarrosselHerois();
+  // centraliza o card ja selecionado sem animar (1a montagem -- um scroll
+  // suave aqui pareceria a tela "escorregando" sozinha ao abrir)
+  requestAnimationFrame(() => rolarAteHeroi(heroiEscolhido, false));
+}
+window.montarCarrosselHerois = montarCarrosselHerois;
+
+function atualizarNomeCarrosselHerois(){
+  const el = document.getElementById('heroiNomeGrande');
+  if (el && typeof HEROIS !== 'undefined' && HEROIS[heroiEscolhido]) el.textContent = HEROIS[heroiEscolhido].nome;
+}
+
+function rolarAteHeroi(i, suave){
+  const track = document.getElementById('gradeHerois');
+  const card = track && track.children[i];
+  if (!card) return;
+  card.scrollIntoView({ behavior: suave ? 'smooth' : 'auto', inline: 'center', block: 'nearest' });
+}
+
+function selecionarHeroiCarrossel(i, suave){
+  heroiEscolhido = i;
+  document.querySelectorAll('#gradeHerois .heroiCard').forEach((el, idx) => {
+    el.classList.toggle('sel', idx === i);
+  });
+  atualizarNomeCarrosselHerois();
+  rolarAteHeroi(i, suave);
+}
+
+// arrastar o dedo (scroll nativo) muda a posicao visual sem passar pelos
+// clicks acima -- esse listener descobre qual card ficou mais perto do
+// centro do carrossel a cada frame de scroll e sincroniza heroiEscolhido
+// com o que a pessoa esta vendo de verdade. rAF-throttled pra nao rodar
+// getBoundingClientRect em cada pixel de scroll.
+(function(){
+  let scrollRaf = null;
+  const track = document.getElementById('gradeHerois');
+  if (!track) return;
+  track.addEventListener('scroll', () => {
+    if (scrollRaf) return;
+    scrollRaf = requestAnimationFrame(() => {
+      scrollRaf = null;
+      if (!track.children.length) return;
+      const rect = track.getBoundingClientRect();
+      const centro = rect.left + rect.width / 2;
+      let melhorIdx = heroiEscolhido, melhorDist = Infinity, distAtual = Infinity;
+      Array.from(track.children).forEach((el, idx) => {
+        const r = el.getBoundingClientRect();
+        const dist = Math.abs((r.left + r.width / 2) - centro);
+        if (idx === heroiEscolhido) distAtual = dist;
+        if (dist < melhorDist){ melhorDist = dist; melhorIdx = idx; }
+      });
+      // v4.18x FIX (bug relatado pelo usuario com print/video -- "o texto
+      // meio que buga" durante o arrasto): SEM essa margem, quando o dedo
+      // para bem no meio do caminho entre 2 cards, a distancia dos 2 ao
+      // centro fica quase identica -- o jitter de sub-pixel que o
+      // proprio scroll nativo gera a cada frame (mesmo com o dedo
+      // "parado") fazia o "mais perto" trocar de lado a cada rAF, e o
+      // nome embaixo piscava entre os 2 herois varias vezes por segundo
+      // (confirmado extraindo os frames do video -- Loiro/Cinza alternando
+      // repetidas vezes antes de estabilizar). So troca de selecao quando
+      // o novo card estiver visivelmente mais perto do centro que o atual
+      // (nao so por 1-2px de ruido) -- movimento de verdade continua
+      // instantaneo, so o "empate" no meio do caminho para de piscar.
+      const MARGEM_HISTERESE = 10; // px
+      if (melhorIdx !== heroiEscolhido && melhorDist < distAtual - MARGEM_HISTERESE){
+        heroiEscolhido = melhorIdx;
+        Array.from(track.children).forEach((el, idx) => el.classList.toggle('sel', idx === melhorIdx));
+        atualizarNomeCarrosselHerois();
+      }
+    });
+  }, { passive: true });
+})();
+
+function mostrarSetupPersonagemENome(){
+  const elPersonagem = document.getElementById('passoHeroi');
+  const elNome = document.getElementById('passo2');
+  if (!elPersonagem || !elNome) return;
+
+  // estado limpo -- garante que nenhum outro passo do wizard antigo
+  // (passo1/passo3) fica visivel por engano nessa entrada
+  ['passo1', 'passo2', 'passoHeroi', 'passo3'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('on');
+  });
+
+  // defesa extra (mesma familia do bug dos pontinhos acima): o chamador
+  // normal (entrarNoApp(), conta nova) ja nao ativa mais #passoBoasVindas
+  // antes de chegar aqui, mas se esse passo for chamado de outro lugar
+  // no futuro com essa tela ainda ligada, ela nao pode ficar colada por
+  // baixo -- era a causa exata da "tela em cima da outra" reportada.
+  const elBoasVindas = document.getElementById('passoBoasVindas');
+  if (elBoasVindas) elBoasVindas.classList.remove('on');
+
+  // bug visual descoberto no teste: os 5 pontinhos do carrossel de
+  // marketing (#carrosselDots) so ficam escondidos quando o fluxo passa
+  // por irParaLogin() (que adiciona .oculto) -- mas esse passo novo pode
+  // ser chamado em cenarios onde isso nao aconteceu antes (ou o estado
+  // ja foi restaurado por atualizarTopo em algum ponto), e ai os 5
+  // pontinhos ficam sobrando fixos embaixo da tela de Nome/Tarefas. Nao
+  // depende mais desse acoplamento -- forca escondido aqui direto.
+  const dotsCarrosselAntigo = document.getElementById('carrosselDots');
+  if (dotsCarrosselAntigo) dotsCarrosselAntigo.classList.add('oculto');
+
+  heroiEscolhido = 0; // ponto de partida -- a pessoa escolhe no carrossel
+  montarCarrosselHerois();
+  elPersonagem.classList.add('on');
+
+  // heroiAnterior/heroiProximo ja tinham onclick (linha ~4566, feito pra
+  // #palcoSprite/pintarEscolha() -- markup antigo). Sobrescreve aqui pro
+  // carrossel novo, mesma convencao wrap-not-rewrite usada no resto do
+  // arquivo (ultima atribuicao no load vence).
+  document.getElementById('heroiAnterior').onclick = () => {
+    selecionarHeroiCarrossel(Math.max(0, heroiEscolhido - 1), true);
+  };
+  document.getElementById('heroiProximo').onclick = () => {
+    selecionarHeroiCarrossel(Math.min(HEROIS.length - 1, heroiEscolhido + 1), true);
+  };
+
+  // Personagem e o 1o passo do fluxo novo -- sem seta de voltar, mesma
+  // convencao ja usada no slide 1 do carrossel (nada antes dele nessa
+  // sequencia).
+  const btnVoltarPersonagem = document.getElementById('voltarNome');
+  if (btnVoltarPersonagem) btnVoltarPersonagem.style.visibility = 'hidden';
+
+  document.getElementById('irPasso3').onclick = () => {
+    if (typeof desenharHeroi === 'function') desenharHeroi();
+    // avatar da placa de nome -- mostra o heroi que acabou de ser
+    // escolhido, pra a etapa de Nome nao parecer desconectada da
+    // escolha anterior (era so um label+input generico antes).
+    const badge = document.getElementById('nomeAvatarBadge');
+    if (badge && typeof HEROIS !== 'undefined' && HEROIS[heroiEscolhido]){
+      badge.innerHTML = '<img src="' + HEROIS[heroiEscolhido].img + '" alt="">';
+    }
+    elPersonagem.classList.remove('on');
+    elNome.classList.add('on');
+  };
+
+  document.getElementById('irEscolha').onclick = () => {
+    const campo = document.getElementById('nomeHeroi');
+    const n = campo.value.trim();
+    if (!n){
+      campo.focus();
+      campo.placeholder = idiomaApp() === 'en' ? 'Choose a name to continue' : 'Escolha um nome pra continuar';
+      campo.style.borderColor = 'var(--blood)';
+      return;
+    }
+    nomeHeroi = n; // let top-level, visivel entre scripts classic -- mesma variavel que salvar()/render() usam
+
+    // v4.17x (pedido do usuario): Nome agora e o ULTIMO passo do setup --
+    // sem etapa de "adicionar tarefas" no meio, entra direto no app.
+    // Mesma logica de finalizacao que o handler de #entrar (passo3) usava
+    // -- so sem exigir tarefa nenhuma aqui (tarefasIniciais fica vazio,
+    // dado que a etapa nem aparece mais; a pessoa adiciona depois, ja
+    // dentro do app, pelo "+Adicionar" que ja existe la).
+    jaComecou = true;
+    document.getElementById('intro').classList.add('off');
+    render();
+  };
+
+  document.getElementById('voltar1').onclick = () => {
+    elNome.classList.remove('on');
+    elPersonagem.classList.add('on');
+  };
+}
+window.mostrarSetupPersonagemENome = mostrarSetupPersonagemENome;
+
 const campoIni = document.getElementById('primeiraTarefa');
 campoIni.addEventListener('keydown', e => {
   if (e.key === 'Enter'){
@@ -4575,6 +4892,37 @@ campoIni.addEventListener('keydown', e => {
     renderIniciais();
   }
 });
+
+// ===== PERSONALIZACAO DO ONBOARDING (v4.17x) =====
+// resposta da pergunta de categoria do carrossel (ver
+// CATEGORIAS_ONBOARDING / htmlQuizPergunta, bloco do carrossel mais
+// acima no arquivo) troca o placeholder de EXEMPLO do campo de 1a
+// tarefa por algo mais relevante pra categoria escolhida. Wrap em cima
+// de mostrarPasso() em vez de editar a funcao original (convencao
+// wrap-not-rewrite ja usada no resto do arquivo) -- so age quando o
+// passo que abre e o 4 (tarefas). Sem categoria salva (pulou a
+// pergunta, ou versao antiga do app sem essa chave ainda) mantem o
+// placeholder estatico original do HTML, sem quebrar nada.
+(function(){
+  const _mostrarPassoOriginalV17x = mostrarPasso;
+  const EXEMPLOS_TAREFA_POR_CATEGORIA = {
+    estudos:  { pt:'Ex: estudar 30 minutos', en:'E.g. study for 30 minutes' },
+    trabalho: { pt:'Ex: responder e-mails pendentes', en:'E.g. reply to pending emails' },
+    rotina:   { pt:'Ex: arrumar o quarto', en:'E.g. tidy up the room' },
+    tudo:     { pt:'Ex: estudar 30 minutos', en:'E.g. study for 30 minutes' }
+  };
+  mostrarPasso = function(n){
+    _mostrarPassoOriginalV17x(n);
+    if (n !== 4) return;
+    let categoria = '';
+    try { categoria = localStorage.getItem('questlog.onboarding.categoria.v1') || ''; } catch(e){}
+    const exemplo = EXEMPLOS_TAREFA_POR_CATEGORIA[categoria];
+    if (!exemplo) return;
+    let idiomaEn = false;
+    try { idiomaEn = localStorage.getItem('questlog.idioma.v1') === 'en'; } catch(e){}
+    campoIni.placeholder = idiomaEn ? exemplo.en : exemplo.pt;
+  };
+})();
 
 document.getElementById('entrar').onclick = () => {
   const pendente = campoIni.value.trim();
@@ -11986,7 +12334,22 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // passo2/passoHeroi/passo3 mais abaixo, que ficam intocados no DOM
   // mas nao reparentados no carrossel reduzido). Ultimo slide (estagio)
   // vai direto pro login em vez de continuar a numeracao.
-  const SLIDES = [
+  // v4.17x (pedido do usuario -- "refazer o carrossel inicial"):
+  // reconstrucao completa dos slides seguindo os 5 elementos de
+  // onboarding que convertem (referencia: reel @gabrielbuzzi "5
+  // elementos que seu onboarding precisa pra converter"): 1) Dor e
+  // Promessa, 2) Personalizacao, 3) Sensacao de Progresso, 4) Prova
+  // Social, 5) Aha Moment. Prova social virou "Conquistas" -- o app
+  // ainda nao tem usuario real/depoimento pra mostrar, entao o gancho
+  // vira o sistema de conquistas (real, ja existe no jogo) em vez de
+  // inventar depoimento falso. Estrutura antiga (logo/golpeAnim/
+  // bauAnim/estagioAnim) comentada abaixo por convencao wrap-not-
+  // rewrite, nao apagada.
+  //   1 dor-e-promessa (monstro) · 2 personalizacao (pergunta de
+  //   categoria, ver htmlQuizPergunta) · 3 progresso (heroi + card de
+  //   XP) · 4 conquistas (badges) · 5 aha-moment (golpeAnim, mesma
+  //   demo de combate de antes, agora no fim como fechamento)
+  /* const SLIDES = [
     { dataSlide:1, next:2, tipo:'logo',
       fraca:'Bem-vindo ao', fraca_en:'Welcome to',
       titulo:'DungeonLog', titulo_en:'DungeonLog',
@@ -12009,11 +12372,41 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       texto:'A masmorra muda de cara conforme você progride — cada estágio é um cenário diferente.',
       texto_en:'The dungeon changes as you progress — each stage is a different scenery.',
       botao:'Vamos lá', botao_en:'Let\'s go', layout:'mockupExato' }
+  ]; */
+  const SLIDES = [
+    { dataSlide:1, next:2, tipo:'monstro', idx:49, // Moeda mímica (dourada, chama mais atenção no grafite que a Gosma cinza de antes -- pedido do usuario)
+      fraca:'Chega de tarefa esquecida', fraca_en:'No more forgotten tasks',
+      titulo:'Suas tarefas viram uma masmorra pra vencer', titulo_en:'Your tasks become a dungeon to beat',
+      texto:'Cada pendência é um monstro parado no seu caminho. Complete a tarefa, derrote o monstro.',
+      texto_en:'Every pending task is a monster blocking your way. Finish it, defeat the monster.',
+      botao:'Começar', botao_en:'Get started', layout:'mockupExato' },
+    { dataSlide:2, next:3, tipo:'quizCategoria',
+      fraca:'Personalização', fraca_en:'Personalization',
+      titulo:'O que você mais quer organizar?', titulo_en:'What do you want to organize most?',
+      botao:'Continuar', botao_en:'Continue', layout:'quizPergunta' },
+    { dataSlide:3, next:4, tipo:'heroi', idx:1,
+      fraca:'Todo dia um pouco mais forte', fraca_en:'A little stronger every day',
+      titulo:'Veja seu herói evoluir a cada tarefa', titulo_en:'Watch your hero level up with every task',
+      texto:'XP, níveis e cenários novos conforme você avança nos estágios.',
+      texto_en:'XP, levels and new scenery as you advance through stages.',
+      botao:'Continuar', botao_en:'Continue', layout:'progressoPreview' },
+    { dataSlide:4, next:5, tipo:'conquistasPreview',
+      fraca:'Recompensas por consistência', fraca_en:'Rewards for consistency',
+      titulo:'Desbloqueie conquistas conforme joga', titulo_en:'Unlock achievements as you play',
+      texto:'Streaks, marcos e itens raros — cada conquista fica guardada no seu perfil.',
+      texto_en:'Streaks, milestones and rare items — every achievement is saved to your profile.',
+      botao:'Continuar', botao_en:'Continue', layout:'mockupExato' },
+    { dataSlide:5, next:'login', tipo:'golpeAnim', idx:22,
+      fraca:'É rápido assim', fraca_en:'It\'s this quick',
+      titulo:'Marcou como feito. Golpe certeiro.', titulo_en:'Marked as done. Direct hit.',
+      texto:'Essa é a sensação toda vez que você fecha uma tarefa. Bora começar?',
+      texto_en:'That\'s the feeling every time you finish a task. Let\'s go?',
+      botao:'Criar minha conta', botao_en:'Create my account', layout:'mockupExato' }
   ];
-  const SLIDE_TRANSICAO = 5; // slide removido do carrossel reduzido -- nunca mais bate (numero fora do range 1-4), guarda fica inofensiva
-  const SLIDE_NOME = 6; // idem -- slide removido, guarda fica inofensiva
-  const TOTAL_SLIDES = 4;
-  const SLIDE_GOLPE = 2; // usado pra ligar/desligar o ciclo de animacao do golpe (ver iniciarCicloGolpe, mais abaixo)
+  const SLIDE_TRANSICAO = 6; // slide removido do carrossel reduzido -- nunca mais bate (numero fora do range 1-5), guarda fica inofensiva
+  const SLIDE_NOME = 7; // idem -- slide removido, guarda fica inofensiva
+  const TOTAL_SLIDES = 5;
+  const SLIDE_GOLPE = 5; // usado pra ligar/desligar o ciclo de animacao do golpe (ver iniciarCicloGolpe, mais abaixo) -- golpeAnim agora e o Aha Moment, ultimo slide antes do login
 
   // item 46 do roadmap: idioma lido direto do localStorage (mesmo padrao
   // ja usado no resto do arquivo -- item()/aplicarIdiomaDados()/
@@ -12083,6 +12476,28 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         '<div class="obBauImg"></div>' +
         '<div class="bauitens obBauItens">' + bauItem(item(0)) + bauItem(item(31)) + '</div>' +
       '</div>';
+    }
+    if (s.tipo === 'quizCategoria'){
+      // sem imagem -- o corpo inteiro (pergunta + opcoes) e montado
+      // direto em htmlQuizPergunta(), ver layout 'quizPergunta' mais
+      // abaixo na composicao de `corpo`.
+      return '';
+    }
+    if (s.tipo === 'conquistasPreview'){
+      // v4.17x: substitui prova social (o app nao tem usuario real/
+      // depoimento ainda pra mostrar, entao nao inventa -- usa o
+      // sistema de conquistas de verdade, que ja existe no jogo, como
+      // gancho). 3 badges simples (vetor, nao sprite -- conquista nao
+      // tem uma imagem "dona" no app como monstro/heroi tem), a
+      // terceira apagada (bloqueada) pra sugerir progressao.
+      const ICONE_TROFEU = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z"/></svg>';
+      const ICONE_ESTRELA = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3 7h7l-5.6 4.3L18.4 21 12 16.8 5.6 21l2-7.7L2 9h7z"/></svg>';
+      const ICONE_CADEADO = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>';
+      return '<div class="carrosselImgWrap obConquistasRow">' +
+        '<div class="obConquistaBadge">' + ICONE_TROFEU + '</div>' +
+        '<div class="obConquistaBadge">' + ICONE_ESTRELA + '</div>' +
+        '<div class="obConquistaBadge off">' + ICONE_CADEADO + '</div>' +
+        '</div>';
     }
     if (s.tipo === 'trioLogo'){
       // composicao escalonada igual a foto de referencia: sprite do
@@ -12169,6 +12584,49 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     </div>
   `;
 
+  // v4.17x (item "personalizacao" do novo carrossel): pergunta de
+  // categoria no slide 2 -- resposta salva em localStorage e reaproveitada
+  // depois pra trocar o placeholder de exemplo do campo de 1a tarefa
+  // (ver #primeiraTarefa / mostrarPasso(4), mais abaixo no arquivo,
+  // bloco "PERSONALIZACAO DO ONBOARDING"). Nao bloqueia o Continuar
+  // sem escolha -- se a pessoa nao selecionar nada, o placeholder so
+  // fica no exemplo generico de sempre.
+  const CHAVE_CATEGORIA_ONBOARDING = 'questlog.onboarding.categoria.v1';
+  const CATEGORIAS_ONBOARDING = [
+    { id:'estudos', label:'Estudos', label_en:'Study',
+      icone:'<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>' },
+    { id:'trabalho', label:'Trabalho', label_en:'Work',
+      icone:'<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>' },
+    { id:'rotina', label:'Rotina pessoal', label_en:'Personal routine',
+      icone:'<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>' },
+    { id:'tudo', label:'Um pouco de tudo', label_en:'A bit of everything',
+      icone:'<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>' }
+  ];
+  function categoriaOnboardingSalva(){
+    try { return localStorage.getItem(CHAVE_CATEGORIA_ONBOARDING) || ''; } catch(e){ return ''; }
+  }
+  function htmlQuizPergunta(s){
+    const selecionada = categoriaOnboardingSalva();
+    const opcoes = CATEGORIAS_ONBOARDING.map(c => `
+      <button type="button" class="quizOpcao${c.id === selecionada ? ' sel' : ''}" data-cat="${c.id}">
+        ${c.icone}<span>${txtSlide(c, 'label')}</span><span class="check"></span>
+      </button>`).join('');
+    return `
+      <div class="obHeadline"><span class="obFraca">${txtSlide(s, 'fraca')}</span></div>
+      <div class="quizPergunta">${txtSlide(s, 'titulo')}</div>
+      <div class="quizOpcoes" id="quizOpcoesCategoria">${opcoes}</div>`;
+  }
+  // preview de progresso (slide 3) -- numeros fixos de demonstracao, nao
+  // le XP/nivel real da conta (esse slide roda ANTES da conta existir).
+  function htmlProgressoPreview(){
+    const nivelLbl = CARROSSEL_EN ? 'LEVEL 4' : 'NÍVEL 4';
+    return `
+      <div class="progressoCard">
+        <div class="progressoTop"><span class="progressoLvl">${nivelLbl}</span><span class="progressoPct">640 / 1000 XP</span></div>
+        <div class="barra"><i style="width:64%"></i></div>
+      </div>`;
+  }
+
   const htmlSlides = SLIDES.map((s, i) => {
     const blocoImagem = imagemSlide(s);
     const blocoMarca = `
@@ -12205,6 +12663,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
                 : s.layout === 'idiomaEscolha' ? (blocoMarca + htmlIdiomaEscolha)
                 : s.layout === 'mockupExato' ? (blocoImagem + blocoHeadlineMockup + '<p class="obCorpo">' + txtSlide(s, 'texto') + '</p>')
                 : s.layout === 'mockupExatoSemCorpo' ? (blocoImagem + blocoHeadlineMockup)
+                : s.layout === 'quizPergunta' ? htmlQuizPergunta(s)
+                : s.layout === 'progressoPreview' ? (blocoImagem + blocoHeadlineMockup + htmlProgressoPreview() + '<p class="obCorpo">' + txtSlide(s, 'texto') + '</p>')
                 : (blocoImagem + blocoMarca); // 'imagemPrimeiro' e fallback
 
     return `
@@ -12343,10 +12803,21 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // proprio #intro por cima (mesmo elemento que pintarParede() usa) o
   // gradiente cobre 100% da tela, sem sobra. Sem tile (so gradiente
   // liso) pra bater com o mockup aprovado.
+  // v4.17x: paleta trocada pra tons de grafite (grayscale), a pedido do
+  // usuario ("cores do tema grafite, design minimalista") -- antes eram
+  // roxo/dourado fixos (hex literal, nao var() -- ver comentario acima),
+  // sem ligacao com o tema de verdade. Continua hex literal de proposito
+  // (mesmo motivo de antes: sem crossfade se fosse var() lido 1x), so
+  // que agora as 5 entradas usam a MESMA dupla de tons (bem sutil,
+  // minimalista) em vez de 1 cor por slide -- o grafite e a paleta
+  // padrao do onboarding (temaSalvo() ja default 'grafite'), entao nao
+  // faz sentido variar hue por slide como fazia com o tema antigo.
   const GRADIENTES_ONBOARD = {
-    1: 'linear-gradient(160deg,#251E38 0%,#1A1526 100%)',
-    2: 'linear-gradient(160deg,#2C2444 0%,#1A1526 100%)',
-    3: 'linear-gradient(160deg,#3A2F16 0%,#1F1A0C 100%)'
+    1: 'linear-gradient(160deg,#333333 0%,#1E1E1E 100%)',
+    2: 'linear-gradient(160deg,#323232 0%,#1E1E1E 100%)',
+    3: 'linear-gradient(160deg,#323232 0%,#1E1E1E 100%)',
+    4: 'linear-gradient(160deg,#323232 0%,#1E1E1E 100%)',
+    5: 'linear-gradient(160deg,#333333 0%,#1E1E1E 100%)'
   };
   // slide estagio identificado pelo tipo (nao hardcoded), assim continua
   // certo se a ordem/numero dos slides mudar de novo no futuro.
@@ -12614,6 +13085,21 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   SLIDES.forEach(s => {
     const btn = document.getElementById('carrosselBtn' + s.dataSlide);
     if (btn) btn.onclick = () => (s.next === 'login' ? irParaLogin() : irPara(s.next));
+  });
+
+  // v4.17x: clique numa opcao da pergunta de categoria (slide
+  // Personalizacao) -- delegacao no palco inteiro porque as opcoes
+  // nascem dentro do HTML gerado por htmlQuizPergunta(), nao tem onclick
+  // individual. So marca visualmente + salva; nao bloqueia nem exige
+  // escolha pra continuar (ver comentario acima de CATEGORIAS_ONBOARDING).
+  palco.addEventListener('click', (e) => {
+    const opcao = e.target.closest('.quizOpcao');
+    if (!opcao) return;
+    const grupo = opcao.closest('.quizOpcoes');
+    if (grupo) grupo.querySelectorAll('.quizOpcao').forEach(el => el.classList.remove('sel'));
+    opcao.classList.add('sel');
+    try { localStorage.setItem(CHAVE_CATEGORIA_ONBOARDING, opcao.dataset.cat); } catch(e){}
+    if (typeof window.feedbackClique === 'function') window.feedbackClique('clique', 10);
   });
 
   document.getElementById('carrosselVoltar').onclick = () => {
@@ -12896,7 +13382,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
   ['idiomaBtn','temaMiniBtn','loginEsqueci','loginEntrarBtn','loginGoogleBtn',
    'loginContinuarSemConta','boasVindasContinuar',
-   'carrosselBtn1','carrosselBtn2','carrosselBtn3','carrosselBtn4',
+   'carrosselBtn1','carrosselBtn2','carrosselBtn3','carrosselBtn4','carrosselBtn5',
    'carrosselVoltar','carrosselEntrarLink'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.addEventListener('click', () => window.feedbackClique('clique', 10));
@@ -13346,55 +13832,75 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           if (typeof window.desenharHeroi === 'function') window.desenharHeroi();
           if (typeof window.render === 'function') window.render();
         } else {
-          // v4.124: sem save local = conta nova. ANTES pulava pro slide
-          // de nome/heroi (irParaCarrossel(5)) -- esse slide NAO EXISTE
-          // MAIS no carrossel reduzido (item mais recente do roadmap
-          // cortou o carrossel pra so 4 slides + login), entao
-          // irParaCarrossel(5) nao achava nada (slideEl(5) retorna null)
-          // e travava a pessoa numa tela em branco logo apos criar
-          // conta -- bug real, achado implementando o pedido abaixo.
-          // Pedido do usuario: em vez de pedir pra escolher nome/heroi
-          // na hora, segue o padrao do Habitica -- nome padrao tirado do
-          // email, heroi padrao (idx 0), e entra direto no app. Da pra
-          // trocar nome/heroi depois nas Opcoes (campo ja existe).
-          const nomeFromEmail = ((user.email || '').split('@')[0] || '')
-            .replace(/[._-]+/g, ' ')
-            .trim()
-            .split(' ')
-            .filter(Boolean)[0] || '';
-          const nomePadrao = nomeFromEmail
-            ? nomeFromEmail.charAt(0).toUpperCase() + nomeFromEmail.slice(1).toLowerCase()
-            : (idiomaApp() === 'en' ? 'Adventurer' : 'Aventureiro');
-          if (typeof nomeHeroi !== 'undefined') nomeHeroi = nomePadrao;
-          if (typeof heroiEscolhido !== 'undefined') heroiEscolhido = 0;
-          if (typeof window.salvar === 'function') window.salvar();
-          intro.classList.add('off');
-          intro.classList.remove('loginBg');
-          intro.style.backgroundImage = '';
-          if (typeof window.desenharHeroi === 'function') window.desenharHeroi();
-          if (typeof window.render === 'function') window.render();
+          // v4.17x (pedido do usuario -- fim do sistema de nome/heroi
+          // padrao tirado do email, substituido pelo setup explicito
+          // Personagem + Nome). ANTES (v4.124): sem save local = conta
+          // nova entrava direto com nome tirado do email + heroi idx 0,
+          // salvando na hora -- esse salvar() imediato foi identificado
+          // nesta sessao como METADE da causa raiz do bug critico "nome/
+          // skin voltam pro padrao" (a outra metade era em
+          // criarPersonagem(), corrigida separadamente): se a pessoa
+          // trocasse nome/heroi logo em seguida, os 2 salvar() quase
+          // juntos entravam numa corrida via empurrarNuvem() (assincrono,
+          // sem fila) e o padrao podia vencer na nuvem.
+          //
+          // Agora: NENHUM salvar() aqui. So mostra o setup (2 passos,
+          // Personagem depois Nome -- ver mostrarSetupPersonagemENome(),
+          // bloco "SETUP POS-LOGIN" no <script> principal, alguns
+          // milhares de linhas acima). #intro continua visivel (a UI do
+          // setup mora dentro dele, mesmo container do carrossel/login)
+          // -- so o CONTEUDO interno muda; #intro.off/render() so
+          // acontecem no fim de verdade, dentro do #entrar.onclick do
+          // passo3 (tarefas), que ja existia e nao foi tocado.
+          if (typeof window.mostrarSetupPersonagemENome === 'function'){
+            window.mostrarSetupPersonagemENome();
+          } else {
+            // fallback defensivo, so se por algum motivo o setup nao
+            // carregou -- mantem o app usavel (com heroi padrao) em vez
+            // de travar numa tela em branco
+            if (typeof heroiEscolhido !== 'undefined') heroiEscolhido = 0;
+            if (typeof window.salvar === 'function') window.salvar();
+            intro.classList.add('off');
+            intro.classList.remove('loginBg');
+            intro.style.backgroundImage = '';
+            if (typeof window.desenharHeroi === 'function') window.desenharHeroi();
+            if (typeof window.render === 'function') window.render();
+          }
         }
       }
 
-      // mostra a tela de boas-vindas primeiro -- so ai que entra no app
+      // v4.17x (pedido do usuario -- "nunca achei essa tela boa" + bug
+      // relatado de "tela em cima da outra"): #passoBoasVindas mostrava
+      // "Conta criada! Bem-vindo / <nome tirado do email ou do Google>"
+      // ANTES do setup novo (Personagem/Nome) -- e como
+      // mostrarSetupPersonagemENome() nunca escondia essa tela (so
+      // limpava passo1/passo2/passoHeroi/passo3), ela ficava colada por
+      // baixo da tela de Personagem, formando a sobreposicao reportada.
+      // Alem do bug, essa tela em si e o mesmo sistema de "nome padrao"
+      // que a pessoa pediu pra extinguir: pra conta NOVA no ha mais
+      // saida pra ela, o fluxo vai direto pro setup novo. Pra quem ja
+      // tem save (login de volta) o "Bem-vindo de volta" continua igual
+      // -- ninguem reclamou dessa parte, e ela nao usa nome tirado do
+      // email/Google (nomeConta ali reflete o nome que a pessoa MESMA
+      // escolheu no setup, ja salvo).
       document.getElementById('passoLogin').classList.remove('on');
-      {
+      if (!temSaveLocal){
+        entrarNoApp();
+      } else {
         let en = false;
         try { en = (localStorage.getItem('questlog.idioma.v1') || 'pt') === 'en'; } catch(e){}
-        document.getElementById('boasVindasRotulo').textContent = temSaveLocal
-          ? (en ? 'Welcome back' : 'Bem-vindo de volta')
-          : (en ? 'Account created! Welcome' : 'Conta criada! Bem-vindo');
-      }
-      document.getElementById('boasVindasNome').textContent = nomeConta;
-      document.getElementById('passoBoasVindas').classList.add('on');
+        document.getElementById('boasVindasRotulo').textContent = en ? 'Welcome back' : 'Bem-vindo de volta';
+        document.getElementById('boasVindasNome').textContent = nomeConta;
+        document.getElementById('passoBoasVindas').classList.add('on');
 
-      let jaEntrou = false;
-      function continuar(){
-        if (jaEntrou) return;
-        jaEntrou = true;
-        entrarNoApp();
+        let jaEntrou = false;
+        function continuar(){
+          if (jaEntrou) return;
+          jaEntrou = true;
+          entrarNoApp();
+        }
+        document.getElementById('boasVindasContinuar').onclick = continuar;
       }
-      document.getElementById('boasVindasContinuar').onclick = continuar;
     }
 
     // v4.124 (item 34 do roadmap, achado pos-implementacao): o caminho
@@ -13836,60 +14342,14 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 </script>
 
 <!-- =====================================================================
-     TOPBAR — MUDO DOS EFEITOS SONOROS  —  bloco autonomo
+     MUDO DOS EFEITOS SONOROS — agora dentro de Preferencias
 
-     Primeira versao (mesma sessao) era um botao de texto dentro de
-     Perfil > Config. Pedido de ajuste: cavar ate Perfil > Config so pra
-     mudar um som que incomoda NA HORA nao faz sentido -- moveu pra um
-     icone na topbar, do lado das moedas, sempre visivel em qualquer
-     aba (nao so dentro de Perfil). Substitui a linha de Config por
-     completo -- nao ficou duplicado de proposito (dois controles pro
-     mesmo toggle seria a mesma "inflar a tela" que motivou o pedido
-     de fazer so o mudo em vez do slider de volume completo).
-
-     Cabe na topbar sem estourar (aprendizado da sub-nav do Perfil,
-     secao 6): #nomeTopo tem flex:1 (`.topbar{gap:10px}`, secao de CSS
-     por volta da linha 500), entao ele absorve o espaco do meio e
-     empurra .coins + este botao pro canto direito, colados um no
-     outro -- exatamente onde o usuario pediu ("em cima ali onde
-     mostra as moedas"), sem precisar de layout novo nenhum.
-
-     So MUDO (liga/desliga), nao volume gradual -- mesma decisao de
-     escopo da versao anterior, so mudou de lugar. API ja existia
-     pronta desde a secao 20 (window.sfxAtivo()/window.definirSfxAtivo(bool),
-     persistida em questlog.sfx.v1) -- este bloco e so a UI, de novo.
-
-     Sempre visivel (topbar nao esconde em nenhuma aba), entao nao
-     precisa do padrao de "segundo addEventListener ao abrir sub-aba"
-     que os controles dentro de Perfil > Config sempre precisaram --
-     so pinta uma vez no carregamento da pagina.
+     v4.20x (pedido do usuario): saiu do icone fixo na topbar e virou
+     mais uma linha em Preferencias, mesmo padrao .cfgrow/.swch de
+     #cfgRowFeedback logo abaixo (ver esse bloco pra wiring identico).
+     API nao mudou -- window.sfxAtivo()/window.definirSfxAtivo(bool),
+     persistida em questlog.sfx.v1 (secao 20).
      ===================================================================== -->
-<script>
-(function(){
-  const btn = document.getElementById('topoSomBtn');
-  const icone = document.getElementById('topoSomIcone');
-  if (!btn || !icone) return;
-
-  const SVG_LIGADO = '<path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M15.5 8.5a5 5 0 010 7"/><path d="M18 6a9 9 0 010 12"/>';
-  const SVG_MUDO   = '<path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 9l6 6"/><path d="M22 9l-6 6"/>';
-
-  function atualizar(){
-    const ligado = (typeof window.sfxAtivo === 'function') ? window.sfxAtivo() : true;
-    icone.innerHTML = ligado ? SVG_LIGADO : SVG_MUDO;
-    btn.classList.toggle('mudo', !ligado);
-  }
-
-  btn.onclick = () => {
-    const ligadoAntes = (typeof window.sfxAtivo === 'function') ? window.sfxAtivo() : true;
-    if (typeof window.definirSfxAtivo === 'function') window.definirSfxAtivo(!ligadoAntes);
-    atualizar();
-    // feedback sonoro so ao LIGAR -- ao desligar nao faria sentido tocar nada
-    if (ligadoAntes === false && typeof window.tocarSom === 'function') window.tocarSom('clique');
-  };
-
-  atualizar(); // primeira pintura -- topbar e sempre visivel, nao precisa esperar abrir aba nenhuma
-})();
-</script>
 
 <!-- =====================================================================
      CONFIG — PREFERENCIA DE FEEDBACK NO CLIQUE (SWITCH TATIL)  —  bloco
@@ -13956,6 +14416,40 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   };
 
   window.atualizarBotaoFeedback(); // primeira pintura, mesmo antes de Config abrir pela 1a vez
+})();
+</script>
+
+<!-- =====================================================================
+     CONFIG — PREFERENCIA DE SOM (SWITCH)  —  bloco autonomo, cole antes
+     de </body>
+
+     v4.20x (pedido do usuario): o mudo que vivia como icone fixo na
+     topbar virou uma linha aqui, mesmo padrao/wiring do switch de
+     Feedback logo acima -- so troca a API de dados (window.sfxAtivo()/
+     window.definirSfxAtivo(bool), ja existente desde a secao 20,
+     persistida em questlog.sfx.v1). Nenhuma logica de audio mudou,
+     so a UI que liga/desliga ela.
+     ===================================================================== -->
+<script>
+(function(){
+  const btn = document.getElementById('cfgSomBtn');
+  if (!btn) return;
+
+  window.atualizarBotaoSom = function(){
+    const ligado = (typeof window.sfxAtivo === 'function') ? window.sfxAtivo() : true;
+    btn.classList.toggle('on', ligado);
+    btn.setAttribute('aria-checked', ligado ? 'true' : 'false');
+  };
+
+  btn.onclick = () => {
+    const ligadoAntes = (typeof window.sfxAtivo === 'function') ? window.sfxAtivo() : true;
+    if (typeof window.definirSfxAtivo === 'function') window.definirSfxAtivo(!ligadoAntes);
+    window.atualizarBotaoSom();
+    // feedback sonoro so ao LIGAR -- ao desligar nao faria sentido tocar nada
+    if (ligadoAntes === false && typeof window.tocarSom === 'function') window.tocarSom('clique');
+  };
+
+  window.atualizarBotaoSom(); // primeira pintura, mesmo antes de Config abrir pela 1a vez
 })();
 </script>
 
@@ -14177,8 +14671,10 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'onb.regra1':            { pt:'Cada tarefa concluída é um <b>golpe</b> no monstro do dia.', en:'Every task you complete is a <b>hit</b> on today\'s monster.' },
     'onb.regra2':            { pt:'Quanto mais tarefas você tem, <b>mais forte</b> ele fica.', en:'The more tasks you have, the <b>stronger</b> it gets.' },
     'onb.regra3':            { pt:'Derrote ele e ganhe <b>moedas</b> pra comprar equipamento melhor.', en:'Defeat it and earn <b>coins</b> to buy better gear.' },
+    'onb.personalizacao':    { pt:'Personalização', en:'Personalization' },
     'onb.comoChamar':        { pt:'Como quer ser chamado?', en:'What should we call you?' },
     'onb.placeholderNome':   { pt:'Aventureiro', en:'Adventurer' },
+    'onb.comecarAventura':   { pt:'Começar aventura', en:'Start the adventure' },
     'onb.quemVaiEnfrentar':  { pt:'Quem vai enfrentar os monstros?', en:'Who will face the monsters?' },
     'onb.quaisTarefas':      { pt:'Quais tarefas você quer vencer hoje?', en:'Which tasks do you want to beat today?' },
     'onb.placeholderTarefa': { pt:'Ex: estudar 30 minutos', en:'E.g.: study for 30 minutes' },
@@ -14187,6 +14683,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
     'jogo.vida':             { pt:'Vida', en:'Health' },
     'jogo.experiencia':      { pt:'Experiência', en:'Experience' },
+    'jogo.estagio':          { pt:'Estágio', en:'Stage' },
     'jogo.addTarefa':        { pt:'+ Adicionar', en:'+ Add' },
     'jogo.oQuePrecisaSerFeito': { pt:'O que precisa ser feito?', en:'What needs to be done?' },
     'jogo.soHoje':           { pt:'Só hoje', en:'Today only' },
@@ -14267,6 +14764,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'cfg.paletaDeCores':   { pt:'Paleta de cores do app', en:'App color palette' },
     'cfg.feedbackDeClique':     { pt:'Feedback de clique', en:'Click feedback' },
     'cfg.feedbackDeCliqueDesc': { pt:'Vibração ou som ao tocar em botões', en:'Vibration or sound when tapping buttons' },
+    'cfg.som':     { pt:'Som', en:'Sound' },
+    'cfg.somDesc': { pt:'Efeitos sonoros do jogo', en:'Game sound effects' },
 
     'loja.comprar': { pt:'Comprar', en:'Buy' },
     'loja.vender':  { pt:'Vender', en:'Sell' },

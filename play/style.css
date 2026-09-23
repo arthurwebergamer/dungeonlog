@@ -4864,3 +4864,192 @@
   transition:opacity .22s var(--expo);
 }
 .pjCortina.on{ opacity:1; pointer-events:auto; }
+
+/* ===== Bloco style #NOVO — carrossel de onboarding refeito (v4.17x) =====
+   Pedido do usuario: design minimalista, paleta do tema Grafite (jah e o
+   tema padrao pra quem ainda nao escolheu, ver temaSalvo()), tipografia
+   em escala tipo Play Store (eyebrow pequeno maiusculo -> headline forte
+   -> corpo em cinza) em vez do "titulo fraca/forte" mais decorativo de
+   antes. So overrides + componentes NOVOS (pergunta de categoria, card
+   de progresso, badges de conquista) -- nao mexe na estrutura JS/HTML
+   dos blocos antigos (.carrosselSlide/.carrosselMeio/etc. continuam os
+   mesmos elementos, so o visual muda por cima). Cores hardcoded em
+   grafite (nao var(--accent) etc.) de proposito: o carrossel de
+   onboarding roda ANTES da pessoa escolher tema (ver GRADIENTES_ONBOARD,
+   ja hardcoded do mesmo jeito por decisao anterior), entao usar var()
+   aqui faria o card de pergunta/progresso mudar de cor se a pessoa
+   trocasse de tema DEPOIS -- o onboarding deve continuar visualmente
+   grafite sempre, junto do fundo gradiente que ja e fixo. */
+
+/* ---- escala tipografica (eyebrow / headline / corpo) ---- */
+.obFraca{
+  font-size:11px !important; font-weight:700 !important; letter-spacing:.14em !important;
+  text-transform:uppercase; color:#9A9A9A !important; opacity:1 !important;
+}
+.obForte{
+  font-size:25px !important; font-weight:700 !important; line-height:1.2 !important;
+  letter-spacing:-.01em; color:#FAFAFA !important; margin-top:3px;
+}
+.obCorpo{
+  font-size:14px !important; line-height:1.55 !important; opacity:1 !important;
+  color:#C2C2C2 !important; margin-top:10px !important; max-width:270px;
+}
+
+/* ---- pergunta de categoria (slide Personalizacao) ---- */
+.quizPergunta{
+  font-family:'Outfit',sans-serif; font-size:21px; font-weight:700; line-height:1.25;
+  text-align:center; color:#FAFAFA; margin-top:6px;
+}
+.quizOpcoes{display:flex;flex-direction:column;gap:9px;margin-top:16px;width:100%}
+.quizOpcao{
+  display:flex; align-items:center; gap:12px; width:100%; text-align:left;
+  background:#323232; border:1.5px solid #494949; border-radius:13px; padding:13px 14px;
+  font-family:'Outfit',sans-serif; font-size:14px; color:#FAFAFA; font-weight:500;
+  cursor:pointer; transition:border-color .15s, background .15s;
+}
+.quizOpcao svg{width:19px;height:19px;stroke:#C2C2C2;flex:none}
+.quizOpcao.sel{border-color:#FAFAFA; background:#4A4A4A}
+.quizOpcao.sel svg{stroke:#FAFAFA}
+.quizOpcao .check{
+  margin-left:auto; width:18px; height:18px; border-radius:50%; border:1.5px solid #5C5C5C; flex:none;
+}
+.quizOpcao.sel .check{border-color:#FAFAFA; background:#FAFAFA; position:relative}
+.quizOpcao.sel .check::after{
+  content:''; position:absolute; inset:0; margin:auto; width:8px; height:5px;
+  border-left:2px solid #232323; border-bottom:2px solid #232323;
+  transform:translateY(-1px) rotate(-45deg);
+}
+
+/* ---- card de progresso (slide Sensacao de Progresso) ---- */
+.progressoCard{
+  background:#323232; border:1px solid #494949; border-radius:16px;
+  padding:16px 18px; width:100%; max-width:280px; margin:14px auto 0;
+}
+.progressoTop{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.progressoLvl{font-family:'Silkscreen',monospace;font-size:12px;color:#FAFAFA}
+.progressoPct{font-family:'Outfit',sans-serif;font-size:11.5px;color:#909090}
+.progressoCard .barra{height:8px;border-radius:5px;background:#494949;overflow:hidden}
+.progressoCard .barra i{display:block;height:100%;background:#FAFAFA;border-radius:5px}
+
+/* ---- badges de conquista (slide Conquistas, substitui prova social) ---- */
+.obConquistasRow{display:flex;gap:12px;justify-content:center}
+.obConquistaBadge{
+  width:64px;height:64px;border-radius:16px;background:#323232;
+  border:1px solid #494949;display:flex;align-items:center;justify-content:center;
+}
+.obConquistaBadge svg{width:28px;height:28px;stroke:#FAFAFA}
+.obConquistaBadge.off{opacity:.4}
+.obConquistaBadge.off svg{stroke:#909090}
+
+/* ---- botao primario do onboarding: minimalista, contraste alto ---- */
+.carrosselSlide:not([data-slide="login"]) .primario{
+  background:#FAFAFA !important; color:#1E1E1E !important; border:none !important;
+  border-radius:12px !important; font-weight:600 !important; letter-spacing:.01em;
+}
+
+/* ---- dots minimalistas (ativo vira pilula, resto ponto pequeno) ---- */
+.carrosselDot{width:6px;height:6px;background:#494949}
+.carrosselDot.on{background:#FAFAFA;width:16px;border-radius:3px}
+
+/* ===== Bloco style #NOVO2 — setup pos-login: Personagem + Nome (v4.17x) =====
+   Restyle de #passo2 (Nome) e #passoHeroi (Personagem) pra bater com o
+   visual do carrossel novo (grafite, minimalista, escala tipo Play
+   Store) -- pedido do usuario. Ao contrario do carrossel (que forca
+   grafite hardcoded, roda ANTES de qualquer tema escolhido), estes 2
+   passos usam var(--accent)/var(--panel)/etc. normalmente: rodam DEPOIS
+   do login, quando o tema (padrao Grafite, ver temaSalvo()) ja esta
+   aplicado no :root -- nao precisa hardcode aqui. */
+.setupDots{display:flex;gap:7px;justify-content:center;margin-bottom:22px}
+.setupHeadline{text-align:center;margin-bottom:22px}
+.setupHeadline .obFraca{color:var(--dim) !important}
+.setupLabel{
+  display:block; font-family:'Outfit',sans-serif; font-size:22px !important; font-weight:700 !important;
+  line-height:1.25; color:var(--text) !important; text-align:center; margin-bottom:4px;
+}
+#passo2 .campo, #passoHeroi .campo{align-items:center}
+#passo2, #passoHeroi{justify-content:center}
+#passo2 .primario, #passoHeroi .primario{
+  border-radius:12px; font-weight:600; letter-spacing:.01em;
+}
+
+/* ===== Bloco style #NOVO3 — redesign Personagem/Nome (v4.18x) =====
+   Substitui as regras do #NOVO2 acima que miravam o markup antigo
+   (preview-box fixo #palcoSprite/#palcoNome + grid estatico de 8
+   miniaturas em #passoHeroi; label+input em caixa em #passo2) --
+   removidas porque o HTML foi reescrito (ver index.html). Pedido do
+   usuario: "quero telas completamente novas... design novo da sua
+   criatividade mas diferente". As duas ideias novas:
+   1) #passoHeroi vira um carrossel horizontal de cards com scroll
+      nativo + snap -- arrastar o dedo ESCOLHE o heroi de verdade (ver
+      montarCarrosselHerois() no <script>), sem grid separado.
+   2) #passo2 vira uma "placa de nome": avatar circular do heroi ja
+      escolhido acima de um campo sem caixa, so uma linha embaixo
+      (como assinar uma pergaminho), em vez do input com fundo/borda
+      igual a qualquer outro formulario do app. */
+
+/* ---------- Personagem: carrossel horizontal com snap ---------- */
+.heroiCarrosselWrap{ position:relative; margin:4px -4px 6px; }
+.heroiCarrossel{
+  display:flex; gap:14px; overflow-x:auto; scroll-snap-type:x mandatory;
+  padding:6px 42% 10px; scrollbar-width:none; -ms-overflow-style:none;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 22%,#000 78%,transparent 100%);
+  mask-image:linear-gradient(90deg,transparent 0,#000 22%,#000 78%,transparent 100%);
+}
+.heroiCarrossel::-webkit-scrollbar{display:none}
+.heroiCard{
+  flex:0 0 auto; width:104px; height:104px; scroll-snap-align:center;
+  display:flex; align-items:center; justify-content:center;
+  border-radius:18px; background:var(--panel-2); border:1px solid var(--line);
+  opacity:.4; transform:scale(.82);
+  transition:opacity .22s var(--expo), transform .22s var(--expo), border-color .22s, box-shadow .22s;
+  cursor:pointer;
+}
+.heroiCard img{width:76px;height:76px;image-rendering:pixelated;display:block;pointer-events:none}
+.heroiCard.sel{
+  opacity:1; transform:scale(1); border-color:var(--accent);
+  box-shadow:0 0 0 1px var(--accent), 0 14px 26px -14px rgba(0,0,0,.55);
+}
+.heroiNomeGrande{
+  display:block; text-align:center; margin:2px 0 22px;
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:21px; color:var(--text); letter-spacing:.3px;
+  min-height:26px; /* evita a tela "pular" de layout enquanto o texto troca */
+}
+.heroiSeta{
+  position:absolute; top:50%; transform:translateY(-50%);
+  width:34px; height:34px; border-radius:50%; border:none;
+  background:var(--panel-3); color:var(--text);
+  display:grid; place-items:center; cursor:pointer; z-index:2;
+  transition:background .15s;
+}
+.heroiSeta:hover{background:var(--panel)}
+.heroiSetaEsq{left:-2px}
+.heroiSetaDir{right:-2px}
+
+/* ---------- Nome: placa com avatar do heroi escolhido ---------- */
+.nomeAvatarBadge{
+  width:72px; height:72px; margin:0 auto 18px; border-radius:50%;
+  background:radial-gradient(circle,var(--panel-2) 0%,var(--panel) 100%);
+  border:1px solid var(--line); display:flex; align-items:center; justify-content:center;
+  overflow:hidden;
+}
+.nomeAvatarBadge img{width:52px;height:52px;image-rendering:pixelated;display:block}
+.nomeCampo{align-items:center}
+.nomeInputElegante{
+  width:100%; text-align:center; font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:24px; color:var(--text); background:transparent; border:none;
+  border-bottom:1.5px solid var(--line); border-radius:0; padding:8px 4px 10px; outline:none;
+  transition:border-color .2s;
+}
+.nomeInputElegante::placeholder{color:var(--dim); opacity:.6}
+.nomeInputElegante:focus{border-color:var(--accent)}
+
+/* ===== Bloco style #NOVO4 — espaçamento das barras de status (v4.20x) =====
+   pedido do usuario: espacamento entre Vida/Experiencia/Estagio ficou
+   apertado depois que Estagio virou 3a linha dentro de #statsBarra
+   (.xprow ja tem margin-bottom:6px entre label e barra, mas nao havia
+   nada SEPARANDO um grupo do proximo). So no card de status do topo
+   (id="statsBarra") pra nao mexer no mesmo .xpwrap/.bar reaproveitado
+   em Perfil (.perfilhero ja tem seu proprio ritmo, linha ~1216). */
+#statsBarra .bar{margin-bottom:14px}
+#statsBarra .bar:last-child{margin-bottom:0}

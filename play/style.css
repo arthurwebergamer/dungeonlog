@@ -4864,3 +4864,89 @@
   transition:opacity .22s var(--expo);
 }
 .pjCortina.on{ opacity:1; pointer-events:auto; }
+
+/* ===== Bloco style #NOVO — carrossel de onboarding refeito (v4.17x) =====
+   Pedido do usuario: design minimalista, paleta do tema Grafite (jah e o
+   tema padrao pra quem ainda nao escolheu, ver temaSalvo()), tipografia
+   em escala tipo Play Store (eyebrow pequeno maiusculo -> headline forte
+   -> corpo em cinza) em vez do "titulo fraca/forte" mais decorativo de
+   antes. So overrides + componentes NOVOS (pergunta de categoria, card
+   de progresso, badges de conquista) -- nao mexe na estrutura JS/HTML
+   dos blocos antigos (.carrosselSlide/.carrosselMeio/etc. continuam os
+   mesmos elementos, so o visual muda por cima). Cores hardcoded em
+   grafite (nao var(--accent) etc.) de proposito: o carrossel de
+   onboarding roda ANTES da pessoa escolher tema (ver GRADIENTES_ONBOARD,
+   ja hardcoded do mesmo jeito por decisao anterior), entao usar var()
+   aqui faria o card de pergunta/progresso mudar de cor se a pessoa
+   trocasse de tema DEPOIS -- o onboarding deve continuar visualmente
+   grafite sempre, junto do fundo gradiente que ja e fixo. */
+
+/* ---- escala tipografica (eyebrow / headline / corpo) ---- */
+.obFraca{
+  font-size:11px !important; font-weight:700 !important; letter-spacing:.14em !important;
+  text-transform:uppercase; color:#9A9A9A !important; opacity:1 !important;
+}
+.obForte{
+  font-size:25px !important; font-weight:700 !important; line-height:1.2 !important;
+  letter-spacing:-.01em; color:#FAFAFA !important; margin-top:3px;
+}
+.obCorpo{
+  font-size:14px !important; line-height:1.55 !important; opacity:1 !important;
+  color:#C2C2C2 !important; margin-top:10px !important; max-width:270px;
+}
+
+/* ---- pergunta de categoria (slide Personalizacao) ---- */
+.quizPergunta{
+  font-family:'Outfit',sans-serif; font-size:21px; font-weight:700; line-height:1.25;
+  text-align:center; color:#FAFAFA; margin-top:6px;
+}
+.quizOpcoes{display:flex;flex-direction:column;gap:9px;margin-top:16px;width:100%}
+.quizOpcao{
+  display:flex; align-items:center; gap:12px; width:100%; text-align:left;
+  background:#323232; border:1.5px solid #494949; border-radius:13px; padding:13px 14px;
+  font-family:'Outfit',sans-serif; font-size:14px; color:#FAFAFA; font-weight:500;
+  cursor:pointer; transition:border-color .15s, background .15s;
+}
+.quizOpcao svg{width:19px;height:19px;stroke:#C2C2C2;flex:none}
+.quizOpcao.sel{border-color:#FAFAFA; background:#4A4A4A}
+.quizOpcao.sel svg{stroke:#FAFAFA}
+.quizOpcao .check{
+  margin-left:auto; width:18px; height:18px; border-radius:50%; border:1.5px solid #5C5C5C; flex:none;
+}
+.quizOpcao.sel .check{border-color:#FAFAFA; background:#FAFAFA; position:relative}
+.quizOpcao.sel .check::after{
+  content:''; position:absolute; inset:0; margin:auto; width:8px; height:5px;
+  border-left:2px solid #232323; border-bottom:2px solid #232323;
+  transform:translateY(-1px) rotate(-45deg);
+}
+
+/* ---- card de progresso (slide Sensacao de Progresso) ---- */
+.progressoCard{
+  background:#323232; border:1px solid #494949; border-radius:16px;
+  padding:16px 18px; width:100%; max-width:280px; margin:14px auto 0;
+}
+.progressoTop{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.progressoLvl{font-family:'Silkscreen',monospace;font-size:12px;color:#FAFAFA}
+.progressoPct{font-family:'Outfit',sans-serif;font-size:11.5px;color:#909090}
+.progressoCard .barra{height:8px;border-radius:5px;background:#494949;overflow:hidden}
+.progressoCard .barra i{display:block;height:100%;background:#FAFAFA;border-radius:5px}
+
+/* ---- badges de conquista (slide Conquistas, substitui prova social) ---- */
+.obConquistasRow{display:flex;gap:12px;justify-content:center}
+.obConquistaBadge{
+  width:64px;height:64px;border-radius:16px;background:#323232;
+  border:1px solid #494949;display:flex;align-items:center;justify-content:center;
+}
+.obConquistaBadge svg{width:28px;height:28px;stroke:#FAFAFA}
+.obConquistaBadge.off{opacity:.4}
+.obConquistaBadge.off svg{stroke:#909090}
+
+/* ---- botao primario do onboarding: minimalista, contraste alto ---- */
+.carrosselSlide:not([data-slide="login"]) .primario{
+  background:#FAFAFA !important; color:#1E1E1E !important; border:none !important;
+  border-radius:12px !important; font-weight:600 !important; letter-spacing:.01em;
+}
+
+/* ---- dots minimalistas (ativo vira pilula, resto ponto pequeno) ---- */
+.carrosselDot{width:6px;height:6px;background:#494949}
+.carrosselDot.on{background:#FAFAFA;width:16px;border-radius:3px}

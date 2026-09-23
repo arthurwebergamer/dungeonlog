@@ -4579,6 +4579,37 @@ campoIni.addEventListener('keydown', e => {
   }
 });
 
+// ===== PERSONALIZACAO DO ONBOARDING (v4.17x) =====
+// resposta da pergunta de categoria do carrossel (ver
+// CATEGORIAS_ONBOARDING / htmlQuizPergunta, bloco do carrossel mais
+// acima no arquivo) troca o placeholder de EXEMPLO do campo de 1a
+// tarefa por algo mais relevante pra categoria escolhida. Wrap em cima
+// de mostrarPasso() em vez de editar a funcao original (convencao
+// wrap-not-rewrite ja usada no resto do arquivo) -- so age quando o
+// passo que abre e o 4 (tarefas). Sem categoria salva (pulou a
+// pergunta, ou versao antiga do app sem essa chave ainda) mantem o
+// placeholder estatico original do HTML, sem quebrar nada.
+(function(){
+  const _mostrarPassoOriginalV17x = mostrarPasso;
+  const EXEMPLOS_TAREFA_POR_CATEGORIA = {
+    estudos:  { pt:'Ex: estudar 30 minutos', en:'E.g. study for 30 minutes' },
+    trabalho: { pt:'Ex: responder e-mails pendentes', en:'E.g. reply to pending emails' },
+    rotina:   { pt:'Ex: arrumar o quarto', en:'E.g. tidy up the room' },
+    tudo:     { pt:'Ex: estudar 30 minutos', en:'E.g. study for 30 minutes' }
+  };
+  mostrarPasso = function(n){
+    _mostrarPassoOriginalV17x(n);
+    if (n !== 4) return;
+    let categoria = '';
+    try { categoria = localStorage.getItem('questlog.onboarding.categoria.v1') || ''; } catch(e){}
+    const exemplo = EXEMPLOS_TAREFA_POR_CATEGORIA[categoria];
+    if (!exemplo) return;
+    let idiomaEn = false;
+    try { idiomaEn = localStorage.getItem('questlog.idioma.v1') === 'en'; } catch(e){}
+    campoIni.placeholder = idiomaEn ? exemplo.en : exemplo.pt;
+  };
+})();
+
 document.getElementById('entrar').onclick = () => {
   const pendente = campoIni.value.trim();
   if (pendente){ tarefasIniciais.push(pendente); campoIni.value = ''; }
@@ -11989,7 +12020,22 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // passo2/passoHeroi/passo3 mais abaixo, que ficam intocados no DOM
   // mas nao reparentados no carrossel reduzido). Ultimo slide (estagio)
   // vai direto pro login em vez de continuar a numeracao.
-  const SLIDES = [
+  // v4.17x (pedido do usuario -- "refazer o carrossel inicial"):
+  // reconstrucao completa dos slides seguindo os 5 elementos de
+  // onboarding que convertem (referencia: reel @gabrielbuzzi "5
+  // elementos que seu onboarding precisa pra converter"): 1) Dor e
+  // Promessa, 2) Personalizacao, 3) Sensacao de Progresso, 4) Prova
+  // Social, 5) Aha Moment. Prova social virou "Conquistas" -- o app
+  // ainda nao tem usuario real/depoimento pra mostrar, entao o gancho
+  // vira o sistema de conquistas (real, ja existe no jogo) em vez de
+  // inventar depoimento falso. Estrutura antiga (logo/golpeAnim/
+  // bauAnim/estagioAnim) comentada abaixo por convencao wrap-not-
+  // rewrite, nao apagada.
+  //   1 dor-e-promessa (monstro) · 2 personalizacao (pergunta de
+  //   categoria, ver htmlQuizPergunta) · 3 progresso (heroi + card de
+  //   XP) · 4 conquistas (badges) · 5 aha-moment (golpeAnim, mesma
+  //   demo de combate de antes, agora no fim como fechamento)
+  /* const SLIDES = [
     { dataSlide:1, next:2, tipo:'logo',
       fraca:'Bem-vindo ao', fraca_en:'Welcome to',
       titulo:'DungeonLog', titulo_en:'DungeonLog',
@@ -12012,11 +12058,41 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       texto:'A masmorra muda de cara conforme você progride — cada estágio é um cenário diferente.',
       texto_en:'The dungeon changes as you progress — each stage is a different scenery.',
       botao:'Vamos lá', botao_en:'Let\'s go', layout:'mockupExato' }
+  ]; */
+  const SLIDES = [
+    { dataSlide:1, next:2, tipo:'monstro', idx:1,
+      fraca:'Chega de tarefa esquecida', fraca_en:'No more forgotten tasks',
+      titulo:'Suas tarefas viram uma masmorra pra vencer', titulo_en:'Your tasks become a dungeon to beat',
+      texto:'Cada pendência é um monstro parado no seu caminho. Complete a tarefa, derrote o monstro.',
+      texto_en:'Every pending task is a monster blocking your way. Finish it, defeat the monster.',
+      botao:'Começar', botao_en:'Get started', layout:'mockupExato' },
+    { dataSlide:2, next:3, tipo:'quizCategoria',
+      fraca:'Personalização', fraca_en:'Personalization',
+      titulo:'O que você mais quer organizar?', titulo_en:'What do you want to organize most?',
+      botao:'Continuar', botao_en:'Continue', layout:'quizPergunta' },
+    { dataSlide:3, next:4, tipo:'heroi', idx:1,
+      fraca:'Todo dia um pouco mais forte', fraca_en:'A little stronger every day',
+      titulo:'Veja seu herói evoluir a cada tarefa', titulo_en:'Watch your hero level up with every task',
+      texto:'XP, níveis e cenários novos conforme você avança nos estágios.',
+      texto_en:'XP, levels and new scenery as you advance through stages.',
+      botao:'Continuar', botao_en:'Continue', layout:'progressoPreview' },
+    { dataSlide:4, next:5, tipo:'conquistasPreview',
+      fraca:'Recompensas por consistência', fraca_en:'Rewards for consistency',
+      titulo:'Desbloqueie conquistas conforme joga', titulo_en:'Unlock achievements as you play',
+      texto:'Streaks, marcos e itens raros — cada conquista fica guardada no seu perfil.',
+      texto_en:'Streaks, milestones and rare items — every achievement is saved to your profile.',
+      botao:'Continuar', botao_en:'Continue', layout:'mockupExato' },
+    { dataSlide:5, next:'login', tipo:'golpeAnim', idx:22,
+      fraca:'É rápido assim', fraca_en:'It\'s this quick',
+      titulo:'Marcou como feito. Golpe certeiro.', titulo_en:'Marked as done. Direct hit.',
+      texto:'Essa é a sensação toda vez que você fecha uma tarefa. Bora começar?',
+      texto_en:'That\'s the feeling every time you finish a task. Let\'s go?',
+      botao:'Criar minha conta', botao_en:'Create my account', layout:'mockupExato' }
   ];
-  const SLIDE_TRANSICAO = 5; // slide removido do carrossel reduzido -- nunca mais bate (numero fora do range 1-4), guarda fica inofensiva
-  const SLIDE_NOME = 6; // idem -- slide removido, guarda fica inofensiva
-  const TOTAL_SLIDES = 4;
-  const SLIDE_GOLPE = 2; // usado pra ligar/desligar o ciclo de animacao do golpe (ver iniciarCicloGolpe, mais abaixo)
+  const SLIDE_TRANSICAO = 6; // slide removido do carrossel reduzido -- nunca mais bate (numero fora do range 1-5), guarda fica inofensiva
+  const SLIDE_NOME = 7; // idem -- slide removido, guarda fica inofensiva
+  const TOTAL_SLIDES = 5;
+  const SLIDE_GOLPE = 5; // usado pra ligar/desligar o ciclo de animacao do golpe (ver iniciarCicloGolpe, mais abaixo) -- golpeAnim agora e o Aha Moment, ultimo slide antes do login
 
   // item 46 do roadmap: idioma lido direto do localStorage (mesmo padrao
   // ja usado no resto do arquivo -- item()/aplicarIdiomaDados()/
@@ -12086,6 +12162,28 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         '<div class="obBauImg"></div>' +
         '<div class="bauitens obBauItens">' + bauItem(item(0)) + bauItem(item(31)) + '</div>' +
       '</div>';
+    }
+    if (s.tipo === 'quizCategoria'){
+      // sem imagem -- o corpo inteiro (pergunta + opcoes) e montado
+      // direto em htmlQuizPergunta(), ver layout 'quizPergunta' mais
+      // abaixo na composicao de `corpo`.
+      return '';
+    }
+    if (s.tipo === 'conquistasPreview'){
+      // v4.17x: substitui prova social (o app nao tem usuario real/
+      // depoimento ainda pra mostrar, entao nao inventa -- usa o
+      // sistema de conquistas de verdade, que ja existe no jogo, como
+      // gancho). 3 badges simples (vetor, nao sprite -- conquista nao
+      // tem uma imagem "dona" no app como monstro/heroi tem), a
+      // terceira apagada (bloqueada) pra sugerir progressao.
+      const ICONE_TROFEU = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z"/></svg>';
+      const ICONE_ESTRELA = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3 7h7l-5.6 4.3L18.4 21 12 16.8 5.6 21l2-7.7L2 9h7z"/></svg>';
+      const ICONE_CADEADO = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>';
+      return '<div class="carrosselImgWrap obConquistasRow">' +
+        '<div class="obConquistaBadge">' + ICONE_TROFEU + '</div>' +
+        '<div class="obConquistaBadge">' + ICONE_ESTRELA + '</div>' +
+        '<div class="obConquistaBadge off">' + ICONE_CADEADO + '</div>' +
+        '</div>';
     }
     if (s.tipo === 'trioLogo'){
       // composicao escalonada igual a foto de referencia: sprite do
@@ -12172,6 +12270,49 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     </div>
   `;
 
+  // v4.17x (item "personalizacao" do novo carrossel): pergunta de
+  // categoria no slide 2 -- resposta salva em localStorage e reaproveitada
+  // depois pra trocar o placeholder de exemplo do campo de 1a tarefa
+  // (ver #primeiraTarefa / mostrarPasso(4), mais abaixo no arquivo,
+  // bloco "PERSONALIZACAO DO ONBOARDING"). Nao bloqueia o Continuar
+  // sem escolha -- se a pessoa nao selecionar nada, o placeholder so
+  // fica no exemplo generico de sempre.
+  const CHAVE_CATEGORIA_ONBOARDING = 'questlog.onboarding.categoria.v1';
+  const CATEGORIAS_ONBOARDING = [
+    { id:'estudos', label:'Estudos', label_en:'Study',
+      icone:'<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>' },
+    { id:'trabalho', label:'Trabalho', label_en:'Work',
+      icone:'<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>' },
+    { id:'rotina', label:'Rotina pessoal', label_en:'Personal routine',
+      icone:'<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>' },
+    { id:'tudo', label:'Um pouco de tudo', label_en:'A bit of everything',
+      icone:'<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>' }
+  ];
+  function categoriaOnboardingSalva(){
+    try { return localStorage.getItem(CHAVE_CATEGORIA_ONBOARDING) || ''; } catch(e){ return ''; }
+  }
+  function htmlQuizPergunta(s){
+    const selecionada = categoriaOnboardingSalva();
+    const opcoes = CATEGORIAS_ONBOARDING.map(c => `
+      <button type="button" class="quizOpcao${c.id === selecionada ? ' sel' : ''}" data-cat="${c.id}">
+        ${c.icone}<span>${txtSlide(c, 'label')}</span><span class="check"></span>
+      </button>`).join('');
+    return `
+      <div class="obHeadline"><span class="obFraca">${txtSlide(s, 'fraca')}</span></div>
+      <div class="quizPergunta">${txtSlide(s, 'titulo')}</div>
+      <div class="quizOpcoes" id="quizOpcoesCategoria">${opcoes}</div>`;
+  }
+  // preview de progresso (slide 3) -- numeros fixos de demonstracao, nao
+  // le XP/nivel real da conta (esse slide roda ANTES da conta existir).
+  function htmlProgressoPreview(){
+    const nivelLbl = CARROSSEL_EN ? 'LEVEL 4' : 'NÍVEL 4';
+    return `
+      <div class="progressoCard">
+        <div class="progressoTop"><span class="progressoLvl">${nivelLbl}</span><span class="progressoPct">640 / 1000 XP</span></div>
+        <div class="barra"><i style="width:64%"></i></div>
+      </div>`;
+  }
+
   const htmlSlides = SLIDES.map((s, i) => {
     const blocoImagem = imagemSlide(s);
     const blocoMarca = `
@@ -12208,6 +12349,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
                 : s.layout === 'idiomaEscolha' ? (blocoMarca + htmlIdiomaEscolha)
                 : s.layout === 'mockupExato' ? (blocoImagem + blocoHeadlineMockup + '<p class="obCorpo">' + txtSlide(s, 'texto') + '</p>')
                 : s.layout === 'mockupExatoSemCorpo' ? (blocoImagem + blocoHeadlineMockup)
+                : s.layout === 'quizPergunta' ? htmlQuizPergunta(s)
+                : s.layout === 'progressoPreview' ? (blocoImagem + blocoHeadlineMockup + htmlProgressoPreview() + '<p class="obCorpo">' + txtSlide(s, 'texto') + '</p>')
                 : (blocoImagem + blocoMarca); // 'imagemPrimeiro' e fallback
 
     return `
@@ -12346,10 +12489,21 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // proprio #intro por cima (mesmo elemento que pintarParede() usa) o
   // gradiente cobre 100% da tela, sem sobra. Sem tile (so gradiente
   // liso) pra bater com o mockup aprovado.
+  // v4.17x: paleta trocada pra tons de grafite (grayscale), a pedido do
+  // usuario ("cores do tema grafite, design minimalista") -- antes eram
+  // roxo/dourado fixos (hex literal, nao var() -- ver comentario acima),
+  // sem ligacao com o tema de verdade. Continua hex literal de proposito
+  // (mesmo motivo de antes: sem crossfade se fosse var() lido 1x), so
+  // que agora as 5 entradas usam a MESMA dupla de tons (bem sutil,
+  // minimalista) em vez de 1 cor por slide -- o grafite e a paleta
+  // padrao do onboarding (temaSalvo() ja default 'grafite'), entao nao
+  // faz sentido variar hue por slide como fazia com o tema antigo.
   const GRADIENTES_ONBOARD = {
-    1: 'linear-gradient(160deg,#251E38 0%,#1A1526 100%)',
-    2: 'linear-gradient(160deg,#2C2444 0%,#1A1526 100%)',
-    3: 'linear-gradient(160deg,#3A2F16 0%,#1F1A0C 100%)'
+    1: 'linear-gradient(160deg,#333333 0%,#1E1E1E 100%)',
+    2: 'linear-gradient(160deg,#323232 0%,#1E1E1E 100%)',
+    3: 'linear-gradient(160deg,#323232 0%,#1E1E1E 100%)',
+    4: 'linear-gradient(160deg,#323232 0%,#1E1E1E 100%)',
+    5: 'linear-gradient(160deg,#333333 0%,#1E1E1E 100%)'
   };
   // slide estagio identificado pelo tipo (nao hardcoded), assim continua
   // certo se a ordem/numero dos slides mudar de novo no futuro.
@@ -12617,6 +12771,21 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   SLIDES.forEach(s => {
     const btn = document.getElementById('carrosselBtn' + s.dataSlide);
     if (btn) btn.onclick = () => (s.next === 'login' ? irParaLogin() : irPara(s.next));
+  });
+
+  // v4.17x: clique numa opcao da pergunta de categoria (slide
+  // Personalizacao) -- delegacao no palco inteiro porque as opcoes
+  // nascem dentro do HTML gerado por htmlQuizPergunta(), nao tem onclick
+  // individual. So marca visualmente + salva; nao bloqueia nem exige
+  // escolha pra continuar (ver comentario acima de CATEGORIAS_ONBOARDING).
+  palco.addEventListener('click', (e) => {
+    const opcao = e.target.closest('.quizOpcao');
+    if (!opcao) return;
+    const grupo = opcao.closest('.quizOpcoes');
+    if (grupo) grupo.querySelectorAll('.quizOpcao').forEach(el => el.classList.remove('sel'));
+    opcao.classList.add('sel');
+    try { localStorage.setItem(CHAVE_CATEGORIA_ONBOARDING, opcao.dataset.cat); } catch(e){}
+    if (typeof window.feedbackClique === 'function') window.feedbackClique('clique', 10);
   });
 
   document.getElementById('carrosselVoltar').onclick = () => {
@@ -12899,7 +13068,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
   ['idiomaBtn','temaMiniBtn','loginEsqueci','loginEntrarBtn','loginGoogleBtn',
    'loginContinuarSemConta','boasVindasContinuar',
-   'carrosselBtn1','carrosselBtn2','carrosselBtn3','carrosselBtn4',
+   'carrosselBtn1','carrosselBtn2','carrosselBtn3','carrosselBtn4','carrosselBtn5',
    'carrosselVoltar','carrosselEntrarLink'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.addEventListener('click', () => window.feedbackClique('clique', 10));

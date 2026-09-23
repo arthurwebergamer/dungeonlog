@@ -4728,13 +4728,27 @@ function selecionarHeroiCarrossel(i, suave){
       if (!track.children.length) return;
       const rect = track.getBoundingClientRect();
       const centro = rect.left + rect.width / 2;
-      let melhorIdx = heroiEscolhido, melhorDist = Infinity;
+      let melhorIdx = heroiEscolhido, melhorDist = Infinity, distAtual = Infinity;
       Array.from(track.children).forEach((el, idx) => {
         const r = el.getBoundingClientRect();
         const dist = Math.abs((r.left + r.width / 2) - centro);
+        if (idx === heroiEscolhido) distAtual = dist;
         if (dist < melhorDist){ melhorDist = dist; melhorIdx = idx; }
       });
-      if (melhorIdx !== heroiEscolhido){
+      // v4.18x FIX (bug relatado pelo usuario com print/video -- "o texto
+      // meio que buga" durante o arrasto): SEM essa margem, quando o dedo
+      // para bem no meio do caminho entre 2 cards, a distancia dos 2 ao
+      // centro fica quase identica -- o jitter de sub-pixel que o
+      // proprio scroll nativo gera a cada frame (mesmo com o dedo
+      // "parado") fazia o "mais perto" trocar de lado a cada rAF, e o
+      // nome embaixo piscava entre os 2 herois varias vezes por segundo
+      // (confirmado extraindo os frames do video -- Loiro/Cinza alternando
+      // repetidas vezes antes de estabilizar). So troca de selecao quando
+      // o novo card estiver visivelmente mais perto do centro que o atual
+      // (nao so por 1-2px de ruido) -- movimento de verdade continua
+      // instantaneo, so o "empate" no meio do caminho para de piscar.
+      const MARGEM_HISTERESE = 10; // px
+      if (melhorIdx !== heroiEscolhido && melhorDist < distAtual - MARGEM_HISTERESE){
         heroiEscolhido = melhorIdx;
         Array.from(track.children).forEach((el, idx) => el.classList.toggle('sel', idx === melhorIdx));
         atualizarNomeCarrosselHerois();

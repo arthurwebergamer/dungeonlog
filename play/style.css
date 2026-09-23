@@ -4967,13 +4967,79 @@
   line-height:1.25; color:var(--text) !important; text-align:center; margin-bottom:4px;
 }
 #passo2 .campo, #passoHeroi .campo{align-items:center}
-#passo2 .campo input{
-  text-align:center; font-size:16px; padding:14px; border-radius:12px;
-  background:var(--panel); border:1.5px solid var(--line);
-}
-#passo2 .campo input:focus{border-color:var(--accent)}
-#passoHeroi .grade{margin-top:4px}
 #passo2, #passoHeroi{justify-content:center}
 #passo2 .primario, #passoHeroi .primario{
   border-radius:12px; font-weight:600; letter-spacing:.01em;
 }
+
+/* ===== Bloco style #NOVO3 — redesign Personagem/Nome (v4.18x) =====
+   Substitui as regras do #NOVO2 acima que miravam o markup antigo
+   (preview-box fixo #palcoSprite/#palcoNome + grid estatico de 8
+   miniaturas em #passoHeroi; label+input em caixa em #passo2) --
+   removidas porque o HTML foi reescrito (ver index.html). Pedido do
+   usuario: "quero telas completamente novas... design novo da sua
+   criatividade mas diferente". As duas ideias novas:
+   1) #passoHeroi vira um carrossel horizontal de cards com scroll
+      nativo + snap -- arrastar o dedo ESCOLHE o heroi de verdade (ver
+      montarCarrosselHerois() no <script>), sem grid separado.
+   2) #passo2 vira uma "placa de nome": avatar circular do heroi ja
+      escolhido acima de um campo sem caixa, so uma linha embaixo
+      (como assinar uma pergaminho), em vez do input com fundo/borda
+      igual a qualquer outro formulario do app. */
+
+/* ---------- Personagem: carrossel horizontal com snap ---------- */
+.heroiCarrosselWrap{ position:relative; margin:4px -4px 6px; }
+.heroiCarrossel{
+  display:flex; gap:14px; overflow-x:auto; scroll-snap-type:x mandatory;
+  padding:6px 42% 10px; scrollbar-width:none; -ms-overflow-style:none;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 22%,#000 78%,transparent 100%);
+  mask-image:linear-gradient(90deg,transparent 0,#000 22%,#000 78%,transparent 100%);
+}
+.heroiCarrossel::-webkit-scrollbar{display:none}
+.heroiCard{
+  flex:0 0 auto; width:104px; height:104px; scroll-snap-align:center;
+  display:flex; align-items:center; justify-content:center;
+  border-radius:18px; background:var(--panel-2); border:1px solid var(--line);
+  opacity:.4; transform:scale(.82);
+  transition:opacity .22s var(--expo), transform .22s var(--expo), border-color .22s, box-shadow .22s;
+  cursor:pointer;
+}
+.heroiCard img{width:76px;height:76px;image-rendering:pixelated;display:block;pointer-events:none}
+.heroiCard.sel{
+  opacity:1; transform:scale(1); border-color:var(--accent);
+  box-shadow:0 0 0 1px var(--accent), 0 14px 26px -14px rgba(0,0,0,.55);
+}
+.heroiNomeGrande{
+  display:block; text-align:center; margin:2px 0 22px;
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:21px; color:var(--text); letter-spacing:.3px;
+  min-height:26px; /* evita a tela "pular" de layout enquanto o texto troca */
+}
+.heroiSeta{
+  position:absolute; top:50%; transform:translateY(-50%);
+  width:34px; height:34px; border-radius:50%; border:none;
+  background:var(--panel-3); color:var(--text);
+  display:grid; place-items:center; cursor:pointer; z-index:2;
+  transition:background .15s;
+}
+.heroiSeta:hover{background:var(--panel)}
+.heroiSetaEsq{left:-2px}
+.heroiSetaDir{right:-2px}
+
+/* ---------- Nome: placa com avatar do heroi escolhido ---------- */
+.nomeAvatarBadge{
+  width:72px; height:72px; margin:0 auto 18px; border-radius:50%;
+  background:radial-gradient(circle,var(--panel-2) 0%,var(--panel) 100%);
+  border:1px solid var(--line); display:flex; align-items:center; justify-content:center;
+  overflow:hidden;
+}
+.nomeAvatarBadge img{width:52px;height:52px;image-rendering:pixelated;display:block}
+.nomeCampo{align-items:center}
+.nomeInputElegante{
+  width:100%; text-align:center; font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:24px; color:var(--text); background:transparent; border:none;
+  border-bottom:1.5px solid var(--line); border-radius:0; padding:8px 4px 10px; outline:none;
+  transition:border-color .2s;
+}
+.nomeInputElegante::placeholder{color:var(--dim); opacity:.6}
+.nomeInputElegante:focus{border-color:var(--accent)}

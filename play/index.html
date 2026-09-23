@@ -136,16 +136,36 @@
          estaticos originais destes botoes (irEscolha/irPasso3/voltar1/
          voltarNome, alguns paragrafos abaixo) ficam mortos, sobrescritos
          em runtime, por convencao wrap-not-rewrite. -->
+    <!-- v4.18x (pedido do usuario -- "quero telas completamente novas" +
+         "design novo da sua criatividade mas diferente"): markup
+         reescrito do zero pras 2 telas do setup pos-login. #passoHeroi
+         trocou o preview-box fixo + grid estatico de 8 miniaturas por um
+         carrossel horizontal com scroll nativo + snap (heroiCarrossel,
+         ver CSS "#NOVO3" e as funcoes montarCarrosselHerois()/
+         selecionarHeroiCarrossel() mais abaixo) -- arrastar o dedo TROCA
+         o heroi de verdade, sem reimplementar fisica de drag em JS.
+         #passo2 trocou o label+input em caixa por uma "placa de nome"
+         com o avatar do heroi ja escolhido acima do campo, texto do
+         botao mudou pra refletir que agora e o ULTIMO passo (ver
+         mostrarSetupPersonagemENome() -- Nome nao leva mais pra tela de
+         tarefas, entra direto no app). IDs que o JS ja usava
+         (nomeHeroi, gradeHerois, heroiAnterior/Proximo, irEscolha/
+         irPasso3/voltar1/voltarNome) foram MANTIDOS de proposito, so o
+         conteudo interno mudou -- os handlers ja existentes continuam
+         funcionando. -->
     <div class="passo" id="passo2">
       <div class="setupDots"><span class="carrosselDot"></span><span class="carrosselDot on"></span></div>
       <div class="obHeadline setupHeadline">
         <span class="obFraca" data-i18n="onb.personalizacao">Personalização</span>
       </div>
-      <div class="campo">
+
+      <div class="nomeAvatarBadge" id="nomeAvatarBadge"></div>
+
+      <div class="campo nomeCampo">
         <label class="setupLabel" data-i18n="onb.comoChamar">Como quer ser chamado?</label>
-        <input id="nomeHeroi" placeholder="Aventureiro" data-i18n-placeholder="onb.placeholderNome" maxlength="18" autocomplete="off">
+        <input id="nomeHeroi" class="nomeInputElegante" placeholder="Aventureiro" data-i18n-placeholder="onb.placeholderNome" maxlength="18" autocomplete="off">
       </div>
-      <button class="primario" id="irEscolha" data-i18n="acao.continuar">Continuar</button>
+      <button class="primario" id="irEscolha" data-i18n="onb.comecarAventura">Começar aventura</button>
       <button class="secundario" id="voltar1" data-i18n="acao.voltar">Voltar</button>
     </div>
 
@@ -158,21 +178,16 @@
         <label class="setupLabel" data-i18n="onb.quemVaiEnfrentar">Quem vai enfrentar os monstros?</label>
       </div>
 
-      <div class="palcoNav">
-        <button class="palcoSeta" id="heroiAnterior" aria-label="Herói anterior">
+      <div class="heroiCarrosselWrap">
+        <button class="heroiSeta heroiSetaEsq" id="heroiAnterior" aria-label="Herói anterior">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
         </button>
-        <div class="palco">
-          <div class="palco-sprite" id="palcoSprite"></div>
-          <div class="palco-sombra"></div>
-          <span class="palco-nome" id="palcoNome"></span>
-        </div>
-        <button class="palcoSeta" id="heroiProximo" aria-label="Próximo herói">
+        <div class="heroiCarrossel" id="gradeHerois"></div>
+        <button class="heroiSeta heroiSetaDir" id="heroiProximo" aria-label="Próximo herói">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
         </button>
       </div>
-
-      <div class="grade" id="gradeHerois"></div>
+      <span class="heroiNomeGrande" id="heroiNomeGrande"></span>
 
       <button class="primario" id="irPasso3" data-i18n="acao.continuar">Continuar</button>
       <button class="secundario" id="voltarNome" data-i18n="acao.voltar">Voltar</button>
@@ -4638,6 +4653,96 @@ campoNomeIni.addEventListener('keydown', e => {
 // passo3 (#entrar.onclick, ja existente, intocado), depois que
 // nome+heroi+1a tarefa ja estao TODOS definidos -- um unico save, com
 // o dado final, sem intermediario de valor padrao.
+// v4.18x (pedido do usuario -- "quero telas completamente novas... design
+// novo da sua criatividade mas diferente"): carrossel horizontal de
+// heroi pra #passoHeroi, no lugar do preview-box fixo (#palcoSprite/
+// #palcoNome) + grid estatico de 8 miniaturas que existiam antes.
+// Reaproveita #gradeHerois (mesmo id, agora com CSS/estrutura de
+// carrossel -- ver ".heroiCarrossel" no style.css) e os botoes
+// heroiAnterior/heroiProximo ja existentes no HTML.
+//
+// Decisao de implementacao: SCROLL NATIVO com scroll-snap-type (CSS)
+// em vez de reimplementar arrastar/soltar em JS -- o navegador ja cuida
+// de inercia, elasticidade nas pontas e acessibilidade de teclado de
+// graca. O unico trabalho daqui e: 1) montar os cards, 2) descobrir
+// qual card esta mais perto do centro durante o scroll (pra sincronizar
+// heroiEscolhido com o que a pessoa esta vendo), 3) rolar ate um card
+// quando clicado ou quando as setas sao usadas.
+function montarCarrosselHerois(){
+  const track = document.getElementById('gradeHerois');
+  if (!track || typeof HEROIS === 'undefined') return;
+  track.innerHTML = '';
+  HEROIS.forEach((hh, i) => {
+    const card = document.createElement('div');
+    // ".opcao" mantida de proposito -- e a classe que o bloco de
+    // feedback haptico (secao "SFX/VIBRACAO", delegacao em #gradeHerois
+    // mais abaixo no arquivo) usa pra saber que foi um card de heroi
+    // que recebeu o clique. Sem ela o toque para de vibrar, silenciosamente.
+    card.className = 'heroiCard opcao' + (i === heroiEscolhido ? ' sel' : '');
+    card.dataset.idx = i;
+    card.innerHTML = '<img src="' + hh.img + '" alt="' + hh.nome + '">';
+    card.onclick = () => selecionarHeroiCarrossel(i, true);
+    track.appendChild(card);
+  });
+  atualizarNomeCarrosselHerois();
+  // centraliza o card ja selecionado sem animar (1a montagem -- um scroll
+  // suave aqui pareceria a tela "escorregando" sozinha ao abrir)
+  requestAnimationFrame(() => rolarAteHeroi(heroiEscolhido, false));
+}
+window.montarCarrosselHerois = montarCarrosselHerois;
+
+function atualizarNomeCarrosselHerois(){
+  const el = document.getElementById('heroiNomeGrande');
+  if (el && typeof HEROIS !== 'undefined' && HEROIS[heroiEscolhido]) el.textContent = HEROIS[heroiEscolhido].nome;
+}
+
+function rolarAteHeroi(i, suave){
+  const track = document.getElementById('gradeHerois');
+  const card = track && track.children[i];
+  if (!card) return;
+  card.scrollIntoView({ behavior: suave ? 'smooth' : 'auto', inline: 'center', block: 'nearest' });
+}
+
+function selecionarHeroiCarrossel(i, suave){
+  heroiEscolhido = i;
+  document.querySelectorAll('#gradeHerois .heroiCard').forEach((el, idx) => {
+    el.classList.toggle('sel', idx === i);
+  });
+  atualizarNomeCarrosselHerois();
+  rolarAteHeroi(i, suave);
+}
+
+// arrastar o dedo (scroll nativo) muda a posicao visual sem passar pelos
+// clicks acima -- esse listener descobre qual card ficou mais perto do
+// centro do carrossel a cada frame de scroll e sincroniza heroiEscolhido
+// com o que a pessoa esta vendo de verdade. rAF-throttled pra nao rodar
+// getBoundingClientRect em cada pixel de scroll.
+(function(){
+  let scrollRaf = null;
+  const track = document.getElementById('gradeHerois');
+  if (!track) return;
+  track.addEventListener('scroll', () => {
+    if (scrollRaf) return;
+    scrollRaf = requestAnimationFrame(() => {
+      scrollRaf = null;
+      if (!track.children.length) return;
+      const rect = track.getBoundingClientRect();
+      const centro = rect.left + rect.width / 2;
+      let melhorIdx = heroiEscolhido, melhorDist = Infinity;
+      Array.from(track.children).forEach((el, idx) => {
+        const r = el.getBoundingClientRect();
+        const dist = Math.abs((r.left + r.width / 2) - centro);
+        if (dist < melhorDist){ melhorDist = dist; melhorIdx = idx; }
+      });
+      if (melhorIdx !== heroiEscolhido){
+        heroiEscolhido = melhorIdx;
+        Array.from(track.children).forEach((el, idx) => el.classList.toggle('sel', idx === melhorIdx));
+        atualizarNomeCarrosselHerois();
+      }
+    });
+  }, { passive: true });
+})();
+
 function mostrarSetupPersonagemENome(){
   const elPersonagem = document.getElementById('passoHeroi');
   const elNome = document.getElementById('passo2');
@@ -4668,9 +4773,20 @@ function mostrarSetupPersonagemENome(){
   const dotsCarrosselAntigo = document.getElementById('carrosselDots');
   if (dotsCarrosselAntigo) dotsCarrosselAntigo.classList.add('oculto');
 
-  heroiEscolhido = 0; // ponto de partida -- a pessoa escolhe na grade
-  if (typeof montarGrade === 'function') montarGrade();
+  heroiEscolhido = 0; // ponto de partida -- a pessoa escolhe no carrossel
+  montarCarrosselHerois();
   elPersonagem.classList.add('on');
+
+  // heroiAnterior/heroiProximo ja tinham onclick (linha ~4566, feito pra
+  // #palcoSprite/pintarEscolha() -- markup antigo). Sobrescreve aqui pro
+  // carrossel novo, mesma convencao wrap-not-rewrite usada no resto do
+  // arquivo (ultima atribuicao no load vence).
+  document.getElementById('heroiAnterior').onclick = () => {
+    selecionarHeroiCarrossel(Math.max(0, heroiEscolhido - 1), true);
+  };
+  document.getElementById('heroiProximo').onclick = () => {
+    selecionarHeroiCarrossel(Math.min(HEROIS.length - 1, heroiEscolhido + 1), true);
+  };
 
   // Personagem e o 1o passo do fluxo novo -- sem seta de voltar, mesma
   // convencao ja usada no slide 1 do carrossel (nada antes dele nessa
@@ -4680,6 +4796,13 @@ function mostrarSetupPersonagemENome(){
 
   document.getElementById('irPasso3').onclick = () => {
     if (typeof desenharHeroi === 'function') desenharHeroi();
+    // avatar da placa de nome -- mostra o heroi que acabou de ser
+    // escolhido, pra a etapa de Nome nao parecer desconectada da
+    // escolha anterior (era so um label+input generico antes).
+    const badge = document.getElementById('nomeAvatarBadge');
+    if (badge && typeof HEROIS !== 'undefined' && HEROIS[heroiEscolhido]){
+      badge.innerHTML = '<img src="' + HEROIS[heroiEscolhido].img + '" alt="">';
+    }
     elPersonagem.classList.remove('on');
     elNome.classList.add('on');
   };
@@ -4694,8 +4817,16 @@ function mostrarSetupPersonagemENome(){
       return;
     }
     nomeHeroi = n; // let top-level, visivel entre scripts classic -- mesma variavel que salvar()/render() usam
-    elNome.classList.remove('on');
-    mostrarPasso(4); // passo3 (tarefas) -- fluxo ja existente, sem mudanca nenhuma
+
+    // v4.17x (pedido do usuario): Nome agora e o ULTIMO passo do setup --
+    // sem etapa de "adicionar tarefas" no meio, entra direto no app.
+    // Mesma logica de finalizacao que o handler de #entrar (passo3) usava
+    // -- so sem exigir tarefa nenhuma aqui (tarefasIniciais fica vazio,
+    // dado que a etapa nem aparece mais; a pessoa adiciona depois, ja
+    // dentro do app, pelo "+Adicionar" que ja existe la).
+    jaComecou = true;
+    document.getElementById('intro').classList.add('off');
+    render();
   };
 
   document.getElementById('voltar1').onclick = () => {
@@ -14509,6 +14640,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'onb.personalizacao':    { pt:'Personalização', en:'Personalization' },
     'onb.comoChamar':        { pt:'Como quer ser chamado?', en:'What should we call you?' },
     'onb.placeholderNome':   { pt:'Aventureiro', en:'Adventurer' },
+    'onb.comecarAventura':   { pt:'Começar aventura', en:'Start the adventure' },
     'onb.quemVaiEnfrentar':  { pt:'Quem vai enfrentar os monstros?', en:'Who will face the monsters?' },
     'onb.quaisTarefas':      { pt:'Quais tarefas você quer vencer hoje?', en:'Which tasks do you want to beat today?' },
     'onb.placeholderTarefa': { pt:'Ex: estudar 30 minutos', en:'E.g.: study for 30 minutes' },

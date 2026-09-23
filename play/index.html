@@ -213,10 +213,15 @@
          textContent nele direto, linha ~3492 -- por isso o trigger novo
          ENVOLVE o span antigo em vez de substituir, senao render()
          apagaria o chevron/nome do personagem a cada frame). -->
+    <!-- v4.21x (pedido do usuario): a setinha saiu -- "Nível" fica so
+         texto limpo agora. Continua clicavel pra TROCAR de heroi (isso
+         nao mudou, so perdeu o indicador visual de dropdown); CRIAR
+         heroi novo saiu daqui e virou linha em Config (#cfgAbrirNovoHeroi,
+         perto de Herói), ver bloco JS "PLANO PRO -- criar personagem
+         novo" mais abaixo no arquivo. -->
     <button class="pjTrigger" id="pjTrigger" aria-label="Trocar de herói" type="button">
       <span class="pjNomeTopo" id="pjNomeTopo"></span>
       <span class="lvl" id="lvl">Nível I</span>
-      <svg class="pjChevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
     </button>
     <!-- v4.20x (pedido do usuario): o botao de mudo saiu daqui e virou
          uma linha em Preferencias (#cfgRowSom, perto de #cfgRowFeedback)
@@ -233,12 +238,12 @@
        cortina de transicao. Vivem soltos aqui, fora da .topbar, porque
        sao position:absolute relativos ao .app (que ja e position:relative
        desde a media query existente -- nao precisou de CSS novo pra isso). -->
+  <!-- v4.21x (pedido do usuario): "+ Novo herói" saiu daqui -- criar
+       heroi agora mora em Config (#cfgAbrirNovoHeroi). Esse dropdown
+       continua so pra TROCAR entre herois ja existentes. -->
   <div class="pjDropdown" id="pjDropdown">
     <div class="edsec">Meus heróis</div>
     <div class="pjLista" id="pjLista"></div>
-    <button class="pjNovoBtn" id="pjNovoBtn" type="button">
-      <span>+ Novo herói</span>
-    </button>
   </div>
   <div class="pjCortina" id="pjCortina"></div>
 
@@ -674,6 +679,22 @@
           <b data-i18n="cfg.heroi">Herói</b>
         </div>
         <span class="cfgval" id="cfgHeroiResumo">Aventureiro</span>
+        <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+      </div>
+
+      <!-- v4.21x (pedido do usuario): "Criar novo herói" saiu do dropdown
+           da topbar (pjNovoBtn) e virou linha aqui -- mesmo padrao
+           .cfgrow.cfglink de Herói/Aparência/Preferências, so que abre
+           direto #novoHeroiOverlay (window.abrirNovoHeroiOverlay(), ja
+           existia pronta) em vez de uma sub-tela nova. cfgval mostra
+           quantos herois existem (ex. "2/3"), atualizado no mesmo lugar
+           que ja atualiza #cfgHeroiResumo (atualizarResumosConfig()). -->
+      <div class="cfgrow cfglink" id="cfgAbrirNovoHeroi">
+        <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></span>
+        <div class="cfgtxt">
+          <b data-i18n="cfg.novoHeroi">Criar novo herói</b>
+        </div>
+        <span class="cfgval" id="cfgNovoHeroiResumo">1/1</span>
         <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
       </div>
 
@@ -8007,6 +8028,12 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
         ? (pref === 'vibrar' ? 'Vibrate' : 'Off')
         : (pref === 'vibrar' ? 'Vibrar' : 'Desativado');
     }
+
+    // v4.21x: contagem "N/limite" da linha "Criar novo herói"
+    const rNovoHeroi = document.getElementById('cfgNovoHeroiResumo');
+    if (rNovoHeroi && typeof listarPersonagens === 'function' && typeof limitePersonagens === 'function'){
+      rNovoHeroi.textContent = listarPersonagens().length + '/' + limitePersonagens();
+    }
   }
   window.atualizarResumosConfig = atualizarResumosConfig;
 
@@ -8081,7 +8108,6 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   const pjTrigger = document.getElementById('pjTrigger');
   const pjDropdown = document.getElementById('pjDropdown');
   const pjLista = document.getElementById('pjLista');
-  const pjNovoBtn = document.getElementById('pjNovoBtn');
   const pjCortina = document.getElementById('pjCortina');
   const pjNomeTopoEl = document.getElementById('pjNomeTopo');
 
@@ -8119,13 +8145,8 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       if (!ehAtivo) btn.onclick = () => trocarPersonagemComTransicao(p.id);
       pjLista.appendChild(btn);
     });
-
-    const pro = (typeof assinaturaAtiva === 'function' && assinaturaAtiva());
-    const cheio = lista.length >= limitePersonagens();
-    if (pjNovoBtn){
-      pjNovoBtn.classList.toggle('bloqueado', cheio && !pro);
-      pjNovoBtn.innerHTML = (en ? '+ New hero' : '+ Novo herói') + (!pro ? ' <span class="pjSelo">PRO</span>' : '');
-    }
+    // "+ Novo herói" nao mora mais aqui (v4.21x, ver #cfgAbrirNovoHeroi em
+    // Config) -- esse dropdown agora e SO pra trocar entre herois existentes.
   }
   window.pintarDropdownPersonagens = pintarDropdownPersonagens;
 
@@ -8197,7 +8218,11 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   function fecharNovoHeroiOverlay(){
     if (novoHeroiOverlay) novoHeroiOverlay.classList.remove('on');
   }
-  if (pjNovoBtn) pjNovoBtn.onclick = () => {
+  // v4.21x (pedido do usuario): "Criar novo herói" saiu do dropdown da
+  // topbar e virou linha em Config (#cfgAbrirNovoHeroi, perto de Herói)
+  // -- mesmo guard de limite de antes, so trigger/lugar que mudou.
+  const btnAbrirNovoHeroi = document.getElementById('cfgAbrirNovoHeroi');
+  if (btnAbrirNovoHeroi) btnAbrirNovoHeroi.onclick = () => {
     if (listarPersonagens().length >= limitePersonagens()){
       if (typeof window.aviso === 'function') window.aviso(idiomaApp() === 'en' ? 'Hero limit reached' : 'Limite de heróis atingido');
       return;
@@ -8214,6 +8239,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     if (r && r.ok){
       fecharNovoHeroiOverlay();
       atualizarNomeTopoPersonagem();
+      if (typeof window.atualizarResumosConfig === 'function') window.atualizarResumosConfig(); // refaz a contagem "N/limite"
       if (typeof window.aviso === 'function') window.aviso(en ? 'New hero created' : 'Herói novo criado');
     } else if (typeof window.aviso === 'function'){
       window.aviso(en ? 'Hero limit reached' : 'Limite de heróis atingido');
@@ -14766,6 +14792,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'cfg.feedbackDeCliqueDesc': { pt:'Vibração ou som ao tocar em botões', en:'Vibration or sound when tapping buttons' },
     'cfg.som':     { pt:'Som', en:'Sound' },
     'cfg.somDesc': { pt:'Efeitos sonoros do jogo', en:'Game sound effects' },
+    'cfg.novoHeroi': { pt:'Criar novo herói', en:'Create new hero' },
 
     'loja.comprar': { pt:'Comprar', en:'Buy' },
     'loja.vender':  { pt:'Vender', en:'Sell' },

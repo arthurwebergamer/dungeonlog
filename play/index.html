@@ -127,9 +127,22 @@
       <button class="primario" id="irPasso2" data-i18n="acao.continuar">Continuar</button>
     </div>
 
+    <!-- v4.17x: passo2 (Nome) e passoHeroi (Personagem) ganharam o
+         cabecalho obFraca/obForte + dots do carrossel novo (setupDots),
+         e viraram os 2 passos de setup pos-login pra conta nova
+         (Personagem primeiro, Nome depois -- pedido do usuario). Ver
+         mostrarSetupPersonagemENome() mais abaixo no arquivo, que e
+         quem de fato controla a ordem/navegacao agora -- os onclick
+         estaticos originais destes botoes (irEscolha/irPasso3/voltar1/
+         voltarNome, alguns paragrafos abaixo) ficam mortos, sobrescritos
+         em runtime, por convencao wrap-not-rewrite. -->
     <div class="passo" id="passo2">
+      <div class="setupDots"><span class="carrosselDot"></span><span class="carrosselDot on"></span></div>
+      <div class="obHeadline setupHeadline">
+        <span class="obFraca" data-i18n="onb.personalizacao">Personalização</span>
+      </div>
       <div class="campo">
-        <label data-i18n="onb.comoChamar">Como quer ser chamado?</label>
+        <label class="setupLabel" data-i18n="onb.comoChamar">Como quer ser chamado?</label>
         <input id="nomeHeroi" placeholder="Aventureiro" data-i18n-placeholder="onb.placeholderNome" maxlength="18" autocomplete="off">
       </div>
       <button class="primario" id="irEscolha" data-i18n="acao.continuar">Continuar</button>
@@ -137,8 +150,12 @@
     </div>
 
     <div class="passo" id="passoHeroi">
+      <div class="setupDots"><span class="carrosselDot on"></span><span class="carrosselDot"></span></div>
+      <div class="obHeadline setupHeadline">
+        <span class="obFraca" data-i18n="onb.personalizacao">Personalização</span>
+      </div>
       <div class="campo">
-        <label data-i18n="onb.quemVaiEnfrentar">Quem vai enfrentar os monstros?</label>
+        <label class="setupLabel" data-i18n="onb.quemVaiEnfrentar">Quem vai enfrentar os monstros?</label>
       </div>
 
       <div class="palcoNav">
@@ -1542,6 +1559,33 @@ window.trocarPersonagem = trocarPersonagem;
 // heroiIdx e opcional (indice em HEROIS) -- quem cria pela tela nova
 // escolhe o sprite antes de confirmar; quem chama so por console (teste)
 // pode omitir e fica no sprite 0 padrao, igual conta nova sempre foi.
+// BUG CRITICO CORRIGIDO (relatado pelo usuario, com repro exato: conta
+// nova -> trocar personagem/nome -> adicionar um novo heroi -> nome e
+// personagem resetam pro padrao). Causa raiz: esta funcao chamava
+// trocarPersonagem(id) ANTES de aplicar nome/heroiIdx escolhidos na
+// tela -- e trocarPersonagem() termina chamando window.render(), que
+// tem "if (jaComecou) salvar();" no proprio final (ver render(), mais
+// acima no arquivo). Como o save do personagem novo ainda nao existe,
+// carregar() (chamado dentro de trocarPersonagem()) deixa nomeHeroi/
+// heroiEscolhido no PADRAO ("Aventureiro"/idx 0) -- e esse render()
+// salvava esse padrao. Só DEPOIS a funcao aplicava a escolha real e
+// chamava salvar() de novo. Dois salvar() quase juntos, e como
+// window.salvar esta com um gancho que dispara empurrarNuvem()
+// (assincrono, sem fila -- ver reconectarEnvio() no bloco Firebase),
+// nao ha garantia de qual dos dois chega por ultimo no Firestore: o
+// padrao podia vencer, sobrescrevendo a escolha real na nuvem (dado
+// local ficava certo, so a nuvem corrompia -- por isso o bug parecia
+// "aleatorio").
+// FIX: troca a chave ativa e reseta o estado em memoria SEM chamar
+// render()/salvar() no meio (trocarPersonagemSemRenderizar, abaixo) --
+// so entao aplica nome/heroi escolhidos e salva, UMA unica vez, ja com
+// o dado final. Sem intermediario, sem corrida.
+function trocarPersonagemSemRenderizar(id){
+  _personagemAtivo = id;
+  try { localStorage.setItem(chavePersonagemAtivo(), id); } catch(e){}
+  if (typeof window.carregar === 'function') window.carregar(); // so estado em memoria -- carregar() nao salva nem renderiza sozinho
+}
+
 function criarPersonagem(nome, heroiIdx){
   const lista = listarPersonagens();
   if (lista.length >= limitePersonagens()) return { ok: false, motivo: 'limite' };
@@ -1549,16 +1593,14 @@ function criarPersonagem(nome, heroiIdx){
   const nomeFinal = (nome && nome.trim()) ? nome.trim() : null;
   lista.push({ id: id, nome: nomeFinal, criadoEm: new Date().toISOString() });
   salvarListaPersonagens(lista);
-  trocarPersonagem(id); // save desse id nao existe ainda -- carregar() cai no mesmo caminho ja corrigido de "conta nova" (resetarEstadoParaPadrao)
-  // resetarEstadoParaPadrao() (dentro de carregar(), acima) ja rodou e
-  // deixou nomeHeroi/heroiEscolhido no default -- agora pisa em cima com
-  // a escolha feita na tela, e persiste ja de cara (senao um F5 antes de
-  // qualquer acao no jogo perderia nome/sprite escolhidos).
+  trocarPersonagemSemRenderizar(id); // save desse id nao existe ainda -- carregar() cai no mesmo caminho ja corrigido de "conta nova" (resetarEstadoParaPadrao), so em memoria, sem side-effect
+  // agora sim pisa em cima do padrao com a escolha feita na tela --
+  // nomeHeroi/heroiEscolhido corretos ANTES do primeiro (e unico) salvar()
   if (typeof nomeHeroi !== 'undefined' && nomeFinal) nomeHeroi = nomeFinal;
   if (typeof heroiEscolhido !== 'undefined' && typeof heroiIdx === 'number' && !isNaN(heroiIdx)) heroiEscolhido = heroiIdx;
-  if (typeof window.salvar === 'function') window.salvar();
-  if (typeof window.desenharHeroi === 'function') window.desenharHeroi(); // idem trocarPersonagem() -- sprite so atualiza chamando isso
-  if (typeof window.render === 'function') window.render();
+  if (typeof window.salvar === 'function') window.salvar(); // UM save so, ja com o dado final
+  if (typeof window.desenharHeroi === 'function') window.desenharHeroi(); // sprite so atualiza chamando isso
+  if (typeof window.render === 'function') window.render(); // re-salva o MESMO dado correto (render() salva sozinho) -- redundante, nao uma corrida
   return { ok: true, id: id };
 }
 window.criarPersonagem = criarPersonagem;
@@ -4567,6 +4609,93 @@ campoNomeIni.addEventListener('input', () => { campoNomeIni.style.borderColor = 
 campoNomeIni.addEventListener('keydown', e => {
   if (e.key === 'Enter') document.getElementById('irEscolha').click();
 });
+
+// ---------------------------------------------------------------------
+// SETUP POS-LOGIN: PERSONAGEM + NOME (v4.17x) -- substitui o sistema de
+// nome/heroi padrao tirado do email (ver comentario em entrarNoApp(),
+// bloco Firebase mais abaixo no arquivo -- bug critico investigado
+// nesta sessao: aquele fluxo fazia um salvar() imediato com valor
+// padrao, que podia entrar numa corrida com o salvar() seguinte de uma
+// troca de nome/heroi feita logo em seguida, porque empurrarNuvem() e
+// assincrono e sem fila -- o padrao podia vencer na nuvem).
+//
+// Pedido do usuario: depois do login confirmado (conta nova, sem save
+// ainda), mostra 2 passos -- Personagem primeiro, Nome depois --
+// reaproveitando os elementos que ja existiam pro wizard antigo
+// (#passoHeroi/#passo2, #gradeHerois, input#nomeHeroi) com estilo novo
+// (obFraca/obForte + setupDots, igual ao carrossel) e onclick
+// REESCRITO aqui: as versoes originais destes botoes (algumas linhas
+// acima) E as do carrossel legado (irPara(5/7/8), na IIFE do carrossel
+// mais abaixo) estao mortas -- apontam pra slides que nao existem mais
+// desde que o onboarding foi reduzido pra 5 slides + login. Como este
+// bloco roda por ULTIMO (só é chamado, nao só definido, depois que a
+// pagina inteira ja carregou), a atribuicao .onclick daqui vence as
+// duas anteriores -- mesma convencao wrap-not-rewrite ja usada no
+// resto do arquivo.
+//
+// IMPORTANTE (o proprio fix do bug critico): nenhum salvar() acontece
+// aqui dentro. O primeiro save de verdade continua sendo so no fim do
+// passo3 (#entrar.onclick, ja existente, intocado), depois que
+// nome+heroi+1a tarefa ja estao TODOS definidos -- um unico save, com
+// o dado final, sem intermediario de valor padrao.
+function mostrarSetupPersonagemENome(){
+  const elPersonagem = document.getElementById('passoHeroi');
+  const elNome = document.getElementById('passo2');
+  if (!elPersonagem || !elNome) return;
+
+  // estado limpo -- garante que nenhum outro passo do wizard antigo
+  // (passo1/passo3) fica visivel por engano nessa entrada
+  ['passo1', 'passo2', 'passoHeroi', 'passo3'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('on');
+  });
+
+  // bug visual descoberto no teste: os 5 pontinhos do carrossel de
+  // marketing (#carrosselDots) so ficam escondidos quando o fluxo passa
+  // por irParaLogin() (que adiciona .oculto) -- mas esse passo novo pode
+  // ser chamado em cenarios onde isso nao aconteceu antes (ou o estado
+  // ja foi restaurado por atualizarTopo em algum ponto), e ai os 5
+  // pontinhos ficam sobrando fixos embaixo da tela de Nome/Tarefas. Nao
+  // depende mais desse acoplamento -- forca escondido aqui direto.
+  const dotsCarrosselAntigo = document.getElementById('carrosselDots');
+  if (dotsCarrosselAntigo) dotsCarrosselAntigo.classList.add('oculto');
+
+  heroiEscolhido = 0; // ponto de partida -- a pessoa escolhe na grade
+  if (typeof montarGrade === 'function') montarGrade();
+  elPersonagem.classList.add('on');
+
+  // Personagem e o 1o passo do fluxo novo -- sem seta de voltar, mesma
+  // convencao ja usada no slide 1 do carrossel (nada antes dele nessa
+  // sequencia).
+  const btnVoltarPersonagem = document.getElementById('voltarNome');
+  if (btnVoltarPersonagem) btnVoltarPersonagem.style.visibility = 'hidden';
+
+  document.getElementById('irPasso3').onclick = () => {
+    if (typeof desenharHeroi === 'function') desenharHeroi();
+    elPersonagem.classList.remove('on');
+    elNome.classList.add('on');
+  };
+
+  document.getElementById('irEscolha').onclick = () => {
+    const campo = document.getElementById('nomeHeroi');
+    const n = campo.value.trim();
+    if (!n){
+      campo.focus();
+      campo.placeholder = idiomaApp() === 'en' ? 'Choose a name to continue' : 'Escolha um nome pra continuar';
+      campo.style.borderColor = 'var(--blood)';
+      return;
+    }
+    nomeHeroi = n; // let top-level, visivel entre scripts classic -- mesma variavel que salvar()/render() usam
+    elNome.classList.remove('on');
+    mostrarPasso(4); // passo3 (tarefas) -- fluxo ja existente, sem mudanca nenhuma
+  };
+
+  document.getElementById('voltar1').onclick = () => {
+    elNome.classList.remove('on');
+    elPersonagem.classList.add('on');
+  };
+}
+window.mostrarSetupPersonagemENome = mostrarSetupPersonagemENome;
 
 const campoIni = document.getElementById('primeiraTarefa');
 campoIni.addEventListener('keydown', e => {
@@ -12060,7 +12189,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       botao:'Vamos lá', botao_en:'Let\'s go', layout:'mockupExato' }
   ]; */
   const SLIDES = [
-    { dataSlide:1, next:2, tipo:'monstro', idx:1,
+    { dataSlide:1, next:2, tipo:'monstro', idx:49, // Moeda mímica (dourada, chama mais atenção no grafite que a Gosma cinza de antes -- pedido do usuario)
       fraca:'Chega de tarefa esquecida', fraca_en:'No more forgotten tasks',
       titulo:'Suas tarefas viram uma masmorra pra vencer', titulo_en:'Your tasks become a dungeon to beat',
       texto:'Cada pendência é um monstro parado no seu caminho. Complete a tarefa, derrote o monstro.',
@@ -13518,33 +13647,40 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           if (typeof window.desenharHeroi === 'function') window.desenharHeroi();
           if (typeof window.render === 'function') window.render();
         } else {
-          // v4.124: sem save local = conta nova. ANTES pulava pro slide
-          // de nome/heroi (irParaCarrossel(5)) -- esse slide NAO EXISTE
-          // MAIS no carrossel reduzido (item mais recente do roadmap
-          // cortou o carrossel pra so 4 slides + login), entao
-          // irParaCarrossel(5) nao achava nada (slideEl(5) retorna null)
-          // e travava a pessoa numa tela em branco logo apos criar
-          // conta -- bug real, achado implementando o pedido abaixo.
-          // Pedido do usuario: em vez de pedir pra escolher nome/heroi
-          // na hora, segue o padrao do Habitica -- nome padrao tirado do
-          // email, heroi padrao (idx 0), e entra direto no app. Da pra
-          // trocar nome/heroi depois nas Opcoes (campo ja existe).
-          const nomeFromEmail = ((user.email || '').split('@')[0] || '')
-            .replace(/[._-]+/g, ' ')
-            .trim()
-            .split(' ')
-            .filter(Boolean)[0] || '';
-          const nomePadrao = nomeFromEmail
-            ? nomeFromEmail.charAt(0).toUpperCase() + nomeFromEmail.slice(1).toLowerCase()
-            : (idiomaApp() === 'en' ? 'Adventurer' : 'Aventureiro');
-          if (typeof nomeHeroi !== 'undefined') nomeHeroi = nomePadrao;
-          if (typeof heroiEscolhido !== 'undefined') heroiEscolhido = 0;
-          if (typeof window.salvar === 'function') window.salvar();
-          intro.classList.add('off');
-          intro.classList.remove('loginBg');
-          intro.style.backgroundImage = '';
-          if (typeof window.desenharHeroi === 'function') window.desenharHeroi();
-          if (typeof window.render === 'function') window.render();
+          // v4.17x (pedido do usuario -- fim do sistema de nome/heroi
+          // padrao tirado do email, substituido pelo setup explicito
+          // Personagem + Nome). ANTES (v4.124): sem save local = conta
+          // nova entrava direto com nome tirado do email + heroi idx 0,
+          // salvando na hora -- esse salvar() imediato foi identificado
+          // nesta sessao como METADE da causa raiz do bug critico "nome/
+          // skin voltam pro padrao" (a outra metade era em
+          // criarPersonagem(), corrigida separadamente): se a pessoa
+          // trocasse nome/heroi logo em seguida, os 2 salvar() quase
+          // juntos entravam numa corrida via empurrarNuvem() (assincrono,
+          // sem fila) e o padrao podia vencer na nuvem.
+          //
+          // Agora: NENHUM salvar() aqui. So mostra o setup (2 passos,
+          // Personagem depois Nome -- ver mostrarSetupPersonagemENome(),
+          // bloco "SETUP POS-LOGIN" no <script> principal, alguns
+          // milhares de linhas acima). #intro continua visivel (a UI do
+          // setup mora dentro dele, mesmo container do carrossel/login)
+          // -- so o CONTEUDO interno muda; #intro.off/render() so
+          // acontecem no fim de verdade, dentro do #entrar.onclick do
+          // passo3 (tarefas), que ja existia e nao foi tocado.
+          if (typeof window.mostrarSetupPersonagemENome === 'function'){
+            window.mostrarSetupPersonagemENome();
+          } else {
+            // fallback defensivo, so se por algum motivo o setup nao
+            // carregou -- mantem o app usavel (com heroi padrao) em vez
+            // de travar numa tela em branco
+            if (typeof heroiEscolhido !== 'undefined') heroiEscolhido = 0;
+            if (typeof window.salvar === 'function') window.salvar();
+            intro.classList.add('off');
+            intro.classList.remove('loginBg');
+            intro.style.backgroundImage = '';
+            if (typeof window.desenharHeroi === 'function') window.desenharHeroi();
+            if (typeof window.render === 'function') window.render();
+          }
         }
       }
 
@@ -14349,6 +14485,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'onb.regra1':            { pt:'Cada tarefa concluída é um <b>golpe</b> no monstro do dia.', en:'Every task you complete is a <b>hit</b> on today\'s monster.' },
     'onb.regra2':            { pt:'Quanto mais tarefas você tem, <b>mais forte</b> ele fica.', en:'The more tasks you have, the <b>stronger</b> it gets.' },
     'onb.regra3':            { pt:'Derrote ele e ganhe <b>moedas</b> pra comprar equipamento melhor.', en:'Defeat it and earn <b>coins</b> to buy better gear.' },
+    'onb.personalizacao':    { pt:'Personalização', en:'Personalization' },
     'onb.comoChamar':        { pt:'Como quer ser chamado?', en:'What should we call you?' },
     'onb.placeholderNome':   { pt:'Aventureiro', en:'Adventurer' },
     'onb.quemVaiEnfrentar':  { pt:'Quem vai enfrentar os monstros?', en:'Who will face the monsters?' },

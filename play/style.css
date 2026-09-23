@@ -4813,16 +4813,23 @@
 .pjTrigger .pjChevron{ width:10px; height:10px; color:var(--accent); opacity:.8; flex:none; transition:transform .2s var(--expo); }
 .pjTrigger.aberto .pjChevron{ transform:rotate(180deg); }
 
+/* v4.22x (pedido do usuario: "animação de puxar pra baixo") -- era so um
+   fade + 6px de deslize, mal dava pra notar. Agora ele nasce encolhido
+   verticalmente a partir do topo (scaleY) e "desenrola" pra baixo, tipo
+   uma cortina abrindo, alem do fade/slide que ja existia. transform-
+   origin:top garante que o encolhimento acontece colado no botao que
+   abriu (#pjTrigger), nao no centro do dropdown. */
 .pjDropdown{
   position:absolute; top:52px; left:18px; width:230px; z-index:20;
   background:var(--panel-2); border:1px solid var(--line); border-radius:12px;
   padding:8px; box-shadow:0 12px 28px rgba(0,0,0,.45);
-  opacity:0; visibility:hidden; transform:translateY(-6px);
-  transition:opacity .18s var(--expo), transform .18s var(--expo), visibility 0s .18s;
+  transform-origin:top center;
+  opacity:0; visibility:hidden; transform:translateY(-8px) scaleY(.75);
+  transition:opacity .22s var(--expo), transform .22s var(--expo), visibility 0s .22s;
 }
 .pjDropdown.on{
-  opacity:1; visibility:visible; transform:translateY(0);
-  transition:opacity .18s var(--expo), transform .18s var(--expo), visibility 0s;
+  opacity:1; visibility:visible; transform:translateY(0) scaleY(1);
+  transition:opacity .22s var(--expo), transform .22s var(--expo), visibility 0s;
 }
 .pjDropdown .edsec{ margin:4px 6px 6px; }
 .pjItem{

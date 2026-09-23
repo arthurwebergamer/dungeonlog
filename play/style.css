@@ -5060,3 +5060,25 @@
    em Perfil (.perfilhero ja tem seu proprio ritmo, linha ~1216). */
 #statsBarra .bar{margin-bottom:14px}
 #statsBarra .bar:last-child{margin-bottom:0}
+
+/* ===== Bloco style #NOVO5 — acordeão "Heróis" dentro de Config (v4.23x) =====
+   pedido do usuario: clicar na linha "Heróis" (Config) expande a lista
+   de personagens + botao "+ Novo herói" NA MESMA TELA, sem abrir
+   dropdown flutuante nem sub-tela nova. Reaproveita .pjItem/.pjAvatar/
+   .pjTxt/.pjNovoBtn/.pjSelo/.bloqueado (ja existentes, usados pelo
+   dropdown da topbar) -- so o container/trigger sao novos. */
+.cfgrow.cfgacordeao{ cursor:pointer; }
+.cfgrow.cfgacordeao:active{ background:var(--panel-3); }
+.cfgacordeaoSeta{ transition:transform .2s var(--expo); }
+.cfgacordeaoSeta.aberto{ transform:rotate(90deg); }
+
+.cfgacordeaoPainel{
+  max-height:0; overflow:hidden;
+  background:var(--panel-2); border:1px solid var(--line); border-radius:12px;
+  margin:-6px 0 10px; padding:0 10px;
+  transition:max-height .28s var(--expo), padding .28s var(--expo), margin .28s var(--expo);
+}
+.cfgacordeaoPainel.on{
+  max-height:420px; overflow-y:auto; margin-top:-4px; padding:10px 10px 12px;
+}
+.cfgHeroisLista{ display:flex; flex-direction:column; gap:2px; margin-bottom:8px; }

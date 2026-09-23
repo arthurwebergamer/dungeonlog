@@ -4650,6 +4650,14 @@ function mostrarSetupPersonagemENome(){
     if (el) el.classList.remove('on');
   });
 
+  // defesa extra (mesma familia do bug dos pontinhos acima): o chamador
+  // normal (entrarNoApp(), conta nova) ja nao ativa mais #passoBoasVindas
+  // antes de chegar aqui, mas se esse passo for chamado de outro lugar
+  // no futuro com essa tela ainda ligada, ela nao pode ficar colada por
+  // baixo -- era a causa exata da "tela em cima da outra" reportada.
+  const elBoasVindas = document.getElementById('passoBoasVindas');
+  if (elBoasVindas) elBoasVindas.classList.remove('on');
+
   // bug visual descoberto no teste: os 5 pontinhos do carrossel de
   // marketing (#carrosselDots) so ficam escondidos quando o fluxo passa
   // por irParaLogin() (que adiciona .oculto) -- mas esse passo novo pode
@@ -13684,25 +13692,38 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         }
       }
 
-      // mostra a tela de boas-vindas primeiro -- so ai que entra no app
+      // v4.17x (pedido do usuario -- "nunca achei essa tela boa" + bug
+      // relatado de "tela em cima da outra"): #passoBoasVindas mostrava
+      // "Conta criada! Bem-vindo / <nome tirado do email ou do Google>"
+      // ANTES do setup novo (Personagem/Nome) -- e como
+      // mostrarSetupPersonagemENome() nunca escondia essa tela (so
+      // limpava passo1/passo2/passoHeroi/passo3), ela ficava colada por
+      // baixo da tela de Personagem, formando a sobreposicao reportada.
+      // Alem do bug, essa tela em si e o mesmo sistema de "nome padrao"
+      // que a pessoa pediu pra extinguir: pra conta NOVA no ha mais
+      // saida pra ela, o fluxo vai direto pro setup novo. Pra quem ja
+      // tem save (login de volta) o "Bem-vindo de volta" continua igual
+      // -- ninguem reclamou dessa parte, e ela nao usa nome tirado do
+      // email/Google (nomeConta ali reflete o nome que a pessoa MESMA
+      // escolheu no setup, ja salvo).
       document.getElementById('passoLogin').classList.remove('on');
-      {
+      if (!temSaveLocal){
+        entrarNoApp();
+      } else {
         let en = false;
         try { en = (localStorage.getItem('questlog.idioma.v1') || 'pt') === 'en'; } catch(e){}
-        document.getElementById('boasVindasRotulo').textContent = temSaveLocal
-          ? (en ? 'Welcome back' : 'Bem-vindo de volta')
-          : (en ? 'Account created! Welcome' : 'Conta criada! Bem-vindo');
-      }
-      document.getElementById('boasVindasNome').textContent = nomeConta;
-      document.getElementById('passoBoasVindas').classList.add('on');
+        document.getElementById('boasVindasRotulo').textContent = en ? 'Welcome back' : 'Bem-vindo de volta';
+        document.getElementById('boasVindasNome').textContent = nomeConta;
+        document.getElementById('passoBoasVindas').classList.add('on');
 
-      let jaEntrou = false;
-      function continuar(){
-        if (jaEntrou) return;
-        jaEntrou = true;
-        entrarNoApp();
+        let jaEntrou = false;
+        function continuar(){
+          if (jaEntrou) return;
+          jaEntrou = true;
+          entrarNoApp();
+        }
+        document.getElementById('boasVindasContinuar').onclick = continuar;
       }
-      document.getElementById('boasVindasContinuar').onclick = continuar;
     }
 
     // v4.124 (item 34 do roadmap, achado pos-implementacao): o caminho

@@ -8198,14 +8198,31 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   // transicao: cortina cobre o .app, SO ENTAO troca o personagem por
   // baixo, SO ENTAO revela -- mesma ordem (nunca revelar antes do
   // conteudo novo estar pronto) que ja resolveu o bug de flash de tema.
-  function trocarPersonagemComTransicao(id){
+  //
+  // v4.24x FIX (pedido do usuario -- "tenho que clicar duas vezes pra
+  // selecionar"): o acordeao de Config repintava a lista LOGO no clique
+  // (setTimeout 0), mas a troca REAL so acontece 220ms depois (dentro
+  // do setTimeout abaixo, atras da cortina). Repintar cedo demais
+  // mostrava a lista com o personagem ANTIGO ainda marcado "ativo agora"
+  // -- so no 2o clique (quando a troca do 1o ja tinha terminado por
+  // baixo) o resultado aparecia certo. Fix: aoTrocar (opcional) so roda
+  // DEPOIS da troca de verdade, nunca antes -- quem precisa repintar
+  // algo (acordeao de Config) passa a funcao aqui em vez de agendar por
+  // conta propria.
+  function trocarPersonagemComTransicao(id, aoTrocar){
     fecharDropdownPersonagens();
-    if (!pjCortina){ trocarPersonagem(id); atualizarNomeTopoPersonagem(); return; }
+    if (!pjCortina){
+      trocarPersonagem(id);
+      atualizarNomeTopoPersonagem();
+      if (typeof aoTrocar === 'function') aoTrocar();
+      return;
+    }
     pjCortina.classList.add('on');
     setTimeout(() => {
       trocarPersonagem(id);
       atualizarNomeTopoPersonagem();
       requestAnimationFrame(() => pjCortina.classList.remove('on'));
+      if (typeof aoTrocar === 'function') aoTrocar();
     }, 220); // mesma duracao de .pjCortina no style.css -- se mudar la, mudar aqui tambem
   }
   window.trocarPersonagemComTransicao = trocarPersonagemComTransicao;
@@ -8288,11 +8305,12 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   const cfgNovoHeroiBtn = document.getElementById('cfgNovoHeroiBtn');
 
   function pintarAcordeaoHerois(){
+    // repinta so DEPOIS que trocarPersonagemComTransicao confirma que a
+    // troca de verdade ja aconteceu por baixo (aoTrocar, 220ms depois do
+    // clique) -- repintar antes disso mostrava o personagem ANTIGO ainda
+    // marcado "ativo agora", precisando de um 2o clique pra atualizar.
     pintarListaHerois(cfgHeroisLista, cfgNovoHeroiBtn, (id) => {
-      trocarPersonagemComTransicao(id);
-      // repinta na hora (nao espera reabrir) pra "ativo agora" mudar de
-      // linha assim que a transicao de troca comeca
-      setTimeout(pintarAcordeaoHerois, 0);
+      trocarPersonagemComTransicao(id, pintarAcordeaoHerois);
     });
   }
   window.pintarAcordeaoHerois = pintarAcordeaoHerois;

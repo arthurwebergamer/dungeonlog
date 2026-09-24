@@ -5071,21 +5071,29 @@
 .cfgrow.cfgacordeao:active{ background:var(--panel-3); }
 .cfgacordeaoSeta{ transition:transform .2s var(--expo); }
 .cfgacordeaoSeta.aberto{ transform:rotate(90deg); }
+/* linha "Heróis" ABERTA nao mostra a propria divisoria (border-bottom
+   padrao de toda linha de Config, ver Modulo #21) -- ela fica logo
+   colada no conteudo expandido, entao a linha ali no meio parecia
+   fim-de-lista. Fechada, volta ao normal. */
+.cfgOverlay .cfgrow.cfgacordeao.aberto{ border-bottom:none; }
 
-/* FIX (relatado pelo usuario: linha fantasma aparecendo embaixo de
-   "Heróis" mesmo com o acordeao fechado). Causa: max-height:0 +
-   overflow:hidden zeram o CONTEUDO, mas nao a BORDA -- um border:1px
-   solid nos 4 lados de uma caixa de altura 0 ainda pinta 2px visiveis
-   (topo+base coincidindo). Fix: a borda tambem nasce em 0 (border-width)
-   e so cresce pra 1px junto com a abertura, na mesma transition. */
+/* FIX #2 (relatado pelo usuario: mesmo com border-width animando 0->1px
+   a linha continuava aparecendo ABERTO, e o box ficava com um cinza
+   destacado -- var(--panel-2) -- que nao combina com o resto de Config,
+   que e lista PLANA (.cfgOverlay .cfgrow: fundo transparente, so
+   divisorias border-bottom, ver Modulo #21). Fix de verdade: o painel
+   perde CARD inteiro (fundo + borda) e vira so um container que
+   expande/recolhe, no MESMO tom de cinza do overlay (var(--bg), o
+   fundo do proprio .cfgOverlay) -- os itens dentro (.pjItem quando
+   ativo, .pjNovoBtn tracejado) ja tem contraste proprio suficiente,
+   nao precisam de uma caixa por fora pra se destacar. */
 .cfgacordeaoPainel{
   max-height:0; overflow:hidden;
-  background:var(--panel-2); border:0 solid var(--line); border-radius:12px;
-  margin:0; padding:0 10px;
-  transition:max-height .28s var(--expo), padding .28s var(--expo), margin .28s var(--expo), border-width .28s var(--expo);
+  background:transparent; border:none;
+  margin:0; padding:0;
+  transition:max-height .28s var(--expo), padding .28s var(--expo);
 }
 .cfgacordeaoPainel.on{
-  max-height:420px; overflow-y:auto; margin:-4px 0 10px; padding:10px 10px 12px;
-  border-width:1px;
+  max-height:420px; overflow-y:auto; padding:4px 0 14px;
 }
 .cfgHeroisLista{ display:flex; flex-direction:column; gap:2px; margin-bottom:8px; }

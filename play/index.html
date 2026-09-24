@@ -8354,6 +8354,12 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     const abrindo = !(cfgHeroisPainel && cfgHeroisPainel.classList.contains('on'));
     if (cfgHeroisPainel) cfgHeroisPainel.classList.toggle('on', abrindo);
     if (cfgHeroisSeta) cfgHeroisSeta.classList.toggle('aberto', abrindo);
+    // v4.24x (pedido do usuario): tira a divisoria (border-bottom) da
+    // propria linha "Heróis" enquanto ela esta ABERTA -- com o painel
+    // logo em seguida, aquela linha ficava parecendo "fim da lista"
+    // bem no meio do conteudo que continua. Fechada, a linha volta
+    // normal (mesma divisoria que toda linha de Config ja tem).
+    cfgHeroisRow.classList.toggle('aberto', abrindo);
     if (abrindo) pintarAcordeaoHerois();
   };
   if (cfgNovoHeroiBtn) cfgNovoHeroiBtn.onclick = abrirNovoHeroiSeCouber;

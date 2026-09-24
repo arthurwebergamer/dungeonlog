@@ -2021,6 +2021,34 @@
   #bloqueioVerificacaoEmail .primario,
   #bloqueioVerificacaoEmail .verificarBloco{width:100%;max-width:340px}
 
+  /* v4.24x (pedido do usuario: loading state "bonequinho correndo" +
+     frase tipo "conectando com a masmorra"). z-index 10000 -- 1 acima
+     do maior overlay existente (#bloqueioVerificacaoEmail, 9999) --
+     pra cobrir QUALQUER tela, inclusive a de login. Escondido por
+     padrao (display:none) e so vira flex com .on, pra nao ocupar
+     espaco/interceptar clique nenhum enquanto nao esta em uso. */
+  .loadingMasmorra{
+    display:none; position:fixed; inset:0; z-index:10000;
+    background:var(--bg); flex-direction:column; align-items:center;
+    justify-content:center; gap:16px; text-align:center; padding:32px;
+  }
+  .loadingMasmorra.on{ display:flex; }
+  .loadingMasmorraSprite{
+    width:56px; height:56px; image-rendering:pixelated;
+    animation:loadingMasmorraCorrer .5s ease-in-out infinite;
+  }
+  @keyframes loadingMasmorraCorrer{
+    0%, 100%{ transform:translateY(0) rotate(-4deg); }
+    50%{ transform:translateY(-10px) rotate(4deg); }
+  }
+  .loadingMasmorraTxt{
+    font-family:'Silkscreen',monospace; font-size:12px; color:var(--dim);
+    letter-spacing:.02em; max-width:280px;
+  }
+  @media (prefers-reduced-motion: reduce){
+    .loadingMasmorraSprite{ animation:none; }
+  }
+
 /* ===== Bloco style #34 ===== */
 .carrosselTopo{display:flex;align-items:center;justify-content:space-between}
   .carrosselTopoLado{flex:1;display:flex}
@@ -4783,9 +4811,15 @@
    span puro, render() escreve textContent nele igual sempre.
    ====================================================================== */
 .pjTrigger{
+  /* v4.24x (pedido do usuario: "não precisa desse quadrado, pode
+     aparecer só o nível normal sem quadrado") -- container perdeu o
+     fundo/padding/radius que formavam o "pill" -- fica so um flex row
+     transparente por baixo do texto. .pjTrigger .lvl (logo abaixo) ja
+     zerava o quadrado do PROPRIO #lvl dentro daqui; agora nenhum dos
+     dois desenha caixa nenhuma. */
   display:flex; align-items:center; gap:6px;
-  background:var(--accent-dim); border:none; border-radius:4px;
-  padding:5px 9px; cursor:pointer; font-family:'Outfit',sans-serif;
+  background:none; border:none;
+  cursor:default; font-family:'Outfit',sans-serif;
 }
 .pjTrigger .pjNomeTopo{
   font-size:13px; font-weight:600; color:var(--accent);
@@ -4813,16 +4847,23 @@
 .pjTrigger .pjChevron{ width:10px; height:10px; color:var(--accent); opacity:.8; flex:none; transition:transform .2s var(--expo); }
 .pjTrigger.aberto .pjChevron{ transform:rotate(180deg); }
 
+/* v4.22x (pedido do usuario: "animação de puxar pra baixo") -- era so um
+   fade + 6px de deslize, mal dava pra notar. Agora ele nasce encolhido
+   verticalmente a partir do topo (scaleY) e "desenrola" pra baixo, tipo
+   uma cortina abrindo, alem do fade/slide que ja existia. transform-
+   origin:top garante que o encolhimento acontece colado no botao que
+   abriu (#pjTrigger), nao no centro do dropdown. */
 .pjDropdown{
   position:absolute; top:52px; left:18px; width:230px; z-index:20;
   background:var(--panel-2); border:1px solid var(--line); border-radius:12px;
   padding:8px; box-shadow:0 12px 28px rgba(0,0,0,.45);
-  opacity:0; visibility:hidden; transform:translateY(-6px);
-  transition:opacity .18s var(--expo), transform .18s var(--expo), visibility 0s .18s;
+  transform-origin:top center;
+  opacity:0; visibility:hidden; transform:translateY(-8px) scaleY(.75);
+  transition:opacity .22s var(--expo), transform .22s var(--expo), visibility 0s .22s;
 }
 .pjDropdown.on{
-  opacity:1; visibility:visible; transform:translateY(0);
-  transition:opacity .18s var(--expo), transform .18s var(--expo), visibility 0s;
+  opacity:1; visibility:visible; transform:translateY(0) scaleY(1);
+  transition:opacity .22s var(--expo), transform .22s var(--expo), visibility 0s;
 }
 .pjDropdown .edsec{ margin:4px 6px 6px; }
 .pjItem{
@@ -5053,3 +5094,40 @@
    em Perfil (.perfilhero ja tem seu proprio ritmo, linha ~1216). */
 #statsBarra .bar{margin-bottom:14px}
 #statsBarra .bar:last-child{margin-bottom:0}
+
+/* ===== Bloco style #NOVO5 — acordeão "Heróis" dentro de Config (v4.23x) =====
+   pedido do usuario: clicar na linha "Heróis" (Config) expande a lista
+   de personagens + botao "+ Novo herói" NA MESMA TELA, sem abrir
+   dropdown flutuante nem sub-tela nova. Reaproveita .pjItem/.pjAvatar/
+   .pjTxt/.pjNovoBtn/.pjSelo/.bloqueado (ja existentes, usados pelo
+   dropdown da topbar) -- so o container/trigger sao novos. */
+.cfgrow.cfgacordeao{ cursor:pointer; }
+.cfgrow.cfgacordeao:active{ background:var(--panel-3); }
+.cfgacordeaoSeta{ transition:transform .2s var(--expo); }
+.cfgacordeaoSeta.aberto{ transform:rotate(90deg); }
+/* linha "Heróis" ABERTA nao mostra a propria divisoria (border-bottom
+   padrao de toda linha de Config, ver Modulo #21) -- ela fica logo
+   colada no conteudo expandido, entao a linha ali no meio parecia
+   fim-de-lista. Fechada, volta ao normal. */
+.cfgOverlay .cfgrow.cfgacordeao.aberto{ border-bottom:none; }
+
+/* FIX #2 (relatado pelo usuario: mesmo com border-width animando 0->1px
+   a linha continuava aparecendo ABERTO, e o box ficava com um cinza
+   destacado -- var(--panel-2) -- que nao combina com o resto de Config,
+   que e lista PLANA (.cfgOverlay .cfgrow: fundo transparente, so
+   divisorias border-bottom, ver Modulo #21). Fix de verdade: o painel
+   perde CARD inteiro (fundo + borda) e vira so um container que
+   expande/recolhe, no MESMO tom de cinza do overlay (var(--bg), o
+   fundo do proprio .cfgOverlay) -- os itens dentro (.pjItem quando
+   ativo, .pjNovoBtn tracejado) ja tem contraste proprio suficiente,
+   nao precisam de uma caixa por fora pra se destacar. */
+.cfgacordeaoPainel{
+  max-height:0; overflow:hidden;
+  background:transparent; border:none;
+  margin:0; padding:0;
+  transition:max-height .28s var(--expo), padding .28s var(--expo);
+}
+.cfgacordeaoPainel.on{
+  max-height:420px; overflow-y:auto; padding:4px 0 14px;
+}
+.cfgHeroisLista{ display:flex; flex-direction:column; gap:2px; margin-bottom:8px; }

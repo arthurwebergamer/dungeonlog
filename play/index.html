@@ -214,10 +214,11 @@
          ENVOLVE o span antigo em vez de substituir, senao render()
          apagaria o chevron/nome do personagem a cada frame). -->
     <!-- v4.21x (pedido do usuario): a setinha saiu -- "Nível" fica so
-         texto limpo agora. Continua clicavel pra abrir o dropdown "Meus
-         heróis" (#pjDropdown, com animacao de puxar pra baixo -- ver
-         style.css), que lista os herois existentes e tem o botao
-         "+ Novo herói" (PRO-gated), so perdeu o indicador visual de seta. -->
+         texto limpo agora. Continua clicavel pra TROCAR de heroi (isso
+         nao mudou, so perdeu o indicador visual de dropdown); CRIAR
+         heroi novo saiu daqui e virou linha em Config (#cfgAbrirNovoHeroi,
+         perto de Herói), ver bloco JS "PLANO PRO -- criar personagem
+         novo" mais abaixo no arquivo. -->
     <button class="pjTrigger" id="pjTrigger" aria-label="Trocar de herói" type="button">
       <span class="pjNomeTopo" id="pjNomeTopo"></span>
       <span class="lvl" id="lvl">Nível I</span>
@@ -237,12 +238,12 @@
        cortina de transicao. Vivem soltos aqui, fora da .topbar, porque
        sao position:absolute relativos ao .app (que ja e position:relative
        desde a media query existente -- nao precisou de CSS novo pra isso). -->
+  <!-- v4.21x (pedido do usuario): "+ Novo herói" saiu daqui -- criar
+       heroi agora mora em Config (#cfgAbrirNovoHeroi). Esse dropdown
+       continua so pra TROCAR entre herois ja existentes. -->
   <div class="pjDropdown" id="pjDropdown">
     <div class="edsec">Meus heróis</div>
     <div class="pjLista" id="pjLista"></div>
-    <button class="pjNovoBtn" id="pjNovoBtn" type="button">
-      <span>+ Novo herói</span>
-    </button>
   </div>
   <div class="pjCortina" id="pjCortina"></div>
 
@@ -657,11 +658,13 @@
         <button class="cfgbtn" id="cfgEntrarBtn" data-i18n="cfg.criarConta">Criar conta</button>
       </div>
 
-      <!-- v4.22x (pedido do usuario): essa linha era um leftover morto --
-           mesma acao de "Apagar tudo", que ja mora no botao full-width
-           la embaixo (zona de risco, #zerarbtn) desde a reforma da linha
-           726. Essa aqui nunca teve onclick/id nenhum, so texto duplicado
-           poluindo Conta -- removida de vez. -->
+      <div class="cfgrow">
+        <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13"/><path d="M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/></svg></span>
+        <div class="cfgtxt">
+          <b data-i18n="cfg.apagarDados">Apagar dados</b>
+          <span data-i18n="cfg.apagarDadosDesc">Zera nível, moedas, itens e vida. Não tem volta.</span>
+        </div>
+      </div>
 
       <div class="edsec" data-i18n="cfg.app">App</div>
 
@@ -679,28 +682,20 @@
         <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
       </div>
 
-      <!-- v4.23x (pedido do usuario): linha "Heróis" em ACORDEÃO -- clicar
-           NAO abre sub-tela nova (diferente do padrao .cfglink usado nas
-           linhas acima/abaixo), so expande um painel AQUI DENTRO mesmo,
-           embaixo da propria linha, com a lista de personagens (selecionar
-           = trocar de herói ativo) e o botao "+ Novo herói" (PRO-gated,
-           selo "PRO" do lado). Reaproveita os mesmos componentes visuais
-           do dropdown da topbar (.pjItem/.pjAvatar/.pjTxt/.pjNovoBtn/
-           .pjSelo, ja existentes) -- so o container e o gatilho que sao
-           novos. Ver bloco JS "PLANO PRO -- acordeao de herois em Config"
-           mais abaixo. -->
-      <div class="cfgrow cfgacordeao" id="cfgHeroisRow">
-        <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+      <!-- v4.21x (pedido do usuario): "Criar novo herói" saiu do dropdown
+           da topbar (pjNovoBtn) e virou linha aqui -- mesmo padrao
+           .cfgrow.cfglink de Herói/Aparência/Preferências, so que abre
+           direto #novoHeroiOverlay (window.abrirNovoHeroiOverlay(), ja
+           existia pronta) em vez de uma sub-tela nova. cfgval mostra
+           quantos herois existem (ex. "2/3"), atualizado no mesmo lugar
+           que ja atualiza #cfgHeroiResumo (atualizarResumosConfig()). -->
+      <div class="cfgrow cfglink" id="cfgAbrirNovoHeroi">
+        <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></span>
         <div class="cfgtxt">
-          <b data-i18n="cfg.herois">Heróis</b>
+          <b data-i18n="cfg.novoHeroi">Criar novo herói</b>
         </div>
-        <svg class="cfgseta cfgacordeaoSeta" id="cfgHeroisSeta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
-      </div>
-      <div class="cfgacordeaoPainel" id="cfgHeroisPainel">
-        <div class="cfgHeroisLista" id="cfgHeroisLista"></div>
-        <button class="pjNovoBtn" id="cfgNovoHeroiBtn" type="button">
-          <span>+ Novo herói</span>
-        </button>
+        <span class="cfgval" id="cfgNovoHeroiResumo">1/1</span>
+        <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
       </div>
 
       <div class="cfgrow cfglink" id="cfgAbrirAparencia">
@@ -1618,28 +1613,6 @@ function trocarPersonagem(id){
   _personagemAtivo = id;
   try { localStorage.setItem(chavePersonagemAtivo(), id); } catch(e){}
   if (typeof window.carregar === 'function') window.carregar();
-
-  // FIX (relatado pelo usuario: "o outro personagem já chega automaticamente
-  // no estágio máximo mesmo sem ter completado uma única tarefa"). Causa
-  // raiz: totalTarefasConcluidas() (e vida/atributos/loja/hpMonstro/
-  // itensVistos/historico, mesmo padrao) leem o localStorage so 1x no
-  // BOOT da pagina e guardam o valor numa closure -- chaveConta() ja
-  // separa por personagem certinho, mas _personagemAtivo mudou aqui em
-  // cima e essas closures nunca foram avisadas, entao continuavam
-  // devolvendo o total do personagem ANTERIOR (ex: 50 tarefas), fazendo
-  // qualquer personagem novo nascer com estagio maximo emprestado.
-  // Mesmos 7 ganchos "recarregarX" que puxarNuvem() ja chama depois de
-  // restaurar dado da nuvem (mesma causa raiz, ver bloco la embaixo) --
-  // precisam rodar ANTES de render() (mais abaixo), que e quem le
-  // totalTarefasConcluidas() dentro de renderEstagioBar().
-  if (window.vidaHeroi && typeof window.vidaHeroi.recarregar === 'function') window.vidaHeroi.recarregar();
-  if (typeof window.recarregarHistorico === 'function') window.recarregarHistorico();
-  if (typeof window.recarregarAtributos === 'function') window.recarregarAtributos();
-  if (typeof window.recarregarLoja === 'function') window.recarregarLoja();
-  if (typeof window.recarregarHpMonstro === 'function') window.recarregarHpMonstro();
-  if (typeof window.recarregarItensVistos === 'function') window.recarregarItensVistos();
-  if (typeof window.recarregarTarefasConcluidas === 'function') window.recarregarTarefasConcluidas();
-
   if (typeof window.desenharHeroi === 'function') window.desenharHeroi(); // render() sozinho nao redesenha o sprite -- confirmado no handler de pintarGradeConfig()
   if (typeof window.render === 'function') window.render();
   if (typeof window.renderInventario === 'function') window.renderInventario();
@@ -8055,6 +8028,12 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
         ? (pref === 'vibrar' ? 'Vibrate' : 'Off')
         : (pref === 'vibrar' ? 'Vibrar' : 'Desativado');
     }
+
+    // v4.21x: contagem "N/limite" da linha "Criar novo herói"
+    const rNovoHeroi = document.getElementById('cfgNovoHeroiResumo');
+    if (rNovoHeroi && typeof listarPersonagens === 'function' && typeof limitePersonagens === 'function'){
+      rNovoHeroi.textContent = listarPersonagens().length + '/' + limitePersonagens();
+    }
   }
   window.atualizarResumosConfig = atualizarResumosConfig;
 
@@ -8129,7 +8108,6 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   const pjTrigger = document.getElementById('pjTrigger');
   const pjDropdown = document.getElementById('pjDropdown');
   const pjLista = document.getElementById('pjLista');
-  const pjNovoBtn = document.getElementById('pjNovoBtn');
   const pjCortina = document.getElementById('pjCortina');
   const pjNomeTopoEl = document.getElementById('pjNomeTopo');
 
@@ -8144,19 +8122,12 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   }
   window.atualizarNomeTopoPersonagem = atualizarNomeTopoPersonagem;
 
-  // v4.23x: extraido de pintarDropdownPersonagens() pra virar helper
-  // compartilhado -- mesmo componente visual (.pjItem/.pjAvatar/.pjTxt +
-  // .pjNovoBtn/.pjSelo/.bloqueado) agora alimenta DOIS lugares: o
-  // dropdown da topbar (pjLista/pjNovoBtn) E o acordeao novo em Config
-  // (cfgHeroisLista/cfgNovoHeroiBtn, ver bloco mais abaixo). onSelecionar
-  // e a funcao chamada ao clicar num herói NAO-ativo -- cada chamador
-  // passa a sua (fecha o dropdown vs repinta o acordeao no lugar).
-  function pintarListaHerois(containerEl, btnNovoEl, onSelecionar){
-    if (!containerEl) return 0;
+  function pintarDropdownPersonagens(){
+    if (!pjLista) return;
     const ativo = personagemAtivoId();
     const lista = listarPersonagens();
     const en = idiomaApp() === 'en';
-    containerEl.innerHTML = '';
+    pjLista.innerHTML = '';
     lista.forEach(p => {
       const ehAtivo = p.id === ativo;
       const dados = ehAtivo
@@ -8171,25 +8142,11 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
         '<span class="pjAvatar">' + (heroiImg ? ('<img src="' + heroiImg + '" alt="">') : '') + '</span>' +
         '<span class="pjTxt"><b>' + nomeMostrado + '</b>' +
         (ehAtivo ? ('<span>' + (en ? 'active now' : 'ativo agora') + '</span>') : '') + '</span>';
-      if (!ehAtivo) btn.onclick = () => onSelecionar(p.id);
-      containerEl.appendChild(btn);
+      if (!ehAtivo) btn.onclick = () => trocarPersonagemComTransicao(p.id);
+      pjLista.appendChild(btn);
     });
-
-    // v4.22x (pedido do usuario): "+ Novo herói" fica opaco/bloqueado
-    // (mas ainda clicavel, mostra o aviso de limite) pra quem nao
-    // assina, com selo "PRO" ao lado -- mesma linguagem visual de
-    // bloqueio que os temas Azul/Terracota ja usam em Aparência.
-    const pro = (typeof assinaturaAtiva === 'function' && assinaturaAtiva());
-    const cheio = lista.length >= limitePersonagens();
-    if (btnNovoEl){
-      btnNovoEl.classList.toggle('bloqueado', cheio && !pro);
-      btnNovoEl.innerHTML = (en ? '+ New hero' : '+ Novo herói') + (!pro ? ' <span class="pjSelo">PRO</span>' : '');
-    }
-    return lista.length;
-  }
-
-  function pintarDropdownPersonagens(){
-    pintarListaHerois(pjLista, pjNovoBtn, trocarPersonagemComTransicao);
+    // "+ Novo herói" nao mora mais aqui (v4.21x, ver #cfgAbrirNovoHeroi em
+    // Config) -- esse dropdown agora e SO pra trocar entre herois existentes.
   }
   window.pintarDropdownPersonagens = pintarDropdownPersonagens;
 
@@ -8220,31 +8177,14 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   // transicao: cortina cobre o .app, SO ENTAO troca o personagem por
   // baixo, SO ENTAO revela -- mesma ordem (nunca revelar antes do
   // conteudo novo estar pronto) que ja resolveu o bug de flash de tema.
-  //
-  // v4.24x FIX (pedido do usuario -- "tenho que clicar duas vezes pra
-  // selecionar"): o acordeao de Config repintava a lista LOGO no clique
-  // (setTimeout 0), mas a troca REAL so acontece 220ms depois (dentro
-  // do setTimeout abaixo, atras da cortina). Repintar cedo demais
-  // mostrava a lista com o personagem ANTIGO ainda marcado "ativo agora"
-  // -- so no 2o clique (quando a troca do 1o ja tinha terminado por
-  // baixo) o resultado aparecia certo. Fix: aoTrocar (opcional) so roda
-  // DEPOIS da troca de verdade, nunca antes -- quem precisa repintar
-  // algo (acordeao de Config) passa a funcao aqui em vez de agendar por
-  // conta propria.
-  function trocarPersonagemComTransicao(id, aoTrocar){
+  function trocarPersonagemComTransicao(id){
     fecharDropdownPersonagens();
-    if (!pjCortina){
-      trocarPersonagem(id);
-      atualizarNomeTopoPersonagem();
-      if (typeof aoTrocar === 'function') aoTrocar();
-      return;
-    }
+    if (!pjCortina){ trocarPersonagem(id); atualizarNomeTopoPersonagem(); return; }
     pjCortina.classList.add('on');
     setTimeout(() => {
       trocarPersonagem(id);
       atualizarNomeTopoPersonagem();
       requestAnimationFrame(() => pjCortina.classList.remove('on'));
-      if (typeof aoTrocar === 'function') aoTrocar();
     }, 220); // mesma duracao de .pjCortina no style.css -- se mudar la, mudar aqui tambem
   }
   window.trocarPersonagemComTransicao = trocarPersonagemComTransicao;
@@ -8278,17 +8218,17 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   function fecharNovoHeroiOverlay(){
     if (novoHeroiOverlay) novoHeroiOverlay.classList.remove('on');
   }
-  // v4.22x (pedido do usuario): voltou pro botao dentro do dropdown
-  // "Meus heróis" (pjNovoBtn), PRO-gated -- mesmo guard de limite de
-  // sempre (window.aviso quando bloqueado/cheio).
-  function abrirNovoHeroiSeCouber(){
+  // v4.21x (pedido do usuario): "Criar novo herói" saiu do dropdown da
+  // topbar e virou linha em Config (#cfgAbrirNovoHeroi, perto de Herói)
+  // -- mesmo guard de limite de antes, so trigger/lugar que mudou.
+  const btnAbrirNovoHeroi = document.getElementById('cfgAbrirNovoHeroi');
+  if (btnAbrirNovoHeroi) btnAbrirNovoHeroi.onclick = () => {
     if (listarPersonagens().length >= limitePersonagens()){
       if (typeof window.aviso === 'function') window.aviso(idiomaApp() === 'en' ? 'Hero limit reached' : 'Limite de heróis atingido');
       return;
     }
     abrirNovoHeroiOverlay();
-  }
-  if (pjNovoBtn) pjNovoBtn.onclick = abrirNovoHeroiSeCouber;
+  };
   const btnNovoHeroiVoltar = document.getElementById('novoHeroiVoltarBtn');
   if (btnNovoHeroiVoltar) btnNovoHeroiVoltar.onclick = fecharNovoHeroiOverlay;
   const btnNovoHeroiCriar = document.getElementById('novoHeroiCriarBtn');
@@ -8299,12 +8239,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     if (r && r.ok){
       fecharNovoHeroiOverlay();
       atualizarNomeTopoPersonagem();
-      // repinta as 2 listas que existem agora (dropdown da topbar + acordeao
-      // de Config) se estiverem pintadas/visiveis -- so uma delas de cada
-      // vez na pratica (o overlay so abre a partir de uma ou de outra),
-      // mas repintar as duas e barato e evita ficar com contagem velha.
-      if (typeof window.pintarDropdownPersonagens === 'function') window.pintarDropdownPersonagens();
-      if (typeof window.pintarAcordeaoHerois === 'function') window.pintarAcordeaoHerois();
+      if (typeof window.atualizarResumosConfig === 'function') window.atualizarResumosConfig(); // refaz a contagem "N/limite"
       if (typeof window.aviso === 'function') window.aviso(en ? 'New hero created' : 'Herói novo criado');
     } else if (typeof window.aviso === 'function'){
       window.aviso(en ? 'Hero limit reached' : 'Limite de heróis atingido');
@@ -8312,38 +8247,6 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   };
   window.abrirNovoHeroiOverlay = abrirNovoHeroiOverlay;
   window.fecharNovoHeroiOverlay = fecharNovoHeroiOverlay;
-
-  /* ---------- Config: acordeão "Heróis" (item novo, pedido do usuario) ----------
-     Mesma ideia do dropdown da topbar, so que embutido dentro da propria
-     tela de Config em vez de um dropdown flutuante OU uma sub-tela nova
-     -- clicar na linha so expande/recolhe um painel logo abaixo dela,
-     nunca navega pra outro lugar. Reaproveita pintarListaHerois() (helper
-     extraido acima) e abrirNovoHeroiSeCouber() (mesmo guard de limite do
-     botao da topbar). */
-  const cfgHeroisRow = document.getElementById('cfgHeroisRow');
-  const cfgHeroisPainel = document.getElementById('cfgHeroisPainel');
-  const cfgHeroisSeta = document.getElementById('cfgHeroisSeta');
-  const cfgHeroisLista = document.getElementById('cfgHeroisLista');
-  const cfgNovoHeroiBtn = document.getElementById('cfgNovoHeroiBtn');
-
-  function pintarAcordeaoHerois(){
-    // repinta so DEPOIS que trocarPersonagemComTransicao confirma que a
-    // troca de verdade ja aconteceu por baixo (aoTrocar, 220ms depois do
-    // clique) -- repintar antes disso mostrava o personagem ANTIGO ainda
-    // marcado "ativo agora", precisando de um 2o clique pra atualizar.
-    pintarListaHerois(cfgHeroisLista, cfgNovoHeroiBtn, (id) => {
-      trocarPersonagemComTransicao(id, pintarAcordeaoHerois);
-    });
-  }
-  window.pintarAcordeaoHerois = pintarAcordeaoHerois;
-
-  if (cfgHeroisRow) cfgHeroisRow.onclick = () => {
-    const abrindo = !(cfgHeroisPainel && cfgHeroisPainel.classList.contains('on'));
-    if (cfgHeroisPainel) cfgHeroisPainel.classList.toggle('on', abrindo);
-    if (cfgHeroisSeta) cfgHeroisSeta.classList.toggle('aberto', abrindo);
-    if (abrindo) pintarAcordeaoHerois();
-  };
-  if (cfgNovoHeroiBtn) cfgNovoHeroiBtn.onclick = abrirNovoHeroiSeCouber;
 
   atualizarNomeTopoPersonagem(); // primeira pintura, no boot
 
@@ -14876,7 +14779,6 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'cfg.apagarTudo':      { pt:'Apagar tudo', en:'Delete everything' },
     'cfg.app':             { pt:'App', en:'App' },
     'cfg.heroi':           { pt:'Herói', en:'Hero' },
-    'cfg.herois':          { pt:'Heróis', en:'Heroes' },
     'cfg.aparencia':       { pt:'Aparência', en:'Appearance' },
     'cfg.preferencias':    { pt:'Preferências', en:'Preferences' },
     'cfg.historicoDesc':   { pt:'Calendário de vitórias, fugas e dias sem tarefa', en:'Calendar of wins, escapes and days with no tasks' },

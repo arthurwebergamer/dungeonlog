@@ -5072,13 +5072,20 @@
 .cfgacordeaoSeta{ transition:transform .2s var(--expo); }
 .cfgacordeaoSeta.aberto{ transform:rotate(90deg); }
 
+/* FIX (relatado pelo usuario: linha fantasma aparecendo embaixo de
+   "Heróis" mesmo com o acordeao fechado). Causa: max-height:0 +
+   overflow:hidden zeram o CONTEUDO, mas nao a BORDA -- um border:1px
+   solid nos 4 lados de uma caixa de altura 0 ainda pinta 2px visiveis
+   (topo+base coincidindo). Fix: a borda tambem nasce em 0 (border-width)
+   e so cresce pra 1px junto com a abertura, na mesma transition. */
 .cfgacordeaoPainel{
   max-height:0; overflow:hidden;
-  background:var(--panel-2); border:1px solid var(--line); border-radius:12px;
-  margin:-6px 0 10px; padding:0 10px;
-  transition:max-height .28s var(--expo), padding .28s var(--expo), margin .28s var(--expo);
+  background:var(--panel-2); border:0 solid var(--line); border-radius:12px;
+  margin:0; padding:0 10px;
+  transition:max-height .28s var(--expo), padding .28s var(--expo), margin .28s var(--expo), border-width .28s var(--expo);
 }
 .cfgacordeaoPainel.on{
-  max-height:420px; overflow-y:auto; margin-top:-4px; padding:10px 10px 12px;
+  max-height:420px; overflow-y:auto; margin:-4px 0 10px; padding:10px 10px 12px;
+  border-width:1px;
 }
 .cfgHeroisLista{ display:flex; flex-direction:column; gap:2px; margin-bottom:8px; }

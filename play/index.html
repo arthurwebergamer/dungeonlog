@@ -14072,6 +14072,11 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       const precisaVerificar = !user.emailVerified && contaNovaOBastante;
 
       if (precisaVerificar){
+        // FIX (loading "masmorra" sumindo cedo demais, ver comentario
+        // nos onclick de loginGoogleBtn/loginEntrarBtn): tela de
+        // verificacao de email e uma tela seguinte de verdade -- esconde
+        // aqui, no exato momento em que ela fica pronta.
+        if (typeof window.esconderLoadingMasmorra === 'function') window.esconderLoadingMasmorra();
         mostrarTelaVerificacao(user);
         return;
       }
@@ -14201,6 +14206,11 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       // -- ninguem reclamou dessa parte, e ela nao usa nome tirado do
       // email/Google (nomeConta ali reflete o nome que a pessoa MESMA
       // escolheu no setup, ja salvo).
+      // FIX (loading "masmorra" sumindo cedo demais, ver comentario nos
+      // onclick de loginGoogleBtn/loginEntrarBtn): AQUI e o momento real
+      // em que a proxima tela (app direto, ou "Bem-vindo de volta") ja
+      // esta pronta pra aparecer -- so agora o loading soma, nao antes.
+      if (typeof window.esconderLoadingMasmorra === 'function') window.esconderLoadingMasmorra();
       document.getElementById('passoLogin').classList.remove('on');
       if (!temSaveLocal){
         entrarNoApp();
@@ -14356,8 +14366,22 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // falhando). signInWithPopup foi CONFIRMADO funcionando em ambos.
     document.getElementById('loginGoogleBtn').onclick = async () => {
       // v4.24x (pedido do usuario): loading "bonequinho correndo" durante
-      // a espera do popup do Google. finally garante que some tanto no
-      // sucesso quanto no erro/cancelamento do popup.
+      // a espera do login.
+      //
+      // FIX (relatado pelo usuario: "a tela de loading tá desaparecendo
+      // antes da tela realmente carregar pra próxima tela"). Causa raiz:
+      // signInWithPopup() so resolve o POPUP em si -- o trabalho de
+      // verdade (puxar dado da nuvem, decidir se mostra "Bem-vindo de
+      // volta" ou o setup de personagem) roda DEPOIS, dentro de aoLogar(),
+      // disparado pelo listener onAuthStateChanged (assincrono, FORA
+      // dessa promise/try). O finally antigo escondia o loading assim
+      // que o popup fechava, bem antes de aoLogar() terminar -- sobrava
+      // um vao (tela de login ainda visivel, ou um frame sem nada) ate a
+      // tela seguinte estar pronta de verdade. Fix: so esconde aqui no
+      // ERRO (popup falhou/cancelado -- aoLogar() nunca vai rodar, entao
+      // ninguem mais vai esconder). No SUCESSO, quem esconde e o proprio
+      // aoLogar() (ou mostrarTelaVerificacao()), no exato momento em que
+      // a tela seguinte esta pronta -- ver esses dois blocos mais abaixo.
       if (typeof window.mostrarLoadingMasmorra === 'function') window.mostrarLoadingMasmorra();
       try {
         await signInWithPopup(auth, new GoogleAuthProvider());
@@ -14365,8 +14389,6 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       catch(e){
         console.error('QuestLog/Firebase: Google falhou', e);
         if (typeof window.aviso === 'function') window.aviso(idiomaAuth() === 'en' ? 'Couldn\'t sign in with Google' : 'Não deu pra entrar com Google');
-      }
-      finally {
         if (typeof window.esconderLoadingMasmorra === 'function') window.esconderLoadingMasmorra();
       }
     };
@@ -14404,8 +14426,16 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       // v4.24x (pedido do usuario): mesmo loading "bonequinho correndo"
       // do botao do Google, agora tambem no login/cadastro por email --
       // so aparece AQUI (depois das validacoes client-side acima, que
-      // retornam cedo sem chamar rede nenhuma), e finally garante que
-      // some em qualquer desfecho (sucesso ou erro).
+      // retornam cedo sem chamar rede nenhuma).
+      //
+      // FIX (mesma causa raiz do botao do Google, ver comentario la):
+      // createUserWithEmailAndPassword()/signInWithEmailAndPassword() so
+      // resolvem a CHAMADA em si -- o trabalho de verdade (puxar da
+      // nuvem, decidir proxima tela) roda depois, dentro de aoLogar(),
+      // disparado pelo onAuthStateChanged (fora deste try/catch). So
+      // esconde aqui no CATCH (erro -- aoLogar() nunca roda). No
+      // sucesso, quem esconde e o proprio aoLogar(), quando a tela
+      // seguinte estiver pronta de verdade.
       if (typeof window.mostrarLoadingMasmorra === 'function') window.mostrarLoadingMasmorra();
       try {
         if (window.questlogModoCadastro && window.questlogModoCadastro()) {
@@ -14451,8 +14481,6 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         } else if (typeof window.aviso === 'function') {
           window.aviso(msg);
         }
-      }
-      finally {
         if (typeof window.esconderLoadingMasmorra === 'function') window.esconderLoadingMasmorra();
       }
     };

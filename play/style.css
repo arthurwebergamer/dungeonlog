@@ -653,6 +653,15 @@
      que monta este overlay (busca por "dlgStage") pra entender o motivo */
   .dlgStage{position:absolute;inset:0;max-width:400px;margin:0 auto}
 
+  /* botao pular (pedido do usuario): fecha a sequencia inteira de falas de
+     uma vez, sem precisar clicar fala por fala */
+  .dlgPular{position:absolute;top:calc(14px + env(safe-area-inset-top));right:14px;
+            z-index:99;background:rgba(4,3,7,.5);border:1px solid rgba(242,166,90,.4);
+            color:var(--accent);font-family:'Outfit',sans-serif;font-size:12px;
+            font-weight:600;letter-spacing:.02em;padding:6px 12px;border-radius:20px;
+            cursor:pointer;opacity:0;pointer-events:none;transition:opacity .22s}
+  .dlgOverlay.on .dlgPular{opacity:1;pointer-events:auto}
+
   .dlgHeroWrap{position:absolute;left:0;right:0;
                bottom:calc(150px + env(safe-area-inset-bottom));z-index:98;
                display:flex;justify-content:center;pointer-events:none;

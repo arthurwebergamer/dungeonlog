@@ -5711,29 +5711,35 @@ window.dbgConta && window.dbgConta('BOOT: depois do carregar() automatico -- tar
 
   // v4.127 (item 81 do roadmap): trava de clique nasce JUNTO e sincrona,
   // igual sempre foi -- zero mudanca na corrida que isso resolve. O
-  // overlay comeca 100% invisivel (so bloqueia clique/toque). So ganha
-  // fundo/blur/cartao "Carregando..." se passar de LIMIAR_REDE_LENTA_MS
-  // sem resolver -- valor alto de proposito (bem acima do tempo normal
-  // de aoLogar()/aoLogarSilencioso() em rede boa) pra so aparecer mesmo
-  // em rede ruim/instavel, nunca no caso comum.
+  // overlay INVISIVEL comeca junto (so bloqueia clique/toque, sem
+  // pintar nada). So ganha visual se passar de LIMIAR_REDE_LENTA_MS sem
+  // resolver -- valor alto de proposito (bem acima do tempo normal de
+  // aoLogar()/aoLogarSilencioso() em rede boa) pra so aparecer mesmo em
+  // rede ruim/instavel, nunca no caso comum.
+  //
+  // FIX (relatado pelo usuario: "ainda tem uma tela 'carregando', deveria
+  // ser substituida pela animação de carregamento"): esse cartao
+  // "Carregando..." de texto puro era construido na mao aqui, sem usar o
+  // overlay novo (mostrarLoadingMasmorra()/#loadingMasmorra, ver bloco
+  // "LOADING MASMORRA" mais abaixo no arquivo). Agora, quando passa do
+  // limiar, reusa o MESMO overlay/sprite/frases -- so o clique continua
+  // bloqueado pelo overlay invisivel proprio (esse aqui roda ANTES do
+  // bloco que define mostrarLoadingMasmorra, entao nao pode depender
+  // dele pra bloquear clique desde o inicio; so pro VISUAL, que so
+  // aparece depois de 2.5s, tempo de sobra pro resto do arquivo carregar).
   const LIMIAR_REDE_LENTA_MS = 2500;
 
   const overlay = document.createElement('div');
   overlay.id = 'aguardandoSessaoOverlay';
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:9990;display:flex;align-items:center;justify-content:center;background:transparent';
-  overlay.innerHTML = '<div style="background:var(--panel,#1a1626);color:var(--text,#F5F0E9);padding:16px 22px;border-radius:14px;font-family:Outfit,sans-serif;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.4);opacity:0;transition:opacity .25s">' +
-    (idiomaApp && idiomaApp() === 'en' ? 'Loading…' : 'Carregando…') + '</div>';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9990;background:transparent';
   document.body.appendChild(overlay);
 
-  // so pinta fundo escurecido/blur e mostra o cartao se ainda nao
-  // resolveu depois do limiar de rede lenta -- cancelado no
-  // confirmarSessaoResolvida() se a confirmacao ja veio antes disso.
+  // so mostra a animacao de loading se ainda nao resolveu depois do
+  // limiar de rede lenta -- cancelado no confirmarSessaoResolvida() se a
+  // confirmacao ja veio antes disso.
   const timerRedeLenta = setTimeout(function(){
     if (jaResolvido) return;
-    overlay.style.background = 'rgba(10,8,20,.55)';
-    overlay.style.backdropFilter = 'blur(2px)';
-    const card = overlay.firstElementChild;
-    if (card) card.style.opacity = '1';
+    if (typeof window.mostrarLoadingMasmorra === 'function') window.mostrarLoadingMasmorra();
     window.dbgConta && window.dbgConta('overlay de sessao ficou visivel -- rede lenta (> ' + LIMIAR_REDE_LENTA_MS + 'ms)');
   }, LIMIAR_REDE_LENTA_MS);
 
@@ -5743,6 +5749,7 @@ window.dbgConta && window.dbgConta('BOOT: depois do carregar() automatico -- tar
     clearTimeout(timerRedeLenta);
     const el = document.getElementById('aguardandoSessaoOverlay');
     if (el) el.remove();
+    if (typeof window.esconderLoadingMasmorra === 'function') window.esconderLoadingMasmorra();
     window.dbgConta && window.dbgConta('overlay de confirmacao de sessao removido');
   };
   setTimeout(window.confirmarSessaoResolvida, 8000); // teto de seguranca -- rede ruim/offline nao trava o app pra sempre

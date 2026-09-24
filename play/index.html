@@ -187,7 +187,12 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
         </button>
       </div>
-      <span class="heroiNomeGrande" id="heroiNomeGrande"></span>
+      <!-- v4.24x (pedido do usuario: "não precisa mostrar tipo esses
+           nomes, loiro etc, mostra só o personagem mesmo") -- #heroiNomeGrande
+           removido. atualizarNomeCarrosselHerois() (index.html, JS) ja
+           tem guarda "if (el && ...)" -- continua sendo chamada a cada
+           troca de sprite no carrossel sem erro nenhum, so nao escreve
+           em lugar nenhum mais. -->
 
       <button class="primario" id="irPasso3" data-i18n="acao.continuar">Continuar</button>
       <button class="secundario" id="voltarNome" data-i18n="acao.voltar">Voltar</button>
@@ -914,6 +919,19 @@
         <div class="temagrid" id="idiomaGrid"></div>
       </div>
     </div>
+  </div>
+
+  <!-- v4.24x (pedido do usuario: "loading state tipo um bonequinho
+       correndo... quando tiver conectando com a conta do Google, tipo
+       'se conectando com a masmorra'"). Overlay generico, reutilizavel
+       pra qualquer espera assincrona (login Google/email por enquanto).
+       Sprite reaproveita o mesmo PNG do heroi ativo (HEROIS[...].img,
+       preenchido via JS em mostrarLoadingMasmorra() -- ver script mais
+       abaixo, perto do CONTADOR de tarefas), sem novo asset. Frases
+       trocam sozinhas a cada 1.8s, pool PT/EN -- ver janela mais abaixo. -->
+  <div class="loadingMasmorra" id="loadingMasmorra">
+    <img class="loadingMasmorraSprite" id="loadingMasmorraSprite" src="" alt="">
+    <span class="loadingMasmorraTxt" id="loadingMasmorraTxt">Conectando com a masmorra...</span>
   </div>
 
   <div class="view" id="viewLoja">
@@ -10521,6 +10539,85 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 </script>
 
 <!-- =====================================================================
+     LOADING "MASMORRA" — bloco autonomo, cole antes de </body>
+
+     v4.24x (pedido do usuario): overlay de loading generico com um
+     "bonequinho correndo" (reaproveita o PNG do heroi ativo, sem asset
+     novo) + frase temática que troca sozinha, tipo "Conectando com a
+     masmorra...". PT/EN desde o inicio. Markup em #loadingMasmorra (ver
+     index.html, logo apos idiomaOverlay) + CSS em .loadingMasmorra*
+     (ver style.css, perto de #bloqueioVerificacaoEmail).
+
+     API publica: window.mostrarLoadingMasmorra(fraseOpcional) /
+     window.esconderLoadingMasmorra(). Colocado DEPOIS do bloco HEROIS
+     (assets.js) e de idiomaApp() (topo do arquivo) de proposito --
+     ambos ja existem quando este script roda.
+     ===================================================================== -->
+<script>
+(function(){
+  const FRASES_LOADING = {
+    pt: [
+      'Conectando com a masmorra...',
+      'Acordando o herói...',
+      'Afiando a espada...',
+      'Acendendo as tochas...',
+      'Abrindo o portal...',
+      'Consultando o oráculo...'
+    ],
+    en: [
+      'Connecting to the dungeon...',
+      'Waking the hero...',
+      'Sharpening the sword...',
+      'Lighting the torches...',
+      'Opening the portal...',
+      'Consulting the oracle...'
+    ]
+  };
+
+  let timer = null;
+
+  function mostrarLoadingMasmorra(fraseInicial){
+    const overlay = document.getElementById('loadingMasmorra');
+    const txt = document.getElementById('loadingMasmorraTxt');
+    const img = document.getElementById('loadingMasmorraSprite');
+    if (!overlay) return;
+
+    const en = (typeof idiomaApp === 'function') ? idiomaApp() === 'en' : false;
+    const frases = en ? FRASES_LOADING.en : FRASES_LOADING.pt;
+
+    // FIXO no "Loiro" (pedido do usuario), independente do heroi ATIVO
+    // do jogador -- indice 1 em HEROIS (assets.js). Cai pro indice 0 se
+    // por algum motivo HEROIS ainda nao carregou ou o indice 1 nao existir.
+    const IDX_SPRITE_LOADING = 1; // "Loiro" / "Blond"
+    if (img && typeof HEROIS !== 'undefined' && HEROIS.length){
+      const idx = HEROIS[IDX_SPRITE_LOADING] ? IDX_SPRITE_LOADING : 0;
+      img.src = HEROIS[idx].img || '';
+    }
+
+    let i = 0;
+    if (txt) txt.textContent = fraseInicial || frases[0];
+    clearInterval(timer);
+    timer = setInterval(() => {
+      i = (i + 1) % frases.length;
+      if (txt) txt.textContent = frases[i];
+    }, 1800);
+
+    overlay.classList.add('on');
+  }
+
+  function esconderLoadingMasmorra(){
+    const overlay = document.getElementById('loadingMasmorra');
+    if (overlay) overlay.classList.remove('on');
+    clearInterval(timer);
+    timer = null;
+  }
+
+  window.mostrarLoadingMasmorra = mostrarLoadingMasmorra;
+  window.esconderLoadingMasmorra = esconderLoadingMasmorra;
+})();
+</script>
+
+<!-- =====================================================================
      PERFIL — CONQUISTAS — bloco autonomo, cole antes de </body>
 
      Substitui o placeholder estatico de #perfilConquistas via JS.
@@ -14248,12 +14345,19 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // reconciliacao entre o dominio do app e o authDomain do Firebase
     // falhando). signInWithPopup foi CONFIRMADO funcionando em ambos.
     document.getElementById('loginGoogleBtn').onclick = async () => {
+      // v4.24x (pedido do usuario): loading "bonequinho correndo" durante
+      // a espera do popup do Google. finally garante que some tanto no
+      // sucesso quanto no erro/cancelamento do popup.
+      if (typeof window.mostrarLoadingMasmorra === 'function') window.mostrarLoadingMasmorra();
       try {
         await signInWithPopup(auth, new GoogleAuthProvider());
       }
       catch(e){
         console.error('QuestLog/Firebase: Google falhou', e);
         if (typeof window.aviso === 'function') window.aviso(idiomaAuth() === 'en' ? 'Couldn\'t sign in with Google' : 'Não deu pra entrar com Google');
+      }
+      finally {
+        if (typeof window.esconderLoadingMasmorra === 'function') window.esconderLoadingMasmorra();
       }
     };
 
@@ -14287,6 +14391,12 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         }
       }
 
+      // v4.24x (pedido do usuario): mesmo loading "bonequinho correndo"
+      // do botao do Google, agora tambem no login/cadastro por email --
+      // so aparece AQUI (depois das validacoes client-side acima, que
+      // retornam cedo sem chamar rede nenhuma), e finally garante que
+      // some em qualquer desfecho (sucesso ou erro).
+      if (typeof window.mostrarLoadingMasmorra === 'function') window.mostrarLoadingMasmorra();
       try {
         if (window.questlogModoCadastro && window.questlogModoCadastro()) {
           const cred = await createUserWithEmailAndPassword(auth, email, senha);
@@ -14331,6 +14441,9 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         } else if (typeof window.aviso === 'function') {
           window.aviso(msg);
         }
+      }
+      finally {
+        if (typeof window.esconderLoadingMasmorra === 'function') window.esconderLoadingMasmorra();
       }
     };
 

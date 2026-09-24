@@ -4785,7 +4785,7 @@
 .pjTrigger{
   display:flex; align-items:center; gap:6px;
   background:var(--accent-dim); border:none; border-radius:4px;
-  padding:5px 9px; cursor:pointer; font-family:'Outfit',sans-serif;
+  padding:5px 9px; cursor:default; font-family:'Outfit',sans-serif;
 }
 .pjTrigger .pjNomeTopo{
   font-size:13px; font-weight:600; color:var(--accent);

@@ -1632,13 +1632,27 @@ function trocarPersonagem(id){
   // restaurar dado da nuvem (mesma causa raiz, ver bloco la embaixo) --
   // precisam rodar ANTES de render() (mais abaixo), que e quem le
   // totalTarefasConcluidas() dentro de renderEstagioBar().
+  //
+  // FIX #2 (relatado pelo usuario: "ainda sim eu alcancei o deserto em
+  // outro heroi que nao tinha nenhuma tarefa feita" -- bug reapareceu
+  // MESMO com os 7 ganchos abaixo todos presentes). Causa raiz:
+  // window.recarregarHpMonstro() (um dos 7) chama render() por dentro
+  // dele mesmo, sincronamente (ver bloco HP DO MONSTRO). Na ordem
+  // antiga, recarregarTarefasConcluidas() era o ULTIMO gancho -- entao
+  // esse render() interno do HP disparava com o total AINDA welho
+  // (do personagem anterior), e verificarDesbloqueiosTemaArena() (rodada
+  // dentro desse render()) gravava o desbloqueio errado na chave do
+  // personagem NOVO (chaveConta ja apontava pro id certo, so o total
+  // comparado que estava atrasado). Fix: recarregarTarefasConcluidas()
+  // agora e o PRIMEIRO gancho, antes de qualquer um que possa disparar
+  // render() por conta propria.
+  if (typeof window.recarregarTarefasConcluidas === 'function') window.recarregarTarefasConcluidas();
   if (window.vidaHeroi && typeof window.vidaHeroi.recarregar === 'function') window.vidaHeroi.recarregar();
   if (typeof window.recarregarHistorico === 'function') window.recarregarHistorico();
   if (typeof window.recarregarAtributos === 'function') window.recarregarAtributos();
   if (typeof window.recarregarLoja === 'function') window.recarregarLoja();
   if (typeof window.recarregarHpMonstro === 'function') window.recarregarHpMonstro();
   if (typeof window.recarregarItensVistos === 'function') window.recarregarItensVistos();
-  if (typeof window.recarregarTarefasConcluidas === 'function') window.recarregarTarefasConcluidas();
 
   if (typeof window.desenharHeroi === 'function') window.desenharHeroi(); // render() sozinho nao redesenha o sprite -- confirmado no handler de pintarGradeConfig()
   if (typeof window.render === 'function') window.render();
@@ -1676,6 +1690,37 @@ function trocarPersonagemSemRenderizar(id){
   _personagemAtivo = id;
   try { localStorage.setItem(chavePersonagemAtivo(), id); } catch(e){}
   if (typeof window.carregar === 'function') window.carregar(); // so estado em memoria -- carregar() nao salva nem renderiza sozinho
+
+  // FIX (relatado pelo usuario: "alcancei o deserto em um outro herói e
+  // mostrou que foi alcançado em outro herói que não tinha nenhuma tarefa
+  // feita" -- bug reapareceu MESMO depois do fix em trocarPersonagem(),
+  // porque criarPersonagem() nao usa trocarPersonagem(), usa ESTA funcao
+  // aqui, que tinha ficado de fora daquele fix). Mesma causa raiz
+  // (totalTarefasConcluidas() e as outras 6 closures cacheadas 1x no
+  // boot, nunca relidas): ao criar um herói novo, o render() final de
+  // criarPersonagem() rodava com o total de tarefas do herói ANTERIOR
+  // ainda preso na memoria -- verificarDesbloqueiosTemaArena() (chamada
+  // dentro de render()) via esse total emprestado, concluia "estagio 2
+  // alcancado" e PERSISTIA esse desbloqueio pra sempre na chave do herói
+  // novo (chaveConta ja aponta pro id certo, so o VALOR comparado que
+  // estava errado). Mesmos 7 ganchos de trocarPersonagem(), na mesma
+  // ordem, ANTES de qualquer render/salvar rodar em cima do id novo.
+  //
+  // FIX #2 (relatado pelo usuario: bug reapareceu de novo MESMO com os
+  // 7 ganchos acima -- causa raiz real: window.recarregarHpMonstro()
+  // chama render() por dentro dele mesmo, e nessa ordem antiga
+  // recarregarTarefasConcluidas() so rodava DEPOIS dele, entao esse
+  // render() interno ainda via o total velho e gravava o desbloqueio
+  // errado na chave do personagem novo. Ver mesmo fix/comentario em
+  // trocarPersonagem() acima. recarregarTarefasConcluidas() agora e o
+  // PRIMEIRO gancho.
+  if (typeof window.recarregarTarefasConcluidas === 'function') window.recarregarTarefasConcluidas();
+  if (window.vidaHeroi && typeof window.vidaHeroi.recarregar === 'function') window.vidaHeroi.recarregar();
+  if (typeof window.recarregarHistorico === 'function') window.recarregarHistorico();
+  if (typeof window.recarregarAtributos === 'function') window.recarregarAtributos();
+  if (typeof window.recarregarLoja === 'function') window.recarregarLoja();
+  if (typeof window.recarregarHpMonstro === 'function') window.recarregarHpMonstro();
+  if (typeof window.recarregarItensVistos === 'function') window.recarregarItensVistos();
 }
 
 function criarPersonagem(nome, heroiIdx){
@@ -10440,6 +10485,19 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       if (r !== false){
         total++;
         persistir();
+        // FIX (relatado pelo usuario: "a barra de estagio deveria aumentar
+        // no momento que a tarefa e concluida por que ela tem um delay
+        // muito grande"). Causa raiz: total++ acima so roda DEPOIS que
+        // _alternarContador (a funcao alternar() original) retorna -- mas
+        // o(s) render() chamado(s) DENTRO dela (inclusive o render()
+        // imediato do toque) ja leem totalTarefasConcluidas() ANTES desse
+        // incremento, entao a barra de estagio ficava 1 tarefa atrasada.
+        // Ela so alcancava o valor certo no PROXIMO render() -- disparado
+        // so quando o voo do icone de XP/moeda termina (voarRecompensaFinal,
+        // ~1.1s depois), da o "delay muito grande" percebido. Fix: repintar
+        // a barra de estagio aqui, na hora, assim que o contador realmente
+        // incrementa -- sem depender de nenhum render() futuro.
+        if (typeof window.renderEstagioBar === 'function') window.renderEstagioBar();
       }
       return r;
     };
@@ -13690,13 +13748,20 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         // populado 1x no boot da IIFE, nunca relido depois) -- as que
         // ja leem direto do localStorage a cada chamada (bauDia,
         // conquistas V2, titulo equipado) nao precisam de gancho.
+        //
+        // FIX (mesma causa raiz do bug de estagio/tema vazando entre
+        // personagens, ver trocarPersonagem()/trocarPersonagemSemRenderizar()):
+        // window.recarregarHpMonstro() chama render() por dentro dele mesmo,
+        // entao recarregarTarefasConcluidas() precisa rodar ANTES dele (e de
+        // qualquer outro gancho), senao esse render() interno ainda ve o
+        // total antigo e pode gravar um desbloqueio de tema errado.
+        if (typeof window.recarregarTarefasConcluidas === 'function') window.recarregarTarefasConcluidas();
         if (window.vidaHeroi && typeof window.vidaHeroi.recarregar === 'function') window.vidaHeroi.recarregar();
         if (typeof window.recarregarHistorico === 'function') window.recarregarHistorico();
         if (typeof window.recarregarAtributos === 'function') window.recarregarAtributos();
         if (typeof window.recarregarLoja === 'function') window.recarregarLoja();
         if (typeof window.recarregarHpMonstro === 'function') window.recarregarHpMonstro();
         if (typeof window.recarregarItensVistos === 'function') window.recarregarItensVistos();
-        if (typeof window.recarregarTarefasConcluidas === 'function') window.recarregarTarefasConcluidas();
       }
     }
 

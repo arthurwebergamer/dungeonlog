@@ -2409,7 +2409,23 @@ function mostrarPoofMonstro(){
   // "ressuscitava" visualmente ate o render() de verdade rodar (bug
   // confirmado em video: monstro reaparecia normal enquanto "+X"
   // ainda estava na tela). Um so lugar controla isso agora.
-  setTimeout(() => el.remove(), 400);
+  //
+  // FIX (pedido do usuario: "ainda ocorre aquele corte no final da
+  // animação, não resolveu 100%") -- a causa era o setTimeout(400ms) fixo
+  // vs a animacao CSS de 390ms: so 10ms de folga entre o fim visual da
+  // animacao e a remocao do elemento. Qualquer jank do main thread (JS
+  // rodando em paralelo -- e tem bastante coisa rodando junto aqui:
+  // recompensa voando, contador global, etc.) podia atrasar o paint do
+  // ULTIMO frame pra depois desses 10ms, cortando a animacao antes dela
+  // terminar de aparecer. Troca pra esperar o evento REAL 'animationend'
+  // do browser (so dispara quando a animacao de fato terminou de
+  // rodar/pintar), com um setTimeout de seguranca bem mais folgado
+  // (700ms) so pra garantir que o elemento some mesmo se o evento por
+  // algum motivo nao disparar (ex: webview antigo com bug conhecido).
+  let jaRemovido = false;
+  const removerUmaVez = () => { if (jaRemovido) return; jaRemovido = true; el.remove(); };
+  el.addEventListener('animationend', removerUmaVez, { once: true });
+  setTimeout(removerUmaVez, 700);
 }
 window.mostrarPoofMonstro = mostrarPoofMonstro;
 let nomeHeroi = 'Aventureiro';

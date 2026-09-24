@@ -26,7 +26,7 @@
      alteracao aqui (bump manual) pra forcar cache-bust; SUBIR ESTE
      NUMERO sempre que style.css mudar e o problema persistir em
      producao. -->
-<link rel="stylesheet" href="style.css?v=3">
+<link rel="stylesheet" href="style.css?v=4">
 
 <!-- =====================================================================
      TOGGLE DEBUG — silenciar console (log/warn/error)  —  precisa ser o
@@ -9727,6 +9727,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   overlay.className = 'dlgOverlay';
   overlay.innerHTML =
     '<div class="dlgStage">' +
+      '<button class="dlgPular" id="dlgPular" type="button"></button>' +
       '<div class="dlgHeroWrap"><img class="dlgHeroImg" id="dlgHeroImg" alt=""></div>' +
       '<div class="dlgNomeplate"><span>◆</span><span id="dlgNome"></span></div>' +
       '<div class="dlgBox">' +
@@ -9751,6 +9752,25 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     abaPendente = null;
   }
   overlay.addEventListener('click', fechar);
+
+  // BOTAO PULAR (pedido do usuario): fecha a sequencia INTEIRA de uma vez,
+  // independente de quantas falas faltam -- diferente do clique no overlay
+  // (fechar(), acima), que so avanca 1 fala por vez. stopPropagation() pra
+  // nao disparar o listener de click do overlay junto (que reabriria/
+  // avancaria por cima do fechamento).
+  function pularDialogo(){
+    if (!abaPendente) return;
+    clearTimeout(timerDigitacao);
+    digitando = false;
+    overlay.classList.remove('on');
+    vistas[abaPendente] = true;
+    salvarVistas();
+    abaPendente = null;
+  }
+  document.getElementById('dlgPular').addEventListener('click', (e) => {
+    e.stopPropagation();
+    pularDialogo();
+  });
 
   const VELOCIDADE_DIGITACAO = 28;   // ms por letra
   let fraseAtual = '';
@@ -9819,7 +9839,8 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   }
 
   function mostrarDialogoTela(nome){
-    const fonte = (typeof idiomaApp === 'function' && idiomaApp() === 'en') ? DIALOGOS_EN : DIALOGOS;
+    const en = (typeof idiomaApp === 'function' && idiomaApp() === 'en');
+    const fonte = en ? DIALOGOS_EN : DIALOGOS;
     const linhas = fonte[nome];
     if (!linhas || !linhas.length) return;
     abaPendente = nome;
@@ -9828,7 +9849,8 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     const img = (typeof heroiAtual === 'function') ? heroiAtual().img : '';
     document.getElementById('dlgHeroImg').src = img;
     document.getElementById('dlgNome').textContent =
-      (typeof nomeHeroi !== 'undefined' && nomeHeroi) || ((typeof idiomaApp === 'function' && idiomaApp() === 'en') ? 'Adventurer' : 'Aventureiro');
+      (typeof nomeHeroi !== 'undefined' && nomeHeroi) || (en ? 'Adventurer' : 'Aventureiro');
+    document.getElementById('dlgPular').textContent = en ? 'Skip »' : 'Pular »';
     overlay.classList.add('on');
     digitar(linhasAba[0]);
   }

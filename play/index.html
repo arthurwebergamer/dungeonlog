@@ -26,7 +26,7 @@
      alteracao aqui (bump manual) pra forcar cache-bust; SUBIR ESTE
      NUMERO sempre que style.css mudar e o problema persistir em
      producao. -->
-<link rel="stylesheet" href="style.css?v=6">
+<link rel="stylesheet" href="style.css?v=7">
 
 <!-- =====================================================================
      TOGGLE DEBUG — silenciar console (log/warn/error)  —  precisa ser o
@@ -345,11 +345,18 @@
          de "Nível I" na topbar: o numero identifica QUAL estagio, nao e
          progresso). O slot de valor (.xpnum) agora mostra so a fracao
          ("4/10" ou "MAX"), igual ao padrao limpo de Vida/Experiência. -->
+    <!-- FIX (pedido do usuario: "esse tanto de barra nao ficou legal" --
+         3 barras empilhadas ficou poluido). Estagio virou texto puro (sem
+         .bar/.fill visual), mesmo padrao de linha de Vida/Experiencia mas
+         sem a barra embaixo. #estagioTopoFill NAO foi removido do DOM --
+         so escondido via CSS (#estagioTopoBar, ver style.css) -- continua
+         existindo pra renderEstagioBar() nao precisar de nenhuma mudanca
+         (ela so escreve o width nele, que agora nao aparece pra ninguem). -->
     <div class="xprow">
-      <span class="xplabel"><span data-i18n="jogo.estagio">Estágio</span> <span id="estagioTopoNum">1</span></span>
+      <span class="xplabel"><span data-i18n="jogo.tarefasParaEstagio">Tarefas para Estágio</span> <span id="estagioTopoNum">1</span></span>
       <span class="xpnum" id="estagioTopoLbl">0/10</span>
     </div>
-    <div class="bar"><div class="fill" id="estagioTopoFill"></div></div>
+    <div class="bar" id="estagioTopoBar"><div class="fill" id="estagioTopoFill"></div></div>
   </div>
 
   <div class="tasks">
@@ -15091,6 +15098,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'jogo.vida':             { pt:'Vida', en:'Health' },
     'jogo.experiencia':      { pt:'Experiência', en:'Experience' },
     'jogo.estagio':          { pt:'Estágio', en:'Stage' },
+    'jogo.tarefasParaEstagio': { pt:'Tarefas para Estágio', en:'Tasks for Stage' },
     'jogo.addTarefa':        { pt:'+ Adicionar', en:'+ Add' },
     'jogo.oQuePrecisaSerFeito': { pt:'O que precisa ser feito?', en:'What needs to be done?' },
     'jogo.soHoje':           { pt:'Só hoje', en:'Today only' },

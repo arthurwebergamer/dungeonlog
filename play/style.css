@@ -215,6 +215,12 @@
      esse !important em qualquer tema -- especificidade de ID > classe,
      mesmo com !important dos dois lados. */
   #estagioTopoFill{ background:#4EA1E8 !important; }
+  /* FIX (pedido do usuario: "esse tanto de barra nao ficou legal" -- 3
+     barras empilhadas ficou poluido). Estagio virou so texto (label +
+     fracao), sem barra visual -- #estagioTopoFill continua recebendo
+     width no JS (renderEstagioBar(), nao mudou), so ninguem ve mais
+     porque o wrapper .bar dele fica escondido aqui. */
+  #estagioTopoBar{ display:none; }
   /* v4.143 (pedido do usuario): shimmer continuo na barra de XP,
      aditivo via ::after -- nao mexe no width/transition acima. */
   .fill:not(.hpfill)::after{

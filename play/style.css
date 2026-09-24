@@ -206,6 +206,15 @@
   .xpnum{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
   .bar{height:9px;background:var(--panel-2);border:1px solid var(--line);border-radius:3px;padding:2px}
   .fill{height:100%;width:0%;background:linear-gradient(180deg,#7FCBF3,#3F9BD6);border-radius:2px;transition:width .45s cubic-bezier(.4,1.3,.5,1);position:relative;overflow:hidden}
+  /* FIX (pedido do usuario: cor fixa pra barra de Estagio em todos os
+     temas -- 1a tentativa mexeu em .estagio-pill-fill, classe morta de um
+     componente antigo que nao e mais usada; a barra real e #estagioTopoFill
+     com a classe generica .fill, compartilhada com a barra de XP (#fill).
+     Varios temas (:root[data-tema=...]) redefinem `.fill{background:
+     var(--accent) !important}`, entao so um seletor por ID consegue vencer
+     esse !important em qualquer tema -- especificidade de ID > classe,
+     mesmo com !important dos dois lados. */
+  #estagioTopoFill{ background:#4EA1E8 !important; }
   /* v4.143 (pedido do usuario): shimmer continuo na barra de XP,
      aditivo via ::after -- nao mexe no width/transition acima. */
   .fill:not(.hpfill)::after{
@@ -4774,11 +4783,13 @@
   width:100%; max-width:110px; height:6px; border-radius:3px;
   background:rgba(0,0,0,.32); overflow:hidden;
 }
-/* v4.16x (pedido do usuario): antes usava var(--accent), que muda de cor
-   por tema (dourado, roxo, verde etc) -- trocado pra um azul FIXO, igual
-   em qualquer tema, pra virar um "identidade visual" proprio da barra de
-   Estagio (nao mais amarrado ao accent do tema ativo). */
-.estagio-pill-fill{ height:100%; border-radius:3px; background:#4EA1E8; transition:width .4s ease; }
+/* v4.160 (pedido do usuario): tirado o gradiente accent->xp2 da barra
+   de estagio -- agora cor solida (var(--accent)) em todos os temas.
+   NOTA: esta classe (.estagio-pill-fill) e de um componente antigo (pilula
+   solta na topbar) que nao esta mais no markup atual -- a barra de Estagio
+   em uso hoje e #estagioTopoFill (ver #estagioTopoFill acima, perto de
+   .fill). Deixada como estava pra nao mexer em nada morto. */
+.estagio-pill-fill{ height:100%; border-radius:3px; background:var(--accent); transition:width .4s ease; }
 
 /* ======================================================================
    POOF DE DERROTA DO MONSTRO -- nuvem de fumaca (16 frames, extraida

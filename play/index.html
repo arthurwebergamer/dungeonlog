@@ -16,7 +16,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=Outfit:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<!-- v4.24x (bug relatado pelo usuario: loading "masmorra" aparecendo
+     pequeno/inline no canto em vez de tela cheia -- CSS local confirmado
+     100% correto via computed style (position:fixed, z-index:10000,
+     cobrindo os 390x844 inteiros); a causa mais provavel e cache do
+     CDN/navegador servindo um style.css ANTIGO, de antes desse recurso
+     existir -- href literal sem versionamento nenhum, entao um deploy
+     novo nao forca busca de novo do CSS. Query string ?v= muda a cada
+     alteracao aqui (bump manual) pra forcar cache-bust; SUBIR ESTE
+     NUMERO sempre que style.css mudar e o problema persistir em
+     producao. -->
+<link rel="stylesheet" href="style.css?v=2">
 
 <!-- =====================================================================
      TOGGLE DEBUG — silenciar console (log/warn/error)  —  precisa ser o

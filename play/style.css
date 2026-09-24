@@ -2021,6 +2021,34 @@
   #bloqueioVerificacaoEmail .primario,
   #bloqueioVerificacaoEmail .verificarBloco{width:100%;max-width:340px}
 
+  /* v4.24x (pedido do usuario: loading state "bonequinho correndo" +
+     frase tipo "conectando com a masmorra"). z-index 10000 -- 1 acima
+     do maior overlay existente (#bloqueioVerificacaoEmail, 9999) --
+     pra cobrir QUALQUER tela, inclusive a de login. Escondido por
+     padrao (display:none) e so vira flex com .on, pra nao ocupar
+     espaco/interceptar clique nenhum enquanto nao esta em uso. */
+  .loadingMasmorra{
+    display:none; position:fixed; inset:0; z-index:10000;
+    background:var(--bg); flex-direction:column; align-items:center;
+    justify-content:center; gap:16px; text-align:center; padding:32px;
+  }
+  .loadingMasmorra.on{ display:flex; }
+  .loadingMasmorraSprite{
+    width:56px; height:56px; image-rendering:pixelated;
+    animation:loadingMasmorraCorrer .5s ease-in-out infinite;
+  }
+  @keyframes loadingMasmorraCorrer{
+    0%, 100%{ transform:translateY(0) rotate(-4deg); }
+    50%{ transform:translateY(-10px) rotate(4deg); }
+  }
+  .loadingMasmorraTxt{
+    font-family:'Silkscreen',monospace; font-size:12px; color:var(--dim);
+    letter-spacing:.02em; max-width:280px;
+  }
+  @media (prefers-reduced-motion: reduce){
+    .loadingMasmorraSprite{ animation:none; }
+  }
+
 /* ===== Bloco style #34 ===== */
 .carrosselTopo{display:flex;align-items:center;justify-content:space-between}
   .carrosselTopoLado{flex:1;display:flex}

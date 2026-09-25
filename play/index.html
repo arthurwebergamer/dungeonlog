@@ -26,7 +26,7 @@
      alteracao aqui (bump manual) pra forcar cache-bust; SUBIR ESTE
      NUMERO sempre que style.css mudar e o problema persistir em
      producao. -->
-<link rel="stylesheet" href="style.css?v=2">
+<link rel="stylesheet" href="style.css?v=7">
 
 <!-- =====================================================================
      TOGGLE DEBUG — silenciar console (log/warn/error)  —  precisa ser o
@@ -345,11 +345,18 @@
          de "Nível I" na topbar: o numero identifica QUAL estagio, nao e
          progresso). O slot de valor (.xpnum) agora mostra so a fracao
          ("4/10" ou "MAX"), igual ao padrao limpo de Vida/Experiência. -->
+    <!-- FIX (pedido do usuario: "esse tanto de barra nao ficou legal" --
+         3 barras empilhadas ficou poluido). Estagio virou texto puro (sem
+         .bar/.fill visual), mesmo padrao de linha de Vida/Experiencia mas
+         sem a barra embaixo. #estagioTopoFill NAO foi removido do DOM --
+         so escondido via CSS (#estagioTopoBar, ver style.css) -- continua
+         existindo pra renderEstagioBar() nao precisar de nenhuma mudanca
+         (ela so escreve o width nele, que agora nao aparece pra ninguem). -->
     <div class="xprow">
-      <span class="xplabel"><span data-i18n="jogo.estagio">Estágio</span> <span id="estagioTopoNum">1</span></span>
+      <span class="xplabel"><span data-i18n="jogo.tarefasParaEstagio">Tarefas para Estágio</span> <span id="estagioTopoNum">1</span></span>
       <span class="xpnum" id="estagioTopoLbl">0/10</span>
     </div>
-    <div class="bar"><div class="fill" id="estagioTopoFill"></div></div>
+    <div class="bar" id="estagioTopoBar"><div class="fill" id="estagioTopoFill"></div></div>
   </div>
 
   <div class="tasks">
@@ -2409,7 +2416,23 @@ function mostrarPoofMonstro(){
   // "ressuscitava" visualmente ate o render() de verdade rodar (bug
   // confirmado em video: monstro reaparecia normal enquanto "+X"
   // ainda estava na tela). Um so lugar controla isso agora.
-  setTimeout(() => el.remove(), 400);
+  //
+  // FIX (pedido do usuario: "ainda ocorre aquele corte no final da
+  // animação, não resolveu 100%") -- a causa era o setTimeout(400ms) fixo
+  // vs a animacao CSS de 390ms: so 10ms de folga entre o fim visual da
+  // animacao e a remocao do elemento. Qualquer jank do main thread (JS
+  // rodando em paralelo -- e tem bastante coisa rodando junto aqui:
+  // recompensa voando, contador global, etc.) podia atrasar o paint do
+  // ULTIMO frame pra depois desses 10ms, cortando a animacao antes dela
+  // terminar de aparecer. Troca pra esperar o evento REAL 'animationend'
+  // do browser (so dispara quando a animacao de fato terminou de
+  // rodar/pintar), com um setTimeout de seguranca bem mais folgado
+  // (700ms) so pra garantir que o elemento some mesmo se o evento por
+  // algum motivo nao disparar (ex: webview antigo com bug conhecido).
+  let jaRemovido = false;
+  const removerUmaVez = () => { if (jaRemovido) return; jaRemovido = true; el.remove(); };
+  el.addEventListener('animationend', removerUmaVez, { once: true });
+  setTimeout(removerUmaVez, 700);
 }
 window.mostrarPoofMonstro = mostrarPoofMonstro;
 let nomeHeroi = 'Aventureiro';
@@ -9727,6 +9750,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   overlay.className = 'dlgOverlay';
   overlay.innerHTML =
     '<div class="dlgStage">' +
+      '<button class="dlgPular" id="dlgPular" type="button"></button>' +
       '<div class="dlgHeroWrap"><img class="dlgHeroImg" id="dlgHeroImg" alt=""></div>' +
       '<div class="dlgNomeplate"><span>◆</span><span id="dlgNome"></span></div>' +
       '<div class="dlgBox">' +
@@ -9751,6 +9775,25 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     abaPendente = null;
   }
   overlay.addEventListener('click', fechar);
+
+  // BOTAO PULAR (pedido do usuario): fecha a sequencia INTEIRA de uma vez,
+  // independente de quantas falas faltam -- diferente do clique no overlay
+  // (fechar(), acima), que so avanca 1 fala por vez. stopPropagation() pra
+  // nao disparar o listener de click do overlay junto (que reabriria/
+  // avancaria por cima do fechamento).
+  function pularDialogo(){
+    if (!abaPendente) return;
+    clearTimeout(timerDigitacao);
+    digitando = false;
+    overlay.classList.remove('on');
+    vistas[abaPendente] = true;
+    salvarVistas();
+    abaPendente = null;
+  }
+  document.getElementById('dlgPular').addEventListener('click', (e) => {
+    e.stopPropagation();
+    pularDialogo();
+  });
 
   const VELOCIDADE_DIGITACAO = 28;   // ms por letra
   let fraseAtual = '';
@@ -9819,7 +9862,8 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   }
 
   function mostrarDialogoTela(nome){
-    const fonte = (typeof idiomaApp === 'function' && idiomaApp() === 'en') ? DIALOGOS_EN : DIALOGOS;
+    const en = (typeof idiomaApp === 'function' && idiomaApp() === 'en');
+    const fonte = en ? DIALOGOS_EN : DIALOGOS;
     const linhas = fonte[nome];
     if (!linhas || !linhas.length) return;
     abaPendente = nome;
@@ -9828,7 +9872,8 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     const img = (typeof heroiAtual === 'function') ? heroiAtual().img : '';
     document.getElementById('dlgHeroImg').src = img;
     document.getElementById('dlgNome').textContent =
-      (typeof nomeHeroi !== 'undefined' && nomeHeroi) || ((typeof idiomaApp === 'function' && idiomaApp() === 'en') ? 'Adventurer' : 'Aventureiro');
+      (typeof nomeHeroi !== 'undefined' && nomeHeroi) || (en ? 'Adventurer' : 'Aventureiro');
+    document.getElementById('dlgPular').textContent = en ? 'Skip »' : 'Pular »';
     overlay.classList.add('on');
     digitar(linhasAba[0]);
   }
@@ -15053,6 +15098,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'jogo.vida':             { pt:'Vida', en:'Health' },
     'jogo.experiencia':      { pt:'Experiência', en:'Experience' },
     'jogo.estagio':          { pt:'Estágio', en:'Stage' },
+    'jogo.tarefasParaEstagio': { pt:'Tarefas para Estágio', en:'Tasks for Stage' },
     'jogo.addTarefa':        { pt:'+ Adicionar', en:'+ Add' },
     'jogo.oQuePrecisaSerFeito': { pt:'O que precisa ser feito?', en:'What needs to be done?' },
     'jogo.soHoje':           { pt:'Só hoje', en:'Today only' },

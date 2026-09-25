@@ -970,8 +970,12 @@
        enquanto e so um stub -- a integracao real com Google Play Billing
        (verificacao do purchase token via Cloud Function) ainda nao foi
        feita, fica fora do escopo deste bloco (precisa da config dos
-       produtos no Play Console primeiro -- os "R$--" nos planos sao
-       placeholder ate la). -->
+       produtos no Play Console primeiro). Precos abaixo (Mensal R$17,90 /
+       Anual R$89,90 / Vitalicio R$199,90) sao os valores definidos --
+       ainda hardcoded no HTML, PRECISAM bater exatamente com o que for
+       cadastrado no Play Console. Quando o Digital Goods API entrar, estes
+       textos somem e o preco passa a vir dinamico direto do Play (permite
+       promocao/regiao sem precisar editar o HTML de novo). -->
   <div class="paywallOverlay" id="paywallOverlay">
     <div class="pwBg"></div>
     <div class="pwGlow"></div>
@@ -1032,17 +1036,17 @@
                 <span class="pwPlanoNome" data-i18n="pro.planoMensal">Mensal</span>
                 <span class="pwPlanoSub" data-i18n="pro.planoMensalSub">Cobrado todo mês</span>
               </div>
-              <span class="pwPlanoPreco">R$--<span data-i18n="pro.porMes">/mês</span></span>
+              <span class="pwPlanoPreco">R$17,90<span data-i18n="pro.porMes">/mês</span></span>
               <span class="pwRadio"></span>
             </div>
           </div>
           <div class="pwPlano sel" data-plano="anual" id="pwPlanoAnual">
             <div class="pwPlanoRow">
               <div class="pwPlanoInfo">
-                <span class="pwPlanoNome"><span data-i18n="pro.planoAnual">Anual</span> <span class="pwBadge">-30%</span></span>
-                <span class="pwPlanoSub" data-i18n="pro.planoAnualSub">Cobrado R$--/ano</span>
+                <span class="pwPlanoNome"><span data-i18n="pro.planoAnual">Anual</span> <span class="pwBadge">-58%</span></span>
+                <span class="pwPlanoSub" data-i18n="pro.planoAnualSub">Cobrado R$89,90/ano</span>
               </div>
-              <span class="pwPlanoPreco">R$--<span data-i18n="pro.porMes">/mês</span></span>
+              <span class="pwPlanoPreco">R$7,49<span data-i18n="pro.porMes">/mês</span></span>
               <span class="pwRadio"></span>
             </div>
           </div>
@@ -1052,7 +1056,7 @@
                 <span class="pwPlanoNome" data-i18n="pro.planoVitalicio">Vitalício</span>
                 <span class="pwPlanoSub" data-i18n="pro.planoVitalicioSub">Pagamento único</span>
               </div>
-              <span class="pwPlanoPreco">R$--</span>
+              <span class="pwPlanoPreco">R$199,90</span>
               <span class="pwRadio"></span>
             </div>
           </div>
@@ -15444,7 +15448,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'pro.planoMensal':    { pt:'Mensal', en:'Monthly' },
     'pro.planoMensalSub': { pt:'Cobrado todo mês', en:'Billed every month' },
     'pro.planoAnual':     { pt:'Anual', en:'Annual' },
-    'pro.planoAnualSub':  { pt:'Cobrado R$--/ano', en:'Billed $--/year' },
+    'pro.planoAnualSub':  { pt:'Cobrado R$89,90/ano', en:'Billed R$89.90/year' },
     'pro.planoVitalicio':    { pt:'Vitalício', en:'Lifetime' },
     'pro.planoVitalicioSub': { pt:'Pagamento único', en:'One-time payment' },
     'pro.porMes':      { pt:'/mês', en:'/mo' },

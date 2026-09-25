@@ -26,7 +26,7 @@
      alteracao aqui (bump manual) pra forcar cache-bust; SUBIR ESTE
      NUMERO sempre que style.css mudar e o problema persistir em
      producao. -->
-<link rel="stylesheet" href="style.css?v=11">
+<link rel="stylesheet" href="style.css?v=12">
 
 <!-- =====================================================================
      TOGGLE DEBUG — silenciar console (log/warn/error)  —  precisa ser o
@@ -2955,12 +2955,14 @@ function irParaEtapaPaywall(n, animar){
     if (planoMensal) planoMensal.classList.toggle('sel', id === 'mensal');
     if (planoAnual) planoAnual.classList.toggle('sel', id === 'anual');
     // pulso rapido no card recem-marcado -- feedback tatil de que o clique
-    // registrou, sem esperar nenhum redesenho de layout.
+    // registrou. .pwPulse agora e' so transform+transition (CSS, ver
+    // style.css perto de ".pwPlano.pwPulse") -- nao usa `animation`, entao
+    // precisa tirar a classe manualmente aqui pra transition "descer" de
+    // volta (um `animation` se limparia sozinho, transition nao).
     const alvo = id === 'mensal' ? planoMensal : planoAnual;
     if (alvo){
-      alvo.classList.remove('pwPulse');
-      void alvo.offsetWidth;
       alvo.classList.add('pwPulse');
+      setTimeout(() => alvo.classList.remove('pwPulse'), 150);
     }
   }
   if (planoMensal) planoMensal.onclick = () => selecionarPlano('mensal');

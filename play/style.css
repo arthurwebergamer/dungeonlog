@@ -2125,11 +2125,12 @@
     display:flex; flex-direction:column; position:fixed; inset:0; z-index:9500;
     color:#FAF6F0; overflow:hidden;
     opacity:0; visibility:hidden; pointer-events:none;
-    transition:opacity .25s var(--expo), visibility 0s .25s;
+    transform:scale(.96); transform-origin:center;
+    transition:opacity .22s var(--expo), transform .22s var(--expo), visibility 0s .22s;
   }
   .paywallOverlay.on{
-    opacity:1; visibility:visible; pointer-events:auto;
-    transition:opacity .25s var(--expo), visibility 0s;
+    opacity:1; visibility:visible; pointer-events:auto; transform:scale(1);
+    transition:opacity .22s var(--expo), transform .22s var(--expo), visibility 0s;
   }
   .pwBg{
     position:absolute; inset:0;
@@ -2230,56 +2231,62 @@
   }
 
   /* ---------------------------------------------------------------------
-     Animacoes do paywall (pedido do usuario: "tá meio seco" + abertura
-     lenta demais). 3 partes:
-     1) troca de etapa com slide+fade direcional (.pwStepIn pra frente,
-        .pwStepInVolta pra tras) -- mesma ideia do passoIn/passoInVolta do
-        onboarding, disparada em JS por irParaEtapaPaywall().
-     2) entrada escalonada dos beneficios/planos (cada linha atrasa um
-        pouco mais que a anterior via nth-child), pra tela nao aparecer
-        com tudo estatico de uma vez.
-     3) feedback tatil: mascote com uma pequena entrada/pulso quando a
-        etapa aparece, cards de plano com active-state ao tocar, e um
-        pulso rapido no plano que acabou de ser selecionado.
+     Animacoes do paywall (pedido do usuario: "tá seco" + abertura lenta).
+     v2 -- 1a versao tinha 2 problemas reportados pelo usuario:
+     (a) clicar num plano fazia AS DUAS opcoes sumirem: o pulso usava
+         `animation:pwPulse` no MESMO elemento que ja tinha
+         `animation:pwSobe ... forwards` de entrada -- a propriedade
+         `animation` e' um shorthand, entao a 2a declaracao SUBSTITUI a
+         1a inteira, perdendo o "forwards" que segurava opacity:1 depois
+         da entrada, e o card voltava pro opacity:0 do estado inicial.
+         Corrigido: pulso agora e' so `transform` via transition (nunca
+         mexe em `animation`), sem colisao nenhuma.
+     (b) transicao de etapa (Continuar/Voltar) parecia fraca/seca --
+         distancia do slide aumentada e as entradas escalonadas dos
+         filhos foram comprimidas (cascata inteira em ~300ms em vez de
+         ~700ms), pra sensacao ser rapida e viva, nao arrastada.
      --------------------------------------------------------------------- */
   @keyframes pwStepIn{
-    from{ opacity:0; transform:translateX(28px); }
-    to{ opacity:1; transform:translateX(0); }
+    from{ opacity:0; transform:translateX(46px) scale(.98); }
+    to{ opacity:1; transform:translateX(0) scale(1); }
   }
   @keyframes pwStepInVolta{
-    from{ opacity:0; transform:translateX(-28px); }
-    to{ opacity:1; transform:translateX(0); }
+    from{ opacity:0; transform:translateX(-46px) scale(.98); }
+    to{ opacity:1; transform:translateX(0) scale(1); }
   }
-  .pwEtapa.pwStepIn{ animation:pwStepIn .32s var(--expo); }
-  .pwEtapa.pwStepInVolta{ animation:pwStepInVolta .32s var(--expo); }
+  .pwEtapa.pwStepIn{ animation:pwStepIn .26s var(--expo); }
+  .pwEtapa.pwStepInVolta{ animation:pwStepInVolta .26s var(--expo); }
 
   @keyframes pwSobe{
     from{ opacity:0; transform:translateY(10px); }
     to{ opacity:1; transform:translateY(0); }
   }
-  .pwMascote{ animation:pwSobe .38s var(--expo) both; }
-  .pwEyebrow{ animation:pwSobe .34s var(--expo) .04s both; }
-  .pwHeadline{ animation:pwSobe .34s var(--expo) .08s both; }
-  .pwSub{ animation:pwSobe .34s var(--expo) .12s both; }
-  .pwBeneficio{ opacity:0; animation:pwSobe .34s var(--expo) forwards; }
-  .pwBeneficio:nth-child(1){ animation-delay:.16s; }
-  .pwBeneficio:nth-child(2){ animation-delay:.22s; }
-  .pwBeneficio:nth-child(3){ animation-delay:.28s; }
-  .pwEtapa .pwCTA{ opacity:0; animation:pwSobe .34s var(--expo) .34s both; }
-  .pwEtapa .pwSecundario{ opacity:0; animation:pwSobe .34s var(--expo) .38s both; }
+  .pwMascote{ animation:pwSobe .3s var(--expo) both; }
+  .pwEyebrow{ animation:pwSobe .28s var(--expo) .02s both; }
+  .pwHeadline{ animation:pwSobe .28s var(--expo) .05s both; }
+  .pwSub{ animation:pwSobe .28s var(--expo) .08s both; }
+  .pwBeneficio{ opacity:0; animation:pwSobe .28s var(--expo) forwards; }
+  .pwBeneficio:nth-child(1){ animation-delay:.11s; }
+  .pwBeneficio:nth-child(2){ animation-delay:.15s; }
+  .pwBeneficio:nth-child(3){ animation-delay:.19s; }
+  .pwEtapa .pwCTA{ opacity:0; animation:pwSobe .28s var(--expo) .24s both; }
+  .pwEtapa .pwSecundario{ opacity:0; animation:pwSobe .28s var(--expo) .27s both; }
 
-  .pwPlano{ opacity:0; animation:pwSobe .3s var(--expo) forwards; transition:transform .12s var(--expo), border-color .15s, background .15s; }
-  .pwPlano:nth-child(1){ animation-delay:.14s; }
-  .pwPlano:nth-child(2){ animation-delay:.2s; }
-  .pwPlano:active{ transform:scale(.98); }
-  .pwEtapa#pwEtapa2 .pwMicro{ opacity:0; animation:pwSobe .3s var(--expo) .28s both; }
-
-  @keyframes pwPulse{
-    0%{ transform:scale(1); }
-    40%{ transform:scale(1.025); }
-    100%{ transform:scale(1); }
+  .pwPlano{
+    opacity:0; animation:pwSobe .26s var(--expo) forwards;
+    transition:transform .15s var(--expo), border-color .15s, background .15s;
   }
-  .pwPlano.pwPulse{ animation:pwPulse .26s var(--expo); }
+  .pwPlano:nth-child(1){ animation-delay:.09s; }
+  .pwPlano:nth-child(2){ animation-delay:.13s; }
+  .pwPlano:active{ transform:scale(.98); }
+  .pwEtapa#pwEtapa2 .pwMicro{ opacity:0; animation:pwSobe .26s var(--expo) .19s both; }
+
+  /* pulso ao selecionar -- SO transform+transition, nunca `animation`,
+     pra nunca mais colidir com a entrada (ver nota acima). JS (perto de
+     selecionarPlano(), index.html) adiciona .pwPulse e remove logo
+     depois; a transicao ja declarada em .pwPlano cuida da subida e
+     descida sozinha. */
+  .pwPlano.pwPulse{ transform:scale(1.035); }
 
   .pwCTA{ transition:transform .12s var(--expo), filter .15s; }
   .pwCTA:active{ transform:scale(.97); }
@@ -2287,8 +2294,9 @@
   .pwClose:active,.pwBack:active{ transform:scale(.88); }
 
   @media (prefers-reduced-motion: reduce){
+    .paywallOverlay{ transform:none !important; }
     .pwEtapa.pwStepIn,.pwEtapa.pwStepInVolta,
-    .pwMascote,.pwEyebrow,.pwHeadline,.pwSub,.pwBeneficio,.pwPlano,.pwPlano.pwPulse,
+    .pwMascote,.pwEyebrow,.pwHeadline,.pwSub,.pwBeneficio,.pwPlano,
     .pwEtapa .pwCTA,.pwEtapa .pwSecundario,.pwEtapa#pwEtapa2 .pwMicro{
       animation:none !important; opacity:1 !important; transform:none !important;
     }

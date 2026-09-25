@@ -309,7 +309,7 @@
   .navpill{position:absolute;top:8px;left:0;width:62px;height:44px;border-radius:999px;background:var(--accent-dim);border:1px solid rgba(255,255,255,.14);box-shadow:0 0 10px rgba(255,255,255,.08);transform:translateX(0);transition:transform .32s cubic-bezier(.34,1.56,.64,1);pointer-events:none;z-index:0}
 
   /* ============ Estatisticas ============ */
-  .est-card{background:var(--panel-2);border:1px solid var(--line);border-radius:20px;padding:20px;margin-bottom:14px;box-shadow:0 10px 24px rgba(0,0,0,.22)}
+  .est-card{background:var(--panel-2);border:1px solid var(--line);border-radius:20px;padding:20px;margin-bottom:14px;box-shadow:0 10px 24px rgba(0,0,0,.22);position:relative}
   .est-divider{height:1px;background:var(--line);margin:0 0 16px}
   .est-titulo{font-size:12.5px;font-weight:600;color:var(--muted);letter-spacing:.02em;margin-bottom:16px;display:flex;align-items:center;gap:7px}
 
@@ -378,8 +378,8 @@
      estranho na borda, e nao o .est-lockoverlay, que precisa ficar nitido)
      e mostra o .est-lockoverlay (SVG de cadeado real + "PRO", ja no HTML
      do card -- nao emoji, pedido explicito do usuario). */
-  .est-statscol.premiumBloqueado{ cursor:pointer; }
-  .est-statscol.premiumBloqueado > *:not(.est-lockoverlay){
+  .est-card.premiumBloqueado{ cursor:pointer; }
+  .est-card.premiumBloqueado > *:not(.est-lockoverlay){
     filter:blur(5px); user-select:none; pointer-events:none;
   }
   .est-lockoverlay{
@@ -388,11 +388,17 @@
     background:rgba(10,8,16,.32); border-radius:12px;
   }
   .est-lockoverlay svg{ width:20px; height:20px; color:var(--text); }
+  /* selo "PRO" no MESMO estilo usado em todo o resto do app (.temaSelo,
+     .pjSelo -- pilula pequena, fundo var(--accent), texto var(--bg)) --
+     antes esse aqui tinha fonte Silkscreen 10px propria e destoava,
+     ficando mais chamativo que os outros (pedido do usuario: "parece
+     mais destacado que todos os outros lugares"). */
   .est-lockoverlay span{
-    font-family:'Silkscreen',monospace; font-weight:700; font-size:10px;
-    letter-spacing:.05em; color:var(--text);
+    font-family:'Outfit',sans-serif; font-size:8px; font-weight:700;
+    background:var(--accent); color:var(--bg);
+    border-radius:999px; padding:2px 6px; letter-spacing:.3px;
   }
-  .est-statscol.premiumBloqueado .est-lockoverlay{ display:flex; }
+  .est-card.premiumBloqueado .est-lockoverlay{ display:flex; }
   .est-donutlegenda-compacta{width:100%}
   .est-donutlegenda-compacta .est-legitem{font-size:10.5px}
   .est-donutlegenda-compacta .est-legbar{display:none}
@@ -2278,6 +2284,7 @@
   }
   .pwPlano:nth-child(1){ animation-delay:.09s; }
   .pwPlano:nth-child(2){ animation-delay:.13s; }
+  .pwPlano:nth-child(3){ animation-delay:.17s; }
   .pwPlano:active{ transform:scale(.98); }
   .pwEtapa#pwEtapa2 .pwMicro{ opacity:0; animation:pwSobe .26s var(--expo) .19s both; }
 

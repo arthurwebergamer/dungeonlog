@@ -26,7 +26,7 @@
      alteracao aqui (bump manual) pra forcar cache-bust; SUBIR ESTE
      NUMERO sempre que style.css mudar e o problema persistir em
      producao. -->
-<link rel="stylesheet" href="style.css?v=12">
+<link rel="stylesheet" href="style.css?v=13">
 
 <!-- =====================================================================
      TOGGLE DEBUG — silenciar console (log/warn/error)  —  precisa ser o
@@ -1046,6 +1046,16 @@
               <span class="pwRadio"></span>
             </div>
           </div>
+          <div class="pwPlano" data-plano="vitalicio" id="pwPlanoVitalicio">
+            <div class="pwPlanoRow">
+              <div class="pwPlanoInfo">
+                <span class="pwPlanoNome" data-i18n="pro.planoVitalicio">Vitalício</span>
+                <span class="pwPlanoSub" data-i18n="pro.planoVitalicioSub">Pagamento único</span>
+              </div>
+              <span class="pwPlanoPreco">R$--</span>
+              <span class="pwRadio"></span>
+            </div>
+          </div>
         </div>
 
         <div class="pwMicro">
@@ -1151,7 +1161,7 @@
       </div>
     </div>
 
-    <div class="est-card">
+    <div class="est-card" id="estCard7Dias">
       <div class="est-titulo"><span data-i18n="est.ultimos7">Últimos 7 dias</span></div>
       <div class="est-chartwrap">
         <svg id="est7DiasSvg" viewBox="0 0 300 80" width="100%" height="80" preserveAspectRatio="none">
@@ -1164,6 +1174,10 @@
         </svg>
       </div>
       <div class="est-chartlabels" id="est7DiasLabels"></div>
+      <div class="est-lockoverlay" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        <span data-i18n="pro.trancado">PRO</span>
+      </div>
     </div>
 
     <div class="est-card est-clicavel" id="estHistCard">
@@ -1191,6 +1205,10 @@
         <div class="est-tile"></div><span data-i18n="est.semTarefa">sem tarefa</span>
         <div class="est-tile est-tile-fuga"></div><span data-i18n="est.fuga">fugiu</span>
         <div class="est-tile est-tile-vitoria"></div><span data-i18n="est.vitoria">venceu</span>
+      </div>
+      <div class="est-lockoverlay" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        <span data-i18n="pro.trancado">PRO</span>
       </div>
     </div>
 
@@ -1287,6 +1305,13 @@
   if (periodoOverlay) periodoOverlay.onclick = function(e){ if (e.target === periodoOverlay) fecharPeriodo(); };
   if (periodoFechar) periodoFechar.onclick = fecharPeriodo;
   if (histCard) histCard.onclick = function(){
+    // PLANO PRO (pedido do usuario): historico trancado abre o paywall em
+    // vez do seletor de periodo. Checa assinaturaAtiva() no clique (nao
+    // precisa esperar renderEstatisticas() re-wiring, sempre atual).
+    if (typeof assinaturaAtiva === 'function' && !assinaturaAtiva()){
+      if (typeof window.abrirPaywall === 'function') window.abrirPaywall('estatisticas');
+      return;
+    }
     if (periodoOverlay) periodoOverlay.classList.add('on');
     document.querySelectorAll('.est-periodoopc').forEach(function(b){
       b.classList.toggle('on', b.dataset.periodo === estPeriodoAtual);
@@ -2937,6 +2962,8 @@ function irParaEtapaPaywall(n, animar){
   const btnAssinar = document.getElementById('paywallAssinarBtn');
   const planoMensal = document.getElementById('pwPlanoMensal');
   const planoAnual = document.getElementById('pwPlanoAnual');
+  const planoVitalicio = document.getElementById('pwPlanoVitalicio');
+  const planosPorId = { mensal: planoMensal, anual: planoAnual, vitalicio: planoVitalicio };
 
   if (btnFechar) btnFechar.onclick = fecharPaywall;
   if (btnVoltar) btnVoltar.onclick = () => irParaEtapaPaywall(1);
@@ -2952,14 +2979,15 @@ function irParaEtapaPaywall(n, animar){
   function selecionarPlano(id){
     if (id === _pwPlanoSelecionado) return;
     _pwPlanoSelecionado = id;
-    if (planoMensal) planoMensal.classList.toggle('sel', id === 'mensal');
-    if (planoAnual) planoAnual.classList.toggle('sel', id === 'anual');
+    Object.keys(planosPorId).forEach(k => {
+      if (planosPorId[k]) planosPorId[k].classList.toggle('sel', k === id);
+    });
     // pulso rapido no card recem-marcado -- feedback tatil de que o clique
     // registrou. .pwPulse agora e' so transform+transition (CSS, ver
     // style.css perto de ".pwPlano.pwPulse") -- nao usa `animation`, entao
     // precisa tirar a classe manualmente aqui pra transition "descer" de
     // volta (um `animation` se limparia sozinho, transition nao).
-    const alvo = id === 'mensal' ? planoMensal : planoAnual;
+    const alvo = planosPorId[id];
     if (alvo){
       alvo.classList.add('pwPulse');
       setTimeout(() => alvo.classList.remove('pwPulse'), 150);
@@ -2967,6 +2995,7 @@ function irParaEtapaPaywall(n, animar){
   }
   if (planoMensal) planoMensal.onclick = () => selecionarPlano('mensal');
   if (planoAnual) planoAnual.onclick = () => selecionarPlano('anual');
+  if (planoVitalicio) planoVitalicio.onclick = () => selecionarPlano('vitalicio');
 })();
 
 function iniciarCompraAssinatura(){
@@ -5912,12 +5941,17 @@ function renderEstatisticas(){
   // Reaplica a cada render() -- barato (2 elementos) e garante que destrava
   // sozinho se a pessoa virar assinante enquanto a tela ja esta aberta.
   const bloqueadoPro = typeof assinaturaAtiva === 'function' && !assinaturaAtiva();
-  ['estCardTaxaConclusao', 'estCardComoFoiMes'].forEach(id => {
+  ['estCardTaxaConclusao', 'estCardComoFoiMes', 'estCard7Dias'].forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
     el.classList.toggle('premiumBloqueado', bloqueadoPro);
     el.onclick = bloqueadoPro ? () => { if (typeof window.abrirPaywall === 'function') window.abrirPaywall('estatisticas'); } : null;
   });
+  // estHistCard tem onclick proprio, fixo (ver IIFE mais abaixo -- decide
+  // entre abrir o paywall ou o popup de periodo direto no clique, sempre
+  // le assinaturaAtiva() na hora); aqui so cuida do blur+cadeado visual.
+  const estHistCardEl = document.getElementById('estHistCard');
+  if (estHistCardEl) estHistCardEl.classList.toggle('premiumBloqueado', bloqueadoPro);
 
   // resumo vitalicio -- totalTarefasConcluidas() ja existe desde o
   // "CONTADOR - TAREFAS CONCLUIDAS (lifetime)" (incrementa 1x por
@@ -15411,6 +15445,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'pro.planoMensalSub': { pt:'Cobrado todo mês', en:'Billed every month' },
     'pro.planoAnual':     { pt:'Anual', en:'Annual' },
     'pro.planoAnualSub':  { pt:'Cobrado R$--/ano', en:'Billed $--/year' },
+    'pro.planoVitalicio':    { pt:'Vitalício', en:'Lifetime' },
+    'pro.planoVitalicioSub': { pt:'Pagamento único', en:'One-time payment' },
     'pro.porMes':      { pt:'/mês', en:'/mo' },
     'pro.microcopy':   { pt:'Cancele quando quiser', en:'Cancel anytime' },
     'pro.assinar':     { pt:'Assinar Plano Pro', en:'Subscribe to Pro' },

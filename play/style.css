@@ -369,9 +369,30 @@
   .est-streaklbl{display:none}
 
   .est-statsrow{display:flex;gap:12px;margin-bottom:14px}
-  .est-statscol{flex:1;min-width:0;margin-bottom:0;display:flex;flex-direction:column;align-items:center;text-align:center}
+  .est-statscol{flex:1;min-width:0;margin-bottom:0;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative}
   .est-statscol .est-titulo{justify-content:center}
   .est-statscol .est-ringbox,.est-statscol .est-donutbox{margin:6px 0 12px}
+
+  /* PLANO PRO -- cadeado sobre card de estatistica (pedido do usuario).
+     Borra os FILHOS reais (nao o proprio card -- blur no card gera halo
+     estranho na borda, e nao o .est-lockoverlay, que precisa ficar nitido)
+     e mostra o .est-lockoverlay (SVG de cadeado real + "PRO", ja no HTML
+     do card -- nao emoji, pedido explicito do usuario). */
+  .est-statscol.premiumBloqueado{ cursor:pointer; }
+  .est-statscol.premiumBloqueado > *:not(.est-lockoverlay){
+    filter:blur(5px); user-select:none; pointer-events:none;
+  }
+  .est-lockoverlay{
+    display:none; position:absolute; inset:0; z-index:1;
+    flex-direction:column; align-items:center; justify-content:center; gap:5px;
+    background:rgba(10,8,16,.32); border-radius:12px;
+  }
+  .est-lockoverlay svg{ width:20px; height:20px; color:var(--text); }
+  .est-lockoverlay span{
+    font-family:'Silkscreen',monospace; font-weight:700; font-size:10px;
+    letter-spacing:.05em; color:var(--text);
+  }
+  .est-statscol.premiumBloqueado .est-lockoverlay{ display:flex; }
   .est-donutlegenda-compacta{width:100%}
   .est-donutlegenda-compacta .est-legitem{font-size:10.5px}
   .est-donutlegenda-compacta .est-legbar{display:none}
@@ -2085,6 +2106,67 @@
   @media (prefers-reduced-motion: reduce){
     .loadingMasmorraSprite{ animation:none; }
   }
+
+  /* PLANO PRO -- paywall central. Mesmo padrao de fade (opacity+
+     visibility, sem display:none) do .loadingMasmorra logo acima.
+     z-index 9500 -- abaixo do loading (10000, so cobre tudo por
+     instantes) mas acima de qualquer view/overlay normal do app. */
+  .paywallOverlay{
+    display:flex; position:fixed; inset:0; z-index:9500;
+    background:rgba(4,3,7,.72); backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px);
+    align-items:center; justify-content:center; padding:24px;
+    opacity:0; visibility:hidden; pointer-events:none;
+    transition:opacity .25s var(--expo), visibility 0s .25s;
+  }
+  .paywallOverlay.on{
+    opacity:1; visibility:visible; pointer-events:auto;
+    transition:opacity .25s var(--expo), visibility 0s;
+  }
+  .paywallCard{
+    position:relative; width:100%; max-width:360px; max-height:88vh; overflow-y:auto;
+    display:flex; flex-direction:column; gap:18px; align-items:stretch;
+    background:var(--panel); border:1px solid var(--line); border-radius:20px;
+    padding:30px 22px 24px; box-shadow:0 20px 60px rgba(0,0,0,.45);
+  }
+  .paywallFechar{
+    position:absolute; top:12px; right:12px; z-index:2; background:none; border:none;
+    color:var(--dim); padding:8px; cursor:pointer;
+  }
+  .paywallFechar:hover{ color:var(--text); }
+  .paywallTopo{ display:flex; flex-direction:column; align-items:center; gap:7px; text-align:center; }
+  .paywallIconWrap{
+    width:76px; height:76px; margin-bottom:5px; display:grid; place-items:center;
+    border-radius:20px; border:1px solid var(--accent-dim);
+    background:radial-gradient(circle at 50% 35%, var(--accent-dim), transparent 72%);
+  }
+  .paywallIconWrap .pxi{ filter:drop-shadow(0 3px 6px rgba(0,0,0,.45)); }
+  .paywallEyebrow{
+    font-family:'Silkscreen',monospace; font-size:11px; letter-spacing:1.5px;
+    color:var(--accent); text-transform:uppercase;
+  }
+  .paywallHeadline{
+    font-family:'Outfit',sans-serif; font-size:20px; font-weight:700; line-height:1.32;
+    color:var(--text); margin:0;
+  }
+  .paywallHeadline b{ color:var(--accent); font-weight:700; }
+  .paywallBeneficios{ display:flex; flex-direction:column; gap:12px; }
+  .paywallBeneficio{ display:flex; gap:12px; align-items:center; }
+  .paywallBeneficioIc{
+    width:38px; height:38px; flex:none; display:grid; place-items:center;
+    background:var(--accent-dim); border-radius:11px; color:var(--accent);
+  }
+  .paywallBeneficioIc svg{ width:19px; height:19px; }
+  .paywallBeneficioTxt{ display:flex; flex-direction:column; gap:1px; text-align:left; }
+  .paywallBeneficioTxt b{ font-size:14px; color:var(--text); font-weight:600; }
+  .paywallBeneficioTxt span{ font-size:12.5px; color:var(--dim); line-height:1.35; }
+  .paywallCTA{
+    background:var(--accent); color:var(--bg); border:none; border-radius:14px;
+    padding:16px; font-family:'Outfit',sans-serif; font-size:15.5px; font-weight:700;
+    cursor:pointer; width:100%;
+  }
+  .paywallCTA:hover{ filter:brightness(1.05); }
+  .paywallMicrocopy{ font-size:11.5px; color:var(--dim); text-align:center; margin-top:-11px; }
+  .paywallCard .secundario{ margin:0 auto; }
 
 /* ===== Bloco style #34 ===== */
 .carrosselTopo{display:flex;align-items:center;justify-content:space-between}

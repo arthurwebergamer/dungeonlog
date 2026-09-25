@@ -26,7 +26,7 @@
      alteracao aqui (bump manual) pra forcar cache-bust; SUBIR ESTE
      NUMERO sempre que style.css mudar e o problema persistir em
      producao. -->
-<link rel="stylesheet" href="style.css?v=7">
+<link rel="stylesheet" href="style.css?v=9">
 
 <!-- =====================================================================
      TOGGLE DEBUG — silenciar console (log/warn/error)  —  precisa ser o
@@ -951,6 +951,66 @@
     <span class="loadingMasmorraTxt" id="loadingMasmorraTxt">Conectando com a masmorra...</span>
   </div>
 
+  <!-- PLANO PRO -- tela de paywall central, com layout proprio (nao reaproveita
+       mais .card/.regras/.marca do onboarding -- pedido do usuario apos ver
+       referencias de outros apps: ".paywallCard/.paywallBeneficio/etc" abaixo,
+       CSS perto de "Bloco style #34" em style.css).
+       Icone do topo e o sprite do item "Coroa Real" (ITENS[93]) do proprio
+       jogo, injetado em #paywallIcone via JS (perto de abrirPaywall(),
+       mais abaixo) -- sem emoji, reaproveita asset que ja existe.
+       Aberta via window.abrirPaywall(motivo) -- QUALQUER gatilho PRO do app
+       (tema bloqueado, limite de heroi, limite de tarefas, card de
+       estatistica trancado) chama a MESMA funcao, entao so existe 1 paywall
+       pra manter. Botao "Assinar" chama iniciarCompraAssinatura(), que por
+       enquanto e so um stub -- a integracao real com Google Play Billing
+       (verificacao do purchase token via Cloud Function) ainda nao foi
+       feita, e fica fora do escopo deste bloco (precisa da config dos
+       produtos no Play Console primeiro). -->
+  <div class="paywallOverlay" id="paywallOverlay">
+    <div class="paywallCard">
+      <button class="paywallFechar" id="paywallFecharBtn" type="button" aria-label="Fechar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+      <div class="paywallTopo">
+        <div class="paywallIconWrap" id="paywallIcone"></div>
+        <span class="paywallEyebrow" data-i18n="pro.titulo">PLANO PRO</span>
+        <h2 class="paywallHeadline" data-i18n="pro.headline">Continue sua <b>jornada</b> sem limites</h2>
+      </div>
+      <div class="paywallBeneficios">
+        <div class="paywallBeneficio">
+          <span class="paywallBeneficioIc">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/></svg>
+          </span>
+          <div class="paywallBeneficioTxt">
+            <b data-i18n="pro.beneficio1Titulo">Tarefas ilimitadas</b>
+            <span data-i18n="pro.beneficio1">Sem limite diário de tarefas ativas.</span>
+          </div>
+        </div>
+        <div class="paywallBeneficio">
+          <span class="paywallBeneficioIc">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="9"/></svg>
+          </span>
+          <div class="paywallBeneficioTxt">
+            <b data-i18n="pro.beneficio2Titulo">Todos os temas</b>
+            <span data-i18n="pro.beneficio2">E até 4 heróis na mesma conta.</span>
+          </div>
+        </div>
+        <div class="paywallBeneficio">
+          <span class="paywallBeneficioIc">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>
+          </span>
+          <div class="paywallBeneficioTxt">
+            <b data-i18n="pro.beneficio3Titulo">Estatísticas completas</b>
+            <span data-i18n="pro.beneficio3">Acompanhe toda a sua jornada.</span>
+          </div>
+        </div>
+      </div>
+      <button class="paywallCTA" id="paywallAssinarBtn" type="button" data-i18n="pro.assinar">Assinar Plano Pro</button>
+      <span class="paywallMicrocopy" data-i18n="pro.microcopy">Cancele quando quiser</span>
+      <button class="secundario" id="paywallAgoraNaoBtn" type="button" data-i18n="pro.agoraNao">Agora não</button>
+    </div>
+  </div>
+
   <div class="view" id="viewLoja">
     <div class="vhead">
       <span class="vtitle" data-i18n="nav.loja">Loja</span>
@@ -1006,16 +1066,27 @@
     </div>
 
     <div class="est-statsrow">
-      <div class="est-card est-statscol">
+      <!-- PLANO PRO (pedido do usuario: "essas 2 telas com efeito de blur
+           que manda pro paywall"). Card ganha .premiumBloqueado via JS
+           (renderEstatisticas(), so quando !assinaturaAtiva()) -- CSS
+           (ver style.css, perto de .est-statscol) borra o CONTEUDO real
+           e mostra o .est-lockoverlay abaixo (cadeado SVG real + "PRO",
+           nao emoji -- pedido do usuario). Clique em QUALQUER lugar do
+           card trancado abre o paywall. -->
+      <div class="est-card est-statscol" id="estCardTaxaConclusao">
         <div class="est-titulo" data-i18n="est.taxaConclusaoTitulo">Taxa de conclusão</div>
         <div class="est-ringbox" id="estTaxaRing" style="--pct:0">
           <div class="est-ringbg"></div>
           <div class="est-ringtrack"></div>
           <div class="est-ringtxt"><span class="n" id="estTaxaNum">0%</span><span class="u" data-i18n="est.mes">MÊS</span></div>
         </div>
+        <div class="est-lockoverlay" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          <span data-i18n="pro.trancado">PRO</span>
+        </div>
       </div>
 
-      <div class="est-card est-statscol">
+      <div class="est-card est-statscol" id="estCardComoFoiMes">
         <div class="est-titulo"><span data-i18n="est.comoFoiMes">Como foi o mês</span></div>
         <div class="est-donutbox">
           <div class="est-donutring" id="estDonutMes"></div>
@@ -1025,6 +1096,10 @@
           <div class="est-legitem"><span class="est-dot" style="background:var(--accent)"></span><span data-i18n="est.vitoria">venceu</span><div class="est-legbar"><i id="estBarraVitoria" style="width:0%;background:var(--accent)"></i></div><b id="estQtdVitoria">0</b></div>
           <div class="est-legitem"><span class="est-dot" style="background:color-mix(in srgb, var(--accent) 40%, transparent)"></span><span data-i18n="est.fuga">fugiu</span><div class="est-legbar"><i id="estBarraFuga" style="width:0%;background:color-mix(in srgb, var(--accent) 40%, transparent)"></i></div><b id="estQtdFuga">0</b></div>
           <div class="est-legitem"><span class="est-dot" style="background:var(--panel-3)"></span><span data-i18n="est.semTarefa">sem tarefa</span><div class="est-legbar"><i id="estBarraSemTarefa" style="width:0%"></i></div><b id="estQtdSemTarefa">0</b></div>
+        </div>
+        <div class="est-lockoverlay" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          <span data-i18n="pro.trancado">PRO</span>
         </div>
       </div>
     </div>
@@ -2673,7 +2748,14 @@ function renderEstagioBar(){
   const max = estagio >= 4; // ultimo estagio -- sem proxima meta, barra so fica cheia
   fillEl.style.width = Math.round(progressoEstagio() * 100) + '%';
 
-  if (estagioNumEl) estagioNumEl.textContent = estagio;
+  // FIX (pedido do usuario: "seriam tarefas pro estagio 2, ja que a gente
+  // ja comeca no estagio 1") -- a fracao/barra sempre mediu progresso RUMO
+  // ao PROXIMO estagio (ver "alvo"/"inicio" mais abaixo), mas o numero no
+  // label mostrava o estagio ATUAL (ex: "Tarefas para Estágio 1" contando
+  // as tarefas que levam ao estagio 2 -- numero errado pro que o label
+  // agora descreve). No ultimo estagio (max, sem proximo) mantem o numero
+  // atual, ja que nao ha "proximo" pra apontar.
+  if (estagioNumEl) estagioNumEl.textContent = max ? estagio : (estagio + 1);
 
   // v4.20x (pedido do usuario: "1 · 4/10" no valor ficou confuso --
   // misturava QUAL estagio com QUANTO falta). O numero do estagio
@@ -2711,6 +2793,82 @@ function assinaturaAtiva(){
   } catch(e){}
   return false;
 }
+window.assinaturaAtiva = assinaturaAtiva;
+
+// ---------------------------------------------------------------------
+// PLANO PRO -- paywall central (pedido do usuario: telas de Estatisticas
+// bloqueadas + limite de tarefas + integrar pagamento de verdade). Um SO
+// gatilho (window.abrirPaywall) pra todo mundo que precisa mostrar o
+// paywall -- tema PRO bloqueado, limite de heroi, limite de tarefa
+// diaria, card de estatistica trancado. Mostra um toast rapido
+// ("Você descobriu um recurso premium!", reaproveitando aviso() que ja
+// existe) e, logo em seguida, abre a tela cheia (#paywallOverlay).
+//
+// iniciarCompraAssinatura() e' so um STUB por enquanto -- a integracao
+// real com Google Play Billing (Digital Goods API dentro da TWA +
+// verificacao do purchase token numa Cloud Function, pra ninguem
+// conseguir "liberar premium" so mexendo no client) ainda nao foi feita.
+// Precisa antes: criar o produto de assinatura no Play Console (ID,
+// preco) e decidir onde a Cloud Function vai rodar. Ate la, o botao
+// "Assinar" so avisa que ainda nao esta disponivel.
+// ---------------------------------------------------------------------
+const LIMITE_TAREFAS_GRATIS = 5; // pedido do usuario -- plano gratis para em 5 tarefas ativas
+
+function abrirPaywall(motivo){
+  window.dbgConta && window.dbgConta('abrirPaywall() -- motivo=' + motivo);
+  // Icone do topo = sprite do item "Coroa Real" (ITENS[93]) ja existente no
+  // jogo, em vez de emoji. Injetado aqui (nao no <script> logo apos o HTML)
+  // porque spriteHTML()/SHEET_COLS so existem mais abaixo no arquivo --
+  // nesse ponto da execucao (topo do script) ainda seria TDZ/undefined.
+  // So preenche uma vez (innerHTML vazio na primeira chamada).
+  const icone = document.getElementById('paywallIcone');
+  if (icone && !icone.innerHTML && typeof spriteHTML === 'function'){
+    icone.innerHTML = spriteHTML(93, 48);
+  }
+  if (typeof window.aviso === 'function'){
+    window.aviso((typeof idiomaApp === 'function' && idiomaApp() === 'en') ? 'You found a premium feature!' : 'Você descobriu um recurso premium!');
+  }
+  const overlay = document.getElementById('paywallOverlay');
+  if (!overlay) return;
+  // pequeno atraso pra o toast ("descobriu um recurso premium") ser lido
+  // ANTES do paywall cobrir a tela -- sem isso os dois apareciam
+  // simultaneos e o toast ficava escondido atras do overlay na hora.
+  setTimeout(() => overlay.classList.add('on'), 550);
+}
+window.abrirPaywall = abrirPaywall;
+
+function fecharPaywall(){
+  const overlay = document.getElementById('paywallOverlay');
+  if (overlay) overlay.classList.remove('on');
+}
+window.fecharPaywall = fecharPaywall;
+
+(function(){
+  const btnFechar = document.getElementById('paywallFecharBtn');
+  const btnAgoraNao = document.getElementById('paywallAgoraNaoBtn');
+  const btnAssinar = document.getElementById('paywallAssinarBtn');
+  const overlay = document.getElementById('paywallOverlay');
+  if (btnFechar) btnFechar.onclick = fecharPaywall;
+  if (btnAgoraNao) btnAgoraNao.onclick = fecharPaywall;
+  if (btnAssinar) btnAssinar.onclick = iniciarCompraAssinatura;
+  // clique fora do card tambem fecha, mesmo padrao de dlgOverlay/outros
+  // overlays do app -- clique DENTRO do card nao propaga (stopPropagation
+  // no proprio card evitaria closures extras, mas como so o overlay tem
+  // o listener e o card cobre a area central, um clique no card nunca
+  // chega no overlay mesmo, entao nao precisa de stopPropagation aqui).
+  if (overlay) overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharPaywall(); });
+})();
+
+function iniciarCompraAssinatura(){
+  // TODO (integracao real, ver comentario acima do bloco): chamar o
+  // Digital Goods API / Play Billing daqui, mandar o purchase token pra
+  // Cloud Function verificar, e so entao marcar a assinatura como ativa
+  // (hoje assinaturaAtiva() so reflete o modo debug).
+  if (typeof window.aviso === 'function'){
+    window.aviso((typeof idiomaApp === 'function' && idiomaApp() === 'en') ? 'Payments coming soon' : 'Pagamento ainda não disponível');
+  }
+}
+window.iniciarCompraAssinatura = iniciarCompraAssinatura;
 
 // temas com desbloqueioGratis (ex: Deserto via streak) ficam bloqueados
 // ate a condicao ser atingida -- ver verificarDesbloqueiosTemaArena().
@@ -4536,6 +4694,16 @@ function criar(){
   if (!texto) return;
   if (modo === 'repete' && diasEscolhidos.length === 0) return;
 
+  // PLANO PRO (pedido do usuario): plano gratis para em LIMITE_TAREFAS_GRATIS
+  // tarefas ATIVAS (tarefas.length conta todas, independente do tipo --
+  // simples de entender e sem precisar decidir "ativas hoje" vs "no total").
+  // Assinante (assinaturaAtiva()) nunca esbarra aqui.
+  if (typeof assinaturaAtiva === 'function' && !assinaturaAtiva() && tarefas.length >= LIMITE_TAREFAS_GRATIS){
+    composer.classList.remove('on');
+    if (typeof window.abrirPaywall === 'function') window.abrirPaywall('tarefas');
+    return;
+  }
+
   if (modo === 'hoje') tarefas.push({ texto, tipo:'hoje', data:isoAtual(), feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined });
   else if (modo === 'mensal') tarefas.push({ texto, tipo:'mensal', diaMes:diaMesEscolhido, feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined });
   else if (modo === 'anual') tarefas.push({ texto, tipo:'anual', diaAno:diaAnoEscolhido, mesAno:mesAnoEscolhido, feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined });
@@ -5627,6 +5795,19 @@ function renderEstatisticas(){
   const [anoStr, mesStr] = hoje.split('-');
   const ano = Number(anoStr), mes = Number(mesStr);
   const anoMesPrefixo = anoStr + '-' + mesStr;
+
+  // PLANO PRO (pedido do usuario): "Taxa de conclusão" e "Como foi o mês"
+  // ficam borrados + trancados pra quem nao assina -- "Sequência atual"
+  // (o card principal, fora deste bloco) continua sempre liberado.
+  // Reaplica a cada render() -- barato (2 elementos) e garante que destrava
+  // sozinho se a pessoa virar assinante enquanto a tela ja esta aberta.
+  const bloqueadoPro = typeof assinaturaAtiva === 'function' && !assinaturaAtiva();
+  ['estCardTaxaConclusao', 'estCardComoFoiMes'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.toggle('premiumBloqueado', bloqueadoPro);
+    el.onclick = bloqueadoPro ? () => { if (typeof window.abrirPaywall === 'function') window.abrirPaywall('estatisticas'); } : null;
+  });
 
   // resumo vitalicio -- totalTarefasConcluidas() ja existe desde o
   // "CONTADOR - TAREFAS CONCLUIDAS (lifetime)" (incrementa 1x por
@@ -8397,7 +8578,10 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   // sempre (window.aviso quando bloqueado/cheio).
   function abrirNovoHeroiSeCouber(){
     if (listarPersonagens().length >= limitePersonagens()){
-      if (typeof window.aviso === 'function') window.aviso(idiomaApp() === 'en' ? 'Hero limit reached' : 'Limite de heróis atingido');
+      // FIX (pedido do usuario -- integrar o paywall de verdade): mesmo
+      // motivo da troca em escolherTema() -- so avisar e morto, agora abre
+      // o paywall de verdade.
+      if (typeof window.abrirPaywall === 'function') window.abrirPaywall('herois');
       return;
     }
     abrirNovoHeroiOverlay();
@@ -8815,9 +8999,10 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     // chamado de fora do clique da lista (ex.: futuro deep-link).
     const temaAlvo = TEMAS.find(t => t.id === id);
     if (temaAlvo && temaAlvo.pro && typeof assinaturaAtiva === 'function' && !assinaturaAtiva()){
-      if (typeof window.aviso === 'function'){
-        window.aviso(idiomaApp() === 'en' ? 'Pro plan theme' : 'Tema do Plano Pro');
-      }
+      // FIX (pedido do usuario -- integrar o paywall de verdade): antes so
+      // mostrava um toast ("Tema do Plano Pro") e morria ai. Agora abre o
+      // paywall central -- mesmo gatilho que qualquer outro limite PRO usa.
+      if (typeof window.abrirPaywall === 'function') window.abrirPaywall('tema');
       return;
     }
     const root = document.documentElement;
@@ -15099,6 +15284,24 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'jogo.experiencia':      { pt:'Experiência', en:'Experience' },
     'jogo.estagio':          { pt:'Estágio', en:'Stage' },
     'jogo.tarefasParaEstagio': { pt:'Tarefas para Estágio', en:'Tasks for Stage' },
+
+    // PLANO PRO -- paywall (ver #paywallOverlay no HTML + abrirPaywall() no script)
+    'pro.titulo':      { pt:'Plano Pro', en:'Pro Plan' },
+    'pro.headline':    { pt:'Continue sua <b>jornada</b> sem limites', en:'Continue your <b>journey</b> without limits' },
+    'pro.beneficio1Titulo': { pt:'Tarefas ilimitadas', en:'Unlimited tasks' },
+    'pro.beneficio1':  { pt:'Sem limite diário de tarefas ativas.', en:'No daily limit on active tasks.' },
+    'pro.beneficio2Titulo': { pt:'Todos os temas', en:'All themes' },
+    'pro.beneficio2':  { pt:'E até 4 heróis na mesma conta.', en:'And up to 4 heroes on the same account.' },
+    'pro.beneficio3Titulo': { pt:'Estatísticas completas', en:'Full statistics' },
+    'pro.beneficio3':  { pt:'Acompanhe toda a sua jornada.', en:'Track your whole journey.' },
+    'pro.microcopy':   { pt:'Cancele quando quiser', en:'Cancel anytime' },
+    'pro.assinar':     { pt:'Assinar Plano Pro', en:'Subscribe to Pro' },
+    'pro.agoraNao':    { pt:'Agora não', en:'Not now' },
+    'pro.descobriu':   { pt:'Você descobriu um recurso premium!', en:'You found a premium feature!' },
+    'pro.temaBloqueado': { pt:'Tema do Plano Pro', en:'Pro plan theme' },
+    'pro.limiteHerois':  { pt:'Limite de heróis atingido', en:'Hero limit reached' },
+    'pro.limiteTarefas': { pt:'Limite diário de tarefas atingido', en:'Daily task limit reached' },
+    'pro.trancado':    { pt:'PRO', en:'PRO' },
     'jogo.addTarefa':        { pt:'+ Adicionar', en:'+ Add' },
     'jogo.oQuePrecisaSerFeito': { pt:'O que precisa ser feito?', en:'What needs to be done?' },
     'jogo.soHoje':           { pt:'Só hoje', en:'Today only' },

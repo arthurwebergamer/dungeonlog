@@ -26,7 +26,7 @@
      alteracao aqui (bump manual) pra forcar cache-bust; SUBIR ESTE
      NUMERO sempre que style.css mudar e o problema persistir em
      producao. -->
-<link rel="stylesheet" href="style.css?v=10">
+<link rel="stylesheet" href="style.css?v=11">
 
 <!-- =====================================================================
      TOGGLE DEBUG — silenciar console (log/warn/error)  —  precisa ser o
@@ -2883,11 +2883,12 @@ function abrirPaywall(motivo){
   }
   const overlay = document.getElementById('paywallOverlay');
   if (!overlay) return;
-  irParaEtapaPaywall(1);
-  // pequeno atraso pra o toast ("descobriu um recurso premium") ser lido
-  // ANTES do paywall cobrir a tela -- sem isso os dois apareciam
-  // simultaneos e o toast ficava escondido atras do overlay na hora.
-  setTimeout(() => overlay.classList.add('on'), 550);
+  irParaEtapaPaywall(1, false);
+  // atraso bem curto so pra o toast ("descobriu um recurso premium") nao
+  // nascer e morrer debaixo do paywall no mesmo frame -- era 550ms (pedido
+  // do usuario: "demora pra tela aparecer, deveria ser mais rapido"),
+  // 120ms ja da pro toast aparecer primeiro sem o paywall parecer lento.
+  setTimeout(() => overlay.classList.add('on'), 120);
 }
 window.abrirPaywall = abrirPaywall;
 
@@ -2897,16 +2898,28 @@ function fecharPaywall(){
 }
 window.fecharPaywall = fecharPaywall;
 
-// Navega entre as 2 etapas do paywall (pitch -> preco). So troca a etapa
-// visivel + o estado da bolinha/seta de voltar no topo -- nao mexe em
-// mais nada do app (mesmo espirito do mostrarPasso() do onboarding, so
-// que bem mais simples pq sao so 2 telas).
-function irParaEtapaPaywall(n){
+// Navega entre as 2 etapas do paywall (pitch -> preco). Troca a etapa
+// visivel (com slide -- pra frente entra da direita, pra tras entra da
+// esquerda, mesma ideia do passoIn/passoInVolta do onboarding) + o estado
+// da bolinha/seta de voltar no topo. `animar=false` so na 1a abertura
+// (abrirPaywall()), pra nao rodar a animacao de slide junto com o fade
+// do overlay inteiro entrando.
+function irParaEtapaPaywall(n, animar){
+  if (animar === undefined) animar = true;
+  const direcao = n >= _pwEtapaAtual ? 1 : -1;
   _pwEtapaAtual = n;
   const e1 = document.getElementById('pwEtapa1');
   const e2 = document.getElementById('pwEtapa2');
-  if (e1) e1.classList.toggle('on', n === 1);
-  if (e2) e2.classList.toggle('on', n === 2);
+  [e1, e2].forEach((el, i) => {
+    if (!el) return;
+    const ativar = (i === n - 1);
+    el.classList.remove('pwStepIn', 'pwStepInVolta');
+    el.classList.toggle('on', ativar);
+    if (ativar && animar){
+      void el.offsetWidth; // forca reflow pra reiniciar a animacao mesmo se a classe ja tivesse sido usada antes
+      el.classList.add(direcao > 0 ? 'pwStepIn' : 'pwStepInVolta');
+    }
+  });
   const d1 = document.getElementById('pwDot1');
   const d2 = document.getElementById('pwDot2');
   if (d1) d1.classList.toggle('on', n === 1);
@@ -2937,9 +2950,18 @@ function irParaEtapaPaywall(n){
   // real do Play Billing existir) le essa variavel pra saber qual produto
   // comprar.
   function selecionarPlano(id){
+    if (id === _pwPlanoSelecionado) return;
     _pwPlanoSelecionado = id;
     if (planoMensal) planoMensal.classList.toggle('sel', id === 'mensal');
     if (planoAnual) planoAnual.classList.toggle('sel', id === 'anual');
+    // pulso rapido no card recem-marcado -- feedback tatil de que o clique
+    // registrou, sem esperar nenhum redesenho de layout.
+    const alvo = id === 'mensal' ? planoMensal : planoAnual;
+    if (alvo){
+      alvo.classList.remove('pwPulse');
+      void alvo.offsetWidth;
+      alvo.classList.add('pwPulse');
+    }
   }
   if (planoMensal) planoMensal.onclick = () => selecionarPlano('mensal');
   if (planoAnual) planoAnual.onclick = () => selecionarPlano('anual');

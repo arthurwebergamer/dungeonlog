@@ -2229,6 +2229,71 @@
     font-size:12.5px; text-align:center; padding:12px 2px 0; width:100%; cursor:pointer;
   }
 
+  /* ---------------------------------------------------------------------
+     Animacoes do paywall (pedido do usuario: "tá meio seco" + abertura
+     lenta demais). 3 partes:
+     1) troca de etapa com slide+fade direcional (.pwStepIn pra frente,
+        .pwStepInVolta pra tras) -- mesma ideia do passoIn/passoInVolta do
+        onboarding, disparada em JS por irParaEtapaPaywall().
+     2) entrada escalonada dos beneficios/planos (cada linha atrasa um
+        pouco mais que a anterior via nth-child), pra tela nao aparecer
+        com tudo estatico de uma vez.
+     3) feedback tatil: mascote com uma pequena entrada/pulso quando a
+        etapa aparece, cards de plano com active-state ao tocar, e um
+        pulso rapido no plano que acabou de ser selecionado.
+     --------------------------------------------------------------------- */
+  @keyframes pwStepIn{
+    from{ opacity:0; transform:translateX(28px); }
+    to{ opacity:1; transform:translateX(0); }
+  }
+  @keyframes pwStepInVolta{
+    from{ opacity:0; transform:translateX(-28px); }
+    to{ opacity:1; transform:translateX(0); }
+  }
+  .pwEtapa.pwStepIn{ animation:pwStepIn .32s var(--expo); }
+  .pwEtapa.pwStepInVolta{ animation:pwStepInVolta .32s var(--expo); }
+
+  @keyframes pwSobe{
+    from{ opacity:0; transform:translateY(10px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+  .pwMascote{ animation:pwSobe .38s var(--expo) both; }
+  .pwEyebrow{ animation:pwSobe .34s var(--expo) .04s both; }
+  .pwHeadline{ animation:pwSobe .34s var(--expo) .08s both; }
+  .pwSub{ animation:pwSobe .34s var(--expo) .12s both; }
+  .pwBeneficio{ opacity:0; animation:pwSobe .34s var(--expo) forwards; }
+  .pwBeneficio:nth-child(1){ animation-delay:.16s; }
+  .pwBeneficio:nth-child(2){ animation-delay:.22s; }
+  .pwBeneficio:nth-child(3){ animation-delay:.28s; }
+  .pwEtapa .pwCTA{ opacity:0; animation:pwSobe .34s var(--expo) .34s both; }
+  .pwEtapa .pwSecundario{ opacity:0; animation:pwSobe .34s var(--expo) .38s both; }
+
+  .pwPlano{ opacity:0; animation:pwSobe .3s var(--expo) forwards; transition:transform .12s var(--expo), border-color .15s, background .15s; }
+  .pwPlano:nth-child(1){ animation-delay:.14s; }
+  .pwPlano:nth-child(2){ animation-delay:.2s; }
+  .pwPlano:active{ transform:scale(.98); }
+  .pwEtapa#pwEtapa2 .pwMicro{ opacity:0; animation:pwSobe .3s var(--expo) .28s both; }
+
+  @keyframes pwPulse{
+    0%{ transform:scale(1); }
+    40%{ transform:scale(1.025); }
+    100%{ transform:scale(1); }
+  }
+  .pwPlano.pwPulse{ animation:pwPulse .26s var(--expo); }
+
+  .pwCTA{ transition:transform .12s var(--expo), filter .15s; }
+  .pwCTA:active{ transform:scale(.97); }
+  .pwClose,.pwBack{ transition:transform .12s var(--expo); }
+  .pwClose:active,.pwBack:active{ transform:scale(.88); }
+
+  @media (prefers-reduced-motion: reduce){
+    .pwEtapa.pwStepIn,.pwEtapa.pwStepInVolta,
+    .pwMascote,.pwEyebrow,.pwHeadline,.pwSub,.pwBeneficio,.pwPlano,.pwPlano.pwPulse,
+    .pwEtapa .pwCTA,.pwEtapa .pwSecundario,.pwEtapa#pwEtapa2 .pwMicro{
+      animation:none !important; opacity:1 !important; transform:none !important;
+    }
+  }
+
 /* ===== Bloco style #34 ===== */
 .carrosselTopo{display:flex;align-items:center;justify-content:space-between}
   .carrosselTopoLado{flex:1;display:flex}

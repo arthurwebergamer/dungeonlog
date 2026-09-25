@@ -26,7 +26,7 @@
      alteracao aqui (bump manual) pra forcar cache-bust; SUBIR ESTE
      NUMERO sempre que style.css mudar e o problema persistir em
      producao. -->
-<link rel="stylesheet" href="style.css?v=9">
+<link rel="stylesheet" href="style.css?v=10">
 
 <!-- =====================================================================
      TOGGLE DEBUG — silenciar console (log/warn/error)  —  precisa ser o
@@ -951,63 +951,110 @@
     <span class="loadingMasmorraTxt" id="loadingMasmorraTxt">Conectando com a masmorra...</span>
   </div>
 
-  <!-- PLANO PRO -- tela de paywall central, com layout proprio (nao reaproveita
-       mais .card/.regras/.marca do onboarding -- pedido do usuario apos ver
-       referencias de outros apps: ".paywallCard/.paywallBeneficio/etc" abaixo,
-       CSS perto de "Bloco style #34" em style.css).
-       Icone do topo e o sprite do item "Coroa Real" (ITENS[93]) do proprio
-       jogo, injetado em #paywallIcone via JS (perto de abrirPaywall(),
-       mais abaixo) -- sem emoji, reaproveita asset que ja existe.
-       Aberta via window.abrirPaywall(motivo) -- QUALQUER gatilho PRO do app
-       (tema bloqueado, limite de heroi, limite de tarefas, card de
-       estatistica trancado) chama a MESMA funcao, entao so existe 1 paywall
-       pra manter. Botao "Assinar" chama iniciarCompraAssinatura(), que por
+  <!-- PLANO PRO -- paywall em 2 etapas (pitch -> preco), tela cheia, sem
+       card flutuando. Layout redesenhado do zero (ver CSS ".pwBg/.pwEtapa/
+       .pwPlano/etc" perto de "Bloco style #34" em style.css) depois de
+       comparar com referencias de outros apps (Levelite/Levla/Skillion):
+       conteudo direto em cima do cenario (reaproveita o mesmo tijolo da
+       Arena de verdade do jogo), mascote solto (sprite "Coroa Real",
+       ITENS[93], injetado via JS em #paywallIcone/#paywallIcone2 -- ver
+       abrirPaywall() mais abaixo), e so os planos de assinatura viram
+       caixa.
+       Navegacao entre as 2 etapas e' local (irParaEtapaPaywall(), perto de
+       abrirPaywall()) -- nao mexe no resto do app.
+       Aberta via window.abrirPaywall(motivo) -- QUALQUER gatilho PRO do
+       app (tema bloqueado, limite de heroi, limite de tarefas, card de
+       estatistica trancado) chama a MESMA funcao, entao so existe 1
+       paywall pra manter, sempre comecando na etapa 1.
+       Botao "Assinar" (etapa 2) chama iniciarCompraAssinatura(), que por
        enquanto e so um stub -- a integracao real com Google Play Billing
        (verificacao do purchase token via Cloud Function) ainda nao foi
-       feita, e fica fora do escopo deste bloco (precisa da config dos
-       produtos no Play Console primeiro). -->
+       feita, fica fora do escopo deste bloco (precisa da config dos
+       produtos no Play Console primeiro -- os "R$--" nos planos sao
+       placeholder ate la). -->
   <div class="paywallOverlay" id="paywallOverlay">
-    <div class="paywallCard">
-      <button class="paywallFechar" id="paywallFecharBtn" type="button" aria-label="Fechar">
+    <div class="pwBg"></div>
+    <div class="pwGlow"></div>
+    <div class="pwFade"></div>
+
+    <div class="pwTopo">
+      <button class="pwBack" id="paywallVoltarBtn" type="button" aria-label="Voltar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <div class="pwDots">
+        <span class="pwDot" id="pwDot1"></span>
+        <span class="pwDot" id="pwDot2"></span>
+      </div>
+      <button class="pwClose" id="paywallFecharBtn" type="button" aria-label="Fechar">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
       </button>
-      <div class="paywallTopo">
-        <div class="paywallIconWrap" id="paywallIcone"></div>
-        <span class="paywallEyebrow" data-i18n="pro.titulo">PLANO PRO</span>
-        <h2 class="paywallHeadline" data-i18n="pro.headline">Continue sua <b>jornada</b> sem limites</h2>
+    </div>
+
+    <!-- etapa 1: gancho + beneficios -->
+    <div class="pwEtapa" id="pwEtapa1">
+      <div class="pwConteudo">
+        <div class="pwMascote" id="paywallIcone"></div>
+        <span class="pwEyebrow" data-i18n="pro.titulo">Plano Pro</span>
+        <h2 class="pwHeadline" data-i18n="pro.headline">Pronto pra virar uma <b>lenda</b>?</h2>
+        <p class="pwSub" data-i18n="pro.sub">Sem parar em 5 tarefas por dia. Sem tema bloqueado. Sem herói de fora.</p>
+
+        <div class="pwBeneficios">
+          <div class="pwBeneficio">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/></svg>
+            <div><b data-i18n="pro.beneficio1Titulo">Tarefas ilimitadas</b><span data-i18n="pro.beneficio1">Crie quantas quiser, todo dia.</span></div>
+          </div>
+          <div class="pwBeneficio">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg>
+            <div><b data-i18n="pro.beneficio2Titulo">Todos os temas e heróis</b><span data-i18n="pro.beneficio2">6 temas liberados e até 4 heróis na conta.</span></div>
+          </div>
+          <div class="pwBeneficio">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>
+            <div><b data-i18n="pro.beneficio3Titulo">Estatísticas completas</b><span data-i18n="pro.beneficio3">Taxa de conclusão e resumo do mês sem bloqueio.</span></div>
+          </div>
+        </div>
+
+        <button class="pwCTA" id="paywallContinuarBtn" type="button" data-i18n="pro.continuar">Continuar</button>
+        <button class="pwSecundario" id="paywallAgoraNaoBtn1" type="button" data-i18n="pro.agoraNao">Agora não</button>
       </div>
-      <div class="paywallBeneficios">
-        <div class="paywallBeneficio">
-          <span class="paywallBeneficioIc">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/></svg>
-          </span>
-          <div class="paywallBeneficioTxt">
-            <b data-i18n="pro.beneficio1Titulo">Tarefas ilimitadas</b>
-            <span data-i18n="pro.beneficio1">Sem limite diário de tarefas ativas.</span>
+    </div>
+
+    <!-- etapa 2: escolha de plano -->
+    <div class="pwEtapa" id="pwEtapa2">
+      <div class="pwConteudo pwConteudoCentro">
+        <div class="pwMascote pwMascotePequeno" id="paywallIcone2"></div>
+        <span class="pwEyebrow" data-i18n="pro.titulo">Plano Pro</span>
+        <h2 class="pwHeadline pwHeadlineMenor" data-i18n="pro.escolhaPlano">Escolha como quer assinar</h2>
+
+        <div class="pwPlanos">
+          <div class="pwPlano" data-plano="mensal" id="pwPlanoMensal">
+            <div class="pwPlanoRow">
+              <div class="pwPlanoInfo">
+                <span class="pwPlanoNome" data-i18n="pro.planoMensal">Mensal</span>
+                <span class="pwPlanoSub" data-i18n="pro.planoMensalSub">Cobrado todo mês</span>
+              </div>
+              <span class="pwPlanoPreco">R$--<span data-i18n="pro.porMes">/mês</span></span>
+              <span class="pwRadio"></span>
+            </div>
+          </div>
+          <div class="pwPlano sel" data-plano="anual" id="pwPlanoAnual">
+            <div class="pwPlanoRow">
+              <div class="pwPlanoInfo">
+                <span class="pwPlanoNome"><span data-i18n="pro.planoAnual">Anual</span> <span class="pwBadge">-30%</span></span>
+                <span class="pwPlanoSub" data-i18n="pro.planoAnualSub">Cobrado R$--/ano</span>
+              </div>
+              <span class="pwPlanoPreco">R$--<span data-i18n="pro.porMes">/mês</span></span>
+              <span class="pwRadio"></span>
+            </div>
           </div>
         </div>
-        <div class="paywallBeneficio">
-          <span class="paywallBeneficioIc">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="9"/></svg>
-          </span>
-          <div class="paywallBeneficioTxt">
-            <b data-i18n="pro.beneficio2Titulo">Todos os temas</b>
-            <span data-i18n="pro.beneficio2">E até 4 heróis na mesma conta.</span>
-          </div>
+
+        <div class="pwMicro">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          <span data-i18n="pro.microcopy">Cancele quando quiser</span>
         </div>
-        <div class="paywallBeneficio">
-          <span class="paywallBeneficioIc">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>
-          </span>
-          <div class="paywallBeneficioTxt">
-            <b data-i18n="pro.beneficio3Titulo">Estatísticas completas</b>
-            <span data-i18n="pro.beneficio3">Acompanhe toda a sua jornada.</span>
-          </div>
-        </div>
+        <button class="pwCTA" id="paywallAssinarBtn" type="button" data-i18n="pro.assinar">Assinar Plano Pro</button>
+        <button class="pwSecundario" id="paywallAgoraNaoBtn2" type="button" data-i18n="pro.agoraNao">Agora não</button>
       </div>
-      <button class="paywallCTA" id="paywallAssinarBtn" type="button" data-i18n="pro.assinar">Assinar Plano Pro</button>
-      <span class="paywallMicrocopy" data-i18n="pro.microcopy">Cancele quando quiser</span>
-      <button class="secundario" id="paywallAgoraNaoBtn" type="button" data-i18n="pro.agoraNao">Agora não</button>
     </div>
   </div>
 
@@ -2814,22 +2861,29 @@ window.assinaturaAtiva = assinaturaAtiva;
 // ---------------------------------------------------------------------
 const LIMITE_TAREFAS_GRATIS = 5; // pedido do usuario -- plano gratis para em 5 tarefas ativas
 
+let _pwEtapaAtual = 1;
+let _pwPlanoSelecionado = 'anual'; // pedido do usuario -- anual vem pre-selecionado (o "mais vantajoso")
+
 function abrirPaywall(motivo){
   window.dbgConta && window.dbgConta('abrirPaywall() -- motivo=' + motivo);
-  // Icone do topo = sprite do item "Coroa Real" (ITENS[93]) ja existente no
-  // jogo, em vez de emoji. Injetado aqui (nao no <script> logo apos o HTML)
-  // porque spriteHTML()/SHEET_COLS so existem mais abaixo no arquivo --
-  // nesse ponto da execucao (topo do script) ainda seria TDZ/undefined.
-  // So preenche uma vez (innerHTML vazio na primeira chamada).
-  const icone = document.getElementById('paywallIcone');
-  if (icone && !icone.innerHTML && typeof spriteHTML === 'function'){
-    icone.innerHTML = spriteHTML(93, 48);
+  // Icone (etapa 1 grande, etapa 2 pequeno) = sprite do item "Coroa Real"
+  // (ITENS[93]) ja existente no jogo, em vez de emoji. Injetado aqui (nao
+  // no <script> logo apos o HTML) porque spriteHTML()/SHEET_COLS so
+  // existem mais abaixo no arquivo -- nesse ponto da execucao (topo do
+  // script) ainda seria TDZ/undefined. So preenche uma vez cada (innerHTML
+  // vazio na primeira chamada).
+  if (typeof spriteHTML === 'function'){
+    const icone1 = document.getElementById('paywallIcone');
+    if (icone1 && !icone1.innerHTML) icone1.innerHTML = spriteHTML(93, 118);
+    const icone2 = document.getElementById('paywallIcone2');
+    if (icone2 && !icone2.innerHTML) icone2.innerHTML = spriteHTML(93, 84);
   }
   if (typeof window.aviso === 'function'){
     window.aviso((typeof idiomaApp === 'function' && idiomaApp() === 'en') ? 'You found a premium feature!' : 'Você descobriu um recurso premium!');
   }
   const overlay = document.getElementById('paywallOverlay');
   if (!overlay) return;
+  irParaEtapaPaywall(1);
   // pequeno atraso pra o toast ("descobriu um recurso premium") ser lido
   // ANTES do paywall cobrir a tela -- sem isso os dois apareciam
   // simultaneos e o toast ficava escondido atras do overlay na hora.
@@ -2843,20 +2897,52 @@ function fecharPaywall(){
 }
 window.fecharPaywall = fecharPaywall;
 
+// Navega entre as 2 etapas do paywall (pitch -> preco). So troca a etapa
+// visivel + o estado da bolinha/seta de voltar no topo -- nao mexe em
+// mais nada do app (mesmo espirito do mostrarPasso() do onboarding, so
+// que bem mais simples pq sao so 2 telas).
+function irParaEtapaPaywall(n){
+  _pwEtapaAtual = n;
+  const e1 = document.getElementById('pwEtapa1');
+  const e2 = document.getElementById('pwEtapa2');
+  if (e1) e1.classList.toggle('on', n === 1);
+  if (e2) e2.classList.toggle('on', n === 2);
+  const d1 = document.getElementById('pwDot1');
+  const d2 = document.getElementById('pwDot2');
+  if (d1) d1.classList.toggle('on', n === 1);
+  if (d2) d2.classList.toggle('on', n === 2);
+  const back = document.getElementById('paywallVoltarBtn');
+  if (back) back.classList.toggle('on', n === 2);
+}
+
 (function(){
   const btnFechar = document.getElementById('paywallFecharBtn');
-  const btnAgoraNao = document.getElementById('paywallAgoraNaoBtn');
+  const btnVoltar = document.getElementById('paywallVoltarBtn');
+  const btnContinuar = document.getElementById('paywallContinuarBtn');
+  const btnAgoraNao1 = document.getElementById('paywallAgoraNaoBtn1');
+  const btnAgoraNao2 = document.getElementById('paywallAgoraNaoBtn2');
   const btnAssinar = document.getElementById('paywallAssinarBtn');
-  const overlay = document.getElementById('paywallOverlay');
+  const planoMensal = document.getElementById('pwPlanoMensal');
+  const planoAnual = document.getElementById('pwPlanoAnual');
+
   if (btnFechar) btnFechar.onclick = fecharPaywall;
-  if (btnAgoraNao) btnAgoraNao.onclick = fecharPaywall;
+  if (btnVoltar) btnVoltar.onclick = () => irParaEtapaPaywall(1);
+  if (btnContinuar) btnContinuar.onclick = () => irParaEtapaPaywall(2);
+  if (btnAgoraNao1) btnAgoraNao1.onclick = fecharPaywall;
+  if (btnAgoraNao2) btnAgoraNao2.onclick = fecharPaywall;
   if (btnAssinar) btnAssinar.onclick = iniciarCompraAssinatura;
-  // clique fora do card tambem fecha, mesmo padrao de dlgOverlay/outros
-  // overlays do app -- clique DENTRO do card nao propaga (stopPropagation
-  // no proprio card evitaria closures extras, mas como so o overlay tem
-  // o listener e o card cobre a area central, um clique no card nunca
-  // chega no overlay mesmo, entao nao precisa de stopPropagation aqui).
-  if (overlay) overlay.addEventListener('click', (e) => { if (e.target === overlay) fecharPaywall(); });
+
+  // selecao de plano -- so troca qual card fica marcado (.sel) e guarda em
+  // _pwPlanoSelecionado; iniciarCompraAssinatura() (quando a integracao
+  // real do Play Billing existir) le essa variavel pra saber qual produto
+  // comprar.
+  function selecionarPlano(id){
+    _pwPlanoSelecionado = id;
+    if (planoMensal) planoMensal.classList.toggle('sel', id === 'mensal');
+    if (planoAnual) planoAnual.classList.toggle('sel', id === 'anual');
+  }
+  if (planoMensal) planoMensal.onclick = () => selecionarPlano('mensal');
+  if (planoAnual) planoAnual.onclick = () => selecionarPlano('anual');
 })();
 
 function iniciarCompraAssinatura(){
@@ -15287,13 +15373,21 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
     // PLANO PRO -- paywall (ver #paywallOverlay no HTML + abrirPaywall() no script)
     'pro.titulo':      { pt:'Plano Pro', en:'Pro Plan' },
-    'pro.headline':    { pt:'Continue sua <b>jornada</b> sem limites', en:'Continue your <b>journey</b> without limits' },
+    'pro.headline':    { pt:'Pronto pra virar uma <b>lenda</b>?', en:'Ready to become a <b>legend</b>?' },
+    'pro.sub':         { pt:'Sem parar em 5 tarefas por dia. Sem tema bloqueado. Sem herói de fora.', en:'No stopping at 5 tasks a day. No locked theme. No hero left out.' },
     'pro.beneficio1Titulo': { pt:'Tarefas ilimitadas', en:'Unlimited tasks' },
-    'pro.beneficio1':  { pt:'Sem limite diário de tarefas ativas.', en:'No daily limit on active tasks.' },
-    'pro.beneficio2Titulo': { pt:'Todos os temas', en:'All themes' },
-    'pro.beneficio2':  { pt:'E até 4 heróis na mesma conta.', en:'And up to 4 heroes on the same account.' },
+    'pro.beneficio1':  { pt:'Crie quantas quiser, todo dia.', en:'Create as many as you want, every day.' },
+    'pro.beneficio2Titulo': { pt:'Todos os temas e heróis', en:'All themes and heroes' },
+    'pro.beneficio2':  { pt:'6 temas liberados e até 4 heróis na conta.', en:'6 themes unlocked and up to 4 heroes on the account.' },
     'pro.beneficio3Titulo': { pt:'Estatísticas completas', en:'Full statistics' },
-    'pro.beneficio3':  { pt:'Acompanhe toda a sua jornada.', en:'Track your whole journey.' },
+    'pro.beneficio3':  { pt:'Taxa de conclusão e resumo do mês sem bloqueio.', en:'Completion rate and monthly summary, unlocked.' },
+    'pro.continuar':   { pt:'Continuar', en:'Continue' },
+    'pro.escolhaPlano':{ pt:'Escolha como quer assinar', en:'Choose how you want to subscribe' },
+    'pro.planoMensal':    { pt:'Mensal', en:'Monthly' },
+    'pro.planoMensalSub': { pt:'Cobrado todo mês', en:'Billed every month' },
+    'pro.planoAnual':     { pt:'Anual', en:'Annual' },
+    'pro.planoAnualSub':  { pt:'Cobrado R$--/ano', en:'Billed $--/year' },
+    'pro.porMes':      { pt:'/mês', en:'/mo' },
     'pro.microcopy':   { pt:'Cancele quando quiser', en:'Cancel anytime' },
     'pro.assinar':     { pt:'Assinar Plano Pro', en:'Subscribe to Pro' },
     'pro.agoraNao':    { pt:'Agora não', en:'Not now' },

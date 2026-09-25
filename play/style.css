@@ -2107,14 +2107,23 @@
     .loadingMasmorraSprite{ animation:none; }
   }
 
-  /* PLANO PRO -- paywall central. Mesmo padrao de fade (opacity+
+  /* PLANO PRO -- paywall central, tela cheia em 2 etapas (pitch ->
+     preco), sem card flutuando -- pedido explicito do usuario apos
+     comparar com referencias de outros apps (Levelite/Levla/Skillion):
+     conteudo direto em cima do cenario (reaproveita o MESMO tijolo+
+     gradiente da Arena de verdade, so com paleta propria fixa -- essa
+     tela nao muda com o tema escolhido no app), mascote (sprite real
+     "Coroa Real", ITENS[93]) flutuando solto sem caixinha, e so os
+     planos de preco viram caixa. Mesmo padrao de fade (opacity+
      visibility, sem display:none) do .loadingMasmorra logo acima.
      z-index 9500 -- abaixo do loading (10000, so cobre tudo por
      instantes) mas acima de qualquer view/overlay normal do app. */
+  :root{
+    --pw-gold:#F2A65A; --pw-a1:#3A322A; --pw-a2:#221E1B; --pw-a3:#131110;
+  }
   .paywallOverlay{
-    display:flex; position:fixed; inset:0; z-index:9500;
-    background:rgba(4,3,7,.72); backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px);
-    align-items:center; justify-content:center; padding:24px;
+    display:flex; flex-direction:column; position:fixed; inset:0; z-index:9500;
+    color:#FAF6F0; overflow:hidden;
     opacity:0; visibility:hidden; pointer-events:none;
     transition:opacity .25s var(--expo), visibility 0s .25s;
   }
@@ -2122,51 +2131,103 @@
     opacity:1; visibility:visible; pointer-events:auto;
     transition:opacity .25s var(--expo), visibility 0s;
   }
-  .paywallCard{
-    position:relative; width:100%; max-width:360px; max-height:88vh; overflow-y:auto;
-    display:flex; flex-direction:column; gap:18px; align-items:stretch;
-    background:var(--panel); border:1px solid var(--line); border-radius:20px;
-    padding:30px 22px 24px; box-shadow:0 20px 60px rgba(0,0,0,.45);
+  .pwBg{
+    position:absolute; inset:0;
+    background:
+      radial-gradient(ellipse at 50% 18%, transparent 28%, rgba(0,0,0,.6) 85%),
+      url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAKCAYAAADVTVykAAABfElEQVR4nJ2TwU7CQBCGvxKMQeCEXojGlMvWIw/AnfIOwh0egYfwpIneQJ4Bn4L22r10SeCoJ0CDJVkvdNPWgsT/srM738x0Z6fWZDKpPwyHdLpdlFK0222yklIyHY3o9HoHmVMUBAFvr6+49/copXBdl6KUkkW0JgxDGo0GUspfgUIInnefKKWwbTuXOUWO4/ASbZjP56ZWAeD6rILrugcD/1vwUJ5kBwsAH6sVUkqEEMbheR6e5xm7tNXYtp3LJLnkmrUBSludqmXd1mp1nQCuKpVUgN5/YJ5q1SrW3l5EGwBuzsosok1qjfW+XgPwdW6Z82K33wdg9PREr9//c8iklIwfH+kOBoRhePTpYn46HnPXagH8yl2Mjcty+eggxhJCUKtWT2Jjfrq38wa4kNz8dZv4RstofRIb84toc7CrpgPL3WcuoLVO7X3fB20Zn2VZeWHpHEd8pgPZ6QSYzWamqO/7ADSbTUrfmiAIcBzHsNm/ITn9F5ncSd8PSsnXJX9WpAwAAAAASUVORK5CYII=) repeat,
+      linear-gradient(180deg,var(--pw-a1) 0%,var(--pw-a2) 45%,var(--pw-a3) 100%);
+    background-size:auto, 130px 41px, auto;
+    image-rendering:pixelated;
   }
-  .paywallFechar{
-    position:absolute; top:12px; right:12px; z-index:2; background:none; border:none;
-    color:var(--dim); padding:8px; cursor:pointer;
+  .pwFade{
+    position:absolute; inset:0;
+    background:linear-gradient(180deg, transparent 0%, rgba(10,8,7,.35) 42%, rgba(10,8,7,.88) 68%, #0E0B09 100%);
   }
-  .paywallFechar:hover{ color:var(--text); }
-  .paywallTopo{ display:flex; flex-direction:column; align-items:center; gap:7px; text-align:center; }
-  .paywallIconWrap{
-    width:76px; height:76px; margin-bottom:5px; display:grid; place-items:center;
-    border-radius:20px; border:1px solid var(--accent-dim);
-    background:radial-gradient(circle at 50% 35%, var(--accent-dim), transparent 72%);
+  .pwGlow{
+    position:absolute; left:50%; top:0; width:340px; height:340px; transform:translateX(-50%);
+    background:radial-gradient(circle, rgba(242,166,90,.3), transparent 70%);
+    pointer-events:none;
   }
-  .paywallIconWrap .pxi{ filter:drop-shadow(0 3px 6px rgba(0,0,0,.45)); }
-  .paywallEyebrow{
-    font-family:'Silkscreen',monospace; font-size:11px; letter-spacing:1.5px;
-    color:var(--accent); text-transform:uppercase;
+  .pwTopo{
+    position:absolute; top:16px; left:0; right:0; z-index:3;
+    display:flex; align-items:center; justify-content:space-between; padding:0 16px;
   }
-  .paywallHeadline{
-    font-family:'Outfit',sans-serif; font-size:20px; font-weight:700; line-height:1.32;
-    color:var(--text); margin:0;
+  .pwClose,.pwBack{ background:none; border:none; color:rgba(255,255,255,.85); padding:6px; cursor:pointer; }
+  .pwClose svg,.pwBack svg{ width:22px; height:22px; }
+  .pwBack{ visibility:hidden; }
+  .pwBack.on{ visibility:visible; }
+  .pwDots{ display:flex; gap:6px; }
+  .pwDot{ width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.3); transition:width .2s var(--expo), background .2s; }
+  .pwDot.on{ width:18px; border-radius:4px; background:var(--pw-gold); }
+
+  .pwEtapa{ display:none; position:relative; z-index:2; flex:1; overflow-y:auto; }
+  .pwEtapa.on{ display:flex; }
+  .pwConteudo{
+    display:flex; flex-direction:column; align-items:center; width:100%;
+    padding:64px 24px 26px; margin:auto 0; flex:1;
   }
-  .paywallHeadline b{ color:var(--accent); font-weight:700; }
-  .paywallBeneficios{ display:flex; flex-direction:column; gap:12px; }
-  .paywallBeneficio{ display:flex; gap:12px; align-items:center; }
-  .paywallBeneficioIc{
-    width:38px; height:38px; flex:none; display:grid; place-items:center;
-    background:var(--accent-dim); border-radius:11px; color:var(--accent);
+  .pwConteudoCentro{ justify-content:center; }
+  .pwMascote{ margin-bottom:14px; }
+  .pwMascote .pxi{ filter:drop-shadow(0 10px 22px rgba(0,0,0,.6)) drop-shadow(0 0 30px rgba(242,166,90,.45)); }
+  .pwMascotePequeno{ margin-bottom:16px; }
+  .pwEyebrow{
+    font-family:'Silkscreen',monospace; font-size:12px; letter-spacing:2.5px;
+    color:var(--pw-gold); text-transform:uppercase; text-align:center; margin-bottom:8px;
   }
-  .paywallBeneficioIc svg{ width:19px; height:19px; }
-  .paywallBeneficioTxt{ display:flex; flex-direction:column; gap:1px; text-align:left; }
-  .paywallBeneficioTxt b{ font-size:14px; color:var(--text); font-weight:600; }
-  .paywallBeneficioTxt span{ font-size:12.5px; color:var(--dim); line-height:1.35; }
-  .paywallCTA{
-    background:var(--accent); color:var(--bg); border:none; border-radius:14px;
-    padding:16px; font-family:'Outfit',sans-serif; font-size:15.5px; font-weight:700;
-    cursor:pointer; width:100%;
+  .pwHeadline{
+    font-family:'Outfit',sans-serif; font-size:27px; font-weight:800; line-height:1.22;
+    margin:0 0 10px; text-align:center; text-shadow:0 2px 10px rgba(0,0,0,.5);
   }
-  .paywallCTA:hover{ filter:brightness(1.05); }
-  .paywallMicrocopy{ font-size:11.5px; color:var(--dim); text-align:center; margin-top:-11px; }
-  .paywallCard .secundario{ margin:0 auto; }
+  .pwHeadline b{ color:var(--pw-gold); }
+  .pwHeadlineMenor{ font-size:22px; margin-bottom:0; }
+  .pwSub{ font-size:13.5px; color:#D8CFC5; text-align:center; line-height:1.45; margin:0 0 30px; max-width:290px; }
+
+  .pwBeneficios{ display:flex; flex-direction:column; gap:18px; width:100%; margin-bottom:auto; }
+  .pwBeneficio{ display:flex; gap:13px; align-items:flex-start; }
+  .pwBeneficio svg{ width:22px; height:22px; color:var(--pw-gold); flex:none; margin-top:1px; }
+  .pwBeneficio b{ display:block; font-size:15px; font-weight:700; color:#fff; }
+  .pwBeneficio span{ font-size:13px; color:#D8CFC5; line-height:1.4; }
+
+  .pwPlanos{ display:flex; flex-direction:column; gap:10px; width:100%; margin:36px 0 6px; }
+  .pwPlano{
+    position:relative; background:rgba(20,16,13,.55); border:2px solid rgba(255,255,255,.14);
+    border-radius:16px; padding:15px 16px; cursor:pointer;
+  }
+  .pwPlano.sel{ border-color:var(--pw-gold); background:rgba(242,166,90,.12); }
+  .pwPlanoRow{ display:flex; align-items:center; width:100%; gap:12px; }
+  .pwPlanoInfo{ display:flex; flex-direction:column; gap:3px; flex:1; }
+  .pwPlanoNome{ font-size:15px; font-weight:700; display:flex; align-items:center; gap:8px; }
+  .pwPlanoSub{ font-size:12px; color:#C9BEB2; }
+  .pwBadge{
+    background:var(--pw-gold); color:#1A1206; font-size:10px; font-weight:800;
+    letter-spacing:.03em; padding:3px 8px; border-radius:20px; text-transform:uppercase;
+  }
+  .pwPlanoPreco{ font-size:18px; font-weight:800; text-align:right; white-space:nowrap; }
+  .pwPlanoPreco span{ display:block; font-size:10.5px; font-weight:400; color:#C9BEB2; }
+  .pwRadio{
+    width:21px; height:21px; border-radius:50%; border:2.5px solid rgba(255,255,255,.35); flex:none;
+    display:grid; place-items:center;
+  }
+  .pwPlano.sel .pwRadio{ border-color:var(--pw-gold); background:var(--pw-gold); }
+  .pwPlano.sel .pwRadio::after{
+    content:''; width:9px; height:7px; border-left:2.5px solid #1A1206; border-bottom:2.5px solid #1A1206;
+    transform:rotate(-45deg) translate(1px,-1px);
+  }
+
+  .pwMicro{ display:flex; align-items:center; justify-content:center; gap:7px; font-size:12.5px; color:#D8CFC5; margin:16px 0 14px; }
+  .pwMicro svg{ width:14px; height:14px; color:var(--pw-gold); }
+
+  .pwCTA{
+    background:var(--pw-gold); color:#1A1206; border:none; border-radius:16px; padding:18px;
+    font-family:'Outfit',sans-serif; font-size:16.5px; font-weight:800; width:100%; cursor:pointer; margin-top:28px;
+  }
+  .pwPlanos + .pwMicro + .pwCTA{ margin-top:0; }
+  .pwCTA:hover{ filter:brightness(1.05); }
+  .pwSecundario{
+    background:none; border:none; color:#B8ACA0; font-family:'Outfit',sans-serif;
+    font-size:12.5px; text-align:center; padding:12px 2px 0; width:100%; cursor:pointer;
+  }
 
 /* ===== Bloco style #34 ===== */
 .carrosselTopo{display:flex;align-items:center;justify-content:space-between}

@@ -2135,12 +2135,12 @@
     display:flex; flex-direction:column; position:fixed; inset:0; z-index:9500;
     background:#282828; color:#FAFAFA; overflow:hidden;
     opacity:0; visibility:hidden; pointer-events:none;
-    transform:scale(.96); transform-origin:center;
-    transition:opacity .22s var(--expo), transform .22s var(--expo), visibility 0s .22s;
+    transform:scale(1.03); transform-origin:center;
+    transition:opacity .4s var(--expo), transform .4s var(--expo), visibility 0s .4s;
   }
   .paywallOverlay.on{
     opacity:1; visibility:visible; pointer-events:auto; transform:scale(1);
-    transition:opacity .22s var(--expo), transform .22s var(--expo), visibility 0s;
+    transition:opacity .4s var(--expo), transform .4s var(--expo), visibility 0s;
   }
   .pwFloresta{ position:absolute; inset:0; z-index:0; overflow:hidden; }
   .pwFloresta img{
@@ -2165,10 +2165,19 @@
   .pwEtapa{ display:none; position:relative; z-index:2; flex:1; overflow-y:auto; }
   .pwEtapa.on{ display:flex; }
   .pwConteudo{
-    display:flex; flex-direction:column; align-items:center; width:100%;
-    padding:64px 24px 26px; margin:auto 0; flex:1;
+    display:flex; flex-direction:column; align-items:center; width:100%; height:100%;
+    padding:64px 24px 26px;
   }
-  .pwConteudoCentro{ justify-content:center; }
+  /* v2 (pedido do usuario: "parece pequena, não usa a maior parte da
+     tela") -- antes .pwConteudo tinha margin:auto 0, que centraliza o
+     bloco INTEIRO (header+trilha/planos+CTA) dentro da tela cheia,
+     sobrando uma faixa vazia igual em cima e embaixo em telas altas de
+     verdade (o preview de 380x780 usado nos testes escondia isso). Agora
+     as DUAS etapas ficam ancoradas: header logo abaixo de .pwTopo,
+     .pwTrilha/.pwPlanos crescem (flex:1) pra ocupar o espaco que sobra
+     -- em vez de virar um blocao centralizado -- e o CTA fica ancorado
+     embaixo (.pwSpacer absorve so o resto). */
+  .pwSpacer{ flex:1; min-height:20px; }
   .pwEyebrow{
     font-family:'Silkscreen',monospace; font-size:12px; letter-spacing:2.5px;
     color:var(--pw-muted); text-transform:uppercase; text-align:center; margin-bottom:8px;
@@ -2180,7 +2189,10 @@
   .pwHeadlineMenor{ font-size:22px; margin-bottom:0; }
   .pwSub{ font-size:13.5px; color:var(--pw-muted); text-align:center; line-height:1.45; margin:0 0 22px; max-width:290px; }
 
-  .pwTrilha{ position:relative; width:100%; margin-top:4px; margin-bottom:auto; }
+  .pwTrilha{
+    position:relative; width:100%; margin-top:8px;
+    flex:4 1 0; min-height:0; display:flex; flex-direction:column; justify-content:space-evenly;
+  }
   .pwTrilhaLinha{ position:absolute; left:29px; top:0; bottom:0; width:2px; background:rgba(255,255,255,.2); }
   .pwPasso{ position:relative; display:flex; align-items:center; gap:14px; min-height:70px; }
   .pwPassoNo{
@@ -2193,7 +2205,10 @@
   .pwPassoTxt b{ display:block; font-size:14px; font-weight:700; color:#fff; }
   .pwPassoTxt span{ display:block; font-size:10.5px; color:var(--pw-muted); margin-top:2px; }
 
-  .pwPlanos{ display:flex; flex-direction:column; gap:10px; width:100%; margin:22px 0 6px; }
+  .pwPlanos{
+    display:flex; flex-direction:column; justify-content:center; gap:14px; width:100%; margin:22px 0 6px;
+    flex:4 1 0; min-height:0;
+  }
   .pwPlano{
     position:relative; background:var(--pw-panel); border:1.5px solid var(--pw-panel2);
     border-radius:14px; padding:15px 16px; cursor:pointer;
@@ -2208,8 +2223,8 @@
     font-weight:800; letter-spacing:.04em; padding:2px 8px; border-radius:999px; text-transform:uppercase;
   }
   .pwBadge{
-    position:absolute; top:-9px; right:16px; background:var(--pw-panel2); border:1px solid var(--pw-line);
-    color:#FAFAFA; font-size:8.5px; font-weight:800; letter-spacing:.03em; padding:2px 8px; border-radius:999px;
+    position:absolute; top:-10px; right:14px; background:#1C1C1C; border:1.5px solid var(--pw-accent);
+    color:var(--pw-accent); font-size:11px; font-weight:800; letter-spacing:.02em; padding:3px 10px; border-radius:999px;
   }
   .pwPlanoPreco{ font-size:18px; font-weight:800; text-align:right; white-space:nowrap; }
   .pwPlanoPreco span{ display:block; font-size:10.5px; font-weight:400; color:var(--pw-muted); }
@@ -2244,20 +2259,19 @@
   }
 
   /* ---------------------------------------------------------------------
-     Animacoes do paywall (pedido do usuario: "tá seco" + abertura lenta).
-     v2 -- 1a versao tinha 2 problemas reportados pelo usuario:
-     (a) clicar num plano fazia AS DUAS opcoes sumirem: o pulso usava
-         `animation:pwPulse` no MESMO elemento que ja tinha
-         `animation:pwSobe ... forwards` de entrada -- a propriedade
-         `animation` e' um shorthand, entao a 2a declaracao SUBSTITUI a
-         1a inteira, perdendo o "forwards" que segurava opacity:1 depois
-         da entrada, e o card voltava pro opacity:0 do estado inicial.
-         Corrigido: pulso agora e' so `transform` via transition (nunca
-         mexe em `animation`), sem colisao nenhuma.
-     (b) transicao de etapa (Continuar/Voltar) parecia fraca/seca --
-         distancia do slide aumentada e as entradas escalonadas dos
-         filhos foram comprimidas (cascata inteira em ~300ms em vez de
-         ~700ms), pra sensacao ser rapida e viva, nao arrastada.
+     Animacoes do paywall.
+     v3 (pedido do usuario: "a animação das coisas aparecendo não ficou
+     legal, tira"): removida a cascata pwSobe que fazia CADA elemento
+     (eyebrow, headline, passo, plano, CTA...) entrar num timing proprio
+     -- ficava "picado". A entrada agora e' UMA coisa so: o fade+leve
+     zoom-out do .paywallOverlay inteiro (o cenario de fundo ja aparece
+     junto, entao nao tem sentido os filhos ficarem piscando por cima
+     depois), no mesmo espirito do reveal do cenario de login/estagio
+     (#introCenario, so opacity, ver mais acima) -- calmo, uma unica
+     transicao, sem elementos surgindo um a um.
+     Transicao entre etapas (Continuar/Voltar) continua com slide
+     (pwStepIn/pwStepInVolta) -- isso nao foi reclamado, so a entrada
+     inicial "picada".
      --------------------------------------------------------------------- */
   @keyframes pwStepIn{
     from{ opacity:0; transform:translateX(46px) scale(.98); }
@@ -2270,30 +2284,8 @@
   .pwEtapa.pwStepIn{ animation:pwStepIn .26s var(--expo); }
   .pwEtapa.pwStepInVolta{ animation:pwStepInVolta .26s var(--expo); }
 
-  @keyframes pwSobe{
-    from{ opacity:0; transform:translateY(10px); }
-    to{ opacity:1; transform:translateY(0); }
-  }
-  .pwEyebrow{ animation:pwSobe .28s var(--expo) .02s both; }
-  .pwHeadline{ animation:pwSobe .28s var(--expo) .05s both; }
-  .pwSub{ animation:pwSobe .28s var(--expo) .08s both; }
-  .pwPasso{ opacity:0; animation:pwSobe .28s var(--expo) forwards; }
-  .pwPasso:nth-child(2){ animation-delay:.09s; }
-  .pwPasso:nth-child(3){ animation-delay:.13s; }
-  .pwPasso:nth-child(4){ animation-delay:.17s; }
-  .pwPasso:nth-child(5){ animation-delay:.21s; }
-  .pwEtapa .pwCTA{ opacity:0; animation:pwSobe .28s var(--expo) .24s both; }
-  .pwEtapa .pwSecundario{ opacity:0; animation:pwSobe .28s var(--expo) .27s both; }
-
-  .pwPlano{
-    opacity:0; animation:pwSobe .26s var(--expo) forwards;
-    transition:transform .15s var(--expo), border-color .15s, background .15s;
-  }
-  .pwPlano:nth-child(1){ animation-delay:.09s; }
-  .pwPlano:nth-child(2){ animation-delay:.13s; }
-  .pwPlano:nth-child(3){ animation-delay:.17s; }
+  .pwPlano{ transition:transform .15s var(--expo), border-color .15s, background .15s; }
   .pwPlano:active{ transform:scale(.98); }
-  .pwEtapa#pwEtapa2 .pwMicro{ opacity:0; animation:pwSobe .26s var(--expo) .19s both; }
 
   /* pulso ao selecionar -- SO transform+transition, nunca `animation`,
      pra nunca mais colidir com a entrada (ver nota acima). JS (perto de
@@ -2309,9 +2301,7 @@
 
   @media (prefers-reduced-motion: reduce){
     .paywallOverlay{ transform:none !important; }
-    .pwEtapa.pwStepIn,.pwEtapa.pwStepInVolta,
-    .pwEyebrow,.pwHeadline,.pwSub,.pwPasso,.pwPlano,
-    .pwEtapa .pwCTA,.pwEtapa .pwSecundario,.pwEtapa#pwEtapa2 .pwMicro{
+    .pwEtapa.pwStepIn,.pwEtapa.pwStepInVolta{
       animation:none !important; opacity:1 !important; transform:none !important;
     }
   }

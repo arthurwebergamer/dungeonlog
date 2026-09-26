@@ -2114,22 +2114,26 @@
   }
 
   /* PLANO PRO -- paywall central, tela cheia em 2 etapas (pitch ->
-     preco), sem card flutuando -- pedido explicito do usuario apos
-     comparar com referencias de outros apps (Levelite/Levla/Skillion):
-     conteudo direto em cima do cenario (reaproveita o MESMO tijolo+
-     gradiente da Arena de verdade, so com paleta propria fixa -- essa
-     tela nao muda com o tema escolhido no app), mascote (sprite real
-     "Coroa Real", ITENS[93]) flutuando solto sem caixinha, e so os
-     planos de preco viram caixa. Mesmo padrao de fade (opacity+
+     preco), sem card flutuando. v2 (pedido do usuario, depois de
+     comparar varios mockups): visual flat/clean, fonte unica (Outfit,
+     Silkscreen so no eyebrow pequeno), paleta Grafite (mesma do resto do
+     app), fundo reaproveitando a arte real "Floresta" de TEMAS_ARENA
+     (assets.js) com o MESMO gradiente/tecnica do cenario de login (ver
+     mostrarCenarioLogin()/#introCenario.modoLogin) -- pintado 1x em
+     #pwFlorestaImg dentro de abrirPaywall() (index.html). Etapa 1 virou
+     uma trilha vertical (.pwTrilha/.pwPasso) com o passo "Suas tarefas"
+     ja concluido; etapa 2 ganhou um monstro real (MONSTROS[31], "Goblin
+     fungoso", bioma floresta) sentado em cima do botao "Assinar Plano
+     Pro" (.pwMob dentro de .pwCtaWrap). Mesmo padrao de fade (opacity+
      visibility, sem display:none) do .loadingMasmorra logo acima.
      z-index 9500 -- abaixo do loading (10000, so cobre tudo por
      instantes) mas acima de qualquer view/overlay normal do app. */
   :root{
-    --pw-gold:#F2A65A; --pw-a1:#3A322A; --pw-a2:#221E1B; --pw-a3:#131110;
+    --pw-accent:#FAFAFA; --pw-panel:#323232; --pw-panel2:#3D3D3D; --pw-line:#5C5C5C; --pw-muted:#D8D8D8;
   }
   .paywallOverlay{
     display:flex; flex-direction:column; position:fixed; inset:0; z-index:9500;
-    color:#FAF6F0; overflow:hidden;
+    background:#282828; color:#FAFAFA; overflow:hidden;
     opacity:0; visibility:hidden; pointer-events:none;
     transform:scale(.96); transform-origin:center;
     transition:opacity .22s var(--expo), transform .22s var(--expo), visibility 0s .22s;
@@ -2138,35 +2142,25 @@
     opacity:1; visibility:visible; pointer-events:auto; transform:scale(1);
     transition:opacity .22s var(--expo), transform .22s var(--expo), visibility 0s;
   }
-  .pwBg{
-    position:absolute; inset:0;
-    background:
-      radial-gradient(ellipse at 50% 18%, transparent 28%, rgba(0,0,0,.6) 85%),
-      url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAKCAYAAADVTVykAAABfElEQVR4nJ2TwU7CQBCGvxKMQeCEXojGlMvWIw/AnfIOwh0egYfwpIneQJ4Bn4L22r10SeCoJ0CDJVkvdNPWgsT/srM738x0Z6fWZDKpPwyHdLpdlFK0222yklIyHY3o9HoHmVMUBAFvr6+49/copXBdl6KUkkW0JgxDGo0GUspfgUIInnefKKWwbTuXOUWO4/ASbZjP56ZWAeD6rILrugcD/1vwUJ5kBwsAH6sVUkqEEMbheR6e5xm7tNXYtp3LJLnkmrUBSludqmXd1mp1nQCuKpVUgN5/YJ5q1SrW3l5EGwBuzsosok1qjfW+XgPwdW6Z82K33wdg9PREr9//c8iklIwfH+kOBoRhePTpYn46HnPXagH8yl2Mjcty+eggxhJCUKtWT2Jjfrq38wa4kNz8dZv4RstofRIb84toc7CrpgPL3WcuoLVO7X3fB20Zn2VZeWHpHEd8pgPZ6QSYzWamqO/7ADSbTUrfmiAIcBzHsNm/ITn9F5ncSd8PSsnXJX9WpAwAAAAASUVORK5CYII=) repeat,
-      linear-gradient(180deg,var(--pw-a1) 0%,var(--pw-a2) 45%,var(--pw-a3) 100%);
-    background-size:auto, 130px 41px, auto;
-    image-rendering:pixelated;
+  .pwFloresta{ position:absolute; inset:0; z-index:0; overflow:hidden; }
+  .pwFloresta img{
+    position:absolute; inset:0; width:100%; height:100%; object-fit:cover; image-rendering:pixelated;
   }
-  .pwFade{
-    position:absolute; inset:0;
-    background:linear-gradient(180deg, transparent 0%, rgba(10,8,7,.35) 42%, rgba(10,8,7,.88) 68%, #0E0B09 100%);
-  }
-  .pwGlow{
-    position:absolute; left:50%; top:0; width:340px; height:340px; transform:translateX(-50%);
-    background:radial-gradient(circle, rgba(242,166,90,.3), transparent 70%);
-    pointer-events:none;
+  .pwFloresta::after{
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(180deg,rgba(11,7,16,0) 0%,rgba(11,7,16,0) 35%,rgba(11,7,16,.58) 68%,rgba(11,7,16,.94) 100%);
   }
   .pwTopo{
     position:absolute; top:16px; left:0; right:0; z-index:3;
     display:flex; align-items:center; justify-content:space-between; padding:0 16px;
   }
-  .pwClose,.pwBack{ background:none; border:none; color:rgba(255,255,255,.85); padding:6px; cursor:pointer; }
+  .pwClose,.pwBack{ background:rgba(0,0,0,.35); border:none; border-radius:8px; color:#FAFAFA; padding:6px; cursor:pointer; }
   .pwClose svg,.pwBack svg{ width:22px; height:22px; }
   .pwBack{ visibility:hidden; }
   .pwBack.on{ visibility:visible; }
   .pwDots{ display:flex; gap:6px; }
   .pwDot{ width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.3); transition:width .2s var(--expo), background .2s; }
-  .pwDot.on{ width:18px; border-radius:4px; background:var(--pw-gold); }
+  .pwDot.on{ width:18px; border-radius:4px; background:var(--pw-accent); }
 
   .pwEtapa{ display:none; position:relative; z-index:2; flex:1; overflow-y:auto; }
   .pwEtapa.on{ display:flex; }
@@ -2175,64 +2169,77 @@
     padding:64px 24px 26px; margin:auto 0; flex:1;
   }
   .pwConteudoCentro{ justify-content:center; }
-  .pwMascote{ margin-bottom:14px; }
-  .pwMascote .pxi{ filter:drop-shadow(0 10px 22px rgba(0,0,0,.6)) drop-shadow(0 0 30px rgba(242,166,90,.45)); }
-  .pwMascotePequeno{ margin-bottom:16px; }
   .pwEyebrow{
     font-family:'Silkscreen',monospace; font-size:12px; letter-spacing:2.5px;
-    color:var(--pw-gold); text-transform:uppercase; text-align:center; margin-bottom:8px;
+    color:var(--pw-muted); text-transform:uppercase; text-align:center; margin-bottom:8px;
   }
   .pwHeadline{
     font-family:'Outfit',sans-serif; font-size:27px; font-weight:800; line-height:1.22;
-    margin:0 0 10px; text-align:center; text-shadow:0 2px 10px rgba(0,0,0,.5);
+    margin:0 0 10px; text-align:center; color:#FAFAFA;
   }
-  .pwHeadline b{ color:var(--pw-gold); }
   .pwHeadlineMenor{ font-size:22px; margin-bottom:0; }
-  .pwSub{ font-size:13.5px; color:#D8CFC5; text-align:center; line-height:1.45; margin:0 0 30px; max-width:290px; }
+  .pwSub{ font-size:13.5px; color:var(--pw-muted); text-align:center; line-height:1.45; margin:0 0 22px; max-width:290px; }
 
-  .pwBeneficios{ display:flex; flex-direction:column; gap:18px; width:100%; margin-bottom:auto; }
-  .pwBeneficio{ display:flex; gap:13px; align-items:flex-start; }
-  .pwBeneficio svg{ width:22px; height:22px; color:var(--pw-gold); flex:none; margin-top:1px; }
-  .pwBeneficio b{ display:block; font-size:15px; font-weight:700; color:#fff; }
-  .pwBeneficio span{ font-size:13px; color:#D8CFC5; line-height:1.4; }
-
-  .pwPlanos{ display:flex; flex-direction:column; gap:10px; width:100%; margin:36px 0 6px; }
-  .pwPlano{
-    position:relative; background:rgba(20,16,13,.55); border:2px solid rgba(255,255,255,.14);
-    border-radius:16px; padding:15px 16px; cursor:pointer;
+  .pwTrilha{ position:relative; width:100%; margin-top:4px; margin-bottom:auto; }
+  .pwTrilhaLinha{ position:absolute; left:29px; top:0; bottom:0; width:2px; background:rgba(255,255,255,.2); }
+  .pwPasso{ position:relative; display:flex; align-items:center; gap:14px; min-height:70px; }
+  .pwPassoNo{
+    width:58px; height:58px; border-radius:14px; background:var(--pw-panel); border:1px solid var(--pw-panel2);
+    flex:none; display:flex; align-items:center; justify-content:center; position:relative; z-index:1;
   }
-  .pwPlano.sel{ border-color:var(--pw-gold); background:rgba(242,166,90,.12); }
+  .pwPasso.on .pwPassoNo{ background:var(--pw-accent); border-color:var(--pw-accent); }
+  .pwPassoNo svg{ width:24px; height:24px; color:var(--pw-muted); }
+  .pwPasso.on .pwPassoNo svg{ color:#1C1C1C; }
+  .pwPassoTxt b{ display:block; font-size:14px; font-weight:700; color:#fff; }
+  .pwPassoTxt span{ display:block; font-size:10.5px; color:var(--pw-muted); margin-top:2px; }
+
+  .pwPlanos{ display:flex; flex-direction:column; gap:10px; width:100%; margin:22px 0 6px; }
+  .pwPlano{
+    position:relative; background:var(--pw-panel); border:1.5px solid var(--pw-panel2);
+    border-radius:14px; padding:15px 16px; cursor:pointer;
+  }
+  .pwPlano.sel{ border-color:var(--pw-accent); background:var(--pw-panel2); }
   .pwPlanoRow{ display:flex; align-items:center; width:100%; gap:12px; }
   .pwPlanoInfo{ display:flex; flex-direction:column; gap:3px; flex:1; }
   .pwPlanoNome{ font-size:15px; font-weight:700; display:flex; align-items:center; gap:8px; }
-  .pwPlanoSub{ font-size:12px; color:#C9BEB2; }
+  .pwPlanoSub{ font-size:12px; color:var(--pw-muted); }
+  .pwPopular{
+    position:absolute; top:-9px; left:16px; background:var(--pw-accent); color:#1C1C1C; font-size:8.5px;
+    font-weight:800; letter-spacing:.04em; padding:2px 8px; border-radius:999px; text-transform:uppercase;
+  }
   .pwBadge{
-    background:var(--pw-gold); color:#1A1206; font-size:10px; font-weight:800;
-    letter-spacing:.03em; padding:3px 8px; border-radius:20px; text-transform:uppercase;
+    position:absolute; top:-9px; right:16px; background:var(--pw-panel2); border:1px solid var(--pw-line);
+    color:#FAFAFA; font-size:8.5px; font-weight:800; letter-spacing:.03em; padding:2px 8px; border-radius:999px;
   }
   .pwPlanoPreco{ font-size:18px; font-weight:800; text-align:right; white-space:nowrap; }
-  .pwPlanoPreco span{ display:block; font-size:10.5px; font-weight:400; color:#C9BEB2; }
+  .pwPlanoPreco span{ display:block; font-size:10.5px; font-weight:400; color:var(--pw-muted); }
   .pwRadio{
-    width:21px; height:21px; border-radius:50%; border:2.5px solid rgba(255,255,255,.35); flex:none;
+    width:21px; height:21px; border-radius:50%; border:2px solid var(--pw-line); flex:none;
     display:grid; place-items:center;
   }
-  .pwPlano.sel .pwRadio{ border-color:var(--pw-gold); background:var(--pw-gold); }
+  .pwPlano.sel .pwRadio{ border-color:var(--pw-accent); background:var(--pw-accent); }
   .pwPlano.sel .pwRadio::after{
-    content:''; width:9px; height:7px; border-left:2.5px solid #1A1206; border-bottom:2.5px solid #1A1206;
+    content:''; width:9px; height:7px; border-left:2.5px solid #1C1C1C; border-bottom:2.5px solid #1C1C1C;
     transform:rotate(-45deg) translate(1px,-1px);
   }
 
-  .pwMicro{ display:flex; align-items:center; justify-content:center; gap:7px; font-size:12.5px; color:#D8CFC5; margin:16px 0 14px; }
-  .pwMicro svg{ width:14px; height:14px; color:var(--pw-gold); }
+  .pwMicro{ display:flex; align-items:center; justify-content:center; gap:7px; font-size:12.5px; color:var(--pw-muted); margin:16px 0 14px; }
+  .pwMicro svg{ width:14px; height:14px; color:var(--pw-accent); }
 
-  .pwCTA{
-    background:var(--pw-gold); color:#1A1206; border:none; border-radius:16px; padding:18px;
-    font-family:'Outfit',sans-serif; font-size:16.5px; font-weight:800; width:100%; cursor:pointer; margin-top:28px;
+  .pwCtaWrap{ position:relative; width:100%; margin-top:38px; }
+  .pwMob{
+    position:absolute; left:78%; bottom:100%; transform:translateX(-50%) scaleX(-1);
+    width:60px; height:60px; margin-bottom:-6px; image-rendering:pixelated;
+    filter:drop-shadow(0 4px 4px rgba(0,0,0,.55));
   }
-  .pwPlanos + .pwMicro + .pwCTA{ margin-top:0; }
+  .pwCTA{
+    background:var(--pw-accent); color:#1C1C1C; border:none; border-radius:16px; padding:18px;
+    font-family:'Outfit',sans-serif; font-size:16.5px; font-weight:800; width:100%; cursor:pointer;
+  }
+  #pwEtapa1 .pwCTA{ margin-top:28px; }
   .pwCTA:hover{ filter:brightness(1.05); }
   .pwSecundario{
-    background:none; border:none; color:#B8ACA0; font-family:'Outfit',sans-serif;
+    background:none; border:none; color:var(--pw-muted); font-family:'Outfit',sans-serif;
     font-size:12.5px; text-align:center; padding:12px 2px 0; width:100%; cursor:pointer;
   }
 
@@ -2267,14 +2274,14 @@
     from{ opacity:0; transform:translateY(10px); }
     to{ opacity:1; transform:translateY(0); }
   }
-  .pwMascote{ animation:pwSobe .3s var(--expo) both; }
   .pwEyebrow{ animation:pwSobe .28s var(--expo) .02s both; }
   .pwHeadline{ animation:pwSobe .28s var(--expo) .05s both; }
   .pwSub{ animation:pwSobe .28s var(--expo) .08s both; }
-  .pwBeneficio{ opacity:0; animation:pwSobe .28s var(--expo) forwards; }
-  .pwBeneficio:nth-child(1){ animation-delay:.11s; }
-  .pwBeneficio:nth-child(2){ animation-delay:.15s; }
-  .pwBeneficio:nth-child(3){ animation-delay:.19s; }
+  .pwPasso{ opacity:0; animation:pwSobe .28s var(--expo) forwards; }
+  .pwPasso:nth-child(2){ animation-delay:.09s; }
+  .pwPasso:nth-child(3){ animation-delay:.13s; }
+  .pwPasso:nth-child(4){ animation-delay:.17s; }
+  .pwPasso:nth-child(5){ animation-delay:.21s; }
   .pwEtapa .pwCTA{ opacity:0; animation:pwSobe .28s var(--expo) .24s both; }
   .pwEtapa .pwSecundario{ opacity:0; animation:pwSobe .28s var(--expo) .27s both; }
 
@@ -2303,7 +2310,7 @@
   @media (prefers-reduced-motion: reduce){
     .paywallOverlay{ transform:none !important; }
     .pwEtapa.pwStepIn,.pwEtapa.pwStepInVolta,
-    .pwMascote,.pwEyebrow,.pwHeadline,.pwSub,.pwBeneficio,.pwPlano,
+    .pwEyebrow,.pwHeadline,.pwSub,.pwPasso,.pwPlano,
     .pwEtapa .pwCTA,.pwEtapa .pwSecundario,.pwEtapa#pwEtapa2 .pwMicro{
       animation:none !important; opacity:1 !important; transform:none !important;
     }

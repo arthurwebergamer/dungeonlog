@@ -952,14 +952,19 @@
   </div>
 
   <!-- PLANO PRO -- paywall em 2 etapas (pitch -> preco), tela cheia, sem
-       card flutuando. Layout redesenhado do zero (ver CSS ".pwBg/.pwEtapa/
-       .pwPlano/etc" perto de "Bloco style #34" em style.css) depois de
-       comparar com referencias de outros apps (Levelite/Levla/Skillion):
-       conteudo direto em cima do cenario (reaproveita o mesmo tijolo da
-       Arena de verdade do jogo), mascote solto (sprite "Coroa Real",
-       ITENS[93], injetado via JS em #paywallIcone/#paywallIcone2 -- ver
-       abrirPaywall() mais abaixo), e so os planos de assinatura viram
-       caixa.
+       card flutuando. v2 (pedido do usuario, depois de comparar varios
+       mockups): visual flat/clean, fonte unica (Outfit, Silkscreen so no
+       eyebrow pequeno), paleta Grafite (mesma do resto do app), fundo
+       reaproveitando a arte real "Floresta" de TEMAS_ARENA (assets.js)
+       com o MESMO gradiente/tecnica do cenario de login (ver
+       mostrarCenarioLogin()/#introCenario.modoLogin) -- pintado 1x em
+       #pwFlorestaImg dentro de abrirPaywall(). Etapa 1 virou uma trilha
+       vertical (".pwTrilha/.pwPasso", mesma ideia visual da trilha de
+       estagios da Arena) com o passo "Suas tarefas" ja concluido; etapa 2
+       ganhou um monstro real (MONSTROS[31], "Goblin fungoso", bioma
+       floresta) sentado em cima do botao "Assinar Plano Pro"
+       (#pwMobIcone, pintado no mesmo abrirPaywall()). CSS perto de
+       "Bloco style #34" em style.css.
        Navegacao entre as 2 etapas e' local (irParaEtapaPaywall(), perto de
        abrirPaywall()) -- nao mexe no resto do app.
        Aberta via window.abrirPaywall(motivo) -- QUALQUER gatilho PRO do
@@ -977,9 +982,7 @@
        textos somem e o preco passa a vir dinamico direto do Play (permite
        promocao/regiao sem precisar editar o HTML de novo). -->
   <div class="paywallOverlay" id="paywallOverlay">
-    <div class="pwBg"></div>
-    <div class="pwGlow"></div>
-    <div class="pwFade"></div>
+    <div class="pwFloresta"><img id="pwFlorestaImg" alt=""></div>
 
     <div class="pwTopo">
       <button class="pwBack" id="paywallVoltarBtn" type="button" aria-label="Voltar">
@@ -994,26 +997,31 @@
       </button>
     </div>
 
-    <!-- etapa 1: gancho + beneficios -->
+    <!-- etapa 1: trilha (mesmos beneficios de antes, agora como passos,
+         com "Suas tarefas" ja concluido no topo) -->
     <div class="pwEtapa" id="pwEtapa1">
       <div class="pwConteudo">
-        <div class="pwMascote" id="paywallIcone"></div>
         <span class="pwEyebrow" data-i18n="pro.titulo">Plano Pro</span>
-        <h2 class="pwHeadline" data-i18n="pro.headline">Pronto pra virar uma <b>lenda</b>?</h2>
-        <p class="pwSub" data-i18n="pro.sub">Sem parar em 5 tarefas por dia. Sem tema bloqueado. Sem herói de fora.</p>
+        <h2 class="pwHeadline" data-i18n="pro.headline">Sua trilha continua</h2>
+        <p class="pwSub" data-i18n="pro.sub">3 etapas seguem bloqueadas até você assinar.</p>
 
-        <div class="pwBeneficios">
-          <div class="pwBeneficio">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/></svg>
-            <div><b data-i18n="pro.beneficio1Titulo">Tarefas ilimitadas</b><span data-i18n="pro.beneficio1">Crie quantas quiser, todo dia.</span></div>
+        <div class="pwTrilha">
+          <div class="pwTrilhaLinha"></div>
+          <div class="pwPasso on">
+            <div class="pwPassoNo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+            <div class="pwPassoTxt"><b data-i18n="pro.passo1Titulo">Suas tarefas</b><span data-i18n="pro.passo1Sub">Já disponível</span></div>
           </div>
-          <div class="pwBeneficio">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg>
-            <div><b data-i18n="pro.beneficio2Titulo">Todos os temas e heróis</b><span data-i18n="pro.beneficio2">6 temas liberados e até 4 heróis na conta.</span></div>
+          <div class="pwPasso">
+            <div class="pwPassoNo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div>
+            <div class="pwPassoTxt"><b data-i18n="pro.beneficio2Titulo">Temas &amp; heróis</b><span data-i18n="pro.beneficio2">6 temas, 4 heróis</span></div>
           </div>
-          <div class="pwBeneficio">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>
-            <div><b data-i18n="pro.beneficio3Titulo">Estatísticas completas</b><span data-i18n="pro.beneficio3">Taxa de conclusão e resumo do mês sem bloqueio.</span></div>
+          <div class="pwPasso">
+            <div class="pwPassoNo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div>
+            <div class="pwPassoTxt"><b data-i18n="pro.beneficio1Titulo">Sem limite diário</b><span data-i18n="pro.beneficio1">Tarefas ilimitadas</span></div>
+          </div>
+          <div class="pwPasso">
+            <div class="pwPassoNo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18M8 17V10M13 17V6M18 17v-4"/></svg></div>
+            <div class="pwPassoTxt"><b data-i18n="pro.beneficio3Titulo">Estatísticas</b><span data-i18n="pro.beneficio3">Histórico completo</span></div>
           </div>
         </div>
 
@@ -1025,7 +1033,6 @@
     <!-- etapa 2: escolha de plano -->
     <div class="pwEtapa" id="pwEtapa2">
       <div class="pwConteudo pwConteudoCentro">
-        <div class="pwMascote pwMascotePequeno" id="paywallIcone2"></div>
         <span class="pwEyebrow" data-i18n="pro.titulo">Plano Pro</span>
         <h2 class="pwHeadline pwHeadlineMenor" data-i18n="pro.escolhaPlano">Escolha como quer assinar</h2>
 
@@ -1041,9 +1048,11 @@
             </div>
           </div>
           <div class="pwPlano sel" data-plano="anual" id="pwPlanoAnual">
+            <span class="pwPopular" data-i18n="pro.maisPopular">Mais popular</span>
+            <span class="pwBadge">-58%</span>
             <div class="pwPlanoRow">
               <div class="pwPlanoInfo">
-                <span class="pwPlanoNome"><span data-i18n="pro.planoAnual">Anual</span> <span class="pwBadge">-58%</span></span>
+                <span class="pwPlanoNome" data-i18n="pro.planoAnual">Anual</span>
                 <span class="pwPlanoSub" data-i18n="pro.planoAnualSub">Cobrado R$89,90/ano</span>
               </div>
               <span class="pwPlanoPreco">R$7,49<span data-i18n="pro.porMes">/mês</span></span>
@@ -1066,7 +1075,10 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
           <span data-i18n="pro.microcopy">Cancele quando quiser</span>
         </div>
-        <button class="pwCTA" id="paywallAssinarBtn" type="button" data-i18n="pro.assinar">Assinar Plano Pro</button>
+        <div class="pwCtaWrap">
+          <img class="pwMob" id="pwMobIcone" alt="">
+          <button class="pwCTA" id="paywallAssinarBtn" type="button" data-i18n="pro.assinar">Assinar Plano Pro</button>
+        </div>
         <button class="pwSecundario" id="paywallAgoraNaoBtn2" type="button" data-i18n="pro.agoraNao">Agora não</button>
       </div>
     </div>
@@ -2895,17 +2907,24 @@ let _pwPlanoSelecionado = 'anual'; // pedido do usuario -- anual vem pre-selecio
 
 function abrirPaywall(motivo){
   window.dbgConta && window.dbgConta('abrirPaywall() -- motivo=' + motivo);
-  // Icone (etapa 1 grande, etapa 2 pequeno) = sprite do item "Coroa Real"
-  // (ITENS[93]) ja existente no jogo, em vez de emoji. Injetado aqui (nao
-  // no <script> logo apos o HTML) porque spriteHTML()/SHEET_COLS so
-  // existem mais abaixo no arquivo -- nesse ponto da execucao (topo do
-  // script) ainda seria TDZ/undefined. So preenche uma vez cada (innerHTML
-  // vazio na primeira chamada).
-  if (typeof spriteHTML === 'function'){
-    const icone1 = document.getElementById('paywallIcone');
-    if (icone1 && !icone1.innerHTML) icone1.innerHTML = spriteHTML(93, 118);
-    const icone2 = document.getElementById('paywallIcone2');
-    if (icone2 && !icone2.innerHTML) icone2.innerHTML = spriteHTML(93, 84);
+  // Fundo = MESMA arte "Floresta" de TEMAS_ARENA (assets.js) usada na
+  // Arena de verdade, pintada aqui (nao no <script> logo apos o HTML)
+  // porque TEMAS_ARENA so existe mais abaixo no arquivo -- nesse ponto da
+  // execucao (topo do script) ainda seria TDZ/undefined. So preenche uma
+  // vez (src vazio na 1a chamada). Gradiente por cima e' CSS puro
+  // (.pwFloresta::after em style.css), mesma tecnica do cenario de login
+  // (ver mostrarCenarioLogin()/#introCenario.modoLogin).
+  const fundo = document.getElementById('pwFlorestaImg');
+  if (fundo && !fundo.src && typeof TEMAS_ARENA !== 'undefined'){
+    const floresta = TEMAS_ARENA.find(t => t.id === 'floresta');
+    if (floresta) fundo.src = 'data:image/png;base64,' + floresta.arte;
+  }
+  // Monstro sentado em cima do botao "Assinar Plano Pro" (etapa 2) =
+  // sprite real MONSTROS[31] ("Goblin fungoso", bioma floresta,
+  // assets.js) -- mesmo padrao (so preenche 1x).
+  const mob = document.getElementById('pwMobIcone');
+  if (mob && !mob.src && typeof MONSTROS !== 'undefined' && MONSTROS[31]){
+    mob.src = MONSTROS[31].img;
   }
   if (typeof window.aviso === 'function'){
     window.aviso((typeof idiomaApp === 'function' && idiomaApp() === 'en') ? 'You found a premium feature!' : 'Você descobriu um recurso premium!');
@@ -15435,16 +15454,19 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
     // PLANO PRO -- paywall (ver #paywallOverlay no HTML + abrirPaywall() no script)
     'pro.titulo':      { pt:'Plano Pro', en:'Pro Plan' },
-    'pro.headline':    { pt:'Pronto pra virar uma <b>lenda</b>?', en:'Ready to become a <b>legend</b>?' },
-    'pro.sub':         { pt:'Sem parar em 5 tarefas por dia. Sem tema bloqueado. Sem herói de fora.', en:'No stopping at 5 tasks a day. No locked theme. No hero left out.' },
-    'pro.beneficio1Titulo': { pt:'Tarefas ilimitadas', en:'Unlimited tasks' },
-    'pro.beneficio1':  { pt:'Crie quantas quiser, todo dia.', en:'Create as many as you want, every day.' },
-    'pro.beneficio2Titulo': { pt:'Todos os temas e heróis', en:'All themes and heroes' },
-    'pro.beneficio2':  { pt:'6 temas liberados e até 4 heróis na conta.', en:'6 themes unlocked and up to 4 heroes on the account.' },
-    'pro.beneficio3Titulo': { pt:'Estatísticas completas', en:'Full statistics' },
-    'pro.beneficio3':  { pt:'Taxa de conclusão e resumo do mês sem bloqueio.', en:'Completion rate and monthly summary, unlocked.' },
+    'pro.headline':    { pt:'Sua trilha continua', en:'Your path continues' },
+    'pro.sub':         { pt:'3 etapas seguem bloqueadas até você assinar.', en:'3 steps stay locked until you subscribe.' },
+    'pro.passo1Titulo':{ pt:'Suas tarefas', en:'Your tasks' },
+    'pro.passo1Sub':   { pt:'Já disponível', en:'Already unlocked' },
+    'pro.beneficio1Titulo': { pt:'Sem limite diário', en:'No daily limit' },
+    'pro.beneficio1':  { pt:'Tarefas ilimitadas', en:'Unlimited tasks' },
+    'pro.beneficio2Titulo': { pt:'Temas & heróis', en:'Themes & heroes' },
+    'pro.beneficio2':  { pt:'6 temas, 4 heróis', en:'6 themes, 4 heroes' },
+    'pro.beneficio3Titulo': { pt:'Estatísticas', en:'Statistics' },
+    'pro.beneficio3':  { pt:'Histórico completo', en:'Full history' },
     'pro.continuar':   { pt:'Continuar', en:'Continue' },
     'pro.escolhaPlano':{ pt:'Escolha como quer assinar', en:'Choose how you want to subscribe' },
+    'pro.maisPopular': { pt:'Mais popular', en:'Most popular' },
     'pro.planoMensal':    { pt:'Mensal', en:'Monthly' },
     'pro.planoMensalSub': { pt:'Cobrado todo mês', en:'Billed every month' },
     'pro.planoAnual':     { pt:'Anual', en:'Annual' },

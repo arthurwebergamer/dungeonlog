@@ -2165,10 +2165,19 @@
   .pwEtapa{ display:none; position:relative; z-index:2; flex:1; overflow-y:auto; }
   .pwEtapa.on{ display:flex; }
   .pwConteudo{
-    display:flex; flex-direction:column; align-items:center; width:100%;
-    padding:64px 24px 26px; margin:auto 0; flex:1;
+    display:flex; flex-direction:column; align-items:center; width:100%; height:100%;
+    padding:64px 24px 26px;
   }
-  .pwConteudoCentro{ justify-content:center; }
+  /* v2 (pedido do usuario: "parece pequena, não usa a maior parte da
+     tela") -- antes .pwConteudo tinha margin:auto 0, que centraliza o
+     bloco INTEIRO (header+trilha/planos+CTA) dentro da tela cheia,
+     sobrando uma faixa vazia igual em cima e embaixo em telas altas de
+     verdade (o preview de 380x780 usado nos testes escondia isso). Agora
+     as DUAS etapas ficam ancoradas: header logo abaixo de .pwTopo,
+     .pwTrilha/.pwPlanos crescem (flex:1) pra ocupar o espaco que sobra
+     -- em vez de virar um blocao centralizado -- e o CTA fica ancorado
+     embaixo (.pwSpacer absorve so o resto). */
+  .pwSpacer{ flex:1; min-height:20px; }
   .pwEyebrow{
     font-family:'Silkscreen',monospace; font-size:12px; letter-spacing:2.5px;
     color:var(--pw-muted); text-transform:uppercase; text-align:center; margin-bottom:8px;
@@ -2180,7 +2189,10 @@
   .pwHeadlineMenor{ font-size:22px; margin-bottom:0; }
   .pwSub{ font-size:13.5px; color:var(--pw-muted); text-align:center; line-height:1.45; margin:0 0 22px; max-width:290px; }
 
-  .pwTrilha{ position:relative; width:100%; margin-top:4px; margin-bottom:auto; }
+  .pwTrilha{
+    position:relative; width:100%; margin-top:8px;
+    flex:4 1 0; min-height:0; display:flex; flex-direction:column; justify-content:space-evenly;
+  }
   .pwTrilhaLinha{ position:absolute; left:29px; top:0; bottom:0; width:2px; background:rgba(255,255,255,.2); }
   .pwPasso{ position:relative; display:flex; align-items:center; gap:14px; min-height:70px; }
   .pwPassoNo{
@@ -2193,7 +2205,10 @@
   .pwPassoTxt b{ display:block; font-size:14px; font-weight:700; color:#fff; }
   .pwPassoTxt span{ display:block; font-size:10.5px; color:var(--pw-muted); margin-top:2px; }
 
-  .pwPlanos{ display:flex; flex-direction:column; gap:10px; width:100%; margin:22px 0 6px; }
+  .pwPlanos{
+    display:flex; flex-direction:column; justify-content:center; gap:14px; width:100%; margin:22px 0 6px;
+    flex:4 1 0; min-height:0;
+  }
   .pwPlano{
     position:relative; background:var(--pw-panel); border:1.5px solid var(--pw-panel2);
     border-radius:14px; padding:15px 16px; cursor:pointer;
@@ -2208,8 +2223,8 @@
     font-weight:800; letter-spacing:.04em; padding:2px 8px; border-radius:999px; text-transform:uppercase;
   }
   .pwBadge{
-    position:absolute; top:-9px; right:16px; background:var(--pw-panel2); border:1px solid var(--pw-line);
-    color:#FAFAFA; font-size:8.5px; font-weight:800; letter-spacing:.03em; padding:2px 8px; border-radius:999px;
+    position:absolute; top:-10px; right:14px; background:#1C1C1C; border:1.5px solid var(--pw-accent);
+    color:var(--pw-accent); font-size:11px; font-weight:800; letter-spacing:.02em; padding:3px 10px; border-radius:999px;
   }
   .pwPlanoPreco{ font-size:18px; font-weight:800; text-align:right; white-space:nowrap; }
   .pwPlanoPreco span{ display:block; font-size:10.5px; font-weight:400; color:var(--pw-muted); }

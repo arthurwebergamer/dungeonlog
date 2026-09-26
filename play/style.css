@@ -309,7 +309,7 @@
   .navpill{position:absolute;top:8px;left:0;width:62px;height:44px;border-radius:999px;background:var(--accent-dim);border:1px solid rgba(255,255,255,.14);box-shadow:0 0 10px rgba(255,255,255,.08);transform:translateX(0);transition:transform .32s cubic-bezier(.34,1.56,.64,1);pointer-events:none;z-index:0}
 
   /* ============ Estatisticas ============ */
-  .est-card{background:var(--panel-2);border:1px solid var(--line);border-radius:20px;padding:20px;margin-bottom:14px;box-shadow:0 10px 24px rgba(0,0,0,.22)}
+  .est-card{background:var(--panel-2);border:1px solid var(--line);border-radius:20px;padding:20px;margin-bottom:14px;box-shadow:0 10px 24px rgba(0,0,0,.22);position:relative}
   .est-divider{height:1px;background:var(--line);margin:0 0 16px}
   .est-titulo{font-size:12.5px;font-weight:600;color:var(--muted);letter-spacing:.02em;margin-bottom:16px;display:flex;align-items:center;gap:7px}
 
@@ -369,9 +369,36 @@
   .est-streaklbl{display:none}
 
   .est-statsrow{display:flex;gap:12px;margin-bottom:14px}
-  .est-statscol{flex:1;min-width:0;margin-bottom:0;display:flex;flex-direction:column;align-items:center;text-align:center}
+  .est-statscol{flex:1;min-width:0;margin-bottom:0;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative}
   .est-statscol .est-titulo{justify-content:center}
   .est-statscol .est-ringbox,.est-statscol .est-donutbox{margin:6px 0 12px}
+
+  /* PLANO PRO -- cadeado sobre card de estatistica (pedido do usuario).
+     Borra os FILHOS reais (nao o proprio card -- blur no card gera halo
+     estranho na borda, e nao o .est-lockoverlay, que precisa ficar nitido)
+     e mostra o .est-lockoverlay (SVG de cadeado real + "PRO", ja no HTML
+     do card -- nao emoji, pedido explicito do usuario). */
+  .est-card.premiumBloqueado{ cursor:pointer; }
+  .est-card.premiumBloqueado > *:not(.est-lockoverlay){
+    filter:blur(5px); user-select:none; pointer-events:none;
+  }
+  .est-lockoverlay{
+    display:none; position:absolute; inset:0; z-index:1;
+    flex-direction:column; align-items:center; justify-content:center; gap:5px;
+    background:rgba(10,8,16,.32); border-radius:12px;
+  }
+  .est-lockoverlay svg{ width:20px; height:20px; color:var(--text); }
+  /* selo "PRO" no MESMO estilo usado em todo o resto do app (.temaSelo,
+     .pjSelo -- pilula pequena, fundo var(--accent), texto var(--bg)) --
+     antes esse aqui tinha fonte Silkscreen 10px propria e destoava,
+     ficando mais chamativo que os outros (pedido do usuario: "parece
+     mais destacado que todos os outros lugares"). */
+  .est-lockoverlay span{
+    font-family:'Outfit',sans-serif; font-size:8px; font-weight:700;
+    background:var(--accent); color:var(--bg);
+    border-radius:999px; padding:2px 6px; letter-spacing:.3px;
+  }
+  .est-card.premiumBloqueado .est-lockoverlay{ display:flex; }
   .est-donutlegenda-compacta{width:100%}
   .est-donutlegenda-compacta .est-legitem{font-size:10.5px}
   .est-donutlegenda-compacta .est-legbar{display:none}
@@ -2084,6 +2111,209 @@
   }
   @media (prefers-reduced-motion: reduce){
     .loadingMasmorraSprite{ animation:none; }
+  }
+
+  /* PLANO PRO -- paywall central, tela cheia em 2 etapas (pitch ->
+     preco), sem card flutuando. v2 (pedido do usuario, depois de
+     comparar varios mockups): visual flat/clean, fonte unica (Outfit,
+     Silkscreen so no eyebrow pequeno), paleta Grafite (mesma do resto do
+     app), fundo reaproveitando a arte real "Floresta" de TEMAS_ARENA
+     (assets.js) com o MESMO gradiente/tecnica do cenario de login (ver
+     mostrarCenarioLogin()/#introCenario.modoLogin) -- pintado 1x em
+     #pwFlorestaImg dentro de abrirPaywall() (index.html). Etapa 1 virou
+     uma trilha vertical (.pwTrilha/.pwPasso) com o passo "Suas tarefas"
+     ja concluido; etapa 2 ganhou um monstro real (MONSTROS[31], "Goblin
+     fungoso", bioma floresta) sentado em cima do botao "Assinar Plano
+     Pro" (.pwMob dentro de .pwCtaWrap). Mesmo padrao de fade (opacity+
+     visibility, sem display:none) do .loadingMasmorra logo acima.
+     z-index 9500 -- abaixo do loading (10000, so cobre tudo por
+     instantes) mas acima de qualquer view/overlay normal do app. */
+  :root{
+    --pw-accent:#FAFAFA; --pw-panel:#323232; --pw-panel2:#3D3D3D; --pw-line:#5C5C5C; --pw-muted:#D8D8D8;
+  }
+  .paywallOverlay{
+    display:flex; flex-direction:column; position:fixed; inset:0; z-index:9500;
+    background:#282828; color:#FAFAFA; overflow:hidden;
+    opacity:0; visibility:hidden; pointer-events:none;
+    transform:scale(.96); transform-origin:center;
+    transition:opacity .22s var(--expo), transform .22s var(--expo), visibility 0s .22s;
+  }
+  .paywallOverlay.on{
+    opacity:1; visibility:visible; pointer-events:auto; transform:scale(1);
+    transition:opacity .22s var(--expo), transform .22s var(--expo), visibility 0s;
+  }
+  .pwFloresta{ position:absolute; inset:0; z-index:0; overflow:hidden; }
+  .pwFloresta img{
+    position:absolute; inset:0; width:100%; height:100%; object-fit:cover; image-rendering:pixelated;
+  }
+  .pwFloresta::after{
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(180deg,rgba(11,7,16,0) 0%,rgba(11,7,16,0) 35%,rgba(11,7,16,.58) 68%,rgba(11,7,16,.94) 100%);
+  }
+  .pwTopo{
+    position:absolute; top:16px; left:0; right:0; z-index:3;
+    display:flex; align-items:center; justify-content:space-between; padding:0 16px;
+  }
+  .pwClose,.pwBack{ background:rgba(0,0,0,.35); border:none; border-radius:8px; color:#FAFAFA; padding:6px; cursor:pointer; }
+  .pwClose svg,.pwBack svg{ width:22px; height:22px; }
+  .pwBack{ visibility:hidden; }
+  .pwBack.on{ visibility:visible; }
+  .pwDots{ display:flex; gap:6px; }
+  .pwDot{ width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.3); transition:width .2s var(--expo), background .2s; }
+  .pwDot.on{ width:18px; border-radius:4px; background:var(--pw-accent); }
+
+  .pwEtapa{ display:none; position:relative; z-index:2; flex:1; overflow-y:auto; }
+  .pwEtapa.on{ display:flex; }
+  .pwConteudo{
+    display:flex; flex-direction:column; align-items:center; width:100%;
+    padding:64px 24px 26px; margin:auto 0; flex:1;
+  }
+  .pwConteudoCentro{ justify-content:center; }
+  .pwEyebrow{
+    font-family:'Silkscreen',monospace; font-size:12px; letter-spacing:2.5px;
+    color:var(--pw-muted); text-transform:uppercase; text-align:center; margin-bottom:8px;
+  }
+  .pwHeadline{
+    font-family:'Outfit',sans-serif; font-size:27px; font-weight:800; line-height:1.22;
+    margin:0 0 10px; text-align:center; color:#FAFAFA;
+  }
+  .pwHeadlineMenor{ font-size:22px; margin-bottom:0; }
+  .pwSub{ font-size:13.5px; color:var(--pw-muted); text-align:center; line-height:1.45; margin:0 0 22px; max-width:290px; }
+
+  .pwTrilha{ position:relative; width:100%; margin-top:4px; margin-bottom:auto; }
+  .pwTrilhaLinha{ position:absolute; left:29px; top:0; bottom:0; width:2px; background:rgba(255,255,255,.2); }
+  .pwPasso{ position:relative; display:flex; align-items:center; gap:14px; min-height:70px; }
+  .pwPassoNo{
+    width:58px; height:58px; border-radius:14px; background:var(--pw-panel); border:1px solid var(--pw-panel2);
+    flex:none; display:flex; align-items:center; justify-content:center; position:relative; z-index:1;
+  }
+  .pwPasso.on .pwPassoNo{ background:var(--pw-accent); border-color:var(--pw-accent); }
+  .pwPassoNo svg{ width:24px; height:24px; color:var(--pw-muted); }
+  .pwPasso.on .pwPassoNo svg{ color:#1C1C1C; }
+  .pwPassoTxt b{ display:block; font-size:14px; font-weight:700; color:#fff; }
+  .pwPassoTxt span{ display:block; font-size:10.5px; color:var(--pw-muted); margin-top:2px; }
+
+  .pwPlanos{ display:flex; flex-direction:column; gap:10px; width:100%; margin:22px 0 6px; }
+  .pwPlano{
+    position:relative; background:var(--pw-panel); border:1.5px solid var(--pw-panel2);
+    border-radius:14px; padding:15px 16px; cursor:pointer;
+  }
+  .pwPlano.sel{ border-color:var(--pw-accent); background:var(--pw-panel2); }
+  .pwPlanoRow{ display:flex; align-items:center; width:100%; gap:12px; }
+  .pwPlanoInfo{ display:flex; flex-direction:column; gap:3px; flex:1; }
+  .pwPlanoNome{ font-size:15px; font-weight:700; display:flex; align-items:center; gap:8px; }
+  .pwPlanoSub{ font-size:12px; color:var(--pw-muted); }
+  .pwPopular{
+    position:absolute; top:-9px; left:16px; background:var(--pw-accent); color:#1C1C1C; font-size:8.5px;
+    font-weight:800; letter-spacing:.04em; padding:2px 8px; border-radius:999px; text-transform:uppercase;
+  }
+  .pwBadge{
+    position:absolute; top:-9px; right:16px; background:var(--pw-panel2); border:1px solid var(--pw-line);
+    color:#FAFAFA; font-size:8.5px; font-weight:800; letter-spacing:.03em; padding:2px 8px; border-radius:999px;
+  }
+  .pwPlanoPreco{ font-size:18px; font-weight:800; text-align:right; white-space:nowrap; }
+  .pwPlanoPreco span{ display:block; font-size:10.5px; font-weight:400; color:var(--pw-muted); }
+  .pwRadio{
+    width:21px; height:21px; border-radius:50%; border:2px solid var(--pw-line); flex:none;
+    display:grid; place-items:center;
+  }
+  .pwPlano.sel .pwRadio{ border-color:var(--pw-accent); background:var(--pw-accent); }
+  .pwPlano.sel .pwRadio::after{
+    content:''; width:9px; height:7px; border-left:2.5px solid #1C1C1C; border-bottom:2.5px solid #1C1C1C;
+    transform:rotate(-45deg) translate(1px,-1px);
+  }
+
+  .pwMicro{ display:flex; align-items:center; justify-content:center; gap:7px; font-size:12.5px; color:var(--pw-muted); margin:16px 0 14px; }
+  .pwMicro svg{ width:14px; height:14px; color:var(--pw-accent); }
+
+  .pwCtaWrap{ position:relative; width:100%; margin-top:38px; }
+  .pwMob{
+    position:absolute; left:78%; bottom:100%; transform:translateX(-50%) scaleX(-1);
+    width:60px; height:60px; margin-bottom:-6px; image-rendering:pixelated;
+    filter:drop-shadow(0 4px 4px rgba(0,0,0,.55));
+  }
+  .pwCTA{
+    background:var(--pw-accent); color:#1C1C1C; border:none; border-radius:16px; padding:18px;
+    font-family:'Outfit',sans-serif; font-size:16.5px; font-weight:800; width:100%; cursor:pointer;
+  }
+  #pwEtapa1 .pwCTA{ margin-top:28px; }
+  .pwCTA:hover{ filter:brightness(1.05); }
+  .pwSecundario{
+    background:none; border:none; color:var(--pw-muted); font-family:'Outfit',sans-serif;
+    font-size:12.5px; text-align:center; padding:12px 2px 0; width:100%; cursor:pointer;
+  }
+
+  /* ---------------------------------------------------------------------
+     Animacoes do paywall (pedido do usuario: "tá seco" + abertura lenta).
+     v2 -- 1a versao tinha 2 problemas reportados pelo usuario:
+     (a) clicar num plano fazia AS DUAS opcoes sumirem: o pulso usava
+         `animation:pwPulse` no MESMO elemento que ja tinha
+         `animation:pwSobe ... forwards` de entrada -- a propriedade
+         `animation` e' um shorthand, entao a 2a declaracao SUBSTITUI a
+         1a inteira, perdendo o "forwards" que segurava opacity:1 depois
+         da entrada, e o card voltava pro opacity:0 do estado inicial.
+         Corrigido: pulso agora e' so `transform` via transition (nunca
+         mexe em `animation`), sem colisao nenhuma.
+     (b) transicao de etapa (Continuar/Voltar) parecia fraca/seca --
+         distancia do slide aumentada e as entradas escalonadas dos
+         filhos foram comprimidas (cascata inteira em ~300ms em vez de
+         ~700ms), pra sensacao ser rapida e viva, nao arrastada.
+     --------------------------------------------------------------------- */
+  @keyframes pwStepIn{
+    from{ opacity:0; transform:translateX(46px) scale(.98); }
+    to{ opacity:1; transform:translateX(0) scale(1); }
+  }
+  @keyframes pwStepInVolta{
+    from{ opacity:0; transform:translateX(-46px) scale(.98); }
+    to{ opacity:1; transform:translateX(0) scale(1); }
+  }
+  .pwEtapa.pwStepIn{ animation:pwStepIn .26s var(--expo); }
+  .pwEtapa.pwStepInVolta{ animation:pwStepInVolta .26s var(--expo); }
+
+  @keyframes pwSobe{
+    from{ opacity:0; transform:translateY(10px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+  .pwEyebrow{ animation:pwSobe .28s var(--expo) .02s both; }
+  .pwHeadline{ animation:pwSobe .28s var(--expo) .05s both; }
+  .pwSub{ animation:pwSobe .28s var(--expo) .08s both; }
+  .pwPasso{ opacity:0; animation:pwSobe .28s var(--expo) forwards; }
+  .pwPasso:nth-child(2){ animation-delay:.09s; }
+  .pwPasso:nth-child(3){ animation-delay:.13s; }
+  .pwPasso:nth-child(4){ animation-delay:.17s; }
+  .pwPasso:nth-child(5){ animation-delay:.21s; }
+  .pwEtapa .pwCTA{ opacity:0; animation:pwSobe .28s var(--expo) .24s both; }
+  .pwEtapa .pwSecundario{ opacity:0; animation:pwSobe .28s var(--expo) .27s both; }
+
+  .pwPlano{
+    opacity:0; animation:pwSobe .26s var(--expo) forwards;
+    transition:transform .15s var(--expo), border-color .15s, background .15s;
+  }
+  .pwPlano:nth-child(1){ animation-delay:.09s; }
+  .pwPlano:nth-child(2){ animation-delay:.13s; }
+  .pwPlano:nth-child(3){ animation-delay:.17s; }
+  .pwPlano:active{ transform:scale(.98); }
+  .pwEtapa#pwEtapa2 .pwMicro{ opacity:0; animation:pwSobe .26s var(--expo) .19s both; }
+
+  /* pulso ao selecionar -- SO transform+transition, nunca `animation`,
+     pra nunca mais colidir com a entrada (ver nota acima). JS (perto de
+     selecionarPlano(), index.html) adiciona .pwPulse e remove logo
+     depois; a transicao ja declarada em .pwPlano cuida da subida e
+     descida sozinha. */
+  .pwPlano.pwPulse{ transform:scale(1.035); }
+
+  .pwCTA{ transition:transform .12s var(--expo), filter .15s; }
+  .pwCTA:active{ transform:scale(.97); }
+  .pwClose,.pwBack{ transition:transform .12s var(--expo); }
+  .pwClose:active,.pwBack:active{ transform:scale(.88); }
+
+  @media (prefers-reduced-motion: reduce){
+    .paywallOverlay{ transform:none !important; }
+    .pwEtapa.pwStepIn,.pwEtapa.pwStepInVolta,
+    .pwEyebrow,.pwHeadline,.pwSub,.pwPasso,.pwPlano,
+    .pwEtapa .pwCTA,.pwEtapa .pwSecundario,.pwEtapa#pwEtapa2 .pwMicro{
+      animation:none !important; opacity:1 !important; transform:none !important;
+    }
   }
 
 /* ===== Bloco style #34 ===== */

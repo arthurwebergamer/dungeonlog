@@ -26,7 +26,7 @@
      alteracao aqui (bump manual) pra forcar cache-bust; SUBIR ESTE
      NUMERO sempre que style.css mudar e o problema persistir em
      producao. -->
-<link rel="stylesheet" href="style.css?v=7">
+<link rel="stylesheet" href="style.css?v=13">
 
 <!-- =====================================================================
      TOGGLE DEBUG — silenciar console (log/warn/error)  —  precisa ser o
@@ -951,6 +951,139 @@
     <span class="loadingMasmorraTxt" id="loadingMasmorraTxt">Conectando com a masmorra...</span>
   </div>
 
+  <!-- PLANO PRO -- paywall em 2 etapas (pitch -> preco), tela cheia, sem
+       card flutuando. v2 (pedido do usuario, depois de comparar varios
+       mockups): visual flat/clean, fonte unica (Outfit, Silkscreen so no
+       eyebrow pequeno), paleta Grafite (mesma do resto do app), fundo
+       reaproveitando a arte real "Floresta" de TEMAS_ARENA (assets.js)
+       com o MESMO gradiente/tecnica do cenario de login (ver
+       mostrarCenarioLogin()/#introCenario.modoLogin) -- pintado 1x em
+       #pwFlorestaImg dentro de abrirPaywall(). Etapa 1 virou uma trilha
+       vertical (".pwTrilha/.pwPasso", mesma ideia visual da trilha de
+       estagios da Arena) com o passo "Suas tarefas" ja concluido; etapa 2
+       ganhou um monstro real (MONSTROS[31], "Goblin fungoso", bioma
+       floresta) sentado em cima do botao "Assinar Plano Pro"
+       (#pwMobIcone, pintado no mesmo abrirPaywall()). CSS perto de
+       "Bloco style #34" em style.css.
+       Navegacao entre as 2 etapas e' local (irParaEtapaPaywall(), perto de
+       abrirPaywall()) -- nao mexe no resto do app.
+       Aberta via window.abrirPaywall(motivo) -- QUALQUER gatilho PRO do
+       app (tema bloqueado, limite de heroi, limite de tarefas, card de
+       estatistica trancado) chama a MESMA funcao, entao so existe 1
+       paywall pra manter, sempre comecando na etapa 1.
+       Botao "Assinar" (etapa 2) chama iniciarCompraAssinatura(), que por
+       enquanto e so um stub -- a integracao real com Google Play Billing
+       (verificacao do purchase token via Cloud Function) ainda nao foi
+       feita, fica fora do escopo deste bloco (precisa da config dos
+       produtos no Play Console primeiro). Precos abaixo (Mensal R$17,90 /
+       Anual R$89,90 / Vitalicio R$199,90) sao os valores definidos --
+       ainda hardcoded no HTML, PRECISAM bater exatamente com o que for
+       cadastrado no Play Console. Quando o Digital Goods API entrar, estes
+       textos somem e o preco passa a vir dinamico direto do Play (permite
+       promocao/regiao sem precisar editar o HTML de novo). -->
+  <div class="paywallOverlay" id="paywallOverlay">
+    <div class="pwFloresta"><img id="pwFlorestaImg" alt=""></div>
+
+    <div class="pwTopo">
+      <button class="pwBack" id="paywallVoltarBtn" type="button" aria-label="Voltar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <div class="pwDots">
+        <span class="pwDot" id="pwDot1"></span>
+        <span class="pwDot" id="pwDot2"></span>
+      </div>
+      <button class="pwClose" id="paywallFecharBtn" type="button" aria-label="Fechar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <!-- etapa 1: trilha (mesmos beneficios de antes, agora como passos,
+         com "Suas tarefas" ja concluido no topo) -->
+    <div class="pwEtapa" id="pwEtapa1">
+      <div class="pwConteudo">
+        <span class="pwEyebrow" data-i18n="pro.titulo">Plano Pro</span>
+        <h2 class="pwHeadline" data-i18n="pro.headline">Sua trilha continua</h2>
+        <p class="pwSub" data-i18n="pro.sub">3 etapas seguem bloqueadas até você assinar.</p>
+
+        <div class="pwTrilha">
+          <div class="pwTrilhaLinha"></div>
+          <div class="pwPasso on">
+            <div class="pwPassoNo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+            <div class="pwPassoTxt"><b data-i18n="pro.passo1Titulo">Suas tarefas</b><span data-i18n="pro.passo1Sub">Já disponível</span></div>
+          </div>
+          <div class="pwPasso">
+            <div class="pwPassoNo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div>
+            <div class="pwPassoTxt"><b data-i18n="pro.beneficio2Titulo">Temas &amp; heróis</b><span data-i18n="pro.beneficio2">6 temas, 4 heróis</span></div>
+          </div>
+          <div class="pwPasso">
+            <div class="pwPassoNo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div>
+            <div class="pwPassoTxt"><b data-i18n="pro.beneficio1Titulo">Sem limite diário</b><span data-i18n="pro.beneficio1">Tarefas ilimitadas</span></div>
+          </div>
+          <div class="pwPasso">
+            <div class="pwPassoNo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18M8 17V10M13 17V6M18 17v-4"/></svg></div>
+            <div class="pwPassoTxt"><b data-i18n="pro.beneficio3Titulo">Estatísticas</b><span data-i18n="pro.beneficio3">Histórico completo</span></div>
+          </div>
+        </div>
+
+        <button class="pwCTA" id="paywallContinuarBtn" type="button" data-i18n="pro.continuar">Continuar</button>
+        <button class="pwSecundario" id="paywallAgoraNaoBtn1" type="button" data-i18n="pro.agoraNao">Agora não</button>
+      </div>
+    </div>
+
+    <!-- etapa 2: escolha de plano -->
+    <div class="pwEtapa" id="pwEtapa2">
+      <div class="pwConteudo pwConteudoCentro">
+        <span class="pwEyebrow" data-i18n="pro.titulo">Plano Pro</span>
+        <h2 class="pwHeadline pwHeadlineMenor" data-i18n="pro.escolhaPlano">Escolha como quer assinar</h2>
+
+        <div class="pwPlanos">
+          <div class="pwPlano" data-plano="mensal" id="pwPlanoMensal">
+            <div class="pwPlanoRow">
+              <div class="pwPlanoInfo">
+                <span class="pwPlanoNome" data-i18n="pro.planoMensal">Mensal</span>
+                <span class="pwPlanoSub" data-i18n="pro.planoMensalSub">Cobrado todo mês</span>
+              </div>
+              <span class="pwPlanoPreco">R$17,90<span data-i18n="pro.porMes">/mês</span></span>
+              <span class="pwRadio"></span>
+            </div>
+          </div>
+          <div class="pwPlano sel" data-plano="anual" id="pwPlanoAnual">
+            <span class="pwPopular" data-i18n="pro.maisPopular">Mais popular</span>
+            <span class="pwBadge">-58%</span>
+            <div class="pwPlanoRow">
+              <div class="pwPlanoInfo">
+                <span class="pwPlanoNome" data-i18n="pro.planoAnual">Anual</span>
+                <span class="pwPlanoSub" data-i18n="pro.planoAnualSub">Cobrado R$89,90/ano</span>
+              </div>
+              <span class="pwPlanoPreco">R$7,49<span data-i18n="pro.porMes">/mês</span></span>
+              <span class="pwRadio"></span>
+            </div>
+          </div>
+          <div class="pwPlano" data-plano="vitalicio" id="pwPlanoVitalicio">
+            <div class="pwPlanoRow">
+              <div class="pwPlanoInfo">
+                <span class="pwPlanoNome" data-i18n="pro.planoVitalicio">Vitalício</span>
+                <span class="pwPlanoSub" data-i18n="pro.planoVitalicioSub">Pagamento único</span>
+              </div>
+              <span class="pwPlanoPreco">R$199,90</span>
+              <span class="pwRadio"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="pwMicro">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          <span data-i18n="pro.microcopy">Cancele quando quiser</span>
+        </div>
+        <div class="pwCtaWrap">
+          <img class="pwMob" id="pwMobIcone" alt="">
+          <button class="pwCTA" id="paywallAssinarBtn" type="button" data-i18n="pro.assinar">Assinar Plano Pro</button>
+        </div>
+        <button class="pwSecundario" id="paywallAgoraNaoBtn2" type="button" data-i18n="pro.agoraNao">Agora não</button>
+      </div>
+    </div>
+  </div>
+
   <div class="view" id="viewLoja">
     <div class="vhead">
       <span class="vtitle" data-i18n="nav.loja">Loja</span>
@@ -1006,16 +1139,27 @@
     </div>
 
     <div class="est-statsrow">
-      <div class="est-card est-statscol">
+      <!-- PLANO PRO (pedido do usuario: "essas 2 telas com efeito de blur
+           que manda pro paywall"). Card ganha .premiumBloqueado via JS
+           (renderEstatisticas(), so quando !assinaturaAtiva()) -- CSS
+           (ver style.css, perto de .est-statscol) borra o CONTEUDO real
+           e mostra o .est-lockoverlay abaixo (cadeado SVG real + "PRO",
+           nao emoji -- pedido do usuario). Clique em QUALQUER lugar do
+           card trancado abre o paywall. -->
+      <div class="est-card est-statscol" id="estCardTaxaConclusao">
         <div class="est-titulo" data-i18n="est.taxaConclusaoTitulo">Taxa de conclusão</div>
         <div class="est-ringbox" id="estTaxaRing" style="--pct:0">
           <div class="est-ringbg"></div>
           <div class="est-ringtrack"></div>
           <div class="est-ringtxt"><span class="n" id="estTaxaNum">0%</span><span class="u" data-i18n="est.mes">MÊS</span></div>
         </div>
+        <div class="est-lockoverlay" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          <span data-i18n="pro.trancado">PRO</span>
+        </div>
       </div>
 
-      <div class="est-card est-statscol">
+      <div class="est-card est-statscol" id="estCardComoFoiMes">
         <div class="est-titulo"><span data-i18n="est.comoFoiMes">Como foi o mês</span></div>
         <div class="est-donutbox">
           <div class="est-donutring" id="estDonutMes"></div>
@@ -1026,10 +1170,14 @@
           <div class="est-legitem"><span class="est-dot" style="background:color-mix(in srgb, var(--accent) 40%, transparent)"></span><span data-i18n="est.fuga">fugiu</span><div class="est-legbar"><i id="estBarraFuga" style="width:0%;background:color-mix(in srgb, var(--accent) 40%, transparent)"></i></div><b id="estQtdFuga">0</b></div>
           <div class="est-legitem"><span class="est-dot" style="background:var(--panel-3)"></span><span data-i18n="est.semTarefa">sem tarefa</span><div class="est-legbar"><i id="estBarraSemTarefa" style="width:0%"></i></div><b id="estQtdSemTarefa">0</b></div>
         </div>
+        <div class="est-lockoverlay" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          <span data-i18n="pro.trancado">PRO</span>
+        </div>
       </div>
     </div>
 
-    <div class="est-card">
+    <div class="est-card" id="estCard7Dias">
       <div class="est-titulo"><span data-i18n="est.ultimos7">Últimos 7 dias</span></div>
       <div class="est-chartwrap">
         <svg id="est7DiasSvg" viewBox="0 0 300 80" width="100%" height="80" preserveAspectRatio="none">
@@ -1042,6 +1190,10 @@
         </svg>
       </div>
       <div class="est-chartlabels" id="est7DiasLabels"></div>
+      <div class="est-lockoverlay" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        <span data-i18n="pro.trancado">PRO</span>
+      </div>
     </div>
 
     <div class="est-card est-clicavel" id="estHistCard">
@@ -1069,6 +1221,10 @@
         <div class="est-tile"></div><span data-i18n="est.semTarefa">sem tarefa</span>
         <div class="est-tile est-tile-fuga"></div><span data-i18n="est.fuga">fugiu</span>
         <div class="est-tile est-tile-vitoria"></div><span data-i18n="est.vitoria">venceu</span>
+      </div>
+      <div class="est-lockoverlay" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        <span data-i18n="pro.trancado">PRO</span>
       </div>
     </div>
 
@@ -1165,6 +1321,13 @@
   if (periodoOverlay) periodoOverlay.onclick = function(e){ if (e.target === periodoOverlay) fecharPeriodo(); };
   if (periodoFechar) periodoFechar.onclick = fecharPeriodo;
   if (histCard) histCard.onclick = function(){
+    // PLANO PRO (pedido do usuario): historico trancado abre o paywall em
+    // vez do seletor de periodo. Checa assinaturaAtiva() no clique (nao
+    // precisa esperar renderEstatisticas() re-wiring, sempre atual).
+    if (typeof assinaturaAtiva === 'function' && !assinaturaAtiva()){
+      if (typeof window.abrirPaywall === 'function') window.abrirPaywall('estatisticas');
+      return;
+    }
     if (periodoOverlay) periodoOverlay.classList.add('on');
     document.querySelectorAll('.est-periodoopc').forEach(function(b){
       b.classList.toggle('on', b.dataset.periodo === estPeriodoAtual);
@@ -2673,7 +2836,14 @@ function renderEstagioBar(){
   const max = estagio >= 4; // ultimo estagio -- sem proxima meta, barra so fica cheia
   fillEl.style.width = Math.round(progressoEstagio() * 100) + '%';
 
-  if (estagioNumEl) estagioNumEl.textContent = estagio;
+  // FIX (pedido do usuario: "seriam tarefas pro estagio 2, ja que a gente
+  // ja comeca no estagio 1") -- a fracao/barra sempre mediu progresso RUMO
+  // ao PROXIMO estagio (ver "alvo"/"inicio" mais abaixo), mas o numero no
+  // label mostrava o estagio ATUAL (ex: "Tarefas para Estágio 1" contando
+  // as tarefas que levam ao estagio 2 -- numero errado pro que o label
+  // agora descreve). No ultimo estagio (max, sem proximo) mantem o numero
+  // atual, ja que nao ha "proximo" pra apontar.
+  if (estagioNumEl) estagioNumEl.textContent = max ? estagio : (estagio + 1);
 
   // v4.20x (pedido do usuario: "1 · 4/10" no valor ficou confuso --
   // misturava QUAL estagio com QUANTO falta). O numero do estagio
@@ -2711,6 +2881,156 @@ function assinaturaAtiva(){
   } catch(e){}
   return false;
 }
+window.assinaturaAtiva = assinaturaAtiva;
+
+// ---------------------------------------------------------------------
+// PLANO PRO -- paywall central (pedido do usuario: telas de Estatisticas
+// bloqueadas + limite de tarefas + integrar pagamento de verdade). Um SO
+// gatilho (window.abrirPaywall) pra todo mundo que precisa mostrar o
+// paywall -- tema PRO bloqueado, limite de heroi, limite de tarefa
+// diaria, card de estatistica trancado. Mostra um toast rapido
+// ("Você descobriu um recurso premium!", reaproveitando aviso() que ja
+// existe) e, logo em seguida, abre a tela cheia (#paywallOverlay).
+//
+// iniciarCompraAssinatura() e' so um STUB por enquanto -- a integracao
+// real com Google Play Billing (Digital Goods API dentro da TWA +
+// verificacao do purchase token numa Cloud Function, pra ninguem
+// conseguir "liberar premium" so mexendo no client) ainda nao foi feita.
+// Precisa antes: criar o produto de assinatura no Play Console (ID,
+// preco) e decidir onde a Cloud Function vai rodar. Ate la, o botao
+// "Assinar" so avisa que ainda nao esta disponivel.
+// ---------------------------------------------------------------------
+const LIMITE_TAREFAS_GRATIS = 5; // pedido do usuario -- plano gratis para em 5 tarefas ativas
+
+let _pwEtapaAtual = 1;
+let _pwPlanoSelecionado = 'anual'; // pedido do usuario -- anual vem pre-selecionado (o "mais vantajoso")
+
+function abrirPaywall(motivo){
+  window.dbgConta && window.dbgConta('abrirPaywall() -- motivo=' + motivo);
+  // Fundo = MESMA arte "Floresta" de TEMAS_ARENA (assets.js) usada na
+  // Arena de verdade, pintada aqui (nao no <script> logo apos o HTML)
+  // porque TEMAS_ARENA so existe mais abaixo no arquivo -- nesse ponto da
+  // execucao (topo do script) ainda seria TDZ/undefined. So preenche uma
+  // vez (src vazio na 1a chamada). Gradiente por cima e' CSS puro
+  // (.pwFloresta::after em style.css), mesma tecnica do cenario de login
+  // (ver mostrarCenarioLogin()/#introCenario.modoLogin).
+  const fundo = document.getElementById('pwFlorestaImg');
+  if (fundo && !fundo.src && typeof TEMAS_ARENA !== 'undefined'){
+    const floresta = TEMAS_ARENA.find(t => t.id === 'floresta');
+    if (floresta) fundo.src = 'data:image/png;base64,' + floresta.arte;
+  }
+  // Monstro sentado em cima do botao "Assinar Plano Pro" (etapa 2) =
+  // sprite real MONSTROS[31] ("Goblin fungoso", bioma floresta,
+  // assets.js) -- mesmo padrao (so preenche 1x).
+  const mob = document.getElementById('pwMobIcone');
+  if (mob && !mob.src && typeof MONSTROS !== 'undefined' && MONSTROS[31]){
+    mob.src = MONSTROS[31].img;
+  }
+  if (typeof window.aviso === 'function'){
+    window.aviso((typeof idiomaApp === 'function' && idiomaApp() === 'en') ? 'You found a premium feature!' : 'Você descobriu um recurso premium!');
+  }
+  const overlay = document.getElementById('paywallOverlay');
+  if (!overlay) return;
+  irParaEtapaPaywall(1, false);
+  // atraso bem curto so pra o toast ("descobriu um recurso premium") nao
+  // nascer e morrer debaixo do paywall no mesmo frame -- era 550ms (pedido
+  // do usuario: "demora pra tela aparecer, deveria ser mais rapido"),
+  // 120ms ja da pro toast aparecer primeiro sem o paywall parecer lento.
+  setTimeout(() => overlay.classList.add('on'), 120);
+}
+window.abrirPaywall = abrirPaywall;
+
+function fecharPaywall(){
+  const overlay = document.getElementById('paywallOverlay');
+  if (overlay) overlay.classList.remove('on');
+}
+window.fecharPaywall = fecharPaywall;
+
+// Navega entre as 2 etapas do paywall (pitch -> preco). Troca a etapa
+// visivel (com slide -- pra frente entra da direita, pra tras entra da
+// esquerda, mesma ideia do passoIn/passoInVolta do onboarding) + o estado
+// da bolinha/seta de voltar no topo. `animar=false` so na 1a abertura
+// (abrirPaywall()), pra nao rodar a animacao de slide junto com o fade
+// do overlay inteiro entrando.
+function irParaEtapaPaywall(n, animar){
+  if (animar === undefined) animar = true;
+  const direcao = n >= _pwEtapaAtual ? 1 : -1;
+  _pwEtapaAtual = n;
+  const e1 = document.getElementById('pwEtapa1');
+  const e2 = document.getElementById('pwEtapa2');
+  [e1, e2].forEach((el, i) => {
+    if (!el) return;
+    const ativar = (i === n - 1);
+    el.classList.remove('pwStepIn', 'pwStepInVolta');
+    el.classList.toggle('on', ativar);
+    if (ativar && animar){
+      void el.offsetWidth; // forca reflow pra reiniciar a animacao mesmo se a classe ja tivesse sido usada antes
+      el.classList.add(direcao > 0 ? 'pwStepIn' : 'pwStepInVolta');
+    }
+  });
+  const d1 = document.getElementById('pwDot1');
+  const d2 = document.getElementById('pwDot2');
+  if (d1) d1.classList.toggle('on', n === 1);
+  if (d2) d2.classList.toggle('on', n === 2);
+  const back = document.getElementById('paywallVoltarBtn');
+  if (back) back.classList.toggle('on', n === 2);
+}
+
+(function(){
+  const btnFechar = document.getElementById('paywallFecharBtn');
+  const btnVoltar = document.getElementById('paywallVoltarBtn');
+  const btnContinuar = document.getElementById('paywallContinuarBtn');
+  const btnAgoraNao1 = document.getElementById('paywallAgoraNaoBtn1');
+  const btnAgoraNao2 = document.getElementById('paywallAgoraNaoBtn2');
+  const btnAssinar = document.getElementById('paywallAssinarBtn');
+  const planoMensal = document.getElementById('pwPlanoMensal');
+  const planoAnual = document.getElementById('pwPlanoAnual');
+  const planoVitalicio = document.getElementById('pwPlanoVitalicio');
+  const planosPorId = { mensal: planoMensal, anual: planoAnual, vitalicio: planoVitalicio };
+
+  if (btnFechar) btnFechar.onclick = fecharPaywall;
+  if (btnVoltar) btnVoltar.onclick = () => irParaEtapaPaywall(1);
+  if (btnContinuar) btnContinuar.onclick = () => irParaEtapaPaywall(2);
+  if (btnAgoraNao1) btnAgoraNao1.onclick = fecharPaywall;
+  if (btnAgoraNao2) btnAgoraNao2.onclick = fecharPaywall;
+  if (btnAssinar) btnAssinar.onclick = iniciarCompraAssinatura;
+
+  // selecao de plano -- so troca qual card fica marcado (.sel) e guarda em
+  // _pwPlanoSelecionado; iniciarCompraAssinatura() (quando a integracao
+  // real do Play Billing existir) le essa variavel pra saber qual produto
+  // comprar.
+  function selecionarPlano(id){
+    if (id === _pwPlanoSelecionado) return;
+    _pwPlanoSelecionado = id;
+    Object.keys(planosPorId).forEach(k => {
+      if (planosPorId[k]) planosPorId[k].classList.toggle('sel', k === id);
+    });
+    // pulso rapido no card recem-marcado -- feedback tatil de que o clique
+    // registrou. .pwPulse agora e' so transform+transition (CSS, ver
+    // style.css perto de ".pwPlano.pwPulse") -- nao usa `animation`, entao
+    // precisa tirar a classe manualmente aqui pra transition "descer" de
+    // volta (um `animation` se limparia sozinho, transition nao).
+    const alvo = planosPorId[id];
+    if (alvo){
+      alvo.classList.add('pwPulse');
+      setTimeout(() => alvo.classList.remove('pwPulse'), 150);
+    }
+  }
+  if (planoMensal) planoMensal.onclick = () => selecionarPlano('mensal');
+  if (planoAnual) planoAnual.onclick = () => selecionarPlano('anual');
+  if (planoVitalicio) planoVitalicio.onclick = () => selecionarPlano('vitalicio');
+})();
+
+function iniciarCompraAssinatura(){
+  // TODO (integracao real, ver comentario acima do bloco): chamar o
+  // Digital Goods API / Play Billing daqui, mandar o purchase token pra
+  // Cloud Function verificar, e so entao marcar a assinatura como ativa
+  // (hoje assinaturaAtiva() so reflete o modo debug).
+  if (typeof window.aviso === 'function'){
+    window.aviso((typeof idiomaApp === 'function' && idiomaApp() === 'en') ? 'Payments coming soon' : 'Pagamento ainda não disponível');
+  }
+}
+window.iniciarCompraAssinatura = iniciarCompraAssinatura;
 
 // temas com desbloqueioGratis (ex: Deserto via streak) ficam bloqueados
 // ate a condicao ser atingida -- ver verificarDesbloqueiosTemaArena().
@@ -4536,6 +4856,16 @@ function criar(){
   if (!texto) return;
   if (modo === 'repete' && diasEscolhidos.length === 0) return;
 
+  // PLANO PRO (pedido do usuario): plano gratis para em LIMITE_TAREFAS_GRATIS
+  // tarefas ATIVAS (tarefas.length conta todas, independente do tipo --
+  // simples de entender e sem precisar decidir "ativas hoje" vs "no total").
+  // Assinante (assinaturaAtiva()) nunca esbarra aqui.
+  if (typeof assinaturaAtiva === 'function' && !assinaturaAtiva() && tarefas.length >= LIMITE_TAREFAS_GRATIS){
+    composer.classList.remove('on');
+    if (typeof window.abrirPaywall === 'function') window.abrirPaywall('tarefas');
+    return;
+  }
+
   if (modo === 'hoje') tarefas.push({ texto, tipo:'hoje', data:isoAtual(), feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined });
   else if (modo === 'mensal') tarefas.push({ texto, tipo:'mensal', diaMes:diaMesEscolhido, feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined });
   else if (modo === 'anual') tarefas.push({ texto, tipo:'anual', diaAno:diaAnoEscolhido, mesAno:mesAnoEscolhido, feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined });
@@ -5627,6 +5957,24 @@ function renderEstatisticas(){
   const [anoStr, mesStr] = hoje.split('-');
   const ano = Number(anoStr), mes = Number(mesStr);
   const anoMesPrefixo = anoStr + '-' + mesStr;
+
+  // PLANO PRO (pedido do usuario): "Taxa de conclusão" e "Como foi o mês"
+  // ficam borrados + trancados pra quem nao assina -- "Sequência atual"
+  // (o card principal, fora deste bloco) continua sempre liberado.
+  // Reaplica a cada render() -- barato (2 elementos) e garante que destrava
+  // sozinho se a pessoa virar assinante enquanto a tela ja esta aberta.
+  const bloqueadoPro = typeof assinaturaAtiva === 'function' && !assinaturaAtiva();
+  ['estCardTaxaConclusao', 'estCardComoFoiMes', 'estCard7Dias'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.toggle('premiumBloqueado', bloqueadoPro);
+    el.onclick = bloqueadoPro ? () => { if (typeof window.abrirPaywall === 'function') window.abrirPaywall('estatisticas'); } : null;
+  });
+  // estHistCard tem onclick proprio, fixo (ver IIFE mais abaixo -- decide
+  // entre abrir o paywall ou o popup de periodo direto no clique, sempre
+  // le assinaturaAtiva() na hora); aqui so cuida do blur+cadeado visual.
+  const estHistCardEl = document.getElementById('estHistCard');
+  if (estHistCardEl) estHistCardEl.classList.toggle('premiumBloqueado', bloqueadoPro);
 
   // resumo vitalicio -- totalTarefasConcluidas() ja existe desde o
   // "CONTADOR - TAREFAS CONCLUIDAS (lifetime)" (incrementa 1x por
@@ -8397,7 +8745,10 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   // sempre (window.aviso quando bloqueado/cheio).
   function abrirNovoHeroiSeCouber(){
     if (listarPersonagens().length >= limitePersonagens()){
-      if (typeof window.aviso === 'function') window.aviso(idiomaApp() === 'en' ? 'Hero limit reached' : 'Limite de heróis atingido');
+      // FIX (pedido do usuario -- integrar o paywall de verdade): mesmo
+      // motivo da troca em escolherTema() -- so avisar e morto, agora abre
+      // o paywall de verdade.
+      if (typeof window.abrirPaywall === 'function') window.abrirPaywall('herois');
       return;
     }
     abrirNovoHeroiOverlay();
@@ -8815,9 +9166,10 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     // chamado de fora do clique da lista (ex.: futuro deep-link).
     const temaAlvo = TEMAS.find(t => t.id === id);
     if (temaAlvo && temaAlvo.pro && typeof assinaturaAtiva === 'function' && !assinaturaAtiva()){
-      if (typeof window.aviso === 'function'){
-        window.aviso(idiomaApp() === 'en' ? 'Pro plan theme' : 'Tema do Plano Pro');
-      }
+      // FIX (pedido do usuario -- integrar o paywall de verdade): antes so
+      // mostrava um toast ("Tema do Plano Pro") e morria ai. Agora abre o
+      // paywall central -- mesmo gatilho que qualquer outro limite PRO usa.
+      if (typeof window.abrirPaywall === 'function') window.abrirPaywall('tema');
       return;
     }
     const root = document.documentElement;
@@ -15099,6 +15451,37 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'jogo.experiencia':      { pt:'Experiência', en:'Experience' },
     'jogo.estagio':          { pt:'Estágio', en:'Stage' },
     'jogo.tarefasParaEstagio': { pt:'Tarefas para Estágio', en:'Tasks for Stage' },
+
+    // PLANO PRO -- paywall (ver #paywallOverlay no HTML + abrirPaywall() no script)
+    'pro.titulo':      { pt:'Plano Pro', en:'Pro Plan' },
+    'pro.headline':    { pt:'Sua trilha continua', en:'Your path continues' },
+    'pro.sub':         { pt:'3 etapas seguem bloqueadas até você assinar.', en:'3 steps stay locked until you subscribe.' },
+    'pro.passo1Titulo':{ pt:'Suas tarefas', en:'Your tasks' },
+    'pro.passo1Sub':   { pt:'Já disponível', en:'Already unlocked' },
+    'pro.beneficio1Titulo': { pt:'Sem limite diário', en:'No daily limit' },
+    'pro.beneficio1':  { pt:'Tarefas ilimitadas', en:'Unlimited tasks' },
+    'pro.beneficio2Titulo': { pt:'Temas & heróis', en:'Themes & heroes' },
+    'pro.beneficio2':  { pt:'6 temas, 4 heróis', en:'6 themes, 4 heroes' },
+    'pro.beneficio3Titulo': { pt:'Estatísticas', en:'Statistics' },
+    'pro.beneficio3':  { pt:'Histórico completo', en:'Full history' },
+    'pro.continuar':   { pt:'Continuar', en:'Continue' },
+    'pro.escolhaPlano':{ pt:'Escolha como quer assinar', en:'Choose how you want to subscribe' },
+    'pro.maisPopular': { pt:'Mais popular', en:'Most popular' },
+    'pro.planoMensal':    { pt:'Mensal', en:'Monthly' },
+    'pro.planoMensalSub': { pt:'Cobrado todo mês', en:'Billed every month' },
+    'pro.planoAnual':     { pt:'Anual', en:'Annual' },
+    'pro.planoAnualSub':  { pt:'Cobrado R$89,90/ano', en:'Billed R$89.90/year' },
+    'pro.planoVitalicio':    { pt:'Vitalício', en:'Lifetime' },
+    'pro.planoVitalicioSub': { pt:'Pagamento único', en:'One-time payment' },
+    'pro.porMes':      { pt:'/mês', en:'/mo' },
+    'pro.microcopy':   { pt:'Cancele quando quiser', en:'Cancel anytime' },
+    'pro.assinar':     { pt:'Assinar Plano Pro', en:'Subscribe to Pro' },
+    'pro.agoraNao':    { pt:'Agora não', en:'Not now' },
+    'pro.descobriu':   { pt:'Você descobriu um recurso premium!', en:'You found a premium feature!' },
+    'pro.temaBloqueado': { pt:'Tema do Plano Pro', en:'Pro plan theme' },
+    'pro.limiteHerois':  { pt:'Limite de heróis atingido', en:'Hero limit reached' },
+    'pro.limiteTarefas': { pt:'Limite diário de tarefas atingido', en:'Daily task limit reached' },
+    'pro.trancado':    { pt:'PRO', en:'PRO' },
     'jogo.addTarefa':        { pt:'+ Adicionar', en:'+ Add' },
     'jogo.oQuePrecisaSerFeito': { pt:'O que precisa ser feito?', en:'What needs to be done?' },
     'jogo.soHoje':           { pt:'Só hoje', en:'Today only' },

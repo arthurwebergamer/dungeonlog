@@ -2229,6 +2229,12 @@ function apagarCategoriaTarefa(id){
    aba por categoria existente + "+ Nova categoria" no fim. Ve tambem o
    filtro real dentro de render() (variavel pendentesVisiveis). */
 let filtroCategoriaTarefa = null;   // null = "Todos" (sem filtro)
+// pedido do usuario: com "Todos" selecionado, a lista agrupa por
+// categoria (cabecalho colapsavel, ver render()) -- este Set guarda
+// quais grupos estao fechados no momento. So em memoria (like
+// filtroCategoriaTarefa acima), reseta pro estado padrao (tudo aberto)
+// ao recarregar o app.
+const categoriasColapsadas = new Set();
 
 function pintarCatTabs(){
   const linha = document.getElementById('catTabsRow');
@@ -4166,7 +4172,11 @@ function render(){
     lista.innerHTML = '<div class="empty">' + (idiomaApp() === 'en' ? 'No pending tasks in this category.' : 'Nenhuma tarefa pendente nesta categoria.') + '</div>';
   }
 
-  pendentesVisiveis.forEach(t => {
+  // construcao de UMA linha de tarefa (extraido do forEach original pra
+  // poder ser chamado tanto na lista simples quanto dentro de cada grupo
+  // de categoria -- ver uso logo abaixo). So MONTA e retorna o elemento,
+  // quem chama decide onde/quando dar appendChild.
+  function montarLinhaTarefa(t){
     const i = tarefas.indexOf(t);
     const el = document.createElement('div');
     el.className = 'task';
@@ -4177,7 +4187,7 @@ function render(){
     el.innerHTML = '<div class="box">'+CHECK+'</div>'
       + '<div class="tinfo"><span class="label"></span>'
       + '<span class="tmeta"><span class="difpip">' + '<i></i>'.repeat(dObj.pips) + '</span>'
-      + '<span class="repeat"></span><span class="vezesbadge"></span><span class="catbadge"></span></span></div>'
+      + '<span class="repeat"></span><span class="vezesbadge"></span></span></div>'
       + '<button class="del" aria-label="Apagar tarefa">×</button>';
     el.querySelector('.label').textContent = t.texto;
     el.querySelector('.repeat').textContent = rotulo(t);
@@ -4186,20 +4196,6 @@ function render(){
     const meta = (t.meta && t.meta > 1) ? Math.round(t.meta) : 1;
     const vezesAtual = (t.vezesData === isoAtual()) ? (t.vezesN || 0) : 0;
     if (meta > 1) el.querySelector('.vezesbadge').textContent = vezesAtual + '/' + meta;
-
-    // categoria de tarefa (pedido do usuario) -- badge simples, sem
-    // filtro/estatistica: so aparece se a tarefa tiver categoriaId E a
-    // categoria ainda existir (categoriaTarefaPorId resolve pela lista
-    // salva -- se o usuario apagar tudo do localStorage/trocar de conta,
-    // o id fica orfao e o badge so nao aparece, sem quebrar nada)
-    if (t.categoriaId){
-      const cat = categoriaTarefaPorId(t.categoriaId);
-      if (cat){
-        const badge = el.querySelector('.catbadge');
-        badge.innerHTML = '<i style="background:' + cat.cor + '"></i>' + cat.nome;
-        badge.style.display = 'flex';
-      }
-    }
 
     // ve comentario em _tarefaPopIdx (perto de alternar()) -- esta e a
     // MESMA tarefa que acabou de tocar .saiu antes deste render() rodar,
@@ -4262,8 +4258,50 @@ function render(){
       if (typeof abrirEditor === 'function') abrirEditor(i);
     };
     el.querySelector('.del').onclick = e => { e.stopPropagation(); tarefas.splice(i,1); verificarVitoriaAoExcluir(); render(); };
-    lista.appendChild(el);
-  });
+    return el;
+  }
+
+  if (filtroCategoriaTarefa){
+    // uma categoria especifica ja esta selecionada na aba -- lista
+    // simples, sem cabecalho (a propria aba ativa ja deixa claro qual
+    // categoria e essa)
+    pendentesVisiveis.forEach(t => lista.appendChild(montarLinhaTarefa(t)));
+  } else {
+    // "Todos": agrupa por categoria (pedido do usuario -- "a categoria
+    // devia aparecer como texto e nao tipo cor", igual ao Skillion:
+    // cabecalho com nome+contagem, colapsavel). Grupo so aparece se tiver
+    // pelo menos 1 tarefa pendente hoje; tarefa sem categoria cai num
+    // grupo "Sem categoria" no final. O drag-and-drop de reordenar (mais
+    // abaixo no arquivo) continua funcionando igual -- ele so enxerga
+    // elementos .task via querySelectorAll, os cabecalhos de grupo nao
+    // entram na conta.
+    const grupos = obterCategoriasTarefa().map(c => ({ id: c.id, nome: c.nome, tarefas: [] }));
+    const semCategoria = { id: '__sem__', nome: (idiomaApp() === 'en' ? 'No category' : 'Sem categoria'), tarefas: [] };
+    const porId = new Map(grupos.map(g => [g.id, g]));
+
+    pendentesVisiveis.forEach(t => {
+      const g = t.categoriaId ? porId.get(t.categoriaId) : null;
+      (g || semCategoria).tarefas.push(t);
+    });
+
+    grupos.concat(semCategoria).filter(g => g.tarefas.length > 0).forEach(g => {
+      const colapsado = categoriasColapsadas.has(g.id);
+      const header = document.createElement('div');
+      header.className = 'catgrupo' + (colapsado ? ' colapsado' : '');
+      header.innerHTML = '<span class="catgruponome"></span><span class="catgrupocount"></span><span class="catgrupochevron">▾</span>';
+      header.querySelector('.catgruponome').textContent = g.nome;
+      header.querySelector('.catgrupocount').textContent = g.tarefas.length;
+      header.onclick = () => {
+        if (categoriasColapsadas.has(g.id)) categoriasColapsadas.delete(g.id);
+        else categoriasColapsadas.add(g.id);
+        render();
+      };
+      lista.appendChild(header);
+      if (!colapsado){
+        g.tarefas.forEach(t => lista.appendChild(montarLinhaTarefa(t)));
+      }
+    });
+  }
 
   const feitas = doDia.filter(feitaHoje).length;
   const total = doDia.length;

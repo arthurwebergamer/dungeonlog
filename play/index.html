@@ -367,6 +367,7 @@
       </div>
       <button class="add" id="addbtn" data-i18n="jogo.addTarefa">+ Adicionar</button>
     </div>
+    <div class="cattabs" id="catTabsRow"></div>
     <div class="list" id="list"></div>
 
     <div class="composer" id="composer">
@@ -2171,11 +2172,59 @@ function criarCategoriaTarefa(nome, cor){
   const cat = novaCategoriaTarefaObj(nome, cor);
   lista.push(cat);
   salvarCategoriasTarefa(lista);
+  // qualquer lugar que crie uma categoria nova (composer, editor, ou as
+  // abas de filtro abaixo) precisa que as abas fiquem em dia na hora --
+  // centralizado aqui em vez de repetir a chamada em cada call-site
+  if (typeof pintarCatTabs === 'function') pintarCatTabs();
   return cat;
 }
 function categoriaTarefaPorId(id){
   if (!id) return null;
   return obterCategoriasTarefa().find(c => c.id === id) || null;
+}
+
+/* ---------- categoria de tarefa: abas de filtro (pedido do usuario,
+   "sistema de categorias tipo igual o do Skillion") ----------
+   Reaproveita o mesmo armazenamento/CRUD acima (obterCategoriasTarefa,
+   criarCategoriaTarefa) -- so acrescenta a camada de filtro visual em
+   forma de abas horizontais acima da lista de tarefas: "Todos" + uma
+   aba por categoria existente + "+ Nova categoria" no fim. Ve tambem o
+   filtro real dentro de render() (variavel pendentesVisiveis). */
+let filtroCategoriaTarefa = null;   // null = "Todos" (sem filtro)
+
+function pintarCatTabs(){
+  const linha = document.getElementById('catTabsRow');
+  if (!linha) return;
+  const en = idiomaApp() === 'en';
+  linha.innerHTML = '';
+
+  const bTodos = document.createElement('button');
+  bTodos.type = 'button';
+  bTodos.className = 'cattab' + (filtroCategoriaTarefa === null ? ' on' : '');
+  bTodos.textContent = en ? 'All' : 'Todos';
+  bTodos.onclick = () => { filtroCategoriaTarefa = null; if (typeof render === 'function') render(); };
+  linha.appendChild(bTodos);
+
+  obterCategoriasTarefa().forEach(cat => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'cattab' + (filtroCategoriaTarefa === cat.id ? ' on' : '');
+    b.innerHTML = '<i style="background:' + cat.cor + '"></i>' + cat.nome;
+    // toca de novo na mesma aba = volta pra "Todos" (mesmo padrao toggle
+    // dos chips de categoria do composer/editor)
+    b.onclick = () => {
+      filtroCategoriaTarefa = (filtroCategoriaTarefa === cat.id) ? null : cat.id;
+      if (typeof render === 'function') render();
+    };
+    linha.appendChild(b);
+  });
+
+  const bNova = document.createElement('button');
+  bNova.type = 'button';
+  bNova.className = 'cattab cattabnova';
+  bNova.textContent = '+ ' + (en ? 'Add' : 'Adicionar');
+  bNova.onclick = () => { if (typeof abrirNovaCategoriaOverlay === 'function') abrirNovaCategoriaOverlay(); };
+  linha.appendChild(bNova);
 }
 
 /* ---------- dificuldade ---------- */
@@ -4030,6 +4079,8 @@ function render(){
   const lista = document.getElementById('list');
   lista.innerHTML = '';
 
+  if (typeof pintarCatTabs === 'function') pintarCatTabs();
+
   // Botao "+ Adicionar" tambem desabilita quando o monstro ja caiu -- nao
   // so o "Criar tarefa" de dentro da composer (ver atualizarEstadoSave()).
   // Roda a cada render() pra cobrir a virada automatica do dia (watchdog),
@@ -4059,7 +4110,21 @@ function render(){
   pendentes.forEach(t => { if (typeof t.ordem !== 'number') t.ordem = tarefas.indexOf(t) * 10; });
   pendentes.sort((a, b) => a.ordem - b.ordem);
 
-  pendentes.forEach(t => {
+  // filtro de categoria (abas tipo Skillion, pedido do usuario) -- so
+  // decide QUAIS cards aparecem na lista. feitas/total/hp do monstro/
+  // vitoria (calculados mais abaixo) continuam em cima de "pendentes"
+  // (todas as tarefas do dia, sem filtro): esconder uma categoria nao
+  // pode mexer na vida do monstro nem fingir vitoria sem tarefa real
+  // concluida.
+  const pendentesVisiveis = filtroCategoriaTarefa
+    ? pendentes.filter(t => t.categoriaId === filtroCategoriaTarefa)
+    : pendentes;
+
+  if (pendentes.length > 0 && pendentesVisiveis.length === 0){
+    lista.innerHTML = '<div class="empty">' + (idiomaApp() === 'en' ? 'No pending tasks in this category.' : 'Nenhuma tarefa pendente nesta categoria.') + '</div>';
+  }
+
+  pendentesVisiveis.forEach(t => {
     const i = tarefas.indexOf(t);
     const el = document.createElement('div');
     el.className = 'task';
@@ -9588,6 +9653,83 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   bSalv.onclick = confirmar;
 
   window.abrirFolhaNome = abrir;
+})();
+</script>
+
+<!-- =====================================================================
+     NOVA CATEGORIA (pelas abas de filtro da lista de tarefas)
+     Reaproveita .edov/.edsheet/.edpuxador/.edtitulo/.edcampo/.edacoes/
+     .edsalvar (mesmo padrao visual da folha "Renomear" acima) e
+     .advswatches/.advpreset (mesma paleta CORES_PRESET usada no
+     composer/editor) -- nao criei CSS novo pra folha em si, so pra
+     linha de abas (.cattabs/.cattab, ver style.css). Chama a mesma
+     criarCategoriaTarefa() ja usada pelo composer e pelo editor, entao
+     a categoria criada aqui aparece em TODO lugar (chips do composer/
+     editor, abas de filtro) sem duplicar armazenamento.
+     ===================================================================== -->
+<div class="edov" id="novaCategoriaOverlay">
+  <div class="edsheet" id="novaCategoriaSheet">
+    <div class="edpuxador"></div>
+    <div class="edtitulo">Nova categoria</div>
+    <input class="edcampo" id="novaCategoriaCampo" maxlength="24" autocomplete="off" placeholder="Nome da categoria">
+    <div class="advswatches" id="novaCategoriaSwatches"></div>
+    <div class="edacoes">
+      <button class="edsalvar" id="novaCategoriaSalvar" type="button">Criar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const ov       = document.getElementById('novaCategoriaOverlay');
+  const campo    = document.getElementById('novaCategoriaCampo');
+  const swatches = document.getElementById('novaCategoriaSwatches');
+  const bSalv    = document.getElementById('novaCategoriaSalvar');
+  if (!ov || !campo || !swatches || !bSalv) return;
+
+  let corEscolhida = (typeof CORES_PRESET !== 'undefined' && CORES_PRESET[0]) || '#F2A65A';
+
+  function pintarSwatches(){
+    swatches.querySelectorAll('.advpreset').forEach(b =>
+      b.classList.toggle('on', b.dataset.cor.toLowerCase() === corEscolhida.toLowerCase()));
+  }
+  if (typeof CORES_PRESET !== 'undefined'){
+    CORES_PRESET.forEach(c => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'advpreset'; b.dataset.cor = c;
+      b.style.background = c;
+      b.setAttribute('aria-label', 'Cor ' + c);
+      b.onclick = () => { corEscolhida = c; pintarSwatches(); };
+      swatches.appendChild(b);
+    });
+    pintarSwatches();
+  }
+
+  function abrir(){
+    campo.value = '';
+    ov.classList.add('on');
+    setTimeout(() => campo.focus(), 50);
+  }
+  function fechar(){ ov.classList.remove('on'); }
+  function confirmar(){
+    const nome = campo.value.trim();
+    if (!nome){ campo.focus(); return; }
+    const cat = (typeof criarCategoriaTarefa === 'function') ? criarCategoriaTarefa(nome, corEscolhida) : null;
+    if (!cat) return;
+    // categoria recem-criada ja entra selecionada como filtro ativo
+    filtroCategoriaTarefa = cat.id;
+    if (typeof render === 'function') render();
+    fechar();
+  }
+
+  ov.onclick = e => { if (e.target === ov) fechar(); };
+  document.addEventListener('keydown', e => {
+    if (ov.classList.contains('on') && e.key === 'Escape') fechar();
+  });
+  campo.addEventListener('keydown', e => { if (e.key === 'Enter') confirmar(); });
+  bSalv.onclick = confirmar;
+
+  window.abrirNovaCategoriaOverlay = abrir;
 })();
 </script>
 

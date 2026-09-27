@@ -2152,14 +2152,18 @@ function obterCategoriasTarefa(){
   if (lista.length === 0){
     let catOnb = '';
     try { catOnb = localStorage.getItem('questlog.onboarding.categoria.v1') || ''; } catch(e){}
+    // pedido do usuario: "Um pouco de tudo" nao virava categoria nenhuma
+    // que preste pra separar tarefa -- quem responde "tudo" no onboarding
+    // ja faz um pouco de cada, entao semeia as 3 categorias especificas
+    // de uma vez (estudos/trabalho/rotina continuam semeando so a delas).
     const SEED = {
-      estudos:  ['Estudos', '#63C99A'],
-      trabalho: ['Trabalho', '#5AA9F2'],
-      rotina:   ['Rotina pessoal', '#E5698A'],
-      tudo:     ['Um pouco de tudo', '#F2C94C']
+      estudos:  [['Estudos', '#63C99A']],
+      trabalho: [['Trabalho', '#5AA9F2']],
+      rotina:   [['Rotina pessoal', '#E5698A']],
+      tudo:     [['Estudos', '#63C99A'], ['Trabalho', '#5AA9F2'], ['Rotina pessoal', '#E5698A']]
     };
     if (SEED[catOnb]){
-      lista = [novaCategoriaTarefaObj(SEED[catOnb][0], SEED[catOnb][1])];
+      lista = SEED[catOnb].map(([nome, cor]) => novaCategoriaTarefaObj(nome, cor));
       salvarCategoriasTarefa(lista);
     }
   }
@@ -2182,6 +2186,35 @@ function categoriaTarefaPorId(id){
   if (!id) return null;
   return obterCategoriasTarefa().find(c => c.id === id) || null;
 }
+function editarCategoriaTarefa(id, nome, cor){
+  nome = (nome || '').trim();
+  if (!id || !nome) return null;
+  const lista = obterCategoriasTarefa();
+  const cat = lista.find(c => c.id === id);
+  if (!cat) return null;
+  cat.nome = nome;
+  if (cor) cat.cor = cor;
+  salvarCategoriasTarefa(lista);
+  if (typeof pintarCatTabs === 'function') pintarCatTabs();
+  return cat;
+}
+function apagarCategoriaTarefa(id){
+  if (!id) return false;
+  let lista = obterCategoriasTarefa();
+  const antes = lista.length;
+  lista = lista.filter(c => c.id !== id);
+  if (lista.length === antes) return false;
+  salvarCategoriasTarefa(lista);
+  // tarefas que apontavam pra essa categoria ficam so sem a etiqueta --
+  // categoriaTarefaPorId ja tolera um id orfao (badge some sozinho), mas
+  // limpa o campo mesmo assim pra nao carregar um id morto pra sempre
+  if (typeof tarefas !== 'undefined' && Array.isArray(tarefas)){
+    tarefas.forEach(t => { if (t.categoriaId === id) delete t.categoriaId; });
+  }
+  if (typeof filtroCategoriaTarefa !== 'undefined' && filtroCategoriaTarefa === id) filtroCategoriaTarefa = null;
+  if (typeof pintarCatTabs === 'function') pintarCatTabs();
+  return true;
+}
 
 /* ---------- categoria de tarefa: abas de filtro (pedido do usuario,
    "sistema de categorias tipo igual o do Skillion") ----------
@@ -2200,23 +2233,43 @@ function pintarCatTabs(){
 
   const bTodos = document.createElement('button');
   bTodos.type = 'button';
-  bTodos.className = 'cattab' + (filtroCategoriaTarefa === null ? ' on' : '');
+  bTodos.className = 'cattab cattabtodos' + (filtroCategoriaTarefa === null ? ' on' : '');
   bTodos.textContent = en ? 'All' : 'Todos';
   bTodos.onclick = () => { filtroCategoriaTarefa = null; if (typeof render === 'function') render(); };
   linha.appendChild(bTodos);
 
   obterCategoriasTarefa().forEach(cat => {
-    const b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'cattab' + (filtroCategoriaTarefa === cat.id ? ' on' : '');
-    b.innerHTML = '<i style="background:' + cat.cor + '"></i>' + cat.nome;
+    // .cattab agora e um wrapper (nao o proprio botao) com 2 controles
+    // dentro: .cattabsel (toca = filtra, mesmo comportamento de antes) e
+    // .cattabedit (lapis pequeno = abre a folha de editar/apagar) --
+    // pedido do usuario: "devia dar pra apagar e editar" as categorias.
+    const wrap = document.createElement('div');
+    wrap.className = 'cattab' + (filtroCategoriaTarefa === cat.id ? ' on' : '');
+
+    const sel = document.createElement('button');
+    sel.type = 'button';
+    sel.className = 'cattabsel';
+    sel.innerHTML = '<i style="background:' + cat.cor + '"></i>' + cat.nome;
     // toca de novo na mesma aba = volta pra "Todos" (mesmo padrao toggle
     // dos chips de categoria do composer/editor)
-    b.onclick = () => {
+    sel.onclick = () => {
       filtroCategoriaTarefa = (filtroCategoriaTarefa === cat.id) ? null : cat.id;
       if (typeof render === 'function') render();
     };
-    linha.appendChild(b);
+    wrap.appendChild(sel);
+
+    const edit = document.createElement('button');
+    edit.type = 'button';
+    edit.className = 'cattabedit';
+    edit.setAttribute('aria-label', en ? 'Edit category' : 'Editar categoria');
+    edit.textContent = '✎';
+    edit.onclick = e => {
+      e.stopPropagation();
+      if (typeof abrirNovaCategoriaOverlay === 'function') abrirNovaCategoriaOverlay(cat.id);
+    };
+    wrap.appendChild(edit);
+
+    linha.appendChild(wrap);
   });
 
   const bNova = document.createElement('button');
@@ -9657,23 +9710,30 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 </script>
 
 <!-- =====================================================================
-     NOVA CATEGORIA (pelas abas de filtro da lista de tarefas)
-     Reaproveita .edov/.edsheet/.edpuxador/.edtitulo/.edcampo/.edacoes/
-     .edsalvar (mesmo padrao visual da folha "Renomear" acima) e
+     NOVA CATEGORIA / EDITAR CATEGORIA (pelas abas de filtro da lista de
+     tarefas). Reaproveita .edov/.edsheet/.edpuxador/.edtitulo/.edcampo/
+     .edacoes/.edsalvar (mesmo padrao visual da folha "Renomear" acima) e
      .advswatches/.advpreset (mesma paleta CORES_PRESET usada no
      composer/editor) -- nao criei CSS novo pra folha em si, so pra
-     linha de abas (.cattabs/.cattab, ver style.css). Chama a mesma
-     criarCategoriaTarefa() ja usada pelo composer e pelo editor, entao
-     a categoria criada aqui aparece em TODO lugar (chips do composer/
-     editor, abas de filtro) sem duplicar armazenamento.
+     linha de abas (.cattabs/.cattab, ver style.css). Chama
+     criarCategoriaTarefa()/editarCategoriaTarefa()/apagarCategoriaTarefa()
+     ja usadas em todo o resto do app, entao o resultado aparece em TODO
+     lugar (chips do composer/editor, abas de filtro) sem duplicar
+     armazenamento.
+
+     window.abrirNovaCategoriaOverlay(idOpcional): sem argumento = folha
+     de criacao ("Nova categoria"); com o id de uma categoria existente =
+     folha de edicao (nome/cor pre-preenchidos + botao Apagar) -- pedido
+     do usuario: "devia dar pra apagar e editar" as categorias.
      ===================================================================== -->
 <div class="edov" id="novaCategoriaOverlay">
   <div class="edsheet" id="novaCategoriaSheet">
     <div class="edpuxador"></div>
-    <div class="edtitulo">Nova categoria</div>
+    <div class="edtitulo" id="novaCategoriaTitulo">Nova categoria</div>
     <input class="edcampo" id="novaCategoriaCampo" maxlength="24" autocomplete="off" placeholder="Nome da categoria">
     <div class="advswatches" id="novaCategoriaSwatches"></div>
     <div class="edacoes">
+      <button class="edsalvar" id="novaCategoriaApagar" type="button" style="background:var(--panel-2);color:var(--perigo);display:none">Apagar</button>
       <button class="edsalvar" id="novaCategoriaSalvar" type="button">Criar</button>
     </div>
   </div>
@@ -9682,12 +9742,16 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 <script>
 (function(){
   const ov       = document.getElementById('novaCategoriaOverlay');
+  const titulo   = document.getElementById('novaCategoriaTitulo');
   const campo    = document.getElementById('novaCategoriaCampo');
   const swatches = document.getElementById('novaCategoriaSwatches');
   const bSalv    = document.getElementById('novaCategoriaSalvar');
-  if (!ov || !campo || !swatches || !bSalv) return;
+  const bApagar  = document.getElementById('novaCategoriaApagar');
+  if (!ov || !titulo || !campo || !swatches || !bSalv || !bApagar) return;
 
+  const en = () => (typeof idiomaApp === 'function' && idiomaApp() === 'en');
   let corEscolhida = (typeof CORES_PRESET !== 'undefined' && CORES_PRESET[0]) || '#F2A65A';
+  let idEmEdicao = null;   // null = criando categoria nova; id = editando essa categoria
 
   function pintarSwatches(){
     swatches.querySelectorAll('.advpreset').forEach(b =>
@@ -9702,24 +9766,58 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       b.onclick = () => { corEscolhida = c; pintarSwatches(); };
       swatches.appendChild(b);
     });
-    pintarSwatches();
   }
 
-  function abrir(){
-    campo.value = '';
+  function abrir(idParaEditar){
+    idEmEdicao = idParaEditar || null;
+    const cat = (idEmEdicao && typeof categoriaTarefaPorId === 'function') ? categoriaTarefaPorId(idEmEdicao) : null;
+    titulo.textContent = cat ? (en() ? 'Edit category' : 'Editar categoria') : 'Nova categoria';
+    campo.value = cat ? cat.nome : '';
+    corEscolhida = cat ? cat.cor : ((typeof CORES_PRESET !== 'undefined' && CORES_PRESET[0]) || '#F2A65A');
+    pintarSwatches();
+    bSalv.textContent = cat ? (en() ? 'Save' : 'Salvar') : (en() ? 'Create' : 'Criar');
+    bApagar.style.display = cat ? '' : 'none';
     ov.classList.add('on');
-    setTimeout(() => campo.focus(), 50);
+    setTimeout(() => { campo.focus(); campo.select(); }, 50);
   }
   function fechar(){ ov.classList.remove('on'); }
   function confirmar(){
     const nome = campo.value.trim();
     if (!nome){ campo.focus(); return; }
-    const cat = (typeof criarCategoriaTarefa === 'function') ? criarCategoriaTarefa(nome, corEscolhida) : null;
-    if (!cat) return;
-    // categoria recem-criada ja entra selecionada como filtro ativo
-    filtroCategoriaTarefa = cat.id;
+    if (idEmEdicao){
+      if (typeof editarCategoriaTarefa === 'function') editarCategoriaTarefa(idEmEdicao, nome, corEscolhida);
+    } else {
+      const cat = (typeof criarCategoriaTarefa === 'function') ? criarCategoriaTarefa(nome, corEscolhida) : null;
+      if (cat) filtroCategoriaTarefa = cat.id;   // recem-criada ja entra selecionada como filtro
+    }
     if (typeof render === 'function') render();
     fechar();
+  }
+  function apagar(){
+    if (!idEmEdicao) return;
+    const cat = (typeof categoriaTarefaPorId === 'function') ? categoriaTarefaPorId(idEmEdicao) : null;
+    const nomeCat = cat ? cat.nome : '';
+    const idAlvo = idEmEdicao;
+    const feito = () => {
+      if (typeof apagarCategoriaTarefa === 'function') apagarCategoriaTarefa(idAlvo);
+      if (typeof render === 'function') render();
+      fechar();
+    };
+    // window.pedirConfirmacao vem do bloco CONFIRMAR COMPRA/VENDA, mais
+    // abaixo no arquivo -- ja carregado quando o usuario chega a clicar
+    // aqui (interacao real, depois de toda a pagina parseada).
+    if (typeof window.pedirConfirmacao === 'function'){
+      window.pedirConfirmacao(
+        en() ? 'Delete category?' : 'Apagar categoria?',
+        en()
+          ? ('"' + nomeCat + '" will be removed. Tasks using it just lose the tag, they are not deleted.')
+          : ('"' + nomeCat + '" será removida. As tarefas que usam ela só perdem a etiqueta, não são apagadas.'),
+        en() ? 'Delete' : 'Apagar',
+        feito
+      );
+    } else {
+      feito();
+    }
   }
 
   ov.onclick = e => { if (e.target === ov) fechar(); };
@@ -9728,6 +9826,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   });
   campo.addEventListener('keydown', e => { if (e.key === 'Enter') confirmar(); });
   bSalv.onclick = confirmar;
+  bApagar.onclick = apagar;
 
   window.abrirNovaCategoriaOverlay = abrir;
 })();

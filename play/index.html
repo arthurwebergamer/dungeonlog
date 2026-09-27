@@ -450,6 +450,19 @@
           </div>
           <div class="advswatches" id="corBoxSwatches"></div>
         </div>
+        <div class="advcatrow">
+          <span class="diflabel">Categoria</span>
+          <div class="catchips" id="catChips"></div>
+          <button type="button" class="catnova" id="catNovaBtn">+ Nova categoria</button>
+          <div class="catform" id="catForm">
+            <input type="text" class="catnomeinput" id="catNomeInput" placeholder="Nome da categoria" maxlength="24" autocomplete="off">
+            <div class="advswatches" id="catFormSwatches"></div>
+            <div class="catformacoes">
+              <button type="button" class="catformcancelar" id="catFormCancelar">Cancelar</button>
+              <button type="button" class="catformok" id="catFormOk">Criar</button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <button class="cbtn" id="save" data-i18n="jogo.criarTarefa">Criar tarefa</button>
@@ -2103,6 +2116,66 @@ function hexValido(v){
   let s = v.trim();
   if (s[0] !== '#') s = '#' + s;
   return /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(s) ? s : null;
+}
+
+/* ---------- categorias de tarefa (pedido do usuario) ---------- */
+// Usuario cria categorias proprias (nome + cor), uma por tarefa -- sem
+// filtro/estatistica por enquanto, so um badge no card (ver render(),
+// bloco .task) e o seletor dentro de #advPanel/#edAdvPanel (composer/
+// editor de tarefa). A 1a categoria nasce sozinha a partir da resposta
+// do quiz de onboarding (CATEGORIAS_ONBOARDING, bloco do carrossel mais
+// abaixo) na PRIMEIRA LEITURA -- lazy, dentro do getter, nao direto no
+// load do script: se semeasse no load, rodaria antes da conta ser
+// resolvida (login e carrossel vivem em <script> separadas, carregadas
+// depois) e gravaria na chave de conta errada (guest em vez da conta
+// real). Sem UI de excluir categoria ainda -- se um dia ganhar, a
+// condicao "lista vazia" abaixo passa a re-semear depois de excluir a
+// ultima; ajustar junto quando isso for implementado.
+// i18n: strings novas ficam so em PT por enquanto (nao mexi no
+// dicionario TRADUCOES pra nao arriscar a tela toda de idioma por uma
+// feature nova) -- pendencia conhecida, nao silenciosa.
+const CHAVE_CATEGORIAS_TAREFA = 'questlog.categoriasTarefa.v1';
+function novaCategoriaTarefaObj(nome, cor){
+  return { id: 'cat_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), nome, cor };
+}
+function salvarCategoriasTarefa(lista){
+  try { localStorage.setItem(chaveConta(CHAVE_CATEGORIAS_TAREFA), JSON.stringify(lista)); } catch(e){}
+}
+function obterCategoriasTarefa(){
+  let lista = [];
+  try {
+    const bruto = localStorage.getItem(chaveConta(CHAVE_CATEGORIAS_TAREFA));
+    const arr = bruto ? JSON.parse(bruto) : null;
+    lista = Array.isArray(arr) ? arr : [];
+  } catch(e){ lista = []; }
+  if (lista.length === 0){
+    let catOnb = '';
+    try { catOnb = localStorage.getItem('questlog.onboarding.categoria.v1') || ''; } catch(e){}
+    const SEED = {
+      estudos:  ['Estudos', '#63C99A'],
+      trabalho: ['Trabalho', '#5AA9F2'],
+      rotina:   ['Rotina pessoal', '#E5698A'],
+      tudo:     ['Um pouco de tudo', '#F2C94C']
+    };
+    if (SEED[catOnb]){
+      lista = [novaCategoriaTarefaObj(SEED[catOnb][0], SEED[catOnb][1])];
+      salvarCategoriasTarefa(lista);
+    }
+  }
+  return lista;
+}
+function criarCategoriaTarefa(nome, cor){
+  nome = (nome || '').trim();
+  if (!nome) return null;
+  const lista = obterCategoriasTarefa();
+  const cat = novaCategoriaTarefaObj(nome, cor);
+  lista.push(cat);
+  salvarCategoriasTarefa(lista);
+  return cat;
+}
+function categoriaTarefaPorId(id){
+  if (!id) return null;
+  return obterCategoriasTarefa().find(c => c.id === id) || null;
 }
 
 /* ---------- dificuldade ---------- */
@@ -3997,7 +4070,7 @@ function render(){
     el.innerHTML = '<div class="box">'+CHECK+'</div>'
       + '<div class="tinfo"><span class="label"></span>'
       + '<span class="tmeta"><span class="difpip">' + '<i></i>'.repeat(dObj.pips) + '</span>'
-      + '<span class="repeat"></span><span class="vezesbadge"></span></span></div>'
+      + '<span class="repeat"></span><span class="vezesbadge"></span><span class="catbadge"></span></span></div>'
       + '<button class="del" aria-label="Apagar tarefa">×</button>';
     el.querySelector('.label').textContent = t.texto;
     el.querySelector('.repeat').textContent = rotulo(t);
@@ -4006,6 +4079,20 @@ function render(){
     const meta = (t.meta && t.meta > 1) ? Math.round(t.meta) : 1;
     const vezesAtual = (t.vezesData === isoAtual()) ? (t.vezesN || 0) : 0;
     if (meta > 1) el.querySelector('.vezesbadge').textContent = vezesAtual + '/' + meta;
+
+    // categoria de tarefa (pedido do usuario) -- badge simples, sem
+    // filtro/estatistica: so aparece se a tarefa tiver categoriaId E a
+    // categoria ainda existir (categoriaTarefaPorId resolve pela lista
+    // salva -- se o usuario apagar tudo do localStorage/trocar de conta,
+    // o id fica orfao e o badge so nao aparece, sem quebrar nada)
+    if (t.categoriaId){
+      const cat = categoriaTarefaPorId(t.categoriaId);
+      if (cat){
+        const badge = el.querySelector('.catbadge');
+        badge.innerHTML = '<i style="background:' + cat.cor + '"></i>' + cat.nome;
+        badge.style.display = 'flex';
+      }
+    }
 
     // ve comentario em _tarefaPopIdx (perto de alternar()) -- esta e a
     // MESMA tarefa que acabou de tocar .saiu antes deste render() rodar,
@@ -4868,10 +4955,10 @@ function criar(){
     return;
   }
 
-  if (modo === 'hoje') tarefas.push({ texto, tipo:'hoje', data:isoAtual(), feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined });
-  else if (modo === 'mensal') tarefas.push({ texto, tipo:'mensal', diaMes:diaMesEscolhido, feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined });
-  else if (modo === 'anual') tarefas.push({ texto, tipo:'anual', diaAno:diaAnoEscolhido, mesAno:mesAnoEscolhido, feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined });
-  else tarefas.push({ texto, tipo:'repete', dias:[...diasEscolhidos], feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined });
+  if (modo === 'hoje') tarefas.push({ texto, tipo:'hoje', data:isoAtual(), feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined, categoriaId: categoriaEscolhida || undefined });
+  else if (modo === 'mensal') tarefas.push({ texto, tipo:'mensal', diaMes:diaMesEscolhido, feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined, categoriaId: categoriaEscolhida || undefined });
+  else if (modo === 'anual') tarefas.push({ texto, tipo:'anual', diaAno:diaAnoEscolhido, mesAno:mesAnoEscolhido, feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined, categoriaId: categoriaEscolhida || undefined });
+  else tarefas.push({ texto, tipo:'repete', dias:[...diasEscolhidos], feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined, categoriaId: categoriaEscolhida || undefined });
   window.dbgConta && window.dbgConta('criar() -- tarefa "' + texto + '" adicionada | uidAtivo=' + (typeof _uidAtivo!=='undefined'?_uidAtivo:'?') + ' | chave=' + (typeof chaveSaveAtual==='function'?chaveSaveAtual():'?') + ' | tarefas agora: ' + tarefas.length);
 
   input.value = '';
@@ -4955,12 +5042,91 @@ function pintarAdvColor(){
 
 function resetAdvColor(){
   corBoxEscolhida = null;
+  categoriaEscolhida = null;
   const panel = document.getElementById('advPanel');
   const toggle = document.getElementById('advToggle');
   if (panel) panel.classList.remove('on');
   if (toggle) toggle.classList.remove('on');
   pintarAdvColor();
+  if (typeof pintarCategorias === 'function') pintarCategorias();
 }
+
+/* ---------- opcoes avancadas: categoria de tarefa (pedido do usuario) ---------- */
+let categoriaEscolhida = null;   // null = tarefa sem categoria
+
+function pintarCategorias(){
+  const grupo = document.getElementById('catChips');
+  if (!grupo) return;
+  grupo.innerHTML = '';
+  obterCategoriasTarefa().forEach(cat => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'catchip' + (categoriaEscolhida === cat.id ? ' on' : '');
+    b.innerHTML = '<i style="background:' + cat.cor + '"></i>' + cat.nome;
+    // toca de novo na mesma categoria = desmarca (mesmo padrao toggle
+    // ja usado nos chips de dificuldade/dia da semana do resto do app)
+    b.onclick = () => {
+      categoriaEscolhida = (categoriaEscolhida === cat.id) ? null : cat.id;
+      pintarCategorias();
+    };
+    grupo.appendChild(b);
+  });
+}
+
+(function montarCategoria(){
+  const novaBtn = document.getElementById('catNovaBtn');
+  const form = document.getElementById('catForm');
+  const nomeInput = document.getElementById('catNomeInput');
+  const swatchesGrupo = document.getElementById('catFormSwatches');
+  const ok = document.getElementById('catFormOk');
+  const cancelar = document.getElementById('catFormCancelar');
+  if (!novaBtn || !form || !nomeInput || !swatchesGrupo || !ok || !cancelar) return;
+
+  let corForm = CORES_PRESET[0];
+
+  function pintarSwatchesForm(){
+    swatchesGrupo.querySelectorAll('.advpreset').forEach(b =>
+      b.classList.toggle('on', b.dataset.cor.toLowerCase() === corForm.toLowerCase()));
+  }
+  // mesma paleta/mecanica do corBox (CORES_PRESET) -- categoria nova
+  // escolhe so entre os presets, sem campo de hex livre (menos um passo
+  // pra criar uma categoria, e a paleta ja cobre bem)
+  CORES_PRESET.forEach(c => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'advpreset'; b.dataset.cor = c;
+    b.style.background = c;
+    b.setAttribute('aria-label', 'Cor ' + c);
+    b.onclick = () => { corForm = c; pintarSwatchesForm(); };
+    swatchesGrupo.appendChild(b);
+  });
+  pintarSwatchesForm();
+
+  function abrirForm(){
+    form.classList.add('on');
+    novaBtn.classList.add('off');
+    nomeInput.value = '';
+    nomeInput.focus();
+  }
+  function fecharForm(){
+    form.classList.remove('on');
+    novaBtn.classList.remove('off');
+  }
+
+  novaBtn.onclick = abrirForm;
+  cancelar.onclick = fecharForm;
+  ok.onclick = () => {
+    const nome = nomeInput.value.trim();
+    if (!nome){ nomeInput.focus(); return; }
+    const cat = criarCategoriaTarefa(nome, corForm);
+    if (!cat) return;
+    categoriaEscolhida = cat.id;   // categoria recem-criada ja entra selecionada
+    fecharForm();
+    pintarCategorias();
+  };
+  nomeInput.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); ok.click(); } });
+
+  pintarCategorias();
+})();
 
 /* ---------- seletor de dificuldade ---------- */
 let difEscolhida = DIF_PADRAO;
@@ -7402,6 +7568,19 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
           </div>
           <div class="advswatches" id="edCorBoxSwatches"></div>
         </div>
+        <div class="advcatrow">
+          <span class="diflabel">Categoria</span>
+          <div class="catchips" id="edCatChips"></div>
+          <button type="button" class="catnova" id="edCatNovaBtn">+ Nova categoria</button>
+          <div class="catform" id="edCatForm">
+            <input type="text" class="catnomeinput" id="edCatNomeInput" placeholder="Nome da categoria" maxlength="24" autocomplete="off">
+            <div class="advswatches" id="edCatFormSwatches"></div>
+            <div class="catformacoes">
+              <button type="button" class="catformcancelar" id="edCatFormCancelar">Cancelar</button>
+              <button type="button" class="catformok" id="edCatFormOk">Criar</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -7437,9 +7616,16 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   const corHex    = document.getElementById('edCorBoxHex');
   const corReset  = document.getElementById('edCorBoxReset');
   const corGrupo  = document.getElementById('edCorBoxSwatches');
+  const catChips  = document.getElementById('edCatChips');
+  const catNovaBtn = document.getElementById('edCatNovaBtn');
+  const catForm    = document.getElementById('edCatForm');
+  const catNomeInput = document.getElementById('edCatNomeInput');
+  const catFormSwatches = document.getElementById('edCatFormSwatches');
+  const catFormOk = document.getElementById('edCatFormOk');
+  const catFormCancelar = document.getElementById('edCatFormCancelar');
   const VEZES_MIN_ED = 1, VEZES_MAX_ED = 9;
 
-  let idx = -1, dif = 'media', modo = 'hoje', dias = [], diaMes = 1, diaAno = 1, mesAno = 1, vezes = 1, corBox = null;
+  let idx = -1, dif = 'media', modo = 'hoje', dias = [], diaMes = 1, diaAno = 1, mesAno = 1, vezes = 1, corBox = null, categoriaId = null;
 
   function pintar(){
     gDifs.querySelectorAll('.dif').forEach(b => b.classList.toggle('on', b.dataset.dif === dif));
@@ -7471,6 +7657,69 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       if (corGrupo) corGrupo.querySelectorAll('.advpreset').forEach(b =>
         b.classList.toggle('on', corBox && b.dataset.cor.toLowerCase() === corBox.toLowerCase()));
     }
+    pintarCategoriasEd();
+  }
+
+  // categoria de tarefa (pedido do usuario) -- mesmo par de funcoes do
+  // composer de criacao (obterCategoriasTarefa/criarCategoriaTarefa,
+  // definidas no script principal), so a pintura dos chips e do form
+  // de "nova categoria" que precisa existir aqui de novo porque esse
+  // overlay de edicao vive numa <script> separada (mesmo padrao ja
+  // usado pro resto do form: dificuldade, cor, etc, todos duplicados
+  // entre composer e editor)
+  function pintarCategoriasEd(){
+    if (!catChips) return;
+    catChips.innerHTML = '';
+    obterCategoriasTarefa().forEach(cat => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'catchip' + (categoriaId === cat.id ? ' on' : '');
+      b.innerHTML = '<i style="background:' + cat.cor + '"></i>' + cat.nome;
+      b.onclick = () => {
+        categoriaId = (categoriaId === cat.id) ? null : cat.id;
+        pintarCategoriasEd();
+      };
+      catChips.appendChild(b);
+    });
+  }
+
+  if (catNovaBtn && catForm && catNomeInput && catFormSwatches && catFormOk && catFormCancelar){
+    let corFormEd = CORES_PRESET[0];
+    function pintarSwatchesFormEd(){
+      catFormSwatches.querySelectorAll('.advpreset').forEach(b =>
+        b.classList.toggle('on', b.dataset.cor.toLowerCase() === corFormEd.toLowerCase()));
+    }
+    CORES_PRESET.forEach(c => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'advpreset'; b.dataset.cor = c;
+      b.style.background = c;
+      b.setAttribute('aria-label', 'Cor ' + c);
+      b.onclick = () => { corFormEd = c; pintarSwatchesFormEd(); };
+      catFormSwatches.appendChild(b);
+    });
+    pintarSwatchesFormEd();
+
+    catNovaBtn.onclick = () => {
+      catForm.classList.add('on');
+      catNovaBtn.classList.add('off');
+      catNomeInput.value = '';
+      catNomeInput.focus();
+    };
+    catFormCancelar.onclick = () => {
+      catForm.classList.remove('on');
+      catNovaBtn.classList.remove('off');
+    };
+    catFormOk.onclick = () => {
+      const nome = catNomeInput.value.trim();
+      if (!nome){ catNomeInput.focus(); return; }
+      const cat = criarCategoriaTarefa(nome, corFormEd);
+      if (!cat) return;
+      categoriaId = cat.id;
+      catForm.classList.remove('on');
+      catNovaBtn.classList.remove('off');
+      pintarCategoriasEd();
+    };
+    catNomeInput.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); catFormOk.click(); } });
   }
 
   // os botoes de dificuldade sao montados a partir da mesma tabela DIFS
@@ -7551,6 +7800,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     t.dif   = dif;
     t.meta  = vezes;
     if (corBox) t.corBox = corBox; else delete t.corBox;
+    if (categoriaId) t.categoriaId = categoriaId; else delete t.categoriaId;
     // reduzir a meta abaixo do progresso ja feito hoje: encaixa o contador
     // no novo teto e, se ja bater, fecha a tarefa (sem isso ela ficaria
     // "presa" mostrando 3/2, por exemplo)
@@ -7616,11 +7866,12 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     mesAno = (t.mesAno && t.mesAno >= 1 && t.mesAno <= 12) ? t.mesAno : (new Date().getMonth() + 1);
     vezes = (t.meta && t.meta > 1) ? Math.round(t.meta) : 1;
     corBox = t.corBox || null;
+    categoriaId = t.categoriaId || null;
     texto.value = t.texto || '';
     pintar();
     if (advPanel && advToggle){
-      advPanel.classList.toggle('on', !!corBox);
-      advToggle.classList.toggle('on', !!corBox);
+      advPanel.classList.toggle('on', !!corBox || !!categoriaId);
+      advToggle.classList.toggle('on', !!corBox || !!categoriaId);
     }
     ov.classList.add('on');
   };

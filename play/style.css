@@ -2906,6 +2906,52 @@
   }
   .advreset:active{transform:scale(.97)}
 
+  /* --- opcoes avancadas: categoria de tarefa (pedido do usuario) --- */
+  .advpanel.on{max-height:420px}
+  .advcatrow{display:flex;flex-direction:column;gap:9px;padding:8px 0 4px}
+  .catchips{display:flex;flex-wrap:wrap;gap:8px}
+  .catchip{
+    display:flex;align-items:center;gap:7px;height:34px;padding:0 12px;
+    border-radius:9px;border:1px solid var(--line);background:var(--panel);
+    color:var(--muted);font-family:'Outfit',sans-serif;font-size:12.5px;font-weight:500;
+    cursor:pointer;transition:border-color .12s,color .12s,transform .1s;
+  }
+  .catchip:active{transform:scale(.97)}
+  .catchip i{width:9px;height:9px;border-radius:50%;flex:none}
+  .catchip.on{border-color:var(--text);color:var(--text)}
+  .catnova{
+    align-self:flex-start;background:none;border:none;padding:2px 0;
+    font-family:'Outfit',sans-serif;font-size:12.5px;font-weight:600;
+    color:var(--accent);cursor:pointer;
+  }
+  .catnova.off{display:none}
+  .catform{
+    max-height:0;overflow:hidden;opacity:0;display:flex;flex-direction:column;gap:9px;
+    transition:max-height .2s ease,opacity .16s;
+  }
+  .catform.on{max-height:160px;opacity:1;margin-top:2px}
+  .catnomeinput{
+    height:40px;padding:0 12px;border-radius:9px;
+    border:1px solid var(--line);background:var(--panel);color:var(--text);
+    font-family:'Outfit',sans-serif;font-size:14px;
+  }
+  .catnomeinput:focus{outline:none;border-color:var(--accent)}
+  .catformacoes{display:flex;gap:8px;justify-content:flex-end}
+  .catformcancelar,.catformok{
+    border-radius:9px;font-family:'Outfit',sans-serif;font-size:12.5px;font-weight:600;
+    padding:0 14px;height:36px;cursor:pointer;
+  }
+  .catformcancelar{background:var(--panel);border:1px solid var(--line);color:var(--muted)}
+  .catformok{background:var(--accent);border:none;color:var(--bg)}
+  .catformcancelar:active,.catformok:active{transform:scale(.96)}
+
+  .catbadge{
+    display:none;align-items:center;gap:5px;
+    font-family:'Outfit',sans-serif;font-size:11px;color:var(--dim);
+  }
+  .catbadge:empty{display:none !important}
+  .catbadge i{width:8px;height:8px;border-radius:50%;flex:none}
+
 /* --- Módulo style #3 --- */
 /* --- caixa de concluir e botao de apagar, em area de toque real --- */
   .task .box{

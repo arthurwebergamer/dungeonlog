@@ -5209,16 +5209,20 @@
   font-family:'Outfit',sans-serif; font-size:14px; color:#FAFAFA; font-weight:500;
   cursor:pointer; transition:border-color .15s, background .15s;
 }
-.quizOpcao svg{width:19px;height:19px;stroke:#C2C2C2;flex:none}
-.quizOpcao.sel{border-color:#FAFAFA; background:#4A4A4A}
-.quizOpcao.sel svg{stroke:#FAFAFA}
+.quizIcone{
+  width:34px; height:34px; border-radius:50%; flex:none;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--cat-cor); color:#1A1526;
+}
+.quizIcone svg{width:18px;height:18px}
+.quizOpcao.sel{border-color:var(--cat-cor); background:#4A4A4A}
 .quizOpcao .check{
   margin-left:auto; width:18px; height:18px; border-radius:50%; border:1.5px solid #5C5C5C; flex:none;
 }
-.quizOpcao.sel .check{border-color:#FAFAFA; background:#FAFAFA; position:relative}
+.quizOpcao.sel .check{border-color:var(--cat-cor); background:var(--cat-cor); position:relative}
 .quizOpcao.sel .check::after{
   content:''; position:absolute; inset:0; margin:auto; width:8px; height:5px;
-  border-left:2px solid #232323; border-bottom:2px solid #232323;
+  border-left:2px solid #1A1526; border-bottom:2px solid #1A1526;
   transform:translateY(-1px) rotate(-45deg);
 }
 
@@ -5236,11 +5240,12 @@
 /* ---- badges de conquista (slide Conquistas, substitui prova social) ---- */
 .obConquistasRow{display:flex;gap:12px;justify-content:center}
 .obConquistaBadge{
-  width:64px;height:64px;border-radius:16px;background:#323232;
+  width:64px;height:64px;border-radius:16px;background:var(--badge-cor,#323232);
   border:1px solid #494949;display:flex;align-items:center;justify-content:center;
+  color:#1A1526;
 }
-.obConquistaBadge svg{width:28px;height:28px;stroke:#FAFAFA}
-.obConquistaBadge.off{opacity:.4}
+.obConquistaBadge svg{width:28px;height:28px;stroke:currentColor}
+.obConquistaBadge.off{background:#323232;opacity:.4}
 .obConquistaBadge.off svg{stroke:#909090}
 
 /* ---- botao primario do onboarding: minimalista, contraste alto ---- */

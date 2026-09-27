@@ -2956,38 +2956,53 @@
   /* --- categoria de tarefa: abas de filtro acima da lista (pedido do
      usuario, "tipo igual o do Skillion") --- */
   .cattabs{
-    display:flex;gap:8px;overflow-x:auto;overflow-y:hidden;
-    padding-bottom:9px;margin-bottom:2px;
+    display:flex;gap:9px;overflow-x:auto;overflow-y:hidden;
+    padding-bottom:10px;margin-bottom:2px;
     scrollbar-width:none;-webkit-overflow-scrolling:touch;
   }
   .cattabs::-webkit-scrollbar{display:none}
+  /* pedido do usuario: botoes maiores (eram 32px/12.5px) -- e o lapis de
+     editar saiu daqui, cada aba volta a ser so um botao simples de novo
+     (filtra ao tocar); editar/apagar agora mora na tela "Categorias"
+     (ver #categoriasOverlay mais abaixo). */
   .cattab{
-    flex:none;display:flex;align-items:center;gap:2px;height:32px;padding:0 6px 0 14px;
+    flex:none;display:flex;align-items:center;gap:7px;height:40px;padding:0 16px;
     border-radius:100px;border:1px solid var(--line);background:var(--panel);
-    color:var(--muted);font-family:'Outfit',sans-serif;font-size:12.5px;font-weight:600;
+    color:var(--muted);font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;
     cursor:pointer;white-space:nowrap;transition:border-color .12s,color .12s,background .12s;
   }
-  .cattab i{width:8px;height:8px;border-radius:50%;flex:none}
+  .cattab i{width:9px;height:9px;border-radius:50%;flex:none}
   .cattab.on{border-color:var(--accent);color:var(--text);background:var(--accent-dim)}
-  .cattabnova{border-style:dashed;color:var(--accent);padding:0 14px}
-  .cattabtodos{padding:0 14px}
-  /* "Todos" e "+ Adicionar" continuam sendo o proprio <button class="cattab">
-     (sem editar); as categorias reais viram um <div class="cattab"> com 2
-     controles dentro -- .cattabsel (nome+cor, clicavel = filtro) e
-     .cattabedit (lapis pequeno = editar/apagar), pedido do usuario. */
-  .cattabsel{
-    display:flex;align-items:center;gap:6px;height:100%;
-    background:none;border:none;padding:0;margin:0;
-    color:inherit;font:inherit;cursor:pointer;
+  .cattabnova{border-style:dashed;color:var(--accent)}
+
+  /* --- tela "Categorias" (pedido do usuario, lista completa tipo
+     Skillion: nome + contagem de tarefas + editar + apagar + adicionar
+     nova, tudo na mesma folha) --- */
+  .catlista{display:flex;flex-direction:column;gap:9px;max-height:50vh;overflow-y:auto;margin-bottom:14px}
+  .catrow{
+    display:flex;align-items:center;gap:10px;padding:14px 14px;
+    background:var(--panel-2);border:1px solid var(--line);border-radius:12px;
   }
-  .cattabsel i{width:8px;height:8px;border-radius:50%;flex:none}
-  .cattabedit{
-    display:flex;align-items:center;justify-content:center;flex:none;
-    width:22px;height:22px;margin-left:2px;border-radius:50%;
-    background:none;border:none;color:inherit;opacity:.55;
-    font-size:10.5px;line-height:1;cursor:pointer;
+  .catrowdot{width:12px;height:12px;border-radius:50%;flex:none}
+  .catrowinfo{flex:1;min-width:0}
+  .catrownome{font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;color:var(--text);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .catrowcount{font-family:'Outfit',sans-serif;font-size:12px;color:var(--dim);margin-top:2px}
+  .catrowbtn{
+    flex:none;display:flex;align-items:center;justify-content:center;
+    width:36px;height:36px;border-radius:10px;background:var(--panel);
+    border:1px solid var(--line);color:var(--muted);cursor:pointer;
   }
-  .cattabedit:active{opacity:1;transform:scale(.9)}
+  .catrowbtn svg{width:17px;height:17px;stroke:currentColor}
+  .catrowbtn:active{transform:scale(.93)}
+  .catrowbtn.del{color:var(--perigo);border-color:var(--perigo)}
+  .catnovarow{
+    display:flex;align-items:center;gap:10px;padding:14px;
+    background:none;border:1.5px dashed var(--line);border-radius:12px;
+    color:var(--accent);font-family:'Outfit',sans-serif;font-size:14.5px;font-weight:600;
+    cursor:pointer;width:100%;
+  }
+  .catnovarow svg{width:18px;height:18px;stroke:currentColor;flex:none}
 
 /* --- Módulo style #3 --- */
 /* --- caixa de concluir e botao de apagar, em area de toque real --- */

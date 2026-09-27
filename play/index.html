@@ -2178,8 +2178,11 @@ function criarCategoriaTarefa(nome, cor){
   salvarCategoriasTarefa(lista);
   // qualquer lugar que crie uma categoria nova (composer, editor, ou as
   // abas de filtro abaixo) precisa que as abas fiquem em dia na hora --
-  // centralizado aqui em vez de repetir a chamada em cada call-site
+  // centralizado aqui em vez de repetir a chamada em cada call-site.
+  // atualizarCategoriasOverlaySeAberta (definido no bloco da tela
+  // "Categorias") so repinta se aquela folha estiver aberta no momento.
   if (typeof pintarCatTabs === 'function') pintarCatTabs();
+  if (typeof window.atualizarCategoriasOverlaySeAberta === 'function') window.atualizarCategoriasOverlaySeAberta();
   return cat;
 }
 function categoriaTarefaPorId(id){
@@ -2196,6 +2199,7 @@ function editarCategoriaTarefa(id, nome, cor){
   if (cor) cat.cor = cor;
   salvarCategoriasTarefa(lista);
   if (typeof pintarCatTabs === 'function') pintarCatTabs();
+  if (typeof window.atualizarCategoriasOverlaySeAberta === 'function') window.atualizarCategoriasOverlaySeAberta();
   return cat;
 }
 function apagarCategoriaTarefa(id){
@@ -2213,6 +2217,7 @@ function apagarCategoriaTarefa(id){
   }
   if (typeof filtroCategoriaTarefa !== 'undefined' && filtroCategoriaTarefa === id) filtroCategoriaTarefa = null;
   if (typeof pintarCatTabs === 'function') pintarCatTabs();
+  if (typeof window.atualizarCategoriasOverlaySeAberta === 'function') window.atualizarCategoriasOverlaySeAberta();
   return true;
 }
 
@@ -2233,50 +2238,34 @@ function pintarCatTabs(){
 
   const bTodos = document.createElement('button');
   bTodos.type = 'button';
-  bTodos.className = 'cattab cattabtodos' + (filtroCategoriaTarefa === null ? ' on' : '');
+  bTodos.className = 'cattab' + (filtroCategoriaTarefa === null ? ' on' : '');
   bTodos.textContent = en ? 'All' : 'Todos';
   bTodos.onclick = () => { filtroCategoriaTarefa = null; if (typeof render === 'function') render(); };
   linha.appendChild(bTodos);
 
+  // pedido do usuario: tira o lapis de editar de cada aba -- cada aba
+  // volta a ser so um botao simples de novo (toca = filtra). Editar/
+  // apagar categoria agora mora na tela "Categorias" completa, aberta
+  // pela aba "+ Adicionar" (ver abrirCategoriasOverlay()).
   obterCategoriasTarefa().forEach(cat => {
-    // .cattab agora e um wrapper (nao o proprio botao) com 2 controles
-    // dentro: .cattabsel (toca = filtra, mesmo comportamento de antes) e
-    // .cattabedit (lapis pequeno = abre a folha de editar/apagar) --
-    // pedido do usuario: "devia dar pra apagar e editar" as categorias.
-    const wrap = document.createElement('div');
-    wrap.className = 'cattab' + (filtroCategoriaTarefa === cat.id ? ' on' : '');
-
-    const sel = document.createElement('button');
-    sel.type = 'button';
-    sel.className = 'cattabsel';
-    sel.innerHTML = '<i style="background:' + cat.cor + '"></i>' + cat.nome;
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'cattab' + (filtroCategoriaTarefa === cat.id ? ' on' : '');
+    b.innerHTML = '<i style="background:' + cat.cor + '"></i>' + cat.nome;
     // toca de novo na mesma aba = volta pra "Todos" (mesmo padrao toggle
     // dos chips de categoria do composer/editor)
-    sel.onclick = () => {
+    b.onclick = () => {
       filtroCategoriaTarefa = (filtroCategoriaTarefa === cat.id) ? null : cat.id;
       if (typeof render === 'function') render();
     };
-    wrap.appendChild(sel);
-
-    const edit = document.createElement('button');
-    edit.type = 'button';
-    edit.className = 'cattabedit';
-    edit.setAttribute('aria-label', en ? 'Edit category' : 'Editar categoria');
-    edit.textContent = '✎';
-    edit.onclick = e => {
-      e.stopPropagation();
-      if (typeof abrirNovaCategoriaOverlay === 'function') abrirNovaCategoriaOverlay(cat.id);
-    };
-    wrap.appendChild(edit);
-
-    linha.appendChild(wrap);
+    linha.appendChild(b);
   });
 
   const bNova = document.createElement('button');
   bNova.type = 'button';
   bNova.className = 'cattab cattabnova';
   bNova.textContent = '+ ' + (en ? 'Add' : 'Adicionar');
-  bNova.onclick = () => { if (typeof abrirNovaCategoriaOverlay === 'function') abrirNovaCategoriaOverlay(); };
+  bNova.onclick = () => { if (typeof abrirCategoriasOverlay === 'function') abrirCategoriasOverlay(); };
   linha.appendChild(bNova);
 }
 
@@ -9710,6 +9699,132 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 </script>
 
 <!-- =====================================================================
+     CATEGORIAS (tela de gerenciamento completa, pedido do usuario --
+     "mais ou menos esse sistema que o skillion ja faz": lista com nome +
+     contagem de tarefas + editar + apagar, mais "Adicionar nova
+     categoria" no fim, tudo na mesma folha). Reaproveita .edov/.edsheet/
+     .edpuxador/.edtitulo (mesmo padrao visual das outras folhas). A
+     lista e repintada (pintarCategoriasOverlay()) toda vez que abre e
+     depois de qualquer editar/apagar/criar feito por ela mesma, pra dar
+     pra gerenciar varias categorias seguidas sem fechar e reabrir.
+     Reordenar por arrasto (o "::" da referencia) ficou de fora por ora
+     -- fora do escopo pedido, so a lista+CRUD.
+     Aberta pela aba "+ Adicionar" da linha de filtro (ver pintarCatTabs()
+     acima); dali dentro, o lapis abre novaCategoriaOverlay (z-index:85,
+     por cima desta) em modo edicao, e a lixeira usa a mesma confirmacao
+     generica (pedirConfirmacao) que o editar-por-lapis ja usava.
+     ===================================================================== -->
+<div class="edov" id="categoriasOverlay">
+  <div class="edsheet" id="categoriasSheet">
+    <div class="edpuxador"></div>
+    <div class="edtitulo">Categorias</div>
+    <div class="catlista" id="categoriasLista"></div>
+    <button type="button" class="catnovarow" id="categoriasNovaBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+      <span id="categoriasNovaTexto">Adicionar nova categoria</span>
+    </button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const ov     = document.getElementById('categoriasOverlay');
+  const lista  = document.getElementById('categoriasLista');
+  const bNova  = document.getElementById('categoriasNovaBtn');
+  const txtNova = document.getElementById('categoriasNovaTexto');
+  if (!ov || !lista || !bNova || !txtNova) return;
+
+  const en = () => (typeof idiomaApp === 'function' && idiomaApp() === 'en');
+  const ICONE_LAPIS = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
+  const ICONE_LIXO  = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>';
+
+  function contagem(id){
+    return (typeof tarefas !== 'undefined' && Array.isArray(tarefas))
+      ? tarefas.filter(t => t.categoriaId === id).length
+      : 0;
+  }
+
+  function repintar(){
+    txtNova.textContent = en() ? 'Add new category' : 'Adicionar nova categoria';
+    lista.innerHTML = '';
+    obterCategoriasTarefa().forEach(cat => {
+      const row = document.createElement('div');
+      row.className = 'catrow';
+
+      const dot = document.createElement('span');
+      dot.className = 'catrowdot';
+      dot.style.background = cat.cor;
+      row.appendChild(dot);
+
+      const info = document.createElement('div');
+      info.className = 'catrowinfo';
+      const n = contagem(cat.id);
+      info.innerHTML = '<div class="catrownome"></div><div class="catrowcount"></div>';
+      info.querySelector('.catrownome').textContent = cat.nome;
+      info.querySelector('.catrowcount').textContent = en()
+        ? (n + (n === 1 ? ' task' : ' tasks'))
+        : (n + (n === 1 ? ' tarefa' : ' tarefas'));
+      row.appendChild(info);
+
+      const bEdit = document.createElement('button');
+      bEdit.type = 'button'; bEdit.className = 'catrowbtn';
+      bEdit.setAttribute('aria-label', en() ? 'Edit category' : 'Editar categoria');
+      bEdit.innerHTML = ICONE_LAPIS;
+      bEdit.onclick = () => { if (typeof abrirNovaCategoriaOverlay === 'function') abrirNovaCategoriaOverlay(cat.id); };
+      row.appendChild(bEdit);
+
+      const bDel = document.createElement('button');
+      bDel.type = 'button'; bDel.className = 'catrowbtn del';
+      bDel.setAttribute('aria-label', en() ? 'Delete category' : 'Apagar categoria');
+      bDel.innerHTML = ICONE_LIXO;
+      bDel.onclick = () => {
+        const feito = () => {
+          if (typeof apagarCategoriaTarefa === 'function') apagarCategoriaTarefa(cat.id);
+          if (typeof render === 'function') render();
+          repintar();
+        };
+        if (typeof window.pedirConfirmacao === 'function'){
+          window.pedirConfirmacao(
+            en() ? 'Delete category?' : 'Apagar categoria?',
+            en()
+              ? ('"' + cat.nome + '" will be removed. Tasks using it just lose the tag, they are not deleted.')
+              : ('"' + cat.nome + '" será removida. As tarefas que usam ela só perdem a etiqueta, não são apagadas.'),
+            en() ? 'Delete' : 'Apagar',
+            feito
+          );
+        } else feito();
+      };
+      row.appendChild(bDel);
+
+      lista.appendChild(row);
+    });
+  }
+
+  function abrir(){ repintar(); ov.classList.add('on'); }
+  function fechar(){ ov.classList.remove('on'); }
+
+  ov.onclick = e => { if (e.target === ov) fechar(); };
+  document.addEventListener('keydown', e => {
+    if (ov.classList.contains('on') && e.key === 'Escape') fechar();
+  });
+  bNova.onclick = () => { if (typeof abrirNovaCategoriaOverlay === 'function') abrirNovaCategoriaOverlay(); };
+
+  // a folha de criar/editar (novaCategoriaOverlay, z-index mais alto)
+  // fecha por cima desta -- quando ela salva/apaga (pelo lapis), esta
+  // folha continua aberta por baixo e precisa repintar sozinha. Hook
+  // exposto global, chamado direto pelas funcoes de armazenamento
+  // (criarCategoriaTarefa/editarCategoriaTarefa/apagarCategoriaTarefa,
+  // ao lado do pintarCatTabs() que ja chamam) -- mesmo padrao de hook ja
+  // usado no resto do app (ex: atualizarResumosConfig).
+  window.atualizarCategoriasOverlaySeAberta = function(){
+    if (ov.classList.contains('on')) repintar();
+  };
+
+  window.abrirCategoriasOverlay = abrir;
+})();
+</script>
+
+<!-- =====================================================================
      NOVA CATEGORIA / EDITAR CATEGORIA (pelas abas de filtro da lista de
      tarefas). Reaproveita .edov/.edsheet/.edpuxador/.edtitulo/.edcampo/
      .edacoes/.edsalvar (mesmo padrao visual da folha "Renomear" acima) e
@@ -9726,7 +9841,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
      folha de edicao (nome/cor pre-preenchidos + botao Apagar) -- pedido
      do usuario: "devia dar pra apagar e editar" as categorias.
      ===================================================================== -->
-<div class="edov" id="novaCategoriaOverlay">
+<div class="edov" id="novaCategoriaOverlay" style="z-index:85">
   <div class="edsheet" id="novaCategoriaSheet">
     <div class="edpuxador"></div>
     <div class="edtitulo" id="novaCategoriaTitulo">Nova categoria</div>

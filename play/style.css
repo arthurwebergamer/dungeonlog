@@ -5240,13 +5240,19 @@
 /* ---- badges de conquista (slide Conquistas, substitui prova social) ---- */
 .obConquistasRow{display:flex;gap:12px;justify-content:center}
 .obConquistaBadge{
-  width:64px;height:64px;border-radius:16px;background:var(--badge-cor,#323232);
-  border:1px solid #494949;display:flex;align-items:center;justify-content:center;
+  width:64px;height:64px;border-radius:16px;background:var(--poco);
+  border:1.5px solid #494949;display:flex;align-items:center;justify-content:center;
   color:#1A1526;
 }
 .obConquistaBadge svg{width:28px;height:28px;stroke:currentColor}
 .obConquistaBadge.off{background:#323232;opacity:.4}
 .obConquistaBadge.off svg{stroke:#909090}
+/* .r0-.r5 (cor de raridade) vem ANTES no arquivo (~linha 1093) e so seta
+   border-color -- a regra .obConquistaBadge acima, por vir DEPOIS e usar
+   o shorthand `border`, venceria a cascata e apagaria a cor/glow mesmo
+   com a classe aplicada. Override pontual so pro r4 (unico usado aqui
+   hoje, Coroa Real/Diamante) em vez de confiar na ordem entre blocos. */
+.obConquistaBadge.r4{border-color:#F2A65A;box-shadow:0 0 10px rgba(242,166,90,.30)}
 
 /* ---- botao primario do onboarding: minimalista, contraste alto ---- */
 .carrosselSlide:not([data-slide="login"]) .primario{

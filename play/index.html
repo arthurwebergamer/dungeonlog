@@ -13201,21 +13201,19 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       return '';
     }
     if (s.tipo === 'conquistasPreview'){
-      // v4.18x: badges usam icones/cores REAIS das categorias de conquista
-      // (mesmos paths de CATEGORIAS, bloco Conquistas ~linha 11068) em vez
-      // de 3 SVGs desenhados a mao -- mesmo padrao visual de .conqcaticone
-      // (circulo colorido, icone escuro por cima) ja usado em Conquistas de
-      // verdade, pra bater com os outros slides do carrossel (sprite real)
-      // em vez de ficar cinza-chumbo generico. Copiado como string local
-      // porque esse bloco roda numa IIFE separada da de Conquistas.
-      const ICONE_SEQUENCIA = '<path d="M12 22c4 0 7-2.7 7-6.8 0-3-2-5-3.3-7.2-.3 1.6-1.2 2.7-2.2 2.7-1.4 0-1.3-2-1.5-3.2C11.4 5.4 9 3 9 3c.6 3-1.4 4.6-2.7 6.7C5.2 11.5 5 13.2 5 15.2 5 19.3 8 22 12 22z"/>';
-      const ICONE_NIVEL = '<path d="M12 2.5l2.9 6.6 7.1.7-5.4 4.8 1.6 7-6.2-3.8-6.2 3.8 1.6-7-5.4-4.8 7.1-.7z"/>';
+      // v4.20x (pedido do usuario): badges trocam pra ITENS REAIS do jogo
+      // (item()/spriteHTML(), mesmo par de funcoes que o slide anterior
+      // -- bauAnim/EVOLUA -- ja usa pros itens do bau) em vez dos icones
+      // vetoriais de categoria. Bate com a copy do slide ("itens raros")
+      // de verdade, em vez de simbolo abstrato de trofeu/estrela.
+      // Coroa Real (id 34) e Diamante (id 81), os dois Lendarios (rar 4)
+      // -- pega o glow dourado que a classe global .r4 ja da pra
+      // qualquer slot de raridade no app, sem CSS novo pra isso.
       const ICONE_CADEADO = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>';
-      const badge = (pathInner, cor) => '<div class="obConquistaBadge" style="--badge-cor:' + cor + '">' +
-        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + pathInner + '</svg></div>';
+      const itemBadge = it => '<div class="obConquistaBadge r' + it.rar + '">' + spriteHTML(it.sp, 34) + '</div>';
       return '<div class="carrosselImgWrap obConquistasRow">' +
-        badge(ICONE_SEQUENCIA, '#E5698A') +
-        badge(ICONE_NIVEL, '#F2C94C') +
+        itemBadge(item(34)) +
+        itemBadge(item(81)) +
         '<div class="obConquistaBadge off">' + ICONE_CADEADO + '</div>' +
         '</div>';
     }

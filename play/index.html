@@ -457,7 +457,6 @@
           <button type="button" class="catnova" id="catNovaBtn">+ Nova categoria</button>
           <div class="catform" id="catForm">
             <input type="text" class="catnomeinput" id="catNomeInput" placeholder="Nome da categoria" maxlength="24" autocomplete="off">
-            <div class="advswatches" id="catFormSwatches"></div>
             <div class="catformacoes">
               <button type="button" class="catformcancelar" id="catFormCancelar">Cancelar</button>
               <button type="button" class="catformok" id="catFormOk">Criar</button>
@@ -2257,7 +2256,7 @@ function pintarCatTabs(){
     const b = document.createElement('button');
     b.type = 'button';
     b.className = 'cattab' + (filtroCategoriaTarefa === cat.id ? ' on' : '');
-    b.innerHTML = '<i style="background:' + cat.cor + '"></i>' + cat.nome;
+    b.textContent = cat.nome;   // pedido do usuario: sem cor, so o nome
     // toca de novo na mesma aba = volta pra "Todos" (mesmo padrao toggle
     // dos chips de categoria do composer/editor)
     b.onclick = () => {
@@ -4271,10 +4270,13 @@ function render(){
     // devia aparecer como texto e nao tipo cor", igual ao Skillion:
     // cabecalho com nome+contagem, colapsavel). Grupo so aparece se tiver
     // pelo menos 1 tarefa pendente hoje; tarefa sem categoria cai num
-    // grupo "Sem categoria" no final. O drag-and-drop de reordenar (mais
-    // abaixo no arquivo) continua funcionando igual -- ele so enxerga
-    // elementos .task via querySelectorAll, os cabecalhos de grupo nao
-    // entram na conta.
+    // grupo "Sem categoria", que agora vem SEMPRE PRIMEIRO (pedido do
+    // usuario). O drag-and-drop de reordenar (mais abaixo no arquivo)
+    // continua funcionando igual -- ele so enxerga elementos .task via
+    // querySelectorAll, os cabecalhos de grupo nao entram na conta -- e
+    // ALEM disso agora tambem le o data-catid de cada cabecalho pra
+    // decidir se uma tarefa arrastada pra outra secao muda de categoria
+    // de verdade (ver soltar()).
     const grupos = obterCategoriasTarefa().map(c => ({ id: c.id, nome: c.nome, tarefas: [] }));
     const semCategoria = { id: '__sem__', nome: (idiomaApp() === 'en' ? 'No category' : 'Sem categoria'), tarefas: [] };
     const porId = new Map(grupos.map(g => [g.id, g]));
@@ -4284,10 +4286,11 @@ function render(){
       (g || semCategoria).tarefas.push(t);
     });
 
-    grupos.concat(semCategoria).filter(g => g.tarefas.length > 0).forEach(g => {
+    [semCategoria].concat(grupos).filter(g => g.tarefas.length > 0).forEach(g => {
       const colapsado = categoriasColapsadas.has(g.id);
       const header = document.createElement('div');
       header.className = 'catgrupo' + (colapsado ? ' colapsado' : '');
+      header.dataset.catid = g.id;
       header.innerHTML = '<span class="catgruponome"></span><span class="catgrupocount"></span><span class="catgrupochevron">▾</span>';
       header.querySelector('.catgruponome').textContent = g.nome;
       header.querySelector('.catgrupocount').textContent = g.tarefas.length;
@@ -5207,7 +5210,7 @@ function pintarCategorias(){
     const b = document.createElement('button');
     b.type = 'button';
     b.className = 'catchip' + (categoriaEscolhida === cat.id ? ' on' : '');
-    b.innerHTML = '<i style="background:' + cat.cor + '"></i>' + cat.nome;
+    b.textContent = cat.nome;   // pedido do usuario: sem cor, so o nome
     // toca de novo na mesma categoria = desmarca (mesmo padrao toggle
     // ja usado nos chips de dificuldade/dia da semana do resto do app)
     b.onclick = () => {
@@ -5222,29 +5225,12 @@ function pintarCategorias(){
   const novaBtn = document.getElementById('catNovaBtn');
   const form = document.getElementById('catForm');
   const nomeInput = document.getElementById('catNomeInput');
-  const swatchesGrupo = document.getElementById('catFormSwatches');
   const ok = document.getElementById('catFormOk');
   const cancelar = document.getElementById('catFormCancelar');
-  if (!novaBtn || !form || !nomeInput || !swatchesGrupo || !ok || !cancelar) return;
+  if (!novaBtn || !form || !nomeInput || !ok || !cancelar) return;
 
-  let corForm = CORES_PRESET[0];
-
-  function pintarSwatchesForm(){
-    swatchesGrupo.querySelectorAll('.advpreset').forEach(b =>
-      b.classList.toggle('on', b.dataset.cor.toLowerCase() === corForm.toLowerCase()));
-  }
-  // mesma paleta/mecanica do corBox (CORES_PRESET) -- categoria nova
-  // escolhe so entre os presets, sem campo de hex livre (menos um passo
-  // pra criar uma categoria, e a paleta ja cobre bem)
-  CORES_PRESET.forEach(c => {
-    const b = document.createElement('button');
-    b.type = 'button'; b.className = 'advpreset'; b.dataset.cor = c;
-    b.style.background = c;
-    b.setAttribute('aria-label', 'Cor ' + c);
-    b.onclick = () => { corForm = c; pintarSwatchesForm(); };
-    swatchesGrupo.appendChild(b);
-  });
-  pintarSwatchesForm();
+  // pedido do usuario: "a gente nao precisa de cores nas categorias" --
+  // saiu o seletor de cor (era a mesma paleta CORES_PRESET do corBox).
 
   function abrirForm(){
     form.classList.add('on');
@@ -5262,7 +5248,7 @@ function pintarCategorias(){
   ok.onclick = () => {
     const nome = nomeInput.value.trim();
     if (!nome){ nomeInput.focus(); return; }
-    const cat = criarCategoriaTarefa(nome, corForm);
+    const cat = criarCategoriaTarefa(nome);
     if (!cat) return;
     categoriaEscolhida = cat.id;   // categoria recem-criada ja entra selecionada
     fecharForm();
@@ -7719,7 +7705,6 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
           <button type="button" class="catnova" id="edCatNovaBtn">+ Nova categoria</button>
           <div class="catform" id="edCatForm">
             <input type="text" class="catnomeinput" id="edCatNomeInput" placeholder="Nome da categoria" maxlength="24" autocomplete="off">
-            <div class="advswatches" id="edCatFormSwatches"></div>
             <div class="catformacoes">
               <button type="button" class="catformcancelar" id="edCatFormCancelar">Cancelar</button>
               <button type="button" class="catformok" id="edCatFormOk">Criar</button>
@@ -7765,7 +7750,6 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   const catNovaBtn = document.getElementById('edCatNovaBtn');
   const catForm    = document.getElementById('edCatForm');
   const catNomeInput = document.getElementById('edCatNomeInput');
-  const catFormSwatches = document.getElementById('edCatFormSwatches');
   const catFormOk = document.getElementById('edCatFormOk');
   const catFormCancelar = document.getElementById('edCatFormCancelar');
   const VEZES_MIN_ED = 1, VEZES_MAX_ED = 9;
@@ -7819,7 +7803,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       const b = document.createElement('button');
       b.type = 'button';
       b.className = 'catchip' + (categoriaId === cat.id ? ' on' : '');
-      b.innerHTML = '<i style="background:' + cat.cor + '"></i>' + cat.nome;
+      b.textContent = cat.nome;   // pedido do usuario: sem cor, so o nome
       b.onclick = () => {
         categoriaId = (categoriaId === cat.id) ? null : cat.id;
         pintarCategoriasEd();
@@ -7828,22 +7812,9 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     });
   }
 
-  if (catNovaBtn && catForm && catNomeInput && catFormSwatches && catFormOk && catFormCancelar){
-    let corFormEd = CORES_PRESET[0];
-    function pintarSwatchesFormEd(){
-      catFormSwatches.querySelectorAll('.advpreset').forEach(b =>
-        b.classList.toggle('on', b.dataset.cor.toLowerCase() === corFormEd.toLowerCase()));
-    }
-    CORES_PRESET.forEach(c => {
-      const b = document.createElement('button');
-      b.type = 'button'; b.className = 'advpreset'; b.dataset.cor = c;
-      b.style.background = c;
-      b.setAttribute('aria-label', 'Cor ' + c);
-      b.onclick = () => { corFormEd = c; pintarSwatchesFormEd(); };
-      catFormSwatches.appendChild(b);
-    });
-    pintarSwatchesFormEd();
-
+  // pedido do usuario: "a gente nao precisa de cores nas categorias" --
+  // saiu o seletor de cor (era a mesma paleta CORES_PRESET do corBox).
+  if (catNovaBtn && catForm && catNomeInput && catFormOk && catFormCancelar){
     catNovaBtn.onclick = () => {
       catForm.classList.add('on');
       catNovaBtn.classList.add('off');
@@ -7857,7 +7828,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     catFormOk.onclick = () => {
       const nome = catNomeInput.value.trim();
       if (!nome){ catNomeInput.focus(); return; }
-      const cat = criarCategoriaTarefa(nome, corFormEd);
+      const cat = criarCategoriaTarefa(nome);
       if (!cat) return;
       categoriaId = cat.id;
       catForm.classList.remove('on');
@@ -8291,6 +8262,28 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     dragEl.classList.remove('dragging');
     dragEl.style.position = ''; dragEl.style.left = ''; dragEl.style.top = ''; dragEl.style.width = '';
     dragEl.style.transform = ''; dragEl.style.willChange = '';
+
+    // pedido do usuario: soltar a tarefa dentro da secao de outra
+    // categoria (visao "Todos" agrupada) precisa MUDAR a categoria dela
+    // de verdade, nao so empurrar a ordem. Acha o cabecalho de grupo
+    // (.catgrupo) mais proximo ACIMA de onde a tarefa foi largada e le o
+    // id gravado nele (data-catid, ver render()). So existe cabecalho
+    // nessa visao -- com uma categoria ja filtrada na aba nao ha
+    // cabecalho nenhum pra achar, e nada muda (mesma categoria de sempre).
+    let categoriaMudou = false;
+    let headerAcima = dragEl.previousElementSibling;
+    while (headerAcima && !headerAcima.classList.contains('catgrupo')) headerAcima = headerAcima.previousElementSibling;
+    if (headerAcima){
+      const tArrastada = tarefas[+dragEl.dataset.idx];
+      if (tArrastada){
+        const novoCatId = headerAcima.dataset.catid === '__sem__' ? undefined : headerAcima.dataset.catid;
+        if ((tArrastada.categoriaId || undefined) !== novoCatId){
+          if (novoCatId) tArrastada.categoriaId = novoCatId; else delete tArrastada.categoriaId;
+          categoriaMudou = true;
+        }
+      }
+    }
+
     // grava a nova ordem visual direto nas tarefas, pelo data-idx de cada linha
     [...list.querySelectorAll('.task')].forEach((el, i) => {
       const t = tarefas[+el.dataset.idx];
@@ -8299,6 +8292,11 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     dragEl = null; placeholder = null; pid = null;
     if (typeof salvar === 'function') salvar();
     setTimeout(() => { dragArmado = false; }, 50);   // deixa o click "fantasma" do soltar morrer antes de reliberar
+    // categoria mudou: a secao onde o card esta fisicamente na hora nao
+    // e mais a certa (ele fica ate aqui na secao antiga por 1 frame) --
+    // um render() reagrupa tudo direitinho, incluindo a contagem dos
+    // cabecalhos.
+    if (categoriaMudou && typeof render === 'function') render();
   }
   list.addEventListener('pointerup', soltar);
   list.addEventListener('pointercancel', e => { dbgArrasto('!!! pointercancel recebido !!!'); soltar(e); });
@@ -9789,11 +9787,8 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       const row = document.createElement('div');
       row.className = 'catrow';
 
-      const dot = document.createElement('span');
-      dot.className = 'catrowdot';
-      dot.style.background = cat.cor;
-      row.appendChild(dot);
-
+      // pedido do usuario: sem cor nenhuma na categoria -- o ponto
+      // colorido (.catrowdot) saiu, so nome + contagem + acoes.
       const info = document.createElement('div');
       info.className = 'catrowinfo';
       const n = contagem(cat.id);
@@ -9884,7 +9879,6 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     <div class="edpuxador"></div>
     <div class="edtitulo" id="novaCategoriaTitulo">Nova categoria</div>
     <input class="edcampo" id="novaCategoriaCampo" maxlength="24" autocomplete="off" placeholder="Nome da categoria">
-    <div class="advswatches" id="novaCategoriaSwatches"></div>
     <div class="edacoes">
       <button class="edsalvar" id="novaCategoriaApagar" type="button" style="background:var(--panel-2);color:var(--perigo);display:none">Apagar</button>
       <button class="edsalvar" id="novaCategoriaSalvar" type="button">Criar</button>
@@ -9897,37 +9891,24 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   const ov       = document.getElementById('novaCategoriaOverlay');
   const titulo   = document.getElementById('novaCategoriaTitulo');
   const campo    = document.getElementById('novaCategoriaCampo');
-  const swatches = document.getElementById('novaCategoriaSwatches');
   const bSalv    = document.getElementById('novaCategoriaSalvar');
   const bApagar  = document.getElementById('novaCategoriaApagar');
-  if (!ov || !titulo || !campo || !swatches || !bSalv || !bApagar) return;
+  if (!ov || !titulo || !campo || !bSalv || !bApagar) return;
 
+  // pedido do usuario: "a gente nao precisa de cores nas categorias" --
+  // saiu o seletor de cor (era .advswatches/.advpreset, mesma paleta
+  // CORES_PRESET do corBox). criarCategoriaTarefa()/editarCategoriaTarefa()
+  // continuam aceitando um 2o argumento de cor (retrocompatibilidade com
+  // categorias antigas que ja tem cor salva), so que esta folha nao
+  // manda mais nada nesse campo.
   const en = () => (typeof idiomaApp === 'function' && idiomaApp() === 'en');
-  let corEscolhida = (typeof CORES_PRESET !== 'undefined' && CORES_PRESET[0]) || '#F2A65A';
   let idEmEdicao = null;   // null = criando categoria nova; id = editando essa categoria
-
-  function pintarSwatches(){
-    swatches.querySelectorAll('.advpreset').forEach(b =>
-      b.classList.toggle('on', b.dataset.cor.toLowerCase() === corEscolhida.toLowerCase()));
-  }
-  if (typeof CORES_PRESET !== 'undefined'){
-    CORES_PRESET.forEach(c => {
-      const b = document.createElement('button');
-      b.type = 'button'; b.className = 'advpreset'; b.dataset.cor = c;
-      b.style.background = c;
-      b.setAttribute('aria-label', 'Cor ' + c);
-      b.onclick = () => { corEscolhida = c; pintarSwatches(); };
-      swatches.appendChild(b);
-    });
-  }
 
   function abrir(idParaEditar){
     idEmEdicao = idParaEditar || null;
     const cat = (idEmEdicao && typeof categoriaTarefaPorId === 'function') ? categoriaTarefaPorId(idEmEdicao) : null;
     titulo.textContent = cat ? (en() ? 'Edit category' : 'Editar categoria') : 'Nova categoria';
     campo.value = cat ? cat.nome : '';
-    corEscolhida = cat ? cat.cor : ((typeof CORES_PRESET !== 'undefined' && CORES_PRESET[0]) || '#F2A65A');
-    pintarSwatches();
     bSalv.textContent = cat ? (en() ? 'Save' : 'Salvar') : (en() ? 'Create' : 'Criar');
     bApagar.style.display = cat ? '' : 'none';
     ov.classList.add('on');
@@ -9938,9 +9919,9 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     const nome = campo.value.trim();
     if (!nome){ campo.focus(); return; }
     if (idEmEdicao){
-      if (typeof editarCategoriaTarefa === 'function') editarCategoriaTarefa(idEmEdicao, nome, corEscolhida);
+      if (typeof editarCategoriaTarefa === 'function') editarCategoriaTarefa(idEmEdicao, nome);
     } else {
-      const cat = (typeof criarCategoriaTarefa === 'function') ? criarCategoriaTarefa(nome, corEscolhida) : null;
+      const cat = (typeof criarCategoriaTarefa === 'function') ? criarCategoriaTarefa(nome) : null;
       if (cat) filtroCategoriaTarefa = cat.id;   // recem-criada ja entra selecionada como filtro
     }
     if (typeof render === 'function') render();

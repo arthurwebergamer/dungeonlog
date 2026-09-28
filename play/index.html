@@ -241,6 +241,21 @@
       <span class="pjNomeTopo" id="pjNomeTopo"></span>
       <span class="lvl" id="lvl">Nível I</span>
     </div>
+    <!-- PLANO PRO (pedido do usuario): nome do heroi bem no meio da
+         .topbar, na MESMA linha/fonte de #lvl -- morava em cima do
+         sprite do heroi na Arena (.fighter), mas o usuario pediu pra
+         subir pra essa linha do topo. .topbar virou grid de 3 colunas
+         (1fr auto 1fr) so pra isso -- ver regra em style.css, perto de
+         .nomeBadgeTopo -- assim esse bloco fica centralizado de verdade
+         (nao "meio a meio" entre #pjTrigger e .coins, que tem larguras
+         diferentes). Teve uma badge "PRO" do lado do nome (e outra em
+         #perfilNome, Perfil) -- removida a pedido do usuario ("acho que
+         pode tirar a badge sinceramente"), incluindo toda a logica JS
+         que ligava/desligava ela (atualizarBadgesPro()) e o CSS
+         (.proBadge). -->
+    <div class="nomeBadgeTopo">
+      <span id="nomeTopo">Aventureiro</span>
+    </div>
     <!-- v4.20x (pedido do usuario): o botao de mudo saiu daqui e virou
          uma linha em Preferencias (#cfgRowSom, perto de #cfgRowFeedback)
          -- .coins volta a ser o ultimo filho da .topbar, entao
@@ -277,7 +292,6 @@
     </div>
     <div class="fight">
       <div class="fighter">
-        <span id="nomeTopo">Aventureiro</span>
         <div class="hero-sprite" id="heroSprite">
           <img class="heroimg" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAFPklEQVR4nJWXbUxTVxjHf4yFuEwi1pcCZZO2CHZzaNwSXoSYlhKcziwBlGzGzA+Kyz6gLgYwIUtMjPEtYNB9mJkJiWYLWGcMi0LEdi8oIkiCUYoCfUEY1EhBY+JCXO4+tOdy295C/Sc3nPuc5zz///Oc55xb4ogR2zbmScr31ttdcbHMLYSYHQWRpSAPr3uUkfFx2f7d3t0MOh9H2GMRNa+A8MwAjDodq/QfAuB1j1KypTiE3FKQJ88JMfNVZMEKbNuYJwlSEdSo08nEgkyIWmPKCrErK6ImJOYKKDMXUJIp3wWx2BqlmHARUQUoM1cSACGk0RAuBt6iAoJclDs8czWi8DGEbk20CryjRg6EkIvMlaTKvwATJ+ppv34zxCb6RoyNOl1EY0cIaL3dFSdUCvJo+wzI4xwgocUm+06cqGeNKUsWYe/sUhURIUBUwajThRCIMgoCJVlhi43SzCxygj4Cg87HckWMOh32zq6IbVAVILIXpGKc0GKTbTlBP697lNLMAElpZhaFQZ9wwSJGTD0gbrvwJqq1n8XrHqXh1E5KvVflMTePy4856FNrPxsS1+sexVKQF9ED76plb+/sImHxJB8s+VRe/MO3m9h7oh6A8sr72M7XB8gVKK/8XvG2iX35qfx0Z5R9+alUX+5Ro1LfgmhX57HGNoaccRxr7FANdqyxIzjfFjGXsHhS9TuhegoAZl8l8/TFfbzuUT5J/ReAlJQUANqvXVUVIOzC747HBUDdjVZmXyWrJha1CQF5CwQSExPJTnJx79IhVf97lw6RneQiMTExapxwEao9oMTI+DhPX0ySn24AzpGvj+4r5qYd5/A9GOK68xGzr5IRR1oNC36MTBs3BYT0N3P0821os1ez1JgWdc30yBi+B0PU3WjFuK4CAOftP6P21bwVeP3e+wCYzUWYzUXUnalki+dj8tMNaLNXR/j7Hgxxx+PiuvMRew6cB8DhuCXHUUPUClitVqmsbDvp6QYADAYDLpeLn89UzqcZgD0Hzsv+AB6PiytXLtPR0RHBN28F3G43FosVu72Dvr5eyst3YGsLBH3yxIXL5cLhuIXZXITBYCAz0yDP2WwtaDQaLBYrDsett6/Ahg2fSRpNEhrNMgCGh0eYNJbiOFohE421xTH2D6SlQtpmSSY31zWTPPIbGRlGAPz+Kfz+Gfr6emM/hvoVU+wsKkSr1eL3T8n2L3/8CwBTfS/FAz3kfgPFAz2Y6ntD5gWxVqtlZ1Eh+hVTqEFVQFmJXsrVmlj0epit6zPw+2cA2BXfycuJCUz7m+acn8wNTfubeDkxwa74zqCAGbauz2DR62FytSbKSvQRP3JVt6CsRC+V5xQAMOaZ4teHz9BokhhYamFXfCfLEwJ+s1mF8pqEx38D8HwWLv5XwEfTdvz+Gb5au5K09MA22ro7udLuju0iGvMESnbX5wQCAQri+rm2cjusWgtAsecijQ2NVB2s4ua6I4GF3ocUTLbhD8a563OSiykaTfQmFOWytbko32zg0A43De2Bi0Wr1QLQ2NBIxdcVNP/STNXBKgB8Ph8AB0uaOd2il9cDEdnPi+rqWkmgurpWKivRS10XkKSB4PMGyWq1yo/0Zm6u6wJSWYleCo+hxrPgt0DAuK6C0y3NfPFsNykrlzJxbZol8U3yfNOpIwH7s2l+/6NJvoYXQtRjePLk8biamsMh7wDPnd1Me3sY7O8G5so62B+wP3d2h/gD1NQcDnlXYt4KBBdJysWio5cnwLDCV5yMtPRl4Iu+Phxv9d8xEHKWlU0Vzb4Q/gdPH8mFQMjtPAAAAABJRU5ErkJggg==" alt="herói">
           <div class="sombra"></div>
@@ -516,7 +530,7 @@
         <div class="perfilheroLinha">
           <div class="hero-sprite" id="perfilHeroSprite"></div>
           <div class="perfilheroInfo">
-            <div class="perfilnome" id="perfilNome">Aventureiro</div>
+            <div class="perfilnome" id="perfilNome"><span id="perfilNomeTxt">Aventureiro</span></div>
             <div class="xpwrap">
               <div class="xprow hprow">
                 <span class="xplabel" data-i18n="jogo.vida">Vida</span>
@@ -758,6 +772,21 @@
         </div>
         <span class="cfgval" id="cfgPrefsResumo">Vibrar</span>
         <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+      </div>
+
+      <!-- NOTIFICACOES PUSH (pedido do usuario) -- linha simples
+           texto+botao, mesmo padrao de #cfgRowConta (nao um link pra
+           sub-tela, e' uma acao direta). Estado do botao pintado por
+           atualizarBotaoNotificacao() (bloco JS "CONFIG — Notificacoes
+           push", perto de atualizarBotaoFeedback()) -- reflete
+           Notification.permission de verdade, nao um estado proprio. -->
+      <div class="cfgrow" id="cfgRowNotif">
+        <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></span>
+        <div class="cfgtxt">
+          <b data-i18n="cfg.notificacoes">Notificações</b>
+          <span id="cfgNotifInfo" data-i18n="cfg.notifDesc">Teste grátis, streak em risco e monstro do dia</span>
+        </div>
+        <button class="cfgbtn" id="cfgNotifBtn" data-i18n="cfg.ativar">Ativar</button>
       </div>
 
       <!-- Card "Histórico" removido daqui (pedido do usuário, sessão de
@@ -1012,11 +1041,21 @@
 
     <!-- etapa 1: trilha (mesmos beneficios de antes, agora como passos,
          com "Suas tarefas" ja concluido no topo) -->
+    <!-- etapa 1 = "tela nova" da sequencia pedida pelo usuario ("tela
+         nova, tela de lembrete do plano, planos", igual ao Skillion) --
+         PRECISA ser especificamente sobre o teste gratis (nao um pitch
+         generico de "assine o Pro"), porque e' a 1a tela que qualquer
+         gatilho Pro abre (abrirPaywall()). CTA unico leva direto pra
+         tela de lembrete (etapa 2 da sequencia, #pwEtapa3 no DOM) --
+         quem quiser assinar sem usar o teste faz isso na tela final
+         (#pwEtapa2, "planos"), nao aqui. Pra quem ja usou o teste antes,
+         abrirPaywall() pula esta tela e a de lembrete, abrindo direto em
+         "planos" (nao ha teste pra oferecer). -->
     <div class="pwEtapa" id="pwEtapa1">
       <div class="pwConteudo">
         <span class="pwEyebrow" data-i18n="pro.titulo">Plano Pro</span>
-        <h2 class="pwHeadline" data-i18n="pro.headline">Sua trilha continua</h2>
-        <p class="pwSub" data-i18n="pro.sub">3 etapas seguem bloqueadas até você assinar.</p>
+        <h2 class="pwHeadline" data-i18n="pro.headline">Queremos que você experimente o Plano Pro de graça</h2>
+        <p class="pwSub" data-i18n="pro.sub">7 dias grátis, sem compromisso. Cancele quando quiser.</p>
 
         <div class="pwTrilha">
           <div class="pwTrilhaLinha"></div>
@@ -1039,18 +1078,93 @@
         </div>
 
         <div class="pwSpacer"></div>
-        <button class="pwCTA" id="paywallContinuarBtn" type="button" data-i18n="pro.continuar">Continuar</button>
+        <button class="pwCTA" id="paywallContinuarBtn" type="button" data-i18n="pro.testarGratis">Testar grátis por 7 dias</button>
         <button class="pwSecundario" id="paywallAgoraNaoBtn1" type="button" data-i18n="pro.agoraNao">Agora não</button>
       </div>
     </div>
 
     <!-- etapa 2: escolha de plano -->
+    <!-- etapa 2 (2a PARADA DA SEQUENCIA, pedido do usuario: "tela nova,
+         tela de lembrete do plano, planos" -- reordenado pra ficar ANTES
+         da tela de planos, igual ao Skillion). Pergunta so 1x quando
+         avisar que o teste esta acabando -- reaproveita a mesma
+         estrutura visual dos cards de plano (.pwPlano/.pwPlanoRow/
+         .pwRadio, ja com o vidro com blur pedido pelo usuario) so
+         trocando o conteudo por opcoes de aviso. O botao aqui SO avanca
+         pra tela de planos (nao inicia nada ainda) -- ver
+         selecionarAviso() perto de iniciarCompraAssinatura() no script
+         principal. -->
+    <div class="pwEtapa" id="pwEtapa3">
+      <div class="pwConteudo">
+        <span class="pwEyebrow" data-i18n="pro.titulo">Plano Pro</span>
+        <h2 class="pwHeadline pwHeadlineMenor" data-i18n="pro.avisoHeadline">Quando avisamos que o teste tá acabando?</h2>
+        <p class="pwSub" data-i18n="pro.avisoSub">Um aviso dentro do app, pra você decidir se quer assinar antes do teste acabar.</p>
+
+        <div class="pwPlanos">
+          <div class="pwPlano" data-aviso="3" id="pwAviso3">
+            <div class="pwPlanoRow">
+              <div class="pwPlanoInfo">
+                <span class="pwPlanoNome" data-i18n="pro.aviso3Titulo">3 dias antes</span>
+              </div>
+              <span class="pwRadio"></span>
+            </div>
+          </div>
+          <div class="pwPlano sel" data-aviso="1" id="pwAviso1">
+            <div class="pwPlanoRow">
+              <div class="pwPlanoInfo">
+                <span class="pwPlanoNome" data-i18n="pro.aviso1Titulo">1 dia antes</span>
+              </div>
+              <span class="pwRadio"></span>
+            </div>
+          </div>
+          <div class="pwPlano" data-aviso="0" id="pwAviso0">
+            <div class="pwPlanoRow">
+              <div class="pwPlanoInfo">
+                <span class="pwPlanoNome" data-i18n="pro.aviso0Titulo">No último dia</span>
+              </div>
+              <span class="pwRadio"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="pwSpacer"></div>
+        <button class="pwCTA" id="paywallComecarTesteBtn" type="button" data-i18n="pro.continuar">Continuar</button>
+        <button class="pwSecundario" id="paywallAgoraNaoBtn3" type="button" data-i18n="pro.agoraNao">Agora não</button>
+      </div>
+    </div>
+
+    <!-- etapa "planos" (3a e ULTIMA PARADA, pedido do usuario) --
+         SIMPLIFICADA (pedido do usuario: "nossa tela tá muito confusa"
+         comparando com o concorrente) -- a versao anterior tinha 3 cards
+         de plano + linha do tempo do teste gratis (#pwResumoTrial) + 2
+         botoes de CTA disputando atencao. Removida a linha do tempo
+         (pedido do usuario: "tira essa parte daqui da cima") -- ja fica
+         explicita na tela anterior (#pwEtapa3, aviso) e na copy do card
+         "7 dias gratis" logo abaixo. Agora e' so a lista de planos (o
+         teste vira mais um card, junto dos pagos, pre-selecionado) com UM
+         CTA no fim, cujo texto/acao mudam conforme o card marcado -- ver
+         selecionarPlano() perto de iniciarCompraAssinatura() no script
+         principal. Conteudo espalhado pra ocupar a tela inteira (pedido
+         do usuario: "o conteúdo é pra ocupar TODA a tela") -- ver
+         #pwEtapa2 .pwPlanos/.pwPlano em style.css. -->
     <div class="pwEtapa" id="pwEtapa2">
       <div class="pwConteudo">
         <span class="pwEyebrow" data-i18n="pro.titulo">Plano Pro</span>
         <h2 class="pwHeadline pwHeadlineMenor" data-i18n="pro.escolhaPlano">Escolha como quer assinar</h2>
 
         <div class="pwPlanos">
+          <!-- teste gratis, agora um card na MESMA lista dos pagos (nao
+               um botao a parte) -- some (JS) pra quem ja usou o teste. -->
+          <div class="pwPlano sel" data-plano="trial" id="pwPlanoTrial">
+            <div class="pwPlanoRow">
+              <div class="pwPlanoInfo">
+                <span class="pwPlanoNome" data-i18n="pro.planoTrial">7 dias grátis</span>
+                <span class="pwPlanoSub" data-i18n="pro.planoTrialSub">Depois, Anual R$7,49/mês</span>
+              </div>
+              <span class="pwPlanoPreco">R$0,00</span>
+              <span class="pwRadio"></span>
+            </div>
+          </div>
           <div class="pwPlano" data-plano="mensal" id="pwPlanoMensal">
             <div class="pwPlanoRow">
               <div class="pwPlanoInfo">
@@ -1061,7 +1175,7 @@
               <span class="pwRadio"></span>
             </div>
           </div>
-          <div class="pwPlano sel" data-plano="anual" id="pwPlanoAnual">
+          <div class="pwPlano" data-plano="anual" id="pwPlanoAnual">
             <span class="pwPopular" data-i18n="pro.maisPopular">Mais popular</span>
             <span class="pwBadge">-58%</span>
             <div class="pwPlanoRow">
@@ -1090,10 +1204,13 @@
           <span data-i18n="pro.microcopy">Cancele quando quiser</span>
         </div>
         <div class="pwSpacer"></div>
-        <div class="pwCtaWrap">
-          <img class="pwMob" id="pwMobIcone" alt="">
-          <button class="pwCTA" id="paywallAssinarBtn" type="button" data-i18n="pro.assinar">Assinar Plano Pro</button>
-        </div>
+
+        <!-- CTA UNICO -- texto/acao mudam conforme o card selecionado
+             (selecionarPlano() escreve #paywallAssinarBtn direto). Sem o
+             bicho decorativo (.pwMob) que tinha na v1 desta tela --
+             pedido do usuario: tela ainda "tem muita coisa", cortando
+             espaco decorativo pra caber sem rolar. -->
+        <button class="pwCTA" id="paywallAssinarBtn" type="button">Testar grátis por 7 dias</button>
         <button class="pwSecundario" id="paywallAgoraNaoBtn2" type="button" data-i18n="pro.agoraNao">Agora não</button>
       </div>
     </div>
@@ -1756,6 +1873,7 @@ const CHAVES_SECUNDARIAS_CONTA = [
   'questlog.tarefasConcluidas.v1',
   'questlog.temaArena.v1',
   'questlog.temasDesbloqueados.v1',
+  'questlog.trial.v1', // TESTE GRATIS -- precisa estar na nuvem pra Cloud Functions conseguirem ler e mandar push de "teste acabando" mesmo com o app fechado
   'questlog.vida.v1'
 ];
 window.CHAVES_SECUNDARIAS_CONTA = CHAVES_SECUNDARIAS_CONTA;
@@ -3044,9 +3162,15 @@ function assinaturaAtiva(){
   // window.modoDebugAtivo() ja existe e e a fonte da verdade -- usa ela
   // direto se disponivel, com o mesmo fallback de string por baixo.
   try {
-    if (typeof window.modoDebugAtivo === 'function') return window.modoDebugAtivo();
-    if (localStorage.getItem('questlog.modoDebug.v1') === 'true') return true;
+    if (typeof window.modoDebugAtivo === 'function'){ if (window.modoDebugAtivo()) return true; }
+    else if (localStorage.getItem('questlog.modoDebug.v1') === 'true') return true;
   } catch(e){}
+  // TESTE GRATIS (pedido do usuario): enquanto o trial estiver dentro da
+  // janela de 7 dias, conta como assinatura ativa -- ver bloco
+  // "TESTE GRATIS" logo depois de iniciarCompraAssinatura(), poucas
+  // linhas abaixo, onde trialAtivo() e' definida (function declaration,
+  // hoisted no mesmo <script>, entao a ordem aqui nao importa).
+  if (trialAtivo()) return true;
   return false;
 }
 window.assinaturaAtiva = assinaturaAtiva;
@@ -3071,7 +3195,8 @@ window.assinaturaAtiva = assinaturaAtiva;
 const LIMITE_TAREFAS_GRATIS = 5; // pedido do usuario -- plano gratis para em 5 tarefas ativas
 
 let _pwEtapaAtual = 1;
-let _pwPlanoSelecionado = 'anual'; // pedido do usuario -- anual vem pre-selecionado (o "mais vantajoso")
+let _pwPlanoSelecionado = 'trial'; // pedido do usuario (tela "planos" simplificada) -- teste gratis vem pre-selecionado, junto na mesma lista dos planos pagos
+let _pwAvisoSelecionado = 1; // TESTE GRATIS -- "1 dia antes" vem pre-selecionado (etapa 3, #pwEtapa3)
 
 function abrirPaywall(motivo){
   window.dbgConta && window.dbgConta('abrirPaywall() -- motivo=' + motivo);
@@ -3087,19 +3212,36 @@ function abrirPaywall(motivo){
     const floresta = TEMAS_ARENA.find(t => t.id === 'floresta');
     if (floresta) fundo.src = 'data:image/png;base64,' + floresta.arte;
   }
-  // Monstro sentado em cima do botao "Assinar Plano Pro" (etapa 2) =
-  // sprite real MONSTROS[31] ("Goblin fungoso", bioma floresta,
-  // assets.js) -- mesmo padrao (so preenche 1x).
-  const mob = document.getElementById('pwMobIcone');
-  if (mob && !mob.src && typeof MONSTROS !== 'undefined' && MONSTROS[31]){
-    mob.src = MONSTROS[31].img;
-  }
   if (typeof window.aviso === 'function'){
     window.aviso((typeof idiomaApp === 'function' && idiomaApp() === 'en') ? 'You found a premium feature!' : 'Você descobriu um recurso premium!');
   }
+  // TESTE GRATIS -- o card "7 dias gratis" (tela de planos) e a linha do
+  // tempo acima dela so aparecem pra quem ainda nao usou o trial
+  // (trialSalvo() fica pra sempre depois do 1o uso, mesmo apos expirar --
+  // ver bloco TESTE GRATIS). Recalculado TODA vez que o paywall abre (nao
+  // so 1x), porque o mesmo overlay e' reaproveitado por qualquer gatilho
+  // PRO da sessao inteira. Se o trial ja foi usado e a selecao atual
+  // ainda estava em 'trial' (default), forca pra 'anual' -- senao o CTA
+  // ficaria tentando iniciar um teste que nao existe mais.
+  const cardTrialVisibilidade = document.getElementById('pwPlanoTrial');
+  const jaUsouTrial = (typeof window.trialSalvo === 'function' && window.trialSalvo());
+  if (cardTrialVisibilidade) cardTrialVisibilidade.style.display = jaUsouTrial ? 'none' : '';
+  if (jaUsouTrial && _pwPlanoSelecionado === 'trial' && typeof window.selecionarPlanoPaywall === 'function'){
+    window.selecionarPlanoPaywall('anual');
+  }
   const overlay = document.getElementById('paywallOverlay');
   if (!overlay) return;
-  irParaEtapaPaywall(1, false);
+  // Quem ja usou o teste gratis (jaUsouTrial) nao tem teste pra oferecer
+  // -- pula direto pra tela final de planos (passo 3), sem passar pela
+  // tela de teste gratis (passo 1) nem pela de lembrete (passo 2), que
+  // nao fariam sentido pra essa conta.
+  irParaEtapaPaywall(jaUsouTrial ? 3 : 1, false);
+  if (jaUsouTrial){
+    // sem tela 1/2 pra voltar (nao fariam sentido pra quem ja usou o
+    // teste) -- esconde a seta de voltar so nesse caso.
+    const back = document.getElementById('paywallVoltarBtn');
+    if (back) back.classList.remove('on');
+  }
   // atraso bem curto so pra o toast ("descobriu um recurso premium") nao
   // nascer e morrer debaixo do paywall no mesmo frame -- era 550ms (pedido
   // do usuario: "demora pra tela aparecer, deveria ser mais rapido"),
@@ -3125,8 +3267,15 @@ function irParaEtapaPaywall(n, animar){
   const direcao = n >= _pwEtapaAtual ? 1 : -1;
   _pwEtapaAtual = n;
   const e1 = document.getElementById('pwEtapa1');
-  const e2 = document.getElementById('pwEtapa2');
-  [e1, e2].forEach((el, i) => {
+  // SEQUENCIA (pedido do usuario: "tela nova, tela de lembrete do plano,
+  // planos", igual ao Skillion) -- os IDs no HTML nao mudaram (pwEtapa2
+  // continua sendo o markup de planos, pwEtapa3 o de aviso/lembrete),
+  // so a ORDEM em que aparecem nessa lista, que e' o que decide qual
+  // tela e' o passo 2 e qual e' o passo 3. Passo 1 = pitch (e1), passo 2
+  // = lembrete do teste (e3), passo 3 = planos (e2).
+  const ePasso2 = document.getElementById('pwEtapa3');
+  const ePasso3 = document.getElementById('pwEtapa2');
+  [e1, ePasso2, ePasso3].forEach((el, i) => {
     if (!el) return;
     const ativar = (i === n - 1);
     el.classList.remove('pwStepIn', 'pwStepInVolta');
@@ -3136,13 +3285,35 @@ function irParaEtapaPaywall(n, animar){
       el.classList.add(direcao > 0 ? 'pwStepIn' : 'pwStepInVolta');
     }
   });
+  // as bolinhas de progresso (pwDot1/2) marcam so o inicio (pitch) e o
+  // fim (planos) do fluxo -- a tela de lembrete (passo 2) fica "entre"
+  // as duas, sem bolinha propria (so 2 bolinhas existem no HTML).
   const d1 = document.getElementById('pwDot1');
   const d2 = document.getElementById('pwDot2');
   if (d1) d1.classList.toggle('on', n === 1);
-  if (d2) d2.classList.toggle('on', n === 2);
+  if (d2) d2.classList.toggle('on', n === 3);
   const back = document.getElementById('paywallVoltarBtn');
-  if (back) back.classList.toggle('on', n === 2);
+  if (back) back.classList.toggle('on', n !== 1);
 }
+
+// Texto/acao do CTA unico da tela de planos (#paywallAssinarBtn) --
+// muda conforme o card marcado (_pwPlanoSelecionado). Chamada por
+// selecionarPlano() a cada clique E por abrirPaywall() (pra sincronizar
+// ao abrir/reabrir o paywall). Nao usa data-i18n no HTML pro botao (foi
+// removido de proposito) porque o texto e' 100% controlado aqui.
+function aplicarCtaPlano(id){
+  const btn = document.getElementById('paywallAssinarBtn');
+  if (!btn) return;
+  const en = (typeof idiomaApp === 'function' && idiomaApp() === 'en');
+  if (id === 'trial'){
+    btn.textContent = en ? 'Try free for 7 days' : 'Testar grátis por 7 dias';
+    btn.onclick = () => iniciarTesteGratis(_pwAvisoSelecionado);
+  } else {
+    btn.textContent = en ? 'Subscribe to Pro' : 'Assinar Plano Pro';
+    btn.onclick = iniciarCompraAssinatura;
+  }
+}
+window.aplicarCtaPlano = aplicarCtaPlano;
 
 (function(){
   const btnFechar = document.getElementById('paywallFecharBtn');
@@ -3150,29 +3321,61 @@ function irParaEtapaPaywall(n, animar){
   const btnContinuar = document.getElementById('paywallContinuarBtn');
   const btnAgoraNao1 = document.getElementById('paywallAgoraNaoBtn1');
   const btnAgoraNao2 = document.getElementById('paywallAgoraNaoBtn2');
-  const btnAssinar = document.getElementById('paywallAssinarBtn');
+  const planoTrial = document.getElementById('pwPlanoTrial');
   const planoMensal = document.getElementById('pwPlanoMensal');
   const planoAnual = document.getElementById('pwPlanoAnual');
   const planoVitalicio = document.getElementById('pwPlanoVitalicio');
-  const planosPorId = { mensal: planoMensal, anual: planoAnual, vitalicio: planoVitalicio };
+  const planosPorId = { trial: planoTrial, mensal: planoMensal, anual: planoAnual, vitalicio: planoVitalicio };
+
+  // TESTE GRATIS -- sequencia e' pitch(1) -> lembrete(2, #pwEtapa3) ->
+  // planos(3, #pwEtapa2). O botao "Continuar" do lembrete so avanca pro
+  // passo 3 (nada e' iniciado ainda); quem de fato inicia o teste (ou a
+  // assinatura paga) e' o CTA unico da tela de planos, ver
+  // aplicarCtaPlano() acima.
+  const btnAgoraNao3 = document.getElementById('paywallAgoraNaoBtn3');
+  const btnComecarTeste = document.getElementById('paywallComecarTesteBtn');
+  const avisoPorId = {
+    3: document.getElementById('pwAviso3'),
+    1: document.getElementById('pwAviso1'),
+    0: document.getElementById('pwAviso0'),
+  };
 
   if (btnFechar) btnFechar.onclick = fecharPaywall;
-  if (btnVoltar) btnVoltar.onclick = () => irParaEtapaPaywall(1);
+  if (btnVoltar) btnVoltar.onclick = () => irParaEtapaPaywall(_pwEtapaAtual === 3 ? 2 : 1);
   if (btnContinuar) btnContinuar.onclick = () => irParaEtapaPaywall(2);
   if (btnAgoraNao1) btnAgoraNao1.onclick = fecharPaywall;
   if (btnAgoraNao2) btnAgoraNao2.onclick = fecharPaywall;
-  if (btnAssinar) btnAssinar.onclick = iniciarCompraAssinatura;
+  if (btnAgoraNao3) btnAgoraNao3.onclick = fecharPaywall;
+  if (btnComecarTeste) btnComecarTeste.onclick = () => irParaEtapaPaywall(3);
 
-  // selecao de plano -- so troca qual card fica marcado (.sel) e guarda em
-  // _pwPlanoSelecionado; iniciarCompraAssinatura() (quando a integracao
-  // real do Play Billing existir) le essa variavel pra saber qual produto
-  // comprar.
+  // selecao de aviso -- mesmo padrao de selecionarPlano() logo abaixo,
+  // so guarda em _pwAvisoSelecionado (lida por iniciarTesteGratis()).
+  function selecionarAviso(id){
+    if (id === _pwAvisoSelecionado) return;
+    _pwAvisoSelecionado = id;
+    Object.keys(avisoPorId).forEach(k => {
+      if (avisoPorId[k]) avisoPorId[k].classList.toggle('sel', Number(k) === id);
+    });
+    const alvo = avisoPorId[id];
+    if (alvo){
+      alvo.classList.add('pwPulse');
+      setTimeout(() => alvo.classList.remove('pwPulse'), 150);
+    }
+  }
+  if (avisoPorId[3]) avisoPorId[3].onclick = () => selecionarAviso(3);
+  if (avisoPorId[1]) avisoPorId[1].onclick = () => selecionarAviso(1);
+  if (avisoPorId[0]) avisoPorId[0].onclick = () => selecionarAviso(0);
+
+  // selecao de plano -- troca qual card fica marcado (.sel), guarda em
+  // _pwPlanoSelecionado e atualiza o texto/acao do CTA unico
+  // (aplicarCtaPlano()). 'trial' e' so mais um id nessa lista agora.
   function selecionarPlano(id){
     if (id === _pwPlanoSelecionado) return;
     _pwPlanoSelecionado = id;
     Object.keys(planosPorId).forEach(k => {
       if (planosPorId[k]) planosPorId[k].classList.toggle('sel', k === id);
     });
+    aplicarCtaPlano(id);
     // pulso rapido no card recem-marcado -- feedback tatil de que o clique
     // registrou. .pwPulse agora e' so transform+transition (CSS, ver
     // style.css perto de ".pwPlano.pwPulse") -- nao usa `animation`, entao
@@ -3184,9 +3387,13 @@ function irParaEtapaPaywall(n, animar){
       setTimeout(() => alvo.classList.remove('pwPulse'), 150);
     }
   }
+  window.selecionarPlanoPaywall = selecionarPlano; // exposto pra abrirPaywall() forcar 'anual' se o trial ja foi usado
+  if (planoTrial) planoTrial.onclick = () => selecionarPlano('trial');
   if (planoMensal) planoMensal.onclick = () => selecionarPlano('mensal');
   if (planoAnual) planoAnual.onclick = () => selecionarPlano('anual');
   if (planoVitalicio) planoVitalicio.onclick = () => selecionarPlano('vitalicio');
+
+  aplicarCtaPlano(_pwPlanoSelecionado); // sincroniza o CTA com o default ('trial') logo no boot
 })();
 
 function iniciarCompraAssinatura(){
@@ -3199,6 +3406,92 @@ function iniciarCompraAssinatura(){
   }
 }
 window.iniciarCompraAssinatura = iniciarCompraAssinatura;
+
+// ---------------------------------------------------------------------
+// TESTE GRATIS (pedido do usuario): 7 dias de Plano Pro sem cadastrar
+// pagamento. So pode ser usado 1x por conta -- guarda o registro
+// (inicio/fim/preferencia de aviso) mesmo depois de expirado, e a mera
+// PRESENCA desse registro (trialSalvo() != null) ja significa "ja
+// usou", sem precisar de flag separada. Ao expirar, assinaturaAtiva()
+// simplesmente para de enxergar o trial como ativo -- sem nenhuma acao
+// explicita de "desligar", volta pro plano gratis sozinho.
+//
+// So comeca quando a pessoa clica em "Testar gratis" na etapa 2 do
+// paywall (nao automatico no cadastro) -- ver #paywallTrialBtn. Antes
+// de comecar, pergunta 1x quando quer ser avisada que o teste esta
+// acabando (etapa 3 do paywall, #pwEtapa3) -- 3 dias antes / 1 dia
+// antes / no ultimo dia.
+//
+// O aviso em si (verificarAvisoTesteGratis()) e' so um toast
+// (window.aviso(), ja existente) mostrado no maximo 1x por dia
+// enquanto o teste estiver dentro da janela escolhida -- chamado no
+// boot do app (perto do fim do script principal, junto de
+// mostrarDicaSwipeArenaSeNecessario()/carregarContadorGlobal()).
+// ---------------------------------------------------------------------
+const CHAVE_TRIAL = 'questlog.trial.v1';
+const DIAS_TESTE_GRATIS = 7;
+
+function trialSalvo(){
+  try { return JSON.parse(localStorage.getItem(window.chaveConta(CHAVE_TRIAL)) || 'null'); }
+  catch(e){ return null; }
+}
+window.trialSalvo = trialSalvo;
+
+function salvarTrial(obj){
+  try { localStorage.setItem(window.chaveConta(CHAVE_TRIAL), JSON.stringify(obj)); } catch(e){}
+}
+
+function trialAtivo(){
+  const t = trialSalvo();
+  return !!(t && typeof t.fim === 'number' && Date.now() < t.fim);
+}
+window.trialAtivo = trialAtivo;
+
+function diasRestantesTrial(){
+  const t = trialSalvo();
+  if (!t || !trialAtivo()) return 0;
+  return Math.max(0, Math.ceil((t.fim - Date.now()) / 86400000));
+}
+
+// avisoDias: 3, 1 ou 0 (0 = so no ultimo dia) -- escolhido na etapa 3
+// do paywall (#pwEtapa3).
+function iniciarTesteGratis(avisoDias){
+  if (trialSalvo()) return; // ja usou o teste 1x, nao deixa reiniciar
+  const inicio = Date.now();
+  const fim = inicio + DIAS_TESTE_GRATIS * 86400000;
+  salvarTrial({ inicio: inicio, fim: fim, avisoDias: avisoDias, avisoMostradoDia: null });
+  if (typeof fecharPaywall === 'function') fecharPaywall();
+  if (typeof window.aviso === 'function'){
+    const en = (typeof idiomaApp === 'function' && idiomaApp() === 'en');
+    const dataFim = new Date(fim).toLocaleDateString(en ? 'en-US' : 'pt-BR');
+    window.aviso(en ? ('Free trial started! Valid until ' + dataFim) : ('Teste grátis iniciado! Vale até ' + dataFim));
+  }
+  if (typeof render === 'function') render(); // libera Pro na hora (temas/limites deixam de aparecer trancados)
+}
+window.iniciarTesteGratis = iniciarTesteGratis;
+
+// Chamado 1x no boot do app -- so um toast avisando que o teste esta
+// acabando, no maximo 1x por dia enquanto restarem <= avisoDias dias.
+// Nao reabre o paywall sozinha (seria intrusivo toda vez que o app
+// abre); quem quiser assinar clica em qualquer gatilho PRO normal.
+function verificarAvisoTesteGratis(){
+  const t = trialSalvo();
+  if (!t || !trialAtivo()) return;
+  const restantes = diasRestantesTrial();
+  if (restantes > t.avisoDias) return;
+  const hoje = new Date().toISOString().slice(0, 10);
+  if (t.avisoMostradoDia === hoje) return;
+  t.avisoMostradoDia = hoje;
+  salvarTrial(t);
+  if (typeof window.aviso !== 'function') return;
+  const en = (typeof idiomaApp === 'function' && idiomaApp() === 'en');
+  const msg = restantes <= 0
+    ? (en ? 'Your free trial ends today' : 'Seu teste grátis acaba hoje')
+    : (en ? ('Your free trial ends in ' + restantes + (restantes === 1 ? ' day' : ' days'))
+           : ('Seu teste grátis acaba em ' + restantes + (restantes === 1 ? ' dia' : ' dias')));
+  window.aviso(msg);
+}
+window.verificarAvisoTesteGratis = verificarAvisoTesteGratis;
 
 // temas com desbloqueioGratis (ex: Deserto via streak) ficam bloqueados
 // ate a condicao ser atingida -- ver verificarDesbloqueiosTemaArena().
@@ -5307,14 +5600,14 @@ document.getElementById('debugbtn').onclick = () => {
 };
 
 // ---------- nome do heroi ----------
-// FIX (pedido do usuario, print circulado): nome do heroi ("a" no
-// print -- nome curto usado em teste) escondido de vez. Antes essa
-// linha MOVIA o span pro topo, do lado do Nivel (lvl.after(spanNome)).
-// O elemento continua existindo no DOM -- render() (linha ~3039) ainda
-// escreve o texto nele normalmente, sem precisar mexer la -- so nao
-// aparece em lugar nenhum da tela agora.
-const spanNome = document.getElementById('nomeTopo');
-if (spanNome) spanNome.style.display = 'none';
+// HISTORICO: nome do heroi ("a" no print -- nome curto usado em teste)
+// tinha sido escondido de vez daqui (display:none via JS), a pedido do
+// usuario num momento em que ele nao tinha uso nenhum na Arena. Pedido
+// NOVO do usuario: mostrar o nome de novo, com a badge "PRO" do lado
+// (mesmo padrao ja usado no Perfil, #perfilNome) -- e depois subiu de
+// cima do sprite do heroi (Arena) pra dentro da .topbar, na mesma linha
+// de #lvl ("Nível I"), centralizado -- ver .nomeBadgeTopo no HTML
+// (dentro de .topbar) e em style.css.
 // renomear continua feito pela folha modal do Perfil > Config (ver bloco RENOMEAR EM FOLHA)
 
 // ---------- boas-vindas ----------
@@ -6439,6 +6732,7 @@ renderTemaArena();
 precarregarTemasArena();
 mostrarDicaSwipeArenaSeNecessario();
 carregarContadorGlobal(); // fire-and-forget
+verificarAvisoTesteGratis(); // TESTE GRATIS -- toast se o trial estiver acabando (no-op se nao ha trial)
 render();
 </script>
 
@@ -8807,7 +9101,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     if (typeof window.renderPreviewsPerfil === 'function') window.renderPreviewsPerfil();
 
     document.getElementById('perfilSub').textContent = (idiomaApp() === 'en' ? 'Level ' : 'Nível ') + romano(p.nivel);
-    document.getElementById('perfilNome').textContent = (typeof nomeHeroi !== 'undefined' && nomeHeroi) || (idiomaApp() === 'en' ? 'Adventurer' : 'Aventureiro');
+    document.getElementById('perfilNomeTxt').textContent = (typeof nomeHeroi !== 'undefined' && nomeHeroi) || (idiomaApp() === 'en' ? 'Adventurer' : 'Aventureiro');
     document.getElementById('perfilFill').style.width = Math.round((p.resto / p.meta) * 100) + '%';
     document.getElementById('perfilXpNum').textContent = p.resto + ' / ' + p.meta + ' XP';
 
@@ -8941,6 +9235,12 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     // por wrap externo -- uma linha aqui dentro, mesmo padrao da linha
     // acima.
     if (typeof window.atualizarBotaoFeedback === 'function') window.atualizarBotaoFeedback();
+    // NOTIFICACOES PUSH (pedido do usuario) -- linha vive na tela
+    // PRINCIPAL de Config (nao numa sub-tela), por isso o gancho fica
+    // aqui, nao em abrirPrefsConfig(). Notification.permission pode ter
+    // mudado fora do app (configuracoes do navegador/SO) desde a ultima
+    // vez que Config abriu -- repinta sempre.
+    if (typeof window.atualizarBotaoNotificacao === 'function') window.atualizarBotaoNotificacao();
     if (cfgOverlay) cfgOverlay.classList.add('on');
     animarStaggerCfgRows();
   }
@@ -11168,6 +11468,115 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   };
 
   window.abrirFolhaApagarTudo = abrir;
+})();
+</script>
+
+<!-- =====================================================================
+     NOTIFICACOES PUSH — pedido do usuario: push de verdade (chega com o
+     app fechado) pra teste gratis acabando, streak em risco de quebrar e
+     monstro do dia ainda vivo. Quem MANDA essas 3 e' um par de Cloud
+     Functions agendadas (/functions/index.js, raiz do repo -- fora deste
+     arquivo, precisa de deploy separado, ver /functions/README.md).
+     Este bloco e' so o lado CLIENTE: pede permissao do navegador,
+     registra o Service Worker (firebase-messaging-sw.js, mesma pasta
+     /play/), pega o token do FCM e salva em fcmTokens/{uid} no
+     Firestore -- e' de la que as Cloud Functions leem quem tem push
+     ativo. So funciona logado (token e' por CONTA, pra acompanhar a
+     pessoa entre aparelhos -- ver mesmo raciocinio do CHAVE_TRIAL virar
+     conta-scoped). Mesmo padrao de modulo independente que
+     "CONFIRMAR APAGAR DADOS EM FOLHA" logo acima (reimporta
+     app/auth/firestore, usa window.firebaseConfig ja exposto) -- so
+     acrescenta o import do Messaging.
+     ===================================================================== -->
+<script type="module">
+(function(){
+  // >>> UNICA COISA A EDITAR NESTE BLOCO: cole aqui a VAPID key do seu
+  // projeto Firebase (Console > Configuracoes do projeto > Cloud
+  // Messaging > Configuracao Web > "Gerar par de chaves", se ainda nao
+  // existir uma) <<<
+  const VAPID_KEY = 'COLE_AQUI_SUA_VAPID_KEY';
+
+  async function aguardarUsuario(auth, onAuthStateChangedFn, timeoutMs){
+    return new Promise(resolve => {
+      let resolvido = false;
+      const cancelar = onAuthStateChangedFn(auth, u => {
+        if (resolvido) return;
+        resolvido = true;
+        cancelar();
+        resolve(u);
+      });
+      setTimeout(() => {
+        if (resolvido) return;
+        resolvido = true;
+        resolve(auth.currentUser);
+      }, timeoutMs);
+    });
+  }
+
+  // Estado exposto pro botao de Config (#cfgNotifBtn, ver bloco JS
+  // "CONFIG — Notificacoes push" perto da tela de Config) saber o que
+  // mostrar sem precisar reimportar Firebase sozinho.
+  window.statusNotificacaoPush = function(){
+    if (typeof Notification === 'undefined') return 'sem_suporte';
+    return Notification.permission; // 'default' | 'granted' | 'denied'
+  };
+
+  window.ativarNotificacaoPush = async function(){
+    if (!window.firebaseConfig || window.firebaseConfig.apiKey === 'COLE_AQUI_SUA_APIKEY'){
+      return { ok: false, motivo: 'firebase_nao_configurado' };
+    }
+    if (typeof Notification === 'undefined' || !('serviceWorker' in navigator)){
+      return { ok: false, motivo: 'sem_suporte' };
+    }
+    if (VAPID_KEY === 'COLE_AQUI_SUA_VAPID_KEY'){
+      return { ok: false, motivo: 'vapid_nao_configurada' };
+    }
+
+    const permissao = await Notification.requestPermission();
+    if (permissao !== 'granted') return { ok: false, motivo: 'permissao_negada' };
+
+    try {
+      const [modApp, modAuth, modFirestore, modMessaging] = await Promise.all([
+        import("https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js"),
+        import("https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js"),
+        import("https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js"),
+        import("https://www.gstatic.com/firebasejs/10.13.2/firebase-messaging.js")
+      ]);
+      const { initializeApp, getApps, getApp } = modApp;
+      const { getAuth, onAuthStateChanged } = modAuth;
+      const { getFirestore, doc, setDoc, arrayUnion } = modFirestore;
+      const { getMessaging, getToken } = modMessaging;
+
+      const app = getApps().length ? getApp() : initializeApp(window.firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+
+      // TOKEN E' POR CONTA (pedido do usuario, mesmo raciocinio do trial):
+      // sem login, nao ha onde salvar o token de forma que as Cloud
+      // Functions consigam achar depois -- pede pra criar conta em vez de
+      // silenciosamente nao funcionar.
+      const usuario = await aguardarUsuario(auth, onAuthStateChanged, 4000);
+      if (!usuario) return { ok: false, motivo: 'sem_conta' };
+
+      const registro = await navigator.serviceWorker.register('firebase-messaging-sw.js');
+      const messaging = getMessaging(app);
+      const token = await getToken(messaging, { vapidKey: VAPID_KEY, serviceWorkerRegistration: registro });
+      if (!token) return { ok: false, motivo: 'sem_token' };
+
+      // arrayUnion dedupe sozinho -- registrar de novo no mesmo aparelho
+      // (token so muda raramente) nao duplica. merge:true preserva
+      // tokens de OUTROS aparelhos da mesma conta, nunca sobrescreve.
+      await setDoc(doc(db, 'fcmTokens', usuario.uid), {
+        tokens: arrayUnion(token),
+        atualizadoEm: Date.now(),
+      }, { merge: true });
+
+      return { ok: true };
+    } catch(e){
+      console.error('QuestLog/FCM: falha ao ativar notificacoes push', e);
+      return { ok: false, motivo: 'erro', erro: e.message };
+    }
+  };
 })();
 </script>
 
@@ -15811,6 +16220,64 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 </script>
 
 <!-- =====================================================================
+     CONFIG — Notificacoes push. Mesmo padrao de linha+botao de
+     atualizarBotaoFeedback() logo acima, so que o "estado ligado" aqui
+     nao e' uma preferencia nossa -- e' Notification.permission de
+     verdade (window.statusNotificacaoPush(), bloco "NOTIFICACOES PUSH"
+     mais acima no arquivo). Isso importa porque permissao de
+     notificacao, uma vez negada pelo usuario no navegador, so pode ser
+     revertida nas configuracoes do PROPRIO navegador -- nenhum app
+     consegue "pedir de novo" programaticamente depois de um "Bloquear".
+     Por isso o botao mostra 3 estados (nao so ligado/desligado):
+     Ativar / Ativado / Bloqueado (com instrucao de onde desbloquear).
+     ===================================================================== -->
+<script>
+(function(){
+  const btn = document.getElementById('cfgNotifBtn');
+  if (!btn) return;
+
+  window.atualizarBotaoNotificacao = function(){
+    const status = (typeof window.statusNotificacaoPush === 'function') ? window.statusNotificacaoPush() : 'sem_suporte';
+    const en = (typeof idiomaApp === 'function' && idiomaApp() === 'en');
+    if (status === 'granted'){
+      btn.textContent = en ? 'Enabled' : 'Ativado';
+      btn.disabled = true;
+    } else if (status === 'denied'){
+      btn.textContent = en ? 'Blocked' : 'Bloqueado';
+      btn.disabled = true;
+    } else if (status === 'sem_suporte'){
+      btn.textContent = en ? 'Unavailable' : 'Indisponível';
+      btn.disabled = true;
+    } else {
+      btn.textContent = en ? 'Enable' : 'Ativar';
+      btn.disabled = false;
+    }
+  };
+
+  btn.onclick = async () => {
+    if (typeof window.ativarNotificacaoPush !== 'function') return;
+    const en = (typeof idiomaApp === 'function' && idiomaApp() === 'en');
+    btn.disabled = true;
+    btn.textContent = en ? 'Enabling…' : 'Ativando…';
+    const resultado = await window.ativarNotificacaoPush();
+    window.atualizarBotaoNotificacao();
+    if (!resultado.ok && typeof window.aviso === 'function'){
+      // motivo 'permissao_negada'/'denied' nao precisa de toast -- o
+      // proprio botao ja vira "Bloqueado" (estado visivel permanente),
+      // um toast a mais so duplicaria a informacao.
+      if (resultado.motivo === 'sem_conta'){
+        window.aviso(en ? 'Create an account first to enable notifications' : 'Crie uma conta primeiro pra ativar notificações');
+      } else if (resultado.motivo !== 'permissao_negada'){
+        window.aviso(en ? 'Couldn\'t enable notifications' : 'Não deu pra ativar notificações');
+      }
+    }
+  };
+
+  window.atualizarBotaoNotificacao(); // primeira pintura, mesmo antes de Config abrir pela 1a vez
+})();
+</script>
+
+<!-- =====================================================================
      CONFIG — PREFERENCIA DE SOM (SWITCH)  —  bloco autonomo, cole antes
      de </body>
 
@@ -16079,8 +16546,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
     // PLANO PRO -- paywall (ver #paywallOverlay no HTML + abrirPaywall() no script)
     'pro.titulo':      { pt:'Plano Pro', en:'Pro Plan' },
-    'pro.headline':    { pt:'Sua trilha continua', en:'Your path continues' },
-    'pro.sub':         { pt:'3 etapas seguem bloqueadas até você assinar.', en:'3 steps stay locked until you subscribe.' },
+    'pro.headline':    { pt:'Queremos que você experimente o Plano Pro de graça', en:'We want you to try the Pro plan for free' },
+    'pro.sub':         { pt:'7 dias grátis, sem compromisso. Cancele quando quiser.', en:'7 days free, no commitment. Cancel anytime.' },
     'pro.passo1Titulo':{ pt:'Suas tarefas', en:'Your tasks' },
     'pro.passo1Sub':   { pt:'Já disponível', en:'Already unlocked' },
     'pro.beneficio1Titulo': { pt:'Sem limite diário', en:'No daily limit' },
@@ -16092,6 +16559,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'pro.continuar':   { pt:'Continuar', en:'Continue' },
     'pro.escolhaPlano':{ pt:'Escolha como quer assinar', en:'Choose how you want to subscribe' },
     'pro.maisPopular': { pt:'Mais popular', en:'Most popular' },
+    'pro.planoTrial':     { pt:'7 dias grátis', en:'7 days free' },
+    'pro.planoTrialSub':  { pt:'Depois, Anual R$7,49/mês', en:'Then, Annual R$7.49/mo' },
     'pro.planoMensal':    { pt:'Mensal', en:'Monthly' },
     'pro.planoMensalSub': { pt:'Cobrado todo mês', en:'Billed every month' },
     'pro.planoAnual':     { pt:'Anual', en:'Annual' },
@@ -16107,6 +16576,20 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'pro.limiteHerois':  { pt:'Limite de heróis atingido', en:'Hero limit reached' },
     'pro.limiteTarefas': { pt:'Limite diário de tarefas atingido', en:'Daily task limit reached' },
     'pro.trancado':    { pt:'PRO', en:'PRO' },
+    'pro.testarGratis':   { pt:'Testar grátis por 7 dias', en:'Try free for 7 days' },
+    'pro.avisoHeadline':  { pt:'Quando avisamos que o teste tá acabando?', en:'When should we warn you the trial is ending?' },
+    'pro.avisoSub':       { pt:'Um aviso dentro do app, pra você decidir se quer assinar antes do teste acabar.', en:'An in-app alert, so you can decide whether to subscribe before the trial ends.' },
+    'pro.aviso3Titulo':   { pt:'3 dias antes', en:'3 days before' },
+    'pro.aviso1Titulo':   { pt:'1 dia antes', en:'1 day before' },
+    'pro.aviso0Titulo':   { pt:'No último dia', en:'On the last day' },
+    'pro.comecarTeste':   { pt:'Começar teste grátis', en:'Start free trial' },
+    'pro.confirmarHeadline':  { pt:'Comece a evoluir com 7 dias grátis', en:'Start leveling up with 7 free days' },
+    'pro.confirmarHojeTitulo': { pt:'Hoje', en:'Today' },
+    'pro.confirmarHojeSub':    { pt:'Acesso completo liberado na hora', en:'Full access unlocked right away' },
+    'pro.confirmarAvisoSub':   { pt:'Avisamos que o teste tá acabando', en:'We’ll remind you the trial is ending' },
+    'pro.confirmarFimTitulo':  { pt:'Em 7 dias', en:'In 7 days' },
+    'pro.confirmarFimSub':     { pt:'Teste acaba e volta pro plano grátis, sem cobrança', en:'Trial ends and reverts to the free plan, no charge' },
+    'pro.meusDiasGratis':      { pt:'Meus 7 dias grátis', en:'My 7 free days' },
     'jogo.addTarefa':        { pt:'+ Adicionar', en:'+ Add' },
     'jogo.oQuePrecisaSerFeito': { pt:'O que precisa ser feito?', en:'What needs to be done?' },
     'jogo.soHoje':           { pt:'Só hoje', en:'Today only' },
@@ -16179,6 +16662,9 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'cfg.herois':          { pt:'Heróis', en:'Heroes' },
     'cfg.aparencia':       { pt:'Aparência', en:'Appearance' },
     'cfg.preferencias':    { pt:'Preferências', en:'Preferences' },
+    'cfg.notificacoes':    { pt:'Notificações', en:'Notifications' },
+    'cfg.notifDesc':       { pt:'Teste grátis, streak em risco e monstro do dia', en:'Free trial, streak at risk and today\'s monster' },
+    'cfg.ativar':          { pt:'Ativar', en:'Enable' },
     'cfg.historicoDesc':   { pt:'Calendário de vitórias, fugas e dias sem tarefa', en:'Calendar of wins, escapes and days with no tasks' },
     'cfg.nomeDoHeroi':     { pt:'Nome do herói', en:'Hero name' },
     'cfg.renomear':        { pt:'Renomear', en:'Rename' },

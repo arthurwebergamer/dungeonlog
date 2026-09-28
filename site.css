@@ -1,0 +1,47 @@
+/* site.css — base compartilhada entre / , /privacy e /terms
+   Paleta "Grafite" real do app (ver play/style.css) + fontes reais (Outfit/Silkscreen).
+   Mantido separado do play/style.css de propósito: essas páginas não devem
+   herdar nem acoplar no CSS do app (2500+ linhas, específico do jogo). */
+:root{
+  --bg:#282828; --panel:#323232; --panel-2:#3D3D3D; --line:#4A4A4A;
+  --text:#FAFAFA; --muted:#C2C2C2; --dim:#909090; --accent:#FFFFFF;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html{-webkit-text-size-adjust:100%;}
+body{
+  background:var(--bg); color:var(--text);
+  font-family:'Outfit', system-ui, sans-serif;
+  line-height:1.6;
+}
+a{color:var(--accent); text-decoration-color:var(--line);}
+a:hover{text-decoration-color:var(--accent);}
+.wrap{max-width:760px; margin:0 auto; padding:0 24px;}
+
+.pixel{ font-family:'Silkscreen', monospace; letter-spacing:.04em; }
+
+/* Header compartilhado: logo+nome (link de volta pra home) + seletor de
+   idioma PT/EN. Usado em /privacy e /terms "puros"; a home (/ e /en/)
+   reaproveita as mesmas classes mas com seu próprio header.site (fica
+   sobre o fundo da masmorra, com z-index/posicionamento próprios). */
+header.site{
+  display:flex; align-items:center; justify-content:space-between;
+  max-width:760px; margin:0 auto;
+  padding:20px 24px;
+}
+header.site .brand{ display:flex; align-items:center; gap:10px; text-decoration:none; }
+header.site .brand img{ width:26px; height:26px; border-radius:6px; }
+header.site .brand span{ font-family:'Outfit',sans-serif; font-weight:600; letter-spacing:-.01em; font-size:.95rem; color:var(--text); }
+header.site .lang{ display:flex; align-items:center; gap:4px; font-family:'Outfit',sans-serif; font-size:.78rem; }
+header.site .lang a{ color:var(--dim); text-decoration:none; padding:4px 7px; border-radius:6px; }
+header.site .lang a.active{ color:var(--text); background:rgba(255,255,255,.09); }
+header.site .lang .sep{ color:var(--dim); }
+
+footer.site{
+  border-top:1px solid var(--line);
+  padding:28px 0 40px;
+  text-align:center;
+}
+footer.site .wrap{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+footer.site a{ font-size:13px; color:var(--muted); }
+footer.site span.dot{ color:var(--dim); }
+footer.site .copy{ display:block; margin-top:10px; font-size:11px; color:var(--dim); }

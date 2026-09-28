@@ -1,0 +1,82 @@
+rules_version = '2';
+
+// =============================================================================
+// Regras de seguranca do Firestore (projeto questlog-d4c11).
+//
+// CONTEXTO: o projeto rodava em "modo de teste" (qualquer leitura/escrita
+// liberada pra qualquer um, autenticado ou nao) -- flag ja conhecida como
+// bloqueador de lancamento (ver overview do projeto). Este arquivo cobre as
+// 3 colecoes que existem HOJE (saves, fcmTokens, contadorGlobal); qualquer
+// colecao nova precisa ganhar uma regra explicita aqui, nunca herdar do
+// catch-all no fim (que nega tudo de proposito).
+//
+// IMPORTANTE: o Admin SDK (usado pelas Cloud Functions em /functions,
+// inclusive as de notificacao push) IGNORA estas regras por completo --
+// elas valem so pra chamadas vindas do client (o app em play/index.html,
+// via SDK modular do Firebase). Nao precisa (nem faz sentido) liberar
+// leitura pras Cloud Functions aqui.
+//
+// DEPLOY: `firebase deploy --only firestore:rules` (separado do deploy de
+// functions). Ver /functions/README.md pro passo a passo completo.
+// =============================================================================
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // saves/{uid} -- o save principal (campo `data`) + as chaves
+    // secundarias por conta (campo `extras`, ver CHAVES_SECUNDARIAS_CONTA
+    // em play/index.html -- inclui agora questlog.trial.v1,
+    // questlog.hpMonstro.v1 e questlog.hist.v1, que e' de onde as Cloud
+    // Functions de notificacao leem o estado de cada jogador).
+    // So o dono da conta le/escreve o proprio doc.
+    match /saves/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // fcmTokens/{uid} -- token(s) do FCM pra push de verdade (pedido do
+    // usuario -- teste gratis acabando, streak em risco, monstro do dia).
+    // Escrito pelo client em window.ativarNotificacaoPush() (play/index.html).
+    // So o dono le/escreve o proprio doc; as Cloud Functions leem via
+    // Admin SDK (ignora esta regra).
+    match /fcmTokens/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // contadorGlobal/hoje -- doc UNICO e publico ("X herois ja venceram
+    // hoje", sem login necessario pra ver OU incrementar -- ver
+    // incrementarContadorGlobal()/carregarContadorGlobal() em
+    // play/index.html). Leitura sempre livre.
+    //
+    // Escrita: nao da pra impedir 100% um client mal-intencionado de
+    // chamar a transacao varias vezes (nao ha Cloud Function no meio,
+    // decisao de arquitetura de proposito, ver comentario acima de
+    // incrementarContadorGlobal()) -- mas a regra abaixo pelo menos
+    // impede setar um total arbitrario direto: cada escrita so pode
+    // subir o total em exatamente 1 (dia normal) OU resetar pra 1 (troca
+    // de dia, quando `data` muda -- mesmo comportamento que o client ja
+    // implementa ao virar o dia).
+    match /contadorGlobal/hoje {
+      allow read: if true;
+
+      allow create: if request.resource.data.total == 1
+                    && request.resource.data.data is string;
+
+      allow update: if request.resource.data.data is string
+                    && (
+                      (request.resource.data.data == resource.data.data
+                        && request.resource.data.total == resource.data.total + 1)
+                      ||
+                      (request.resource.data.data != resource.data.data
+                        && request.resource.data.total == 1)
+                    );
+
+      allow delete: if false;
+    }
+
+    // Qualquer coisa fora das 3 colecoes acima: nega por padrao. Uma
+    // colecao nova precisa de uma regra explicita ANTES de ser usada do
+    // client -- nunca abre isto de volta pra "if true" geral.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

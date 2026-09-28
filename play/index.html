@@ -367,6 +367,7 @@
       </div>
       <button class="add" id="addbtn" data-i18n="jogo.addTarefa">+ Adicionar</button>
     </div>
+    <div class="cattabs" id="catTabsRow"></div>
     <div class="list" id="list"></div>
 
     <div class="composer" id="composer">
@@ -449,6 +450,18 @@
             <button type="button" class="advreset" id="corBoxReset" data-i18n="jogo.semCor">Sem cor</button>
           </div>
           <div class="advswatches" id="corBoxSwatches"></div>
+        </div>
+        <div class="advcatrow">
+          <span class="diflabel">Categoria</span>
+          <div class="catchips" id="catChips"></div>
+          <button type="button" class="catnova" id="catNovaBtn">+ Nova categoria</button>
+          <div class="catform" id="catForm">
+            <input type="text" class="catnomeinput" id="catNomeInput" placeholder="Nome da categoria" maxlength="24" autocomplete="off">
+            <div class="catformacoes">
+              <button type="button" class="catformcancelar" id="catFormCancelar">Cancelar</button>
+              <button type="button" class="catformok" id="catFormOk">Criar</button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -2103,6 +2116,162 @@ function hexValido(v){
   let s = v.trim();
   if (s[0] !== '#') s = '#' + s;
   return /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(s) ? s : null;
+}
+
+/* ---------- categorias de tarefa (pedido do usuario) ---------- */
+// Usuario cria categorias proprias (nome + cor), uma por tarefa -- sem
+// filtro/estatistica por enquanto, so um badge no card (ver render(),
+// bloco .task) e o seletor dentro de #advPanel/#edAdvPanel (composer/
+// editor de tarefa). A 1a categoria nasce sozinha a partir da resposta
+// do quiz de onboarding (CATEGORIAS_ONBOARDING, bloco do carrossel mais
+// abaixo) na PRIMEIRA LEITURA -- lazy, dentro do getter, nao direto no
+// load do script: se semeasse no load, rodaria antes da conta ser
+// resolvida (login e carrossel vivem em <script> separadas, carregadas
+// depois) e gravaria na chave de conta errada (guest em vez da conta
+// real). Sem UI de excluir categoria ainda -- se um dia ganhar, a
+// condicao "lista vazia" abaixo passa a re-semear depois de excluir a
+// ultima; ajustar junto quando isso for implementado.
+// i18n: strings novas ficam so em PT por enquanto (nao mexi no
+// dicionario TRADUCOES pra nao arriscar a tela toda de idioma por uma
+// feature nova) -- pendencia conhecida, nao silenciosa.
+const CHAVE_CATEGORIAS_TAREFA = 'questlog.categoriasTarefa.v1';
+function novaCategoriaTarefaObj(nome, cor){
+  return { id: 'cat_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), nome, cor };
+}
+function salvarCategoriasTarefa(lista){
+  try { localStorage.setItem(chaveConta(CHAVE_CATEGORIAS_TAREFA), JSON.stringify(lista)); } catch(e){}
+}
+function obterCategoriasTarefa(){
+  let lista = [];
+  try {
+    const bruto = localStorage.getItem(chaveConta(CHAVE_CATEGORIAS_TAREFA));
+    const arr = bruto ? JSON.parse(bruto) : null;
+    lista = Array.isArray(arr) ? arr : [];
+  } catch(e){ lista = []; }
+  if (lista.length === 0){
+    let catOnb = '';
+    try { catOnb = localStorage.getItem('questlog.onboarding.categoria.v1') || ''; } catch(e){}
+    // pedido do usuario: "Um pouco de tudo" nao virava categoria nenhuma
+    // que preste pra separar tarefa -- quem responde "tudo" no onboarding
+    // ja faz um pouco de cada, entao semeia as 3 categorias especificas
+    // de uma vez (estudos/trabalho/rotina continuam semeando so a delas).
+    const SEED = {
+      estudos:  [['Estudos', '#63C99A']],
+      trabalho: [['Trabalho', '#5AA9F2']],
+      rotina:   [['Rotina pessoal', '#E5698A']],
+      tudo:     [['Estudos', '#63C99A'], ['Trabalho', '#5AA9F2'], ['Rotina pessoal', '#E5698A']]
+    };
+    if (SEED[catOnb]){
+      lista = SEED[catOnb].map(([nome, cor]) => novaCategoriaTarefaObj(nome, cor));
+      salvarCategoriasTarefa(lista);
+    }
+  }
+  return lista;
+}
+function criarCategoriaTarefa(nome, cor){
+  nome = (nome || '').trim();
+  if (!nome) return null;
+  const lista = obterCategoriasTarefa();
+  const cat = novaCategoriaTarefaObj(nome, cor);
+  lista.push(cat);
+  salvarCategoriasTarefa(lista);
+  // qualquer lugar que crie uma categoria nova (composer, editor, ou as
+  // abas de filtro abaixo) precisa que as abas fiquem em dia na hora --
+  // centralizado aqui em vez de repetir a chamada em cada call-site.
+  // atualizarCategoriasOverlaySeAberta (definido no bloco da tela
+  // "Categorias") so repinta se aquela folha estiver aberta no momento.
+  if (typeof pintarCatTabs === 'function') pintarCatTabs();
+  if (typeof window.atualizarCategoriasOverlaySeAberta === 'function') window.atualizarCategoriasOverlaySeAberta();
+  return cat;
+}
+function categoriaTarefaPorId(id){
+  if (!id) return null;
+  return obterCategoriasTarefa().find(c => c.id === id) || null;
+}
+function editarCategoriaTarefa(id, nome, cor){
+  nome = (nome || '').trim();
+  if (!id || !nome) return null;
+  const lista = obterCategoriasTarefa();
+  const cat = lista.find(c => c.id === id);
+  if (!cat) return null;
+  cat.nome = nome;
+  if (cor) cat.cor = cor;
+  salvarCategoriasTarefa(lista);
+  if (typeof pintarCatTabs === 'function') pintarCatTabs();
+  if (typeof window.atualizarCategoriasOverlaySeAberta === 'function') window.atualizarCategoriasOverlaySeAberta();
+  return cat;
+}
+function apagarCategoriaTarefa(id){
+  if (!id) return false;
+  let lista = obterCategoriasTarefa();
+  const antes = lista.length;
+  lista = lista.filter(c => c.id !== id);
+  if (lista.length === antes) return false;
+  salvarCategoriasTarefa(lista);
+  // tarefas que apontavam pra essa categoria ficam so sem a etiqueta --
+  // categoriaTarefaPorId ja tolera um id orfao (badge some sozinho), mas
+  // limpa o campo mesmo assim pra nao carregar um id morto pra sempre
+  if (typeof tarefas !== 'undefined' && Array.isArray(tarefas)){
+    tarefas.forEach(t => { if (t.categoriaId === id) delete t.categoriaId; });
+  }
+  if (typeof filtroCategoriaTarefa !== 'undefined' && filtroCategoriaTarefa === id) filtroCategoriaTarefa = null;
+  if (typeof pintarCatTabs === 'function') pintarCatTabs();
+  if (typeof window.atualizarCategoriasOverlaySeAberta === 'function') window.atualizarCategoriasOverlaySeAberta();
+  return true;
+}
+
+/* ---------- categoria de tarefa: abas de filtro (pedido do usuario,
+   "sistema de categorias tipo igual o do Skillion") ----------
+   Reaproveita o mesmo armazenamento/CRUD acima (obterCategoriasTarefa,
+   criarCategoriaTarefa) -- so acrescenta a camada de filtro visual em
+   forma de abas horizontais acima da lista de tarefas: "Todos" + uma
+   aba por categoria existente + "+ Nova categoria" no fim. Ve tambem o
+   filtro real dentro de render() (variavel pendentesVisiveis). */
+let filtroCategoriaTarefa = null;   // null = "Todos" (sem filtro)
+// pedido do usuario: com "Todos" selecionado, a lista agrupa por
+// categoria (cabecalho colapsavel, ver render()) -- este Set guarda
+// quais grupos estao fechados no momento. So em memoria (like
+// filtroCategoriaTarefa acima), reseta pro estado padrao (tudo aberto)
+// ao recarregar o app.
+const categoriasColapsadas = new Set();
+
+function pintarCatTabs(){
+  const linha = document.getElementById('catTabsRow');
+  if (!linha) return;
+  const en = idiomaApp() === 'en';
+  linha.innerHTML = '';
+
+  const bTodos = document.createElement('button');
+  bTodos.type = 'button';
+  bTodos.className = 'cattab' + (filtroCategoriaTarefa === null ? ' on' : '');
+  bTodos.textContent = en ? 'All' : 'Todos';
+  bTodos.onclick = () => { filtroCategoriaTarefa = null; if (typeof render === 'function') render(); };
+  linha.appendChild(bTodos);
+
+  // pedido do usuario: tira o lapis de editar de cada aba -- cada aba
+  // volta a ser so um botao simples de novo (toca = filtra). Editar/
+  // apagar categoria agora mora na tela "Categorias" completa, aberta
+  // pela aba "+ Adicionar" (ver abrirCategoriasOverlay()).
+  obterCategoriasTarefa().forEach(cat => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'cattab' + (filtroCategoriaTarefa === cat.id ? ' on' : '');
+    b.textContent = cat.nome;   // pedido do usuario: sem cor, so o nome
+    // toca de novo na mesma aba = volta pra "Todos" (mesmo padrao toggle
+    // dos chips de categoria do composer/editor)
+    b.onclick = () => {
+      filtroCategoriaTarefa = (filtroCategoriaTarefa === cat.id) ? null : cat.id;
+      if (typeof render === 'function') render();
+    };
+    linha.appendChild(b);
+  });
+
+  const bNova = document.createElement('button');
+  bNova.type = 'button';
+  bNova.className = 'cattab cattabnova';
+  bNova.textContent = '+ ' + (en ? 'Add' : 'Adicionar');
+  bNova.onclick = () => { if (typeof abrirCategoriasOverlay === 'function') abrirCategoriasOverlay(); };
+  linha.appendChild(bNova);
 }
 
 /* ---------- dificuldade ---------- */
@@ -3957,6 +4126,8 @@ function render(){
   const lista = document.getElementById('list');
   lista.innerHTML = '';
 
+  if (typeof pintarCatTabs === 'function') pintarCatTabs();
+
   // Botao "+ Adicionar" tambem desabilita quando o monstro ja caiu -- nao
   // so o "Criar tarefa" de dentro da composer (ver atualizarEstadoSave()).
   // Roda a cada render() pra cobrir a virada automatica do dia (watchdog),
@@ -3986,7 +4157,25 @@ function render(){
   pendentes.forEach(t => { if (typeof t.ordem !== 'number') t.ordem = tarefas.indexOf(t) * 10; });
   pendentes.sort((a, b) => a.ordem - b.ordem);
 
-  pendentes.forEach(t => {
+  // filtro de categoria (abas tipo Skillion, pedido do usuario) -- so
+  // decide QUAIS cards aparecem na lista. feitas/total/hp do monstro/
+  // vitoria (calculados mais abaixo) continuam em cima de "pendentes"
+  // (todas as tarefas do dia, sem filtro): esconder uma categoria nao
+  // pode mexer na vida do monstro nem fingir vitoria sem tarefa real
+  // concluida.
+  const pendentesVisiveis = filtroCategoriaTarefa
+    ? pendentes.filter(t => t.categoriaId === filtroCategoriaTarefa)
+    : pendentes;
+
+  if (pendentes.length > 0 && pendentesVisiveis.length === 0){
+    lista.innerHTML = '<div class="empty">' + (idiomaApp() === 'en' ? 'No pending tasks in this category.' : 'Nenhuma tarefa pendente nesta categoria.') + '</div>';
+  }
+
+  // construcao de UMA linha de tarefa (extraido do forEach original pra
+  // poder ser chamado tanto na lista simples quanto dentro de cada grupo
+  // de categoria -- ver uso logo abaixo). So MONTA e retorna o elemento,
+  // quem chama decide onde/quando dar appendChild.
+  function montarLinhaTarefa(t){
     const i = tarefas.indexOf(t);
     const el = document.createElement('div');
     el.className = 'task';
@@ -4068,8 +4257,54 @@ function render(){
       if (typeof abrirEditor === 'function') abrirEditor(i);
     };
     el.querySelector('.del').onclick = e => { e.stopPropagation(); tarefas.splice(i,1); verificarVitoriaAoExcluir(); render(); };
-    lista.appendChild(el);
-  });
+    return el;
+  }
+
+  if (filtroCategoriaTarefa){
+    // uma categoria especifica ja esta selecionada na aba -- lista
+    // simples, sem cabecalho (a propria aba ativa ja deixa claro qual
+    // categoria e essa)
+    pendentesVisiveis.forEach(t => lista.appendChild(montarLinhaTarefa(t)));
+  } else {
+    // "Todos": agrupa por categoria (pedido do usuario -- "a categoria
+    // devia aparecer como texto e nao tipo cor", igual ao Skillion:
+    // cabecalho com nome+contagem, colapsavel). Grupo so aparece se tiver
+    // pelo menos 1 tarefa pendente hoje; tarefa sem categoria cai num
+    // grupo "Sem categoria", que agora vem SEMPRE PRIMEIRO (pedido do
+    // usuario). O drag-and-drop de reordenar (mais abaixo no arquivo)
+    // continua funcionando igual -- ele so enxerga elementos .task via
+    // querySelectorAll, os cabecalhos de grupo nao entram na conta -- e
+    // ALEM disso agora tambem le o data-catid de cada cabecalho pra
+    // decidir se uma tarefa arrastada pra outra secao muda de categoria
+    // de verdade (ver soltar()).
+    const grupos = obterCategoriasTarefa().map(c => ({ id: c.id, nome: c.nome, tarefas: [] }));
+    const semCategoria = { id: '__sem__', nome: (idiomaApp() === 'en' ? 'No category' : 'Sem categoria'), tarefas: [] };
+    const porId = new Map(grupos.map(g => [g.id, g]));
+
+    pendentesVisiveis.forEach(t => {
+      const g = t.categoriaId ? porId.get(t.categoriaId) : null;
+      (g || semCategoria).tarefas.push(t);
+    });
+
+    [semCategoria].concat(grupos).filter(g => g.tarefas.length > 0).forEach(g => {
+      const colapsado = categoriasColapsadas.has(g.id);
+      const header = document.createElement('div');
+      header.className = 'catgrupo' + (colapsado ? ' colapsado' : '');
+      header.dataset.catid = g.id;
+      header.innerHTML = '<span class="catgruponome"></span><span class="catgrupocount"></span><span class="catgrupochevron">▾</span>';
+      header.querySelector('.catgruponome').textContent = g.nome;
+      header.querySelector('.catgrupocount').textContent = g.tarefas.length;
+      header.onclick = () => {
+        if (categoriasColapsadas.has(g.id)) categoriasColapsadas.delete(g.id);
+        else categoriasColapsadas.add(g.id);
+        render();
+      };
+      lista.appendChild(header);
+      if (!colapsado){
+        g.tarefas.forEach(t => lista.appendChild(montarLinhaTarefa(t)));
+      }
+    });
+  }
 
   const feitas = doDia.filter(feitaHoje).length;
   const total = doDia.length;
@@ -4868,10 +5103,10 @@ function criar(){
     return;
   }
 
-  if (modo === 'hoje') tarefas.push({ texto, tipo:'hoje', data:isoAtual(), feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined });
-  else if (modo === 'mensal') tarefas.push({ texto, tipo:'mensal', diaMes:diaMesEscolhido, feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined });
-  else if (modo === 'anual') tarefas.push({ texto, tipo:'anual', diaAno:diaAnoEscolhido, mesAno:mesAnoEscolhido, feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined });
-  else tarefas.push({ texto, tipo:'repete', dias:[...diasEscolhidos], feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined });
+  if (modo === 'hoje') tarefas.push({ texto, tipo:'hoje', data:isoAtual(), feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined, categoriaId: categoriaEscolhida || undefined });
+  else if (modo === 'mensal') tarefas.push({ texto, tipo:'mensal', diaMes:diaMesEscolhido, feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined, categoriaId: categoriaEscolhida || undefined });
+  else if (modo === 'anual') tarefas.push({ texto, tipo:'anual', diaAno:diaAnoEscolhido, mesAno:mesAnoEscolhido, feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined, categoriaId: categoriaEscolhida || undefined });
+  else tarefas.push({ texto, tipo:'repete', dias:[...diasEscolhidos], feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined, categoriaId: categoriaEscolhida || undefined });
   window.dbgConta && window.dbgConta('criar() -- tarefa "' + texto + '" adicionada | uidAtivo=' + (typeof _uidAtivo!=='undefined'?_uidAtivo:'?') + ' | chave=' + (typeof chaveSaveAtual==='function'?chaveSaveAtual():'?') + ' | tarefas agora: ' + tarefas.length);
 
   input.value = '';
@@ -4955,12 +5190,74 @@ function pintarAdvColor(){
 
 function resetAdvColor(){
   corBoxEscolhida = null;
+  categoriaEscolhida = null;
   const panel = document.getElementById('advPanel');
   const toggle = document.getElementById('advToggle');
   if (panel) panel.classList.remove('on');
   if (toggle) toggle.classList.remove('on');
   pintarAdvColor();
+  if (typeof pintarCategorias === 'function') pintarCategorias();
 }
+
+/* ---------- opcoes avancadas: categoria de tarefa (pedido do usuario) ---------- */
+let categoriaEscolhida = null;   // null = tarefa sem categoria
+
+function pintarCategorias(){
+  const grupo = document.getElementById('catChips');
+  if (!grupo) return;
+  grupo.innerHTML = '';
+  obterCategoriasTarefa().forEach(cat => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'catchip' + (categoriaEscolhida === cat.id ? ' on' : '');
+    b.textContent = cat.nome;   // pedido do usuario: sem cor, so o nome
+    // toca de novo na mesma categoria = desmarca (mesmo padrao toggle
+    // ja usado nos chips de dificuldade/dia da semana do resto do app)
+    b.onclick = () => {
+      categoriaEscolhida = (categoriaEscolhida === cat.id) ? null : cat.id;
+      pintarCategorias();
+    };
+    grupo.appendChild(b);
+  });
+}
+
+(function montarCategoria(){
+  const novaBtn = document.getElementById('catNovaBtn');
+  const form = document.getElementById('catForm');
+  const nomeInput = document.getElementById('catNomeInput');
+  const ok = document.getElementById('catFormOk');
+  const cancelar = document.getElementById('catFormCancelar');
+  if (!novaBtn || !form || !nomeInput || !ok || !cancelar) return;
+
+  // pedido do usuario: "a gente nao precisa de cores nas categorias" --
+  // saiu o seletor de cor (era a mesma paleta CORES_PRESET do corBox).
+
+  function abrirForm(){
+    form.classList.add('on');
+    novaBtn.classList.add('off');
+    nomeInput.value = '';
+    nomeInput.focus();
+  }
+  function fecharForm(){
+    form.classList.remove('on');
+    novaBtn.classList.remove('off');
+  }
+
+  novaBtn.onclick = abrirForm;
+  cancelar.onclick = fecharForm;
+  ok.onclick = () => {
+    const nome = nomeInput.value.trim();
+    if (!nome){ nomeInput.focus(); return; }
+    const cat = criarCategoriaTarefa(nome);
+    if (!cat) return;
+    categoriaEscolhida = cat.id;   // categoria recem-criada ja entra selecionada
+    fecharForm();
+    pintarCategorias();
+  };
+  nomeInput.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); ok.click(); } });
+
+  pintarCategorias();
+})();
 
 /* ---------- seletor de dificuldade ---------- */
 let difEscolhida = DIF_PADRAO;
@@ -7402,6 +7699,18 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
           </div>
           <div class="advswatches" id="edCorBoxSwatches"></div>
         </div>
+        <div class="advcatrow">
+          <span class="diflabel">Categoria</span>
+          <div class="catchips" id="edCatChips"></div>
+          <button type="button" class="catnova" id="edCatNovaBtn">+ Nova categoria</button>
+          <div class="catform" id="edCatForm">
+            <input type="text" class="catnomeinput" id="edCatNomeInput" placeholder="Nome da categoria" maxlength="24" autocomplete="off">
+            <div class="catformacoes">
+              <button type="button" class="catformcancelar" id="edCatFormCancelar">Cancelar</button>
+              <button type="button" class="catformok" id="edCatFormOk">Criar</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -7437,9 +7746,15 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   const corHex    = document.getElementById('edCorBoxHex');
   const corReset  = document.getElementById('edCorBoxReset');
   const corGrupo  = document.getElementById('edCorBoxSwatches');
+  const catChips  = document.getElementById('edCatChips');
+  const catNovaBtn = document.getElementById('edCatNovaBtn');
+  const catForm    = document.getElementById('edCatForm');
+  const catNomeInput = document.getElementById('edCatNomeInput');
+  const catFormOk = document.getElementById('edCatFormOk');
+  const catFormCancelar = document.getElementById('edCatFormCancelar');
   const VEZES_MIN_ED = 1, VEZES_MAX_ED = 9;
 
-  let idx = -1, dif = 'media', modo = 'hoje', dias = [], diaMes = 1, diaAno = 1, mesAno = 1, vezes = 1, corBox = null;
+  let idx = -1, dif = 'media', modo = 'hoje', dias = [], diaMes = 1, diaAno = 1, mesAno = 1, vezes = 1, corBox = null, categoriaId = null;
 
   function pintar(){
     gDifs.querySelectorAll('.dif').forEach(b => b.classList.toggle('on', b.dataset.dif === dif));
@@ -7471,6 +7786,56 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       if (corGrupo) corGrupo.querySelectorAll('.advpreset').forEach(b =>
         b.classList.toggle('on', corBox && b.dataset.cor.toLowerCase() === corBox.toLowerCase()));
     }
+    pintarCategoriasEd();
+  }
+
+  // categoria de tarefa (pedido do usuario) -- mesmo par de funcoes do
+  // composer de criacao (obterCategoriasTarefa/criarCategoriaTarefa,
+  // definidas no script principal), so a pintura dos chips e do form
+  // de "nova categoria" que precisa existir aqui de novo porque esse
+  // overlay de edicao vive numa <script> separada (mesmo padrao ja
+  // usado pro resto do form: dificuldade, cor, etc, todos duplicados
+  // entre composer e editor)
+  function pintarCategoriasEd(){
+    if (!catChips) return;
+    catChips.innerHTML = '';
+    obterCategoriasTarefa().forEach(cat => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'catchip' + (categoriaId === cat.id ? ' on' : '');
+      b.textContent = cat.nome;   // pedido do usuario: sem cor, so o nome
+      b.onclick = () => {
+        categoriaId = (categoriaId === cat.id) ? null : cat.id;
+        pintarCategoriasEd();
+      };
+      catChips.appendChild(b);
+    });
+  }
+
+  // pedido do usuario: "a gente nao precisa de cores nas categorias" --
+  // saiu o seletor de cor (era a mesma paleta CORES_PRESET do corBox).
+  if (catNovaBtn && catForm && catNomeInput && catFormOk && catFormCancelar){
+    catNovaBtn.onclick = () => {
+      catForm.classList.add('on');
+      catNovaBtn.classList.add('off');
+      catNomeInput.value = '';
+      catNomeInput.focus();
+    };
+    catFormCancelar.onclick = () => {
+      catForm.classList.remove('on');
+      catNovaBtn.classList.remove('off');
+    };
+    catFormOk.onclick = () => {
+      const nome = catNomeInput.value.trim();
+      if (!nome){ catNomeInput.focus(); return; }
+      const cat = criarCategoriaTarefa(nome);
+      if (!cat) return;
+      categoriaId = cat.id;
+      catForm.classList.remove('on');
+      catNovaBtn.classList.remove('off');
+      pintarCategoriasEd();
+    };
+    catNomeInput.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); catFormOk.click(); } });
   }
 
   // os botoes de dificuldade sao montados a partir da mesma tabela DIFS
@@ -7551,6 +7916,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     t.dif   = dif;
     t.meta  = vezes;
     if (corBox) t.corBox = corBox; else delete t.corBox;
+    if (categoriaId) t.categoriaId = categoriaId; else delete t.categoriaId;
     // reduzir a meta abaixo do progresso ja feito hoje: encaixa o contador
     // no novo teto e, se ja bater, fecha a tarefa (sem isso ela ficaria
     // "presa" mostrando 3/2, por exemplo)
@@ -7616,11 +7982,12 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     mesAno = (t.mesAno && t.mesAno >= 1 && t.mesAno <= 12) ? t.mesAno : (new Date().getMonth() + 1);
     vezes = (t.meta && t.meta > 1) ? Math.round(t.meta) : 1;
     corBox = t.corBox || null;
+    categoriaId = t.categoriaId || null;
     texto.value = t.texto || '';
     pintar();
     if (advPanel && advToggle){
-      advPanel.classList.toggle('on', !!corBox);
-      advToggle.classList.toggle('on', !!corBox);
+      advPanel.classList.toggle('on', !!corBox || !!categoriaId);
+      advToggle.classList.toggle('on', !!corBox || !!categoriaId);
     }
     ov.classList.add('on');
   };
@@ -7895,6 +8262,28 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     dragEl.classList.remove('dragging');
     dragEl.style.position = ''; dragEl.style.left = ''; dragEl.style.top = ''; dragEl.style.width = '';
     dragEl.style.transform = ''; dragEl.style.willChange = '';
+
+    // pedido do usuario: soltar a tarefa dentro da secao de outra
+    // categoria (visao "Todos" agrupada) precisa MUDAR a categoria dela
+    // de verdade, nao so empurrar a ordem. Acha o cabecalho de grupo
+    // (.catgrupo) mais proximo ACIMA de onde a tarefa foi largada e le o
+    // id gravado nele (data-catid, ver render()). So existe cabecalho
+    // nessa visao -- com uma categoria ja filtrada na aba nao ha
+    // cabecalho nenhum pra achar, e nada muda (mesma categoria de sempre).
+    let categoriaMudou = false;
+    let headerAcima = dragEl.previousElementSibling;
+    while (headerAcima && !headerAcima.classList.contains('catgrupo')) headerAcima = headerAcima.previousElementSibling;
+    if (headerAcima){
+      const tArrastada = tarefas[+dragEl.dataset.idx];
+      if (tArrastada){
+        const novoCatId = headerAcima.dataset.catid === '__sem__' ? undefined : headerAcima.dataset.catid;
+        if ((tArrastada.categoriaId || undefined) !== novoCatId){
+          if (novoCatId) tArrastada.categoriaId = novoCatId; else delete tArrastada.categoriaId;
+          categoriaMudou = true;
+        }
+      }
+    }
+
     // grava a nova ordem visual direto nas tarefas, pelo data-idx de cada linha
     [...list.querySelectorAll('.task')].forEach((el, i) => {
       const t = tarefas[+el.dataset.idx];
@@ -7903,6 +8292,11 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     dragEl = null; placeholder = null; pid = null;
     if (typeof salvar === 'function') salvar();
     setTimeout(() => { dragArmado = false; }, 50);   // deixa o click "fantasma" do soltar morrer antes de reliberar
+    // categoria mudou: a secao onde o card esta fisicamente na hora nao
+    // e mais a certa (ele fica ate aqui na secao antiga por 1 frame) --
+    // um render() reagrupa tudo direitinho, incluindo a contagem dos
+    // cabecalhos.
+    if (categoriaMudou && typeof render === 'function') render();
   }
   list.addEventListener('pointerup', soltar);
   list.addEventListener('pointercancel', e => { dbgArrasto('!!! pointercancel recebido !!!'); soltar(e); });
@@ -9337,6 +9731,238 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   bSalv.onclick = confirmar;
 
   window.abrirFolhaNome = abrir;
+})();
+</script>
+
+<!-- =====================================================================
+     CATEGORIAS (tela de gerenciamento completa, pedido do usuario --
+     "mais ou menos esse sistema que o skillion ja faz": lista com nome +
+     contagem de tarefas + editar + apagar, mais "Adicionar nova
+     categoria" no fim, tudo na mesma folha). Reaproveita .edov/.edsheet/
+     .edpuxador/.edtitulo (mesmo padrao visual das outras folhas). A
+     lista e repintada (pintarCategoriasOverlay()) toda vez que abre e
+     depois de qualquer editar/apagar/criar feito por ela mesma, pra dar
+     pra gerenciar varias categorias seguidas sem fechar e reabrir.
+     Reordenar por arrasto (o "::" da referencia) ficou de fora por ora
+     -- fora do escopo pedido, so a lista+CRUD.
+     Aberta pela aba "+ Adicionar" da linha de filtro (ver pintarCatTabs()
+     acima); dali dentro, o lapis abre novaCategoriaOverlay (z-index:85,
+     por cima desta) em modo edicao, e a lixeira usa a mesma confirmacao
+     generica (pedirConfirmacao) que o editar-por-lapis ja usava.
+     ===================================================================== -->
+<div class="edov" id="categoriasOverlay">
+  <div class="edsheet" id="categoriasSheet">
+    <div class="edpuxador"></div>
+    <div class="edtitulo">Categorias</div>
+    <div class="catlista" id="categoriasLista"></div>
+    <button type="button" class="catnovarow" id="categoriasNovaBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+      <span id="categoriasNovaTexto">Adicionar nova categoria</span>
+    </button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const ov     = document.getElementById('categoriasOverlay');
+  const lista  = document.getElementById('categoriasLista');
+  const bNova  = document.getElementById('categoriasNovaBtn');
+  const txtNova = document.getElementById('categoriasNovaTexto');
+  if (!ov || !lista || !bNova || !txtNova) return;
+
+  const en = () => (typeof idiomaApp === 'function' && idiomaApp() === 'en');
+  const ICONE_LAPIS = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
+  const ICONE_LIXO  = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>';
+
+  function contagem(id){
+    return (typeof tarefas !== 'undefined' && Array.isArray(tarefas))
+      ? tarefas.filter(t => t.categoriaId === id).length
+      : 0;
+  }
+
+  function repintar(){
+    txtNova.textContent = en() ? 'Add new category' : 'Adicionar nova categoria';
+    lista.innerHTML = '';
+    obterCategoriasTarefa().forEach(cat => {
+      const row = document.createElement('div');
+      row.className = 'catrow';
+
+      // pedido do usuario: sem cor nenhuma na categoria -- o ponto
+      // colorido (.catrowdot) saiu, so nome + contagem + acoes.
+      const info = document.createElement('div');
+      info.className = 'catrowinfo';
+      const n = contagem(cat.id);
+      info.innerHTML = '<div class="catrownome"></div><div class="catrowcount"></div>';
+      info.querySelector('.catrownome').textContent = cat.nome;
+      info.querySelector('.catrowcount').textContent = en()
+        ? (n + (n === 1 ? ' task' : ' tasks'))
+        : (n + (n === 1 ? ' tarefa' : ' tarefas'));
+      row.appendChild(info);
+
+      const bEdit = document.createElement('button');
+      bEdit.type = 'button'; bEdit.className = 'catrowbtn';
+      bEdit.setAttribute('aria-label', en() ? 'Edit category' : 'Editar categoria');
+      bEdit.innerHTML = ICONE_LAPIS;
+      bEdit.onclick = () => { if (typeof abrirNovaCategoriaOverlay === 'function') abrirNovaCategoriaOverlay(cat.id); };
+      row.appendChild(bEdit);
+
+      const bDel = document.createElement('button');
+      bDel.type = 'button'; bDel.className = 'catrowbtn del';
+      bDel.setAttribute('aria-label', en() ? 'Delete category' : 'Apagar categoria');
+      bDel.innerHTML = ICONE_LIXO;
+      bDel.onclick = () => {
+        const feito = () => {
+          if (typeof apagarCategoriaTarefa === 'function') apagarCategoriaTarefa(cat.id);
+          if (typeof render === 'function') render();
+          repintar();
+        };
+        if (typeof window.pedirConfirmacao === 'function'){
+          window.pedirConfirmacao(
+            en() ? 'Delete category?' : 'Apagar categoria?',
+            en()
+              ? ('"' + cat.nome + '" will be removed. Tasks using it just lose the tag, they are not deleted.')
+              : ('"' + cat.nome + '" será removida. As tarefas que usam ela só perdem a etiqueta, não são apagadas.'),
+            en() ? 'Delete' : 'Apagar',
+            feito
+          );
+        } else feito();
+      };
+      row.appendChild(bDel);
+
+      lista.appendChild(row);
+    });
+  }
+
+  function abrir(){ repintar(); ov.classList.add('on'); }
+  function fechar(){ ov.classList.remove('on'); }
+
+  ov.onclick = e => { if (e.target === ov) fechar(); };
+  document.addEventListener('keydown', e => {
+    if (ov.classList.contains('on') && e.key === 'Escape') fechar();
+  });
+  bNova.onclick = () => { if (typeof abrirNovaCategoriaOverlay === 'function') abrirNovaCategoriaOverlay(); };
+
+  // a folha de criar/editar (novaCategoriaOverlay, z-index mais alto)
+  // fecha por cima desta -- quando ela salva/apaga (pelo lapis), esta
+  // folha continua aberta por baixo e precisa repintar sozinha. Hook
+  // exposto global, chamado direto pelas funcoes de armazenamento
+  // (criarCategoriaTarefa/editarCategoriaTarefa/apagarCategoriaTarefa,
+  // ao lado do pintarCatTabs() que ja chamam) -- mesmo padrao de hook ja
+  // usado no resto do app (ex: atualizarResumosConfig).
+  window.atualizarCategoriasOverlaySeAberta = function(){
+    if (ov.classList.contains('on')) repintar();
+  };
+
+  window.abrirCategoriasOverlay = abrir;
+})();
+</script>
+
+<!-- =====================================================================
+     NOVA CATEGORIA / EDITAR CATEGORIA (pelas abas de filtro da lista de
+     tarefas). Reaproveita .edov/.edsheet/.edpuxador/.edtitulo/.edcampo/
+     .edacoes/.edsalvar (mesmo padrao visual da folha "Renomear" acima) e
+     .advswatches/.advpreset (mesma paleta CORES_PRESET usada no
+     composer/editor) -- nao criei CSS novo pra folha em si, so pra
+     linha de abas (.cattabs/.cattab, ver style.css). Chama
+     criarCategoriaTarefa()/editarCategoriaTarefa()/apagarCategoriaTarefa()
+     ja usadas em todo o resto do app, entao o resultado aparece em TODO
+     lugar (chips do composer/editor, abas de filtro) sem duplicar
+     armazenamento.
+
+     window.abrirNovaCategoriaOverlay(idOpcional): sem argumento = folha
+     de criacao ("Nova categoria"); com o id de uma categoria existente =
+     folha de edicao (nome/cor pre-preenchidos + botao Apagar) -- pedido
+     do usuario: "devia dar pra apagar e editar" as categorias.
+     ===================================================================== -->
+<div class="edov" id="novaCategoriaOverlay" style="z-index:85">
+  <div class="edsheet" id="novaCategoriaSheet">
+    <div class="edpuxador"></div>
+    <div class="edtitulo" id="novaCategoriaTitulo">Nova categoria</div>
+    <input class="edcampo" id="novaCategoriaCampo" maxlength="24" autocomplete="off" placeholder="Nome da categoria">
+    <div class="edacoes">
+      <button class="edsalvar" id="novaCategoriaApagar" type="button" style="background:var(--panel-2);color:var(--perigo);display:none">Apagar</button>
+      <button class="edsalvar" id="novaCategoriaSalvar" type="button">Criar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const ov       = document.getElementById('novaCategoriaOverlay');
+  const titulo   = document.getElementById('novaCategoriaTitulo');
+  const campo    = document.getElementById('novaCategoriaCampo');
+  const bSalv    = document.getElementById('novaCategoriaSalvar');
+  const bApagar  = document.getElementById('novaCategoriaApagar');
+  if (!ov || !titulo || !campo || !bSalv || !bApagar) return;
+
+  // pedido do usuario: "a gente nao precisa de cores nas categorias" --
+  // saiu o seletor de cor (era .advswatches/.advpreset, mesma paleta
+  // CORES_PRESET do corBox). criarCategoriaTarefa()/editarCategoriaTarefa()
+  // continuam aceitando um 2o argumento de cor (retrocompatibilidade com
+  // categorias antigas que ja tem cor salva), so que esta folha nao
+  // manda mais nada nesse campo.
+  const en = () => (typeof idiomaApp === 'function' && idiomaApp() === 'en');
+  let idEmEdicao = null;   // null = criando categoria nova; id = editando essa categoria
+
+  function abrir(idParaEditar){
+    idEmEdicao = idParaEditar || null;
+    const cat = (idEmEdicao && typeof categoriaTarefaPorId === 'function') ? categoriaTarefaPorId(idEmEdicao) : null;
+    titulo.textContent = cat ? (en() ? 'Edit category' : 'Editar categoria') : 'Nova categoria';
+    campo.value = cat ? cat.nome : '';
+    bSalv.textContent = cat ? (en() ? 'Save' : 'Salvar') : (en() ? 'Create' : 'Criar');
+    bApagar.style.display = cat ? '' : 'none';
+    ov.classList.add('on');
+    setTimeout(() => { campo.focus(); campo.select(); }, 50);
+  }
+  function fechar(){ ov.classList.remove('on'); }
+  function confirmar(){
+    const nome = campo.value.trim();
+    if (!nome){ campo.focus(); return; }
+    if (idEmEdicao){
+      if (typeof editarCategoriaTarefa === 'function') editarCategoriaTarefa(idEmEdicao, nome);
+    } else {
+      const cat = (typeof criarCategoriaTarefa === 'function') ? criarCategoriaTarefa(nome) : null;
+      if (cat) filtroCategoriaTarefa = cat.id;   // recem-criada ja entra selecionada como filtro
+    }
+    if (typeof render === 'function') render();
+    fechar();
+  }
+  function apagar(){
+    if (!idEmEdicao) return;
+    const cat = (typeof categoriaTarefaPorId === 'function') ? categoriaTarefaPorId(idEmEdicao) : null;
+    const nomeCat = cat ? cat.nome : '';
+    const idAlvo = idEmEdicao;
+    const feito = () => {
+      if (typeof apagarCategoriaTarefa === 'function') apagarCategoriaTarefa(idAlvo);
+      if (typeof render === 'function') render();
+      fechar();
+    };
+    // window.pedirConfirmacao vem do bloco CONFIRMAR COMPRA/VENDA, mais
+    // abaixo no arquivo -- ja carregado quando o usuario chega a clicar
+    // aqui (interacao real, depois de toda a pagina parseada).
+    if (typeof window.pedirConfirmacao === 'function'){
+      window.pedirConfirmacao(
+        en() ? 'Delete category?' : 'Apagar categoria?',
+        en()
+          ? ('"' + nomeCat + '" will be removed. Tasks using it just lose the tag, they are not deleted.')
+          : ('"' + nomeCat + '" será removida. As tarefas que usam ela só perdem a etiqueta, não são apagadas.'),
+        en() ? 'Delete' : 'Apagar',
+        feito
+      );
+    } else {
+      feito();
+    }
+  }
+
+  ov.onclick = e => { if (e.target === ov) fechar(); };
+  document.addEventListener('keydown', e => {
+    if (ov.classList.contains('on') && e.key === 'Escape') fechar();
+  });
+  campo.addEventListener('keydown', e => { if (e.key === 'Enter') confirmar(); });
+  bSalv.onclick = confirmar;
+  bApagar.onclick = apagar;
+
+  window.abrirNovaCategoriaOverlay = abrir;
 })();
 </script>
 
@@ -13091,7 +13717,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       botao:'Vamos lá', botao_en:'Let\'s go', layout:'mockupExato' }
   ]; */
   const SLIDES = [
-    { dataSlide:1, next:2, tipo:'monstro', idx:49, // Moeda mímica (dourada, chama mais atenção no grafite que a Gosma cinza de antes -- pedido do usuario)
+    { dataSlide:1, next:2, tipo:'monstro', idx:38, // Gosma glacial (azul, sorridente -- pedido do usuario: "bicho mais amigavel" no lugar da Moeda mimica)
       fraca:'Chega de tarefa esquecida', fraca_en:'No more forgotten tasks',
       titulo:'Suas tarefas viram uma masmorra pra vencer', titulo_en:'Your tasks become a dungeon to beat',
       texto:'Cada pendência é um monstro parado no seu caminho. Complete a tarefa, derrote o monstro.',
@@ -13201,18 +13827,19 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       return '';
     }
     if (s.tipo === 'conquistasPreview'){
-      // v4.17x: substitui prova social (o app nao tem usuario real/
-      // depoimento ainda pra mostrar, entao nao inventa -- usa o
-      // sistema de conquistas de verdade, que ja existe no jogo, como
-      // gancho). 3 badges simples (vetor, nao sprite -- conquista nao
-      // tem uma imagem "dona" no app como monstro/heroi tem), a
-      // terceira apagada (bloqueada) pra sugerir progressao.
-      const ICONE_TROFEU = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z"/></svg>';
-      const ICONE_ESTRELA = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3 7h7l-5.6 4.3L18.4 21 12 16.8 5.6 21l2-7.7L2 9h7z"/></svg>';
+      // v4.20x (pedido do usuario): badges trocam pra ITENS REAIS do jogo
+      // (item()/spriteHTML(), mesmo par de funcoes que o slide anterior
+      // -- bauAnim/EVOLUA -- ja usa pros itens do bau) em vez dos icones
+      // vetoriais de categoria. Bate com a copy do slide ("itens raros")
+      // de verdade, em vez de simbolo abstrato de trofeu/estrela.
+      // Coroa Real (id 34) e Diamante (id 81), os dois Lendarios (rar 4)
+      // -- pega o glow dourado que a classe global .r4 ja da pra
+      // qualquer slot de raridade no app, sem CSS novo pra isso.
       const ICONE_CADEADO = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>';
+      const itemBadge = it => '<div class="obConquistaBadge r' + it.rar + '">' + spriteHTML(it.sp, 34) + '</div>';
       return '<div class="carrosselImgWrap obConquistasRow">' +
-        '<div class="obConquistaBadge">' + ICONE_TROFEU + '</div>' +
-        '<div class="obConquistaBadge">' + ICONE_ESTRELA + '</div>' +
+        itemBadge(item(34)) +
+        itemBadge(item(81)) +
         '<div class="obConquistaBadge off">' + ICONE_CADEADO + '</div>' +
         '</div>';
     }
@@ -13309,15 +13936,22 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // sem escolha -- se a pessoa nao selecionar nada, o placeholder so
   // fica no exemplo generico de sempre.
   const CHAVE_CATEGORIA_ONBOARDING = 'questlog.onboarding.categoria.v1';
+  // v4.19x (pedido do usuario): icones trocados por pixel-art real (pack
+  // Emojis Free anexado pelo usuario), embutidos como data URI -- mesmo
+  // padrao ja usado no arquivo pra icone isolado sem asset final proprio
+  // (ver ICONES_TESTE_V2, bloco Conquistas). Sem arquivo novo no repo,
+  // sem mexer no pipeline de assets: cola no espirito single-file do
+  // projeto. Emoji 91 (livro), 45 (monitor), 146 (casa), 128 (dado) do
+  // pack 48x48.
   const CATEGORIAS_ONBOARDING = [
-    { id:'estudos', label:'Estudos', label_en:'Study',
-      icone:'<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>' },
-    { id:'trabalho', label:'Trabalho', label_en:'Work',
-      icone:'<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>' },
-    { id:'rotina', label:'Rotina pessoal', label_en:'Personal routine',
-      icone:'<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/></svg>' },
-    { id:'tudo', label:'Um pouco de tudo', label_en:'A bit of everything',
-      icone:'<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>' }
+    { id:'estudos', label:'Estudos', label_en:'Study', cor:'#63C99A',
+      icone:'<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAMAAABg3Am1AAAAAXNSR0IArs4c6QAAAe9QTFRFAAAAOQQuZwxSnhRg0CRw9jN0qiuR/GeM/7PEAAAAOQQFZgsgmRM/rCRnzSFB9TxA/3d6/6aLGBgYKioqOjo6QUFBSUlJVlZWbW1tmZmZXl5egoKCmpqaubm5z8/P5+fn////dS0msCIQ4lYh84Io/J41/8dmOBQPVCIadTEm/9on//Fk//epLwoDTxsKk0Ya5XkZ8KwlCiYYE0AjG1gtHns1KbA7R9ZSevN5I2dRHA9ACClJDjxbDFJ4FXyqG57TF77cKPDigf/vMxl+SCK2OEr5VXH/g6P/FRsmMDs+TVZZYWtvj5ydtL2+7fHzTC0IXEMIelwKlH4YzLVI7tp6//m34C5ANwQ5VBoaILkwK9kuT/Y+7a818849//o0axOZQDTUpxzK1zz1/GJm3ZI5Hpwvaoj/TwtmjBi0s8z/cC8Ss2QmmHtWs5Nj1phC07Nz8NWG/++htf/wICslOCohSTkrOEk+dVxDTWVUcY14pbmn1+LYN3vT+fnfazDE72n//6X6/+b+PyYlUjQwg1NLvot53KmR9cqu/+jT//nz1lAW/8/B7bdZ88x5+dySf39/OA8UsEMkyj5R8PDwJhYVVR4AejcSlkMWxm8r4ptM/+LD3to9/+ewl/9zzf+f//rdmzUd/YunHGoxcCSs1dnaVbE0aQAAAKV0Uk5TAP//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////Cv2L1AAAAI9JREFUSInt0MsJAzEMRVEXYqM0YKkvPZhKjGsOWMgMmR8DiZ3F3PU7CykET1cxc7jsx0BVFw8t9qYAVa21lhYRvVrwduQoYAcUzxgRreUU0OuSWuNBKWU5CEBKCUDOeQro3/wfsDVTADPfe+sDDoCIPOAcxBgHAzO5BeADiMgU0Mtelwb210PAVloX62+CNxRkXprPTBEHAAAAAElFTkSuQmCC" alt="">' },
+    { id:'trabalho', label:'Trabalho', label_en:'Work', cor:'#5AA9F2',
+      icone:'<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAMAAABg3Am1AAAAAXNSR0IArs4c6QAAAe9QTFRFAAAAOQQuZwxSnhRg0CRw9jN0qiuR/GeM/7PEAAAAOQQFZgsgmRM/rCRnzSFB9TxA/3d6/6aLGBgYKioqOjo6QUFBSUlJVlZWbW1tmZmZXl5egoKCmpqaubm5z8/P5+fn////dS0msCIQ4lYh84Io/J41/8dmOBQPVCIadTEm/9on//Fk//epLwoDTxsKk0Ya5XkZ8KwlCiYYE0AjG1gtHns1KbA7R9ZSevN5I2dRHA9ACClJDjxbDFJ4FXyqG57TF77cKPDigf/vMxl+SCK2OEr5VXH/g6P/FRsmMDs+TVZZYWtvj5ydtL2+7fHzTC0IXEMIelwKlH4YzLVI7tp6//m34C5ANwQ5VBoaILkwK9kuT/Y+7a818849//o0axOZQDTUpxzK1zz1/GJm3ZI5Hpwvaoj/TwtmjBi0s8z/cC8Ss2QmmHtWs5Nj1phC07Nz8NWG/++htf/wICslOCohSTkrOEk+dVxDTWVUcY14pbmn1+LYN3vT+fnfazDE72n//6X6/+b+PyYlUjQwg1NLvot53KmR9cqu/+jT//nz1lAW/8/B7bdZ88x5+dySf39/OA8UsEMkyj5R8PDwJhYVVR4AejcSlkMWxm8r4ptM/+LD3to9/+ewl/9zzf+f//rdmzUd/YunHGoxcCSs1dnaVbE0aQAAAKV0Uk5TAP//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////Cv2L1AAAAJdJREFUSInV1UsOwyAMRVHWYGxBVbv7X2YV3B81QZ3w0twxRyIo4JT+Mu7L+2EAM99GWZ+2NoMCIlJC8hEzg0Ep5dKqtcooJMg5O9hbeiCYrMYDMzsd8KsLBvxDYGBmw7fj9Xy8Xw0IUFWbps+ICABS2gz1XVsUesyH9SAOO9/396SaTMc1wH+veKD+MYcA3248yvGBLgR3auuuNHetZ0kAAAAASUVORK5CYII=" alt="">' },
+    { id:'rotina', label:'Rotina pessoal', label_en:'Personal routine', cor:'#E5698A',
+      icone:'<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAMAAABg3Am1AAAAAXNSR0IArs4c6QAAAe9QTFRFAAAAOQQuZwxSnhRg0CRw9jN0qiuR/GeM/7PEAAAAOQQFZgsgmRM/rCRnzSFB9TxA/3d6/6aLGBgYKioqOjo6QUFBSUlJVlZWbW1tmZmZXl5egoKCmpqaubm5z8/P5+fn////dS0msCIQ4lYh84Io/J41/8dmOBQPVCIadTEm/9on//Fk//epLwoDTxsKk0Ya5XkZ8KwlCiYYE0AjG1gtHns1KbA7R9ZSevN5I2dRHA9ACClJDjxbDFJ4FXyqG57TF77cKPDigf/vMxl+SCK2OEr5VXH/g6P/FRsmMDs+TVZZYWtvj5ydtL2+7fHzTC0IXEMIelwKlH4YzLVI7tp6//m34C5ANwQ5VBoaILkwK9kuT/Y+7a818849//o0axOZQDTUpxzK1zz1/GJm3ZI5Hpwvaoj/TwtmjBi0s8z/cC8Ss2QmmHtWs5Nj1phC07Nz8NWG/++htf/wICslOCohSTkrOEk+dVxDTWVUcY14pbmn1+LYN3vT+fnfazDE72n//6X6/+b+PyYlUjQwg1NLvot53KmR9cqu/+jT//nz1lAW/8/B7bdZ88x5+dySf39/OA8UsEMkyj5R8PDwJhYVVR4AejcSlkMWxm8r4ptM/+LD3to9/+ewl/9zzf+f//rdmzUd/YunHGoxcCSs1dnaVbE0aQAAAKV0Uk5TAP//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////Cv2L1AAAAK5JREFUSInF00sKwzAMRVGPLaMuxeuqOpAE9v4LEk5N8xtFvqN83oGQkJRGZQQAfpquCwEvCwD82OVygIibRMQr8zwAgHnNzGidmhAwr0XkxjwP5rWqinVlHgalFL/ha28z838SAw7XhybnHAPA0pNklK0YkFLqvatqHRGRqn4svyIirbXfd1gEaq1vazlQ1T9ARGsBM/uCppYAEZlfq+yKB/7oW7wrHvTe210h4AuE0uRg9bkjAAAAAABJRU5ErkJggg==" alt="">' },
+    { id:'tudo', label:'Um pouco de tudo', label_en:'A bit of everything', cor:'#F2C94C',
+      icone:'<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAMAAABg3Am1AAAAAXNSR0IArs4c6QAAAe9QTFRFAAAAOQQuZwxSnhRg0CRw9jN0qiuR/GeM/7PEAAAAOQQFZgsgmRM/rCRnzSFB9TxA/3d6/6aLGBgYKioqOjo6QUFBSUlJVlZWbW1tmZmZXl5egoKCmpqaubm5z8/P5+fn////dS0msCIQ4lYh84Io/J41/8dmOBQPVCIadTEm/9on//Fk//epLwoDTxsKk0Ya5XkZ8KwlCiYYE0AjG1gtHns1KbA7R9ZSevN5I2dRHA9ACClJDjxbDFJ4FXyqG57TF77cKPDigf/vMxl+SCK2OEr5VXH/g6P/FRsmMDs+TVZZYWtvj5ydtL2+7fHzTC0IXEMIelwKlH4YzLVI7tp6//m34C5ANwQ5VBoaILkwK9kuT/Y+7a818849//o0axOZQDTUpxzK1zz1/GJm3ZI5Hpwvaoj/TwtmjBi0s8z/cC8Ss2QmmHtWs5Nj1phC07Nz8NWG/++htf/wICslOCohSTkrOEk+dVxDTWVUcY14pbmn1+LYN3vT+fnfazDE72n//6X6/+b+PyYlUjQwg1NLvot53KmR9cqu/+jT//nz1lAW/8/B7bdZ88x5+dySf39/OA8UsEMkyj5R8PDwJhYVVR4AejcSlkMWxm8r4ptM/+LD3to9/+ewl/9zzf+f//rdmzUd/YunHGoxcCSs1dnaVbE0aQAAAKV0Uk5TAP//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////Cv2L1AAAAJ5JREFUSInNz0EOwjAMRNHcgIWzQhmb+58SkUGVlTrQSo1hFl20/1VJKdHufeGneCsB00df7fsh8KnflK0Es3TKFoMwvfWFLAeoqpl9voOqAsgEXMiYcvlgYEMKQEQSQK1VVfkcGHbLBPttgKf/K3D6DlcAAD7lL8zMnx5Aay0HlPIyIjIwfwem7zoFcHy1MYI4zQID+55mAc8OpdeDJ+3ZvDt876ePAAAAAElFTkSuQmCC" alt="">' }
   ];
   function categoriaOnboardingSalva(){
     try { return localStorage.getItem(CHAVE_CATEGORIA_ONBOARDING) || ''; } catch(e){ return ''; }
@@ -13325,8 +13959,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   function htmlQuizPergunta(s){
     const selecionada = categoriaOnboardingSalva();
     const opcoes = CATEGORIAS_ONBOARDING.map(c => `
-      <button type="button" class="quizOpcao${c.id === selecionada ? ' sel' : ''}" data-cat="${c.id}">
-        ${c.icone}<span>${txtSlide(c, 'label')}</span><span class="check"></span>
+      <button type="button" class="quizOpcao${c.id === selecionada ? ' sel' : ''}" data-cat="${c.id}" style="--cat-cor:${c.cor}">
+        <span class="quizIcone">${c.icone}</span><span>${txtSlide(c, 'label')}</span><span class="check"></span>
       </button>`).join('');
     return `
       <div class="obHeadline"><span class="obFraca">${txtSlide(s, 'fraca')}</span></div>

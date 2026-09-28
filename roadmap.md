@@ -18999,3 +18999,38 @@ Retomada do planejamento de billing/assinatura: decisão de modelo passou por "c
 - [x] **Timing das animações do onboarding (slides golpe/baú).** Pedido inicial foi mal-entendido como "ciclo de repetição mais rápido" (tentativa revertida). O pedido real era reduzir o tempo de espera até a animação COMEÇAR ao entrar no slide (~1.7s parado antes do 1º flash — risco alto de passar pro próximo slide sem ver nada). Solução: `animation-delay` negativo em `obHeroLunge`/`obMobShake`/`obSlash` (-1.536s) e `obBauAbre`/`obBaucardCiclo` (-.85s/-.7s) — "adianta" a animação pro ponto certo assim que o slide fica visível, sem mudar a duração real do ciclo (golpe 3.2s, baú 3.4s intactos). `iniciarCicloGolpe()` (JS) ajustado igual: delay inicial 1728ms → 190ms, intervalo mantido em 3200ms.
 
 > **Observação em aberto (não investigada a fundo):** ícone de email (📧) no botão "Continuar com email" aparece como glifo quebrado ("▷E" numa caixa) no dispositivo real do usuário. Headless Chromium também não renderiza emoji colorido (sem fonte no sandbox), então não deu pra confirmar se é só limitação do ambiente de teste ou se afeta o navegador real também.
+## [Sessão] Paywall redesenhado — trilha/floresta/goblin, implementado no app real
+
+Substituição completa do design antigo do paywall (dourado/pergaminho, `.paywallOverlay` com mascote genérico e cascata de animações por elemento) por um design novo alinhado ao sistema visual real do app (tema Grafite: `--bg/--panel/--line/--text`), com cenário real da Floresta e monstro real como mascote.
+
+### 1. Exploração no mockup (`mockup-p2-floresta-2etapas.html`)
+- Etapa 2 (seleção de plano) não precisava mais repetir os benefícios — já estão na etapa 1. Bloco de recap removido, plano recentralizado.
+- Testados 3 ícones no topo (coroa → estrela → escudo) — todos rejeitados. Decisão final: **sem ícone, só texto** no topo de cada etapa.
+- Testado colocar 3 monstros da Floresta perto do cabeçalho — em screenshot de device real ficou "muito estranho" (like stickers soltos, quebrava a hierarquia visual). **Revertido, removido por completo.**
+- Pedido novo: 1 monstro real (`MONSTROS[31]` = "Goblin fungoso", bioma floresta) sentado em cima do botão "Assinar Plano Pro" — só na etapa 2, não na etapa 1. Ajustado tamanho (34px → **60px**) e posição horizontal (centro → 78% → 92% → volta pra **78%**, `scaleX(-1)`).
+- As duas etapas foram ajustadas pra terem a mesma proporção/tamanho de botão/uso total da tela.
+
+### 2. Implementação real no app (`index.html` + `style.css`)
+- `.pwFloresta` (novo): `<img id="pwFlorestaImg">` com `object-fit:cover; image-rendering:pixelated` + gradiente `::after` (mesma técnica do `#introCenario.modoLogin` do login real) — carrega o `arte` do tema `floresta` em `TEMAS_ARENA` via JS em `abrirPaywall()`.
+- Etapa 1: mascote genérico removido, substituído por `.pwTrilha` (trilha com 4 `.pwPasso`: 1 já desbloqueado "Suas tarefas" + 3 bloqueados "Temas & heróis"/"Sem limite diário"/"Estatísticas").
+- Etapa 2: mascote genérico removido; badge "-58%" e "Mais popular" viraram filhos diretos posicionados do card do plano anual; `#pwMobIcone` (Goblin fungoso real, via `MONSTROS[31].img`) inserido em `.pwCtaWrap`, sentado sobre o botão `#paywallAssinarBtn`.
+- Todos os IDs/classes/funções JS existentes preservados (`abrirPaywall`, `fecharPaywall`, `irParaEtapaPaywall`, `selecionarPlano`, `iniciarCompraAssinatura`, `paywallOverlay`, `pwDot1/2`, `pwEtapa1/2`, botões, `data-plano`). Novos IDs: `pwFlorestaImg`, `pwMobIcone`.
+- i18n: novas chaves `pro.titulo`, `pro.headline`, `pro.sub`, `pro.passo1Titulo`, `pro.passo1Sub`, `pro.beneficio1/2/3Titulo`, `pro.beneficio1/2/3`, `pro.continuar`, `pro.escolhaPlano`, `pro.maisPopular` (pt+en).
+- CSS toda a paleta antiga (dourado/pergaminho) removida, substituída por variáveis do tema Grafite (`--pw-accent:#FAFAFA` etc.).
+
+### 3. Bugfixes pós-teste em device real (screenshots do usuário em produção)
+- [x] **"Não usa a maior parte da tela"** — causa: `.pwConteudo{margin:auto 0}` centralizava o bloco inteiro (header+conteúdo+CTA) como uma unidade encolhida, deixando faixas vazias grandes em cima/embaixo em telas altas reais (viewport de teste 380×780 mascarava o problema). Corrigido: header ancorado no topo, `.pwTrilha`/`.pwPlanos` com `flex:4 1 0` pra crescer e ocupar o espaço disponível, `.pwSpacer{flex:1 1 0}` absorve só o resto antes do CTA. Etapa 2 reestruturada pra ficar igual à etapa 1 (removido wrapper `.pwMeio` que a centralizava separado). Testado com viewport 412×890 (proporção de device real) via Playwright.
+- [x] **Badge de desconto "-58%" com pouco contraste** — trocado de `background:var(--pw-panel2); border:1px solid var(--pw-line); font-size:8.5px` pra `background:#1C1C1C; border:1.5px solid var(--pw-accent); color:var(--pw-accent); font-size:11px; font-weight:800`.
+
+### 4. Transição de abertura redesenhada
+- Pedido: a cascata de animação por elemento ("as coisas aparecendo") não ficou legal. Referência dada: a transição de cenário do onboarding (`#introCenario`, fade único e calmo).
+- Removido `@keyframes pwSobe` e todos os usos (delays por elemento em `.pwEyebrow`, `.pwHeadline`, `.pwSub`, `.pwPasso` (nth-child), `.pwPlano` (nth-child), CTA, secundário, `.pwMicro`).
+- `.paywallOverlay` agora usa fade+zoom-out único no nível do overlay inteiro (`opacity` + `transform:scale(1.03→1)`, `transition` com `--expo`), mesmo princípio do `#introCenario`.
+- Mantido `@keyframes pwStepIn`/`pwStepInVolta` (slide de troca entre etapa 1↔2, não fazia parte da reclamação).
+- `@media (prefers-reduced-motion: reduce)` corrigido (referenciava classes já deletadas).
+- **Decisão consciente, não confirmada pelo usuário ainda**: NÃO foi adicionada a tela `#loadingMasmorra` antes do paywall abrir — o paywall abre instantâneo, sem I/O real esperando, então um loading screen só adicionaria latência artificial. Se o usuário achar que ainda falta alguma coisa na transição, ajustar depois.
+
+### Pendências / decisões em aberto
+- Usuário ainda não confirmou em device real como ficou a transição de abertura nova (última mudança antes desta entrada) — testado só via Playwright/Chromium headless neste ambiente.
+- `iniciarCompraAssinatura()` continua stub — integração real com Google Play Billing é tarefa separada, não tocada nesta sessão.
+- `mockup-p2-floresta-2etapas.html` está superado pela implementação real, pode ser descartado se quiser.

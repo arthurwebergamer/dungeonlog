@@ -1161,7 +1161,7 @@
                 <span class="pwPlanoNome" data-i18n="pro.planoTrial">7 dias grátis</span>
                 <span class="pwPlanoSub" data-i18n="pro.planoTrialSub">Depois, Anual R$7,49/mês</span>
               </div>
-              <span class="pwPlanoPreco">R$0,00</span>
+              <span class="pwPlanoPreco" data-i18n="pro.precoTrial">R$0,00</span>
               <span class="pwRadio"></span>
             </div>
           </div>
@@ -1171,7 +1171,7 @@
                 <span class="pwPlanoNome" data-i18n="pro.planoMensal">Mensal</span>
                 <span class="pwPlanoSub" data-i18n="pro.planoMensalSub">Cobrado todo mês</span>
               </div>
-              <span class="pwPlanoPreco">R$17,90<span data-i18n="pro.porMes">/mês</span></span>
+              <span class="pwPlanoPreco"><span data-i18n="pro.precoMensal">R$17,90</span><span data-i18n="pro.porMes">/mês</span></span>
               <span class="pwRadio"></span>
             </div>
           </div>
@@ -1183,7 +1183,7 @@
                 <span class="pwPlanoNome" data-i18n="pro.planoAnual">Anual</span>
                 <span class="pwPlanoSub" data-i18n="pro.planoAnualSub">Cobrado R$89,90/ano</span>
               </div>
-              <span class="pwPlanoPreco">R$7,49<span data-i18n="pro.porMes">/mês</span></span>
+              <span class="pwPlanoPreco"><span data-i18n="pro.precoAnual">R$7,49</span><span data-i18n="pro.porMes">/mês</span></span>
               <span class="pwRadio"></span>
             </div>
           </div>
@@ -1193,7 +1193,7 @@
                 <span class="pwPlanoNome" data-i18n="pro.planoVitalicio">Vitalício</span>
                 <span class="pwPlanoSub" data-i18n="pro.planoVitalicioSub">Pagamento único</span>
               </div>
-              <span class="pwPlanoPreco">R$199,90</span>
+              <span class="pwPlanoPreco" data-i18n="pro.precoVitalicio">R$199,90</span>
               <span class="pwRadio"></span>
             </div>
           </div>
@@ -16568,6 +16568,16 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'pro.planoVitalicio':    { pt:'Vitalício', en:'Lifetime' },
     'pro.planoVitalicioSub': { pt:'Pagamento único', en:'One-time payment' },
     'pro.porMes':      { pt:'/mês', en:'/mo' },
+    // Preços em destaque (pwPlanoPreco) -- eram texto fixo em pt-BR no
+    // HTML (sem data-i18n), então ao trocar pro inglês só os textos de
+    // apoio (planoXSub acima) mudavam e o número grande ficava sempre
+    // "R$17,90" etc. Mantido em Reais mesmo no en (é a moeda real cobrada
+    // via Google Play Billing, não convertida por idioma -- ver Termos de
+    // Uso), só o formato decimal muda (vírgula -> ponto).
+    'pro.precoTrial':      { pt:'R$0,00', en:'R$0.00' },
+    'pro.precoMensal':     { pt:'R$17,90', en:'R$17.90' },
+    'pro.precoAnual':      { pt:'R$7,49', en:'R$7.49' },
+    'pro.precoVitalicio':  { pt:'R$199,90', en:'R$199.90' },
     'pro.microcopy':   { pt:'Cancele quando quiser', en:'Cancel anytime' },
     'pro.assinar':     { pt:'Assinar Plano Pro', en:'Subscribe to Pro' },
     'pro.agoraNao':    { pt:'Agora não', en:'Not now' },

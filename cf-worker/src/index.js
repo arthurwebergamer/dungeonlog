@@ -132,14 +132,63 @@ function objetoParaFsFields(obj){
   return fields;
 }
 
-async function firestoreGetDoc(projectId, accessToken, caminho){
-  const resp = await fetch(FIRESTORE_BASE + '/projects/' + projectId + '/databases/(default)/documents/' + caminho, {
-    headers: { Authorization: 'Bearer ' + accessToken },
-  });
-  if (resp.status === 404) return null;
-  if (!resp.ok) throw new Error('Firestore GET ' + caminho + ' falhou: ' + resp.status + ' ' + (await resp.text()));
-  const doc = await resp.json();
-  return fsFieldsParaObjeto(doc.fields || {});
+// LIMITE REAL a ter em mente: o plano gratuito do Workers permite so 50
+// subrequests (fetch() feitos DE DENTRO do Worker) POR EXECUCAO. Se este
+// Worker fizesse 1 GET (saves) + 1 GET (notifEnviadas) POR CONTA, uma
+// base de so ~10 contas com push ativo ja estouraria o limite. Por isso
+// firestoreBatchGetDocs()/firestoreCommitLote() abaixo existem -- pegam
+// VARIOS documentos numa unica chamada (ate 100 por vez aqui, a API real
+// aceita mais, 100 e' so uma margem confortavel), transformando "1
+// subrequest por conta" em "1 subrequest a cada 100 contas". Com isso, o
+// numero de contas que cabe numa execucao passa a ser limitado pelos
+// ENVIOS de push de verdade (1 subrequest por token, sem como agrupar --
+// a API REST v1 do FCM nao tem multicast), no' pelas leituras/escritas no
+// Firestore. Ver README.md, secao "Limites", pras contas completas.
+async function firestoreBatchGetDocs(projectId, accessToken, caminhos){
+  const porCaminho = new Map(); // 'colecao/uid' -> dados (ou undefined se o doc nao existe)
+  const TAMANHO_LOTE = 100;
+  for (let i = 0; i < caminhos.length; i += TAMANHO_LOTE){
+    const lote = caminhos.slice(i, i + TAMANHO_LOTE);
+    const resp = await fetch(FIRESTORE_BASE + '/projects/' + projectId + '/databases/(default)/documents:batchGet', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + accessToken, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        documents: lote.map(c => 'projects/' + projectId + '/databases/(default)/documents/' + c),
+      }),
+    });
+    if (!resp.ok) throw new Error('Firestore batchGet falhou: ' + resp.status + ' ' + (await resp.text()));
+    const itens = await resp.json(); // array de BatchGetDocumentsResponse, 1 por documento pedido
+    itens.forEach(item => {
+      if (!item.found) return; // doc nao existe -- fica de fora do Map, .get() devolve undefined
+      const relativo = item.found.name.split('/documents/')[1]; // 'projects/.../documents/saves/uid123' -> 'saves/uid123'
+      porCaminho.set(relativo, fsFieldsParaObjeto(item.found.fields || {}));
+    });
+  }
+  return porCaminho;
+}
+
+// Varias escritas parciais (equivalente a set(...,{merge:true}) em cada
+// uma) numa UNICA chamada -- em vez de 1 PATCH por conta que precisa
+// atualizar notifEnviadas/fcmTokens, todas viram 1 subrequest so (ou
+// poucas, se passar de 500 escritas, limite real do commit da API).
+function escritaParcial(projectId, caminho, camposParciais){
+  return {
+    update: { name: 'projects/' + projectId + '/databases/(default)/documents/' + caminho, fields: objetoParaFsFields(camposParciais) },
+    updateMask: { fieldPaths: Object.keys(camposParciais) },
+  };
+}
+async function firestoreCommitLote(projectId, accessToken, escritas){
+  if (!escritas.length) return;
+  const TAMANHO_LOTE = 500;
+  for (let i = 0; i < escritas.length; i += TAMANHO_LOTE){
+    const lote = escritas.slice(i, i + TAMANHO_LOTE);
+    const resp = await fetch(FIRESTORE_BASE + '/projects/' + projectId + '/databases/(default)/documents:commit', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + accessToken, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ writes: lote }),
+    });
+    if (!resp.ok) throw new Error('Firestore commit falhou: ' + resp.status + ' ' + (await resp.text()));
+  }
 }
 
 // Lista uma colecao inteira, paginando sozinho (a API REST devolve no
@@ -163,21 +212,6 @@ async function firestoreListarColecao(projectId, accessToken, colecao){
     pageToken = pagina.nextPageToken || null;
   } while (pageToken);
   return itens;
-}
-
-// PATCH so nos campos passados (updateMask) -- cria o doc se nao existir,
-// nunca mexe em campos que nao estao em `camposParciais`. Equivalente ao
-// admin.firestore().doc(caminho).set(camposParciais, {merge:true}).
-async function firestorePatchParcial(projectId, accessToken, caminho, camposParciais){
-  const chaves = Object.keys(camposParciais);
-  const url = new URL(FIRESTORE_BASE + '/projects/' + projectId + '/databases/(default)/documents/' + caminho);
-  chaves.forEach(k => url.searchParams.append('updateMask.fieldPaths', k));
-  const resp = await fetch(url.toString(), {
-    method: 'PATCH',
-    headers: { Authorization: 'Bearer ' + accessToken, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ fields: objetoParaFsFields(camposParciais) }),
-  });
-  if (!resp.ok) throw new Error('Firestore PATCH ' + caminho + ' falhou: ' + resp.status + ' ' + (await resp.text()));
 }
 
 // -----------------------------------------------------------------------
@@ -275,14 +309,20 @@ async function checarTesteGratisAcabando(env){
   const tokenFcm = await obterAccessToken(serviceAccount, FCM_SCOPE);
   const hoje = hojeSP();
 
-  const contas = await firestoreListarColecao(projectId, tokenFirestore, 'fcmTokens');
+  const contas = (await firestoreListarColecao(projectId, tokenFirestore, 'fcmTokens'))
+    .filter(c => (c.dados.tokens || []).length); // descarta contas sem nenhum token de cara
 
+  // 2 chamadas em lote (nao 1 por conta) -- ver comentario em
+  // firestoreBatchGetDocs() sobre o limite de 50 subrequests/execucao.
+  const saves = await firestoreBatchGetDocs(projectId, tokenFirestore, contas.map(c => 'saves/' + c.id));
+  const statusDocs = await firestoreBatchGetDocs(projectId, tokenFirestore, contas.map(c => 'notifEnviadas/' + c.id));
+
+  const escritas = [];
   for (const conta of contas){
     const uid = conta.id;
-    const tokens = conta.dados.tokens || [];
-    if (!tokens.length) continue;
+    const tokens = conta.dados.tokens;
 
-    const save = await firestoreGetDoc(projectId, tokenFirestore, 'saves/' + uid);
+    const save = saves.get('saves/' + uid);
     if (!save) continue;
 
     const trial = lerExtra(save.extras, 'questlog.trial.v1');
@@ -292,25 +332,30 @@ async function checarTesteGratisAcabando(env){
     const diasRestantes = Math.max(0, Math.ceil((trial.fim - Date.now()) / 86400000));
     if (diasRestantes > trial.avisoDias) continue;
 
-    const status = await firestoreGetDoc(projectId, tokenFirestore, 'notifEnviadas/' + uid);
+    const status = statusDocs.get('notifEnviadas/' + uid);
     if (status && status.trialDia === hoje) continue;
 
     const corpo = diasRestantes <= 0
       ? 'Seu teste grátis acaba hoje! Assine pra não perder o Plano Pro.'
       : ('Seu teste grátis acaba em ' + diasRestantes + (diasRestantes === 1 ? ' dia! ' : ' dias! ') + 'Assine pra não perder o Plano Pro.');
 
+    // unico ponto que ainda custa 1 subrequest POR CONTA (por token, na
+    // verdade) -- a API REST v1 do FCM nao agrupa varios tokens numa
+    // chamada so. E' o que de fato limita quantas contas cabem numa
+    // execucao, ver README.md.
     const resultado = await enviarParaConta(projectId, tokenFcm, tokens, {
       titulo: 'Teste grátis acabando',
       corpo,
       tipo: 'trial',
     });
     if (resultado.validos.length !== tokens.length){
-      await firestorePatchParcial(projectId, tokenFirestore, 'fcmTokens/' + uid, { tokens: resultado.validos });
+      escritas.push(escritaParcial(projectId, 'fcmTokens/' + uid, { tokens: resultado.validos }));
     }
     if (resultado.algumEnviado){
-      await firestorePatchParcial(projectId, tokenFirestore, 'notifEnviadas/' + uid, { trialDia: hoje });
+      escritas.push(escritaParcial(projectId, 'notifEnviadas/' + uid, { trialDia: hoje }));
     }
   }
+  await firestoreCommitLote(projectId, tokenFirestore, escritas);
 }
 
 async function checarFimDeDia(env){
@@ -320,22 +365,30 @@ async function checarFimDeDia(env){
   const tokenFcm = await obterAccessToken(serviceAccount, FCM_SCOPE);
   const hoje = hojeSP();
 
-  const contas = await firestoreListarColecao(projectId, tokenFirestore, 'fcmTokens');
+  const contas = (await firestoreListarColecao(projectId, tokenFirestore, 'fcmTokens'))
+    .filter(c => (c.dados.tokens || []).length);
 
+  const saves = await firestoreBatchGetDocs(projectId, tokenFirestore, contas.map(c => 'saves/' + c.id));
+  const statusDocs = await firestoreBatchGetDocs(projectId, tokenFirestore, contas.map(c => 'notifEnviadas/' + c.id));
+
+  const escritas = [];
   for (const conta of contas){
     const uid = conta.id;
-    const tokens = conta.dados.tokens || [];
-    if (!tokens.length) continue;
+    const tokens = conta.dados.tokens;
 
-    const save = await firestoreGetDoc(projectId, tokenFirestore, 'saves/' + uid);
+    const save = saves.get('saves/' + uid);
     if (!save) continue;
 
+    // hp.dia precisa ser HOJE -- sincronizar() (play/index.html, modulo
+    // VIDA DO MONSTRO) so atualiza esse registro no BOOT do app. Se a
+    // conta nao abriu o app hoje, o registro e' de um dia anterior e nao
+    // reflete o estado real agora.
     const hp = lerExtra(save.extras, 'questlog.hpMonstro.v1');
     if (!hp || hp.dia !== hoje) continue;
     const viva = Math.max(0, (hp.total || 0) - (hp.dano || 0));
     if (viva <= 0) continue;
 
-    const status = await firestoreGetDoc(projectId, tokenFirestore, 'notifEnviadas/' + uid);
+    const status = statusDocs.get('notifEnviadas/' + uid);
     if (status && status.fimDiaDia === hoje) continue;
 
     const hist = lerExtra(save.extras, 'questlog.hist.v1') || [];
@@ -351,12 +404,13 @@ async function checarFimDeDia(env){
       tipo: 'fimDeDia',
     });
     if (resultado.validos.length !== tokens.length){
-      await firestorePatchParcial(projectId, tokenFirestore, 'fcmTokens/' + uid, { tokens: resultado.validos });
+      escritas.push(escritaParcial(projectId, 'fcmTokens/' + uid, { tokens: resultado.validos }));
     }
     if (resultado.algumEnviado){
-      await firestorePatchParcial(projectId, tokenFirestore, 'notifEnviadas/' + uid, { fimDiaDia: hoje });
+      escritas.push(escritaParcial(projectId, 'notifEnviadas/' + uid, { fimDiaDia: hoje }));
     }
   }
+  await firestoreCommitLote(projectId, tokenFirestore, escritas);
 }
 
 export default {

@@ -81,6 +81,40 @@ confirmar que funciona, se quiser travar esse atalho de teste, é só
 apagar o método `fetch` em `src/index.js` e rodar `wrangler deploy` de
 novo — o Worker continua rodando pelo Cron normalmente.
 
+## Limites (sim, existem — números reais)
+
+Grátis não é ilimitado. O que importa de verdade aqui:
+
+- **100.000 requisições/dia** no plano gratuito do Workers — irrelevante
+  pra gente, só disparamos 2x por dia (mais alguma chamada manual de
+  teste).
+- **10ms de CPU por execução** — é tempo de *processamento*, não de
+  espera de rede (os `fetch()` pra Firestore/FCM não contam nisso).
+  Folgado pro que o Worker faz (conversões de JSON, laços simples).
+- **50 subrequests (chamadas `fetch()`) por execução — este é o que
+  importa.** Cada notificação mandada gasta 1 subrequest por token (a
+  API do FCM não manda pra vários de uma vez). Fora isso, o Worker faz
+  só um punhado fixo de chamadas por execução (2 pra pegar token de
+  acesso, 1 pra listar quem tem push ativo, 2 lotes pra ler os dados de
+  todo mundo de uma vez, 1 pra salvar tudo no final) — leitura/escrita
+  no Firestore são **agrupadas em lote** de propósito (`batchGet`/
+  `commit`), então não crescem por conta.
+
+  Na prática: cada execução aguenta em torno de **~40 contas recebendo
+  notificação naquele dia** antes de estourar o limite (a conta exata
+  varia um pouco conforme quantos precisam ter token limpo). Isso é bem
+  mais do que a base atual do app, mas **não é infinito** — se um dia
+  crescer além disso, a saída é dividir em vários Workers/horários (ex:
+  processar metade das contas às 20h e a outra metade às 20h15) ou
+  migrar pra uma fila (Cloudflare Queues, ainda no plano gratuito). Não
+  vale a complexidade agora, mas é bom saber que o teto existe.
+
+- **Firestore (qualquer plano, inclusive Spark)**: 50.000 leituras e
+  20.000 escritas por dia, de graça. Como as leituras/escritas já são
+  agrupadas em lote, a base atual do app fica muito longe disso.
+- **FCM (envio de push)**: sem limite prático nenhum, é grátis pra
+  qualquer volume.
+
 ## O que cada checagem faz
 
 - **10h BRT**: teste grátis acabando — lê `questlog.trial.v1` de cada

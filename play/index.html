@@ -2229,11 +2229,8 @@ function apagarCategoriaTarefa(id){
    filtro real dentro de render() (variavel pendentesVisiveis). */
 let filtroCategoriaTarefa = null;   // null = "Todos" (sem filtro)
 // pedido do usuario: com "Todos" selecionado, a lista agrupa por
-// categoria (cabecalho colapsavel, ver render()) -- este Set guarda
-// quais grupos estao fechados no momento. So em memoria (like
-// filtroCategoriaTarefa acima), reseta pro estado padrao (tudo aberto)
-// ao recarregar o app.
-const categoriasColapsadas = new Set();
+// categoria (cabecalho .catgrupo, ver render()). Recolher grupo foi
+// removido por enquanto (pedido do usuario) -- so exibe nome + contagem.
 
 function pintarCatTabs(){
   const linha = document.getElementById('catTabsRow');
@@ -4287,22 +4284,14 @@ function render(){
     });
 
     [semCategoria].concat(grupos).filter(g => g.tarefas.length > 0).forEach(g => {
-      const colapsado = categoriasColapsadas.has(g.id);
       const header = document.createElement('div');
-      header.className = 'catgrupo' + (colapsado ? ' colapsado' : '');
+      header.className = 'catgrupo';
       header.dataset.catid = g.id;
-      header.innerHTML = '<span class="catgruponome"></span><span class="catgrupocount"></span><span class="catgrupochevron">▾</span>';
+      header.innerHTML = '<span class="catgruponome"></span><span class="catgrupocount"></span>';
       header.querySelector('.catgruponome').textContent = g.nome;
       header.querySelector('.catgrupocount').textContent = g.tarefas.length;
-      header.onclick = () => {
-        if (categoriasColapsadas.has(g.id)) categoriasColapsadas.delete(g.id);
-        else categoriasColapsadas.add(g.id);
-        render();
-      };
       lista.appendChild(header);
-      if (!colapsado){
-        g.tarefas.forEach(t => lista.appendChild(montarLinhaTarefa(t)));
-      }
+      g.tarefas.forEach(t => lista.appendChild(montarLinhaTarefa(t)));
     });
   }
 

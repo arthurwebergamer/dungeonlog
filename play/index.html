@@ -1027,11 +1027,21 @@
 
     <!-- etapa 1: trilha (mesmos beneficios de antes, agora como passos,
          com "Suas tarefas" ja concluido no topo) -->
+    <!-- etapa 1 = "tela nova" da sequencia pedida pelo usuario ("tela
+         nova, tela de lembrete do plano, planos", igual ao Skillion) --
+         PRECISA ser especificamente sobre o teste gratis (nao um pitch
+         generico de "assine o Pro"), porque e' a 1a tela que qualquer
+         gatilho Pro abre (abrirPaywall()). CTA unico leva direto pra
+         tela de lembrete (etapa 2 da sequencia, #pwEtapa3 no DOM) --
+         quem quiser assinar sem usar o teste faz isso na tela final
+         (#pwEtapa2, "planos"), nao aqui. Pra quem ja usou o teste antes,
+         abrirPaywall() pula esta tela e a de lembrete, abrindo direto em
+         "planos" (nao ha teste pra oferecer). -->
     <div class="pwEtapa" id="pwEtapa1">
       <div class="pwConteudo">
         <span class="pwEyebrow" data-i18n="pro.titulo">Plano Pro</span>
-        <h2 class="pwHeadline" data-i18n="pro.headline">Sua trilha continua</h2>
-        <p class="pwSub" data-i18n="pro.sub">3 etapas seguem bloqueadas até você assinar.</p>
+        <h2 class="pwHeadline" data-i18n="pro.headline">Queremos que você experimente o Plano Pro de graça</h2>
+        <p class="pwSub" data-i18n="pro.sub">7 dias grátis, sem compromisso. Cancele quando quiser.</p>
 
         <div class="pwTrilha">
           <div class="pwTrilhaLinha"></div>
@@ -1054,7 +1064,7 @@
         </div>
 
         <div class="pwSpacer"></div>
-        <button class="pwCTA" id="paywallContinuarBtn" type="button" data-i18n="pro.continuar">Continuar</button>
+        <button class="pwCTA" id="paywallContinuarBtn" type="button" data-i18n="pro.testarGratis">Testar grátis por 7 dias</button>
         <button class="pwSecundario" id="paywallAgoraNaoBtn1" type="button" data-i18n="pro.agoraNao">Agora não</button>
       </div>
     </div>
@@ -3162,10 +3172,16 @@ window.assinaturaAtiva = assinaturaAtiva;
 // funcao que atualiza o Perfil -- ambas ja rodam sempre que a
 // assinatura/trial muda (compra, trial iniciado/expirado, modo debug).
 function atualizarBadgesPro(){
+  // BUG CORRIGIDO: .proBadge tem display:none como padrao no CSS
+  // (style.css) pra nao "piscar" visivel antes do 1o render(). Setar
+  // style.display='' aqui NAO sobrepoe essa regra -- so remove o inline
+  // style, o que faz o computed style CAIR DE VOLTA pro default do CSS
+  // (display:none), entao a badge nunca aparecia mesmo com
+  // assinaturaAtiva()===true. Precisa de um valor real (inline-block).
   const ativo = assinaturaAtiva();
   ['nomeTopoProBadge', 'perfilNomeProBadge'].forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.style.display = ativo ? '' : 'none';
+    if (el) el.style.display = ativo ? 'inline-block' : 'none';
   });
 }
 window.atualizarBadgesPro = atualizarBadgesPro;
@@ -3229,7 +3245,17 @@ function abrirPaywall(motivo){
   if (resumoTrialVisibilidade) resumoTrialVisibilidade.style.display = jaUsouTrial ? 'none' : '';
   const overlay = document.getElementById('paywallOverlay');
   if (!overlay) return;
-  irParaEtapaPaywall(1, false);
+  // Quem ja usou o teste gratis (jaUsouTrial) nao tem teste pra oferecer
+  // -- pula direto pra tela final de planos (passo 3), sem passar pela
+  // tela de teste gratis (passo 1) nem pela de lembrete (passo 2), que
+  // nao fariam sentido pra essa conta.
+  irParaEtapaPaywall(jaUsouTrial ? 3 : 1, false);
+  if (jaUsouTrial){
+    // sem tela 1/2 pra voltar (nao fariam sentido pra quem ja usou o
+    // teste) -- esconde a seta de voltar so nesse caso.
+    const back = document.getElementById('paywallVoltarBtn');
+    if (back) back.classList.remove('on');
+  }
   // atraso bem curto so pra o toast ("descobriu um recurso premium") nao
   // nascer e morrer debaixo do paywall no mesmo frame -- era 550ms (pedido
   // do usuario: "demora pra tela aparecer, deveria ser mais rapido"),
@@ -16539,8 +16565,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
     // PLANO PRO -- paywall (ver #paywallOverlay no HTML + abrirPaywall() no script)
     'pro.titulo':      { pt:'Plano Pro', en:'Pro Plan' },
-    'pro.headline':    { pt:'Sua trilha continua', en:'Your path continues' },
-    'pro.sub':         { pt:'3 etapas seguem bloqueadas até você assinar.', en:'3 steps stay locked until you subscribe.' },
+    'pro.headline':    { pt:'Queremos que você experimente o Plano Pro de graça', en:'We want you to try the Pro plan for free' },
+    'pro.sub':         { pt:'7 dias grátis, sem compromisso. Cancele quando quiser.', en:'7 days free, no commitment. Cancel anytime.' },
     'pro.passo1Titulo':{ pt:'Suas tarefas', en:'Your tasks' },
     'pro.passo1Sub':   { pt:'Já disponível', en:'Already unlocked' },
     'pro.beneficio1Titulo': { pt:'Sem limite diário', en:'No daily limit' },

@@ -1090,11 +1090,64 @@
           <span data-i18n="pro.microcopy">Cancele quando quiser</span>
         </div>
         <div class="pwSpacer"></div>
+        <!-- TESTE GRATIS (pedido do usuario) -- alternativa a assinar
+             direto: 7 dias de Plano Pro sem pagamento. Some sozinho (JS,
+             ver abrirPaywall()) se a conta ja usou o teste antes.
+             Escolher esta opcao manda pra etapa 3 (#pwEtapa3), que
+             pergunta quando avisar que o teste esta acabando, ANTES de
+             comecar de verdade (iniciarTesteGratis(), so chamada de la). -->
+        <button class="pwCTASecundaria" id="paywallTrialBtn" type="button" data-i18n="pro.testarGratis">Testar grátis por 7 dias</button>
         <div class="pwCtaWrap">
           <img class="pwMob" id="pwMobIcone" alt="">
           <button class="pwCTA" id="paywallAssinarBtn" type="button" data-i18n="pro.assinar">Assinar Plano Pro</button>
         </div>
         <button class="pwSecundario" id="paywallAgoraNaoBtn2" type="button" data-i18n="pro.agoraNao">Agora não</button>
+      </div>
+    </div>
+
+    <!-- etapa 3: teste gratis -- pergunta so 1x, quando a pessoa opta por
+         "Testar gratis" na etapa 2, antes do trial comecar de verdade.
+         Reaproveita a mesma estrutura visual dos cards de plano
+         (.pwPlano/.pwPlanoRow/.pwRadio, ja com o vidro com blur pedido
+         pelo usuario) so trocando o conteudo por opcoes de aviso. Ver
+         selecionarAviso()/iniciarTesteGratis() perto de
+         iniciarCompraAssinatura() no script principal. -->
+    <div class="pwEtapa" id="pwEtapa3">
+      <div class="pwConteudo">
+        <span class="pwEyebrow" data-i18n="pro.titulo">Plano Pro</span>
+        <h2 class="pwHeadline pwHeadlineMenor" data-i18n="pro.avisoHeadline">Quando avisamos que o teste tá acabando?</h2>
+        <p class="pwSub" data-i18n="pro.avisoSub">Um aviso dentro do app, pra você decidir se quer assinar antes do teste acabar.</p>
+
+        <div class="pwPlanos">
+          <div class="pwPlano" data-aviso="3" id="pwAviso3">
+            <div class="pwPlanoRow">
+              <div class="pwPlanoInfo">
+                <span class="pwPlanoNome" data-i18n="pro.aviso3Titulo">3 dias antes</span>
+              </div>
+              <span class="pwRadio"></span>
+            </div>
+          </div>
+          <div class="pwPlano sel" data-aviso="1" id="pwAviso1">
+            <div class="pwPlanoRow">
+              <div class="pwPlanoInfo">
+                <span class="pwPlanoNome" data-i18n="pro.aviso1Titulo">1 dia antes</span>
+              </div>
+              <span class="pwRadio"></span>
+            </div>
+          </div>
+          <div class="pwPlano" data-aviso="0" id="pwAviso0">
+            <div class="pwPlanoRow">
+              <div class="pwPlanoInfo">
+                <span class="pwPlanoNome" data-i18n="pro.aviso0Titulo">No último dia</span>
+              </div>
+              <span class="pwRadio"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="pwSpacer"></div>
+        <button class="pwCTA" id="paywallComecarTesteBtn" type="button" data-i18n="pro.comecarTeste">Começar teste grátis</button>
+        <button class="pwSecundario" id="paywallAgoraNaoBtn3" type="button" data-i18n="pro.agoraNao">Agora não</button>
       </div>
     </div>
   </div>
@@ -3044,9 +3097,15 @@ function assinaturaAtiva(){
   // window.modoDebugAtivo() ja existe e e a fonte da verdade -- usa ela
   // direto se disponivel, com o mesmo fallback de string por baixo.
   try {
-    if (typeof window.modoDebugAtivo === 'function') return window.modoDebugAtivo();
-    if (localStorage.getItem('questlog.modoDebug.v1') === 'true') return true;
+    if (typeof window.modoDebugAtivo === 'function'){ if (window.modoDebugAtivo()) return true; }
+    else if (localStorage.getItem('questlog.modoDebug.v1') === 'true') return true;
   } catch(e){}
+  // TESTE GRATIS (pedido do usuario): enquanto o trial estiver dentro da
+  // janela de 7 dias, conta como assinatura ativa -- ver bloco
+  // "TESTE GRATIS" logo depois de iniciarCompraAssinatura(), poucas
+  // linhas abaixo, onde trialAtivo() e' definida (function declaration,
+  // hoisted no mesmo <script>, entao a ordem aqui nao importa).
+  if (trialAtivo()) return true;
   return false;
 }
 window.assinaturaAtiva = assinaturaAtiva;
@@ -3072,6 +3131,7 @@ const LIMITE_TAREFAS_GRATIS = 5; // pedido do usuario -- plano gratis para em 5 
 
 let _pwEtapaAtual = 1;
 let _pwPlanoSelecionado = 'anual'; // pedido do usuario -- anual vem pre-selecionado (o "mais vantajoso")
+let _pwAvisoSelecionado = 1; // TESTE GRATIS -- "1 dia antes" vem pre-selecionado (etapa 3, #pwEtapa3)
 
 function abrirPaywall(motivo){
   window.dbgConta && window.dbgConta('abrirPaywall() -- motivo=' + motivo);
@@ -3096,6 +3156,15 @@ function abrirPaywall(motivo){
   }
   if (typeof window.aviso === 'function'){
     window.aviso((typeof idiomaApp === 'function' && idiomaApp() === 'en') ? 'You found a premium feature!' : 'Você descobriu um recurso premium!');
+  }
+  // TESTE GRATIS -- o botao "Testar gratis" (etapa 2) so aparece pra
+  // quem ainda nao usou o trial (trialSalvo() fica pra sempre depois do
+  // 1o uso, mesmo apos expirar -- ver bloco TESTE GRATIS). Recalculado
+  // TODA vez que o paywall abre (nao so 1x), porque o mesmo overlay e'
+  // reaproveitado por qualquer gatilho PRO da sessao inteira.
+  const btnTrialVisibilidade = document.getElementById('paywallTrialBtn');
+  if (btnTrialVisibilidade){
+    btnTrialVisibilidade.style.display = (typeof window.trialSalvo === 'function' && window.trialSalvo()) ? 'none' : '';
   }
   const overlay = document.getElementById('paywallOverlay');
   if (!overlay) return;
@@ -3126,7 +3195,8 @@ function irParaEtapaPaywall(n, animar){
   _pwEtapaAtual = n;
   const e1 = document.getElementById('pwEtapa1');
   const e2 = document.getElementById('pwEtapa2');
-  [e1, e2].forEach((el, i) => {
+  const e3 = document.getElementById('pwEtapa3'); // TESTE GRATIS -- etapa extra, so acessada a partir do botao "Testar gratis" na etapa 2
+  [e1, e2, e3].forEach((el, i) => {
     if (!el) return;
     const ativar = (i === n - 1);
     el.classList.remove('pwStepIn', 'pwStepInVolta');
@@ -3136,12 +3206,15 @@ function irParaEtapaPaywall(n, animar){
       el.classList.add(direcao > 0 ? 'pwStepIn' : 'pwStepInVolta');
     }
   });
+  // as bolinhas de progresso (pwDot1/2) representam so o fluxo linear de
+  // compra (1 -> 2) -- a etapa 3 e' um desvio (trial), nao aparece nelas,
+  // por isso nenhuma das duas fica "on" quando n===3.
   const d1 = document.getElementById('pwDot1');
   const d2 = document.getElementById('pwDot2');
   if (d1) d1.classList.toggle('on', n === 1);
   if (d2) d2.classList.toggle('on', n === 2);
   const back = document.getElementById('paywallVoltarBtn');
-  if (back) back.classList.toggle('on', n === 2);
+  if (back) back.classList.toggle('on', n !== 1);
 }
 
 (function(){
@@ -3156,12 +3229,44 @@ function irParaEtapaPaywall(n, animar){
   const planoVitalicio = document.getElementById('pwPlanoVitalicio');
   const planosPorId = { mensal: planoMensal, anual: planoAnual, vitalicio: planoVitalicio };
 
+  // TESTE GRATIS -- botao na etapa 2 que desvia pra etapa 3 (escolha de
+  // aviso), e a propria etapa 3 (aviso3/1/0 + botao final).
+  const btnTrial = document.getElementById('paywallTrialBtn');
+  const btnAgoraNao3 = document.getElementById('paywallAgoraNaoBtn3');
+  const btnComecarTeste = document.getElementById('paywallComecarTesteBtn');
+  const avisoPorId = {
+    3: document.getElementById('pwAviso3'),
+    1: document.getElementById('pwAviso1'),
+    0: document.getElementById('pwAviso0'),
+  };
+
   if (btnFechar) btnFechar.onclick = fecharPaywall;
-  if (btnVoltar) btnVoltar.onclick = () => irParaEtapaPaywall(1);
+  if (btnVoltar) btnVoltar.onclick = () => irParaEtapaPaywall(_pwEtapaAtual === 3 ? 2 : 1);
   if (btnContinuar) btnContinuar.onclick = () => irParaEtapaPaywall(2);
   if (btnAgoraNao1) btnAgoraNao1.onclick = fecharPaywall;
   if (btnAgoraNao2) btnAgoraNao2.onclick = fecharPaywall;
   if (btnAssinar) btnAssinar.onclick = iniciarCompraAssinatura;
+  if (btnTrial) btnTrial.onclick = () => irParaEtapaPaywall(3);
+  if (btnAgoraNao3) btnAgoraNao3.onclick = fecharPaywall;
+  if (btnComecarTeste) btnComecarTeste.onclick = () => iniciarTesteGratis(_pwAvisoSelecionado);
+
+  // selecao de aviso -- mesmo padrao de selecionarPlano() logo abaixo,
+  // so guarda em _pwAvisoSelecionado (lida por iniciarTesteGratis()).
+  function selecionarAviso(id){
+    if (id === _pwAvisoSelecionado) return;
+    _pwAvisoSelecionado = id;
+    Object.keys(avisoPorId).forEach(k => {
+      if (avisoPorId[k]) avisoPorId[k].classList.toggle('sel', Number(k) === id);
+    });
+    const alvo = avisoPorId[id];
+    if (alvo){
+      alvo.classList.add('pwPulse');
+      setTimeout(() => alvo.classList.remove('pwPulse'), 150);
+    }
+  }
+  if (avisoPorId[3]) avisoPorId[3].onclick = () => selecionarAviso(3);
+  if (avisoPorId[1]) avisoPorId[1].onclick = () => selecionarAviso(1);
+  if (avisoPorId[0]) avisoPorId[0].onclick = () => selecionarAviso(0);
 
   // selecao de plano -- so troca qual card fica marcado (.sel) e guarda em
   // _pwPlanoSelecionado; iniciarCompraAssinatura() (quando a integracao
@@ -3199,6 +3304,92 @@ function iniciarCompraAssinatura(){
   }
 }
 window.iniciarCompraAssinatura = iniciarCompraAssinatura;
+
+// ---------------------------------------------------------------------
+// TESTE GRATIS (pedido do usuario): 7 dias de Plano Pro sem cadastrar
+// pagamento. So pode ser usado 1x por conta -- guarda o registro
+// (inicio/fim/preferencia de aviso) mesmo depois de expirado, e a mera
+// PRESENCA desse registro (trialSalvo() != null) ja significa "ja
+// usou", sem precisar de flag separada. Ao expirar, assinaturaAtiva()
+// simplesmente para de enxergar o trial como ativo -- sem nenhuma acao
+// explicita de "desligar", volta pro plano gratis sozinho.
+//
+// So comeca quando a pessoa clica em "Testar gratis" na etapa 2 do
+// paywall (nao automatico no cadastro) -- ver #paywallTrialBtn. Antes
+// de comecar, pergunta 1x quando quer ser avisada que o teste esta
+// acabando (etapa 3 do paywall, #pwEtapa3) -- 3 dias antes / 1 dia
+// antes / no ultimo dia.
+//
+// O aviso em si (verificarAvisoTesteGratis()) e' so um toast
+// (window.aviso(), ja existente) mostrado no maximo 1x por dia
+// enquanto o teste estiver dentro da janela escolhida -- chamado no
+// boot do app (perto do fim do script principal, junto de
+// mostrarDicaSwipeArenaSeNecessario()/carregarContadorGlobal()).
+// ---------------------------------------------------------------------
+const CHAVE_TRIAL = 'questlog.trial.v1';
+const DIAS_TESTE_GRATIS = 7;
+
+function trialSalvo(){
+  try { return JSON.parse(localStorage.getItem(window.chaveConta(CHAVE_TRIAL)) || 'null'); }
+  catch(e){ return null; }
+}
+window.trialSalvo = trialSalvo;
+
+function salvarTrial(obj){
+  try { localStorage.setItem(window.chaveConta(CHAVE_TRIAL), JSON.stringify(obj)); } catch(e){}
+}
+
+function trialAtivo(){
+  const t = trialSalvo();
+  return !!(t && typeof t.fim === 'number' && Date.now() < t.fim);
+}
+window.trialAtivo = trialAtivo;
+
+function diasRestantesTrial(){
+  const t = trialSalvo();
+  if (!t || !trialAtivo()) return 0;
+  return Math.max(0, Math.ceil((t.fim - Date.now()) / 86400000));
+}
+
+// avisoDias: 3, 1 ou 0 (0 = so no ultimo dia) -- escolhido na etapa 3
+// do paywall (#pwEtapa3).
+function iniciarTesteGratis(avisoDias){
+  if (trialSalvo()) return; // ja usou o teste 1x, nao deixa reiniciar
+  const inicio = Date.now();
+  const fim = inicio + DIAS_TESTE_GRATIS * 86400000;
+  salvarTrial({ inicio: inicio, fim: fim, avisoDias: avisoDias, avisoMostradoDia: null });
+  if (typeof fecharPaywall === 'function') fecharPaywall();
+  if (typeof window.aviso === 'function'){
+    const en = (typeof idiomaApp === 'function' && idiomaApp() === 'en');
+    const dataFim = new Date(fim).toLocaleDateString(en ? 'en-US' : 'pt-BR');
+    window.aviso(en ? ('Free trial started! Valid until ' + dataFim) : ('Teste grátis iniciado! Vale até ' + dataFim));
+  }
+  if (typeof render === 'function') render(); // libera Pro na hora (temas/limites deixam de aparecer trancados)
+}
+window.iniciarTesteGratis = iniciarTesteGratis;
+
+// Chamado 1x no boot do app -- so um toast avisando que o teste esta
+// acabando, no maximo 1x por dia enquanto restarem <= avisoDias dias.
+// Nao reabre o paywall sozinha (seria intrusivo toda vez que o app
+// abre); quem quiser assinar clica em qualquer gatilho PRO normal.
+function verificarAvisoTesteGratis(){
+  const t = trialSalvo();
+  if (!t || !trialAtivo()) return;
+  const restantes = diasRestantesTrial();
+  if (restantes > t.avisoDias) return;
+  const hoje = new Date().toISOString().slice(0, 10);
+  if (t.avisoMostradoDia === hoje) return;
+  t.avisoMostradoDia = hoje;
+  salvarTrial(t);
+  if (typeof window.aviso !== 'function') return;
+  const en = (typeof idiomaApp === 'function' && idiomaApp() === 'en');
+  const msg = restantes <= 0
+    ? (en ? 'Your free trial ends today' : 'Seu teste grátis acaba hoje')
+    : (en ? ('Your free trial ends in ' + restantes + (restantes === 1 ? ' day' : ' days'))
+           : ('Seu teste grátis acaba em ' + restantes + (restantes === 1 ? ' dia' : ' dias')));
+  window.aviso(msg);
+}
+window.verificarAvisoTesteGratis = verificarAvisoTesteGratis;
 
 // temas com desbloqueioGratis (ex: Deserto via streak) ficam bloqueados
 // ate a condicao ser atingida -- ver verificarDesbloqueiosTemaArena().
@@ -6439,6 +6630,7 @@ renderTemaArena();
 precarregarTemasArena();
 mostrarDicaSwipeArenaSeNecessario();
 carregarContadorGlobal(); // fire-and-forget
+verificarAvisoTesteGratis(); // TESTE GRATIS -- toast se o trial estiver acabando (no-op se nao ha trial)
 render();
 </script>
 
@@ -16107,6 +16299,13 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'pro.limiteHerois':  { pt:'Limite de heróis atingido', en:'Hero limit reached' },
     'pro.limiteTarefas': { pt:'Limite diário de tarefas atingido', en:'Daily task limit reached' },
     'pro.trancado':    { pt:'PRO', en:'PRO' },
+    'pro.testarGratis':   { pt:'Testar grátis por 7 dias', en:'Try free for 7 days' },
+    'pro.avisoHeadline':  { pt:'Quando avisamos que o teste tá acabando?', en:'When should we warn you the trial is ending?' },
+    'pro.avisoSub':       { pt:'Um aviso dentro do app, pra você decidir se quer assinar antes do teste acabar.', en:'An in-app alert, so you can decide whether to subscribe before the trial ends.' },
+    'pro.aviso3Titulo':   { pt:'3 dias antes', en:'3 days before' },
+    'pro.aviso1Titulo':   { pt:'1 dia antes', en:'1 day before' },
+    'pro.aviso0Titulo':   { pt:'No último dia', en:'On the last day' },
+    'pro.comecarTeste':   { pt:'Começar teste grátis', en:'Start free trial' },
     'jogo.addTarefa':        { pt:'+ Adicionar', en:'+ Add' },
     'jogo.oQuePrecisaSerFeito': { pt:'O que precisa ser feito?', en:'What needs to be done?' },
     'jogo.soHoje':           { pt:'Só hoje', en:'Today only' },

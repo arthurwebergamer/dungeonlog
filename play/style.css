@@ -5566,3 +5566,18 @@
 .pwTrilhaResumo .pwPasso{ min-height:52px; gap:12px; }
 .pwTrilhaResumo .pwPassoNo{ width:42px; height:42px; border-radius:11px; }
 .pwTrilhaResumo .pwPassoNo svg{ width:18px; height:18px; }
+
+/* FIX (relatado pelo usuario: "tela bugada, juntando em cima de outras
+   telas") -- a tela de planos (#pwEtapa2) agora tem MUITO mais conteudo
+   do que antes (cards + microcopy + linha do tempo do teste + 2 CTAs),
+   depois de virar a tela final da sequencia (pedido do usuario). O
+   layout original de .pwConteudo/.pwPlanos foi pensado pra so 2 telas
+   com pouco conteudo, cabendo inteiras em height:100% -- .pwPlanos usa
+   flex:4 1 0 + min-height:0, que deixa a CAIXA encolher abaixo do
+   tamanho real do conteudo (os cards de verdade nao encolhem, entao
+   VAZAVAM por cima/baixo da caixa encolhida, sobrepondo o headline). Fix:
+   nesta etapa especifica, o conteudo cresce naturalmente (height:auto) e
+   quem rola e' o proprio .pwEtapa (que ja tem overflow-y:auto), em vez
+   de tentar espremer tudo em 100% via flex-grow. */
+#pwEtapa2 .pwConteudo{ height:auto; min-height:100%; }
+#pwEtapa2 .pwPlanos{ flex:none; }

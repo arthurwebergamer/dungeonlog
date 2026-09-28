@@ -5542,6 +5542,17 @@
    re-renderizam. Dourado (mesma cor das moedas, #F2C94C) com brilho
    pulsante sutil -- combina com o tom de "conquista"/prestigio do resto
    do app sem chamar atencao demais. */
+/* Agrupa nome do heroi + badge PRO na mesma linha, dentro da Arena
+   (pedido do usuario: "apareceria o nome do personagem e do lado essa
+   badge"). #nomeTopo/.proBadge sao filhos DIRETOS de .fighter antes
+   dessa mudanca -- e .fighter e' flex-direction:column, entao cada um
+   virava um item de flex separado e EMPILHAVA verticalmente em vez de
+   ficar lado a lado (diferente do Perfil, onde nome+badge ja ficam
+   dentro de um <div> comum, .perfilnome, sem virar flex-item). Esse
+   wrapper resolve o mesmo jeito: agora nome+badge ficam dentro de UM
+   unico item de flex (.fighterNome), com display:flex proprio pra
+   alinhar os dois na horizontal. */
+.fighterNome{ display:flex; align-items:center; }
 .proBadge{
   display:none; margin-left:6px; padding:1px 7px; border-radius:999px;
   font-family:'Outfit',sans-serif; font-size:9px; font-weight:800; letter-spacing:.04em;

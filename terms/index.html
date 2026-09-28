@@ -5,7 +5,10 @@
      compra via iniciarCompraAssinatura() -> Google Play Billing). O resto
      (foro, isenção de responsabilidade, idade mínima) é texto jurídico
      padrão que eu redigi — não foi ditado pelo usuário. Recomendo revisão
-     antes de publicar isso de verdade no Play Console. -->
+     antes de publicar isso de verdade no Play Console.
+
+     Ganhou header (logo+nome linkando pra "/") + seletor de idioma
+     PT/EN (a versão em inglês é /en/terms). -->
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -17,7 +20,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/site.css">
 <style>
-  main{ padding:56px 0 40px; }
+  main{ padding:24px 0 40px; }
   h1{ font-family:'Outfit',sans-serif; font-weight:800; font-size:1.9rem; letter-spacing:-.01em; }
   h2{ font-family:'Outfit',sans-serif; font-weight:800; font-size:1.15rem; margin-top:2.2em; margin-bottom:.6em; }
   p{ margin:.9em 0; color:var(--text); }
@@ -28,6 +31,19 @@
 </style>
 </head>
 <body>
+
+<header class="site">
+  <a class="brand" href="/">
+    <img src="/play/icon-192.png" alt="">
+    <span>DungeonLog</span>
+  </a>
+  <div class="lang">
+    <a href="/terms" class="active">PT</a>
+    <span class="sep">·</span>
+    <a href="/en/terms">EN</a>
+  </div>
+</header>
+
 <main class="wrap">
 
   <h1>Termos de Uso — DungeonLog</h1>
@@ -84,7 +100,7 @@
 
 <footer class="site">
   <div class="wrap">
-    <a href="/">DungeonLog</a>
+    <a href="/">Início</a>
     <span class="dot">·</span>
     <a href="/privacy">Política de Privacidade</a>
   </div>

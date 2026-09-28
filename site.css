@@ -19,6 +19,23 @@ a:hover{text-decoration-color:var(--accent);}
 
 .pixel{ font-family:'Silkscreen', monospace; letter-spacing:.04em; }
 
+/* Header compartilhado: logo+nome (link de volta pra home) + seletor de
+   idioma PT/EN. Usado em /privacy e /terms "puros"; a home (/ e /en/)
+   reaproveita as mesmas classes mas com seu próprio header.site (fica
+   sobre o fundo da masmorra, com z-index/posicionamento próprios). */
+header.site{
+  display:flex; align-items:center; justify-content:space-between;
+  max-width:760px; margin:0 auto;
+  padding:20px 24px;
+}
+header.site .brand{ display:flex; align-items:center; gap:10px; text-decoration:none; }
+header.site .brand img{ width:26px; height:26px; border-radius:6px; }
+header.site .brand span{ font-family:'Outfit',sans-serif; font-weight:600; letter-spacing:-.01em; font-size:.95rem; color:var(--text); }
+header.site .lang{ display:flex; align-items:center; gap:4px; font-family:'Outfit',sans-serif; font-size:.78rem; }
+header.site .lang a{ color:var(--dim); text-decoration:none; padding:4px 7px; border-radius:6px; }
+header.site .lang a.active{ color:var(--text); background:rgba(255,255,255,.09); }
+header.site .lang .sep{ color:var(--dim); }
+
 footer.site{
   border-top:1px solid var(--line);
   padding:28px 0 40px;

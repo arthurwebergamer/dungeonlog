@@ -31,7 +31,18 @@
      faixa ampla e suave atrás do texto (gradiente radial largo, sem
      borda perceptível), exatamente como a Apple escurece a foto/vídeo
      de fundo atrás do título nas páginas de produto, em vez de mexer no
-     texto. Tipografia: peso 600 (semibold, não 800), sem text-shadow. -->
+     texto. Tipografia: peso 600 (semibold, não 800), sem text-shadow.
+
+     PT/EN: esta é a versão em português (raiz, "/"). A versão em inglês
+     é uma cópia irmã em /en/ (mesmo HTML, textos traduzidos) -- ver
+     comentário equivalente lá. O seletor de idioma no header linka uma
+     pra outra; não é troca dinâmica via JS, são páginas estáticas
+     separadas (mais simples, sem duplicar conteúdo em atributos
+     data-i18n, e cada idioma fica indexável/linkável na sua própria
+     URL). /privacy e /terms seguem o mesmo padrão (raiz = PT, /en/... =
+     EN), e ambos ganharam esse mesmo header com link de volta pra home
+     (pedido do usuário: "deveria ter um jeito de voltar dos documentos
+     pra essa tela principal"). -->
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -66,11 +77,9 @@
   /* ---------- Header ---------- */
   header.site{
     position:relative; z-index:1;
-    display:flex; align-items:center; gap:10px;
-    padding:24px 28px;
+    max-width:none;
+    padding:22px 28px;
   }
-  header.site img{ width:26px; height:26px; border-radius:6px; }
-  header.site span{ font-family:'Outfit',sans-serif; font-weight:600; letter-spacing:-.01em; font-size:.95rem; color:var(--text); }
 
   /* Escurece uma faixa ampla e suave atrás do texto -- sem borda
      perceptível, então não lê como "caixa". É o mesmo truque que a
@@ -125,8 +134,15 @@
   <div class="dim" aria-hidden="true"></div>
 
   <header class="site">
-    <img src="/play/icon-192.png" alt="">
-    <span>DungeonLog</span>
+    <a class="brand" href="/">
+      <img src="/play/icon-192.png" alt="">
+      <span>DungeonLog</span>
+    </a>
+    <div class="lang">
+      <a href="/" class="active">PT</a>
+      <span class="sep">·</span>
+      <a href="/en/">EN</a>
+    </div>
   </header>
 
   <main>

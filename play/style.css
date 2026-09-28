@@ -2954,7 +2954,7 @@
      categoria especifica ja selecionada na aba, a lista fica simples
      (a aba ativa ja deixa claro qual categoria e essa). */
   .catgrupo{
-    display:flex;align-items:center;gap:9px;padding:14px 2px 6px;cursor:pointer;
+    display:flex;align-items:center;gap:9px;padding:14px 2px 6px;
   }
   .catgruponome{font-family:'Outfit',sans-serif;font-size:19px;font-weight:700;color:var(--text)}
   .catgrupocount{
@@ -2962,8 +2962,6 @@
     display:flex;align-items:center;justify-content:center;
     font-family:'Outfit',sans-serif;font-size:11.5px;font-weight:600;color:var(--dim);
   }
-  .catgrupochevron{margin-left:auto;font-size:12px;color:var(--dim);transition:transform .18s}
-  .catgrupo.colapsado .catgrupochevron{transform:rotate(-90deg)}
 
   /* --- categoria de tarefa: abas de filtro acima da lista (pedido do
      usuario, "tipo igual o do Skillion") --- */

@@ -22,11 +22,13 @@
        centralizada -- único elemento de "estilo" novo, mantendo clean.
 
      Ajuste seguinte (contraste): texto direto sobre o tijolo ficava
-     quase ilegível em trechos mais claros da parede. Em vez de escurecer
-     o fundo inteiro (perderia a textura), o hero ganhou um "quadrado de
-     vidro" -- painel com fundo semi-transparente + backdrop-filter:blur,
-     bem sutil (glassmorphism), só atrás do texto. Contraste garantido
-     sem tampar o fundo nem perder o clean. -->
+     quase ilegível em trechos mais claros da parede. 1ª tentativa foi um
+     painel de vidro (glassmorphism) atrás de TUDO -- usuário achou que
+     ficou "um quadradão". 2ª tentativa (esta): sem nenhum retângulo
+     grande -- o destaque agora é um "highlight" que abraça só o texto
+     mesmo (box-decoration-break:clone, uma pastilha escura por LINHA,
+     não um bloco cobrindo o espaço vazio ao redor). Texto também bem
+     mais curto: só a headline + "Em breve", sem parágrafo explicativo. -->
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -75,52 +77,31 @@
     text-align:center;
     padding:24px 28px 64px;
   }
-  .glass{
-    background:rgba(20,18,16,.42);
-    border:1px solid rgba(255,255,255,.10);
-    border-radius:22px;
-    padding:44px 40px;
-    max-width:600px;
-    box-shadow:0 20px 50px rgba(0,0,0,.35);
-  }
-  @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)){
-    .glass{
-      background:rgba(30,28,26,.32);
-      -webkit-backdrop-filter:blur(14px) saturate(140%);
-      backdrop-filter:blur(14px) saturate(140%);
-    }
-  }
   h1{
     font-family:'Outfit', sans-serif;
     font-weight:800;
     letter-spacing:-.02em;
-    line-height:1.18;
-    font-size:clamp(1.7rem, 4.6vw, 2.7rem);
+    font-size:clamp(1.25rem, 3.6vw, 1.9rem);
+    max-width:480px;
+  }
+  h1 .hl{
+    background:rgba(10,9,8,.68);
     color:var(--text);
-    max-width:600px;
-  }
-  .rule{
-    width:44px; height:3px;
-    margin:20px auto 0;
-    background:var(--text);
-    border-radius:2px;
-    opacity:.85;
-  }
-  p.sub{
-    margin-top:20px;
-    max-width:420px;
-    font-family:'Outfit', sans-serif;
-    font-weight:400;
-    font-size:clamp(.9rem, 1.6vw, .98rem);
-    color:var(--muted);
-    line-height:1.6;
+    padding:.28em .5em;
+    border-radius:7px;
+    box-decoration-break:clone;
+    -webkit-box-decoration-break:clone;
+    line-height:1.8;
+    box-shadow:0 6px 18px rgba(0,0,0,.3);
   }
   .soon{
-    margin-top:24px;
+    display:block;
+    margin-top:18px;
     font-family:'Outfit', sans-serif;
-    font-size:.78rem;
+    font-size:.74rem;
     letter-spacing:.02em;
-    color:var(--dim);
+    color:var(--muted);
+    text-shadow:0 2px 6px rgba(0,0,0,.9), 0 0 3px rgba(0,0,0,.9);
   }
 
   /* ---------- Footer ---------- */
@@ -132,9 +113,6 @@
   }
   footer.site .wrap{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
 
-  @media (max-width:480px){
-    .glass{ padding:32px 24px; border-radius:18px; }
-  }
 </style>
 </head>
 <body>
@@ -147,12 +125,8 @@
   </header>
 
   <main>
-    <div class="glass">
-      <h1>Sua lista de tarefas vira uma masmorra.</h1>
-      <div class="rule"></div>
-      <p class="sub">Cada tarefa concluída vira XP — e o monstro fica te encarando até você terminar.</p>
-      <p class="soon">Em breve na Google Play</p>
-    </div>
+    <h1><span class="hl">Sua lista de tarefas<br>vira uma masmorra.</span></h1>
+    <span class="soon">Em breve na Google Play</span>
   </main>
 
   <footer class="site">

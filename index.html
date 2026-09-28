@@ -59,6 +59,10 @@
   body{
     display:flex; flex-direction:column;
     min-height:100vh;
+    min-height:100svh; /* iOS: 100vh conta a área embaixo da barra de
+      endereço, que só recolhe depois do load -- isso empurrava o rodapé
+      pra fora da tela visível, exigindo rolar pra ver Contato/Privacidade/
+      Termos. 100svh usa a altura já visível no load. */
     position:relative;
     overflow-x:hidden;
   }

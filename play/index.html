@@ -277,7 +277,7 @@
     </div>
     <div class="fight">
       <div class="fighter">
-        <span id="nomeTopo">Aventureiro</span>
+        <span id="nomeTopo">Aventureiro</span><span class="proBadge" id="nomeTopoProBadge" data-i18n="pro.trancado">PRO</span>
         <div class="hero-sprite" id="heroSprite">
           <img class="heroimg" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAFPklEQVR4nJWXbUxTVxjHf4yFuEwi1pcCZZO2CHZzaNwSXoSYlhKcziwBlGzGzA+Kyz6gLgYwIUtMjPEtYNB9mJkJiWYLWGcMi0LEdi8oIkiCUYoCfUEY1EhBY+JCXO4+tOdy295C/Sc3nPuc5zz///Oc55xb4ogR2zbmScr31ttdcbHMLYSYHQWRpSAPr3uUkfFx2f7d3t0MOh9H2GMRNa+A8MwAjDodq/QfAuB1j1KypTiE3FKQJ88JMfNVZMEKbNuYJwlSEdSo08nEgkyIWmPKCrErK6ImJOYKKDMXUJIp3wWx2BqlmHARUQUoM1cSACGk0RAuBt6iAoJclDs8czWi8DGEbk20CryjRg6EkIvMlaTKvwATJ+ppv34zxCb6RoyNOl1EY0cIaL3dFSdUCvJo+wzI4xwgocUm+06cqGeNKUsWYe/sUhURIUBUwajThRCIMgoCJVlhi43SzCxygj4Cg87HckWMOh32zq6IbVAVILIXpGKc0GKTbTlBP697lNLMAElpZhaFQZ9wwSJGTD0gbrvwJqq1n8XrHqXh1E5KvVflMTePy4856FNrPxsS1+sexVKQF9ED76plb+/sImHxJB8s+VRe/MO3m9h7oh6A8sr72M7XB8gVKK/8XvG2iX35qfx0Z5R9+alUX+5Ro1LfgmhX57HGNoaccRxr7FANdqyxIzjfFjGXsHhS9TuhegoAZl8l8/TFfbzuUT5J/ReAlJQUANqvXVUVIOzC747HBUDdjVZmXyWrJha1CQF5CwQSExPJTnJx79IhVf97lw6RneQiMTExapxwEao9oMTI+DhPX0ySn24AzpGvj+4r5qYd5/A9GOK68xGzr5IRR1oNC36MTBs3BYT0N3P0821os1ez1JgWdc30yBi+B0PU3WjFuK4CAOftP6P21bwVeP3e+wCYzUWYzUXUnalki+dj8tMNaLNXR/j7Hgxxx+PiuvMRew6cB8DhuCXHUUPUClitVqmsbDvp6QYADAYDLpeLn89UzqcZgD0Hzsv+AB6PiytXLtPR0RHBN28F3G43FosVu72Dvr5eyst3YGsLBH3yxIXL5cLhuIXZXITBYCAz0yDP2WwtaDQaLBYrDsett6/Ahg2fSRpNEhrNMgCGh0eYNJbiOFohE421xTH2D6SlQtpmSSY31zWTPPIbGRlGAPz+Kfz+Gfr6emM/hvoVU+wsKkSr1eL3T8n2L3/8CwBTfS/FAz3kfgPFAz2Y6ntD5gWxVqtlZ1Eh+hVTqEFVQFmJXsrVmlj0epit6zPw+2cA2BXfycuJCUz7m+acn8wNTfubeDkxwa74zqCAGbauz2DR62FytSbKSvQRP3JVt6CsRC+V5xQAMOaZ4teHz9BokhhYamFXfCfLEwJ+s1mF8pqEx38D8HwWLv5XwEfTdvz+Gb5au5K09MA22ro7udLuju0iGvMESnbX5wQCAQri+rm2cjusWgtAsecijQ2NVB2s4ua6I4GF3ocUTLbhD8a563OSiykaTfQmFOWytbko32zg0A43De2Bi0Wr1QLQ2NBIxdcVNP/STNXBKgB8Ph8AB0uaOd2il9cDEdnPi+rqWkmgurpWKivRS10XkKSB4PMGyWq1yo/0Zm6u6wJSWYleCo+hxrPgt0DAuK6C0y3NfPFsNykrlzJxbZol8U3yfNOpIwH7s2l+/6NJvoYXQtRjePLk8biamsMh7wDPnd1Me3sY7O8G5so62B+wP3d2h/gD1NQcDnlXYt4KBBdJysWio5cnwLDCV5yMtPRl4Iu+Phxv9d8xEHKWlU0Vzb4Q/gdPH8mFQMjtPAAAAABJRU5ErkJggg==" alt="herói">
           <div class="sombra"></div>
@@ -516,7 +516,7 @@
         <div class="perfilheroLinha">
           <div class="hero-sprite" id="perfilHeroSprite"></div>
           <div class="perfilheroInfo">
-            <div class="perfilnome" id="perfilNome">Aventureiro</div>
+            <div class="perfilnome" id="perfilNome"><span id="perfilNomeTxt">Aventureiro</span><span class="proBadge" id="perfilNomeProBadge" data-i18n="pro.trancado">PRO</span></div>
             <div class="xpwrap">
               <div class="xprow hprow">
                 <span class="xplabel" data-i18n="jogo.vida">Vida</span>
@@ -1163,6 +1163,48 @@
         <div class="pwSpacer"></div>
         <button class="pwCTA" id="paywallComecarTesteBtn" type="button" data-i18n="pro.comecarTeste">Começar teste grátis</button>
         <button class="pwSecundario" id="paywallAgoraNaoBtn3" type="button" data-i18n="pro.agoraNao">Agora não</button>
+      </div>
+    </div>
+
+    <!-- etapa 4: confirmacao do teste gratis (pedido do usuario: seguir a
+         sequencia de telas do Skillion -- linha do tempo "Hoje / aviso /
+         fim" antes de confirmar de vez). Reaproveita .pwTrilha/.pwPasso
+         (mesma trilha vertical da etapa 1) em vez de criar CSS novo. O
+         card do meio (#pwConfirmaAvisoPasso) e' escondido/preenchido
+         dinamicamente por atualizarResumoEtapa4() (perto de
+         iniciarTesteGratis() no script principal) porque o dia exato
+         depende do aviso escolhido na etapa 3 -- some de vez quando
+         avisoDias===0 (aviso cai no mesmo dia do fim, nao faz sentido
+         2 nos iguais). iniciarTesteGratis() so e' chamada daqui (botao
+         final), nunca direto da etapa 3. -->
+    <div class="pwEtapa" id="pwEtapa4">
+      <div class="pwConteudo">
+        <span class="pwEyebrow" data-i18n="pro.titulo">Plano Pro</span>
+        <h2 class="pwHeadline pwHeadlineMenor" data-i18n="pro.confirmarHeadline">Comece a evoluir com 7 dias grátis</h2>
+
+        <div class="pwTrilha">
+          <div class="pwTrilhaLinha"></div>
+          <div class="pwPasso on">
+            <div class="pwPassoNo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+            <div class="pwPassoTxt"><b data-i18n="pro.confirmarHojeTitulo">Hoje</b><span data-i18n="pro.confirmarHojeSub">Acesso completo liberado na hora</span></div>
+          </div>
+          <div class="pwPasso" id="pwConfirmaAvisoPasso">
+            <div class="pwPassoNo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+            <div class="pwPassoTxt"><b id="pwConfirmaAvisoTitulo">Em 6 dias</b><span data-i18n="pro.confirmarAvisoSub">Avisamos que o teste tá acabando</span></div>
+          </div>
+          <div class="pwPasso">
+            <div class="pwPassoNo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 9.5 8.5 3 9l5 4.5L6.5 20 12 16.5 17.5 20 16 13.5l5-4.5-6.5-.5z"/></svg></div>
+            <div class="pwPassoTxt"><b data-i18n="pro.confirmarFimTitulo">Em 7 dias</b><span data-i18n="pro.confirmarFimSub">Teste acaba e volta pro plano grátis, sem cobrança</span></div>
+          </div>
+        </div>
+
+        <div class="pwMicro">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          <span data-i18n="pro.microcopy">Cancele quando quiser</span>
+        </div>
+        <div class="pwSpacer"></div>
+        <button class="pwCTA" id="paywallConfirmarTesteBtn" type="button" data-i18n="pro.meusDiasGratis">Meus 7 dias grátis</button>
+        <button class="pwSecundario" id="paywallAgoraNaoBtn4" type="button" data-i18n="pro.agoraNao">Agora não</button>
       </div>
     </div>
   </div>
@@ -3126,6 +3168,21 @@ function assinaturaAtiva(){
 }
 window.assinaturaAtiva = assinaturaAtiva;
 
+// BADGE "PRO" (pedido do usuario) ao lado do nome do personagem -- 2
+// lugares (#nomeTopoProBadge na Arena, #perfilNomeProBadge no Perfil).
+// So mostra/esconde (display), o CSS (.proBadge, perto de .pwBadge em
+// style.css) cuida do brilho. Chamada direto de render() (Arena) e da
+// funcao que atualiza o Perfil -- ambas ja rodam sempre que a
+// assinatura/trial muda (compra, trial iniciado/expirado, modo debug).
+function atualizarBadgesPro(){
+  const ativo = assinaturaAtiva();
+  ['nomeTopoProBadge', 'perfilNomeProBadge'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = ativo ? '' : 'none';
+  });
+}
+window.atualizarBadgesPro = atualizarBadgesPro;
+
 // ---------------------------------------------------------------------
 // PLANO PRO -- paywall central (pedido do usuario: telas de Estatisticas
 // bloqueadas + limite de tarefas + integrar pagamento de verdade). Um SO
@@ -3212,7 +3269,8 @@ function irParaEtapaPaywall(n, animar){
   const e1 = document.getElementById('pwEtapa1');
   const e2 = document.getElementById('pwEtapa2');
   const e3 = document.getElementById('pwEtapa3'); // TESTE GRATIS -- etapa extra, so acessada a partir do botao "Testar gratis" na etapa 2
-  [e1, e2, e3].forEach((el, i) => {
+  const e4 = document.getElementById('pwEtapa4'); // TESTE GRATIS -- confirmacao final (linha do tempo), so acessada a partir da etapa 3
+  [e1, e2, e3, e4].forEach((el, i) => {
     if (!el) return;
     const ativar = (i === n - 1);
     el.classList.remove('pwStepIn', 'pwStepInVolta');
@@ -3246,10 +3304,14 @@ function irParaEtapaPaywall(n, animar){
   const planosPorId = { mensal: planoMensal, anual: planoAnual, vitalicio: planoVitalicio };
 
   // TESTE GRATIS -- botao na etapa 2 que desvia pra etapa 3 (escolha de
-  // aviso), e a propria etapa 3 (aviso3/1/0 + botao final).
+  // aviso), a propria etapa 3 (aviso3/1/0 + botao "Comecar teste", que
+  // agora SO avanca pra etapa 4) e a etapa 4 (confirmacao/linha do tempo
+  // -- botao final que de fato chama iniciarTesteGratis()).
   const btnTrial = document.getElementById('paywallTrialBtn');
   const btnAgoraNao3 = document.getElementById('paywallAgoraNaoBtn3');
   const btnComecarTeste = document.getElementById('paywallComecarTesteBtn');
+  const btnAgoraNao4 = document.getElementById('paywallAgoraNaoBtn4');
+  const btnConfirmarTeste = document.getElementById('paywallConfirmarTesteBtn');
   const avisoPorId = {
     3: document.getElementById('pwAviso3'),
     1: document.getElementById('pwAviso1'),
@@ -3257,14 +3319,16 @@ function irParaEtapaPaywall(n, animar){
   };
 
   if (btnFechar) btnFechar.onclick = fecharPaywall;
-  if (btnVoltar) btnVoltar.onclick = () => irParaEtapaPaywall(_pwEtapaAtual === 3 ? 2 : 1);
+  if (btnVoltar) btnVoltar.onclick = () => irParaEtapaPaywall(_pwEtapaAtual === 4 ? 3 : (_pwEtapaAtual === 3 ? 2 : 1));
   if (btnContinuar) btnContinuar.onclick = () => irParaEtapaPaywall(2);
   if (btnAgoraNao1) btnAgoraNao1.onclick = fecharPaywall;
   if (btnAgoraNao2) btnAgoraNao2.onclick = fecharPaywall;
   if (btnAssinar) btnAssinar.onclick = iniciarCompraAssinatura;
   if (btnTrial) btnTrial.onclick = () => irParaEtapaPaywall(3);
   if (btnAgoraNao3) btnAgoraNao3.onclick = fecharPaywall;
-  if (btnComecarTeste) btnComecarTeste.onclick = () => iniciarTesteGratis(_pwAvisoSelecionado);
+  if (btnComecarTeste) btnComecarTeste.onclick = () => { atualizarResumoEtapa4(); irParaEtapaPaywall(4); };
+  if (btnAgoraNao4) btnAgoraNao4.onclick = fecharPaywall;
+  if (btnConfirmarTeste) btnConfirmarTeste.onclick = () => iniciarTesteGratis(_pwAvisoSelecionado);
 
   // selecao de aviso -- mesmo padrao de selecionarPlano() logo abaixo,
   // so guarda em _pwAvisoSelecionado (lida por iniciarTesteGratis()).
@@ -3365,6 +3429,26 @@ function diasRestantesTrial(){
   const t = trialSalvo();
   if (!t || !trialAtivo()) return 0;
   return Math.max(0, Math.ceil((t.fim - Date.now()) / 86400000));
+}
+
+// Preenche a etapa 4 (#pwEtapa4, linha do tempo de confirmacao) com o
+// dia exato em que o aviso do meio ("Em X dias") vai acontecer, com base
+// no que foi escolhido na etapa 3 (_pwAvisoSelecionado). Chamada 1x, no
+// clique de "Comecar teste" (etapa 3 -> 4, ver bloco de wiring dos
+// botoes do paywall). Quando avisoDias===0 o aviso cai no MESMO dia do
+// fim do teste -- nesse caso esconde o no do meio (2 linhas dizendo "Em
+// 7 dias" ficaria redundante e confuso).
+function atualizarResumoEtapa4(){
+  const passo = document.getElementById('pwConfirmaAvisoPasso');
+  const titulo = document.getElementById('pwConfirmaAvisoTitulo');
+  if (_pwAvisoSelecionado === 0){
+    if (passo) passo.style.display = 'none';
+    return;
+  }
+  if (passo) passo.style.display = '';
+  const dia = DIAS_TESTE_GRATIS - _pwAvisoSelecionado;
+  const en = (typeof idiomaApp === 'function' && idiomaApp() === 'en');
+  if (titulo) titulo.textContent = en ? ('In ' + dia + ' days') : ('Em ' + dia + ' dias');
 }
 
 // avisoDias: 3, 1 ou 0 (0 = so no ultimo dia) -- escolhido na etapa 3
@@ -4601,6 +4685,7 @@ function render(){
     document.getElementById('fill').style.width = Math.round((p.resto/p.meta)*100) + '%';
   }
   document.getElementById('nomeTopo').textContent = nomeHeroi || (idiomaApp() === 'en' ? 'Adventurer' : 'Aventureiro');
+  if (typeof window.atualizarBadgesPro === 'function') window.atualizarBadgesPro();
 
   if (jaComecou) salvar();
 }
@@ -9015,7 +9100,8 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     if (typeof window.renderPreviewsPerfil === 'function') window.renderPreviewsPerfil();
 
     document.getElementById('perfilSub').textContent = (idiomaApp() === 'en' ? 'Level ' : 'Nível ') + romano(p.nivel);
-    document.getElementById('perfilNome').textContent = (typeof nomeHeroi !== 'undefined' && nomeHeroi) || (idiomaApp() === 'en' ? 'Adventurer' : 'Aventureiro');
+    document.getElementById('perfilNomeTxt').textContent = (typeof nomeHeroi !== 'undefined' && nomeHeroi) || (idiomaApp() === 'en' ? 'Adventurer' : 'Aventureiro');
+    if (typeof window.atualizarBadgesPro === 'function') window.atualizarBadgesPro();
     document.getElementById('perfilFill').style.width = Math.round((p.resto / p.meta) * 100) + '%';
     document.getElementById('perfilXpNum').textContent = p.resto + ' / ' + p.meta + ' XP';
 
@@ -16495,6 +16581,13 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'pro.aviso1Titulo':   { pt:'1 dia antes', en:'1 day before' },
     'pro.aviso0Titulo':   { pt:'No último dia', en:'On the last day' },
     'pro.comecarTeste':   { pt:'Começar teste grátis', en:'Start free trial' },
+    'pro.confirmarHeadline':  { pt:'Comece a evoluir com 7 dias grátis', en:'Start leveling up with 7 free days' },
+    'pro.confirmarHojeTitulo': { pt:'Hoje', en:'Today' },
+    'pro.confirmarHojeSub':    { pt:'Acesso completo liberado na hora', en:'Full access unlocked right away' },
+    'pro.confirmarAvisoSub':   { pt:'Avisamos que o teste tá acabando', en:'We’ll remind you the trial is ending' },
+    'pro.confirmarFimTitulo':  { pt:'Em 7 dias', en:'In 7 days' },
+    'pro.confirmarFimSub':     { pt:'Teste acaba e volta pro plano grátis, sem cobrança', en:'Trial ends and reverts to the free plan, no charge' },
+    'pro.meusDiasGratis':      { pt:'Meus 7 dias grátis', en:'My 7 free days' },
     'jogo.addTarefa':        { pt:'+ Adicionar', en:'+ Add' },
     'jogo.oQuePrecisaSerFeito': { pt:'O que precisa ser feito?', en:'What needs to be done?' },
     'jogo.soHoje':           { pt:'Só hoje', en:'Today only' },

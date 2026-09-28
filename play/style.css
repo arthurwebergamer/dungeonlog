@@ -5532,3 +5532,25 @@
   max-height:420px; overflow-y:auto; padding:4px 0 14px;
 }
 .cfgHeroisLista{ display:flex; flex-direction:column; gap:2px; margin-bottom:8px; }
+
+/* BADGE "PRO" (pedido do usuario) ao lado do nome do personagem -- usada
+   em #nomeTopo (Arena, sibling span) e dentro de #perfilNome (Perfil,
+   sibling de #perfilNomeTxt). Escondida por padrao (display:none) pra
+   nao "piscar" visivel antes do 1o render() rodar -- JS
+   (atualizarBadgesPro(), perto de assinaturaAtiva() no script principal)
+   decide quando mostrar, chamada sempre que a Arena ou o Perfil
+   re-renderizam. Dourado (mesma cor das moedas, #F2C94C) com brilho
+   pulsante sutil -- combina com o tom de "conquista"/prestigio do resto
+   do app sem chamar atencao demais. */
+.proBadge{
+  display:none; margin-left:6px; padding:1px 7px; border-radius:999px;
+  font-family:'Outfit',sans-serif; font-size:9px; font-weight:800; letter-spacing:.04em;
+  color:#3D2E05; background:linear-gradient(135deg,#FFE9A8,#F2C94C 55%,#D9A62B);
+  box-shadow:0 0 0 1px rgba(242,201,76,.55), 0 0 8px rgba(242,201,76,.55);
+  vertical-align:middle; position:relative; top:-1px;
+  animation:proBadgePulso 2.4s ease-in-out infinite;
+}
+@keyframes proBadgePulso{
+  0%, 100%{ box-shadow:0 0 0 1px rgba(242,201,76,.55), 0 0 6px rgba(242,201,76,.4); }
+  50%{ box-shadow:0 0 0 1px rgba(242,201,76,.75), 0 0 13px rgba(242,201,76,.85); }
+}

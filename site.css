@@ -25,8 +25,7 @@ a:hover{text-decoration-color:var(--accent);}
    sobre o fundo da masmorra, com z-index/posicionamento próprios). */
 header.site{
   display:flex; align-items:center; justify-content:space-between;
-  max-width:760px; margin:0 auto;
-  padding:20px 24px;
+  padding:20px 28px;
 }
 header.site .brand{ display:flex; align-items:center; gap:10px; text-decoration:none; }
 header.site .brand img{ width:26px; height:26px; border-radius:6px; }

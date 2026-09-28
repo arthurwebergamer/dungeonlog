@@ -760,6 +760,21 @@
         <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
       </div>
 
+      <!-- NOTIFICACOES PUSH (pedido do usuario) -- linha simples
+           texto+botao, mesmo padrao de #cfgRowConta (nao um link pra
+           sub-tela, e' uma acao direta). Estado do botao pintado por
+           atualizarBotaoNotificacao() (bloco JS "CONFIG — Notificacoes
+           push", perto de atualizarBotaoFeedback()) -- reflete
+           Notification.permission de verdade, nao um estado proprio. -->
+      <div class="cfgrow" id="cfgRowNotif">
+        <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></span>
+        <div class="cfgtxt">
+          <b data-i18n="cfg.notificacoes">Notificações</b>
+          <span id="cfgNotifInfo" data-i18n="cfg.notifDesc">Teste grátis, streak em risco e monstro do dia</span>
+        </div>
+        <button class="cfgbtn" id="cfgNotifBtn" data-i18n="cfg.ativar">Ativar</button>
+      </div>
+
       <!-- Card "Histórico" removido daqui (pedido do usuário, sessão de
            brainstorm) -- já existe em Perfil, prévia própria com botão
            "Ver tudo" (#verHistoricoBtn), que já chama window.abrirHistorico().
@@ -1809,6 +1824,7 @@ const CHAVES_SECUNDARIAS_CONTA = [
   'questlog.tarefasConcluidas.v1',
   'questlog.temaArena.v1',
   'questlog.temasDesbloqueados.v1',
+  'questlog.trial.v1', // TESTE GRATIS -- precisa estar na nuvem pra Cloud Functions conseguirem ler e mandar push de "teste acabando" mesmo com o app fechado
   'questlog.vida.v1'
 ];
 window.CHAVES_SECUNDARIAS_CONTA = CHAVES_SECUNDARIAS_CONTA;
@@ -9133,6 +9149,12 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     // por wrap externo -- uma linha aqui dentro, mesmo padrao da linha
     // acima.
     if (typeof window.atualizarBotaoFeedback === 'function') window.atualizarBotaoFeedback();
+    // NOTIFICACOES PUSH (pedido do usuario) -- linha vive na tela
+    // PRINCIPAL de Config (nao numa sub-tela), por isso o gancho fica
+    // aqui, nao em abrirPrefsConfig(). Notification.permission pode ter
+    // mudado fora do app (configuracoes do navegador/SO) desde a ultima
+    // vez que Config abriu -- repinta sempre.
+    if (typeof window.atualizarBotaoNotificacao === 'function') window.atualizarBotaoNotificacao();
     if (cfgOverlay) cfgOverlay.classList.add('on');
     animarStaggerCfgRows();
   }
@@ -11360,6 +11382,115 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   };
 
   window.abrirFolhaApagarTudo = abrir;
+})();
+</script>
+
+<!-- =====================================================================
+     NOTIFICACOES PUSH — pedido do usuario: push de verdade (chega com o
+     app fechado) pra teste gratis acabando, streak em risco de quebrar e
+     monstro do dia ainda vivo. Quem MANDA essas 3 e' um par de Cloud
+     Functions agendadas (/functions/index.js, raiz do repo -- fora deste
+     arquivo, precisa de deploy separado, ver /functions/README.md).
+     Este bloco e' so o lado CLIENTE: pede permissao do navegador,
+     registra o Service Worker (firebase-messaging-sw.js, mesma pasta
+     /play/), pega o token do FCM e salva em fcmTokens/{uid} no
+     Firestore -- e' de la que as Cloud Functions leem quem tem push
+     ativo. So funciona logado (token e' por CONTA, pra acompanhar a
+     pessoa entre aparelhos -- ver mesmo raciocinio do CHAVE_TRIAL virar
+     conta-scoped). Mesmo padrao de modulo independente que
+     "CONFIRMAR APAGAR DADOS EM FOLHA" logo acima (reimporta
+     app/auth/firestore, usa window.firebaseConfig ja exposto) -- so
+     acrescenta o import do Messaging.
+     ===================================================================== -->
+<script type="module">
+(function(){
+  // >>> UNICA COISA A EDITAR NESTE BLOCO: cole aqui a VAPID key do seu
+  // projeto Firebase (Console > Configuracoes do projeto > Cloud
+  // Messaging > Configuracao Web > "Gerar par de chaves", se ainda nao
+  // existir uma) <<<
+  const VAPID_KEY = 'COLE_AQUI_SUA_VAPID_KEY';
+
+  async function aguardarUsuario(auth, onAuthStateChangedFn, timeoutMs){
+    return new Promise(resolve => {
+      let resolvido = false;
+      const cancelar = onAuthStateChangedFn(auth, u => {
+        if (resolvido) return;
+        resolvido = true;
+        cancelar();
+        resolve(u);
+      });
+      setTimeout(() => {
+        if (resolvido) return;
+        resolvido = true;
+        resolve(auth.currentUser);
+      }, timeoutMs);
+    });
+  }
+
+  // Estado exposto pro botao de Config (#cfgNotifBtn, ver bloco JS
+  // "CONFIG — Notificacoes push" perto da tela de Config) saber o que
+  // mostrar sem precisar reimportar Firebase sozinho.
+  window.statusNotificacaoPush = function(){
+    if (typeof Notification === 'undefined') return 'sem_suporte';
+    return Notification.permission; // 'default' | 'granted' | 'denied'
+  };
+
+  window.ativarNotificacaoPush = async function(){
+    if (!window.firebaseConfig || window.firebaseConfig.apiKey === 'COLE_AQUI_SUA_APIKEY'){
+      return { ok: false, motivo: 'firebase_nao_configurado' };
+    }
+    if (typeof Notification === 'undefined' || !('serviceWorker' in navigator)){
+      return { ok: false, motivo: 'sem_suporte' };
+    }
+    if (VAPID_KEY === 'COLE_AQUI_SUA_VAPID_KEY'){
+      return { ok: false, motivo: 'vapid_nao_configurada' };
+    }
+
+    const permissao = await Notification.requestPermission();
+    if (permissao !== 'granted') return { ok: false, motivo: 'permissao_negada' };
+
+    try {
+      const [modApp, modAuth, modFirestore, modMessaging] = await Promise.all([
+        import("https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js"),
+        import("https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js"),
+        import("https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js"),
+        import("https://www.gstatic.com/firebasejs/10.13.2/firebase-messaging.js")
+      ]);
+      const { initializeApp, getApps, getApp } = modApp;
+      const { getAuth, onAuthStateChanged } = modAuth;
+      const { getFirestore, doc, setDoc, arrayUnion } = modFirestore;
+      const { getMessaging, getToken } = modMessaging;
+
+      const app = getApps().length ? getApp() : initializeApp(window.firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+
+      // TOKEN E' POR CONTA (pedido do usuario, mesmo raciocinio do trial):
+      // sem login, nao ha onde salvar o token de forma que as Cloud
+      // Functions consigam achar depois -- pede pra criar conta em vez de
+      // silenciosamente nao funcionar.
+      const usuario = await aguardarUsuario(auth, onAuthStateChanged, 4000);
+      if (!usuario) return { ok: false, motivo: 'sem_conta' };
+
+      const registro = await navigator.serviceWorker.register('firebase-messaging-sw.js');
+      const messaging = getMessaging(app);
+      const token = await getToken(messaging, { vapidKey: VAPID_KEY, serviceWorkerRegistration: registro });
+      if (!token) return { ok: false, motivo: 'sem_token' };
+
+      // arrayUnion dedupe sozinho -- registrar de novo no mesmo aparelho
+      // (token so muda raramente) nao duplica. merge:true preserva
+      // tokens de OUTROS aparelhos da mesma conta, nunca sobrescreve.
+      await setDoc(doc(db, 'fcmTokens', usuario.uid), {
+        tokens: arrayUnion(token),
+        atualizadoEm: Date.now(),
+      }, { merge: true });
+
+      return { ok: true };
+    } catch(e){
+      console.error('QuestLog/FCM: falha ao ativar notificacoes push', e);
+      return { ok: false, motivo: 'erro', erro: e.message };
+    }
+  };
 })();
 </script>
 
@@ -16003,6 +16134,64 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 </script>
 
 <!-- =====================================================================
+     CONFIG — Notificacoes push. Mesmo padrao de linha+botao de
+     atualizarBotaoFeedback() logo acima, so que o "estado ligado" aqui
+     nao e' uma preferencia nossa -- e' Notification.permission de
+     verdade (window.statusNotificacaoPush(), bloco "NOTIFICACOES PUSH"
+     mais acima no arquivo). Isso importa porque permissao de
+     notificacao, uma vez negada pelo usuario no navegador, so pode ser
+     revertida nas configuracoes do PROPRIO navegador -- nenhum app
+     consegue "pedir de novo" programaticamente depois de um "Bloquear".
+     Por isso o botao mostra 3 estados (nao so ligado/desligado):
+     Ativar / Ativado / Bloqueado (com instrucao de onde desbloquear).
+     ===================================================================== -->
+<script>
+(function(){
+  const btn = document.getElementById('cfgNotifBtn');
+  if (!btn) return;
+
+  window.atualizarBotaoNotificacao = function(){
+    const status = (typeof window.statusNotificacaoPush === 'function') ? window.statusNotificacaoPush() : 'sem_suporte';
+    const en = (typeof idiomaApp === 'function' && idiomaApp() === 'en');
+    if (status === 'granted'){
+      btn.textContent = en ? 'Enabled' : 'Ativado';
+      btn.disabled = true;
+    } else if (status === 'denied'){
+      btn.textContent = en ? 'Blocked' : 'Bloqueado';
+      btn.disabled = true;
+    } else if (status === 'sem_suporte'){
+      btn.textContent = en ? 'Unavailable' : 'Indisponível';
+      btn.disabled = true;
+    } else {
+      btn.textContent = en ? 'Enable' : 'Ativar';
+      btn.disabled = false;
+    }
+  };
+
+  btn.onclick = async () => {
+    if (typeof window.ativarNotificacaoPush !== 'function') return;
+    const en = (typeof idiomaApp === 'function' && idiomaApp() === 'en');
+    btn.disabled = true;
+    btn.textContent = en ? 'Enabling…' : 'Ativando…';
+    const resultado = await window.ativarNotificacaoPush();
+    window.atualizarBotaoNotificacao();
+    if (!resultado.ok && typeof window.aviso === 'function'){
+      // motivo 'permissao_negada'/'denied' nao precisa de toast -- o
+      // proprio botao ja vira "Bloqueado" (estado visivel permanente),
+      // um toast a mais so duplicaria a informacao.
+      if (resultado.motivo === 'sem_conta'){
+        window.aviso(en ? 'Create an account first to enable notifications' : 'Crie uma conta primeiro pra ativar notificações');
+      } else if (resultado.motivo !== 'permissao_negada'){
+        window.aviso(en ? 'Couldn\'t enable notifications' : 'Não deu pra ativar notificações');
+      }
+    }
+  };
+
+  window.atualizarBotaoNotificacao(); // primeira pintura, mesmo antes de Config abrir pela 1a vez
+})();
+</script>
+
+<!-- =====================================================================
      CONFIG — PREFERENCIA DE SOM (SWITCH)  —  bloco autonomo, cole antes
      de </body>
 
@@ -16378,6 +16567,9 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'cfg.herois':          { pt:'Heróis', en:'Heroes' },
     'cfg.aparencia':       { pt:'Aparência', en:'Appearance' },
     'cfg.preferencias':    { pt:'Preferências', en:'Preferences' },
+    'cfg.notificacoes':    { pt:'Notificações', en:'Notifications' },
+    'cfg.notifDesc':       { pt:'Teste grátis, streak em risco e monstro do dia', en:'Free trial, streak at risk and today\'s monster' },
+    'cfg.ativar':          { pt:'Ativar', en:'Enable' },
     'cfg.historicoDesc':   { pt:'Calendário de vitórias, fugas e dias sem tarefa', en:'Calendar of wins, escapes and days with no tasks' },
     'cfg.nomeDoHeroi':     { pt:'Nome do herói', en:'Hero name' },
     'cfg.renomear':        { pt:'Renomear', en:'Rename' },

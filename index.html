@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <!-- Landing page raiz do domínio dungeonlog.weberlabs.com.br.
-     Substitui a antiga waitlist/ (removida). Estrutura desta versão foi
-     inspirada numa referência que o usuário mandou (skillion.app: ícone
-     pixelado grande no topo, headline em fonte pixel, card de descrição
-     com borda, botões, badges de loja) -- mas usando a identidade visual
-     REAL do DungeonLog, não a da referência:
-     - ícone = sprite real do monstro "Gosma metálica" (extraído de
-       play/assets.js, o mesmo já usado como "assinatura" na antiga
-       waitlist -- é o monstro "mascote" mais amigável do bestiário);
-     - fundo = parede de tijolos pixelados animada (já existente);
-     - fontes = as reais do app (Silkscreen pro pixel, Outfit pro texto).
-     Sem botões "Guides"/"What's New" (não existe esse conteúdo) e sem
-     badge de loja CLICÁVEL -- o app ainda não foi publicado no Google
-     Play, então o badge é só um selo "em breve", não um link real. -->
+     Substitui a antiga waitlist/ (removida). 3ª versão do fundo: as duas
+     anteriores (pedra genérica; depois tijolo 8-bit + tocha + brasas +
+     mascote) foram rejeitadas -- pedido explícito foi algo mais moderno e
+     minimalista, sem o monstro, usando "o tema que existe dentro do app...
+     tipo aqueles da Arena, os blocos de dungeon DO APP".
+
+     Isso é literal: o fundo abaixo é a MESMA fórmula que a .arena de
+     combate usa de verdade (ver play/style.css ~linha 1006) -- o tile
+     TEMA_ARENA_TILE_B64 (32x10px, o bloco de pedra "padrão" da Arena,
+     sem tingir/reinventar) repetido em 130x41px + gradiente vertical com
+     as cores reais do tema Grafite (--arena-1/2/3) + vinheta radial. Sem
+     animação, sem tocha, sem brasas, sem sprite de monstro -- estático e
+     limpo, como a própria Arena é. -->
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -22,7 +22,7 @@
 <link rel="icon" href="/play/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/site.css">
 <style>
   html,body{ height:100%; }
@@ -30,51 +30,27 @@
     display:flex; flex-direction:column;
     min-height:100vh;
     position:relative;
-    overflow-x:hidden;
   }
 
-  /* ---------- Fundo: parede de tijolos pixelados animada ---------- */
+  /* ---------- Fundo: mesmo tratamento da .arena real do app ---------- */
   .dungeonBg{
     position:absolute; inset:0; z-index:0; pointer-events:none;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='8' shape-rendering='crispEdges'%3E%3Crect width='16' height='8' fill='%23161616'/%3E%3Crect x='0' y='0' width='7' height='3' fill='%233a3a3a'/%3E%3Crect x='8' y='0' width='7' height='3' fill='%233a3a3a'/%3E%3Crect x='0' y='0' width='7' height='1' fill='%23484848'/%3E%3Crect x='8' y='0' width='7' height='1' fill='%23484848'/%3E%3Crect x='4' y='4' width='7' height='3' fill='%23343434'/%3E%3Crect x='12' y='4' width='3' height='3' fill='%23343434'/%3E%3Crect x='0' y='4' width='3' height='3' fill='%23343434'/%3E%3Crect x='4' y='4' width='7' height='1' fill='%23424242'/%3E%3Crect x='12' y='4' width='3' height='1' fill='%23424242'/%3E%3Crect x='0' y='4' width='3' height='1' fill='%23424242'/%3E%3C/svg%3E");
-    background-size:160px 80px;
-    image-rendering:pixelated;
-    animation:brickDrift 50s linear infinite;
-  }
-  @keyframes brickDrift{ from{ background-position:0 0; } to{ background-position:-160px 0; } }
-  .dungeonBg::before{
-    content:''; position:absolute; inset:0;
-    background:radial-gradient(55% 42% at 50% 46%, rgba(210,140,60,.24) 0%, rgba(210,140,60,0) 72%);
-    animation:torchPulse 4.5s ease-in-out infinite;
-  }
-  .dungeonBg::after{
-    content:''; position:absolute; inset:0;
     background:
-      linear-gradient(180deg, rgba(0,0,0,.6) 0%, rgba(0,0,0,.15) 22%, rgba(0,0,0,.2) 66%, rgba(0,0,0,.75) 100%),
-      radial-gradient(140% 100% at 50% 50%, transparent 40%, rgba(0,0,0,.6) 100%);
+      radial-gradient(ellipse at 50% 45%, transparent 55%, rgba(0,0,0,.4) 100%),
+      url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAKCAYAAADVTVykAAABfElEQVR4nJ2TwU7CQBCGvxKMQeCEXojGlMvWIw/AnfIOwh0egYfwpIneQJ4Bn4L22r10SeCoJ0CDJVkvdNPWgsT/srM738x0Z6fWZDKpPwyHdLpdlFK0222yklIyHY3o9HoHmVMUBAFvr6+49/copXBdl6KUkkW0JgxDGo0GUspfgUIInnefKKWwbTuXOUWO4/ASbZjP56ZWAeD6rILrugcD/1vwUJ5kBwsAH6sVUkqEEMbheR6e5xm7tNXYtp3LJLnkmrUBSludqmXd1mp1nQCuKpVUgN5/YJ5q1SrW3l5EGwBuzsosok1qjfW+XgPwdW6Z82K33wdg9PREr9//c8iklIwfH+kOBoRhePTpYn46HnPXagH8yl2Mjcty+eggxhJCUKtWT2Jjfrq38wa4kNz8dZv4RstofRIb84toc7CrpgPL3WcuoLVO7X3fB20Zn2VZeWHpHEd8pgPZ6QSYzWamqO/7ADSbTUrfmiAIcBzHsNm/ITn9F5ncSd8PSsnXJX9WpAwAAAAASUVORK5CYII=") repeat,
+      linear-gradient(180deg, #454545 0%, #383838 55%, #2C2C2C 100%);
+    background-size:auto, 130px 41px, auto;
+    image-rendering:pixelated;
   }
-  @keyframes torchPulse{ 0%,100%{ opacity:.75; transform:scale(1); } 50%{ opacity:1; transform:scale(1.06); } }
-  .embers{ position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
-  .ember{
-    position:absolute; bottom:-10px; width:4px; height:4px;
-    background:#e0a05a; box-shadow:0 0 4px 1px rgba(224,160,90,.7);
-    animation-name:emberRise; animation-timing-function:ease-in; animation-iteration-count:infinite;
-  }
-  @keyframes emberRise{
-    0%{ transform:translateY(0) translateX(0); opacity:0; }
-    10%{ opacity:1; } 85%{ opacity:.5; }
-    100%{ transform:translateY(-70vh) translateX(var(--drift, 12px)); opacity:0; }
-  }
-  @media (prefers-reduced-motion: reduce){ .dungeonBg, .dungeonBg::before, .ember{ animation:none; } }
 
   /* ---------- Header ---------- */
   header.site{
     position:relative; z-index:1;
     display:flex; align-items:center; gap:10px;
-    padding:22px 24px;
+    padding:24px 28px;
   }
-  header.site img{ width:28px; height:28px; border-radius:6px; image-rendering:pixelated; }
-  header.site span{ font-family:'Outfit',sans-serif; font-weight:800; letter-spacing:-.01em; font-size:1rem; color:var(--text); }
+  header.site img{ width:26px; height:26px; border-radius:6px; image-rendering:pixelated; }
+  header.site span{ font-family:'Outfit',sans-serif; font-weight:600; letter-spacing:-.01em; font-size:.95rem; color:var(--text); }
 
   /* ---------- Hero ---------- */
   main{
@@ -82,78 +58,46 @@
     flex:1;
     display:flex; flex-direction:column; align-items:center; justify-content:center;
     text-align:center;
-    padding:24px 24px 56px;
-  }
-  .mascote{
-    width:88px; height:88px;
-    image-rendering:pixelated;
-    filter:drop-shadow(0 8px 18px rgba(0,0,0,.55));
-    margin-bottom:18px;
+    padding:24px 28px 72px;
   }
   h1{
-    font-family:'Silkscreen', monospace;
-    font-weight:700;
-    text-transform:uppercase;
-    letter-spacing:.02em;
-    line-height:1.5;
-    font-size:clamp(1.05rem, 3.6vw, 1.9rem);
-    color:var(--text);
-    text-shadow:0 3px 0 rgba(0,0,0,.5);
-    max-width:720px;
-  }
-  h1 .accent{ color:#e0a05a; }
-
-  .descCard{
-    margin-top:26px;
-    max-width:560px;
-    background:rgba(50,50,50,.55);
-    border:2px solid rgba(255,255,255,.14);
-    border-radius:10px;
-    padding:20px 24px;
-    backdrop-filter:blur(2px);
-  }
-  .descCard p{
     font-family:'Outfit', sans-serif;
-    font-size:clamp(.92rem, 2vw, 1.02rem);
+    font-weight:800;
+    letter-spacing:-.02em;
+    line-height:1.18;
+    font-size:clamp(1.7rem, 4.6vw, 2.7rem);
+    color:var(--text);
+    max-width:640px;
+  }
+  p.sub{
+    margin-top:14px;
+    max-width:460px;
+    font-family:'Outfit', sans-serif;
+    font-weight:400;
+    font-size:clamp(.92rem, 1.6vw, 1rem);
     color:var(--muted);
-    line-height:1.65;
+    line-height:1.6;
   }
-
-  .soonBadge{
-    margin-top:26px;
-    display:inline-flex; align-items:center; gap:8px;
-    font-family:'Silkscreen', monospace;
-    font-size:11px; letter-spacing:.04em;
+  .soon{
+    margin-top:28px;
+    font-family:'Outfit', sans-serif;
+    font-size:.8rem;
+    letter-spacing:.02em;
     color:var(--dim);
-    background:rgba(0,0,0,.35);
-    border:1px solid rgba(255,255,255,.12);
-    border-radius:7px;
-    padding:9px 16px;
-  }
-  .soonBadge .dotPulse{
-    width:6px; height:6px; border-radius:50%; background:#e0a05a;
-    box-shadow:0 0 6px 1px rgba(224,160,90,.7);
-    animation:torchPulse 1.8s ease-in-out infinite;
   }
 
   /* ---------- Footer ---------- */
   footer.site{
     position:relative; z-index:1;
     border-top:none; background:transparent;
-    padding:0 24px 28px;
+    padding:0 24px 30px;
   }
   footer.site .wrap{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
-
-  @media (max-width:480px){
-    .mascote{ width:72px; height:72px; }
-    .descCard{ padding:16px 18px; }
-  }
 </style>
 </head>
 <body>
 
   <div class="dungeonBg" aria-hidden="true"></div>
-  <div class="embers" id="embers" aria-hidden="true"></div>
 
   <header class="site">
     <img src="/play/icon-192.png" alt="">
@@ -161,12 +105,9 @@
   </header>
 
   <main>
-    <img class="mascote" alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAC+UlEQVR4nO2WTUhUURTHf8+Zp0ObqF1fEoTRQskiM6WiFrrJqZn05VhO1MIgMFCyFiIItilscEpXLQLnI6xJTcoohTKqEQlEoUURRUVBi4qEqWxyvC3G95jne09n1s0fBu47n/85595zL2SRxf8OKWMHh10spRezcxnFTN9YloWUEHR3+5lduREApbJcZzL55i3ufQuyv3/Tip0eAVkWg2NRXk68YFXePE7lqCHx9oJNAERGogC0nHSnRWJ5gxy7GHg6zsuJFwAcr/doukCozyBLJXHuuAsxv3RLcjJJXuFWyIn90iUHmH73ReentqYzcAdkeck9Y7fUyLIYGIvqRKODkaVimaLH30VjU7OwaodlBaREkrj6762wtXwfYF4Fx8z7ZQmaEpAc+tKrCPYGCPYGdLLp6Ji2PlR9TPulosffZdkKUwIiYaxWMBjh9dQ4o6P3CQaNrWg938pQf5ih/jAAHu8ps9BpEJBl0ePvMiaffIQvPExkJIrdNm8ZMBDqo/1iB4A2LwAuXLqClGMcYgYCau8XwxceBuC6v5OikjKDvtZVyZHaegpLSzRZ6h749tucsOEUCJux/F6vwjWfD7ttnqKSMgoL8nV6dR9UOau42NaurZ2Kh7uRG8lK/PiYjL2oeAYCagX6Qv146qu1jbhtVymAIfliVDmrtLU6Mz59+Ghpb3kMf/2M4SrfoX0XFuQvmzwVJ1wHuRmd0u2DjAjkxr9SU1dHW/PptJOmJlfxZORBZgSETeLhxCvqz5wFoKauDm9DA96GhmUTV7gVKtwKn6U8mlpbGL8XIjf+Fc9RxdLHdDyqdwBAqNunyYt37mXLzt1sWLfGNNiz5xMADPffZnXerOZT4VbYtXmt6e1oTsBhF4ddNQDs37MbgMdPn+lsvv9xAJCYi2symz1XWx+orsEx817zG7h12/RmtLwqJYddiISknYqOy1dN7VLPdywWo3j9CgAam5qTcWxJf6uXUtovIo2QTUDcwigXiC/MkjRfRFlkkcU/kiMZ2BMyCNMAAAAASUVORK5CYII=">
-    <h1>SUA LISTA DE TAREFAS<br>VIRA UMA <span class="accent">MASMORRA</span></h1>
-    <div class="descCard">
-      <p>O DungeonLog transforma suas tarefas do dia a dia em um RPG de verdade: cada tarefa concluída vira XP, seu personagem sobe de nível e ganha itens — e enquanto você não termina, o monstro fica ali, te encarando.</p>
-    </div>
-    <div class="soonBadge"><span class="dotPulse"></span> Em breve na Google Play</div>
+    <h1>Sua lista de tarefas vira uma masmorra.</h1>
+    <p class="sub">Cada tarefa concluída vira XP. Seu personagem sobe de nível, ganha itens — e enquanto você não termina, o monstro fica ali, te encarando.</p>
+    <p class="soon">Em breve na Google Play</p>
   </main>
 
   <footer class="site">
@@ -178,22 +119,6 @@
       <a href="/terms">Termos</a>
     </div>
   </footer>
-
-  <script>
-    (function(){
-      var host = document.getElementById('embers');
-      var n = 16;
-      for (var i = 0; i < n; i++){
-        var e = document.createElement('div');
-        e.className = 'ember';
-        e.style.left = (Math.random() * 100) + '%';
-        e.style.animationDuration = (6 + Math.random() * 6) + 's';
-        e.style.animationDelay = '-' + (Math.random() * 10) + 's';
-        e.style.setProperty('--drift', (Math.random() * 40 - 20).toFixed(0) + 'px');
-        host.appendChild(e);
-      }
-    })();
-  </script>
 
 </body>
 </html>

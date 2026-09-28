@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <!-- Landing page raiz do domínio dungeonlog.weberlabs.com.br.
-     Substitui a antiga waitlist/ (removida). 3ª versão do fundo: as duas
-     anteriores (pedra genérica; depois tijolo 8-bit + tocha + brasas +
-     mascote) foram rejeitadas -- pedido explícito foi algo mais moderno e
-     minimalista, sem o monstro, usando "o tema que existe dentro do app...
-     tipo aqueles da Arena, os blocos de dungeon DO APP".
+     Substitui a antiga waitlist/ (removida). Fundo = mesma fórmula que a
+     .arena de combate real usa (play/style.css ~linha 1006): o tile
+     TEMA_ARENA_TILE_B64 (o bloco "padrão" da Arena) + gradiente vertical
+     com as cores do tema Grafite (--arena-1/2/3) + vinheta radial.
 
-     Isso é literal: o fundo abaixo é a MESMA fórmula que a .arena de
-     combate usa de verdade (ver play/style.css ~linha 1006) -- o tile
-     TEMA_ARENA_TILE_B64 (32x10px, o bloco de pedra "padrão" da Arena,
-     sem tingir/reinventar) repetido em 130x41px + gradiente vertical com
-     as cores reais do tema Grafite (--arena-1/2/3) + vinheta radial. Sem
-     animação, sem tocha, sem brasas, sem sprite de monstro -- estático e
-     limpo, como a própria Arena é. -->
+     Camada extra (pedido do usuário): "onde eu passar o dedo ou o mouse,
+     o bloco destaca/acende". Implementado como uma GRADE REAL de blocos
+     invisíveis (um <div> por bloco de 65x41 -- o tamanho de 1 tijolo nessa
+     escala), gerada por JS pra cobrir a tela toda e se ajustar em
+     qualquer resolução. Cada bloco acende com :hover no mouse (CSS puro,
+     sem JS) e com toque no celular (JS: elementFromPoint no touchmove,
+     já que toque não tem estado de hover). header/main/footer ficam com
+     pointer-events:none (só os links do rodapé reativam) pra deixar o
+     mouse/dedo "atravessar" até a grade nas áreas vazias. -->
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -30,6 +31,7 @@
     display:flex; flex-direction:column;
     min-height:100vh;
     position:relative;
+    overflow:hidden;
   }
 
   /* ---------- Fundo: mesmo tratamento da .arena real do app ---------- */
@@ -42,6 +44,32 @@
     background-size:auto, 130px 41px, auto;
     image-rendering:pixelated;
   }
+
+  /* ---------- Grade de blocos interativos ---------- */
+  .brickGrid{
+    position:absolute; inset:0; z-index:0;
+    overflow:hidden;
+  }
+  .brick-cell{
+    position:absolute;
+    box-sizing:border-box;
+    background:rgba(224,160,90,0);
+    box-shadow:inset 0 0 0 1px rgba(224,160,90,0);
+    transition:background .5s ease, box-shadow .5s ease;
+  }
+  .brick-cell:hover, .brick-cell.lit{
+    background:rgba(224,160,90,.22);
+    box-shadow:inset 0 0 0 1px rgba(224,160,90,.55), 0 0 16px 3px rgba(224,160,90,.3);
+    transition:background .08s ease-out, box-shadow .08s ease-out;
+  }
+  @media (prefers-reduced-motion: reduce){
+    .brick-cell, .brick-cell:hover, .brick-cell.lit{ transition:none; }
+  }
+
+  /* header/main/footer deixam o ponteiro "atravessar" pras áreas vazias
+     chegarem na grade -- só os links do rodapé voltam a ser clicáveis. */
+  header.site, main, footer.site{ pointer-events:none; }
+  footer.site a{ pointer-events:auto; }
 
   /* ---------- Header ---------- */
   header.site{
@@ -98,6 +126,7 @@
 <body>
 
   <div class="dungeonBg" aria-hidden="true"></div>
+  <div class="brickGrid" id="brickGrid" aria-hidden="true"></div>
 
   <header class="site">
     <img src="/play/icon-192.png" alt="">
@@ -119,6 +148,68 @@
       <a href="/terms">Termos</a>
     </div>
   </footer>
+
+  <script>
+    // Gera a grade de blocos (1 bloco = 65x41, metade do tile de 130x41
+    // que o CSS já usa -- ou seja, cada <div> corresponde a 1 tijolo real
+    // da parede). Recalcula no resize (debounced) pra cobrir a tela toda
+    // em qualquer resolução/orientação.
+    (function(){
+      var host = document.getElementById('brickGrid');
+      var CELL_W = 65, CELL_H = 41;
+      var resizeTimer = null;
+
+      function build(){
+        host.innerHTML = '';
+        var cols = Math.ceil(window.innerWidth / CELL_W) + 1;
+        var rows = Math.ceil(window.innerHeight / CELL_H) + 1;
+        var frag = document.createDocumentFragment();
+        for (var r = 0; r < rows; r++){
+          for (var c = 0; c < cols; c++){
+            var cell = document.createElement('div');
+            cell.className = 'brick-cell';
+            cell.style.left = (c * CELL_W) + 'px';
+            cell.style.top = (r * CELL_H) + 'px';
+            cell.style.width = CELL_W + 'px';
+            cell.style.height = CELL_H + 'px';
+            frag.appendChild(cell);
+          }
+        }
+        host.appendChild(frag);
+      }
+
+      build();
+      window.addEventListener('resize', function(){
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(build, 200);
+      });
+
+      // Toque não tem :hover -- acende manualmente o bloco embaixo do dedo.
+      var litCell = null;
+      function litFromPoint(x, y){
+        var el = document.elementFromPoint(x, y);
+        if (el === litCell) return;
+        if (litCell) litCell.classList.remove('lit');
+        if (el && el.classList && el.classList.contains('brick-cell')){
+          el.classList.add('lit');
+          litCell = el;
+        } else {
+          litCell = null;
+        }
+      }
+      host.addEventListener('touchstart', function(e){
+        var t = e.touches[0]; if (!t) return;
+        litFromPoint(t.clientX, t.clientY);
+      }, {passive:true});
+      host.addEventListener('touchmove', function(e){
+        var t = e.touches[0]; if (!t) return;
+        litFromPoint(t.clientX, t.clientY);
+      }, {passive:true});
+      function clearLit(){ if (litCell){ litCell.classList.remove('lit'); litCell = null; } }
+      host.addEventListener('touchend', clearLit);
+      host.addEventListener('touchcancel', clearLit);
+    })();
+  </script>
 
 </body>
 </html>

@@ -1060,6 +1060,67 @@
     </div>
 
     <!-- etapa 2: escolha de plano -->
+    <!-- etapa 2 (2a PARADA DA SEQUENCIA, pedido do usuario: "tela nova,
+         tela de lembrete do plano, planos" -- reordenado pra ficar ANTES
+         da tela de planos, igual ao Skillion). Pergunta so 1x quando
+         avisar que o teste esta acabando -- reaproveita a mesma
+         estrutura visual dos cards de plano (.pwPlano/.pwPlanoRow/
+         .pwRadio, ja com o vidro com blur pedido pelo usuario) so
+         trocando o conteudo por opcoes de aviso. O botao aqui SO avanca
+         pra tela de planos (nao inicia nada ainda) -- ver
+         selecionarAviso()/atualizarResumoTrial() perto de
+         iniciarCompraAssinatura() no script principal. -->
+    <div class="pwEtapa" id="pwEtapa3">
+      <div class="pwConteudo">
+        <span class="pwEyebrow" data-i18n="pro.titulo">Plano Pro</span>
+        <h2 class="pwHeadline pwHeadlineMenor" data-i18n="pro.avisoHeadline">Quando avisamos que o teste tá acabando?</h2>
+        <p class="pwSub" data-i18n="pro.avisoSub">Um aviso dentro do app, pra você decidir se quer assinar antes do teste acabar.</p>
+
+        <div class="pwPlanos">
+          <div class="pwPlano" data-aviso="3" id="pwAviso3">
+            <div class="pwPlanoRow">
+              <div class="pwPlanoInfo">
+                <span class="pwPlanoNome" data-i18n="pro.aviso3Titulo">3 dias antes</span>
+              </div>
+              <span class="pwRadio"></span>
+            </div>
+          </div>
+          <div class="pwPlano sel" data-aviso="1" id="pwAviso1">
+            <div class="pwPlanoRow">
+              <div class="pwPlanoInfo">
+                <span class="pwPlanoNome" data-i18n="pro.aviso1Titulo">1 dia antes</span>
+              </div>
+              <span class="pwRadio"></span>
+            </div>
+          </div>
+          <div class="pwPlano" data-aviso="0" id="pwAviso0">
+            <div class="pwPlanoRow">
+              <div class="pwPlanoInfo">
+                <span class="pwPlanoNome" data-i18n="pro.aviso0Titulo">No último dia</span>
+              </div>
+              <span class="pwRadio"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="pwSpacer"></div>
+        <button class="pwCTA" id="paywallComecarTesteBtn" type="button" data-i18n="pro.continuar">Continuar</button>
+        <button class="pwSecundario" id="paywallAgoraNaoBtn3" type="button" data-i18n="pro.agoraNao">Agora não</button>
+      </div>
+    </div>
+
+    <!-- etapa 3 (3a e ULTIMA PARADA -- "planos", pedido do usuario) --
+         mesma tela de escolha de plano de antes, so que agora com a
+         linha do tempo do teste gratis (#pwResumoTrial, reaproveitando
+         .pwTrilha/.pwPasso da etapa 1) embutida ANTES do botao "Testar
+         gratis", igual a tela final do Skillion (plano + timeline juntos
+         na mesma tela). Preenchida por atualizarResumoTrial() (perto de
+         iniciarCompraAssinatura() no script principal) toda vez que a
+         etapa de aviso e' concluida. #pwResumoTrial some junto com
+         #paywallTrialBtn (mesma logica em abrirPaywall()) pra quem ja
+         usou o teste. Clicar em "Testar gratis" aqui agora chama
+         iniciarTesteGratis() direto (o aviso ja foi escolhido na tela
+         anterior). -->
     <div class="pwEtapa" id="pwEtapa2">
       <div class="pwConteudo">
         <span class="pwEyebrow" data-i18n="pro.titulo">Plano Pro</span>
@@ -1105,84 +1166,11 @@
           <span data-i18n="pro.microcopy">Cancele quando quiser</span>
         </div>
         <div class="pwSpacer"></div>
-        <!-- TESTE GRATIS (pedido do usuario) -- alternativa a assinar
-             direto: 7 dias de Plano Pro sem pagamento. Some sozinho (JS,
-             ver abrirPaywall()) se a conta ja usou o teste antes.
-             Escolher esta opcao manda pra etapa 3 (#pwEtapa3), que
-             pergunta quando avisar que o teste esta acabando, ANTES de
-             comecar de verdade (iniciarTesteGratis(), so chamada de la). -->
-        <button class="pwCTASecundaria" id="paywallTrialBtn" type="button" data-i18n="pro.testarGratis">Testar grátis por 7 dias</button>
-        <div class="pwCtaWrap">
-          <img class="pwMob" id="pwMobIcone" alt="">
-          <button class="pwCTA" id="paywallAssinarBtn" type="button" data-i18n="pro.assinar">Assinar Plano Pro</button>
-        </div>
-        <button class="pwSecundario" id="paywallAgoraNaoBtn2" type="button" data-i18n="pro.agoraNao">Agora não</button>
-      </div>
-    </div>
 
-    <!-- etapa 3: teste gratis -- pergunta so 1x, quando a pessoa opta por
-         "Testar gratis" na etapa 2, antes do trial comecar de verdade.
-         Reaproveita a mesma estrutura visual dos cards de plano
-         (.pwPlano/.pwPlanoRow/.pwRadio, ja com o vidro com blur pedido
-         pelo usuario) so trocando o conteudo por opcoes de aviso. Ver
-         selecionarAviso()/iniciarTesteGratis() perto de
-         iniciarCompraAssinatura() no script principal. -->
-    <div class="pwEtapa" id="pwEtapa3">
-      <div class="pwConteudo">
-        <span class="pwEyebrow" data-i18n="pro.titulo">Plano Pro</span>
-        <h2 class="pwHeadline pwHeadlineMenor" data-i18n="pro.avisoHeadline">Quando avisamos que o teste tá acabando?</h2>
-        <p class="pwSub" data-i18n="pro.avisoSub">Um aviso dentro do app, pra você decidir se quer assinar antes do teste acabar.</p>
-
-        <div class="pwPlanos">
-          <div class="pwPlano" data-aviso="3" id="pwAviso3">
-            <div class="pwPlanoRow">
-              <div class="pwPlanoInfo">
-                <span class="pwPlanoNome" data-i18n="pro.aviso3Titulo">3 dias antes</span>
-              </div>
-              <span class="pwRadio"></span>
-            </div>
-          </div>
-          <div class="pwPlano sel" data-aviso="1" id="pwAviso1">
-            <div class="pwPlanoRow">
-              <div class="pwPlanoInfo">
-                <span class="pwPlanoNome" data-i18n="pro.aviso1Titulo">1 dia antes</span>
-              </div>
-              <span class="pwRadio"></span>
-            </div>
-          </div>
-          <div class="pwPlano" data-aviso="0" id="pwAviso0">
-            <div class="pwPlanoRow">
-              <div class="pwPlanoInfo">
-                <span class="pwPlanoNome" data-i18n="pro.aviso0Titulo">No último dia</span>
-              </div>
-              <span class="pwRadio"></span>
-            </div>
-          </div>
-        </div>
-
-        <div class="pwSpacer"></div>
-        <button class="pwCTA" id="paywallComecarTesteBtn" type="button" data-i18n="pro.comecarTeste">Começar teste grátis</button>
-        <button class="pwSecundario" id="paywallAgoraNaoBtn3" type="button" data-i18n="pro.agoraNao">Agora não</button>
-      </div>
-    </div>
-
-    <!-- etapa 4: confirmacao do teste gratis (pedido do usuario: seguir a
-         sequencia de telas do Skillion -- linha do tempo "Hoje / aviso /
-         fim" antes de confirmar de vez). Reaproveita .pwTrilha/.pwPasso
-         (mesma trilha vertical da etapa 1) em vez de criar CSS novo. O
-         card do meio (#pwConfirmaAvisoPasso) e' escondido/preenchido
-         dinamicamente por atualizarResumoEtapa4() (perto de
-         iniciarTesteGratis() no script principal) porque o dia exato
-         depende do aviso escolhido na etapa 3 -- some de vez quando
-         avisoDias===0 (aviso cai no mesmo dia do fim, nao faz sentido
-         2 nos iguais). iniciarTesteGratis() so e' chamada daqui (botao
-         final), nunca direto da etapa 3. -->
-    <div class="pwEtapa" id="pwEtapa4">
-      <div class="pwConteudo">
-        <span class="pwEyebrow" data-i18n="pro.titulo">Plano Pro</span>
-        <h2 class="pwHeadline pwHeadlineMenor" data-i18n="pro.confirmarHeadline">Comece a evoluir com 7 dias grátis</h2>
-
-        <div class="pwTrilha">
+        <!-- TESTE GRATIS (pedido do usuario) -- linha do tempo + CTA.
+             Ambos somem juntos (JS, ver abrirPaywall()) pra quem ja usou
+             o teste antes. -->
+        <div class="pwTrilha pwTrilhaResumo" id="pwResumoTrial">
           <div class="pwTrilhaLinha"></div>
           <div class="pwPasso on">
             <div class="pwPassoNo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
@@ -1197,14 +1185,13 @@
             <div class="pwPassoTxt"><b data-i18n="pro.confirmarFimTitulo">Em 7 dias</b><span data-i18n="pro.confirmarFimSub">Teste acaba e volta pro plano grátis, sem cobrança</span></div>
           </div>
         </div>
+        <button class="pwCTASecundaria" id="paywallTrialBtn" type="button" data-i18n="pro.testarGratis">Testar grátis por 7 dias</button>
 
-        <div class="pwMicro">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-          <span data-i18n="pro.microcopy">Cancele quando quiser</span>
+        <div class="pwCtaWrap">
+          <img class="pwMob" id="pwMobIcone" alt="">
+          <button class="pwCTA" id="paywallAssinarBtn" type="button" data-i18n="pro.assinar">Assinar Plano Pro</button>
         </div>
-        <div class="pwSpacer"></div>
-        <button class="pwCTA" id="paywallConfirmarTesteBtn" type="button" data-i18n="pro.meusDiasGratis">Meus 7 dias grátis</button>
-        <button class="pwSecundario" id="paywallAgoraNaoBtn4" type="button" data-i18n="pro.agoraNao">Agora não</button>
+        <button class="pwSecundario" id="paywallAgoraNaoBtn2" type="button" data-i18n="pro.agoraNao">Agora não</button>
       </div>
     </div>
   </div>
@@ -3236,9 +3223,10 @@ function abrirPaywall(motivo){
   // TODA vez que o paywall abre (nao so 1x), porque o mesmo overlay e'
   // reaproveitado por qualquer gatilho PRO da sessao inteira.
   const btnTrialVisibilidade = document.getElementById('paywallTrialBtn');
-  if (btnTrialVisibilidade){
-    btnTrialVisibilidade.style.display = (typeof window.trialSalvo === 'function' && window.trialSalvo()) ? 'none' : '';
-  }
+  const resumoTrialVisibilidade = document.getElementById('pwResumoTrial');
+  const jaUsouTrial = (typeof window.trialSalvo === 'function' && window.trialSalvo());
+  if (btnTrialVisibilidade) btnTrialVisibilidade.style.display = jaUsouTrial ? 'none' : '';
+  if (resumoTrialVisibilidade) resumoTrialVisibilidade.style.display = jaUsouTrial ? 'none' : '';
   const overlay = document.getElementById('paywallOverlay');
   if (!overlay) return;
   irParaEtapaPaywall(1, false);
@@ -3267,10 +3255,16 @@ function irParaEtapaPaywall(n, animar){
   const direcao = n >= _pwEtapaAtual ? 1 : -1;
   _pwEtapaAtual = n;
   const e1 = document.getElementById('pwEtapa1');
-  const e2 = document.getElementById('pwEtapa2');
-  const e3 = document.getElementById('pwEtapa3'); // TESTE GRATIS -- etapa extra, so acessada a partir do botao "Testar gratis" na etapa 2
-  const e4 = document.getElementById('pwEtapa4'); // TESTE GRATIS -- confirmacao final (linha do tempo), so acessada a partir da etapa 3
-  [e1, e2, e3, e4].forEach((el, i) => {
+  // SEQUENCIA (pedido do usuario: "tela nova, tela de lembrete do plano,
+  // planos", igual ao Skillion) -- os IDs no HTML nao mudaram (pwEtapa2
+  // continua sendo o markup de planos, pwEtapa3 o de aviso/lembrete),
+  // so a ORDEM em que aparecem nessa lista, que e' o que decide qual
+  // tela e' o passo 2 e qual e' o passo 3. Passo 1 = pitch (e1), passo 2
+  // = lembrete do teste (e3), passo 3 = planos (e2, agora com a linha do
+  // tempo do teste embutida -- ver #pwResumoTrial no HTML).
+  const ePasso2 = document.getElementById('pwEtapa3');
+  const ePasso3 = document.getElementById('pwEtapa2');
+  [e1, ePasso2, ePasso3].forEach((el, i) => {
     if (!el) return;
     const ativar = (i === n - 1);
     el.classList.remove('pwStepIn', 'pwStepInVolta');
@@ -3280,13 +3274,13 @@ function irParaEtapaPaywall(n, animar){
       el.classList.add(direcao > 0 ? 'pwStepIn' : 'pwStepInVolta');
     }
   });
-  // as bolinhas de progresso (pwDot1/2) representam so o fluxo linear de
-  // compra (1 -> 2) -- a etapa 3 e' um desvio (trial), nao aparece nelas,
-  // por isso nenhuma das duas fica "on" quando n===3.
+  // as bolinhas de progresso (pwDot1/2) marcam so o inicio (pitch) e o
+  // fim (planos) do fluxo -- a tela de lembrete (passo 2) fica "entre"
+  // as duas, sem bolinha propria (so 2 bolinhas existem no HTML).
   const d1 = document.getElementById('pwDot1');
   const d2 = document.getElementById('pwDot2');
   if (d1) d1.classList.toggle('on', n === 1);
-  if (d2) d2.classList.toggle('on', n === 2);
+  if (d2) d2.classList.toggle('on', n === 3);
   const back = document.getElementById('paywallVoltarBtn');
   if (back) back.classList.toggle('on', n !== 1);
 }
@@ -3303,15 +3297,15 @@ function irParaEtapaPaywall(n, animar){
   const planoVitalicio = document.getElementById('pwPlanoVitalicio');
   const planosPorId = { mensal: planoMensal, anual: planoAnual, vitalicio: planoVitalicio };
 
-  // TESTE GRATIS -- botao na etapa 2 que desvia pra etapa 3 (escolha de
-  // aviso), a propria etapa 3 (aviso3/1/0 + botao "Comecar teste", que
-  // agora SO avanca pra etapa 4) e a etapa 4 (confirmacao/linha do tempo
-  // -- botao final que de fato chama iniciarTesteGratis()).
+  // TESTE GRATIS -- sequencia agora e' pitch(1) -> lembrete(2, #pwEtapa3)
+  // -> planos(3, #pwEtapa2, com a linha do tempo embutida). O botao
+  // "Continuar" do lembrete so avanca pro passo 3 (nada e' iniciado
+  // ainda); quem de fato inicia o teste e' o "Testar gratis" da tela de
+  // planos, chamando iniciarTesteGratis() direto (o aviso ja foi
+  // escolhido no passo 2).
   const btnTrial = document.getElementById('paywallTrialBtn');
   const btnAgoraNao3 = document.getElementById('paywallAgoraNaoBtn3');
   const btnComecarTeste = document.getElementById('paywallComecarTesteBtn');
-  const btnAgoraNao4 = document.getElementById('paywallAgoraNaoBtn4');
-  const btnConfirmarTeste = document.getElementById('paywallConfirmarTesteBtn');
   const avisoPorId = {
     3: document.getElementById('pwAviso3'),
     1: document.getElementById('pwAviso1'),
@@ -3319,16 +3313,14 @@ function irParaEtapaPaywall(n, animar){
   };
 
   if (btnFechar) btnFechar.onclick = fecharPaywall;
-  if (btnVoltar) btnVoltar.onclick = () => irParaEtapaPaywall(_pwEtapaAtual === 4 ? 3 : (_pwEtapaAtual === 3 ? 2 : 1));
+  if (btnVoltar) btnVoltar.onclick = () => irParaEtapaPaywall(_pwEtapaAtual === 3 ? 2 : 1);
   if (btnContinuar) btnContinuar.onclick = () => irParaEtapaPaywall(2);
   if (btnAgoraNao1) btnAgoraNao1.onclick = fecharPaywall;
   if (btnAgoraNao2) btnAgoraNao2.onclick = fecharPaywall;
   if (btnAssinar) btnAssinar.onclick = iniciarCompraAssinatura;
-  if (btnTrial) btnTrial.onclick = () => irParaEtapaPaywall(3);
+  if (btnTrial) btnTrial.onclick = () => iniciarTesteGratis(_pwAvisoSelecionado);
   if (btnAgoraNao3) btnAgoraNao3.onclick = fecharPaywall;
-  if (btnComecarTeste) btnComecarTeste.onclick = () => { atualizarResumoEtapa4(); irParaEtapaPaywall(4); };
-  if (btnAgoraNao4) btnAgoraNao4.onclick = fecharPaywall;
-  if (btnConfirmarTeste) btnConfirmarTeste.onclick = () => iniciarTesteGratis(_pwAvisoSelecionado);
+  if (btnComecarTeste) btnComecarTeste.onclick = () => { atualizarResumoTrial(); irParaEtapaPaywall(3); };
 
   // selecao de aviso -- mesmo padrao de selecionarPlano() logo abaixo,
   // so guarda em _pwAvisoSelecionado (lida por iniciarTesteGratis()).
@@ -3431,14 +3423,15 @@ function diasRestantesTrial(){
   return Math.max(0, Math.ceil((t.fim - Date.now()) / 86400000));
 }
 
-// Preenche a etapa 4 (#pwEtapa4, linha do tempo de confirmacao) com o
-// dia exato em que o aviso do meio ("Em X dias") vai acontecer, com base
-// no que foi escolhido na etapa 3 (_pwAvisoSelecionado). Chamada 1x, no
-// clique de "Comecar teste" (etapa 3 -> 4, ver bloco de wiring dos
-// botoes do paywall). Quando avisoDias===0 o aviso cai no MESMO dia do
-// fim do teste -- nesse caso esconde o no do meio (2 linhas dizendo "Em
-// 7 dias" ficaria redundante e confuso).
-function atualizarResumoEtapa4(){
+// Preenche a linha do tempo de resumo do teste (#pwResumoTrial, dentro
+// da tela de planos) com o dia exato em que o aviso do meio ("Em X
+// dias") vai acontecer, com base no que foi escolhido na tela de
+// lembrete (_pwAvisoSelecionado). Chamada 1x, no clique de "Continuar"
+// daquela tela (ver bloco de wiring dos botoes do paywall). Quando
+// avisoDias===0 o aviso cai no MESMO dia do fim do teste -- nesse caso
+// esconde o no do meio (2 linhas dizendo "Em 7 dias" ficaria redundante
+// e confuso).
+function atualizarResumoTrial(){
   const passo = document.getElementById('pwConfirmaAvisoPasso');
   const titulo = document.getElementById('pwConfirmaAvisoTitulo');
   if (_pwAvisoSelecionado === 0){

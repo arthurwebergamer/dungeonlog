@@ -5554,3 +5554,15 @@
   0%, 100%{ box-shadow:0 0 0 1px rgba(242,201,76,.55), 0 0 6px rgba(242,201,76,.4); }
   50%{ box-shadow:0 0 0 1px rgba(242,201,76,.75), 0 0 13px rgba(242,201,76,.85); }
 }
+
+/* Resumo do teste gratis (linha do tempo) dentro da tela de planos
+   (pedido do usuario: seguir a sequencia do Skillion -- plano + timeline
+   na mesma tela final). Reaproveita .pwTrilha/.pwPasso da etapa 1, mas
+   aqui SEM flex:4 (que la' e' pensado pra ocupar a tela inteira sozinha)
+   -- linha compacta, so a altura que o conteudo precisa, porque essa
+   tela ja divide espaco com os cards de plano (.pwPlanos, que continua
+   com flex:4 1 0). */
+.pwTrilhaResumo{ flex:none; margin:2px 0 16px; }
+.pwTrilhaResumo .pwPasso{ min-height:52px; gap:12px; }
+.pwTrilhaResumo .pwPassoNo{ width:42px; height:42px; border-radius:11px; }
+.pwTrilhaResumo .pwPassoNo svg{ width:18px; height:18px; }

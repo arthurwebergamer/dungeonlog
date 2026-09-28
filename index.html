@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<!-- Landing page raiz do domínio dungeonlog.weberlabs.com.br.
+     Substitui a antiga waitlist/ (removida — inclusive o Firestore de captura
+     de e-mail que ela usava, ver commit). Bem simples de propósito: logo, nome,
+     tagline curta, fundo de montanhas em CSS puro (sem asset de imagem — zero
+     peso extra) e rodapé com Privacy/Terms. Sem CTA, sem formulário, sem JS. -->
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DungeonLog</title>
+<meta name="description" content="DungeonLog — sua lista de tarefas vira uma masmorra.">
+<link rel="icon" href="/play/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/site.css">
+<style>
+  html,body{ height:100%; }
+  body{
+    display:flex; flex-direction:column;
+    min-height:100vh;
+    position:relative;
+    overflow-x:hidden;
+    background:
+      linear-gradient(180deg, #1c1c1c 0%, var(--bg) 55%);
+  }
+
+  /* Fundo de montanhas: 3 camadas de polígonos CSS puro (clip-path), sem
+     nenhum arquivo de imagem. Mais escura ao fundo, mais clara na frente
+     (parallax visual simples, sem JS). */
+  .mountains{
+    position:absolute; left:0; right:0; bottom:0;
+    width:100%; height:52vh; min-height:280px;
+    z-index:0; pointer-events:none;
+  }
+  .mountains .layer{ position:absolute; left:0; right:0; bottom:0; width:100%; height:100%; }
+  .mountains .l1{ background:#232323; clip-path:polygon(0% 100%,0% 70%,12% 55%,22% 68%,34% 40%,46% 62%,58% 48%,70% 66%,82% 50%,92% 64%,100% 58%,100% 100%); }
+  .mountains .l2{ background:#2c2c2c; height:78%; clip-path:polygon(0% 100%,0% 60%,10% 78%,20% 50%,32% 72%,44% 46%,56% 70%,68% 52%,80% 74%,90% 56%,100% 72%,100% 100%); }
+  .mountains .l3{ background:var(--panel-2); height:52%; clip-path:polygon(0% 100%,0% 68%,15% 44%,28% 70%,40% 50%,55% 76%,68% 46%,82% 68%,100% 50%,100% 100%); }
+
+  main{
+    position:relative; z-index:1;
+    flex:1;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center;
+    padding:40px 24px 30vh;
+  }
+  .logo{
+    width:88px; height:88px; border-radius:20px;
+    image-rendering:pixelated;
+    box-shadow:0 10px 30px rgba(0,0,0,.45);
+    margin-bottom:22px;
+  }
+  h1{
+    font-family:'Outfit', sans-serif; font-weight:800; letter-spacing:-.02em;
+    font-size:clamp(2rem, 6vw, 3rem);
+  }
+  p.tag{
+    margin-top:10px;
+    color:var(--muted);
+    font-size:clamp(.95rem, 2vw, 1.1rem);
+  }
+  footer.site{ position:relative; z-index:1; border-top-color:rgba(255,255,255,.08); background:rgba(0,0,0,.15); }
+</style>
+</head>
+<body>
+
+  <div class="mountains" aria-hidden="true">
+    <div class="layer l1"></div>
+    <div class="layer l2"></div>
+    <div class="layer l3"></div>
+  </div>
+
+  <main>
+    <img class="logo" src="/play/icon-192.png" alt="DungeonLog" width="88" height="88">
+    <h1>DungeonLog</h1>
+    <p class="tag">Sua lista de tarefas vira uma masmorra.</p>
+  </main>
+
+  <footer class="site">
+    <div class="wrap">
+      <a href="/privacy">Política de Privacidade</a>
+      <span class="dot">·</span>
+      <a href="/terms">Termos de Uso</a>
+    </div>
+    <span class="copy">DungeonLog</span>
+  </footer>
+
+</body>
+</html>

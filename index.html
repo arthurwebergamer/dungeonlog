@@ -21,17 +21,17 @@
      - Título ganhou uma barrinha (underline) fina e curta embaixo,
        centralizada -- único elemento de "estilo" novo, mantendo clean.
 
-     Ajuste de contraste (3 tentativas): texto direto sobre o tijolo
-     ficava quase ilegível em trechos mais claros da parede.
+     Ajuste de contraste (4 tentativas):
      1) painel de vidro atrás de tudo -- "parece um quadradão".
-     2) pastilha escura por linha (box-decoration-break) -- ainda achou
-        ruim ("horrível"), confirmou que o problema é especificamente
-        qualquer FORMA/CAIXA atrás do texto, não o fundo nem o layout.
-     3ª tentativa (esta, sem nenhuma forma/caixa): contraste só na
-     própria tipografia -- contorno preto fino ao redor de cada letra
-     (text-shadow em 4 direções, técnica clássica de legenda/HUD de
-     jogo) + uma sombra suave por baixo. Garante leitura em qualquer
-     trecho da parede sem desenhar nenhum retângulo/pastilha visível. -->
+     2) pastilha escura por linha -- ainda "horrível".
+     3) contorno preto na letra (estilo legenda/HUD) -- usuário rejeitou:
+        quer "estilo Apple", sem esse contorno, "pra ser simples".
+     4ª tentativa (esta): nada NO texto (sem contorno, sem peso extra-
+     bold) -- o contraste vem de escurecer a PRÓPRIA foto de fundo numa
+     faixa ampla e suave atrás do texto (gradiente radial largo, sem
+     borda perceptível), exatamente como a Apple escurece a foto/vídeo
+     de fundo atrás do título nas páginas de produto, em vez de mexer no
+     texto. Tipografia: peso 600 (semibold, não 800), sem text-shadow. -->
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -72,6 +72,15 @@
   header.site img{ width:26px; height:26px; border-radius:6px; }
   header.site span{ font-family:'Outfit',sans-serif; font-weight:600; letter-spacing:-.01em; font-size:.95rem; color:var(--text); }
 
+  /* Escurece uma faixa ampla e suave atrás do texto -- sem borda
+     perceptível, então não lê como "caixa". É o mesmo truque que a
+     Apple usa: escurecer a própria imagem de fundo, não desenhar algo
+     sobre o texto. */
+  .dim{
+    position:absolute; inset:0; z-index:0; pointer-events:none;
+    background:radial-gradient(58% 42% at 50% 50%, rgba(0,0,0,.5) 0%, rgba(0,0,0,.22) 55%, rgba(0,0,0,0) 85%);
+  }
+
   /* ---------- Hero ---------- */
   main{
     position:relative; z-index:1;
@@ -82,29 +91,21 @@
   }
   h1{
     font-family:'Outfit', sans-serif;
-    font-weight:800;
-    letter-spacing:-.02em;
+    font-weight:600;
+    letter-spacing:-.01em;
     line-height:1.3;
-    font-size:clamp(1.3rem, 3.8vw, 2rem);
+    font-size:clamp(1.4rem, 4vw, 2.1rem);
     max-width:480px;
     color:#fff;
-    text-shadow:
-      -1.5px -1.5px 0 rgba(0,0,0,.85),
-       1.5px -1.5px 0 rgba(0,0,0,.85),
-      -1.5px  1.5px 0 rgba(0,0,0,.85),
-       1.5px  1.5px 0 rgba(0,0,0,.85),
-       0 6px 18px rgba(0,0,0,.55);
   }
   .soon{
     display:block;
     margin-top:16px;
     font-family:'Outfit', sans-serif;
-    font-size:.74rem;
-    letter-spacing:.02em;
+    font-weight:300;
+    font-size:.8rem;
+    letter-spacing:.01em;
     color:var(--muted);
-    text-shadow:
-      -1px -1px 0 rgba(0,0,0,.8), 1px -1px 0 rgba(0,0,0,.8),
-      -1px  1px 0 rgba(0,0,0,.8), 1px  1px 0 rgba(0,0,0,.8);
   }
 
   /* ---------- Footer ---------- */
@@ -121,6 +122,7 @@
 <body>
 
   <div class="dungeonBg" aria-hidden="true"></div>
+  <div class="dim" aria-hidden="true"></div>
 
   <header class="site">
     <img src="/play/icon-192.png" alt="">

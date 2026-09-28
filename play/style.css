@@ -2218,10 +2218,14 @@
     flex:4 1 0; min-height:0;
   }
   .pwPlano{
-    position:relative; background:var(--pw-panel); border:1.5px solid var(--pw-panel2);
-    border-radius:14px; padding:15px 16px; cursor:pointer;
+    position:relative; border-radius:14px; padding:15px 16px; cursor:pointer;
+    /* pedido do usuario: mesmo vidro escuro com blur do .pwPassoNo
+       (contraste contra a arte de fundo), aplicado aqui nos cards de
+       plano. */
+    background:rgba(10,10,10,.55); backdrop-filter:blur(7px); -webkit-backdrop-filter:blur(7px);
+    border:1.5px solid rgba(255,255,255,.16); box-shadow:0 4px 14px rgba(0,0,0,.3);
   }
-  .pwPlano.sel{ border-color:var(--pw-accent); background:var(--pw-panel2); }
+  .pwPlano.sel{ border-color:var(--pw-accent); background:rgba(30,30,30,.65); }
   .pwPlanoRow{ display:flex; align-items:center; width:100%; gap:12px; }
   .pwPlanoInfo{ display:flex; flex-direction:column; gap:3px; flex:1; }
   .pwPlanoNome{ font-size:15px; font-weight:700; display:flex; align-items:center; gap:8px; }

@@ -241,16 +241,20 @@
       <span class="pjNomeTopo" id="pjNomeTopo"></span>
       <span class="lvl" id="lvl">Nível I</span>
     </div>
-    <!-- PLANO PRO (pedido do usuario): nome do heroi + badge "PRO", bem
-         no meio da .topbar, na MESMA linha/fonte de #lvl -- morava em
-         cima do sprite do heroi na Arena (.fighter), mas o usuario pediu
-         pra subir pra essa linha do topo. .topbar virou grid de 3
-         colunas (1fr auto 1fr) so pra isso -- ver regra em style.css,
-         perto de .proBadge -- assim esse bloco fica centralizado de
-         verdade (nao "meio a meio" entre #pjTrigger e .coins, que tem
-         larguras diferentes). -->
+    <!-- PLANO PRO (pedido do usuario): nome do heroi bem no meio da
+         .topbar, na MESMA linha/fonte de #lvl -- morava em cima do
+         sprite do heroi na Arena (.fighter), mas o usuario pediu pra
+         subir pra essa linha do topo. .topbar virou grid de 3 colunas
+         (1fr auto 1fr) so pra isso -- ver regra em style.css, perto de
+         .nomeBadgeTopo -- assim esse bloco fica centralizado de verdade
+         (nao "meio a meio" entre #pjTrigger e .coins, que tem larguras
+         diferentes). Teve uma badge "PRO" do lado do nome (e outra em
+         #perfilNome, Perfil) -- removida a pedido do usuario ("acho que
+         pode tirar a badge sinceramente"), incluindo toda a logica JS
+         que ligava/desligava ela (atualizarBadgesPro()) e o CSS
+         (.proBadge). -->
     <div class="nomeBadgeTopo">
-      <span id="nomeTopo">Aventureiro</span><span class="proBadge" id="nomeTopoProBadge" data-i18n="pro.trancado">PRO</span>
+      <span id="nomeTopo">Aventureiro</span>
     </div>
     <!-- v4.20x (pedido do usuario): o botao de mudo saiu daqui e virou
          uma linha em Preferencias (#cfgRowSom, perto de #cfgRowFeedback)
@@ -526,7 +530,7 @@
         <div class="perfilheroLinha">
           <div class="hero-sprite" id="perfilHeroSprite"></div>
           <div class="perfilheroInfo">
-            <div class="perfilnome" id="perfilNome"><span id="perfilNomeTxt">Aventureiro</span><span class="proBadge" id="perfilNomeProBadge" data-i18n="pro.trancado">PRO</span></div>
+            <div class="perfilnome" id="perfilNome"><span id="perfilNomeTxt">Aventureiro</span></div>
             <div class="xpwrap">
               <div class="xprow hprow">
                 <span class="xplabel" data-i18n="jogo.vida">Vida</span>
@@ -3171,27 +3175,6 @@ function assinaturaAtiva(){
 }
 window.assinaturaAtiva = assinaturaAtiva;
 
-// BADGE "PRO" (pedido do usuario) ao lado do nome do personagem -- 2
-// lugares (#nomeTopoProBadge na Arena, #perfilNomeProBadge no Perfil).
-// So mostra/esconde (display), o CSS (.proBadge, perto de .pwBadge em
-// style.css) cuida do brilho. Chamada direto de render() (Arena) e da
-// funcao que atualiza o Perfil -- ambas ja rodam sempre que a
-// assinatura/trial muda (compra, trial iniciado/expirado, modo debug).
-function atualizarBadgesPro(){
-  // BUG CORRIGIDO: .proBadge tem display:none como padrao no CSS
-  // (style.css) pra nao "piscar" visivel antes do 1o render(). Setar
-  // style.display='' aqui NAO sobrepoe essa regra -- so remove o inline
-  // style, o que faz o computed style CAIR DE VOLTA pro default do CSS
-  // (display:none), entao a badge nunca aparecia mesmo com
-  // assinaturaAtiva()===true. Precisa de um valor real (inline-block).
-  const ativo = assinaturaAtiva();
-  ['nomeTopoProBadge', 'perfilNomeProBadge'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = ativo ? 'inline-block' : 'none';
-  });
-}
-window.atualizarBadgesPro = atualizarBadgesPro;
-
 // ---------------------------------------------------------------------
 // PLANO PRO -- paywall central (pedido do usuario: telas de Estatisticas
 // bloqueadas + limite de tarefas + integrar pagamento de verdade). Um SO
@@ -4704,7 +4687,6 @@ function render(){
     document.getElementById('fill').style.width = Math.round((p.resto/p.meta)*100) + '%';
   }
   document.getElementById('nomeTopo').textContent = nomeHeroi || (idiomaApp() === 'en' ? 'Adventurer' : 'Aventureiro');
-  if (typeof window.atualizarBadgesPro === 'function') window.atualizarBadgesPro();
 
   if (jaComecou) salvar();
 }
@@ -9120,7 +9102,6 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 
     document.getElementById('perfilSub').textContent = (idiomaApp() === 'en' ? 'Level ' : 'Nível ') + romano(p.nivel);
     document.getElementById('perfilNomeTxt').textContent = (typeof nomeHeroi !== 'undefined' && nomeHeroi) || (idiomaApp() === 'en' ? 'Adventurer' : 'Aventureiro');
-    if (typeof window.atualizarBadgesPro === 'function') window.atualizarBadgesPro();
     document.getElementById('perfilFill').style.width = Math.round((p.resto / p.meta) * 100) + '%';
     document.getElementById('perfilXpNum').textContent = p.resto + ' / ' + p.meta + ' XP';
 

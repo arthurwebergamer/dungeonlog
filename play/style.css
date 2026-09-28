@@ -5534,36 +5534,53 @@
 .cfgHeroisLista{ display:flex; flex-direction:column; gap:2px; margin-bottom:8px; }
 
 /* BADGE "PRO" (pedido do usuario) ao lado do nome do personagem -- usada
-   em #nomeTopo (Arena, sibling span) e dentro de #perfilNome (Perfil,
+   em #nomeTopo (.topbar, sibling span) e dentro de #perfilNome (Perfil,
    sibling de #perfilNomeTxt). Escondida por padrao (display:none) pra
    nao "piscar" visivel antes do 1o render() rodar -- JS
    (atualizarBadgesPro(), perto de assinaturaAtiva() no script principal)
    decide quando mostrar, chamada sempre que a Arena ou o Perfil
-   re-renderizam. Dourado (mesma cor das moedas, #F2C94C) com brilho
-   pulsante sutil -- combina com o tom de "conquista"/prestigio do resto
-   do app sem chamar atencao demais. */
-/* Agrupa nome do heroi + badge PRO na mesma linha, dentro da Arena
-   (pedido do usuario: "apareceria o nome do personagem e do lado essa
-   badge"). #nomeTopo/.proBadge sao filhos DIRETOS de .fighter antes
-   dessa mudanca -- e .fighter e' flex-direction:column, entao cada um
-   virava um item de flex separado e EMPILHAVA verticalmente em vez de
-   ficar lado a lado (diferente do Perfil, onde nome+badge ja ficam
-   dentro de um <div> comum, .perfilnome, sem virar flex-item). Esse
-   wrapper resolve o mesmo jeito: agora nome+badge ficam dentro de UM
-   unico item de flex (.fighterNome), com display:flex proprio pra
-   alinhar os dois na horizontal. */
-.fighterNome{ display:flex; align-items:center; }
+   re-renderizam. */
+/* Nome do heroi + badge PRO, centralizados na .topbar (pedido do
+   usuario: "colocar em cima ali na linha que fica nível essas coisas na
+   mesma fonte mas no meio"). .topbar era flex simples com
+   justify-content:space-between (#pjTrigger vs .coins nas pontas) --
+   vira grid de 3 colunas (1fr auto 1fr) pra esse bloco novo cair
+   EXATAMENTE no meio da barra inteira, e nao so no meio do espaco vazio
+   entre #pjTrigger e .coins (que tem larguras diferentes uma da outra).
+   #nomeTopo herda a MESMA fonte de #lvl (Outfit, 600, 13px) -- so a cor
+   fica um pouco mais discreta (var(--muted)) pra nao competir com o
+   nivel, que continua sendo a info principal daquela barra. */
+.topbar{ display:grid; grid-template-columns:1fr auto 1fr; }
+.topbar .pjTrigger{ justify-self:start }
+.topbar .coins{ justify-self:end }
+.nomeBadgeTopo{ display:flex; align-items:center; justify-self:center; gap:2px }
+.nomeBadgeTopo #nomeTopo{
+  font-family:'Outfit',sans-serif; font-size:13px; font-weight:600;
+  color:var(--muted); white-space:nowrap;
+}
+
+/* Badge mais "premium" (pedido do usuario: "cor mais escura pra ficar
+   um aspecto mais premium") -- selo escuro com borda/texto dourados, no
+   lugar do pill claro de antes. Cores FIXAS (nao usam var(--gold) etc)
+   de proposito: o tema "branco" redefine --gold pra um cinza escuro
+   (fica coerente no resto da UI dele, mas nao e' mais "dourado"), e um
+   selo assim perderia a cara de premium logo no tema mais usado por
+   quem prefere contraste alto. Fundo quase preto SEMPRE contra texto
+   dourado SEMPRE garante o mesmo contraste interno em qualquer tema; a
+   borda dourada translucida garante uma borda visivel mesmo quando o
+   fundo por tras da badge (arena, cores por tema) tambem for escuro. */
 .proBadge{
   display:none; margin-left:6px; padding:1px 7px; border-radius:999px;
   font-family:'Outfit',sans-serif; font-size:9px; font-weight:800; letter-spacing:.04em;
-  color:#3D2E05; background:linear-gradient(135deg,#FFE9A8,#F2C94C 55%,#D9A62B);
-  box-shadow:0 0 0 1px rgba(242,201,76,.55), 0 0 8px rgba(242,201,76,.55);
+  color:#F2C94C; background:linear-gradient(135deg,#2A2015,#1A130B 55%,#0D0905);
+  border:1px solid rgba(242,201,76,.55);
+  box-shadow:0 0 0 1px rgba(0,0,0,.4), 0 0 8px rgba(242,201,76,.35);
   vertical-align:middle; position:relative; top:-1px;
   animation:proBadgePulso 2.4s ease-in-out infinite;
 }
 @keyframes proBadgePulso{
-  0%, 100%{ box-shadow:0 0 0 1px rgba(242,201,76,.55), 0 0 6px rgba(242,201,76,.4); }
-  50%{ box-shadow:0 0 0 1px rgba(242,201,76,.75), 0 0 13px rgba(242,201,76,.85); }
+  0%, 100%{ box-shadow:0 0 0 1px rgba(0,0,0,.4), 0 0 6px rgba(242,201,76,.3); }
+  50%{ box-shadow:0 0 0 1px rgba(0,0,0,.4), 0 0 12px rgba(242,201,76,.7); }
 }
 
 /* Tela de planos (#pwEtapa2, 3a e ultima parada da sequencia). Historico:

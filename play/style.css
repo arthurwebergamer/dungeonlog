@@ -5570,12 +5570,20 @@
    um selo branco/texto escuro tem o MESMO contraste interno alto
    sempre, em qualquer tema -- so precisa de uma borda escura pra nao
    sumir contra um fundo claro (tema "branco"), que a regra ja da. */
+/* v3 (pedido do usuario: "não ficou muito bem visivel") -- v2 (branca
+   lisa, borda fina 30% preto) sumia contra fundos claros/medios e nem
+   sempre chamava atencao contra os escuros -- pouco peso visual pra uma
+   badge que devia se destacar. Sobe font-size/padding, borda mais grossa
+   e escura (contorno solido, nao translucido) + sombra solida (sem
+   glow, so profundidade tipo "sticker" descolando do fundo) pra
+   garantir presenca em qualquer fundo. */
 .proBadge{
-  display:none; margin-left:6px; padding:2px 6px; border-radius:4px;
-  font-family:'Silkscreen',monospace; font-size:8px; font-weight:400; letter-spacing:.02em;
-  color:#2B2620; background:#F2EEE4;
-  border:1px solid rgba(0,0,0,.3);
-  vertical-align:middle; position:relative; top:-1px;
+  display:none; margin-left:6px; padding:3px 8px; border-radius:4px;
+  font-family:'Silkscreen',monospace; font-size:10px; font-weight:400; letter-spacing:.03em;
+  color:#1C1A16; background:#FDFBF6;
+  border:1.5px solid #1C1A16;
+  box-shadow:0 2px 0 rgba(0,0,0,.5);
+  vertical-align:middle; position:relative; top:-2px;
 }
 
 /* Tela de planos (#pwEtapa2, 3a e ultima parada da sequencia). Historico:

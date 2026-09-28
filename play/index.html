@@ -1217,11 +1217,11 @@
         <div class="pwSpacer"></div>
 
         <!-- CTA UNICO -- texto/acao mudam conforme o card selecionado
-             (selecionarPlano() escreve #paywallAssinarBtn direto). -->
-        <div class="pwCtaWrap">
-          <img class="pwMob" id="pwMobIcone" alt="">
-          <button class="pwCTA" id="paywallAssinarBtn" type="button">Testar grátis por 7 dias</button>
-        </div>
+             (selecionarPlano() escreve #paywallAssinarBtn direto). Sem o
+             bicho decorativo (.pwMob) que tinha na v1 desta tela --
+             pedido do usuario: tela ainda "tem muita coisa", cortando
+             espaco decorativo pra caber sem rolar. -->
+        <button class="pwCTA" id="paywallAssinarBtn" type="button">Testar grátis por 7 dias</button>
         <button class="pwSecundario" id="paywallAgoraNaoBtn2" type="button" data-i18n="pro.agoraNao">Agora não</button>
       </div>
     </div>
@@ -3243,13 +3243,6 @@ function abrirPaywall(motivo){
   if (fundo && !fundo.src && typeof TEMAS_ARENA !== 'undefined'){
     const floresta = TEMAS_ARENA.find(t => t.id === 'floresta');
     if (floresta) fundo.src = 'data:image/png;base64,' + floresta.arte;
-  }
-  // Monstro sentado em cima do botao "Assinar Plano Pro" (etapa 2) =
-  // sprite real MONSTROS[31] ("Goblin fungoso", bioma floresta,
-  // assets.js) -- mesmo padrao (so preenche 1x).
-  const mob = document.getElementById('pwMobIcone');
-  if (mob && !mob.src && typeof MONSTROS !== 'undefined' && MONSTROS[31]){
-    mob.src = MONSTROS[31].img;
   }
   if (typeof window.aviso === 'function'){
     window.aviso((typeof idiomaApp === 'function' && idiomaApp() === 'en') ? 'You found a premium feature!' : 'Você descobriu um recurso premium!');

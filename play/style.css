@@ -5581,3 +5581,38 @@
    de tentar espremer tudo em 100% via flex-grow. */
 #pwEtapa2 .pwConteudo{ height:auto; min-height:100%; }
 #pwEtapa2 .pwPlanos{ flex:none; }
+
+/* COMPACTACAO (pedido do usuario: "ainda tem muita coisa, tenho que
+   arrastar pra baixo" -- a tela de planos com timeline+4 cards+CTA ainda
+   nao cabia inteira sem rolar, mesmo depois do fix de overlap acima).
+   So nesta etapa: reduz os espacos verticais genericos (pensados pra
+   telas com bem menos conteudo) pra tentar caber tudo numa tela de
+   celular comum sem rolagem. Numeros por tentativa, nao ha regra exata
+   -- reduzir mais que isso comeca a apertar demais os cards. */
+/* padding-top:54px (nao menos -- #pwTopo, o header com voltar/bolinhas/
+   fechar, e' position:absolute e termina por volta de 50px; menos que
+   isso e o eyebrow "PLANO PRO" fica embaixo do botao de fechar). O resto
+   dos cortes abaixo compensa esses 54px pra ainda caber tudo sem rolar. */
+#pwEtapa2 .pwConteudo{ padding-top:54px; }
+#pwEtapa2 .pwEyebrow{ margin-bottom:4px; }
+#pwEtapa2 .pwHeadlineMenor{ font-size:20px; }
+#pwEtapa2 .pwTrilhaResumo{ margin:0 0 8px; }
+#pwEtapa2 .pwTrilhaResumo .pwPasso{ min-height:34px; gap:10px; }
+#pwEtapa2 .pwTrilhaResumo .pwPassoNo{ width:30px; height:30px; border-radius:8px; }
+#pwEtapa2 .pwTrilhaResumo .pwPassoNo svg{ width:13px; height:13px; }
+#pwEtapa2 .pwTrilhaResumo .pwPassoTxt b{ font-size:12.5px; }
+#pwEtapa2 .pwTrilhaResumo .pwPassoTxt span{ font-size:9.5px; }
+/* gap fica em 12px (nao menos) -- .pwPopular ("MAIS POPULAR", no card
+   Anual) usa position:absolute com top:-9px pra "furar" a borda de cima
+   do proprio card; com um gap menor que isso ela passa a sobrepor o
+   card ANTERIOR (Mensal) em vez de so furar a propria borda. */
+#pwEtapa2 .pwPlanos{ gap:12px; margin:6px 0 2px; }
+#pwEtapa2 .pwPlano{ padding:8px 14px; }
+#pwEtapa2 .pwMicro{ margin:6px 0 6px; }
+#pwEtapa2 .pwCTA{ padding:12px; }
+#pwEtapa2 .pwSecundario{ padding:6px 2px 0; }
+/* .pwSpacer e' flex:1 por padrao (absorve TODO espaco sobrando pra grudar
+   o CTA embaixo da tela) -- certo pras outras 2 etapas (pouco conteudo,
+   tela cheia), mas na etapa2 ja compactada isso sobra um vao vazio enorme
+   entre os cards e o botao. Aqui vira so um respiro fixo pequeno. */
+#pwEtapa2 .pwSpacer{ flex:none; min-height:14px; }

@@ -1,19 +1,25 @@
 <!DOCTYPE html>
 <!-- Landing page raiz do domínio dungeonlog.weberlabs.com.br.
      Substitui a antiga waitlist/ (removida). Fundo = mesma fórmula que a
-     .arena de combate real usa (play/style.css ~linha 1006): o tile
-     TEMA_ARENA_TILE_B64 (o bloco "padrão" da Arena) + gradiente vertical
-     com as cores do tema Grafite (--arena-1/2/3) + vinheta radial.
+     .arena de combate real usa (play/style.css ~linha 1006): tile
+     TEMA_ARENA_TILE_B64 + gradiente vertical com as cores do tema
+     Grafite (--arena-1/2/3) + vinheta radial. Estático, sem animação --
+     a versão com blocos acendendo no hover/toque foi tentada e removida
+     a pedido do usuário (queria algo mais clean).
 
-     Camada extra (pedido do usuário): "onde eu passar o dedo ou o mouse,
-     o bloco destaca/acende". Implementado como uma GRADE REAL de blocos
-     invisíveis (um <div> por bloco de 65x41 -- o tamanho de 1 tijolo nessa
-     escala), gerada por JS pra cobrir a tela toda e se ajustar em
-     qualquer resolução. Cada bloco acende com :hover no mouse (CSS puro,
-     sem JS) e com toque no celular (JS: elementFromPoint no touchmove,
-     já que toque não tem estado de hover). header/main/footer ficam com
-     pointer-events:none (só os links do rodapé reativam) pra deixar o
-     mouse/dedo "atravessar" até a grade nas áreas vazias. -->
+     Ajustes desta versão:
+     - Removida a grade interativa (JS) por completo.
+     - Ícone do header sem image-rendering:pixelated -- o ícone real
+       (play/icon-192.png) é arte "lisa" (sombreada), não pixel art; o
+       pixelated forçava reamostragem nearest-neighbor ao encolher pra
+       26px e ficava serrilhado/ruim. Sem essa propriedade o navegador
+       reamostra suave, que é o certo pra esse arquivo.
+     - Removido body{overflow:hidden}: no celular ele podia cortar o
+       rodapé (Privacidade/Termos) fora da tela sem permitir rolar até
+       ele. Agora a página rola normalmente se o conteúdo não couber.
+     - Texto do hero encurtado (1 frase em vez de 2).
+     - Título ganhou uma barrinha (underline) fina e curta embaixo,
+       centralizada -- único elemento de "estilo" novo, mantendo clean. -->
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -26,12 +32,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/site.css">
 <style>
-  html,body{ height:100%; }
+  html,body{ min-height:100%; }
   body{
     display:flex; flex-direction:column;
     min-height:100vh;
     position:relative;
-    overflow:hidden;
+    overflow-x:hidden;
   }
 
   /* ---------- Fundo: mesmo tratamento da .arena real do app ---------- */
@@ -45,39 +51,13 @@
     image-rendering:pixelated;
   }
 
-  /* ---------- Grade de blocos interativos ---------- */
-  .brickGrid{
-    position:absolute; inset:0; z-index:0;
-    overflow:hidden;
-  }
-  .brick-cell{
-    position:absolute;
-    box-sizing:border-box;
-    background:rgba(224,160,90,0);
-    box-shadow:inset 0 0 0 1px rgba(224,160,90,0);
-    transition:background .5s ease, box-shadow .5s ease;
-  }
-  .brick-cell:hover, .brick-cell.lit{
-    background:rgba(224,160,90,.22);
-    box-shadow:inset 0 0 0 1px rgba(224,160,90,.55), 0 0 16px 3px rgba(224,160,90,.3);
-    transition:background .08s ease-out, box-shadow .08s ease-out;
-  }
-  @media (prefers-reduced-motion: reduce){
-    .brick-cell, .brick-cell:hover, .brick-cell.lit{ transition:none; }
-  }
-
-  /* header/main/footer deixam o ponteiro "atravessar" pras áreas vazias
-     chegarem na grade -- só os links do rodapé voltam a ser clicáveis. */
-  header.site, main, footer.site{ pointer-events:none; }
-  footer.site a{ pointer-events:auto; }
-
   /* ---------- Header ---------- */
   header.site{
     position:relative; z-index:1;
     display:flex; align-items:center; gap:10px;
     padding:24px 28px;
   }
-  header.site img{ width:26px; height:26px; border-radius:6px; image-rendering:pixelated; }
+  header.site img{ width:26px; height:26px; border-radius:6px; }
   header.site span{ font-family:'Outfit',sans-serif; font-weight:600; letter-spacing:-.01em; font-size:.95rem; color:var(--text); }
 
   /* ---------- Hero ---------- */
@@ -86,7 +66,7 @@
     flex:1;
     display:flex; flex-direction:column; align-items:center; justify-content:center;
     text-align:center;
-    padding:24px 28px 72px;
+    padding:24px 28px 64px;
   }
   h1{
     font-family:'Outfit', sans-serif;
@@ -95,21 +75,28 @@
     line-height:1.18;
     font-size:clamp(1.7rem, 4.6vw, 2.7rem);
     color:var(--text);
-    max-width:640px;
+    max-width:600px;
+  }
+  .rule{
+    width:44px; height:3px;
+    margin:20px auto 0;
+    background:var(--text);
+    border-radius:2px;
+    opacity:.85;
   }
   p.sub{
-    margin-top:14px;
-    max-width:460px;
+    margin-top:20px;
+    max-width:420px;
     font-family:'Outfit', sans-serif;
     font-weight:400;
-    font-size:clamp(.92rem, 1.6vw, 1rem);
+    font-size:clamp(.9rem, 1.6vw, .98rem);
     color:var(--muted);
     line-height:1.6;
   }
   .soon{
-    margin-top:28px;
+    margin-top:24px;
     font-family:'Outfit', sans-serif;
-    font-size:.8rem;
+    font-size:.78rem;
     letter-spacing:.02em;
     color:var(--dim);
   }
@@ -118,7 +105,8 @@
   footer.site{
     position:relative; z-index:1;
     border-top:none; background:transparent;
-    padding:0 24px 30px;
+    padding:0 24px 28px;
+    flex-shrink:0;
   }
   footer.site .wrap{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
 </style>
@@ -126,7 +114,6 @@
 <body>
 
   <div class="dungeonBg" aria-hidden="true"></div>
-  <div class="brickGrid" id="brickGrid" aria-hidden="true"></div>
 
   <header class="site">
     <img src="/play/icon-192.png" alt="">
@@ -135,7 +122,8 @@
 
   <main>
     <h1>Sua lista de tarefas vira uma masmorra.</h1>
-    <p class="sub">Cada tarefa concluída vira XP. Seu personagem sobe de nível, ganha itens — e enquanto você não termina, o monstro fica ali, te encarando.</p>
+    <div class="rule"></div>
+    <p class="sub">Cada tarefa concluída vira XP — e o monstro fica te encarando até você terminar.</p>
     <p class="soon">Em breve na Google Play</p>
   </main>
 
@@ -148,68 +136,6 @@
       <a href="/terms">Termos</a>
     </div>
   </footer>
-
-  <script>
-    // Gera a grade de blocos (1 bloco = 65x41, metade do tile de 130x41
-    // que o CSS já usa -- ou seja, cada <div> corresponde a 1 tijolo real
-    // da parede). Recalcula no resize (debounced) pra cobrir a tela toda
-    // em qualquer resolução/orientação.
-    (function(){
-      var host = document.getElementById('brickGrid');
-      var CELL_W = 65, CELL_H = 41;
-      var resizeTimer = null;
-
-      function build(){
-        host.innerHTML = '';
-        var cols = Math.ceil(window.innerWidth / CELL_W) + 1;
-        var rows = Math.ceil(window.innerHeight / CELL_H) + 1;
-        var frag = document.createDocumentFragment();
-        for (var r = 0; r < rows; r++){
-          for (var c = 0; c < cols; c++){
-            var cell = document.createElement('div');
-            cell.className = 'brick-cell';
-            cell.style.left = (c * CELL_W) + 'px';
-            cell.style.top = (r * CELL_H) + 'px';
-            cell.style.width = CELL_W + 'px';
-            cell.style.height = CELL_H + 'px';
-            frag.appendChild(cell);
-          }
-        }
-        host.appendChild(frag);
-      }
-
-      build();
-      window.addEventListener('resize', function(){
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(build, 200);
-      });
-
-      // Toque não tem :hover -- acende manualmente o bloco embaixo do dedo.
-      var litCell = null;
-      function litFromPoint(x, y){
-        var el = document.elementFromPoint(x, y);
-        if (el === litCell) return;
-        if (litCell) litCell.classList.remove('lit');
-        if (el && el.classList && el.classList.contains('brick-cell')){
-          el.classList.add('lit');
-          litCell = el;
-        } else {
-          litCell = null;
-        }
-      }
-      host.addEventListener('touchstart', function(e){
-        var t = e.touches[0]; if (!t) return;
-        litFromPoint(t.clientX, t.clientY);
-      }, {passive:true});
-      host.addEventListener('touchmove', function(e){
-        var t = e.touches[0]; if (!t) return;
-        litFromPoint(t.clientX, t.clientY);
-      }, {passive:true});
-      function clearLit(){ if (litCell){ litCell.classList.remove('lit'); litCell = null; } }
-      host.addEventListener('touchend', clearLit);
-      host.addEventListener('touchcancel', clearLit);
-    })();
-  </script>
 
 </body>
 </html>

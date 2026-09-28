@@ -25,9 +25,10 @@ Console do Firebase → engrenagem → **Configurações do projeto** → aba
 chaves** (se ainda não existir nenhuma).
 
 Copia a chave gerada (começa com letras/números longos) e cola em
-**dois lugares** no código (procure pelo mesmo texto `COLE_AQUI_SUA_VAPID_KEY`):
-
-- `play/index.html`, bloco `NOTIFICACOES PUSH` (constante `VAPID_KEY`)
+`play/index.html`, bloco `NOTIFICACOES PUSH` — procure pelo texto
+`COLE_AQUI_SUA_VAPID_KEY` (constante `VAPID_KEY`). Só esse um lugar —
+o Service Worker (`firebase-messaging-sw.js`) não precisa da chave,
+ela só é usada na hora de pedir o token, no `index.html`.
 
 ## 3. Instalar o Firebase CLI (se ainda não tiver)
 

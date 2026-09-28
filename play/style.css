@@ -2197,10 +2197,17 @@
   .pwTrilhaLinha{ position:absolute; left:29px; top:0; bottom:0; width:2px; background:rgba(255,255,255,.2); }
   .pwPasso{ position:relative; display:flex; align-items:center; gap:14px; min-height:70px; }
   .pwPassoNo{
-    width:58px; height:58px; border-radius:14px; background:var(--pw-panel); border:1px solid var(--pw-panel2);
+    width:58px; height:58px; border-radius:14px;
+    /* pedido do usuario: contraste ruim do icone bloqueado em cima da
+       parte clara da arte de fundo (o gradiente .pwFloresta::after so
+       escurece perto do rodape). Fundo solido virou vidro escuro com
+       blur -- fica legivel em qualquer trecho da imagem, nao so nos
+       mais escuros. */
+    background:rgba(10,10,10,.55); backdrop-filter:blur(7px); -webkit-backdrop-filter:blur(7px);
+    border:1px solid rgba(255,255,255,.16); box-shadow:0 4px 14px rgba(0,0,0,.3);
     flex:none; display:flex; align-items:center; justify-content:center; position:relative; z-index:1;
   }
-  .pwPasso.on .pwPassoNo{ background:var(--pw-accent); border-color:var(--pw-accent); }
+  .pwPasso.on .pwPassoNo{ background:var(--pw-accent); border-color:var(--pw-accent); box-shadow:none; }
   .pwPassoNo svg{ width:24px; height:24px; color:var(--pw-muted); }
   .pwPasso.on .pwPassoNo svg{ color:#1C1C1C; }
   .pwPassoTxt b{ display:block; font-size:14px; font-weight:700; color:#fff; }

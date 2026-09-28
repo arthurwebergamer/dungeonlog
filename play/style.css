@@ -5559,28 +5559,23 @@
   color:var(--muted); white-space:nowrap;
 }
 
-/* Badge mais "premium" (pedido do usuario: "cor mais escura pra ficar
-   um aspecto mais premium") -- selo escuro com borda/texto dourados, no
-   lugar do pill claro de antes. Cores FIXAS (nao usam var(--gold) etc)
-   de proposito: o tema "branco" redefine --gold pra um cinza escuro
-   (fica coerente no resto da UI dele, mas nao e' mais "dourado"), e um
-   selo assim perderia a cara de premium logo no tema mais usado por
-   quem prefere contraste alto. Fundo quase preto SEMPRE contra texto
-   dourado SEMPRE garante o mesmo contraste interno em qualquer tema; a
-   borda dourada translucida garante uma borda visivel mesmo quando o
-   fundo por tras da badge (arena, cores por tema) tambem for escuro. */
+/* v2 (pedido do usuario: "eu imaginava tipo menos brilho assim mas tipo
+   a badge de pro poderia usar uma fonte pixelada e sei lá uma badge
+   branca talvez") -- a v1 (selo escuro dourado com glow pulsante) tinha
+   brilho demais. Troca pra selo BRANCO/creme, achatado (sem
+   animacao/glow), com a fonte pixelada Silkscreen -- a mesma familia ja
+   usada no resto da UI "retro" do app (#lvl no tema pixel, contadores
+   de estatistica, etc, ja carregada via <link> no <head>, sem custo
+   novo). Cores FIXAS de proposito (nao usam var(--accent)/var(--gold)):
+   um selo branco/texto escuro tem o MESMO contraste interno alto
+   sempre, em qualquer tema -- so precisa de uma borda escura pra nao
+   sumir contra um fundo claro (tema "branco"), que a regra ja da. */
 .proBadge{
-  display:none; margin-left:6px; padding:1px 7px; border-radius:999px;
-  font-family:'Outfit',sans-serif; font-size:9px; font-weight:800; letter-spacing:.04em;
-  color:#F2C94C; background:linear-gradient(135deg,#2A2015,#1A130B 55%,#0D0905);
-  border:1px solid rgba(242,201,76,.55);
-  box-shadow:0 0 0 1px rgba(0,0,0,.4), 0 0 8px rgba(242,201,76,.35);
+  display:none; margin-left:6px; padding:2px 6px; border-radius:4px;
+  font-family:'Silkscreen',monospace; font-size:8px; font-weight:400; letter-spacing:.02em;
+  color:#2B2620; background:#F2EEE4;
+  border:1px solid rgba(0,0,0,.3);
   vertical-align:middle; position:relative; top:-1px;
-  animation:proBadgePulso 2.4s ease-in-out infinite;
-}
-@keyframes proBadgePulso{
-  0%, 100%{ box-shadow:0 0 0 1px rgba(0,0,0,.4), 0 0 6px rgba(242,201,76,.3); }
-  50%{ box-shadow:0 0 0 1px rgba(0,0,0,.4), 0 0 12px rgba(242,201,76,.7); }
 }
 
 /* Tela de planos (#pwEtapa2, 3a e ultima parada da sequencia). Historico:

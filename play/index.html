@@ -1131,12 +1131,51 @@
          usou o teste. Clicar em "Testar gratis" aqui agora chama
          iniciarTesteGratis() direto (o aviso ja foi escolhido na tela
          anterior). -->
+    <!-- etapa "planos" SIMPLIFICADA (pedido do usuario: "nossa tela tá
+         muito confusa" comparando com o concorrente) -- a versao anterior
+         tinha 3 cards de plano + linha do tempo + 2 botoes de CTA
+         disputando atencao (contorno "Testar gratis" + solido "Assinar").
+         Agora e' UMA lista so (o teste vira mais um card, junto dos
+         planos pagos, pre-selecionado) com UM CTA no fim, cujo texto/acao
+         mudam conforme o card marcado -- ver selecionarPlano() perto de
+         iniciarCompraAssinatura() no script principal. Ordem = igual ao
+         concorrente: linha do tempo primeiro, lista de opcoes depois. -->
     <div class="pwEtapa" id="pwEtapa2">
       <div class="pwConteudo">
         <span class="pwEyebrow" data-i18n="pro.titulo">Plano Pro</span>
         <h2 class="pwHeadline pwHeadlineMenor" data-i18n="pro.escolhaPlano">Escolha como quer assinar</h2>
 
+        <!-- TESTE GRATIS -- linha do tempo, some (JS, ver abrirPaywall())
+             pra quem ja usou o teste antes. -->
+        <div class="pwTrilha pwTrilhaResumo" id="pwResumoTrial">
+          <div class="pwTrilhaLinha"></div>
+          <div class="pwPasso on">
+            <div class="pwPassoNo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+            <div class="pwPassoTxt"><b data-i18n="pro.confirmarHojeTitulo">Hoje</b><span data-i18n="pro.confirmarHojeSub">Acesso completo liberado na hora</span></div>
+          </div>
+          <div class="pwPasso" id="pwConfirmaAvisoPasso">
+            <div class="pwPassoNo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+            <div class="pwPassoTxt"><b id="pwConfirmaAvisoTitulo">Em 6 dias</b><span data-i18n="pro.confirmarAvisoSub">Avisamos que o teste tá acabando</span></div>
+          </div>
+          <div class="pwPasso">
+            <div class="pwPassoNo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 9.5 8.5 3 9l5 4.5L6.5 20 12 16.5 17.5 20 16 13.5l5-4.5-6.5-.5z"/></svg></div>
+            <div class="pwPassoTxt"><b data-i18n="pro.confirmarFimTitulo">Em 7 dias</b><span data-i18n="pro.confirmarFimSub">Teste acaba e volta pro plano grátis, sem cobrança</span></div>
+          </div>
+        </div>
+
         <div class="pwPlanos">
+          <!-- teste gratis, agora um card na MESMA lista dos pagos (nao
+               um botao a parte) -- some (JS) pra quem ja usou o teste. -->
+          <div class="pwPlano sel" data-plano="trial" id="pwPlanoTrial">
+            <div class="pwPlanoRow">
+              <div class="pwPlanoInfo">
+                <span class="pwPlanoNome" data-i18n="pro.planoTrial">7 dias grátis</span>
+                <span class="pwPlanoSub" data-i18n="pro.planoTrialSub">Depois, Anual R$7,49/mês</span>
+              </div>
+              <span class="pwPlanoPreco">R$0,00</span>
+              <span class="pwRadio"></span>
+            </div>
+          </div>
           <div class="pwPlano" data-plano="mensal" id="pwPlanoMensal">
             <div class="pwPlanoRow">
               <div class="pwPlanoInfo">
@@ -1147,7 +1186,7 @@
               <span class="pwRadio"></span>
             </div>
           </div>
-          <div class="pwPlano sel" data-plano="anual" id="pwPlanoAnual">
+          <div class="pwPlano" data-plano="anual" id="pwPlanoAnual">
             <span class="pwPopular" data-i18n="pro.maisPopular">Mais popular</span>
             <span class="pwBadge">-58%</span>
             <div class="pwPlanoRow">
@@ -1177,29 +1216,11 @@
         </div>
         <div class="pwSpacer"></div>
 
-        <!-- TESTE GRATIS (pedido do usuario) -- linha do tempo + CTA.
-             Ambos somem juntos (JS, ver abrirPaywall()) pra quem ja usou
-             o teste antes. -->
-        <div class="pwTrilha pwTrilhaResumo" id="pwResumoTrial">
-          <div class="pwTrilhaLinha"></div>
-          <div class="pwPasso on">
-            <div class="pwPassoNo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
-            <div class="pwPassoTxt"><b data-i18n="pro.confirmarHojeTitulo">Hoje</b><span data-i18n="pro.confirmarHojeSub">Acesso completo liberado na hora</span></div>
-          </div>
-          <div class="pwPasso" id="pwConfirmaAvisoPasso">
-            <div class="pwPassoNo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
-            <div class="pwPassoTxt"><b id="pwConfirmaAvisoTitulo">Em 6 dias</b><span data-i18n="pro.confirmarAvisoSub">Avisamos que o teste tá acabando</span></div>
-          </div>
-          <div class="pwPasso">
-            <div class="pwPassoNo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 9.5 8.5 3 9l5 4.5L6.5 20 12 16.5 17.5 20 16 13.5l5-4.5-6.5-.5z"/></svg></div>
-            <div class="pwPassoTxt"><b data-i18n="pro.confirmarFimTitulo">Em 7 dias</b><span data-i18n="pro.confirmarFimSub">Teste acaba e volta pro plano grátis, sem cobrança</span></div>
-          </div>
-        </div>
-        <button class="pwCTASecundaria" id="paywallTrialBtn" type="button" data-i18n="pro.testarGratis">Testar grátis por 7 dias</button>
-
+        <!-- CTA UNICO -- texto/acao mudam conforme o card selecionado
+             (selecionarPlano() escreve #paywallAssinarBtn direto). -->
         <div class="pwCtaWrap">
           <img class="pwMob" id="pwMobIcone" alt="">
-          <button class="pwCTA" id="paywallAssinarBtn" type="button" data-i18n="pro.assinar">Assinar Plano Pro</button>
+          <button class="pwCTA" id="paywallAssinarBtn" type="button">Testar grátis por 7 dias</button>
         </div>
         <button class="pwSecundario" id="paywallAgoraNaoBtn2" type="button" data-i18n="pro.agoraNao">Agora não</button>
       </div>
@@ -3206,7 +3227,7 @@ window.atualizarBadgesPro = atualizarBadgesPro;
 const LIMITE_TAREFAS_GRATIS = 5; // pedido do usuario -- plano gratis para em 5 tarefas ativas
 
 let _pwEtapaAtual = 1;
-let _pwPlanoSelecionado = 'anual'; // pedido do usuario -- anual vem pre-selecionado (o "mais vantajoso")
+let _pwPlanoSelecionado = 'trial'; // pedido do usuario (tela "planos" simplificada) -- teste gratis vem pre-selecionado, junto na mesma lista dos planos pagos
 let _pwAvisoSelecionado = 1; // TESTE GRATIS -- "1 dia antes" vem pre-selecionado (etapa 3, #pwEtapa3)
 
 function abrirPaywall(motivo){
@@ -3233,16 +3254,22 @@ function abrirPaywall(motivo){
   if (typeof window.aviso === 'function'){
     window.aviso((typeof idiomaApp === 'function' && idiomaApp() === 'en') ? 'You found a premium feature!' : 'Você descobriu um recurso premium!');
   }
-  // TESTE GRATIS -- o botao "Testar gratis" (etapa 2) so aparece pra
-  // quem ainda nao usou o trial (trialSalvo() fica pra sempre depois do
-  // 1o uso, mesmo apos expirar -- ver bloco TESTE GRATIS). Recalculado
-  // TODA vez que o paywall abre (nao so 1x), porque o mesmo overlay e'
-  // reaproveitado por qualquer gatilho PRO da sessao inteira.
-  const btnTrialVisibilidade = document.getElementById('paywallTrialBtn');
+  // TESTE GRATIS -- o card "7 dias gratis" (tela de planos) e a linha do
+  // tempo acima dela so aparecem pra quem ainda nao usou o trial
+  // (trialSalvo() fica pra sempre depois do 1o uso, mesmo apos expirar --
+  // ver bloco TESTE GRATIS). Recalculado TODA vez que o paywall abre (nao
+  // so 1x), porque o mesmo overlay e' reaproveitado por qualquer gatilho
+  // PRO da sessao inteira. Se o trial ja foi usado e a selecao atual
+  // ainda estava em 'trial' (default), forca pra 'anual' -- senao o CTA
+  // ficaria tentando iniciar um teste que nao existe mais.
+  const cardTrialVisibilidade = document.getElementById('pwPlanoTrial');
   const resumoTrialVisibilidade = document.getElementById('pwResumoTrial');
   const jaUsouTrial = (typeof window.trialSalvo === 'function' && window.trialSalvo());
-  if (btnTrialVisibilidade) btnTrialVisibilidade.style.display = jaUsouTrial ? 'none' : '';
+  if (cardTrialVisibilidade) cardTrialVisibilidade.style.display = jaUsouTrial ? 'none' : '';
   if (resumoTrialVisibilidade) resumoTrialVisibilidade.style.display = jaUsouTrial ? 'none' : '';
+  if (jaUsouTrial && _pwPlanoSelecionado === 'trial' && typeof window.selecionarPlanoPaywall === 'function'){
+    window.selecionarPlanoPaywall('anual');
+  }
   const overlay = document.getElementById('paywallOverlay');
   if (!overlay) return;
   // Quem ja usou o teste gratis (jaUsouTrial) nao tem teste pra oferecer
@@ -3311,25 +3338,42 @@ function irParaEtapaPaywall(n, animar){
   if (back) back.classList.toggle('on', n !== 1);
 }
 
+// Texto/acao do CTA unico da tela de planos (#paywallAssinarBtn) --
+// muda conforme o card marcado (_pwPlanoSelecionado). Chamada por
+// selecionarPlano() a cada clique E por abrirPaywall() (pra sincronizar
+// ao abrir/reabrir o paywall). Nao usa data-i18n no HTML pro botao (foi
+// removido de proposito) porque o texto e' 100% controlado aqui.
+function aplicarCtaPlano(id){
+  const btn = document.getElementById('paywallAssinarBtn');
+  if (!btn) return;
+  const en = (typeof idiomaApp === 'function' && idiomaApp() === 'en');
+  if (id === 'trial'){
+    btn.textContent = en ? 'Try free for 7 days' : 'Testar grátis por 7 dias';
+    btn.onclick = () => iniciarTesteGratis(_pwAvisoSelecionado);
+  } else {
+    btn.textContent = en ? 'Subscribe to Pro' : 'Assinar Plano Pro';
+    btn.onclick = iniciarCompraAssinatura;
+  }
+}
+window.aplicarCtaPlano = aplicarCtaPlano;
+
 (function(){
   const btnFechar = document.getElementById('paywallFecharBtn');
   const btnVoltar = document.getElementById('paywallVoltarBtn');
   const btnContinuar = document.getElementById('paywallContinuarBtn');
   const btnAgoraNao1 = document.getElementById('paywallAgoraNaoBtn1');
   const btnAgoraNao2 = document.getElementById('paywallAgoraNaoBtn2');
-  const btnAssinar = document.getElementById('paywallAssinarBtn');
+  const planoTrial = document.getElementById('pwPlanoTrial');
   const planoMensal = document.getElementById('pwPlanoMensal');
   const planoAnual = document.getElementById('pwPlanoAnual');
   const planoVitalicio = document.getElementById('pwPlanoVitalicio');
-  const planosPorId = { mensal: planoMensal, anual: planoAnual, vitalicio: planoVitalicio };
+  const planosPorId = { trial: planoTrial, mensal: planoMensal, anual: planoAnual, vitalicio: planoVitalicio };
 
-  // TESTE GRATIS -- sequencia agora e' pitch(1) -> lembrete(2, #pwEtapa3)
-  // -> planos(3, #pwEtapa2, com a linha do tempo embutida). O botao
-  // "Continuar" do lembrete so avanca pro passo 3 (nada e' iniciado
-  // ainda); quem de fato inicia o teste e' o "Testar gratis" da tela de
-  // planos, chamando iniciarTesteGratis() direto (o aviso ja foi
-  // escolhido no passo 2).
-  const btnTrial = document.getElementById('paywallTrialBtn');
+  // TESTE GRATIS -- sequencia e' pitch(1) -> lembrete(2, #pwEtapa3) ->
+  // planos(3, #pwEtapa2). O botao "Continuar" do lembrete so avanca pro
+  // passo 3 (nada e' iniciado ainda); quem de fato inicia o teste (ou a
+  // assinatura paga) e' o CTA unico da tela de planos, ver
+  // aplicarCtaPlano() acima.
   const btnAgoraNao3 = document.getElementById('paywallAgoraNaoBtn3');
   const btnComecarTeste = document.getElementById('paywallComecarTesteBtn');
   const avisoPorId = {
@@ -3343,8 +3387,6 @@ function irParaEtapaPaywall(n, animar){
   if (btnContinuar) btnContinuar.onclick = () => irParaEtapaPaywall(2);
   if (btnAgoraNao1) btnAgoraNao1.onclick = fecharPaywall;
   if (btnAgoraNao2) btnAgoraNao2.onclick = fecharPaywall;
-  if (btnAssinar) btnAssinar.onclick = iniciarCompraAssinatura;
-  if (btnTrial) btnTrial.onclick = () => iniciarTesteGratis(_pwAvisoSelecionado);
   if (btnAgoraNao3) btnAgoraNao3.onclick = fecharPaywall;
   if (btnComecarTeste) btnComecarTeste.onclick = () => { atualizarResumoTrial(); irParaEtapaPaywall(3); };
 
@@ -3366,16 +3408,16 @@ function irParaEtapaPaywall(n, animar){
   if (avisoPorId[1]) avisoPorId[1].onclick = () => selecionarAviso(1);
   if (avisoPorId[0]) avisoPorId[0].onclick = () => selecionarAviso(0);
 
-  // selecao de plano -- so troca qual card fica marcado (.sel) e guarda em
-  // _pwPlanoSelecionado; iniciarCompraAssinatura() (quando a integracao
-  // real do Play Billing existir) le essa variavel pra saber qual produto
-  // comprar.
+  // selecao de plano -- troca qual card fica marcado (.sel), guarda em
+  // _pwPlanoSelecionado e atualiza o texto/acao do CTA unico
+  // (aplicarCtaPlano()). 'trial' e' so mais um id nessa lista agora.
   function selecionarPlano(id){
     if (id === _pwPlanoSelecionado) return;
     _pwPlanoSelecionado = id;
     Object.keys(planosPorId).forEach(k => {
       if (planosPorId[k]) planosPorId[k].classList.toggle('sel', k === id);
     });
+    aplicarCtaPlano(id);
     // pulso rapido no card recem-marcado -- feedback tatil de que o clique
     // registrou. .pwPulse agora e' so transform+transition (CSS, ver
     // style.css perto de ".pwPlano.pwPulse") -- nao usa `animation`, entao
@@ -3387,9 +3429,13 @@ function irParaEtapaPaywall(n, animar){
       setTimeout(() => alvo.classList.remove('pwPulse'), 150);
     }
   }
+  window.selecionarPlanoPaywall = selecionarPlano; // exposto pra abrirPaywall() forcar 'anual' se o trial ja foi usado
+  if (planoTrial) planoTrial.onclick = () => selecionarPlano('trial');
   if (planoMensal) planoMensal.onclick = () => selecionarPlano('mensal');
   if (planoAnual) planoAnual.onclick = () => selecionarPlano('anual');
   if (planoVitalicio) planoVitalicio.onclick = () => selecionarPlano('vitalicio');
+
+  aplicarCtaPlano(_pwPlanoSelecionado); // sincroniza o CTA com o default ('trial') logo no boot
 })();
 
 function iniciarCompraAssinatura(){
@@ -16578,6 +16624,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'pro.continuar':   { pt:'Continuar', en:'Continue' },
     'pro.escolhaPlano':{ pt:'Escolha como quer assinar', en:'Choose how you want to subscribe' },
     'pro.maisPopular': { pt:'Mais popular', en:'Most popular' },
+    'pro.planoTrial':     { pt:'7 dias grátis', en:'7 days free' },
+    'pro.planoTrialSub':  { pt:'Depois, Anual R$7,49/mês', en:'Then, Annual R$7.49/mo' },
     'pro.planoMensal':    { pt:'Mensal', en:'Monthly' },
     'pro.planoMensalSub': { pt:'Cobrado todo mês', en:'Billed every month' },
     'pro.planoAnual':     { pt:'Anual', en:'Annual' },

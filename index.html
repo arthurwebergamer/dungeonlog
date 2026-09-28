@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <!-- Landing page raiz do domínio dungeonlog.weberlabs.com.br.
-     Substitui a antiga waitlist/ (removida — inclusive o Firestore de captura
-     de e-mail que ela usava, ver commit). Layout inspirado na referência que
-     o usuário mandou (foundable.com): logo fixo no topo, fundo full-bleed
-     atmosférico, headline grande centralizada, rodapé simples -- mas SEM
-     waitlist/CTA/login (não existe waitlist mais). Fundo trocado 2x:
-     1ª tentativa foi textura de pedra em gradiente CSS puro -- usuário achou
-     genérico. 2ª tentativa (esta): parede de tijolos PIXELADOS de verdade
-     (tile 16x8 em SVG inline, ampliado com image-rendering:pixelated pra
-     ficar 8-bit igual ao resto do app), com brilho de tocha pulsando
-     (keyframes) e brasas subindo (partículas via <div>s gerados por um
-     script pequeno). Zero imagem externa, zero peso extra. -->
+     Substitui a antiga waitlist/ (removida). Estrutura desta versão foi
+     inspirada numa referência que o usuário mandou (skillion.app: ícone
+     pixelado grande no topo, headline em fonte pixel, card de descrição
+     com borda, botões, badges de loja) -- mas usando a identidade visual
+     REAL do DungeonLog, não a da referência:
+     - ícone = sprite real do monstro "Gosma metálica" (extraído de
+       play/assets.js, o mesmo já usado como "assinatura" na antiga
+       waitlist -- é o monstro "mascote" mais amigável do bestiário);
+     - fundo = parede de tijolos pixelados animada (já existente);
+     - fontes = as reais do app (Silkscreen pro pixel, Outfit pro texto).
+     Sem botões "Guides"/"What's New" (não existe esse conteúdo) e sem
+     badge de loja CLICÁVEL -- o app ainda não foi publicado no Google
+     Play, então o badge é só um selo "em breve", não um link real. -->
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -28,14 +30,10 @@
     display:flex; flex-direction:column;
     min-height:100vh;
     position:relative;
-    overflow:hidden;
+    overflow-x:hidden;
   }
 
-  /* Parede de tijolos pixelados -- tile SVG 16x8 (2 fiadas de tijolo,
-     offset como alvenaria de verdade) ampliado ~10x com image-rendering:
-     pixelated, pra sair com a cara 8-bit do resto do app (mesma linguagem
-     visual dos sprites em play/assets.js). Anima devagar pra dar sensação
-     de profundidade/movimento sem distrair do texto. */
+  /* ---------- Fundo: parede de tijolos pixelados animada ---------- */
   .dungeonBg{
     position:absolute; inset:0; z-index:0; pointer-events:none;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='8' shape-rendering='crispEdges'%3E%3Crect width='16' height='8' fill='%23161616'/%3E%3Crect x='0' y='0' width='7' height='3' fill='%233a3a3a'/%3E%3Crect x='8' y='0' width='7' height='3' fill='%233a3a3a'/%3E%3Crect x='0' y='0' width='7' height='1' fill='%23484848'/%3E%3Crect x='8' y='0' width='7' height='1' fill='%23484848'/%3E%3Crect x='4' y='4' width='7' height='3' fill='%23343434'/%3E%3Crect x='12' y='4' width='3' height='3' fill='%23343434'/%3E%3Crect x='0' y='4' width='3' height='3' fill='%23343434'/%3E%3Crect x='4' y='4' width='7' height='1' fill='%23424242'/%3E%3Crect x='12' y='4' width='3' height='1' fill='%23424242'/%3E%3Crect x='0' y='4' width='3' height='1' fill='%23424242'/%3E%3C/svg%3E");
@@ -43,83 +41,113 @@
     image-rendering:pixelated;
     animation:brickDrift 50s linear infinite;
   }
-  @keyframes brickDrift{
-    from{ background-position:0 0; }
-    to{ background-position:-160px 0; }
-  }
+  @keyframes brickDrift{ from{ background-position:0 0; } to{ background-position:-160px 0; } }
   .dungeonBg::before{
-    /* brilho de tocha atrás do texto, pulsando devagar */
     content:''; position:absolute; inset:0;
-    background:radial-gradient(55% 42% at 50% 60%, rgba(210,140,60,.28) 0%, rgba(210,140,60,0) 72%);
+    background:radial-gradient(55% 42% at 50% 46%, rgba(210,140,60,.24) 0%, rgba(210,140,60,0) 72%);
     animation:torchPulse 4.5s ease-in-out infinite;
   }
   .dungeonBg::after{
-    /* vinheta escura nas bordas, pra dar profundidade e não competir com o texto */
     content:''; position:absolute; inset:0;
     background:
-      linear-gradient(180deg, rgba(0,0,0,.6) 0%, rgba(0,0,0,.1) 22%, rgba(0,0,0,.15) 68%, rgba(0,0,0,.75) 100%),
-      radial-gradient(140% 100% at 50% 50%, transparent 45%, rgba(0,0,0,.6) 100%);
+      linear-gradient(180deg, rgba(0,0,0,.6) 0%, rgba(0,0,0,.15) 22%, rgba(0,0,0,.2) 66%, rgba(0,0,0,.75) 100%),
+      radial-gradient(140% 100% at 50% 50%, transparent 40%, rgba(0,0,0,.6) 100%);
   }
-  @keyframes torchPulse{
-    0%, 100%{ opacity:.75; transform:scale(1); }
-    50%{ opacity:1; transform:scale(1.06); }
-  }
-
-  /* Brasas subindo -- pequenos quadrados pixelados, posição/atraso/duração
-     gerados no script no fim do body pra não parecerem uma grade repetida. */
+  @keyframes torchPulse{ 0%,100%{ opacity:.75; transform:scale(1); } 50%{ opacity:1; transform:scale(1.06); } }
   .embers{ position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
   .ember{
-    position:absolute; bottom:-10px;
-    width:4px; height:4px;
-    background:#e0a05a;
-    box-shadow:0 0 4px 1px rgba(224,160,90,.7);
-    animation-name:emberRise;
-    animation-timing-function:ease-in;
-    animation-iteration-count:infinite;
+    position:absolute; bottom:-10px; width:4px; height:4px;
+    background:#e0a05a; box-shadow:0 0 4px 1px rgba(224,160,90,.7);
+    animation-name:emberRise; animation-timing-function:ease-in; animation-iteration-count:infinite;
   }
   @keyframes emberRise{
     0%{ transform:translateY(0) translateX(0); opacity:0; }
-    10%{ opacity:1; }
-    85%{ opacity:.5; }
+    10%{ opacity:1; } 85%{ opacity:.5; }
     100%{ transform:translateY(-70vh) translateX(var(--drift, 12px)); opacity:0; }
   }
-  @media (prefers-reduced-motion: reduce){
-    .dungeonBg, .dungeonBg::before, .ember{ animation:none; }
-  }
+  @media (prefers-reduced-motion: reduce){ .dungeonBg, .dungeonBg::before, .ember{ animation:none; } }
 
+  /* ---------- Header ---------- */
   header.site{
     position:relative; z-index:1;
     display:flex; align-items:center; gap:10px;
     padding:22px 24px;
   }
-  header.site img{ width:30px; height:30px; border-radius:7px; image-rendering:pixelated; }
-  header.site span{
-    font-family:'Outfit', sans-serif; font-weight:800; letter-spacing:-.01em;
-    font-size:1.05rem; color:var(--text);
-  }
+  header.site img{ width:28px; height:28px; border-radius:6px; image-rendering:pixelated; }
+  header.site span{ font-family:'Outfit',sans-serif; font-weight:800; letter-spacing:-.01em; font-size:1rem; color:var(--text); }
 
+  /* ---------- Hero ---------- */
   main{
     position:relative; z-index:1;
     flex:1;
     display:flex; flex-direction:column; align-items:center; justify-content:center;
     text-align:center;
-    padding:40px 24px;
+    padding:24px 24px 56px;
+  }
+  .mascote{
+    width:88px; height:88px;
+    image-rendering:pixelated;
+    filter:drop-shadow(0 8px 18px rgba(0,0,0,.55));
+    margin-bottom:18px;
   }
   h1{
-    font-family:'Outfit', sans-serif; font-weight:800; letter-spacing:-.02em;
-    line-height:1.12;
-    font-size:clamp(1.9rem, 6.4vw, 3.4rem);
-    max-width:820px;
-    text-shadow:0 4px 24px rgba(0,0,0,.6);
+    font-family:'Silkscreen', monospace;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.02em;
+    line-height:1.5;
+    font-size:clamp(1.05rem, 3.6vw, 1.9rem);
+    color:var(--text);
+    text-shadow:0 3px 0 rgba(0,0,0,.5);
+    max-width:720px;
   }
-  h1 .muted{ color:var(--muted); }
+  h1 .accent{ color:#e0a05a; }
 
+  .descCard{
+    margin-top:26px;
+    max-width:560px;
+    background:rgba(50,50,50,.55);
+    border:2px solid rgba(255,255,255,.14);
+    border-radius:10px;
+    padding:20px 24px;
+    backdrop-filter:blur(2px);
+  }
+  .descCard p{
+    font-family:'Outfit', sans-serif;
+    font-size:clamp(.92rem, 2vw, 1.02rem);
+    color:var(--muted);
+    line-height:1.65;
+  }
+
+  .soonBadge{
+    margin-top:26px;
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'Silkscreen', monospace;
+    font-size:11px; letter-spacing:.04em;
+    color:var(--dim);
+    background:rgba(0,0,0,.35);
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:7px;
+    padding:9px 16px;
+  }
+  .soonBadge .dotPulse{
+    width:6px; height:6px; border-radius:50%; background:#e0a05a;
+    box-shadow:0 0 6px 1px rgba(224,160,90,.7);
+    animation:torchPulse 1.8s ease-in-out infinite;
+  }
+
+  /* ---------- Footer ---------- */
   footer.site{
     position:relative; z-index:1;
     border-top:none; background:transparent;
-    padding:0 24px 30px;
+    padding:0 24px 28px;
   }
   footer.site .wrap{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+
+  @media (max-width:480px){
+    .mascote{ width:72px; height:72px; }
+    .descCard{ padding:16px 18px; }
+  }
 </style>
 </head>
 <body>
@@ -133,8 +161,12 @@
   </header>
 
   <main>
-    <h1>Você já abandonou 5 apps de produtividade.<br class="brk">
-      <span class="muted">Esse tem um monstro te encarando até você terminar.</span></h1>
+    <img class="mascote" alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAC+UlEQVR4nO2WTUhUURTHf8+Zp0ObqF1fEoTRQskiM6WiFrrJqZn05VhO1MIgMFCyFiIItilscEpXLQLnI6xJTcoohTKqEQlEoUURRUVBi4qEqWxyvC3G95jne09n1s0fBu47n/85595zL2SRxf8OKWMHh10spRezcxnFTN9YloWUEHR3+5lduREApbJcZzL55i3ufQuyv3/Tip0eAVkWg2NRXk68YFXePE7lqCHx9oJNAERGogC0nHSnRWJ5gxy7GHg6zsuJFwAcr/doukCozyBLJXHuuAsxv3RLcjJJXuFWyIn90iUHmH73ReentqYzcAdkeck9Y7fUyLIYGIvqRKODkaVimaLH30VjU7OwaodlBaREkrj6762wtXwfYF4Fx8z7ZQmaEpAc+tKrCPYGCPYGdLLp6Ji2PlR9TPulosffZdkKUwIiYaxWMBjh9dQ4o6P3CQaNrWg938pQf5ih/jAAHu8ps9BpEJBl0ePvMiaffIQvPExkJIrdNm8ZMBDqo/1iB4A2LwAuXLqClGMcYgYCau8XwxceBuC6v5OikjKDvtZVyZHaegpLSzRZ6h749tucsOEUCJux/F6vwjWfD7ttnqKSMgoL8nV6dR9UOau42NaurZ2Kh7uRG8lK/PiYjL2oeAYCagX6Qv146qu1jbhtVymAIfliVDmrtLU6Mz59+Ghpb3kMf/2M4SrfoX0XFuQvmzwVJ1wHuRmd0u2DjAjkxr9SU1dHW/PptJOmJlfxZORBZgSETeLhxCvqz5wFoKauDm9DA96GhmUTV7gVKtwKn6U8mlpbGL8XIjf+Fc9RxdLHdDyqdwBAqNunyYt37mXLzt1sWLfGNNiz5xMADPffZnXerOZT4VbYtXmt6e1oTsBhF4ddNQDs37MbgMdPn+lsvv9xAJCYi2symz1XWx+orsEx817zG7h12/RmtLwqJYddiISknYqOy1dN7VLPdywWo3j9CgAam5qTcWxJf6uXUtovIo2QTUDcwigXiC/MkjRfRFlkkcU/kiMZ2BMyCNMAAAAASUVORK5CYII=">
+    <h1>SUA LISTA DE TAREFAS<br>VIRA UMA <span class="accent">MASMORRA</span></h1>
+    <div class="descCard">
+      <p>O DungeonLog transforma suas tarefas do dia a dia em um RPG de verdade: cada tarefa concluída vira XP, seu personagem sobe de nível e ganha itens — e enquanto você não termina, o monstro fica ali, te encarando.</p>
+    </div>
+    <div class="soonBadge"><span class="dotPulse"></span> Em breve na Google Play</div>
   </main>
 
   <footer class="site">
@@ -148,23 +180,16 @@
   </footer>
 
   <script>
-    // Gera as brasas -- 16 partículas com posição/duração/atraso variados,
-    // pra não parecer uma grade repetindo. Puramente decorativo, sem
-    // dependência de nada (respeita prefers-reduced-motion via CSS acima).
     (function(){
       var host = document.getElementById('embers');
       var n = 16;
       for (var i = 0; i < n; i++){
         var e = document.createElement('div');
         e.className = 'ember';
-        var left = Math.random() * 100;
-        var duration = 6 + Math.random() * 6;
-        var delay = Math.random() * 10;
-        var drift = (Math.random() * 40 - 20).toFixed(0) + 'px';
-        e.style.left = left + '%';
-        e.style.animationDuration = duration + 's';
-        e.style.animationDelay = '-' + delay + 's';
-        e.style.setProperty('--drift', drift);
+        e.style.left = (Math.random() * 100) + '%';
+        e.style.animationDuration = (6 + Math.random() * 6) + 's';
+        e.style.animationDelay = '-' + (Math.random() * 10) + 's';
+        e.style.setProperty('--drift', (Math.random() * 40 - 20).toFixed(0) + 'px');
         host.appendChild(e);
       }
     })();

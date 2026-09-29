@@ -49,7 +49,7 @@ footer.site{
    desktop as colunas ficam lado a lado (a .wrap com max-width:760px
    ja centraliza o BLOCO inteiro na pagina; o alinhamento interno das
    colunas continua a esquerda). */
-footer.site .footcols{ display:flex; gap:40px 56px; flex-wrap:wrap; margin-bottom:22px; }
+footer.site .footcols{ display:flex; gap:40px 56px; flex-wrap:wrap; margin-bottom:28px; padding-bottom:22px; border-bottom:1px solid var(--panel-2); }
 footer.site .footcol{ display:flex; flex-direction:column; gap:9px; min-width:120px; }
 footer.site .footlabel{ font-family:'Outfit',sans-serif; font-weight:700; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--dim); margin-bottom:1px; }
 footer.site a{ font-size:14px; color:var(--muted); text-decoration:none; }

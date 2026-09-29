@@ -1936,24 +1936,15 @@ try {
   if (uidSalvo) _uidAtivo = uidSalvo;
 } catch(e){}
 
-// MENU DEBUG RESTRITO POR CONTA (pedido do usuario: revisor do Google
-// Play precisa testar o menu debug, mas nenhum jogador comum deveria
-// conseguir ligar isso so tocando no icone de moedas -- ver TOGGLE DEBUG
-// perto do fim do arquivo). Allowlist client-side: nao e' seguranca de
-// verdade (da pra ler no devtools), so impede o usuario comum de achar
-// por acidente -- suficiente pra uma ferramenta de dev/QA, nao pra algo
-// que concede PRO de verdade (isso continua so via Firestore, ver
-// entitlements/{uid} em firestore.rules). Pra liberar debug numa conta
-// nova, pega o uid em Authentication > Users no Firebase Console e
-// adiciona aqui.
-const UIDS_DEBUG_PERMITIDO = [
-  'CVNPbBxIFebPmnmCEw6iYYYKWRS2', // conta de revisor do Google Play (mesma do PRO vitalicio)
-  // 'SEU_UID_AQUI', // sua propria conta, se quiser testar tambem
-];
-function uidTemDebugPermitido(){
-  return UIDS_DEBUG_PERMITIDO.includes(_uidAtivo);
-}
-window.uidTemDebugPermitido = uidTemDebugPermitido;
+// REVERTIDO (pedido do usuario): menu debug restrito por conta
+// (UIDS_DEBUG_PERMITIDO) removido de proposito -- o Google proibe
+// "cloaking" (app se comportar diferente so pra uma conta especifica
+// durante a revisao), pratica que pode gerar rejeicao ou ate suspensao
+// da conta de desenvolvedor. O menu debug volta a ser o mesmo pra
+// qualquer conta, destravado so pelo clique no icone de moedas (ver
+// TOGGLE DEBUG perto do fim do arquivo) -- esse padrao (gesto secreto
+// igual pra todo mundo, visivel pra qualquer robo de varredura) e' o
+// jeito aceito de ter uma ferramenta de debug em producao.
 
 // PLANO PRO (roadmap: item 1 do Plano de Lancamento) -- personagem ativo
 // dentro da conta. Precisa ser resolvido ANTES de chaveSaveAtual()/
@@ -2034,10 +2025,6 @@ window.definirUidAtivo = function(uid){
     if (_uidAtivo) localStorage.setItem('questlog.uidAtivo.v1', _uidAtivo);
     else localStorage.removeItem('questlog.uidAtivo.v1');
   } catch(e){}
-  // menu debug restrito por conta (ver UIDS_DEBUG_PERMITIDO, alguns
-  // paragrafos acima) -- uid so muda de verdade aqui, entao e aqui que
-  // reavalia se o debug deve continuar visivel/ficar visivel agora.
-  if (typeof window.__reavaliarModoDebugPosLogin === 'function') window.__reavaliarModoDebugPosLogin();
   // PLANO PRO: personagemAtivo e por CONTA -- troca de uid precisa reler
   // qual personagem essa conta especifica tinha ativo, senao
   // _personagemAtivo fica "vazado" da conta anterior (mesma classe de
@@ -17375,19 +17362,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   if (!alvo) return;
 
   // flag bruta, so o que o usuario "destravou" tocando nas moedas
-  function flagLigada(){
-    try { return localStorage.getItem(CHAVE) === 'true'; } catch(e){ return false; }
-  }
-
-  // BUG/PEDIDO (revisor do Google Play testando, mas nenhum jogador
-  // comum deveria achar isso por acidente): modo debug so fica ativo de
-  // verdade se a flag estiver ligada E a conta logada estiver na
-  // allowlist (UIDS_DEBUG_PERMITIDO, ver topo do arquivo). Continua
-  // escrevendo a flag normalmente pra quem nao esta na lista (inofensivo,
-  // ela so nunca produz efeito visivel) -- assim, se essa mesma conta um
-  // dia entrar na allowlist, nao precisa tocar nas moedas de novo.
   function lerModoDebug(){
-    return flagLigada() && (typeof window.uidTemDebugPermitido === 'function') && window.uidTemDebugPermitido();
+    try { return localStorage.getItem(CHAVE) === 'true'; } catch(e){ return false; }
   }
 
   function aplicar(ligado){
@@ -17402,17 +17378,10 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
   aplicar(lerModoDebug()); // pintura inicial, persiste entre aberturas
 
-  // reavalia depois que o login termina (uid so fica disponivel de
-  // verdade apos aoLogar()/aoLogarSilencioso() -- ver definirUidAtivo()
-  // no topo do arquivo). Sem isso, quem abre o app deslogado e loga
-  // durante a sessao so veria o debug aparecer no proximo toque nas
-  // moedas, mesmo ja estando numa conta permitida.
-  window.__reavaliarModoDebugPosLogin = () => aplicar(lerModoDebug());
-
   alvo.addEventListener('click', () => {
-    const novo = !flagLigada();
+    const novo = !lerModoDebug();
     try { localStorage.setItem(CHAVE, String(novo)); } catch(e){}
-    aplicar(lerModoDebug());
+    aplicar(novo);
   });
 })();
 </script>

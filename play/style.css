@@ -2239,7 +2239,14 @@
     color:var(--pw-accent); font-size:11px; font-weight:800; letter-spacing:.02em; padding:3px 10px; border-radius:999px;
   }
   .pwPlanoPreco{ font-size:18px; font-weight:800; text-align:right; white-space:nowrap; }
-  .pwPlanoPreco span{ display:block; font-size:10.5px; font-weight:400; color:var(--pw-muted); }
+  /* FIX: era ".pwPlanoPreco span" (generico) -- certo enquanto o unico
+     span aqui dentro era o "/mes". Depois que o proprio numero do preco
+     virou span tambem (pra poder traduzir R$17,90 -> R$17.90 sem perder
+     o "/mes" ao lado, ver data-i18n="pro.precoMensal"/"pro.precoAnual"),
+     essa regra generica passou a encolher o preco JUNTO -- ficava
+     pequeno feito o "/mes". Classe .pwPlanoUnidade restringe o estilo
+     pequeno/discreto so pro rotulo de unidade mesmo. */
+  .pwPlanoPreco .pwPlanoUnidade{ display:block; font-size:10.5px; font-weight:400; color:var(--pw-muted); }
   .pwRadio{
     width:21px; height:21px; border-radius:50%; border:2px solid var(--pw-line); flex:none;
     display:grid; place-items:center;

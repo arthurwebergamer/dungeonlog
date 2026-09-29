@@ -796,6 +796,34 @@
            abrirHistorico() e o overlay #histOverlay não mudaram em nada --
            só esse atalho extra saiu. -->
 
+      <!-- Legal (pedido do usuario: app nao tinha NENHUM link pra
+           Politica de Privacidade em lugar nenhum -- obrigatorio pra
+           listagem na Play Store). Links reais pro site estatico
+           (dungeonlog.weberlabs.com.br/privacy e /terms), nao uma
+           sub-tela do app. href e' setado por JS (atualizarLinksLegais(),
+           perto de aplicarIdioma() no bloco de idioma) porque muda
+           pt/en -> /privacy ou /en/privacy conforme o idioma atual;
+           aqui no HTML fica so um href placeholder (pt) de fallback
+           caso o JS falhe por algum motivo. Abre em nova aba
+           (target=_blank) pra nao tirar o usuario do app. -->
+      <div class="edsec" data-i18n="cfg.legal">Legal</div>
+
+      <a class="cfgrow cfglink" id="cfgLinkPrivacidade" href="https://dungeonlog.weberlabs.com.br/privacy" target="_blank" rel="noopener">
+        <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+        <div class="cfgtxt">
+          <b data-i18n="cfg.privacidade">Política de Privacidade</b>
+        </div>
+        <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14L21 3"/></svg>
+      </a>
+
+      <a class="cfgrow cfglink" id="cfgLinkTermos" href="https://dungeonlog.weberlabs.com.br/terms" target="_blank" rel="noopener">
+        <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg></span>
+        <div class="cfgtxt">
+          <b data-i18n="cfg.termosDeUso">Termos de Uso</b>
+        </div>
+        <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14L21 3"/></svg>
+      </a>
+
       <!-- Zona de risco (pedido do usuário, comparando com concorrente):
            Sair e Apagar tudo saíram de dentro das linhas Conta/Apagar
            dados (onde eram pílula de 12px) e viraram botão full-width
@@ -16675,6 +16703,9 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'cfg.notificacoes':    { pt:'Notificações', en:'Notifications' },
     'cfg.notifDesc':       { pt:'Teste grátis, streak em risco e monstro do dia', en:'Free trial, streak at risk and today\'s monster' },
     'cfg.ativar':          { pt:'Ativar', en:'Enable' },
+    'cfg.legal':           { pt:'Legal', en:'Legal' },
+    'cfg.privacidade':     { pt:'Política de Privacidade', en:'Privacy Policy' },
+    'cfg.termosDeUso':     { pt:'Termos de Uso', en:'Terms of Use' },
     'cfg.historicoDesc':   { pt:'Calendário de vitórias, fugas e dias sem tarefa', en:'Calendar of wins, escapes and days with no tasks' },
     'cfg.nomeDoHeroi':     { pt:'Nome do herói', en:'Hero name' },
     'cfg.renomear':        { pt:'Renomear', en:'Rename' },
@@ -16757,8 +16788,24 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
       el.placeholder = t(el.dataset.i18nPlaceholder);
     });
+    atualizarLinksLegais();
   }
   window.aplicarIdioma = aplicarIdioma;
+
+  // Links de Config > Legal (Politica de Privacidade / Termos de Uso)
+  // apontam pro site estatico real, que tem paginas separadas por
+  // idioma (/privacy e /en/privacy, /terms e /en/terms -- ver
+  // repositorio, pastas privacy/ terms/ en/privacy/ en/terms/). O href
+  // no HTML e' so fallback pt; aqui troca pra /en/... quando o idioma
+  // atual do app e' en. Chamado de dentro de aplicarIdioma() (roda no
+  // load e toda vez que o idioma muda).
+  function atualizarLinksLegais(){
+    const en = idiomaSalvo() === 'en';
+    const linkPriv = document.getElementById('cfgLinkPrivacidade');
+    const linkTermos = document.getElementById('cfgLinkTermos');
+    if (linkPriv) linkPriv.href = en ? 'https://dungeonlog.weberlabs.com.br/en/privacy' : 'https://dungeonlog.weberlabs.com.br/privacy';
+    if (linkTermos) linkTermos.href = en ? 'https://dungeonlog.weberlabs.com.br/en/terms' : 'https://dungeonlog.weberlabs.com.br/terms';
+  }
 
   // window.definirIdioma(lang) -- chamado pelos 2 botões do slide de
   // idioma no carrossel (ver bloco TELA DE LOGIN / SPLASH + CARROSSEL).

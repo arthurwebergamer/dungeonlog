@@ -13964,6 +13964,21 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // ja tinha sido escondido pelo voltarDoLoginCarrossel). Fix: uma flag
   // de "transicao em andamento" que ignora toques repetidos nos 260ms.
   window.__loginEmTransicao = false;
+
+  // BUG REAL (reportado pelo usuario: sem botao pra voltar da tela de
+  // email pra escolha Google/email quando o login foi forcado, sem slide
+  // de marketing de origem -- ver comentario em irParaLogin() sobre
+  // semVoltar). A seta #carrosselVoltar fica visivel se HOUVER slide de
+  // origem (!__loginSemVoltarAtual) OU se o formulario de email/senha
+  // estiver aberto agora (nesse caso ela so volta pra escolha, nunca sai
+  // do login de vez -- ver handler de #carrosselVoltar mais abaixo no
+  // arquivo, que ja trata isso via __loginFormAberto).
+  window.__atualizarSetaVoltarLogin = function(){
+    const seta = document.getElementById('carrosselVoltar');
+    if (!seta) return;
+    seta.classList.toggle('visivel', !window.__loginSemVoltarAtual || !!window.__loginFormAberto);
+  };
+
   const abrirFormLogin = () => {
     if (window.__loginEmTransicao) return;
     window.__loginEmTransicao = true;
@@ -13979,6 +13994,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       window.__loginEmTransicao = false;
     }, DURACAO_TRANSICAO_LOGIN);
     window.__loginFormAberto = true;
+    window.__atualizarSetaVoltarLogin();
   };
   document.getElementById('loginEscolhaEmail').onclick = abrirFormLogin;
   document.getElementById('loginEscolhaEntrar').onclick = abrirFormLogin;
@@ -14017,6 +14033,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       window.__loginEmTransicao = false;
     }, DURACAO_TRANSICAO_LOGIN);
     window.__loginFormAberto = false;
+    window.__atualizarSetaVoltarLogin();
   };
 
   card.insertAdjacentHTML('afterbegin', `
@@ -15087,7 +15104,19 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // clicar em "Voltar" jogava a pessoa pro inicio do carrossel de
     // marketing sem sentido nenhum (bug relatado pelo usuario). Com
     // semVoltar=true a seta fica escondida por completo.
-    document.getElementById('carrosselVoltar').classList.toggle('visivel', !semVoltar);
+    // BUG REAL (reportado pelo usuario): com semVoltar=true (login
+    // forcado por "Sair"/"Criar conta", sem slide de marketing de
+    // origem) a seta ficava escondida por COMPLETO -- inclusive depois
+    // de abrir o formulario de email, onde ela deveria pelo menos
+    // voltar pra tela de escolha (Google/email). Guarda o semVoltar
+    // original e delega a visibilidade pra __atualizarSetaVoltarLogin()
+    // (definida no bloco que injeta #passoLogin, mais acima), que
+    // tambem considera __loginFormAberto -- assim abrirFormLogin()/
+    // voltarParaEscolhaLogin() conseguem reavaliar a seta sozinhas
+    // quando o formulario abre/fecha, sem esperar um irParaLogin() novo.
+    window.__loginSemVoltarAtual = semVoltar;
+    if (typeof window.__atualizarSetaVoltarLogin === 'function') window.__atualizarSetaVoltarLogin();
+    else document.getElementById('carrosselVoltar').classList.toggle('visivel', !semVoltar);
     document.getElementById('carrosselEntrarLink').classList.add('oculto');
     if (!atualEl || atualEl === passoLogin){
       passoLogin.classList.add('on');

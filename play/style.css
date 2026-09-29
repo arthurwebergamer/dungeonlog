@@ -1,5 +1,11 @@
 /* ===== Bloco style #1 ===== */
 :root{
+    /* reforca o <meta name="color-scheme" content="dark"> em index.html
+       (mesmo motivo: desliga o "Force Dark"/"Auto Dark Theme" do Chrome
+       no Android, que reestilizava sozinho qualquer <a> -- ex.: linhas
+       de Politica de Privacidade/Termos de Uso em Config -- com azul e
+       sublinhado, ignorando a cor definida abaixo em --text). */
+    color-scheme: dark;
     --bg:#1A1526;
     --panel:#1A1526;
     --panel-2:#251E38;

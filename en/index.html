@@ -45,7 +45,7 @@
   }
 
   .dim{
-    position:absolute; inset:0; z-index:0; pointer-events:none;
+    position:absolute; inset:0; z-index:-1; pointer-events:none;
     background:radial-gradient(58% 42% at 50% 50%, rgba(0,0,0,.5) 0%, rgba(0,0,0,.22) 55%, rgba(0,0,0,0) 85%);
   }
 
@@ -80,17 +80,20 @@
   footer.site{
     position:relative; z-index:1;
     border-top:none; background:transparent;
-    padding:0 24px 28px;
+    padding:0 0 28px;
     flex-shrink:0;
   }
-  footer.site .wrap{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+  /* colunas lado a lado tambem no mobile: gap/min-width menores em tela estreita */
+  @media (max-width:480px){
+    footer.site .footcols{ gap:28px 32px; }
+    footer.site .footcol{ min-width:0; }
+  }
 
 </style>
 </head>
 <body>
 
   <div class="dungeonBg" aria-hidden="true"></div>
-  <div class="dim" aria-hidden="true"></div>
 
   <header class="site">
     <a class="brand" href="/en/">
@@ -105,6 +108,7 @@
   </header>
 
   <main>
+    <div class="dim" aria-hidden="true"></div>
     <h1>Your to-do list<br>becomes a dungeon.</h1>
     <span class="soon">Coming soon to Google Play</span>
   </main>

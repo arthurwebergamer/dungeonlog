@@ -1076,22 +1076,16 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
           <span data-i18n="cfg.sair">Sair</span>
         </button>
-        <button class="cfgbtnfull perigo" id="zerarbtn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-          <span data-i18n="cfg.apagarTudo">Apagar tudo</span>
-        </button>
-        <!-- v4.126 (exigencia Google Play, Account Deletion policy): "Apagar
-             tudo" acima so zera saves/{uid} + localStorage, NUNCA apagou o
-             usuario do Firebase Auth (verificado por leitura de codigo, ver
-             bloco "CONFIRMAR APAGAR TUDO EM FOLHA") -- a conta/login
-             continuava existindo. Este botao e' o que falta: apaga de
-             verdade o usuario do Firebase Auth (deleteUser), depois de
-             reautenticar (senha ou popup do Google, conforme o provider).
-             So aparece logado (mesmo padrao visual/oculto do cfgSairBtn,
-             classe alternada por JS -- ver perto de onAuthStateChanged).
+        <!-- v4.127 (pedido do usuario): "Apagar tudo" (so zerava
+             saves/{uid} + localStorage, NUNCA apagou o usuario do Firebase
+             Auth) foi removido -- este botao herdou o icone de lixeira e
+             excluir de verdade a conta (deleteUser), apos reautenticar
+             (senha ou popup do Google, conforme o provider). So aparece
+             logado (mesmo padrao visual/oculto do cfgSairBtn, classe
+             alternada por JS -- ver perto de onAuthStateChanged).
              Ver folha #excluirContaOverlay logo apos #contaOverlay. -->
         <button class="cfgbtnfull perigo oculto" id="excluirContaBtn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
           <span data-i18n="cfg.excluirConta">Excluir conta</span>
         </button>
       </div>
@@ -5833,20 +5827,9 @@ let difEscolhida = DIF_PADRAO;
   });
 })();
 input.addEventListener('keydown', e => { if (e.key === 'Enter') criar(); });
-
-document.getElementById('zerarbtn').onclick = () => {
-  // NAO usa mais confirm() nativo -- em mobile, o dialogo bloqueante do
-  // sistema pode gerar um "clique fantasma" no elemento que fica embaixo
-  // do botao do confirm() assim que ele fecha (bug conhecido em varios
-  // navegadores mobile). Se esse fantasma cair na nav inferior, dispara
-  // mostrarAba() e mostra o dialogo de tutorial por cima -- exatamente o
-  // sintoma "clico em apagar tudo, ele volta pra Tarefas e mostra o
-  // dialogo, so apaga de verdade no segundo clique". A folha modal abaixo
-  // (mesmo padrao visual do "Renomear") substitui o confirm() nativo por
-  // completo -- ver bloco "CONFIRMAR APAGAR TUDO EM FOLHA" perto do fim
-  // do arquivo, onde mora o clique que realmente apaga.
-  if (typeof window.abrirFolhaApagarTudo === 'function') window.abrirFolhaApagarTudo();
-};
+// v4.127: handler do extinto #zerarbtn ("Apagar tudo") removido daqui --
+// o botao que sobrou na zona de risco (#excluirContaBtn) tem seu proprio
+// bloco de JS self-contained perto de #excluirContaOverlay.
 
 document.getElementById('debugbtn').onclick = () => {
   const doDia = tarefas.filter(ehDeHoje);
@@ -11601,194 +11584,31 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 </script>
 
 <!-- =====================================================================
-     CONFIRMAR APAGAR DADOS EM FOLHA — bloco autonomo, cole antes de </body>
-
-     Por que existe (v4.27): o fluxo antigo usava confirm() nativo do
-     navegador. Bug relatado: no mobile, clicar em "Apagar tudo" as vezes
-     nao apagava — voltava pra aba Tarefas e mostrava o dialogo de tutorial,
-     so apagando de verdade num segundo clique. Hipotese mais provavel:
-     "clique fantasma" pos-confirm() — varios navegadores mobile, ao
-     fechar um confirm()/alert() bloqueante, reenviam um clique sintetico
-     pro elemento que estava embaixo do botao do dialogo do SISTEMA. Se
-     esse fantasma caisse na nav inferior, disparava mostrarAba('tarefas')
-     e, por tabela, o dialogo de boas-vindas daquela aba. E um bug
-     conhecido de varios navegadores, nao verificavel neste ambiente (sem
-     navegador real disponivel pra reproduzir) — mas trocar confirm() por
-     uma folha modal elimina essa classe de bug inteira, nao so o sintoma.
-
-     Reaproveita .edov/.edsheet/.edpuxador/.edtitulo/.edacoes (mesmo padrao
-     visual da folha de Renomear) + .edexcluir pro botao destrutivo.
-
-     Mudanca maior junto (v4.27): em vez de 5 modulos diferentes (original +
-     Loja + Vida + Atributos + Tutorial) cada um dando seu proprio removeItem
-     numa chave quando zerarbtn e clicado, agora e so localStorage.clear()
-     aqui dentro, na confirmacao. Isso tambem fecha de vez o item do roadmap
-     "apagar tudo esta incompleto" (chaves de vida/loja/economia/tema que
-     sobreviviam ao reset) -- clear() nao deixa passar nenhuma chave futura
-     esquecida, o que os hooks individuais SEMPRE arriscavam.
-
-     BUG CRITICO ENCONTRADO E CORRIGIDO (v4.45): localStorage.clear() so
-     apaga o aparelho. Pra conta logada (Firebase, ver secao do login), o
-     save tambem existe em saves/{uid} no Firestore — e esse nunca era
-     apagado. Cadeia que garantia a restauracao silenciosa dos dados
-     "apagados": localStorage.clear() -> reload -> carregar() nao acha
-     save -> #intro NAO ganha .off -> #passoLogin E INJETADO DE NOVO
-     (a condicao de injecao e literalmente "#intro sem .off", ver aquele
-     bloco) -> Firebase SDK carrega -> onAuthStateChanged encontra a MESMA
-     sessao (persistida em IndexedDB, localStorage.clear() nao alcanca
-     isso) -> aoLogar() chama puxarNuvem(uid) -> acha o documento antigo
-     ainda intacto no Firestore -> escreve ele de volta no localStorage
-     que acabou de ser limpo. Resultado: pra QUALQUER conta logada, sem
-     excecao, "apagar tudo" nunca apagava de verdade — sempre voltava
-     depois do reload. Verificado por leitura de codigo, nao suposicao.
-
-     Fix: antes de localStorage.clear(), tenta apagar saves/{uid} no
-     Firestore tambem, se houver usuario logado. Carrega o SDK do
-     Firebase por conta propria (import dinamico, mesmas URLs do modulo
-     de login) em vez de depender do bootstrap daquele modulo — que so
-     roda quando #passoLogin existe no DOM, ou seja, SO quando NAO ha
-     save local (ver nota acima). Pra quem tem save local (o caso normal
-     de quem vai clicar "apagar tudo"), aquele bootstrap nunca rodou
-     nesta sessao, entao nao ha auth/db prontos pra reaproveitar — esta
-     folha precisa dos seus proprios. window.firebaseConfig (exposto no
-     modulo de login) evita duplicar a apiKey inline nos dois lugares.
-
-     Achado em teste, nao previsto no design original: os 3 import()
-     dinamicos (app/auth/firestore) precisam de um timeout GERAL
-     envolvendo a tentativa inteira, nao so a espera de onAuthStateChanged.
-     Testado num ambiente sem rota pra www.gstatic.com (sandbox de dev
-     sem esse dominio liberado) e o clique ficou preso indefinidamente —
-     nem apagava o aparelho, nem recarregava, nem avisava nada. Promise.
-     race() com teto de 8s resolve: rede lenta/CDN fora do ar/sandbox sem
-     rota nunca mais trava o botao, o apagamento local sempre acontece.
-     ===================================================================== -->
-<div class="edov" id="zerarOverlay">
-  <div class="edsheet" id="zerarSheet">
-    <div class="edpuxador"></div>
-    <div class="edtitulo">Apagar todos os dados?</div>
-    <p style="font-family:'Outfit',sans-serif;font-size:13px;color:var(--dim);line-height:1.5;margin:0 0 16px">
-      Zera nível, moedas, itens, vida e tudo o mais salvo — neste aparelho e, se você estiver logado numa conta, também na nuvem. Não tem volta.
-    </p>
-    <div class="edacoes">
-      <button class="edsalvar" id="zerarCancelar" type="button" style="background:var(--panel-2);color:var(--text)">Cancelar</button>
-      <button class="edperigo" id="zerarConfirmar" type="button">Apagar tudo</button>
-    </div>
-  </div>
-</div>
-
-<script>
-(function(){
-  const ov  = document.getElementById('zerarOverlay');
-  const bC  = document.getElementById('zerarCancelar');
-  const bOk = document.getElementById('zerarConfirmar');
-  if (!ov || !bC || !bOk) return;
-
-  function abrir(){ ov.classList.add('on'); }
-  function fechar(){ ov.classList.remove('on'); }
-
-  ov.onclick = e => { if (e.target === ov) fechar(); };
-  document.addEventListener('keydown', e => {
-    if (ov.classList.contains('on') && e.key === 'Escape') fechar();
-  });
-  bC.onclick = fechar;
-
-  // espera o Firebase Auth terminar de restaurar a sessao persistida
-  // (IndexedDB) antes de decidir se tem usuario logado -- auth.currentUser
-  // pode estar null por um instante logo apos getAuth(), mesmo com sessao
-  // valida, ate a restauracao assincrona terminar. Timeout de seguranca:
-  // se o Firebase nao responder em 4s (rede lenta/offline), segue so com
-  // o que auth.currentUser tiver naquele momento, nao trava o botao pra sempre.
-  function aguardarUsuario(auth, onAuthStateChangedFn, timeoutMs){
-    return new Promise(resolve => {
-      let resolvido = false;
-      const cancelar = onAuthStateChangedFn(auth, u => {
-        if (resolvido) return;
-        resolvido = true;
-        cancelar();
-        resolve(u);
-      });
-      setTimeout(() => {
-        if (resolvido) return;
-        resolvido = true;
-        resolve(auth.currentUser);
-      }, timeoutMs);
-    });
-  }
-
-  async function apagarDaNuvemSeLogado(){
-    if (!window.firebaseConfig || window.firebaseConfig.apiKey === 'COLE_AQUI_SUA_APIKEY') return;
-    // PERFORMANCE: mesmo motivo do modulo de login -- os 3 sao
-    // independentes, Promise.all() em vez de sequencial corta a espera
-    // pra so a do mais lento dos 3, nao a soma.
-    const [modApp, modAuth, modFirestore] = await Promise.all([
-      import("https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js"),
-      import("https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js"),
-      import("https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js")
-    ]);
-    const { initializeApp, getApps, getApp } = modApp;
-    const { getAuth, onAuthStateChanged } = modAuth;
-    const { getFirestore, doc, deleteDoc } = modFirestore;
-
-    const app = getApps().length ? getApp() : initializeApp(window.firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    const usuario = await aguardarUsuario(auth, onAuthStateChanged, 4000);
-    if (usuario) await deleteDoc(doc(db, 'saves', usuario.uid));
-  }
-
-  bOk.onclick = async () => {
-    bOk.disabled = true;
-    bOk.textContent = 'Apagando…';
-
-    try {
-      // timeout GERAL, nao so da espera do usuario logado: se
-      // import() de algum dos 3 modulos do Firebase travar (rede lenta,
-      // CDN bloqueado, sandbox sem rota pra gstatic.com) sem nunca
-      // resolver nem rejeitar, o botao nao pode travar pra sempre —
-      // Promise.race com um teto de 8s garante que o app segue com o
-      // apagamento local de qualquer forma
-      await Promise.race([
-        apagarDaNuvemSeLogado(),
-        new Promise((_, rej) => setTimeout(() => rej(new Error('timeout geral de 8s')), 8000))
-      ]);
-    } catch(e){
-      console.error('QuestLog: falha ao apagar dados da nuvem — segue apagando so o aparelho', e);
-      if (typeof window.aviso === 'function'){
-        let en = false;
-        try { en = (localStorage.getItem('questlog.idioma.v1') || 'pt') === 'en'; } catch(e2){}
-        window.aviso(en ? 'Couldn\'t delete from the cloud, but the device was cleared' : 'Não deu pra apagar da nuvem, mas o aparelho foi limpo', false, true);
-      }
-    }
-
-    try { localStorage.clear(); } catch(e){}
-    location.reload();
-  };
-
-  window.abrirFolhaApagarTudo = abrir;
-})();
-</script>
-
-<!-- =====================================================================
      EXCLUIR CONTA DE VERDADE (v4.126, exigencia Google Play Console ->
      App content -> Account deletion: precisa de um caminho DENTRO DO APP,
-     nao so a pagina publica /delete-account). "Apagar tudo" (folha acima)
-     NUNCA apagou o usuario do Firebase Auth -- so saves/{uid} + localStorage,
-     verificado por leitura de codigo. Esta folha apaga de verdade:
+     nao so a pagina publica /delete-account).
+
+     v4.127 (pedido do usuario): existia um botao "Apagar tudo" separado
+     (so zerava saves/{uid} + localStorage, nunca apagou o usuario do
+     Firebase Auth, verificado por leitura de codigo) -- removido de
+     proposito. So faz sentido excluir conta de verdade agora, entao os
+     dois botoes viraram um so. Este e' o unico fluxo restante na zona de
+     risco, alem de "Sair":
 
      1) reautentica (Firebase exige login "recente" pra deleteUser() --
         senha de novo pra conta email/senha, popup do Google de novo pra
         conta Google);
-     2) apaga saves/{uid} no Firestore (mesmo passo da folha "Apagar tudo");
+     2) apaga saves/{uid} no Firestore;
      3) chama deleteUser(usuario) -- isso sim remove o login/credencial;
      4) limpa o aparelho e recarrega.
 
-     Mesmo padrao de import dinamico self-contained do bloco anterior
-     (nao depende de auth/db do modulo de login, que so roda quando
-     #passoLogin existe no DOM -- ver aquele comentario). window.firebaseConfig
-     evita duplicar a apiKey inline.
+     Import dinamico self-contained do Firebase (nao depende de auth/db
+     do modulo de login, que so roda quando #passoLogin existe no DOM --
+     ver aquele comentario). window.firebaseConfig evita duplicar a
+     apiKey inline.
 
-     Botao so fica visivel logado (#excluirContaBtn, toggle em
+     Botao so fica visivel logado (#excluirContaBtn, icone de lixeira
+     reaproveitado do extinto "Apagar tudo", toggle em
      atualizarLinhaConta(), bloco "CONTA — SAIR").
      ===================================================================== -->
 <div class="edov" id="excluirContaOverlay">

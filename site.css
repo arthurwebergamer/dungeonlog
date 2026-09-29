@@ -37,10 +37,22 @@ header.site .lang .sep{ color:var(--dim); }
 
 footer.site{
   border-top:1px solid var(--line);
-  padding:28px 0 40px;
-  text-align:center;
+  padding:32px 0 40px;
+  text-align:left;
 }
-footer.site .wrap{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
-footer.site a{ font-size:13px; color:var(--muted); }
+/* pedido do usuario: rodape organizado por categoria (Legal / Contato /
+   Navegacao) em vez da lista unica de links separados por "." -- cada
+   categoria vira uma coluna alinhada a esquerda (flex-start, NAO center
+   -- com center, ao quebrar linha no mobile cada coluna vira um bloco
+   centralizado sozinho, feio e diferente da referencia que o usuario
+   mandou), com a linha de direitos reservados embaixo de tudo. No
+   desktop as colunas ficam lado a lado (a .wrap com max-width:760px
+   ja centraliza o BLOCO inteiro na pagina; o alinhamento interno das
+   colunas continua a esquerda). */
+footer.site .footcols{ display:flex; gap:40px 56px; flex-wrap:wrap; margin-bottom:28px; padding-bottom:22px; border-bottom:1px solid var(--panel-2); }
+footer.site .footcol{ display:flex; flex-direction:column; gap:9px; min-width:120px; }
+footer.site .footlabel{ font-family:'Outfit',sans-serif; font-weight:700; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--dim); margin-bottom:1px; }
+footer.site a{ font-size:14px; color:var(--muted); text-decoration:none; }
+footer.site a:hover{ color:var(--text); }
 footer.site span.dot{ color:var(--dim); }
-footer.site .copy{ display:block; margin-top:10px; font-size:11px; color:var(--dim); }
+footer.site .copy{ display:block; font-size:11.5px; color:var(--dim); }

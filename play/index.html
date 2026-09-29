@@ -1068,7 +1068,7 @@
            NAO apaga o doc no Firestore -- so a leitura ja feita nesta
            aba). Ver JS logo apos #cfgAbrirAssinatura. -->
       <button class="cfgbtnfull perigo debug-el" id="debugCancelarAssinaturaBtn" type="button" style="margin-bottom:14px">
-        🐞 Cancelar assinatura (debug)
+        🐞 Cancel subscription (debug)
       </button>
 
       <div class="zonarisco">
@@ -1076,9 +1076,17 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
           <span data-i18n="cfg.sair">Sair</span>
         </button>
-        <button class="cfgbtnfull perigo" id="zerarbtn">
+        <!-- v4.127 (pedido do usuario): "Apagar tudo" (so zerava
+             saves/{uid} + localStorage, NUNCA apagou o usuario do Firebase
+             Auth) foi removido -- este botao herdou o icone de lixeira e
+             excluir de verdade a conta (deleteUser), apos reautenticar
+             (senha ou popup do Google, conforme o provider). So aparece
+             logado (mesmo padrao visual/oculto do cfgSairBtn, classe
+             alternada por JS -- ver perto de onAuthStateChanged).
+             Ver folha #excluirContaOverlay logo apos #contaOverlay. -->
+        <button class="cfgbtnfull perigo oculto" id="excluirContaBtn">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-          <span data-i18n="cfg.apagarTudo">Apagar tudo</span>
+          <span data-i18n="cfg.excluirConta">Excluir conta</span>
         </button>
       </div>
     </div>
@@ -1866,7 +1874,7 @@
       if (!blob) return;
       const emIngles = (typeof idiomaApp === 'function') && idiomaApp() === 'en';
       const arquivo = new File([blob], 'dungeonlog-sequencia.png', { type: 'image/png' });
-      const texto = emIngles ? 'Check out my DungeonLog streak!' : 'Olha minha sequência no DungeonLog!';
+      const texto = emIngles ? 'Check out my Dungeonlog streak!' : 'Olha minha sequência no Dungeonlog!';
 
       function baixarImagem(){
         const url = URL.createObjectURL(blob);
@@ -1910,7 +1918,10 @@
 })();
 </script>
 
-<div class="debugbar"><button class="debugbtn" id="debugbtn">próximo dia →</button><button class="debugbtn" id="pularTutoriaisBtn">pular tutorial</button><button class="debugbtn" id="debugArmasBtn">+ todas armas</button><button class="debugbtn" id="debugEstagioBtn">forçar estágio</button></div>
+<!-- pedido do usuario: textos do menu debug sempre em ingles, fixos --
+     ferramenta de dev/QA (revisor do Google Play), nao roda pelo i18n do
+     app (data-i18n), de proposito. -->
+<div class="debugbar"><button class="debugbtn" id="debugbtn">next day →</button><button class="debugbtn" id="pularTutoriaisBtn">skip tutorial</button><button class="debugbtn" id="debugArmasBtn">+ all weapons</button><button class="debugbtn" id="debugEstagioBtn">force stage</button></div>
 <!-- #estagioDebugPanel (terminal verde de log dos Estagios) removido a
      pedido do usuario -- debugEstagio() ja tem "if (!painel) return"
      logo no inicio (ver funcao, perto de "Painel de debug VISIVEL NA
@@ -1932,6 +1943,25 @@ try {
   const uidSalvo = localStorage.getItem('questlog.uidAtivo.v1');
   if (uidSalvo) _uidAtivo = uidSalvo;
 } catch(e){}
+
+// MENU DEBUG RESTRITO POR CONTA (pedido do usuario: revisor do Google
+// Play precisa testar o menu debug, mas nenhum jogador comum deveria
+// conseguir ligar isso so tocando no icone de moedas -- ver TOGGLE DEBUG
+// perto do fim do arquivo). Allowlist client-side: nao e' seguranca de
+// verdade (da pra ler no devtools), so impede o usuario comum de achar
+// por acidente -- suficiente pra uma ferramenta de dev/QA, nao pra algo
+// que concede PRO de verdade (isso continua so via Firestore, ver
+// entitlements/{uid} em firestore.rules). Pra liberar debug numa conta
+// nova, pega o uid em Authentication > Users no Firebase Console e
+// adiciona aqui.
+const UIDS_DEBUG_PERMITIDO = [
+  'CVNPbBxIFebPmnmCEw6iYYYKWRS2', // conta de revisor do Google Play (mesma do PRO vitalicio)
+  // 'SEU_UID_AQUI', // sua propria conta, se quiser testar tambem
+];
+function uidTemDebugPermitido(){
+  return UIDS_DEBUG_PERMITIDO.includes(_uidAtivo);
+}
+window.uidTemDebugPermitido = uidTemDebugPermitido;
 
 // PLANO PRO (roadmap: item 1 do Plano de Lancamento) -- personagem ativo
 // dentro da conta. Precisa ser resolvido ANTES de chaveSaveAtual()/
@@ -2012,6 +2042,10 @@ window.definirUidAtivo = function(uid){
     if (_uidAtivo) localStorage.setItem('questlog.uidAtivo.v1', _uidAtivo);
     else localStorage.removeItem('questlog.uidAtivo.v1');
   } catch(e){}
+  // menu debug restrito por conta (ver UIDS_DEBUG_PERMITIDO, alguns
+  // paragrafos acima) -- uid so muda de verdade aqui, entao e aqui que
+  // reavalia se o debug deve continuar visivel/ficar visivel agora.
+  if (typeof window.__reavaliarModoDebugPosLogin === 'function') window.__reavaliarModoDebugPosLogin();
   // PLANO PRO: personagemAtivo e por CONTA -- troca de uid precisa reler
   // qual personagem essa conta especifica tinha ativo, senao
   // _personagemAtivo fica "vazado" da conta anterior (mesma classe de
@@ -5598,10 +5632,18 @@ function criar(){
   if (modo === 'repete' && diasEscolhidos.length === 0) return;
 
   // PLANO PRO (pedido do usuario): plano gratis para em LIMITE_TAREFAS_GRATIS
-  // tarefas ATIVAS (tarefas.length conta todas, independente do tipo --
-  // simples de entender e sem precisar decidir "ativas hoje" vs "no total").
-  // Assinante (assinaturaAtiva()) nunca esbarra aqui.
-  if (typeof assinaturaAtiva === 'function' && !assinaturaAtiva() && tarefas.length >= LIMITE_TAREFAS_GRATIS){
+  // tarefas ATIVAS.
+  // BUG REAL (reportado 28 set: paywall disparando cedo demais, as vezes
+  // com so 1 tarefa visivel): a versao anterior usava tarefas.length
+  // (TODAS as tarefas que ja existiram, incluindo tipo "hoje" de dias
+  // passados -- essas nunca sao removidas do array, so ficam invisiveis
+  // porque ehDeHoje() as filtra da lista visivel). Depois de alguns dias
+  // usando tarefas "so hoje", tarefas.length passava de 5 silenciosamente
+  // e travava a criacao mesmo com 1 unica tarefa aparecendo na tela.
+  // Fix: conta so o que "existe" de verdade pro jogador hoje (mesmo
+  // filtro ehDeHoje() que decide o que aparece na lista de tarefas).
+  const tarefasAtivas = tarefas.filter(ehDeHoje).length;
+  if (typeof assinaturaAtiva === 'function' && !assinaturaAtiva() && tarefasAtivas >= LIMITE_TAREFAS_GRATIS){
     composer.classList.remove('on');
     if (typeof window.abrirPaywall === 'function') window.abrirPaywall('tarefas');
     return;
@@ -5785,20 +5827,9 @@ let difEscolhida = DIF_PADRAO;
   });
 })();
 input.addEventListener('keydown', e => { if (e.key === 'Enter') criar(); });
-
-document.getElementById('zerarbtn').onclick = () => {
-  // NAO usa mais confirm() nativo -- em mobile, o dialogo bloqueante do
-  // sistema pode gerar um "clique fantasma" no elemento que fica embaixo
-  // do botao do confirm() assim que ele fecha (bug conhecido em varios
-  // navegadores mobile). Se esse fantasma cair na nav inferior, dispara
-  // mostrarAba() e mostra o dialogo de tutorial por cima -- exatamente o
-  // sintoma "clico em apagar tudo, ele volta pra Tarefas e mostra o
-  // dialogo, so apaga de verdade no segundo clique". A folha modal abaixo
-  // (mesmo padrao visual do "Renomear") substitui o confirm() nativo por
-  // completo -- ver bloco "CONFIRMAR APAGAR TUDO EM FOLHA" perto do fim
-  // do arquivo, onde mora o clique que realmente apaga.
-  if (typeof window.abrirFolhaApagarTudo === 'function') window.abrirFolhaApagarTudo();
-};
+// v4.127: handler do extinto #zerarbtn ("Apagar tudo") removido daqui --
+// o botao que sobrou na zona de risco (#excluirContaBtn) tem seu proprio
+// bloco de JS self-contained perto de #excluirContaOverlay.
 
 document.getElementById('debugbtn').onclick = () => {
   const doDia = tarefas.filter(ehDeHoje);
@@ -7216,7 +7247,13 @@ Object.keys(SPRITE_SLOT).forEach(k => {
   ICONE_SLOT[k] = '<div class="pxi fantasma" style="' + estiloSprite(SPRITE_SLOT[k], 26) + '"></div>';
 });
 
-const ROTULO_SLOT = {arma:'arma',armadura:'peito',elmo:'elmo',escudo:'escudo',acess:'acess.'};
+// bug reportado: com o app em EN os rotulos ficavam presos em PT --
+// era um dicionario fixo, agora le a traducao ativa via window.t()
+// (chaves inv.slot* -- ver dicionario TRADUCOES).
+const CHAVE_I18N_SLOT = {arma:'inv.slotArma',armadura:'inv.slotPeito',elmo:'inv.slotElmo',escudo:'inv.slotEscudo',acess:'inv.slotAcess'};
+function rotuloSlot(s){
+  return (typeof window.t === 'function') ? window.t(CHAVE_I18N_SLOT[s]) : CHAVE_I18N_SLOT[s];
+}
 
 // rastreia qual quadradinho do grid (ou slot equipado) abriu a ficha atual
 // -- a ficha em si e um painel modal que sempre aparece no mesmo lugar da
@@ -7250,7 +7287,7 @@ function renderInventario(){
     const d = document.createElement('div');
     d.className = 'eslot' + (tem ? ' cheio r'+item(id).rar : '');
     d.innerHTML = tem ? spriteHTML(item(id).sp, 34) : ICONE_SLOT[s];
-    d.innerHTML += '<span class="etag">'+ROTULO_SLOT[s]+'</span>';
+    d.innerHTML += '<span class="etag">'+rotuloSlot(s)+'</span>';
     d.onclick = () => { if (tem){ fichaOrigemEl = d; abrirFicha(id); } };
     row.appendChild(d);
   });
@@ -11547,103 +11584,84 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 </script>
 
 <!-- =====================================================================
-     CONFIRMAR APAGAR DADOS EM FOLHA — bloco autonomo, cole antes de </body>
+     EXCLUIR CONTA DE VERDADE (v4.126, exigencia Google Play Console ->
+     App content -> Account deletion: precisa de um caminho DENTRO DO APP,
+     nao so a pagina publica /delete-account).
 
-     Por que existe (v4.27): o fluxo antigo usava confirm() nativo do
-     navegador. Bug relatado: no mobile, clicar em "Apagar tudo" as vezes
-     nao apagava — voltava pra aba Tarefas e mostrava o dialogo de tutorial,
-     so apagando de verdade num segundo clique. Hipotese mais provavel:
-     "clique fantasma" pos-confirm() — varios navegadores mobile, ao
-     fechar um confirm()/alert() bloqueante, reenviam um clique sintetico
-     pro elemento que estava embaixo do botao do dialogo do SISTEMA. Se
-     esse fantasma caisse na nav inferior, disparava mostrarAba('tarefas')
-     e, por tabela, o dialogo de boas-vindas daquela aba. E um bug
-     conhecido de varios navegadores, nao verificavel neste ambiente (sem
-     navegador real disponivel pra reproduzir) — mas trocar confirm() por
-     uma folha modal elimina essa classe de bug inteira, nao so o sintoma.
+     v4.127 (pedido do usuario): existia um botao "Apagar tudo" separado
+     (so zerava saves/{uid} + localStorage, nunca apagou o usuario do
+     Firebase Auth, verificado por leitura de codigo) -- removido de
+     proposito. So faz sentido excluir conta de verdade agora, entao os
+     dois botoes viraram um so. Este e' o unico fluxo restante na zona de
+     risco, alem de "Sair":
 
-     Reaproveita .edov/.edsheet/.edpuxador/.edtitulo/.edacoes (mesmo padrao
-     visual da folha de Renomear) + .edexcluir pro botao destrutivo.
+     1) reautentica (Firebase exige login "recente" pra deleteUser() --
+        senha de novo pra conta email/senha, popup do Google de novo pra
+        conta Google);
+     2) apaga saves/{uid} no Firestore;
+     3) chama deleteUser(usuario) -- isso sim remove o login/credencial;
+     4) limpa o aparelho e recarrega.
 
-     Mudanca maior junto (v4.27): em vez de 5 modulos diferentes (original +
-     Loja + Vida + Atributos + Tutorial) cada um dando seu proprio removeItem
-     numa chave quando zerarbtn e clicado, agora e so localStorage.clear()
-     aqui dentro, na confirmacao. Isso tambem fecha de vez o item do roadmap
-     "apagar tudo esta incompleto" (chaves de vida/loja/economia/tema que
-     sobreviviam ao reset) -- clear() nao deixa passar nenhuma chave futura
-     esquecida, o que os hooks individuais SEMPRE arriscavam.
+     Import dinamico self-contained do Firebase (nao depende de auth/db
+     do modulo de login, que so roda quando #passoLogin existe no DOM --
+     ver aquele comentario). window.firebaseConfig evita duplicar a
+     apiKey inline.
 
-     BUG CRITICO ENCONTRADO E CORRIGIDO (v4.45): localStorage.clear() so
-     apaga o aparelho. Pra conta logada (Firebase, ver secao do login), o
-     save tambem existe em saves/{uid} no Firestore — e esse nunca era
-     apagado. Cadeia que garantia a restauracao silenciosa dos dados
-     "apagados": localStorage.clear() -> reload -> carregar() nao acha
-     save -> #intro NAO ganha .off -> #passoLogin E INJETADO DE NOVO
-     (a condicao de injecao e literalmente "#intro sem .off", ver aquele
-     bloco) -> Firebase SDK carrega -> onAuthStateChanged encontra a MESMA
-     sessao (persistida em IndexedDB, localStorage.clear() nao alcanca
-     isso) -> aoLogar() chama puxarNuvem(uid) -> acha o documento antigo
-     ainda intacto no Firestore -> escreve ele de volta no localStorage
-     que acabou de ser limpo. Resultado: pra QUALQUER conta logada, sem
-     excecao, "apagar tudo" nunca apagava de verdade — sempre voltava
-     depois do reload. Verificado por leitura de codigo, nao suposicao.
-
-     Fix: antes de localStorage.clear(), tenta apagar saves/{uid} no
-     Firestore tambem, se houver usuario logado. Carrega o SDK do
-     Firebase por conta propria (import dinamico, mesmas URLs do modulo
-     de login) em vez de depender do bootstrap daquele modulo — que so
-     roda quando #passoLogin existe no DOM, ou seja, SO quando NAO ha
-     save local (ver nota acima). Pra quem tem save local (o caso normal
-     de quem vai clicar "apagar tudo"), aquele bootstrap nunca rodou
-     nesta sessao, entao nao ha auth/db prontos pra reaproveitar — esta
-     folha precisa dos seus proprios. window.firebaseConfig (exposto no
-     modulo de login) evita duplicar a apiKey inline nos dois lugares.
-
-     Achado em teste, nao previsto no design original: os 3 import()
-     dinamicos (app/auth/firestore) precisam de um timeout GERAL
-     envolvendo a tentativa inteira, nao so a espera de onAuthStateChanged.
-     Testado num ambiente sem rota pra www.gstatic.com (sandbox de dev
-     sem esse dominio liberado) e o clique ficou preso indefinidamente —
-     nem apagava o aparelho, nem recarregava, nem avisava nada. Promise.
-     race() com teto de 8s resolve: rede lenta/CDN fora do ar/sandbox sem
-     rota nunca mais trava o botao, o apagamento local sempre acontece.
+     Botao so fica visivel logado (#excluirContaBtn, icone de lixeira
+     reaproveitado do extinto "Apagar tudo", toggle em
+     atualizarLinhaConta(), bloco "CONTA — SAIR").
      ===================================================================== -->
-<div class="edov" id="zerarOverlay">
-  <div class="edsheet" id="zerarSheet">
+<div class="edov" id="excluirContaOverlay">
+  <div class="edsheet" id="excluirContaSheet">
     <div class="edpuxador"></div>
-    <div class="edtitulo">Apagar todos os dados?</div>
-    <p style="font-family:'Outfit',sans-serif;font-size:13px;color:var(--dim);line-height:1.5;margin:0 0 16px">
-      Zera nível, moedas, itens, vida e tudo o mais salvo — neste aparelho e, se você estiver logado numa conta, também na nuvem. Não tem volta.
+    <div class="edtitulo" id="excluirContaTitulo">Excluir conta?</div>
+    <p style="font-family:'Outfit',sans-serif;font-size:13px;color:var(--dim);line-height:1.5;margin:0 0 16px" id="excluirContaDesc">
+      Isso apaga sua conta de login e todo o progresso salvo na nuvem, em definitivo. Não tem volta.
     </p>
+    <p class="oculto" id="excluirContaGoogleAviso" style="font-family:'Outfit',sans-serif;font-size:12.5px;color:var(--dim);line-height:1.5;margin:0 0 14px">
+      Sua conta usa login do Google. Vamos pedir pra você confirmar de novo com o Google antes de excluir.
+    </p>
+    <label id="excluirContaSenhaLabel" style="display:block;font-family:'Outfit',sans-serif;font-size:12px;color:var(--dim);margin:0 0 6px">
+      Confirme sua senha pra continuar
+    </label>
+    <input class="edcampo" type="password" id="excluirContaSenha" autocomplete="current-password" placeholder="Sua senha" style="margin-bottom:10px">
+    <p class="oculto" id="excluirContaErro" style="font-family:'Outfit',sans-serif;font-size:12.5px;color:#ff6b6b;line-height:1.4;margin:0 0 10px"></p>
     <div class="edacoes">
-      <button class="edsalvar" id="zerarCancelar" type="button" style="background:var(--panel-2);color:var(--text)">Cancelar</button>
-      <button class="edperigo" id="zerarConfirmar" type="button">Apagar tudo</button>
+      <button class="edsalvar" id="excluirContaCancelar" type="button" style="background:var(--panel-2);color:var(--text)">Cancelar</button>
+      <button class="edperigo" id="excluirContaConfirmar" type="button" disabled>Excluir conta</button>
     </div>
   </div>
 </div>
 
 <script>
 (function(){
-  const ov  = document.getElementById('zerarOverlay');
-  const bC  = document.getElementById('zerarCancelar');
-  const bOk = document.getElementById('zerarConfirmar');
-  if (!ov || !bC || !bOk) return;
+  const ov         = document.getElementById('excluirContaOverlay');
+  const bAbrir      = document.getElementById('excluirContaBtn');
+  const bCancelar   = document.getElementById('excluirContaCancelar');
+  const bOk         = document.getElementById('excluirContaConfirmar');
+  const elTitulo    = document.getElementById('excluirContaTitulo');
+  const elDesc      = document.getElementById('excluirContaDesc');
+  const elGoogleAviso = document.getElementById('excluirContaGoogleAviso');
+  const elSenhaLabel  = document.getElementById('excluirContaSenhaLabel');
+  const campoSenha    = document.getElementById('excluirContaSenha');
+  const elErro        = document.getElementById('excluirContaErro');
+  if (!ov || !bAbrir || !bCancelar || !bOk || !campoSenha || !elErro) return;
 
-  function abrir(){ ov.classList.add('on'); }
-  function fechar(){ ov.classList.remove('on'); }
+  function t(chave, fallback){
+    return (typeof window.t === 'function') ? window.t(chave) : fallback;
+  }
 
-  ov.onclick = e => { if (e.target === ov) fechar(); };
-  document.addEventListener('keydown', e => {
-    if (ov.classList.contains('on') && e.key === 'Escape') fechar();
-  });
-  bC.onclick = fechar;
+  // referencias do SDK, preenchidas em obterContextoAuth() -- import
+  // dinamico so acontece quando a folha e' de fato aberta
+  let _GoogleAuthProvider, _reauthenticateWithPopup, _reauthenticateWithCredential,
+      _EmailAuthProvider, _deleteUser, _doc, _deleteDoc;
+  let _usuarioAtual = null;
+  let _dbAtual = null;
+  let _emProgresso = false;
 
-  // espera o Firebase Auth terminar de restaurar a sessao persistida
-  // (IndexedDB) antes de decidir se tem usuario logado -- auth.currentUser
-  // pode estar null por um instante logo apos getAuth(), mesmo com sessao
-  // valida, ate a restauracao assincrona terminar. Timeout de seguranca:
-  // se o Firebase nao responder em 4s (rede lenta/offline), segue so com
-  // o que auth.currentUser tiver naquele momento, nao trava o botao pra sempre.
+  // mesma logica de espera de restauracao de sessao (IndexedDB) do bloco
+  // "Apagar tudo" acima -- duplicada de proposito, ver comentario daquele
+  // bloco sobre por que esta folha tem seu proprio Firebase self-contained
   function aguardarUsuario(auth, onAuthStateChangedFn, timeoutMs){
     return new Promise(resolve => {
       let resolvido = false;
@@ -11661,57 +11679,164 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     });
   }
 
-  async function apagarDaNuvemSeLogado(){
-    if (!window.firebaseConfig || window.firebaseConfig.apiKey === 'COLE_AQUI_SUA_APIKEY') return;
-    // PERFORMANCE: mesmo motivo do modulo de login -- os 3 sao
-    // independentes, Promise.all() em vez de sequencial corta a espera
-    // pra so a do mais lento dos 3, nao a soma.
+  async function obterContextoAuth(){
+    if (!window.firebaseConfig || window.firebaseConfig.apiKey === 'COLE_AQUI_SUA_APIKEY') return null;
     const [modApp, modAuth, modFirestore] = await Promise.all([
       import("https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js"),
       import("https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js"),
       import("https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js")
     ]);
     const { initializeApp, getApps, getApp } = modApp;
-    const { getAuth, onAuthStateChanged } = modAuth;
+    const {
+      getAuth, onAuthStateChanged, GoogleAuthProvider, EmailAuthProvider,
+      reauthenticateWithPopup, reauthenticateWithCredential, deleteUser
+    } = modAuth;
     const { getFirestore, doc, deleteDoc } = modFirestore;
+
+    _GoogleAuthProvider = GoogleAuthProvider;
+    _EmailAuthProvider = EmailAuthProvider;
+    _reauthenticateWithPopup = reauthenticateWithPopup;
+    _reauthenticateWithCredential = reauthenticateWithCredential;
+    _deleteUser = deleteUser;
+    _doc = doc;
+    _deleteDoc = deleteDoc;
 
     const app = getApps().length ? getApp() : initializeApp(window.firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-
     const usuario = await aguardarUsuario(auth, onAuthStateChanged, 4000);
-    if (usuario) await deleteDoc(doc(db, 'saves', usuario.uid));
+    return { auth, db, user: usuario };
   }
 
-  bOk.onclick = async () => {
+  function ehGoogle(usuario){
+    return !!(usuario && usuario.providerData && usuario.providerData.some(p => p.providerId === 'google.com'));
+  }
+
+  function resetarFolha(){
+    campoSenha.value = '';
+    campoSenha.classList.add('oculto');
+    elSenhaLabel.classList.add('oculto');
+    elGoogleAviso.classList.add('oculto');
+    elErro.classList.add('oculto');
+    elErro.textContent = '';
     bOk.disabled = true;
-    bOk.textContent = 'Apagando…';
+    bOk.textContent = t('cfg.excluirContaBotao', 'Excluir conta');
+    bCancelar.disabled = false;
+  }
+
+  async function abrir(){
+    elTitulo.textContent = t('cfg.excluirContaTitulo', 'Excluir conta?');
+    elDesc.textContent   = t('cfg.excluirContaDesc', 'Isso apaga sua conta de login e todo o progresso salvo na nuvem, em definitivo. Não tem volta.');
+    elGoogleAviso.textContent = t('cfg.excluirContaGoogleAviso', 'Sua conta usa login do Google. Vamos pedir pra você confirmar de novo com o Google antes de excluir.');
+    elSenhaLabel.textContent  = t('cfg.excluirContaSenhaLabel', 'Confirme sua senha pra continuar');
+    campoSenha.placeholder    = t('cfg.excluirContaSenhaPlaceholder', 'Sua senha');
+    resetarFolha();
+    ov.classList.add('on');
 
     try {
-      // timeout GERAL, nao so da espera do usuario logado: se
-      // import() de algum dos 3 modulos do Firebase travar (rede lenta,
-      // CDN bloqueado, sandbox sem rota pra gstatic.com) sem nunca
-      // resolver nem rejeitar, o botao nao pode travar pra sempre —
-      // Promise.race com um teto de 8s garante que o app segue com o
-      // apagamento local de qualquer forma
-      await Promise.race([
-        apagarDaNuvemSeLogado(),
-        new Promise((_, rej) => setTimeout(() => rej(new Error('timeout geral de 8s')), 8000))
-      ]);
-    } catch(e){
-      console.error('QuestLog: falha ao apagar dados da nuvem — segue apagando so o aparelho', e);
-      if (typeof window.aviso === 'function'){
-        let en = false;
-        try { en = (localStorage.getItem('questlog.idioma.v1') || 'pt') === 'en'; } catch(e2){}
-        window.aviso(en ? 'Couldn\'t delete from the cloud, but the device was cleared' : 'Não deu pra apagar da nuvem, mas o aparelho foi limpo', false, true);
+      const ctx = await obterContextoAuth();
+      if (!ctx || !ctx.user){
+        // sem usuario logado (sessao ainda restaurando ou SDK indisponivel)
+        // -- nao ha o que excluir, fecha e deixa o botao normal de "Sair"
+        // resolver o estado visivel
+        fechar();
+        return;
       }
+      _usuarioAtual = ctx.user;
+      _dbAtual = ctx.db;
+      if (ehGoogle(_usuarioAtual)){
+        elGoogleAviso.classList.remove('oculto');
+      } else {
+        campoSenha.classList.remove('oculto');
+        elSenhaLabel.classList.remove('oculto');
+        setTimeout(() => campoSenha.focus(), 50);
+      }
+      bOk.disabled = false;
+    } catch(e){
+      console.error('excluirConta: falha ao obter contexto de autenticacao', e);
+      elErro.textContent = t('cfg.excluirContaFalhouGenerico', 'Não deu pra excluir a conta agora. Tenta de novo em instantes.');
+      elErro.classList.remove('oculto');
+    }
+  }
+
+  function fechar(){
+    if (_emProgresso) return; // nao fecha no meio de uma exclusao em andamento
+    ov.classList.remove('on');
+    _usuarioAtual = null;
+  }
+
+  ov.onclick = e => { if (e.target === ov) fechar(); };
+  document.addEventListener('keydown', e => {
+    if (ov.classList.contains('on') && e.key === 'Escape') fechar();
+  });
+  bAbrir.onclick = abrir;
+  bCancelar.onclick = fechar;
+  campoSenha.addEventListener('keydown', e => { if (e.key === 'Enter' && !bOk.disabled) bOk.click(); });
+
+  bOk.onclick = async () => {
+    if (!_usuarioAtual || _emProgresso) return;
+    const google = ehGoogle(_usuarioAtual);
+
+    if (!google && !campoSenha.value){
+      elErro.textContent = t('cfg.excluirContaSenhaErrada', 'Senha incorreta.');
+      elErro.classList.remove('oculto');
+      campoSenha.focus();
+      return;
     }
 
-    try { localStorage.clear(); } catch(e){}
-    location.reload();
+    _emProgresso = true;
+    bOk.disabled = true;
+    bCancelar.disabled = true;
+    elErro.classList.add('oculto');
+    bOk.textContent = t('cfg.excluirContaExcluindo', 'Excluindo…');
+
+    try {
+      if (google){
+        await _reauthenticateWithPopup(_usuarioAtual, new _GoogleAuthProvider());
+      } else {
+        const cred = _EmailAuthProvider.credential(_usuarioAtual.email, campoSenha.value);
+        await _reauthenticateWithCredential(_usuarioAtual, cred);
+      }
+
+      // mesmo passo/ordem da folha "Apagar tudo": apaga o save na nuvem
+      // antes -- se falhar, segue mesmo assim pro deleteUser(), que e' o
+      // passo que realmente importa pra exigencia do Google (o doc orfao
+      // em saves/{uid} sem dono e' inofensivo, so ocupa espaco)
+      try {
+        if (_dbAtual && _doc && _deleteDoc) await _deleteDoc(_doc(_dbAtual, 'saves', _usuarioAtual.uid));
+      } catch(e){
+        console.error('excluirConta: falha ao apagar saves/{uid}, segue mesmo assim pra deleteUser()', e);
+      }
+
+      await _deleteUser(_usuarioAtual);
+
+      try { localStorage.clear(); } catch(e){}
+      location.reload();
+    } catch(e){
+      console.error('excluirConta: falha ao excluir conta', e);
+      _emProgresso = false;
+      bOk.disabled = false;
+      bCancelar.disabled = false;
+      bOk.textContent = t('cfg.excluirContaBotao', 'Excluir conta');
+
+      const codigo = e && e.code;
+      if (codigo === 'auth/wrong-password' || codigo === 'auth/invalid-credential'){
+        elErro.textContent = t('cfg.excluirContaSenhaErrada', 'Senha incorreta.');
+      } else if (codigo === 'auth/popup-closed-by-user' || codigo === 'auth/cancelled-popup-request'){
+        // usuario fechou o popup do Google por conta propria -- nao e' erro de verdade, so nao mostra nada
+        return;
+      } else if (codigo === 'auth/requires-recent-login'){
+        elErro.textContent = t('cfg.excluirContaPrecisaRelogar', 'Por segurança, entre na sua conta de novo e tente excluir em seguida.');
+      } else if (google){
+        elErro.textContent = t('cfg.excluirContaGoogleFalhou', 'Não deu pra confirmar com o Google. Tenta de novo.');
+      } else {
+        elErro.textContent = t('cfg.excluirContaFalhouGenerico', 'Não deu pra excluir a conta agora. Tenta de novo em instantes.');
+      }
+      elErro.classList.remove('oculto');
+    }
   };
 
-  window.abrirFolhaApagarTudo = abrir;
+  window.abrirFolhaExcluirConta = abrir;
 })();
 </script>
 
@@ -13924,6 +14049,21 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // ja tinha sido escondido pelo voltarDoLoginCarrossel). Fix: uma flag
   // de "transicao em andamento" que ignora toques repetidos nos 260ms.
   window.__loginEmTransicao = false;
+
+  // BUG REAL (reportado pelo usuario: sem botao pra voltar da tela de
+  // email pra escolha Google/email quando o login foi forcado, sem slide
+  // de marketing de origem -- ver comentario em irParaLogin() sobre
+  // semVoltar). A seta #carrosselVoltar fica visivel se HOUVER slide de
+  // origem (!__loginSemVoltarAtual) OU se o formulario de email/senha
+  // estiver aberto agora (nesse caso ela so volta pra escolha, nunca sai
+  // do login de vez -- ver handler de #carrosselVoltar mais abaixo no
+  // arquivo, que ja trata isso via __loginFormAberto).
+  window.__atualizarSetaVoltarLogin = function(){
+    const seta = document.getElementById('carrosselVoltar');
+    if (!seta) return;
+    seta.classList.toggle('visivel', !window.__loginSemVoltarAtual || !!window.__loginFormAberto);
+  };
+
   const abrirFormLogin = () => {
     if (window.__loginEmTransicao) return;
     window.__loginEmTransicao = true;
@@ -13939,6 +14079,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       window.__loginEmTransicao = false;
     }, DURACAO_TRANSICAO_LOGIN);
     window.__loginFormAberto = true;
+    window.__atualizarSetaVoltarLogin();
   };
   document.getElementById('loginEscolhaEmail').onclick = abrirFormLogin;
   document.getElementById('loginEscolhaEntrar').onclick = abrirFormLogin;
@@ -13977,6 +14118,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       window.__loginEmTransicao = false;
     }, DURACAO_TRANSICAO_LOGIN);
     window.__loginFormAberto = false;
+    window.__atualizarSetaVoltarLogin();
   };
 
   card.insertAdjacentHTML('afterbegin', `
@@ -14337,7 +14479,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   /* const SLIDES = [
     { dataSlide:1, next:2, tipo:'logo',
       fraca:'Bem-vindo ao', fraca_en:'Welcome to',
-      titulo:'DungeonLog', titulo_en:'DungeonLog',
+      titulo:'Dungeonlog', titulo_en:'Dungeonlog',
       texto:'Suas tarefas do dia viram uma batalha. Complete tarefas, evolua seu herói, vença monstros.',
       texto_en:'Your daily tasks become a battle. Complete tasks, level up your hero, defeat monsters.',
       botao:'Começar', botao_en:'Get started', layout:'mockupExato' },
@@ -15047,7 +15189,19 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // clicar em "Voltar" jogava a pessoa pro inicio do carrossel de
     // marketing sem sentido nenhum (bug relatado pelo usuario). Com
     // semVoltar=true a seta fica escondida por completo.
-    document.getElementById('carrosselVoltar').classList.toggle('visivel', !semVoltar);
+    // BUG REAL (reportado pelo usuario): com semVoltar=true (login
+    // forcado por "Sair"/"Criar conta", sem slide de marketing de
+    // origem) a seta ficava escondida por COMPLETO -- inclusive depois
+    // de abrir o formulario de email, onde ela deveria pelo menos
+    // voltar pra tela de escolha (Google/email). Guarda o semVoltar
+    // original e delega a visibilidade pra __atualizarSetaVoltarLogin()
+    // (definida no bloco que injeta #passoLogin, mais acima), que
+    // tambem considera __loginFormAberto -- assim abrirFormLogin()/
+    // voltarParaEscolhaLogin() conseguem reavaliar a seta sozinhas
+    // quando o formulario abre/fecha, sem esperar um irParaLogin() novo.
+    window.__loginSemVoltarAtual = semVoltar;
+    if (typeof window.__atualizarSetaVoltarLogin === 'function') window.__atualizarSetaVoltarLogin();
+    else document.getElementById('carrosselVoltar').classList.toggle('visivel', !semVoltar);
     document.getElementById('carrosselEntrarLink').classList.add('oculto');
     if (!atualEl || atualEl === passoLogin){
       passoLogin.classList.add('on');
@@ -15464,6 +15618,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     let initializeApp, getAuth, GoogleAuthProvider, signInWithPopup,
         signInWithEmailAndPassword, createUserWithEmailAndPassword,
         sendPasswordResetEmail, onAuthStateChanged, sendEmailVerification,
+        getRedirectResult,
         getFirestore, doc, getDoc, setDoc;
     try {
       // PERFORMANCE: os 3 modulos do Firebase (app/auth/firestore) sao
@@ -15485,7 +15640,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       ({
         getAuth, GoogleAuthProvider, signInWithPopup,
         signInWithEmailAndPassword, createUserWithEmailAndPassword,
-        sendPasswordResetEmail, onAuthStateChanged, sendEmailVerification
+        sendPasswordResetEmail, onAuthStateChanged, sendEmailVerification,
+        getRedirectResult
       } = modAuth);
       ({ getFirestore, doc, getDoc, setDoc } = modFirestore);
     } catch(e){
@@ -15505,6 +15661,30 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       console.error('QuestLog/Firebase: falha ao inicializar (confere o firebaseConfig)', e);
       if (!passoLogin) return;
       throw e;
+    }
+
+    // BUG REAL (reportado 28 set: clicar "Entrar com Google" e depois
+    // voltar cai num loop na tela de login, so escapa clicando voltar de
+    // novo). HIPOTESE: em alguns ambientes (provavelmente o wrapper
+    // Android/TWA usado pro Play Store, diferente do Chrome comum onde
+    // signInWithPopup foi testado e confirmado -- ver comentario acima
+    // do onclick do botao do Google) o navegador nao consegue abrir um
+    // popup de verdade e o proprio Firebase SDK cai sozinho num fallback
+    // de REDIRECT de pagina inteira (sem avisar o app) -- daí o "voltar"
+    // do usuario, que nao existiria com popup de verdade (popup fecha
+    // sozinho, sem navegacao nenhuma na aba principal). O app nunca
+    // chamava getRedirectResult(), entao esse fallback silencioso nunca
+    // era "consumido" -- Firebase ficava com um resultado de redirect
+    // pendente, o que pode deixar auth num estado esquisito ate a
+    // proxima navegacao (loop). Chamar aqui, uma vez, no boot, e
+    // inofensivo pra quem usa popup normalmente (resolve pra null,
+    // onAuthStateChanged de baixo continua sendo o caminho normal) e
+    // fecha esse buraco pra quem cai no fallback.
+    try {
+      const redirectResult = await getRedirectResult(auth);
+      window.dbgConta && window.dbgConta('getRedirectResult() no boot -- teve resultado? ' + !!redirectResult);
+    } catch(e){
+      window.dbgConta && window.dbgConta('getRedirectResult() no boot FALHOU: ' + e.code + ' -- ' + e.message);
     }
 
     // PRO VITALICIO MANUAL, versao servidor (pedido do usuario: conta de
@@ -16326,6 +16506,11 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   const info  = document.getElementById('cfgContaInfo');
   const btnSair = document.getElementById('cfgSairBtn');
   const btnEntrar = document.getElementById('cfgEntrarBtn');
+  // v4.126: #excluirContaBtn segue exatamente a mesma visibilidade de
+  // #cfgSairBtn (so faz sentido excluir conta de quem esta logado) --
+  // elemento opcional aqui de proposito, mesmo padrao do infoContaOverlay
+  // logo abaixo, pra nao quebrar este bloco se a folha nao existir.
+  const btnExcluirConta = document.getElementById('excluirContaBtn');
   if (!linha || !info || !btnSair || !btnEntrar) return;
   // #contaIdInfo mora dentro de #contaOverlay (sub-tela "Gerenciar
   // conta", pedido do usuario v4.9x) -- opcional aqui de proposito (nao
@@ -16346,9 +16531,11 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     if (conta && (conta.nome || conta.email)){
       btnSair.classList.remove('oculto');
       btnEntrar.classList.add('oculto');
+      if (btnExcluirConta) btnExcluirConta.classList.remove('oculto');
     } else {
       btnSair.classList.add('oculto');
       btnEntrar.classList.remove('oculto');
+      if (btnExcluirConta) btnExcluirConta.classList.add('oculto');
     }
   }
 
@@ -17005,6 +17192,15 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'inv.mochilaVazia':  { pt:'Mochila vazia', en:'Empty bag' },
     'inv.mochilaVaziaDesc': { pt:'Derrote o monstro do dia para receber espólio. Quanto mais tarefas no dia, melhor o saque.', en:'Defeat today\'s monster to get loot. The more tasks in the day, the better the loot.' },
 
+    // rotulos da barra de slots de equipamento (bug reportado: ficavam
+    // sempre em PT mesmo com o app em EN -- ver ROTULO_SLOT, que agora
+    // le daqui via window.t() em vez de string fixa)
+    'inv.slotArma':      { pt:'arma', en:'weapon' },
+    'inv.slotPeito':     { pt:'peito', en:'chest' },
+    'inv.slotElmo':      { pt:'elmo', en:'helmet' },
+    'inv.slotEscudo':    { pt:'escudo', en:'shield' },
+    'inv.slotAcess':     { pt:'acess.', en:'acc.' },
+
     'perfil.vidaMaxima':      { pt:'Vida máxima', en:'Max health' },
     'perfil.bonusXpEquip':    { pt:'Bônus XP equip.', en:'Equip. XP bonus' },
     'perfil.bonusMoedasEquip':{ pt:'Bônus moedas equip.', en:'Equip. coin bonus' },
@@ -17033,6 +17229,18 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'cfg.apagarDados':     { pt:'Apagar dados', en:'Delete data' },
     'cfg.apagarDadosDesc': { pt:'Zera nível, moedas, itens e vida. Não tem volta.', en:'Resets level, coins, items and health. Cannot be undone.' },
     'cfg.apagarTudo':      { pt:'Apagar tudo', en:'Delete everything' },
+    'cfg.excluirConta':          { pt:'Excluir conta', en:'Delete account' },
+    'cfg.excluirContaTitulo':    { pt:'Excluir conta?', en:'Delete account?' },
+    'cfg.excluirContaDesc':      { pt:'Isso apaga sua conta de login e todo o progresso salvo na nuvem, em definitivo. Não tem volta.', en:'This permanently deletes your login and all progress saved in the cloud. Cannot be undone.' },
+    'cfg.excluirContaSenhaLabel':{ pt:'Confirme sua senha pra continuar', en:'Confirm your password to continue' },
+    'cfg.excluirContaSenhaPlaceholder': { pt:'Sua senha', en:'Your password' },
+    'cfg.excluirContaGoogleAviso': { pt:'Sua conta usa login do Google. Vamos pedir pra você confirmar de novo com o Google antes de excluir.', en:'Your account signs in with Google. We\'ll ask you to confirm again with Google before deleting.' },
+    'cfg.excluirContaBotao':     { pt:'Excluir conta', en:'Delete account' },
+    'cfg.excluirContaExcluindo':{ pt:'Excluindo…', en:'Deleting…' },
+    'cfg.excluirContaSenhaErrada': { pt:'Senha incorreta.', en:'Wrong password.' },
+    'cfg.excluirContaGoogleFalhou': { pt:'Não deu pra confirmar com o Google. Tenta de novo.', en:'Couldn\'t confirm with Google. Please try again.' },
+    'cfg.excluirContaFalhouGenerico': { pt:'Não deu pra excluir a conta agora. Tenta de novo em instantes.', en:'Couldn\'t delete the account right now. Please try again shortly.' },
+    'cfg.excluirContaPrecisaRelogar': { pt:'Por segurança, entre na sua conta de novo e tente excluir em seguida.', en:'For security, please sign in again and then try deleting.' },
     'cfg.app':             { pt:'App', en:'App' },
     'cfg.heroi':           { pt:'Herói', en:'Hero' },
     'cfg.herois':          { pt:'Heróis', en:'Heroes' },
@@ -17174,7 +17382,17 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // typeof-guard em cada uma porque nem toda sessão de jogo passou
     // por todo módulo (ex: quem nunca abriu o Perfil não tem
     // renderConquistas definido ainda nesse ponto do arquivo).
-    ['render','renderInventario','renderLoja','renderConquistasV2','renderBestiario','renderHistorico','renderGrimorio','desenharHeroi']
+    //
+    // BUG REAL (reportado 28 set: strings em ingles vazando com o app em
+    // PT -- "X of 18 unlocked", "X of 63 monsters defeated", "Equipment",
+    // "Health", "Tasks for Tuesday"): renderPerfil() (a tela inicial/
+    // home) faltava nesta lista. Ela monta esses textos concatenando
+    // idiomaApp() na hora (nao via data-i18n), entao trocar o idioma em
+    // Config nao atualizava nada da home ate o jogador sair e voltar pra
+    // aba forcar um re-render por outro motivo. renderPerfil() ja chama
+    // renderPreviewsPerfil() sozinha (ve o bloco logo acima), cobrindo
+    // Conquistas/Bestiario tambem.
+    ['render','renderInventario','renderLoja','renderConquistasV2','renderBestiario','renderHistorico','renderGrimorio','desenharHeroi','renderPerfil']
       .forEach(fn => { if (typeof window[fn] === 'function') window[fn](); });
     if (typeof window.atualizarTextosDificuldade === 'function') window.atualizarTextosDificuldade();
     if (typeof window.pintarTemaGrid === 'function') window.pintarTemaGrid();
@@ -17289,8 +17507,20 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   const alvo = document.querySelector('.coins');
   if (!alvo) return;
 
-  function lerModoDebug(){
+  // flag bruta, so o que o usuario "destravou" tocando nas moedas
+  function flagLigada(){
     try { return localStorage.getItem(CHAVE) === 'true'; } catch(e){ return false; }
+  }
+
+  // BUG/PEDIDO (revisor do Google Play testando, mas nenhum jogador
+  // comum deveria achar isso por acidente): modo debug so fica ativo de
+  // verdade se a flag estiver ligada E a conta logada estiver na
+  // allowlist (UIDS_DEBUG_PERMITIDO, ver topo do arquivo). Continua
+  // escrevendo a flag normalmente pra quem nao esta na lista (inofensivo,
+  // ela so nunca produz efeito visivel) -- assim, se essa mesma conta um
+  // dia entrar na allowlist, nao precisa tocar nas moedas de novo.
+  function lerModoDebug(){
+    return flagLigada() && (typeof window.uidTemDebugPermitido === 'function') && window.uidTemDebugPermitido();
   }
 
   function aplicar(ligado){
@@ -17305,10 +17535,17 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
   aplicar(lerModoDebug()); // pintura inicial, persiste entre aberturas
 
+  // reavalia depois que o login termina (uid so fica disponivel de
+  // verdade apos aoLogar()/aoLogarSilencioso() -- ver definirUidAtivo()
+  // no topo do arquivo). Sem isso, quem abre o app deslogado e loga
+  // durante a sessao so veria o debug aparecer no proximo toque nas
+  // moedas, mesmo ja estando numa conta permitida.
+  window.__reavaliarModoDebugPosLogin = () => aplicar(lerModoDebug());
+
   alvo.addEventListener('click', () => {
-    const novo = !lerModoDebug();
+    const novo = !flagLigada();
     try { localStorage.setItem(CHAVE, String(novo)); } catch(e){}
-    aplicar(novo);
+    aplicar(lerModoDebug());
   });
 })();
 </script>

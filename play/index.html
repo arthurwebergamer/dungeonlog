@@ -1080,6 +1080,20 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
           <span data-i18n="cfg.apagarTudo">Apagar tudo</span>
         </button>
+        <!-- v4.126 (exigencia Google Play, Account Deletion policy): "Apagar
+             tudo" acima so zera saves/{uid} + localStorage, NUNCA apagou o
+             usuario do Firebase Auth (verificado por leitura de codigo, ver
+             bloco "CONFIRMAR APAGAR TUDO EM FOLHA") -- a conta/login
+             continuava existindo. Este botao e' o que falta: apaga de
+             verdade o usuario do Firebase Auth (deleteUser), depois de
+             reautenticar (senha ou popup do Google, conforme o provider).
+             So aparece logado (mesmo padrao visual/oculto do cfgSairBtn,
+             classe alternada por JS -- ver perto de onAuthStateChanged).
+             Ver folha #excluirContaOverlay logo apos #contaOverlay. -->
+        <button class="cfgbtnfull perigo oculto" id="excluirContaBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          <span data-i18n="cfg.excluirConta">Excluir conta</span>
+        </button>
       </div>
     </div>
   </div>
@@ -11756,6 +11770,257 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 </script>
 
 <!-- =====================================================================
+     EXCLUIR CONTA DE VERDADE (v4.126, exigencia Google Play Console ->
+     App content -> Account deletion: precisa de um caminho DENTRO DO APP,
+     nao so a pagina publica /delete-account). "Apagar tudo" (folha acima)
+     NUNCA apagou o usuario do Firebase Auth -- so saves/{uid} + localStorage,
+     verificado por leitura de codigo. Esta folha apaga de verdade:
+
+     1) reautentica (Firebase exige login "recente" pra deleteUser() --
+        senha de novo pra conta email/senha, popup do Google de novo pra
+        conta Google);
+     2) apaga saves/{uid} no Firestore (mesmo passo da folha "Apagar tudo");
+     3) chama deleteUser(usuario) -- isso sim remove o login/credencial;
+     4) limpa o aparelho e recarrega.
+
+     Mesmo padrao de import dinamico self-contained do bloco anterior
+     (nao depende de auth/db do modulo de login, que so roda quando
+     #passoLogin existe no DOM -- ver aquele comentario). window.firebaseConfig
+     evita duplicar a apiKey inline.
+
+     Botao so fica visivel logado (#excluirContaBtn, toggle em
+     atualizarLinhaConta(), bloco "CONTA — SAIR").
+     ===================================================================== -->
+<div class="edov" id="excluirContaOverlay">
+  <div class="edsheet" id="excluirContaSheet">
+    <div class="edpuxador"></div>
+    <div class="edtitulo" id="excluirContaTitulo">Excluir conta?</div>
+    <p style="font-family:'Outfit',sans-serif;font-size:13px;color:var(--dim);line-height:1.5;margin:0 0 16px" id="excluirContaDesc">
+      Isso apaga sua conta de login e todo o progresso salvo na nuvem, em definitivo. Não tem volta.
+    </p>
+    <p class="oculto" id="excluirContaGoogleAviso" style="font-family:'Outfit',sans-serif;font-size:12.5px;color:var(--dim);line-height:1.5;margin:0 0 14px">
+      Sua conta usa login do Google. Vamos pedir pra você confirmar de novo com o Google antes de excluir.
+    </p>
+    <label id="excluirContaSenhaLabel" style="display:block;font-family:'Outfit',sans-serif;font-size:12px;color:var(--dim);margin:0 0 6px">
+      Confirme sua senha pra continuar
+    </label>
+    <input class="edcampo" type="password" id="excluirContaSenha" autocomplete="current-password" placeholder="Sua senha" style="margin-bottom:10px">
+    <p class="oculto" id="excluirContaErro" style="font-family:'Outfit',sans-serif;font-size:12.5px;color:#ff6b6b;line-height:1.4;margin:0 0 10px"></p>
+    <div class="edacoes">
+      <button class="edsalvar" id="excluirContaCancelar" type="button" style="background:var(--panel-2);color:var(--text)">Cancelar</button>
+      <button class="edperigo" id="excluirContaConfirmar" type="button" disabled>Excluir conta</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const ov         = document.getElementById('excluirContaOverlay');
+  const bAbrir      = document.getElementById('excluirContaBtn');
+  const bCancelar   = document.getElementById('excluirContaCancelar');
+  const bOk         = document.getElementById('excluirContaConfirmar');
+  const elTitulo    = document.getElementById('excluirContaTitulo');
+  const elDesc      = document.getElementById('excluirContaDesc');
+  const elGoogleAviso = document.getElementById('excluirContaGoogleAviso');
+  const elSenhaLabel  = document.getElementById('excluirContaSenhaLabel');
+  const campoSenha    = document.getElementById('excluirContaSenha');
+  const elErro        = document.getElementById('excluirContaErro');
+  if (!ov || !bAbrir || !bCancelar || !bOk || !campoSenha || !elErro) return;
+
+  function t(chave, fallback){
+    return (typeof window.t === 'function') ? window.t(chave) : fallback;
+  }
+
+  // referencias do SDK, preenchidas em obterContextoAuth() -- import
+  // dinamico so acontece quando a folha e' de fato aberta
+  let _GoogleAuthProvider, _reauthenticateWithPopup, _reauthenticateWithCredential,
+      _EmailAuthProvider, _deleteUser, _doc, _deleteDoc;
+  let _usuarioAtual = null;
+  let _dbAtual = null;
+  let _emProgresso = false;
+
+  // mesma logica de espera de restauracao de sessao (IndexedDB) do bloco
+  // "Apagar tudo" acima -- duplicada de proposito, ver comentario daquele
+  // bloco sobre por que esta folha tem seu proprio Firebase self-contained
+  function aguardarUsuario(auth, onAuthStateChangedFn, timeoutMs){
+    return new Promise(resolve => {
+      let resolvido = false;
+      const cancelar = onAuthStateChangedFn(auth, u => {
+        if (resolvido) return;
+        resolvido = true;
+        cancelar();
+        resolve(u);
+      });
+      setTimeout(() => {
+        if (resolvido) return;
+        resolvido = true;
+        resolve(auth.currentUser);
+      }, timeoutMs);
+    });
+  }
+
+  async function obterContextoAuth(){
+    if (!window.firebaseConfig || window.firebaseConfig.apiKey === 'COLE_AQUI_SUA_APIKEY') return null;
+    const [modApp, modAuth, modFirestore] = await Promise.all([
+      import("https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js"),
+      import("https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js"),
+      import("https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js")
+    ]);
+    const { initializeApp, getApps, getApp } = modApp;
+    const {
+      getAuth, onAuthStateChanged, GoogleAuthProvider, EmailAuthProvider,
+      reauthenticateWithPopup, reauthenticateWithCredential, deleteUser
+    } = modAuth;
+    const { getFirestore, doc, deleteDoc } = modFirestore;
+
+    _GoogleAuthProvider = GoogleAuthProvider;
+    _EmailAuthProvider = EmailAuthProvider;
+    _reauthenticateWithPopup = reauthenticateWithPopup;
+    _reauthenticateWithCredential = reauthenticateWithCredential;
+    _deleteUser = deleteUser;
+    _doc = doc;
+    _deleteDoc = deleteDoc;
+
+    const app = getApps().length ? getApp() : initializeApp(window.firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const usuario = await aguardarUsuario(auth, onAuthStateChanged, 4000);
+    return { auth, db, user: usuario };
+  }
+
+  function ehGoogle(usuario){
+    return !!(usuario && usuario.providerData && usuario.providerData.some(p => p.providerId === 'google.com'));
+  }
+
+  function resetarFolha(){
+    campoSenha.value = '';
+    campoSenha.classList.add('oculto');
+    elSenhaLabel.classList.add('oculto');
+    elGoogleAviso.classList.add('oculto');
+    elErro.classList.add('oculto');
+    elErro.textContent = '';
+    bOk.disabled = true;
+    bOk.textContent = t('cfg.excluirContaBotao', 'Excluir conta');
+    bCancelar.disabled = false;
+  }
+
+  async function abrir(){
+    elTitulo.textContent = t('cfg.excluirContaTitulo', 'Excluir conta?');
+    elDesc.textContent   = t('cfg.excluirContaDesc', 'Isso apaga sua conta de login e todo o progresso salvo na nuvem, em definitivo. Não tem volta.');
+    elGoogleAviso.textContent = t('cfg.excluirContaGoogleAviso', 'Sua conta usa login do Google. Vamos pedir pra você confirmar de novo com o Google antes de excluir.');
+    elSenhaLabel.textContent  = t('cfg.excluirContaSenhaLabel', 'Confirme sua senha pra continuar');
+    campoSenha.placeholder    = t('cfg.excluirContaSenhaPlaceholder', 'Sua senha');
+    resetarFolha();
+    ov.classList.add('on');
+
+    try {
+      const ctx = await obterContextoAuth();
+      if (!ctx || !ctx.user){
+        // sem usuario logado (sessao ainda restaurando ou SDK indisponivel)
+        // -- nao ha o que excluir, fecha e deixa o botao normal de "Sair"
+        // resolver o estado visivel
+        fechar();
+        return;
+      }
+      _usuarioAtual = ctx.user;
+      _dbAtual = ctx.db;
+      if (ehGoogle(_usuarioAtual)){
+        elGoogleAviso.classList.remove('oculto');
+      } else {
+        campoSenha.classList.remove('oculto');
+        elSenhaLabel.classList.remove('oculto');
+        setTimeout(() => campoSenha.focus(), 50);
+      }
+      bOk.disabled = false;
+    } catch(e){
+      console.error('excluirConta: falha ao obter contexto de autenticacao', e);
+      elErro.textContent = t('cfg.excluirContaFalhouGenerico', 'Não deu pra excluir a conta agora. Tenta de novo em instantes.');
+      elErro.classList.remove('oculto');
+    }
+  }
+
+  function fechar(){
+    if (_emProgresso) return; // nao fecha no meio de uma exclusao em andamento
+    ov.classList.remove('on');
+    _usuarioAtual = null;
+  }
+
+  ov.onclick = e => { if (e.target === ov) fechar(); };
+  document.addEventListener('keydown', e => {
+    if (ov.classList.contains('on') && e.key === 'Escape') fechar();
+  });
+  bAbrir.onclick = abrir;
+  bCancelar.onclick = fechar;
+  campoSenha.addEventListener('keydown', e => { if (e.key === 'Enter' && !bOk.disabled) bOk.click(); });
+
+  bOk.onclick = async () => {
+    if (!_usuarioAtual || _emProgresso) return;
+    const google = ehGoogle(_usuarioAtual);
+
+    if (!google && !campoSenha.value){
+      elErro.textContent = t('cfg.excluirContaSenhaErrada', 'Senha incorreta.');
+      elErro.classList.remove('oculto');
+      campoSenha.focus();
+      return;
+    }
+
+    _emProgresso = true;
+    bOk.disabled = true;
+    bCancelar.disabled = true;
+    elErro.classList.add('oculto');
+    bOk.textContent = t('cfg.excluirContaExcluindo', 'Excluindo…');
+
+    try {
+      if (google){
+        await _reauthenticateWithPopup(_usuarioAtual, new _GoogleAuthProvider());
+      } else {
+        const cred = _EmailAuthProvider.credential(_usuarioAtual.email, campoSenha.value);
+        await _reauthenticateWithCredential(_usuarioAtual, cred);
+      }
+
+      // mesmo passo/ordem da folha "Apagar tudo": apaga o save na nuvem
+      // antes -- se falhar, segue mesmo assim pro deleteUser(), que e' o
+      // passo que realmente importa pra exigencia do Google (o doc orfao
+      // em saves/{uid} sem dono e' inofensivo, so ocupa espaco)
+      try {
+        if (_dbAtual && _doc && _deleteDoc) await _deleteDoc(_doc(_dbAtual, 'saves', _usuarioAtual.uid));
+      } catch(e){
+        console.error('excluirConta: falha ao apagar saves/{uid}, segue mesmo assim pra deleteUser()', e);
+      }
+
+      await _deleteUser(_usuarioAtual);
+
+      try { localStorage.clear(); } catch(e){}
+      location.reload();
+    } catch(e){
+      console.error('excluirConta: falha ao excluir conta', e);
+      _emProgresso = false;
+      bOk.disabled = false;
+      bCancelar.disabled = false;
+      bOk.textContent = t('cfg.excluirContaBotao', 'Excluir conta');
+
+      const codigo = e && e.code;
+      if (codigo === 'auth/wrong-password' || codigo === 'auth/invalid-credential'){
+        elErro.textContent = t('cfg.excluirContaSenhaErrada', 'Senha incorreta.');
+      } else if (codigo === 'auth/popup-closed-by-user' || codigo === 'auth/cancelled-popup-request'){
+        // usuario fechou o popup do Google por conta propria -- nao e' erro de verdade, so nao mostra nada
+        return;
+      } else if (codigo === 'auth/requires-recent-login'){
+        elErro.textContent = t('cfg.excluirContaPrecisaRelogar', 'Por segurança, entre na sua conta de novo e tente excluir em seguida.');
+      } else if (google){
+        elErro.textContent = t('cfg.excluirContaGoogleFalhou', 'Não deu pra confirmar com o Google. Tenta de novo.');
+      } else {
+        elErro.textContent = t('cfg.excluirContaFalhouGenerico', 'Não deu pra excluir a conta agora. Tenta de novo em instantes.');
+      }
+      elErro.classList.remove('oculto');
+    }
+  };
+
+  window.abrirFolhaExcluirConta = abrir;
+})();
+</script>
+
+<!-- =====================================================================
      NOTIFICACOES PUSH — pedido do usuario: push de verdade (chega com o
      app fechado) pra teste gratis acabando, streak em risco de quebrar e
      monstro do dia ainda vivo. Quem MANDA essas 3 e' um par de Cloud
@@ -16421,6 +16686,11 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   const info  = document.getElementById('cfgContaInfo');
   const btnSair = document.getElementById('cfgSairBtn');
   const btnEntrar = document.getElementById('cfgEntrarBtn');
+  // v4.126: #excluirContaBtn segue exatamente a mesma visibilidade de
+  // #cfgSairBtn (so faz sentido excluir conta de quem esta logado) --
+  // elemento opcional aqui de proposito, mesmo padrao do infoContaOverlay
+  // logo abaixo, pra nao quebrar este bloco se a folha nao existir.
+  const btnExcluirConta = document.getElementById('excluirContaBtn');
   if (!linha || !info || !btnSair || !btnEntrar) return;
   // #contaIdInfo mora dentro de #contaOverlay (sub-tela "Gerenciar
   // conta", pedido do usuario v4.9x) -- opcional aqui de proposito (nao
@@ -16441,9 +16711,11 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     if (conta && (conta.nome || conta.email)){
       btnSair.classList.remove('oculto');
       btnEntrar.classList.add('oculto');
+      if (btnExcluirConta) btnExcluirConta.classList.remove('oculto');
     } else {
       btnSair.classList.add('oculto');
       btnEntrar.classList.remove('oculto');
+      if (btnExcluirConta) btnExcluirConta.classList.add('oculto');
     }
   }
 
@@ -17137,6 +17409,18 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'cfg.apagarDados':     { pt:'Apagar dados', en:'Delete data' },
     'cfg.apagarDadosDesc': { pt:'Zera nível, moedas, itens e vida. Não tem volta.', en:'Resets level, coins, items and health. Cannot be undone.' },
     'cfg.apagarTudo':      { pt:'Apagar tudo', en:'Delete everything' },
+    'cfg.excluirConta':          { pt:'Excluir conta', en:'Delete account' },
+    'cfg.excluirContaTitulo':    { pt:'Excluir conta?', en:'Delete account?' },
+    'cfg.excluirContaDesc':      { pt:'Isso apaga sua conta de login e todo o progresso salvo na nuvem, em definitivo. Não tem volta.', en:'This permanently deletes your login and all progress saved in the cloud. Cannot be undone.' },
+    'cfg.excluirContaSenhaLabel':{ pt:'Confirme sua senha pra continuar', en:'Confirm your password to continue' },
+    'cfg.excluirContaSenhaPlaceholder': { pt:'Sua senha', en:'Your password' },
+    'cfg.excluirContaGoogleAviso': { pt:'Sua conta usa login do Google. Vamos pedir pra você confirmar de novo com o Google antes de excluir.', en:'Your account signs in with Google. We\'ll ask you to confirm again with Google before deleting.' },
+    'cfg.excluirContaBotao':     { pt:'Excluir conta', en:'Delete account' },
+    'cfg.excluirContaExcluindo':{ pt:'Excluindo…', en:'Deleting…' },
+    'cfg.excluirContaSenhaErrada': { pt:'Senha incorreta.', en:'Wrong password.' },
+    'cfg.excluirContaGoogleFalhou': { pt:'Não deu pra confirmar com o Google. Tenta de novo.', en:'Couldn\'t confirm with Google. Please try again.' },
+    'cfg.excluirContaFalhouGenerico': { pt:'Não deu pra excluir a conta agora. Tenta de novo em instantes.', en:'Couldn\'t delete the account right now. Please try again shortly.' },
+    'cfg.excluirContaPrecisaRelogar': { pt:'Por segurança, entre na sua conta de novo e tente excluir em seguida.', en:'For security, please sign in again and then try deleting.' },
     'cfg.app':             { pt:'App', en:'App' },
     'cfg.heroi':           { pt:'Herói', en:'Hero' },
     'cfg.herois':          { pt:'Heróis', en:'Heroes' },

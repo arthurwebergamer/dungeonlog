@@ -1056,6 +1056,21 @@
         <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
       </div>
 
+      <!-- DEBUG (pedido do usuario): so aparece com modo debug ligado
+           (classe .debug-el, mesma pilula de log/coins do resto do app --
+           clique no icone de moedas liga/desliga). Cancelar de VERDADE so
+           vai existir via Google Play (nao ha billing real ainda, ver
+           iniciarCompraAssinatura()) -- este botao e' so pra poder testar
+           as telas de "sem PRO"/paywall sem esperar 7 dias de teste
+           gratis de verdade. Zera teste gratis (expirarTrialAgora()), PRO
+           vitalicio local (revogarProVitalicio()) e o cache em memoria do
+           PRO vitalicio vindo do servidor (forcarProVitalicioServidorOffDebug(),
+           NAO apaga o doc no Firestore -- so a leitura ja feita nesta
+           aba). Ver JS logo apos #cfgAbrirAssinatura. -->
+      <button class="cfgbtnfull perigo debug-el" id="debugCancelarAssinaturaBtn" type="button" style="margin-bottom:14px">
+        🐞 Cancelar assinatura (debug)
+      </button>
+
       <div class="zonarisco">
         <button class="cfgbtnfull perigo oculto" id="cfgSairBtn">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -15504,6 +15519,15 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // roda em todo login, ver aoLogar() mais abaixo).
     let _proVitalicioServidor = false;
     window.proVitalicioServidorAtivo = () => _proVitalicioServidor;
+    // DEBUG (pedido do usuario: testar o app sem PRO sem esperar o teste
+    // gratis expirar de verdade, ja que cancelar de verdade so vai
+    // existir via Google Play). So zera o CACHE em memoria desta aba --
+    // nao apaga o doc entitlements/{uid} no Firestore (o client nem
+    // pode, write e' sempre negado, ver firestore.rules), entao um
+    // proximo login/reload volta a puxar o valor real de la. Usado pelo
+    // botao #debugCancelarAssinaturaBtn (#contaOverlay, so aparece com
+    // modo debug ligado -- clique nas moedas).
+    window.forcarProVitalicioServidorOffDebug = function(){ _proVitalicioServidor = false; };
     async function puxarEntitlement(uid){
       try {
         const snap = await getDoc(doc(db, 'entitlements', uid));
@@ -16384,6 +16408,34 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   if (linhaAssinatura) linhaAssinatura.onclick = () => {
     const temPro = (typeof assinaturaAtiva === 'function' && assinaturaAtiva());
     if (!temPro && typeof window.abrirPaywall === 'function') window.abrirPaywall('conta');
+  };
+
+  // DEBUG -- "Cancelar assinatura (debug)" (pedido do usuario: testar as
+  // telas de "sem PRO" sem esperar o teste gratis expirar de verdade nem
+  // depender de cancelar pela Google Play, que ainda nem existe de
+  // verdade aqui). So visivel com modo debug ligado (.debug-el, ver CSS).
+  // Zera as 3 fontes que assinaturaAtiva() consulta:
+  //   1. teste gratis (expirarTrialAgora(), bloco TESTE GRATIS)
+  //   2. PRO vitalicio LOCAL (revogarProVitalicio(), bloco PRO VITALICIO MANUAL)
+  //   3. cache em memoria do PRO vitalicio do SERVIDOR
+  //      (forcarProVitalicioServidorOffDebug(), bloco AUTH/Firebase --
+  //      NAO apaga o doc entitlements/{uid} de verdade, so a leitura ja
+  //      feita nesta aba; um proximo login volta a puxar o valor real)
+  // Modo debug tambem faz assinaturaAtiva() retornar true direto (ver
+  // topo da funcao) -- por isso NAO desliga o modo debug sozinho aqui:
+  // se desligasse, "cancelar" reativaria o PRO na mesma hora por outro
+  // motivo, o oposto do que o botao promete.
+  const btnDebugCancelarAssinatura = document.getElementById('debugCancelarAssinaturaBtn');
+  if (btnDebugCancelarAssinatura) btnDebugCancelarAssinatura.onclick = () => {
+    if (typeof window.expirarTrialAgora === 'function') window.expirarTrialAgora();
+    if (typeof window.revogarProVitalicio === 'function') window.revogarProVitalicio();
+    if (typeof window.forcarProVitalicioServidorOffDebug === 'function') window.forcarProVitalicioServidorOffDebug();
+    atualizarResumoAssinatura();
+    if (typeof render === 'function') render();
+    if (typeof window.aviso === 'function'){
+      const en = (typeof idiomaApp === 'function' && idiomaApp() === 'en');
+      window.aviso(en ? '[Debug] Subscription cancelled locally' : '[Debug] Assinatura cancelada localmente');
+    }
   };
 
   btnSair.onclick = async () => {

@@ -5,6 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Dungeonlog</title>
 <meta name="theme-color" content="#1A1526">
+<!-- pedido do usuario (print real, Android/Chrome): "linhas estranhas em
+     cima" de Politica de Privacidade/Termos de Uso na tela de Config --
+     essas 2 linhas sao <a> de verdade (abrem o site em nova aba, ver
+     #cfgLinkPrivacidade/#cfgLinkTermos), diferente do resto de Config
+     (que sao <div>). Sem este meta, o "Force Dark"/"Auto Dark Theme" do
+     Chrome no Android nao reconhece que a pagina ja e' escura de
+     proposito e reestiliza qualquer <a> sozinho (azul + sublinhado),
+     ignorando a cor definida em CSS (.cfgtxt b{color:var(--text)}) --
+     por isso so essas 2 linhas ficavam diferentes das demais. Isso avisa
+     o navegador que o app so oferece tema escuro, desligando esse
+     "auto-dark" nele (nao muda nada visualmente fora do Android/Chrome). -->
+<meta name="color-scheme" content="dark">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">

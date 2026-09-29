@@ -3635,6 +3635,25 @@ function trialAtivo(){
 }
 window.trialAtivo = trialAtivo;
 
+// DEBUG (pedido do usuario: "avancando o dia parece que o teste gratis
+// nao acaba") -- nao e' bug, e' esperado: trialAtivo() compara com
+// Date.now() (relogio de verdade do aparelho), enquanto "avancar dia"
+// (window.avancarDia(), bloco DATA EFETIVA DO APP) so soma um offset
+// pra logica de streak/tarefa diaria, sem tocar no relogio real. Pra
+// testar o expirar do teste gratis sem esperar 7 dias de verdade, usa
+// isto no Console do navegador (com o app aberto):
+//   window.expirarTrialAgora() -- forca trialAtivo() a virar false JA,
+//   mantendo trialSalvo() != null (mesmo estado de "ja usei o teste,
+//   expirou" que aconteceria organicamente).
+window.expirarTrialAgora = function(){
+  const t = trialSalvo();
+  if (!t) { console.log('Nenhum teste gratis registrado nesta conta ainda.'); return; }
+  t.fim = Date.now() - 1000;
+  salvarTrial(t);
+  console.log('Teste gratis expirado manualmente (so pra teste).');
+  if (typeof render === 'function') render();
+};
+
 function diasRestantesTrial(){
   const t = trialSalvo();
   if (!t || !trialAtivo()) return 0;
@@ -15489,12 +15508,21 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       try {
         const snap = await getDoc(doc(db, 'entitlements', uid));
         _proVitalicioServidor = snap.exists() && snap.data().proVitalicio === true;
-        window.dbgConta && window.dbgConta('puxarEntitlement(' + uid.slice(0,6) + ') -- proVitalicio=' + _proVitalicioServidor);
+        window.dbgConta && window.dbgConta('puxarEntitlement(' + uid.slice(0,6) + ') -- proVitalicio=' + _proVitalicioServidor + ' | doc existe? ' + snap.exists() + (snap.exists() ? (' | campos: ' + JSON.stringify(snap.data())) : ''));
       } catch(e){
         // se falhar (offline, doc nao existe, regra etc.) mantem false --
         // nunca libera PRO por erro, so por doc existente de verdade.
-        window.dbgConta && window.dbgConta('puxarEntitlement(' + uid.slice(0,6) + ') FALHOU: ' + e.message);
+        window.dbgConta && window.dbgConta('puxarEntitlement(' + uid.slice(0,6) + ') FALHOU: ' + e.code + ' -- ' + e.message);
       }
+      // FIX (pedido do usuario, testando com a conta de revisor): esta
+      // funcao roda em PARALELO dentro de puxarNuvem() (comentario acima),
+      // entao se a sub-tela "Gerenciar assinatura" (#contaOverlay) ja
+      // tiver sido aberta e pintada ANTES do getDoc() acima resolver, o
+      // resumo ficava preso no valor antigo (normalmente "Sem plano PRO")
+      // ate a pessoa fechar e abrir a tela de novo. Repinta aqui, depois
+      // que o valor de verdade chegou -- window.atualizarResumoAssinatura
+      // e' null-safe sozinha (checa `if (!resumoAssinatura) return;`).
+      if (typeof window.atualizarResumoAssinatura === 'function') window.atualizarResumoAssinatura();
     }
 
     async function puxarNuvem(uid){

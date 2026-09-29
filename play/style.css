@@ -183,7 +183,11 @@
     40%{transform:scale(1.28);text-shadow:0 0 14px var(--gold)}
     100%{transform:scale(1);text-shadow:0 0 6px var(--gold)}
   }
-  .vitoria .faixa{font-family:'Silkscreen',monospace;font-size:11px;color:var(--accent);letter-spacing:1px;display:inline-block}
+  /* cor fixa (pedido do usuario): var(--accent) mudava de tema pra tema
+     -- alguns temas tem accent muito escuro ou muito parecido com o
+     fundo da arena, deixando "DIA VENCIDO" ilegivel. #FFD65A (dourado
+     claro) + sombra escura funciona em qualquer fundo, claro ou escuro. */
+  .vitoria .faixa{font-family:'Silkscreen',monospace;font-size:11px;color:#FFD65A;text-shadow:0 1px 3px rgba(0,0,0,.65);letter-spacing:1px;display:inline-block}
   .vitoria .ganho{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--gold)}
   .vitoria .ganho svg{width:12px;height:12px;image-rendering:pixelated}
   /* item pedido pelo usuario: burst de faiscas radiando da faixa DIA
@@ -612,8 +616,11 @@
   .tcount{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
   .xplabel{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
   .xpnum{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:500;color:var(--text)}
+  /* cor fixa (pedido do usuario, mesmo motivo da regra .vitoria .faixa
+     acima): var(--accent) mudava de tema pra tema e ficava ilegivel em
+     alguns fundos. */
   .faixa{font-family:'Cormorant Garamond',serif !important;font-size:20px !important;font-weight:600;
-         letter-spacing:.18em;text-transform:uppercase;color:var(--accent) !important}
+         letter-spacing:.18em;text-transform:uppercase;color:#FFD65A !important;text-shadow:0 1px 3px rgba(0,0,0,.65)}
 
   /* barras finas, sem moldura */
   .bar{height:3px;background:var(--line);border:none;border-radius:0;padding:0}
@@ -876,8 +883,9 @@
   .nav button{font-size:12px !important;color:var(--dim)}
   .nav button.on{color:var(--accent)}
 
+  /* cor fixa (pedido do usuario, mesmo motivo das outras regras .faixa) */
   .vitoria .faixa{font-family:'Outfit',sans-serif !important;font-size:15px !important;font-weight:700 !important;
-                  letter-spacing:.08em;color:var(--accent) !important}
+                  letter-spacing:.08em;color:#FFD65A !important;text-shadow:0 1px 3px rgba(0,0,0,.65)}
   .toast{border-radius:22px;text-transform:none;font-size:13px;letter-spacing:0}
 
 /* ===== Bloco style #8 ===== */

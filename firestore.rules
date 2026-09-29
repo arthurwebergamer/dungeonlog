@@ -41,6 +41,26 @@ service cloud.firestore {
       allow read, write: if request.auth != null && request.auth.uid == uid;
     }
 
+    // entitlements/{uid} -- concessao MANUAL de PRO vitalicio (pedido do
+    // usuario: precisa dar acesso PRO vitalicio pra conta de revisor do
+    // Google Play, sem billing real integrado ainda -- ver comentario
+    // grande perto de iniciarCompraAssinatura() em play/index.html).
+    //
+    // So o DONO le o proprio doc -- escrita SEMPRE negada do client, de
+    // proposito: se o client pudesse escrever aqui, qualquer usuario
+    // tecnico se autoconcederia PRO abrindo o DevTools e chamando
+    // setDoc() direto, sem passar pelo app nem por pagamento nenhum.
+    //
+    // CONCEDER PRO (passo manual, so pelo Firebase Console, nunca pelo
+    // app): Firestore Database > coleção "entitlements" > Adicionar
+    // documento > ID do documento = uid da conta (Authentication > Users
+    // pra achar o uid pelo e-mail) > campo "proVitalicio", tipo boolean,
+    // valor true.
+    match /entitlements/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+
     // contadorGlobal/hoje -- doc UNICO e publico ("X herois ja venceram
     // hoje", sem login necessario pra ver OU incrementar -- ver
     // incrementarContadorGlobal()/carregarContadorGlobal() em

@@ -3207,28 +3207,36 @@ window.renderEstagioBar = renderEstagioBar;
 
 
 // PRO VITALICIO MANUAL (pedido do usuario: "dá pra definir uma conta
-// como pro vitalício?") -- ainda NAO existe integracao real com Google
-// Play Billing (ver comentario grande antes de iniciarCompraAssinatura()
-// mais abaixo), entao nao ha "assinatura de verdade" pra conceder.
-// Isso aqui e' um override manual, por CONTA (uid do Firebase Auth, nao
-// por personagem/device) -- pensado pra liberar PRO pra voce mesmo, um
-// beta tester etc. antes do billing real existir.
+// como pro vitalício?", depois "vou ter que dar uma conta pro de acesso
+// pros revisores do Google e preciso de uma conta com acesso vitalício")
+// -- ainda NAO existe integracao real com Google Play Billing (ver
+// comentario grande antes de iniciarCompraAssinatura() mais abaixo),
+// entao nao ha "assinatura de verdade" pra conceder. Existem 2 formas,
+// pra 2 necessidades diferentes:
 //
-// LIMITACAO IMPORTANTE: fica salvo em localStorage, NO NAVEGADOR/
-// APARELHO ONDE VOCE RODAR O COMANDO -- nao sincroniza pelo Firestore.
-// Se a conta logar em outro aparelho, o PRO vitalicio nao vai junto (ao
-// contrario do resto do progresso, que sincroniza). Pra sincronizar de
-// verdade entre aparelhos precisaria gravar um campo no documento da
-// conta no Firestore + as security rules pra ninguem se auto-conceder
-// -- nao fiz isso aqui pra nao mexer em regra de banco sem voce pedir
-// explicitamente, mas da pra fazer depois se precisar.
+// 1) LOCAL (aqui embaixo, window.concederProVitalicio()) -- fica so em
+//    localStorage, NESTE aparelho/navegador. Rapido, sem depender do
+//    Firebase, mas NAO sincroniza: se a conta logar em outro aparelho,
+//    o PRO nao vai junto. Serve pra voce mesmo testar localmente.
 //
-// Uso (abra o Console do navegador com o app aberto):
+// 2) SERVIDOR (Firestore, coleção entitlements/{uid} -- ver
+//    firestore.rules e puxarEntitlement() no bloco AUTH/Firebase mais
+//    abaixo) -- sincroniza de verdade entre aparelhos, e' a forma certa
+//    pra dar acesso PRO a uma conta de revisor do Google Play (eles vao
+//    logar no aparelho DELES, nao no seu). So pode ser concedido
+//    manualmente pelo Firebase Console (Firestore Database > coleção
+//    "entitlements" > novo documento com ID = uid da conta > campo
+//    "proVitalicio" boolean = true) -- de proposito NENHUM caminho do
+//    app escreve nessa coleção, senao qualquer usuario tecnico se
+//    autoconcederia PRO direto pelo DevTools sem pagar nada.
+//
+// Uso da versao LOCAL (abra o Console do navegador com o app aberto):
 //   window.concederProVitalicio()        -- concede pra conta logada agora
 //   window.concederProVitalicio('UID_X') -- concede pra um uid especifico
 //   window.revogarProVitalicio()         -- remove da conta logada agora
 // O uid de uma conta aparece em window.dbgConta ligado, ou no Firebase
-// Console (Authentication > Users).
+// Console (Authentication > Users) -- mesmo lugar onde achar o uid pra
+// conceder a versao SERVIDOR (acima).
 const CHAVE_PRO_VITALICIO = 'questlog.proVitalicio.v1';
 function chaveProVitalicio(uid){
   const alvo = uid || _uidAtivo;
@@ -3261,8 +3269,12 @@ function assinaturaAtiva(){
     if (typeof window.modoDebugAtivo === 'function'){ if (window.modoDebugAtivo()) return true; }
     else if (localStorage.getItem('questlog.modoDebug.v1') === 'true') return true;
   } catch(e){}
-  // PRO VITALICIO MANUAL -- ver bloco logo acima.
+  // PRO VITALICIO MANUAL, versao local (localStorage, ver bloco logo
+  // acima) OU versao servidor (Firestore entitlements/{uid}, sincroniza
+  // entre aparelhos -- ver puxarEntitlement() no bloco AUTH/Firebase,
+  // mais abaixo no arquivo).
   if (proVitalicioAtivo()) return true;
+  if (typeof window.proVitalicioServidorAtivo === 'function' && window.proVitalicioServidorAtivo()) return true;
   // TESTE GRATIS (pedido do usuario): enquanto o trial estiver dentro da
   // janela de 7 dias, conta como assinatura ativa -- ver bloco
   // "TESTE GRATIS" logo depois de iniciarCompraAssinatura(), poucas
@@ -15378,9 +15390,34 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       throw e;
     }
 
+    // PRO VITALICIO MANUAL, versao servidor (pedido do usuario: conta de
+    // revisor do Google Play precisa de PRO vitalicio sem billing real
+    // integrado ainda). Le entitlements/{uid} (ver firestore.rules --
+    // client so LE, nunca escreve, doc e' criado manualmente pelo
+    // Firebase Console) e cacheia num modulo-level var, porque
+    // assinaturaAtiva() (fora desta IIFE, la em cima no script
+    // principal) e' sincrona e nao pode esperar um await do Firestore
+    // toda vez que e' chamada -- so window.proVitalicioServidorAtivo()
+    // consulta o cache, populado 1x aqui dentro de puxarNuvem() (que ja
+    // roda em todo login, ver aoLogar() mais abaixo).
+    let _proVitalicioServidor = false;
+    window.proVitalicioServidorAtivo = () => _proVitalicioServidor;
+    async function puxarEntitlement(uid){
+      try {
+        const snap = await getDoc(doc(db, 'entitlements', uid));
+        _proVitalicioServidor = snap.exists() && snap.data().proVitalicio === true;
+        window.dbgConta && window.dbgConta('puxarEntitlement(' + uid.slice(0,6) + ') -- proVitalicio=' + _proVitalicioServidor);
+      } catch(e){
+        // se falhar (offline, doc nao existe, regra etc.) mantem false --
+        // nunca libera PRO por erro, so por doc existente de verdade.
+        window.dbgConta && window.dbgConta('puxarEntitlement(' + uid.slice(0,6) + ') FALHOU: ' + e.message);
+      }
+    }
+
     async function puxarNuvem(uid){
       const ref = doc(db, 'saves', uid);
       const snap = await getDoc(ref);
+      puxarEntitlement(uid); // paralelo, nao bloqueia o resto de puxarNuvem() -- so precisa terminar antes da 1a checagem de assinaturaAtiva()/paywall, o que na pratica sempre acontece bem depois
       window.dbgConta && window.dbgConta('puxarNuvem(' + uid.slice(0,6) + ') -- doc existe na nuvem? ' + snap.exists() + (snap.exists() ? (' | tamanho do data: ' + (snap.data().data||'').length) : ''));
       if (snap.exists() && snap.data().data) {
         try { localStorage.setItem(window.chaveSaveAtual(), snap.data().data); } catch(e){}

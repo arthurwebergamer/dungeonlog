@@ -3206,6 +3206,50 @@ function renderEstagioBar(){
 window.renderEstagioBar = renderEstagioBar;
 
 
+// PRO VITALICIO MANUAL (pedido do usuario: "dá pra definir uma conta
+// como pro vitalício?") -- ainda NAO existe integracao real com Google
+// Play Billing (ver comentario grande antes de iniciarCompraAssinatura()
+// mais abaixo), entao nao ha "assinatura de verdade" pra conceder.
+// Isso aqui e' um override manual, por CONTA (uid do Firebase Auth, nao
+// por personagem/device) -- pensado pra liberar PRO pra voce mesmo, um
+// beta tester etc. antes do billing real existir.
+//
+// LIMITACAO IMPORTANTE: fica salvo em localStorage, NO NAVEGADOR/
+// APARELHO ONDE VOCE RODAR O COMANDO -- nao sincroniza pelo Firestore.
+// Se a conta logar em outro aparelho, o PRO vitalicio nao vai junto (ao
+// contrario do resto do progresso, que sincroniza). Pra sincronizar de
+// verdade entre aparelhos precisaria gravar um campo no documento da
+// conta no Firestore + as security rules pra ninguem se auto-conceder
+// -- nao fiz isso aqui pra nao mexer em regra de banco sem voce pedir
+// explicitamente, mas da pra fazer depois se precisar.
+//
+// Uso (abra o Console do navegador com o app aberto):
+//   window.concederProVitalicio()        -- concede pra conta logada agora
+//   window.concederProVitalicio('UID_X') -- concede pra um uid especifico
+//   window.revogarProVitalicio()         -- remove da conta logada agora
+// O uid de uma conta aparece em window.dbgConta ligado, ou no Firebase
+// Console (Authentication > Users).
+const CHAVE_PRO_VITALICIO = 'questlog.proVitalicio.v1';
+function chaveProVitalicio(uid){
+  const alvo = uid || _uidAtivo;
+  return alvo ? (CHAVE_PRO_VITALICIO + '.uid.' + alvo) : CHAVE_PRO_VITALICIO;
+}
+function proVitalicioAtivo(){
+  try { return localStorage.getItem(chaveProVitalicio()) === 'true'; } catch(e){ return false; }
+}
+window.concederProVitalicio = function(uid){
+  try {
+    localStorage.setItem(chaveProVitalicio(uid), 'true');
+    console.log('PRO vitalício concedido (neste aparelho) para uid=' + (uid || _uidAtivo || '(conta convidado/local)'));
+  } catch(e){ console.error('Falha ao conceder PRO vitalício', e); }
+};
+window.revogarProVitalicio = function(uid){
+  try {
+    localStorage.removeItem(chaveProVitalicio(uid));
+    console.log('PRO vitalício revogado (neste aparelho) para uid=' + (uid || _uidAtivo || '(conta convidado/local)'));
+  } catch(e){ console.error('Falha ao revogar PRO vitalício', e); }
+};
+
 function assinaturaAtiva(){
   // FIX: o alternador real de modo debug (clicar no icone das moedas,
   // ver modulo perto do fim do arquivo) salva a STRING 'true', nao '1'
@@ -3217,6 +3261,8 @@ function assinaturaAtiva(){
     if (typeof window.modoDebugAtivo === 'function'){ if (window.modoDebugAtivo()) return true; }
     else if (localStorage.getItem('questlog.modoDebug.v1') === 'true') return true;
   } catch(e){}
+  // PRO VITALICIO MANUAL -- ver bloco logo acima.
+  if (proVitalicioAtivo()) return true;
   // TESTE GRATIS (pedido do usuario): enquanto o trial estiver dentro da
   // janela de 7 dias, conta como assinatura ativa -- ver bloco
   // "TESTE GRATIS" logo depois de iniciarCompraAssinatura(), poucas

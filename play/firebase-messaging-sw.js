@@ -47,7 +47,7 @@ const messaging = firebase.messaging();
 // navegadores/SOs que tratam os dois campos de formas diferentes).
 messaging.onBackgroundMessage((payload) => {
   const dados = payload.data || {};
-  const titulo = dados.titulo || 'DungeonLog';
+  const titulo = dados.titulo || 'Dungeonlog';
   self.registration.showNotification(titulo, {
     body: dados.corpo || '',
     icon: 'icon-192.png',

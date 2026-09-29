@@ -40,7 +40,13 @@ footer.site{
   padding:28px 0 40px;
   text-align:center;
 }
-footer.site .wrap{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
-footer.site a{ font-size:13px; color:var(--muted); }
+/* pedido do usuario: rodape organizado por categoria (Legal / Contato)
+   em vez da lista unica de links separados por "." -- cada categoria
+   vira uma coluna, com a linha de direitos reservados embaixo de tudo */
+footer.site .footcols{ display:flex; gap:40px; justify-content:center; flex-wrap:wrap; text-align:left; margin-bottom:18px; }
+footer.site .footcol{ display:flex; flex-direction:column; gap:7px; }
+footer.site .footlabel{ font-family:'Outfit',sans-serif; font-weight:600; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--dim); }
+footer.site a{ font-size:13px; color:var(--muted); text-decoration:none; }
+footer.site a:hover{ color:var(--text); }
 footer.site span.dot{ color:var(--dim); }
-footer.site .copy{ display:block; margin-top:10px; font-size:11px; color:var(--dim); }
+footer.site .copy{ display:block; font-size:11px; color:var(--dim); }

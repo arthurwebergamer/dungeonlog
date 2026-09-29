@@ -701,20 +701,30 @@
     <div class="cfgovcorpo">
       <div class="edsec" data-i18n="cfg.conta">Conta</div>
 
-      <div class="cfgrow" id="cfgRowConta">
+      <!-- v4.9x (pedido do usuario): a linha "Conta" virou link pra uma
+           sub-tela propria (#contaOverlay, "Gerenciar conta" -- padrao
+           .cfglink identico a Aparencia/Preferencias acima), em vez de so
+           mostrar texto+botao aqui mesmo. #cfgEntrarBtn ("Criar conta")
+           continua existindo dentro da linha pra quem ainda nao tem conta
+           -- clicar nele ainda reabre o login direto (mesmo onclick de
+           sempre, ver IIFE "cfgRowConta"), so ganhou e.stopPropagation()
+           pra nao AINDA abrir #contaOverlay por cima ao mesmo tempo (o
+           reload que o login dispara logo em seguida tornaria isso
+           inofensivo de qualquer forma, mas fica mais limpo assim).
+           Zona de risco (Sair/Apagar tudo) SAIU daqui de baixo e MUDOU
+           pra dentro de #contaOverlay -- ver bloco logo apos
+           #prefsOverlay mais abaixo. Zero mudanca na logica dos dois
+           botoes (getElementById puro, independente de onde moram no
+           DOM). -->
+      <div class="cfgrow cfglink" id="cfgAbrirConta">
         <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="8" r="4.5"/></svg></span>
         <div class="cfgtxt">
           <b data-i18n="cfg.conta">Conta</b>
           <span id="cfgContaInfo">Jogando sem conta</span>
         </div>
         <button class="cfgbtn" id="cfgEntrarBtn" data-i18n="cfg.criarConta">Criar conta</button>
+        <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
       </div>
-
-      <!-- v4.22x (pedido do usuario): essa linha era um leftover morto --
-           mesma acao de "Apagar tudo", que ja mora no botao full-width
-           la embaixo (zona de risco, #zerarbtn) desde a reforma da linha
-           726. Essa aqui nunca teve onclick/id nenhum, so texto duplicado
-           poluindo Conta -- removida de vez. -->
 
       <div class="edsec" data-i18n="cfg.app">App</div>
 
@@ -774,20 +784,16 @@
         <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
       </div>
 
-      <!-- NOTIFICACOES PUSH (pedido do usuario) -- linha simples
-           texto+botao, mesmo padrao de #cfgRowConta (nao um link pra
-           sub-tela, e' uma acao direta). Estado do botao pintado por
-           atualizarBotaoNotificacao() (bloco JS "CONFIG — Notificacoes
-           push", perto de atualizarBotaoFeedback()) -- reflete
-           Notification.permission de verdade, nao um estado proprio. -->
-      <div class="cfgrow" id="cfgRowNotif">
-        <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></span>
-        <div class="cfgtxt">
-          <b data-i18n="cfg.notificacoes">Notificações</b>
-          <span id="cfgNotifInfo" data-i18n="cfg.notifDesc">Teste grátis, streak em risco e monstro do dia</span>
-        </div>
-        <button class="cfgbtn" id="cfgNotifBtn" data-i18n="cfg.ativar">Ativar</button>
-      </div>
+      <!-- Linha "Notificações" removida daqui (pedido do usuario, v4.9x) --
+           era texto+botao (Ativar/Ativado/Bloqueado, refletindo
+           Notification.permission de verdade). O bloco JS que a
+           controlava (window.atualizarBotaoNotificacao, "CONFIG —
+           Notificacoes push") NAO foi tocado -- ja e' null-safe
+           (`if (!btn) return;` logo no topo da IIFE, btn = getElementById
+           de um id que nao existe mais no DOM), entao vira no-op sozinho.
+           window.ativarNotificacaoPush() (bloco "NOTIFICACOES PUSH" mais
+           acima no arquivo) tambem continua existindo, so sem UI que a
+           chame agora. -->
 
       <!-- Card "Histórico" removido daqui (pedido do usuário, sessão de
            brainstorm) -- já existe em Perfil, prévia própria com botão
@@ -824,24 +830,9 @@
         <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14L21 3"/></svg>
       </a>
 
-      <!-- Zona de risco (pedido do usuário, comparando com concorrente):
-           Sair e Apagar tudo saíram de dentro das linhas Conta/Apagar
-           dados (onde eram pílula de 12px) e viraram botão full-width
-           aqui embaixo, mesmo peso visual do padrão "danger zone" de
-           apps de referência. MESMOS id (cfgSairBtn/zerarbtn) e MESMAS
-           classes de estado (oculto) das versões antigas -- só mudou de
-           lugar no HTML, nenhum JS foi tocado (ver blocos "PERFIL — SUB-
-           ABAS" e a IIFE de Conta, ambos usam getElementById puro). -->
-      <div class="zonarisco">
-        <button class="cfgbtnfull perigo oculto" id="cfgSairBtn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-          <span data-i18n="cfg.sair">Sair</span>
-        </button>
-        <button class="cfgbtnfull perigo" id="zerarbtn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-          <span data-i18n="cfg.apagarTudo">Apagar tudo</span>
-        </button>
-      </div>
+      <!-- Zona de risco (Sair/Apagar tudo) MUDOU pra dentro de
+           #contaOverlay (pedido do usuario, v4.9x) -- ver bloco logo apos
+           #prefsOverlay mais abaixo pro HTML atual dos 2 botoes. -->
     </div>
   </div>
 
@@ -1004,6 +995,64 @@
           <span data-i18n="cfg.idiomaDesc">Idioma dos textos do app</span>
         </div>
         <div class="temagrid" id="idiomaGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- v4.9x (pedido do usuario): sub-tela "Gerenciar conta", mesmo padrao
+       de overlay (.cfgOverlay/.cfgovhead/.cfgovcorpo/.cfgvoltar) que o
+       resto de Config -- aberta pela linha "Conta" (#cfgAbrirConta) na
+       tela principal (ver JS "Config: sub-tela Conta" logo apos o bloco
+       de Preferencias). Conteudo:
+       - "ID da conta": e-mail/nome de quem esta logado (ou "Jogando sem
+         conta"), preenchido por atualizarLinhaConta() -- MESMA funcao
+         que ja preenchia #cfgContaInfo na tela principal, so ganhou mais
+         um elemento (#contaIdInfo) pra atualizar junto, ver IIFE "Conta"
+         mais abaixo.
+       - "Gerenciar assinatura" (#cfgAbrirAssinatura): NAO abre outra
+         sub-tela -- so mostra o status atual (#cfgAssinaturaResumo,
+         pintado por atualizarResumoAssinatura()) e, se nao tiver PRO
+         ativo, clicar abre o paywall de sempre (window.abrirPaywall()).
+         Ainda nao ha billing real (ver comentario grande perto de
+         iniciarCompraAssinatura()), entao nao ha "cancelar assinatura"
+         de verdade pra oferecer aqui.
+       - Zona de risco (Sair/Apagar tudo): MOVIDA pra ca de dentro da
+         tela principal de Config (pedido do usuario) -- mesmos ids
+         (cfgSairBtn/zerarbtn) e MESMO JS de sempre, so mudou de lugar no
+         HTML (getElementById puro, independente de onde mora no DOM). -->
+  <div class="cfgOverlay" id="contaOverlay">
+    <div class="cfgovhead">
+      <button class="cfgvoltar" id="contaVoltarBtn" aria-label="Voltar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      </button>
+      <span class="vtitle" data-i18n="cfg.gerenciarConta">Gerenciar conta</span>
+    </div>
+    <div class="cfgovcorpo">
+      <div class="cfgrow" id="cfgRowContaId">
+        <div class="cfgtxt">
+          <b data-i18n="cfg.idDaConta">ID da conta</b>
+          <span id="contaIdInfo">Jogando sem conta</span>
+        </div>
+      </div>
+
+      <div class="cfgrow cfglink" id="cfgAbrirAssinatura">
+        <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.9 6.6L22 9.3l-5 4.9 1.2 7.1L12 17.8l-6.2 3.5L7 14.2 2 9.3l7.1-.7z"/></svg></span>
+        <div class="cfgtxt">
+          <b data-i18n="cfg.gerenciarAssinatura">Gerenciar assinatura</b>
+        </div>
+        <span class="cfgval" id="cfgAssinaturaResumo">Sem plano PRO</span>
+        <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+      </div>
+
+      <div class="zonarisco">
+        <button class="cfgbtnfull perigo oculto" id="cfgSairBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span data-i18n="cfg.sair">Sair</span>
+        </button>
+        <button class="cfgbtnfull perigo" id="zerarbtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          <span data-i18n="cfg.apagarTudo">Apagar tudo</span>
+        </button>
       </div>
     </div>
   </div>
@@ -9681,6 +9730,28 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   window.abrirPrefsConfig = abrirPrefsConfig;
   window.fecharPrefsConfig = fecharPrefsConfig;
 
+  /* ---------- Config: sub-tela Conta (pedido do usuario, v4.9x) ----------
+     Abre/fecha #contaOverlay -- "ID da conta" e "Gerenciar assinatura" sao
+     pintados por atualizarLinhaConta()/atualizarResumoAssinatura() (IIFE
+     "Conta", perto de #cfgSairBtn/#cfgEntrarBtn), chamados aqui de novo
+     ao abrir pra garantir que o status esteja fresco (ex.: PRO vitalicio
+     concedido pelo servidor depois do boot, ver puxarEntitlement()). */
+  const contaOverlay = document.getElementById('contaOverlay');
+  function abrirContaConfig(){
+    if (typeof window.atualizarLinhaConta === 'function') window.atualizarLinhaConta();
+    if (typeof window.atualizarResumoAssinatura === 'function') window.atualizarResumoAssinatura();
+    if (contaOverlay) contaOverlay.classList.add('on');
+  }
+  function fecharContaConfig(){
+    if (contaOverlay) contaOverlay.classList.remove('on');
+  }
+  const btnAbrirConta = document.getElementById('cfgAbrirConta');
+  if (btnAbrirConta) btnAbrirConta.onclick = abrirContaConfig;
+  const btnContaVoltar = document.getElementById('contaVoltarBtn');
+  if (btnContaVoltar) btnContaVoltar.onclick = fecharContaConfig;
+  window.abrirContaConfig = abrirContaConfig;
+  window.fecharContaConfig = fecharContaConfig;
+
   /* ---------- Conquistas ---------- */
   const conquistasOverlay = document.getElementById('conquistasOverlay');
   function abrirConquistas(){
@@ -16187,23 +16258,31 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 <script>
 (function(){
   const CHAVE_CONTA = 'questlog.conta.v1';
-  const linha = document.getElementById('cfgRowConta');
+  const linha = document.getElementById('cfgAbrirConta');
   const info  = document.getElementById('cfgContaInfo');
   const btnSair = document.getElementById('cfgSairBtn');
   const btnEntrar = document.getElementById('cfgEntrarBtn');
   if (!linha || !info || !btnSair || !btnEntrar) return;
+  // #contaIdInfo mora dentro de #contaOverlay (sub-tela "Gerenciar
+  // conta", pedido do usuario v4.9x) -- opcional aqui de proposito (nao
+  // entra no guard acima) pra atualizarLinhaConta() continuar funcionando
+  // mesmo se essa sub-tela nao existir por algum motivo.
+  const infoContaOverlay = document.getElementById('contaIdInfo');
 
   function atualizarLinhaConta(){
     let conta = null;
     try { conta = JSON.parse(localStorage.getItem(CHAVE_CONTA)); } catch(e){}
     let emIngles = false;
     try { emIngles = (localStorage.getItem('questlog.idioma.v1') || 'pt') === 'en'; } catch(e){}
+    const texto = (conta && (conta.nome || conta.email))
+      ? (emIngles ? 'Logged in as ' : 'Logado como ') + (conta.nome || conta.email)
+      : (emIngles ? 'Playing without an account' : 'Jogando sem conta');
+    info.textContent = texto;
+    if (infoContaOverlay) infoContaOverlay.textContent = texto;
     if (conta && (conta.nome || conta.email)){
-      info.textContent = (emIngles ? 'Logged in as ' : 'Logado como ') + (conta.nome || conta.email);
       btnSair.classList.remove('oculto');
       btnEntrar.classList.add('oculto');
     } else {
-      info.textContent = emIngles ? 'Playing without an account' : 'Jogando sem conta';
       btnSair.classList.add('oculto');
       btnEntrar.classList.remove('oculto');
     }
@@ -16217,7 +16296,13 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   window.atualizarLinhaConta = atualizarLinhaConta;
   atualizarLinhaConta(); // primeira pintura, sem esperar abrir a aba
 
-  btnEntrar.onclick = () => {
+  btnEntrar.onclick = (e) => {
+    // pedido do usuario (v4.9x): a linha inteira (#cfgAbrirConta) agora
+    // tambem abre #contaOverlay ao clicar -- stopPropagation aqui evita
+    // abrir a sub-tela por cima do reload que este botao ja dispara (nao
+    // seria um bug de verdade, o reload apaga qualquer overlay aberta de
+    // qualquer forma, mas fica mais limpo sem o flash).
+    e.stopPropagation();
     try {
       // mesmo mecanismo do "Sair" (ver acima), sem signOut() -- nao ha
       // sessao nenhuma pra encerrar aqui, so reabre a tela de login com
@@ -16225,6 +16310,40 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       localStorage.setItem('questlog.forcarLogin.v1', '1');
     } catch(e){}
     location.reload();
+  };
+
+  // ---------------------------------------------------------------------
+  // "Gerenciar assinatura" (pedido do usuario, v4.9x): linha dentro de
+  // #contaOverlay que so mostra o status atual do plano PRO -- nao ha
+  // billing real ainda (ver comentario grande perto de
+  // iniciarCompraAssinatura()), entao nao ha "cancelar" de verdade.
+  // Clicar so abre o paywall de sempre quando NAO ha PRO ativo; com PRO
+  // ativo, o clique nao faz nada (o resumo ja diz tudo que ha pra dizer).
+  const linhaAssinatura = document.getElementById('cfgAbrirAssinatura');
+  const resumoAssinatura = document.getElementById('cfgAssinaturaResumo');
+  function atualizarResumoAssinatura(){
+    if (!resumoAssinatura) return;
+    let emIngles = false;
+    try { emIngles = (localStorage.getItem('questlog.idioma.v1') || 'pt') === 'en'; } catch(e){}
+    const vitalicio = (typeof proVitalicioAtivo === 'function' && proVitalicioAtivo())
+      || (typeof window.proVitalicioServidorAtivo === 'function' && window.proVitalicioServidorAtivo());
+    const emTrial = (typeof trialAtivo === 'function' && trialAtivo());
+    if (vitalicio){
+      resumoAssinatura.textContent = emIngles ? 'PRO active (lifetime)' : 'PRO ativo (vitalício)';
+    } else if (emTrial){
+      resumoAssinatura.textContent = emIngles ? 'Free trial active' : 'Teste grátis ativo';
+    } else if (typeof assinaturaAtiva === 'function' && assinaturaAtiva()){
+      resumoAssinatura.textContent = emIngles ? 'PRO active' : 'Plano PRO ativo';
+    } else {
+      resumoAssinatura.textContent = emIngles ? 'No PRO plan' : 'Sem plano PRO';
+    }
+  }
+  window.atualizarResumoAssinatura = atualizarResumoAssinatura;
+  atualizarResumoAssinatura(); // primeira pintura, sem esperar abrir a sub-tela
+
+  if (linhaAssinatura) linhaAssinatura.onclick = () => {
+    const temPro = (typeof assinaturaAtiva === 'function' && assinaturaAtiva());
+    if (!temPro && typeof window.abrirPaywall === 'function') window.abrirPaywall('conta');
   };
 
   btnSair.onclick = async () => {
@@ -16814,6 +16933,9 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
     'cfg.configuracoes':  { pt:'Configurações', en:'Settings' },
     'cfg.conta':           { pt:'Conta', en:'Account' },
+    'cfg.gerenciarConta':  { pt:'Gerenciar conta', en:'Manage account' },
+    'cfg.idDaConta':       { pt:'ID da conta', en:'Account ID' },
+    'cfg.gerenciarAssinatura': { pt:'Gerenciar assinatura', en:'Manage subscription' },
     'cfg.sair':            { pt:'Sair', en:'Log out' },
     'cfg.criarConta':      { pt:'Criar conta', en:'Create account' },
     'cfg.apagarDados':     { pt:'Apagar dados', en:'Delete data' },
@@ -16824,9 +16946,6 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'cfg.herois':          { pt:'Heróis', en:'Heroes' },
     'cfg.aparencia':       { pt:'Aparência', en:'Appearance' },
     'cfg.preferencias':    { pt:'Preferências', en:'Preferences' },
-    'cfg.notificacoes':    { pt:'Notificações', en:'Notifications' },
-    'cfg.notifDesc':       { pt:'Teste grátis, streak em risco e monstro do dia', en:'Free trial, streak at risk and today\'s monster' },
-    'cfg.ativar':          { pt:'Ativar', en:'Enable' },
     'cfg.legal':           { pt:'Legal', en:'Legal' },
     'cfg.privacidade':     { pt:'Política de Privacidade', en:'Privacy Policy' },
     'cfg.termosDeUso':     { pt:'Termos de Uso', en:'Terms of Use' },

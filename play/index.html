@@ -1240,6 +1240,14 @@
              espaco decorativo pra caber sem rolar. -->
         <button class="pwCTA" id="paywallAssinarBtn" type="button">Testar grátis por 7 dias</button>
         <button class="pwSecundario" id="paywallAgoraNaoBtn2" type="button" data-i18n="pro.agoraNao">Agora não</button>
+
+        <div class="pwLegal">
+          <a id="pwLinkTermos" href="https://dungeonlog.weberlabs.com.br/terms" target="_blank" rel="noopener" data-i18n="pro.legalTermos">Termos e Condições</a>
+          <span class="pwLegalDot">·</span>
+          <a id="pwLinkPrivacidade" href="https://dungeonlog.weberlabs.com.br/privacy" target="_blank" rel="noopener" data-i18n="pro.legalPrivacidade">Privacidade</a>
+          <span class="pwLegalDot">·</span>
+          <button type="button" id="pwRestaurarBtn" data-i18n="pro.legalRestaurar">Restaurar compras</button>
+        </div>
       </div>
     </div>
   </div>
@@ -3434,6 +3442,21 @@ function iniciarCompraAssinatura(){
   }
 }
 window.iniciarCompraAssinatura = iniciarCompraAssinatura;
+
+// "Restaurar compras" (.pwLegal no paywall, pedido do usuario: mesmo
+// rodape do Skillion) -- mesmo estagio que iniciarCompraAssinatura():
+// so um aviso, ate a integracao real com Google Play Billing existir
+// (a real so vai poder checar compras de verdade quando o Digital
+// Goods API estiver ligado, ver comentario grande acima deste bloco).
+function restaurarCompras(){
+  const texto = (typeof window.t === 'function') ? window.t('pro.restaurarEmBreve') : 'Restauração de compras em breve';
+  if (typeof window.aviso === 'function'){ window.aviso(texto); }
+}
+window.restaurarCompras = restaurarCompras;
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('pwRestaurarBtn');
+  if (btn) btn.onclick = restaurarCompras;
+});
 
 // ---------------------------------------------------------------------
 // TESTE GRATIS (pedido do usuario): 7 dias de Plano Pro sem cadastrar
@@ -16706,6 +16729,10 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'cfg.legal':           { pt:'Legal', en:'Legal' },
     'cfg.privacidade':     { pt:'Política de Privacidade', en:'Privacy Policy' },
     'cfg.termosDeUso':     { pt:'Termos de Uso', en:'Terms of Use' },
+    'pro.legalTermos':      { pt:'Termos e Condições', en:'Terms & Conditions' },
+    'pro.legalPrivacidade': { pt:'Privacidade', en:'Privacy' },
+    'pro.legalRestaurar':   { pt:'Restaurar compras', en:'Restore purchases' },
+    'pro.restaurarEmBreve': { pt:'Restauração de compras em breve', en:'Restore purchases coming soon' },
     'cfg.historicoDesc':   { pt:'Calendário de vitórias, fugas e dias sem tarefa', en:'Calendar of wins, escapes and days with no tasks' },
     'cfg.nomeDoHeroi':     { pt:'Nome do herói', en:'Hero name' },
     'cfg.renomear':        { pt:'Renomear', en:'Rename' },
@@ -16805,6 +16832,13 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     const linkTermos = document.getElementById('cfgLinkTermos');
     if (linkPriv) linkPriv.href = en ? 'https://dungeonlog.weberlabs.com.br/en/privacy' : 'https://dungeonlog.weberlabs.com.br/privacy';
     if (linkTermos) linkTermos.href = en ? 'https://dungeonlog.weberlabs.com.br/en/terms' : 'https://dungeonlog.weberlabs.com.br/terms';
+    // mesmos links, versao paywall (#pwLinkTermos/#pwLinkPrivacidade,
+    // ver .pwLegal no paywall) -- 2 pares de ids porque sao 2 telas
+    // diferentes (Config e Paywall), nao uma so.
+    const pwPriv = document.getElementById('pwLinkPrivacidade');
+    const pwTermos = document.getElementById('pwLinkTermos');
+    if (pwPriv) pwPriv.href = en ? 'https://dungeonlog.weberlabs.com.br/en/privacy' : 'https://dungeonlog.weberlabs.com.br/privacy';
+    if (pwTermos) pwTermos.href = en ? 'https://dungeonlog.weberlabs.com.br/en/terms' : 'https://dungeonlog.weberlabs.com.br/terms';
   }
 
   // window.definirIdioma(lang) -- chamado pelos 2 botões do slide de

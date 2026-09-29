@@ -2253,6 +2253,25 @@
   .pwMicro{ display:flex; align-items:center; justify-content:center; gap:7px; font-size:12.5px; color:var(--pw-muted); margin:16px 0 14px; }
   .pwMicro svg{ width:14px; height:14px; color:var(--pw-accent); }
 
+  /* Linha "Termos e Condições · Privacidade · Restaurar compras" embaixo
+     do CTA (pedido do usuario, mesmo padrao do Skillion: 3 links
+     discretos, sublinhados, separados por ponto). Termos/Privacidade
+     abrem o site real em nova aba (href setado por JS, mesma logica de
+     idioma de atualizarLinksLegais() em Config -- ver
+     atualizarLinksLegaisPaywall() perto dela); "Restaurar compras" ainda
+     e' so um aviso ("em breve"), mesmo estagio de iniciarCompraAssinatura(). */
+  .pwLegal{
+    display:flex; align-items:center; justify-content:center; gap:6px; flex-wrap:wrap;
+    font-family:'Outfit',sans-serif; font-size:11px; color:var(--pw-muted);
+    margin:10px 0 0; text-align:center;
+  }
+  .pwLegal a, .pwLegal button{
+    background:none; border:none; padding:0; margin:0; cursor:pointer;
+    font-family:inherit; font-size:inherit; color:var(--pw-muted);
+    text-decoration:underline; text-underline-offset:2px;
+  }
+  .pwLegal .pwLegalDot{ color:var(--pw-muted); opacity:.6; }
+
   .pwCtaWrap{ position:relative; width:100%; margin-top:38px; }
   .pwMob{
     position:absolute; left:78%; bottom:100%; transform:translateX(-50%) scaleX(-1);

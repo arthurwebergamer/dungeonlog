@@ -1372,6 +1372,10 @@
   /* item 39: linhas-resumo da tela principal de Config que abrem sub-tela */
   .cfgrow.cfglink{cursor:pointer}
   .cfgrow.cfglink:active{background:var(--panel-3)}
+  /* bug reportado: Politica de Privacidade/Termos de Uso sublinhados -- e
+     um <a> de verdade (abre externo), sem text-decoration:none herdava o
+     sublinhado padrao do navegador em cima do texto inteiro da linha. */
+  .cfgrow.cfglink, .cfgrow.cfglink:visited{text-decoration:none;color:inherit}
   .cfgseta{width:18px;height:18px;flex:none;color:var(--dim)}
   .cfgtxt{display:flex;flex-direction:column;gap:2px}
   .cfgtxt b{font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;color:var(--text)}
@@ -3391,6 +3395,10 @@
   /* item 39: linhas-resumo da tela principal de Config que abrem sub-tela */
   .cfgrow.cfglink{cursor:pointer}
   .cfgrow.cfglink:active{background:var(--panel-3)}
+  /* bug reportado: Politica de Privacidade/Termos de Uso sublinhados -- e
+     um <a> de verdade (abre externo), sem text-decoration:none herdava o
+     sublinhado padrao do navegador em cima do texto inteiro da linha. */
+  .cfgrow.cfglink, .cfgrow.cfglink:visited{text-decoration:none;color:inherit}
   .cfgseta{width:18px;height:18px;flex:none;color:var(--dim)}
   .cfgtxt{display:flex;flex-direction:column;gap:2px}
   .cfgtxt b{font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;color:var(--text)}

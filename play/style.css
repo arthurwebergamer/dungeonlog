@@ -5660,3 +5660,6 @@
 .hexleg .atricone{width:14px;height:14px;flex:none;color:var(--atr-cor)}
 .hexleg b{color:var(--text)}
 .rnota{font-family:'Outfit',sans-serif;font-size:11.5px;color:var(--dim)}
+/* v4.131: fundo cinza atras das barras do heroi removido (herdava o painel da Arena) */
+.fichaHero .perfilheroInfo .xpwrap{background:none;border:0;box-shadow:none;padding:0;margin:0;border-radius:0}
+.fichaHero .perfilheroInfo{text-align:left}

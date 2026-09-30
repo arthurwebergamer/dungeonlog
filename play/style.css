@@ -5665,3 +5665,8 @@
 .fichaHero .perfilheroInfo{text-align:left}
 /* v4.132: heroi sem degrade roxo (pedido do usuario) -- volta ao painel padrao do tema */
 .fichaHero{background:var(--panel-2);padding:16px}
+/* v4.133: sem icones nas placas; uma cor so (accent do tema) em 3 tons */
+.hexrow>.hexcol:nth-child(1),.hexlegenda>.hexleg:nth-child(1){--atr-cor:color-mix(in srgb,var(--accent) 68%,#fff)}
+.hexrow>.hexcol:nth-child(2),.hexlegenda>.hexleg:nth-child(2){--atr-cor:var(--accent)}
+.hexrow>.hexcol:nth-child(3),.hexlegenda>.hexleg:nth-child(3){--atr-cor:color-mix(in srgb,var(--accent) 62%,var(--bg))}
+.hexleg::before{content:"";width:10px;height:10px;border-radius:3px;background:var(--atr-cor);flex:none}

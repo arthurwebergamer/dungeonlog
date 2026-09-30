@@ -19034,3 +19034,55 @@ Substituição completa do design antigo do paywall (dourado/pergaminho, `.paywa
 - Usuário ainda não confirmou em device real como ficou a transição de abertura nova (última mudança antes desta entrada) — testado só via Playwright/Chromium headless neste ambiente.
 - `iniciarCompraAssinatura()` continua stub — integração real com Google Play Billing é tarefa separada, não tocada nesta sessão.
 - `mockup-p2-floresta-2etapas.html` está superado pela implementação real, pode ser descartado se quiser.
+
+
+## [Sessão 30/09/2026] Excluir conta no app, rodapé do site, Perfil "ficha B", estado de erro do login e diálogo de Tarefas
+
+Sessão longa, várias frentes. Versões internas citadas: v4.127 → v4.138. PRs: #63 e #64 já mergeados em `main`; #65 (`dev` → `main`) aberto com tudo que está na seção 3 em diante.
+
+### 1. Conta e privacidade (Google Play)
+- [x] **Exclusão de conta dentro do app.** Botão `#excluirContaBtn` (ícone de lixeira, `cfgbtnfull perigo oculto`) na zona de risco das Configurações; aparece só logado (`atualizarLinhaConta()` alterna `.oculto`). Folha `#excluirContaOverlay` com script próprio. Fluxo: `obterContextoAuth()` → provedor via `ehGoogle(user)` → reautenticação (senha, ou `reauthenticateWithPopup` para Google) → `deleteDoc(saves/uid)` → `deleteUser` → `localStorage.clear()` → reload. **A ordem importa:** a regra do Firestore (`request.auth.uid == uid`) exige apagar o documento ANTES de `deleteUser`. Erros tratados: `auth/wrong-password`, `auth/invalid-credential`, `auth/popup-closed-by-user`, `auth/cancelled-popup-request`, `auth/requires-recent-login`. Chaves i18n `cfg.excluirConta*` (titulo, desc, senhaLabel, senhaPlaceholder, googleAviso, botao, excluindo, senhaErrada, googleFalhou, falhouGenerico, precisaRelogar), pt + en.
+- [x] **Botão "Apagar tudo" removido** (`zerarbtn`, handler e toda a folha `#zerarOverlay`). Sobram comentários antigos citando "CONFIRMAR APAGAR TUDO EM FOLHA" — inofensivos, deixados de propósito. Marcador no código: `v4.127`.
+- [x] **Política do Google Play:** exclusão de conta exige caminho público na web **e** caminho dentro do app. Página `/delete-account` (pt e en) descreve o caminho do app ("Configurações → Conta → Gerenciar conta → Excluir conta"); `/privacy` §7 atualizado. Allowlist de debug é aceitável desde que a conta de teste seja declarada no Play Console → App access.
+- [x] **Nome padronizado "Dungeonlog"** (o Google pede que a página use o mesmo nome da ficha da loja): strings de compartilhar sequência, slides comentados, título padrão do push em `firebase-messaging-sw.js`, site inteiro.
+
+### 2. Site estático
+- [x] **Rodapé redesenhado** em todas as páginas (`/`, `/en/`, privacy, terms, delete-account, pt e en): colunas `.footcols/.footcol/.footlabel` (Navegação / Legal / Contato), "© 2026 Weberlabs. Todos os direitos reservados." embaixo de tudo, contato escrito só "E-mail". CSS em `site.css`. Causa do visual ruim no celular: `justify-content:center` centralizava cada coluna quebrada; trocado por `flex-start`, removido override e padding duplicado da home, media query `max-width:480px`.
+- [x] **Sombra da home** (`.dim`) movida para dentro de `<main>` com `z-index:-1` e `main{position:relative;z-index:1}`; antes ficava descentralizada atrás do conteúdo.
+- [x] **Loja:** nota "the blacksmith swaps the shelf..." removida do rodapé (`montarCompra`, marcador `v4.128`).
+
+### 3. Perfil redesenhado — "ficha B" (v4.129 → v4.136)
+Processo: mockups no Design artifact (https://claude.ai/artifact/JFHxxWmCUoCndfRSjuaZbE, privado) → três ideias (A colunas de medidor vertical, B placas hexagonais, C dial) → o usuário escolheu B → implementado e ajustado no aparelho.
+- [x] Primeira versão implementada (v4.129): radar + abas Atributos/Conquistas/Bestiário. **Descartada** pelo usuário ("não ficou tão bom"); substituída pela B.
+- [x] **Versão final (v4.130):** bloco `#perfilAtributos` — herói, placas hexagonais (`.hexrow/.hexcol/.hexo/.hexi`, `clip-path`), `.statgrid`, prévias de Conquistas/Bestiário (mesmos botões "Ver todas/Ver tudo" abrindo os overlays de sempre). Todos os IDs de lógica preservados (`atrFortunaValor`, `atrMaisFortuna`, `atrDisponiveis` etc.), então `investir()`/`renderAtributosPontos()` seguem iguais; a função só ganhou a escrita de `atrFortunaPts/atrFocoPts/atrVigorPts` e o rótulo do botão ("+" ou "TETO").
+- [x] Ajustes pós-teste: fundo cinza atrás das barras do herói removido (`.xpwrap` herdava o painel da Arena) — v4.131; degradê roxo do herói removido — v4.132; ícones das placas e da legenda removidos, cor única do tema em 3 tons — v4.133; tons sempre distintos em qualquer tema (accent → accent misturado com `--bg` a 68% e 42%; misturar com branco não funcionava no Grafite, cujo accent já é branco) e legenda/nota removidas — v4.134; placas menores e botão só "+" (o "+2%" confundia) — v4.136.
+- [x] Chaves i18n novas: `perfil.atributos`, `perfil.atrNota` (a nota não aparece mais na tela, chave mantida).
+- **Consequência:** a descrição do que cada atributo faz (raridade do espólio, desconto na loja, perdão de dano) deixou de aparecer em qualquer lugar do app. Chaves `atr.*Desc` continuam no arquivo. Candidato: mostrar ao tocar na placa.
+- Cache-bust de `style.css`: `?v=13` → `?v=23` ao longo da sessão.
+
+### 4. Login: erros visíveis (v4.135 → v4.137)
+- **Causa raiz de "não avisa nada":** `aviso()` está desligada por `TOASTS_DESATIVADOS = true` (teste de 27/08 nunca revertido) — retorna antes de tocar no DOM. Todo erro de senha/email/rede passava por ela.
+- [x] **Estado de erro do loading** (`#loadingMasmorra`): `window.erroLoadingMasmorra(msg)`. O herói para de pular, cai, cambaleia e fica deitado (`@keyframes loadingMasmorraTombar`, 1,1 s); texto muda para "Algo deu errado" (rosa) + mensagem + botão "Tentar de novo" (fecha o overlay). pt/en; `prefers-reduced-motion` mostra o herói já deitado. Prévia aprovada antes: https://claude.ai/artifact/JrH7DbkRkoJry4oStbkeNd. Estrelinhas tontas foram tiradas a pedido.
+- [x] Login por email: qualquer erro do Firebase usa a tela de erro (mensagens já existentes + novo `auth/network-request-failed`). `auth/email-already-in-use` continua inline no campo de email.
+- [x] Google: falha mostra a tela de erro; fechar o popup de propósito (`popup-closed-by-user`/`cancelled-popup-request`) só esconde o loading, sem erro.
+- [x] Validações client-side (campos vazios, senhas diferentes, senha fraca) agora aparecem inline sob o campo de email (`questlogMostrarErroEmail`), não pelo toast mudo.
+- [x] **Autofill do Chrome/Android** pintava o campo de email de azul translúcido: `#passoLogin .campo input:-webkit-autofill` mantém o fundo do tema (v4.135). **Não** foi reproduzido o "botão Entrar transparente" relatado — no teste headless o botão ficou sólido em todos os passos; se voltar, pedir print com teclado aberto e o tema.
+
+### 5. Diálogo da aba Tarefas não tocava de primeira (v4.138)
+- **Bug recorrente** (já corrigido uma vez para o fluxo de conta nova, ver comentário em `mostrarSetupPersonagemENome`): cada caminho de entrada no app fecha o `#intro` sozinho e só alguns agendavam `agendarDialogoTela('tarefas')`. Login com conta que restaura da nuvem não agendava.
+- [x] Fix estrutural: `MutationObserver` no `#intro` agenda o diálogo sempre que ele ganha `.off`. `agendarDialogoTela()` é idempotente (ignora se já visto, reagenda o timer), então várias chamadas são seguras. Se o teste for repetido no mesmo domínio, lembrar da flag `questlog.tutorialTelas.v2` no `localStorage`.
+
+### 6. Email de verificação indo para spam (configuração externa, em andamento)
+Não é código. O Firebase envia de `noreply@questlog-d4c11.firebaseapp.com`, sem SPF/DKIM do domínio próprio.
+- Em Authentication → Modelos → Verificação de endereço de e-mail: nome do remetente "Dungeonlog", "Personalizar domínio" com `dungeonlog.weberlabs.com.br`, "Responder para" `arthurdungeonlog@gmail.com`, assunto e mensagem em português com link de texto (`%LINK%` como âncora, sem `%DISPLAY_NAME%`, que vem vazio em cadastro por email).
+- Registros DNS que o Firebase pediu (nome relativo a `weberlabs.com.br`): TXT `dungeonlog` = `v=spf1 include:_spf.firebasemail.com ~all`; TXT `dungeonlog` = `firebase=questlog-d4c11`; CNAME `firebase1._domainkey.dungeonlog` → `mail-dungeonlog-weberlabs-com-br.dkim1._domainkey.firebasemail.com`; CNAME `firebase2._domainkey.dungeonlog` → `...dkim2._domainkey.firebasemail.com`. Cloudflare: CNAMEs em "somente DNS". Possível conflito de TXT com o CNAME do site (Pages) no mesmo nome — alternativa: subdomínio só de email.
+- Verificação pode levar até 48 h. Depois de verificado, trocar o remetente do modelo e salvar. Também trocar o "Nome público" do projeto (Configurações do projeto → Geral) de `questlog-d4c11` para Dungeonlog (aparece em `%APP_NAME%`).
+
+### Pendências / em aberto
+- [ ] **"Esqueceu a senha?" segue mudo** (sucesso e falha passam por `aviso()`). Candidato: reaproveitar o overlay de loading com um estado de sucesso.
+- [ ] Decidir o destino de `TOASTS_DESATIVADOS`: o teste de 27/08 nunca foi concluído; outros avisos do app continuam silenciosos.
+- [ ] Bug "monstro fugindo do nada": não resolvido.
+- [ ] UID pessoal do usuário ainda não está em `UIDS_DEBUG_PERMITIDO`; conta de teste do revisor precisa ser declarada no Play Console → App access.
+- [ ] **Risco:** `reauthenticateWithPopup` para contas Google no TWA/Android pode cair em redirect (mesma classe do bug do loop de login). Sem teste em aparelho.
+- [ ] Concluir a verificação de domínio do email no Firebase e testar entrega no Gmail/Outlook.
+- [ ] Merge do PR #65 na `main` (aberto, não mergeado).

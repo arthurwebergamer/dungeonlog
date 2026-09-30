@@ -1941,8 +1941,16 @@ const UIDS_DEBUG_PERMITIDO = [
   'CVNPbBxIFebPmnmCEw6iYYYKWRS2', // conta de revisor do Google Play (mesma do PRO vitalicio)
   // 'SEU_UID_AQUI', // sua propria conta, se quiser testar tambem
 ];
+// Tambem libera por e-mail (so conta com e-mail VERIFICADO -- Google sempre
+// e). Util quando nao se tem o UID em maos. window.__emailDebugAtivo e
+// preenchido em aoLogar()/aoLogarSilencioso(), antes de definirUidAtivo().
+const EMAILS_DEBUG_PERMITIDO = [
+  'arthurwebergamer@gmail.com',
+];
 function uidTemDebugPermitido(){
-  return UIDS_DEBUG_PERMITIDO.includes(_uidAtivo);
+  if (UIDS_DEBUG_PERMITIDO.includes(_uidAtivo)) return true;
+  const em = (window.__emailDebugAtivo || '').toLowerCase();
+  return !!em && EMAILS_DEBUG_PERMITIDO.includes(em);
 }
 window.uidTemDebugPermitido = uidTemDebugPermitido;
 
@@ -2037,6 +2045,13 @@ window.definirUidAtivo = function(uid){
     const pjSalvo = localStorage.getItem(chavePersonagemAtivo());
     _personagemAtivo = pjSalvo || 'pj1';
   } catch(e){ _personagemAtivo = 'pj1'; }
+  // v4.139: o offset de dia (debug "avancar dia") e guardado POR CONTA
+  // (chaveConta(CHAVE_DIA)), mas so era relido no boot -- que roda ANTES do
+  // login, com a chave de "sem conta" -- e no watchdog (foco/visibilidade).
+  // Resultado: ao logar, o app ficava no dia real ate o primeiro foco e depois
+  // "pulava" pro offset salvo da conta. Relê aqui, junto com o resto do estado
+  // que depende do uid.
+  try { if (typeof lerOffsetDia === 'function') lerOffsetDia(); } catch(e){}
 };
 
 // ---------------------------------------------------------------------
@@ -2242,6 +2257,14 @@ window.criarPersonagem = criarPersonagem;
 const DEBUG_CONTA = true;
 let _dbgContaT0 = performance.now();
 let _dbgContaLinhas = [];
+// v4.141: o log sobrevive ao reload (o "Sair" recarrega a pagina e apagava
+// justamente o trecho que importa). Guarda as ultimas 120 linhas; as da
+// sessao anterior voltam marcadas com "[antes]".
+const _CHAVE_DBG_LOG = 'questlog.dbgLog.v1';
+try {
+  const _ant = JSON.parse(localStorage.getItem(_CHAVE_DBG_LOG) || '[]');
+  if (Array.isArray(_ant)) _dbgContaLinhas = _ant.slice(-120).map(l => '[antes] ' + String(l).replace(/^\[antes\] /, ''));
+} catch(e){}
 let _dbgContaAberto = false;
 function _dbgContaRepintar(){
   // item: TOGGLE DEBUG (clique nas moedas) -- esta pilula usa
@@ -2298,6 +2321,8 @@ function dbgConta(msg){
   if (!DEBUG_CONTA) return;
   const t = Math.round(performance.now() - _dbgContaT0);
   _dbgContaLinhas.push('+' + t + 'ms  ' + msg);
+  if (_dbgContaLinhas.length > 200) _dbgContaLinhas.splice(0, _dbgContaLinhas.length - 200);
+  try { localStorage.setItem(_CHAVE_DBG_LOG, JSON.stringify(_dbgContaLinhas.slice(-120))); } catch(e){}
   _dbgContaRepintar();
 }
 window.dbgConta = dbgConta;
@@ -15761,8 +15786,16 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
     async function puxarNuvem(uid){
       const ref = doc(db, 'saves', uid);
+      puxarEntitlement(uid);
+      if (temSujo(uid)){
+        // ha alteracao local que nunca chegou na nuvem: o local e o mais
+        // novo. Empurra (nuvem fica igual ao local) em vez de sobrescrever.
+        window.dbgConta && window.dbgConta('puxarNuvem(' + uid.slice(0,6) + ') -- marcador SUJO: mantendo save local e reenviando pra nuvem');
+        await empurrarNuvem(uid);
+        return;
+      }
       const snap = await getDoc(ref);
-      puxarEntitlement(uid); // paralelo, nao bloqueia o resto de puxarNuvem() -- so precisa terminar antes da 1a checagem de assinaturaAtiva()/paywall, o que na pratica sempre acontece bem depois
+      // (puxarEntitlement ja disparado acima) paralelo, nao bloqueia o resto de puxarNuvem() -- so precisa terminar antes da 1a checagem de assinaturaAtiva()/paywall, o que na pratica sempre acontece bem depois
       window.dbgConta && window.dbgConta('puxarNuvem(' + uid.slice(0,6) + ') -- doc existe na nuvem? ' + snap.exists() + (snap.exists() ? (' | tamanho do data: ' + (snap.data().data||'').length) : ''));
       if (snap.exists() && snap.data().data) {
         try { localStorage.setItem(window.chaveSaveAtual(), snap.data().data); } catch(e){}
@@ -15805,7 +15838,25 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       }
     }
 
+    // v4.140: marcador "alteracao local ainda nao confirmada na nuvem".
+    // Liga de forma SINCRONA a cada salvar() (antes do setDoc, que e
+    // assincrono) e so desliga quando o setDoc do ULTIMO salvar() termina
+    // com sucesso. Se o envio falhar, for cancelado (reload, Sair, rede) ou
+    // negado, o marcador fica no localStorage -- e o proximo login NAO deixa
+    // puxarNuvem() sobrescrever o save local com a copia velha da nuvem
+    // (causa de "criei uma tarefa, sai, entrei e ela sumiu").
+    let _seqSalvar = 0;
+    const chaveSujo = uid => 'questlog.sujo.v1.uid.' + uid;
+    function marcarSujo(uid){
+      _seqSalvar++;
+      try { localStorage.setItem(chaveSujo(uid), String(Date.now())); } catch(e){}
+    }
+    function temSujo(uid){
+      try { return !!localStorage.getItem(chaveSujo(uid)); } catch(e){ return false; }
+    }
+
     async function empurrarNuvem(uid){
+      const seqInicio = _seqSalvar;
       try {
         const dados = localStorage.getItem(window.chaveSaveAtual()) || '';
         // FIX bug reset (ver CHAVES_SECUNDARIAS_CONTA, topo do arquivo):
@@ -15818,6 +15869,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         });
         window.dbgConta && window.dbgConta('empurrarNuvem(' + uid.slice(0,6) + ') INICIOU -- chave lida: ' + window.chaveSaveAtual() + ' | tamanho: ' + dados.length + ' | extras: ' + Object.keys(extras).length);
         await setDoc(doc(db, 'saves', uid), { data: dados, extras: extras, atualizadoEm: Date.now() });
+        if (seqInicio === _seqSalvar){ try { localStorage.removeItem(chaveSujo(uid)); } catch(e){} }
         window.dbgConta && window.dbgConta('empurrarNuvem(' + uid.slice(0,6) + ') TERMINOU com sucesso');
       } catch(e){
         window.dbgConta && window.dbgConta('empurrarNuvem(' + uid.slice(0,6) + ') FALHOU: ' + e.message);
@@ -15889,6 +15941,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           // a versao ANTIGA de volta, apagando a mudanca mais recente.
           // Guarda o Promise aqui pra quem for recarregar a pagina
           // poder esperar ele terminar antes (ver "CONTA — SAIR").
+          marcarSujo(user.uid);
           window._questlogUltimoPush = empurrarNuvem(user.uid);
           return r;
         };
@@ -16016,7 +16069,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         return;
       }
 
-      window.definirUidAtivo(user.uid);
+      window.__emailDebugAtivo = user.emailVerified ? (user.email || '') : ''; window.definirUidAtivo(user.uid);
 
       // BUG REAL ENCONTRADO E CORRIGIDO (testado pelo usuario, nao
       // suposicao): a migracao abaixo rodava pra TODA conta nova que
@@ -16084,6 +16137,13 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       function entrarNoApp(){
         const intro = document.getElementById('intro');
         if (temSaveLocal) {
+          // v4.142: render() so chama salvar() quando jaComecou === true, e
+          // quem liga essa flag e o carregar() do BOOT (que, apos o Sair,
+          // roda sem uid e falha). Logando por aqui (Google) a flag ficava
+          // false pra sempre: criar() atualizava a memoria, mas NADA era
+          // salvo -- nem local, nem nuvem (log: "tarefas agora: 1" sem
+          // nenhum empurrarNuvem depois).
+          try { if (typeof jaComecou !== 'undefined') jaComecou = true; } catch(e){}
           intro.classList.add('off');
           intro.classList.remove('loginBg');
           intro.style.backgroundImage = '';
@@ -16256,13 +16316,13 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         // coisa por baixo, o suficiente na pratica mesmo sem ser um
         // gate "puro" antes do primeiro paint.
         bloquearPorEmailNaoVerificado(user, () => {
-          window.definirUidAtivo(user.uid);
+          window.__emailDebugAtivo = user.emailVerified ? (user.email || '') : ''; window.definirUidAtivo(user.uid);
           reconectarEnvio(user);
         });
         return;
       }
 
-      window.definirUidAtivo(user.uid);
+      window.__emailDebugAtivo = user.emailVerified ? (user.email || '') : ''; window.definirUidAtivo(user.uid);
       reconectarEnvio(user);
     }
 
@@ -16674,6 +16734,17 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     try { en = (localStorage.getItem('questlog.idioma.v1') || 'pt') === 'en'; } catch(e){}
     const textoOriginal = btnSair.textContent;
     btnSair.textContent = en ? 'Logging out…' : 'Saindo…';
+
+    // v4.139: espera o ultimo envio pra nuvem ANTES do signOut(). Antes a
+    // espera so acontecia depois dele -- com a sessao ja encerrada, o
+    // setDoc em voo/na fila era negado pela regra (saves/{uid} exige
+    // request.auth.uid == uid) e a tarefa recem-criada nunca chegava na
+    // nuvem; no proximo login puxarNuvem() trazia a versao antiga por cima.
+    try {
+      if (window._questlogUltimoPush){
+        await Promise.race([window._questlogUltimoPush, new Promise(res => setTimeout(res, 4000))]);
+      }
+    } catch(e){}
 
     try {
       if (window.firebaseConfig && window.firebaseConfig.apiKey !== 'COLE_AQUI_SUA_APIKEY'){

@@ -16682,6 +16682,17 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     const textoOriginal = btnSair.textContent;
     btnSair.textContent = en ? 'Logging out…' : 'Saindo…';
 
+    // v4.139: espera o ultimo envio pra nuvem ANTES do signOut(). Antes a
+    // espera so acontecia depois dele -- com a sessao ja encerrada, o
+    // setDoc em voo/na fila era negado pela regra (saves/{uid} exige
+    // request.auth.uid == uid) e a tarefa recem-criada nunca chegava na
+    // nuvem; no proximo login puxarNuvem() trazia a versao antiga por cima.
+    try {
+      if (window._questlogUltimoPush){
+        await Promise.race([window._questlogUltimoPush, new Promise(res => setTimeout(res, 4000))]);
+      }
+    } catch(e){}
+
     try {
       if (window.firebaseConfig && window.firebaseConfig.apiKey !== 'COLE_AQUI_SUA_APIKEY'){
         await Promise.race([

@@ -2249,6 +2249,14 @@ window.criarPersonagem = criarPersonagem;
 const DEBUG_CONTA = true;
 let _dbgContaT0 = performance.now();
 let _dbgContaLinhas = [];
+// v4.141: o log sobrevive ao reload (o "Sair" recarrega a pagina e apagava
+// justamente o trecho que importa). Guarda as ultimas 120 linhas; as da
+// sessao anterior voltam marcadas com "[antes]".
+const _CHAVE_DBG_LOG = 'questlog.dbgLog.v1';
+try {
+  const _ant = JSON.parse(localStorage.getItem(_CHAVE_DBG_LOG) || '[]');
+  if (Array.isArray(_ant)) _dbgContaLinhas = _ant.slice(-120).map(l => '[antes] ' + String(l).replace(/^\[antes\] /, ''));
+} catch(e){}
 let _dbgContaAberto = false;
 function _dbgContaRepintar(){
   // item: TOGGLE DEBUG (clique nas moedas) -- esta pilula usa
@@ -2305,6 +2313,8 @@ function dbgConta(msg){
   if (!DEBUG_CONTA) return;
   const t = Math.round(performance.now() - _dbgContaT0);
   _dbgContaLinhas.push('+' + t + 'ms  ' + msg);
+  if (_dbgContaLinhas.length > 200) _dbgContaLinhas.splice(0, _dbgContaLinhas.length - 200);
+  try { localStorage.setItem(_CHAVE_DBG_LOG, JSON.stringify(_dbgContaLinhas.slice(-120))); } catch(e){}
   _dbgContaRepintar();
 }
 window.dbgConta = dbgConta;

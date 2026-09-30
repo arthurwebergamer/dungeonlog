@@ -1941,8 +1941,16 @@ const UIDS_DEBUG_PERMITIDO = [
   'CVNPbBxIFebPmnmCEw6iYYYKWRS2', // conta de revisor do Google Play (mesma do PRO vitalicio)
   // 'SEU_UID_AQUI', // sua propria conta, se quiser testar tambem
 ];
+// Tambem libera por e-mail (so conta com e-mail VERIFICADO -- Google sempre
+// e). Util quando nao se tem o UID em maos. window.__emailDebugAtivo e
+// preenchido em aoLogar()/aoLogarSilencioso(), antes de definirUidAtivo().
+const EMAILS_DEBUG_PERMITIDO = [
+  'arthurwebergamer@gmail.com',
+];
 function uidTemDebugPermitido(){
-  return UIDS_DEBUG_PERMITIDO.includes(_uidAtivo);
+  if (UIDS_DEBUG_PERMITIDO.includes(_uidAtivo)) return true;
+  const em = (window.__emailDebugAtivo || '').toLowerCase();
+  return !!em && EMAILS_DEBUG_PERMITIDO.includes(em);
 }
 window.uidTemDebugPermitido = uidTemDebugPermitido;
 
@@ -16061,7 +16069,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         return;
       }
 
-      window.definirUidAtivo(user.uid);
+      window.__emailDebugAtivo = user.emailVerified ? (user.email || '') : ''; window.definirUidAtivo(user.uid);
 
       // BUG REAL ENCONTRADO E CORRIGIDO (testado pelo usuario, nao
       // suposicao): a migracao abaixo rodava pra TODA conta nova que
@@ -16301,13 +16309,13 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         // coisa por baixo, o suficiente na pratica mesmo sem ser um
         // gate "puro" antes do primeiro paint.
         bloquearPorEmailNaoVerificado(user, () => {
-          window.definirUidAtivo(user.uid);
+          window.__emailDebugAtivo = user.emailVerified ? (user.email || '') : ''; window.definirUidAtivo(user.uid);
           reconectarEnvio(user);
         });
         return;
       }
 
-      window.definirUidAtivo(user.uid);
+      window.__emailDebugAtivo = user.emailVerified ? (user.email || '') : ''; window.definirUidAtivo(user.uid);
       reconectarEnvio(user);
     }
 

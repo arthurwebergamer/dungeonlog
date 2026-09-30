@@ -5744,3 +5744,42 @@
 .atrinvestir{margin-top:10px;width:100%;height:44px;border:none;border-radius:12px;background:var(--accent);color:var(--bg);font-family:'Outfit',sans-serif;font-size:14.5px;font-weight:700;cursor:pointer}
 .atrinvestir:disabled{background:var(--panel-3,#2A2240);color:var(--dim);cursor:not-allowed}
 @media (prefers-reduced-motion: reduce){.atrdet,.atrchev{transition:none}}
+
+/* ===== v4.143 — Perfil: Bento ===== */
+.fichaHero{border-radius:18px}
+.fichaHero .hero-sprite{background:radial-gradient(ellipse at 50% 90%,color-mix(in srgb,var(--accent) 28%,transparent),var(--panel-3,#2A2240));border-radius:14px}
+.bentorow{display:flex;gap:8px;align-items:stretch;margin:14px 0}
+.bentoAtr{flex:1.35;min-width:0;margin:0!important;padding:12px!important;display:flex;flex-direction:column}
+.bentoAtr .atrhead{padding:0;margin:0 0 10px}
+.atrbento{display:flex;gap:2px;flex:1}
+.gcol{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;border-radius:12px;padding:4px 0;-webkit-tap-highlight-color:transparent}
+.gcol.sel{background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.gico{color:var(--accent);display:flex}
+.gauge{display:flex!important;flex-direction:column-reverse;gap:2px;width:26px}
+.gauge i{height:7px;border-radius:2px;background:var(--line);display:block;flex:none}
+.gauge i.on{background:var(--accent)}
+.gcol .atrvalor{font-family:'Silkscreen',monospace;font-size:12px;color:var(--accent)}
+.gcol .atrnome{font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;color:var(--muted)}
+.gplus{width:34px;height:34px;border-radius:50%;border:none;background:var(--accent);color:var(--bg);font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.gplus:not(:disabled){font-size:22px}
+.gplus:disabled{background:transparent;border:1px solid var(--line);color:var(--dim);cursor:not-allowed}
+.gpts{font-size:10.5px;color:var(--dim)}
+.atrinfo{margin:8px 0 0;font-family:'Outfit',sans-serif;font-size:11px;line-height:1.35;color:var(--dim);text-align:center;min-height:30px}
+.bentocol{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
+.bentoPts{background:var(--accent);color:var(--bg);border-radius:18px;padding:12px 8px;text-align:center;display:flex;flex-direction:column;align-items:center}
+.bentoPts.vazio{background:var(--panel-2);color:var(--dim);border:1px solid var(--line)}
+.bentoPtsNum{font-family:'Silkscreen',monospace;font-size:30px;line-height:1;background:none;padding:0;color:inherit}
+.bentoPtsLbl{font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;margin-top:4px;line-height:1.2}
+.bentocol .statgrid{display:flex;flex-direction:column;gap:8px;margin:0;flex:1}
+.bentocol .statcard{flex:1;border-radius:14px;padding:8px 10px;display:flex;flex-direction:column;justify-content:center;gap:1px}
+.bentocol .statval{font-size:15px;order:0}
+.bentocol .statlabel{font-size:10px;order:1}
+.conqAnel{--p:0;width:56px;height:56px;flex:none;border-radius:50%;background:conic-gradient(var(--accent) calc(var(--p)*1%),var(--line) 0);display:flex;align-items:center;justify-content:center;position:relative}
+.conqAnel::before{content:"";position:absolute;inset:6px;border-radius:50%;background:var(--panel-2)}
+.conqAnel b{position:relative;font-family:'Silkscreen',monospace;font-size:11px;color:var(--text)}
+#prevConquistas .cfgrowtopo{gap:12px}
+#prevConquistas .cfgtxt{flex:1;min-width:0}
+#prevBestiarioFaixa{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;min-height:0}
+.bestcel{aspect-ratio:1;border-radius:10px;background:var(--panel-3,#2A2240);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.bestcel .prevbestimg{width:70%;height:70%}
+.bestcel.vazia{background:var(--bg);border:1px dashed var(--line);color:var(--dim);font-family:'Silkscreen',monospace;font-size:13px}

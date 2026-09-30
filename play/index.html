@@ -38,7 +38,7 @@
      alteracao aqui (bump manual) pra forcar cache-bust; SUBIR ESTE
      NUMERO sempre que style.css mudar e o problema persistir em
      producao. -->
-<link rel="stylesheet" href="style.css?v=24">
+<link rel="stylesheet" href="style.css?v=25">
 
 <!-- =====================================================================
      TOGGLE DEBUG — silenciar console (log/warn/error)  —  precisa ser o
@@ -560,67 +560,45 @@
         </div>
       </div>
 
-      <div class="atributospontos">
-        <div class="atrhead">
-          <b data-i18n="perfil.atributos">Atributos</b>
-          <span class="atrpill" id="atrDisponiveis">0 disponíveis</span>
-        </div>
-        <div class="atrlista">
-          <div class="atrlinha" data-atr="fortuna">
-            <button type="button" class="atrtopo" aria-expanded="false">
-              <span class="atricone2"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5l2.9 6.6 7.1.7-5.4 4.8 1.6 7-6.2-3.8-6.2 3.8 1.6-7-5.4-4.8 7.1-.7z"/></svg></span>
-              <span class="atrmeio"><span class="atrnome" data-i18n="atr.fortuna">Fortuna</span><span class="atrseg" id="atrFortunaSeg"></span></span>
-              <span class="atrnum"><span class="atrvalor" id="atrFortunaValor">+0%</span><span class="atrptsl"><span id="atrFortunaPts">0</span>/15</span></span>
-              <span class="atrchev"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
-            </button>
-            <div class="atrdet"><div class="atrdetIn">
-              <p class="atrdetxt" id="atrFortunaDesc"></p>
-              <button class="atrinvestir" id="atrMaisFortuna" type="button"></button>
-            </div></div>
+      <div class="bentorow">
+        <div class="atributospontos bentoAtr">
+          <div class="atrhead"><b data-i18n="perfil.atributos">Atributos</b></div>
+          <div class="atrbento">
+            <div class="gcol" data-atr="fortuna">
+              <span class="gico"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5l2.9 6.6 7.1.7-5.4 4.8 1.6 7-6.2-3.8-6.2 3.8 1.6-7-5.4-4.8 7.1-.7z"/></svg></span>
+              <span class="atrseg gauge" id="atrFortunaSeg"></span>
+              <span class="atrvalor" id="atrFortunaValor">+0%</span>
+              <span class="atrnome" data-i18n="atr.fortuna">Fortuna</span>
+              <button class="gplus" id="atrMaisFortuna" type="button" aria-label="Investir">+</button>
+              <span class="gpts"><span id="atrFortunaPts">0</span>/15</span>
+            </div>
+            <div class="gcol" data-atr="foco">
+              <span class="gico"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".8" fill="currentColor"/></svg></span>
+              <span class="atrseg gauge" id="atrFocoSeg"></span>
+              <span class="atrvalor" id="atrFocoValor">+0%</span>
+              <span class="atrnome" data-i18n="atr.foco">Foco</span>
+              <button class="gplus" id="atrMaisFoco" type="button" aria-label="Investir">+</button>
+              <span class="gpts"><span id="atrFocoPts">0</span>/15</span>
+            </div>
+            <div class="gcol" data-atr="vigor">
+              <span class="gico"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5s-7.5-4.6-9.8-9.3C.9 8 2.4 4.8 5.6 4.1c2-.4 3.9.5 5 2.1a5.5 5.5 0 015-2.1c3.2.7 4.7 3.9 3.4 7.1-2.3 4.7-9.8 9.3-9.8 9.3z"/></svg></span>
+              <span class="atrseg gauge" id="atrVigorSeg"></span>
+              <span class="atrvalor" id="atrVigorValor">+0%</span>
+              <span class="atrnome" data-i18n="atr.vigor">Vigor</span>
+              <button class="gplus" id="atrMaisVigor" type="button" aria-label="Investir">+</button>
+              <span class="gpts"><span id="atrVigorPts">0</span>/15</span>
+            </div>
           </div>
-          <div class="atrlinha" data-atr="foco">
-            <button type="button" class="atrtopo" aria-expanded="false">
-              <span class="atricone2"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".8" fill="currentColor"/></svg></span>
-              <span class="atrmeio"><span class="atrnome" data-i18n="atr.foco">Foco</span><span class="atrseg" id="atrFocoSeg"></span></span>
-              <span class="atrnum"><span class="atrvalor" id="atrFocoValor">+0%</span><span class="atrptsl"><span id="atrFocoPts">0</span>/15</span></span>
-              <span class="atrchev"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
-            </button>
-            <div class="atrdet"><div class="atrdetIn">
-              <p class="atrdetxt" id="atrFocoDesc"></p>
-              <button class="atrinvestir" id="atrMaisFoco" type="button"></button>
-            </div></div>
+          <p class="atrinfo" id="atrInfo"></p>
+        </div>
+        <div class="bentocol">
+          <div class="bentoPts"><span class="bentoPtsNum" id="atrDisponiveis">0</span><span class="bentoPtsLbl" id="atrDispLbl">pontos p/ investir</span></div>
+          <div class="statgrid">
+            <div class="statcard"><span class="statval" id="statVida">—</span><span class="statlabel" data-i18n="perfil.vidaMaxima">Vida máxima</span></div>
+            <div class="statcard"><span class="statval" id="statMoedas">—</span><span class="statlabel" data-i18n="inv.moedas">Moedas</span></div>
+            <div class="statcard"><span class="statval" id="statBonusXp">—</span><span class="statlabel" data-i18n="perfil.bonusXpEquip">Bônus XP equip.</span></div>
+            <div class="statcard"><span class="statval" id="statBonusMoedas">—</span><span class="statlabel" data-i18n="perfil.bonusMoedasEquip">Bônus moedas equip.</span></div>
           </div>
-          <div class="atrlinha" data-atr="vigor">
-            <button type="button" class="atrtopo" aria-expanded="false">
-              <span class="atricone2"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5s-7.5-4.6-9.8-9.3C.9 8 2.4 4.8 5.6 4.1c2-.4 3.9.5 5 2.1a5.5 5.5 0 015-2.1c3.2.7 4.7 3.9 3.4 7.1-2.3 4.7-9.8 9.3-9.8 9.3z"/></svg></span>
-              <span class="atrmeio"><span class="atrnome" data-i18n="atr.vigor">Vigor</span><span class="atrseg" id="atrVigorSeg"></span></span>
-              <span class="atrnum"><span class="atrvalor" id="atrVigorValor">+0%</span><span class="atrptsl"><span id="atrVigorPts">0</span>/15</span></span>
-              <span class="atrchev"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span>
-            </button>
-            <div class="atrdet"><div class="atrdetIn">
-              <p class="atrdetxt" id="atrVigorDesc"></p>
-              <button class="atrinvestir" id="atrMaisVigor" type="button"></button>
-            </div></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="statgrid">
-        <div class="statcard">
-          <span class="statlabel" data-i18n="perfil.vidaMaxima">Vida máxima</span>
-          <span class="statval" id="statVida">—</span>
-        </div>
-        <div class="statcard">
-          <span class="statlabel" data-i18n="inv.moedas">Moedas</span>
-          <span class="statval" id="statMoedas">—</span>
-        </div>
-        <div class="statcard">
-          <span class="statlabel" data-i18n="perfil.bonusXpEquip">Bônus XP equip.</span>
-          <span class="statval" id="statBonusXp">—</span>
-        </div>
-        <div class="statcard">
-          <span class="statlabel" data-i18n="perfil.bonusMoedasEquip">Bônus moedas equip.</span>
-          <span class="statval" id="statBonusMoedas">—</span>
         </div>
       </div>
 
@@ -639,6 +617,7 @@
 
       <div class="cfgrow cfgcol" id="prevConquistas">
         <div class="cfgrowtopo">
+          <span class="conqAnel" id="prevConquistasAnel"><b id="prevConquistasAnelTxt">0/0</b></span>
           <div class="cfgtxt">
             <b data-i18n="perfil.conquistas">Conquistas</b>
             <span id="prevConquistasTxt">—</span>
@@ -9918,6 +9897,14 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
         : (en ? (r.resgatadas + ' of ' + r.total + ' unlocked') : (r.resgatadas + ' de ' + r.total + ' desbloqueadas'));
     }
 
+    if (typeof window.resumoConquistasPerfil === 'function'){
+      const r2 = window.resumoConquistasPerfil();
+      const an = document.getElementById('prevConquistasAnel');
+      if (an) an.style.setProperty('--p', r2.total ? Math.round(100 * r2.resgatadas / r2.total) : 0);
+      const at = document.getElementById('prevConquistasAnelTxt');
+      if (at) at.textContent = r2.resgatadas + '/' + r2.total;
+    }
+
     // Faixa das conquistas recentes -- removida a pedido do usuario (nem
     // texto nem bolinha, nada mesmo). O cabecalho (nome + "X de Y
     // desbloqueadas" + botao "Ver todas") ja diz o essencial; detalhe
@@ -9966,25 +9953,26 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
         if (jaVisto.has(v.monstroId)) continue;
         jaVisto.add(v.monstroId);
         vistos.push(v.monstroId);
-        if (vistos.length >= 5) break;
+        if (vistos.length >= 6) break;
       }
       faixaBest.innerHTML = '';
-      if (!vistos.length){
-        const vazio = document.createElement('span');
-        vazio.className = 'prevvazio';
-        vazio.textContent = en ? 'No monster defeated yet' : 'Nenhum monstro derrotado ainda';
-        faixaBest.appendChild(vazio);
-      } else {
-        vistos.forEach(idx => {
-          const m = MONSTROS[idx];
-          if (!m) return;
-          const img = document.createElement('img');
-          img.className = 'prevbestimg';
-          img.src = m.img;
-          img.alt = m.nome;
-          img.title = m.nome;
-          faixaBest.appendChild(img);
-        });
+      // v4.143 (Bento): mosaico fixo de 6 celulas -- vistos primeiro, '?' no resto
+      let _n = 0;
+      vistos.forEach(idx => {
+        const m = MONSTROS[idx];
+        if (!m) return;
+        const cel = document.createElement('span'); cel.className = 'bestcel';
+        const img = document.createElement('img');
+        img.className = 'prevbestimg';
+        img.src = m.img;
+        img.alt = m.nome;
+        img.title = m.nome;
+        cel.appendChild(img);
+        faixaBest.appendChild(cel); _n++;
+      });
+      for (; _n < 6; _n++){
+        const cel = document.createElement('span'); cel.className = 'bestcel vazia'; cel.textContent = '?';
+        faixaBest.appendChild(cel);
       }
     }
   }
@@ -11098,10 +11086,11 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     const disp = Math.max(0, pontosDisponiveis());   // nunca mostra negativo (save orfao de reset incompleto)
     const elDisp = document.getElementById('atrDisponiveis');
     if (elDisp){
-      const en = idiomaApp() === 'en';
-      elDisp.textContent = en
-        ? (disp + (disp === 1 ? ' available' : ' available'))
-        : (disp + (disp === 1 ? ' disponível' : ' disponíveis'));
+      elDisp.textContent = disp;
+      const lb = document.getElementById('atrDispLbl');
+      if (lb) lb.textContent = (typeof window.t === 'function') ? window.t(disp === 1 ? 'atr.pontoLbl' : 'atr.pontosLbl') : '';
+      const tile = elDisp.closest('.bentoPts');
+      if (tile) tile.classList.toggle('vazio', disp <= 0);
     }
 
     // Sinal unificado nos 3 (sempre "+N%") -- antes Fortuna usava "+",
@@ -11130,8 +11119,8 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 
     // v4.130: placas hexagonais (ficha B) -- pontos investidos por atributo e
     // rotulo do botao ("+ 2%" ou "TETO").
-    // v4.139: lista expansivel (ideia H) -- pontos, barra de 15 segmentos,
-    // descricao e rotulo do botao conforme o estado.
+    // v4.143: Bento -- medidor vertical de 15 segmentos por atributo (enche de baixo
+    // pra cima), "+" redondo, e a linha de ajuda do atributo selecionado.
     const _tr = (c) => (typeof window.t === 'function') ? window.t(c) : c;
     [['fortuna','Fortuna'],['foco','Foco'],['vigor','Vigor']].forEach(([k,n])=>{
       const e=document.getElementById('atr'+n+'Pts'); if(e) e.textContent=gasto[k];
@@ -11143,17 +11132,16 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
         }
         Array.prototype.forEach.call(seg.children, (el,i)=> el.classList.toggle('on', i < gasto[k]));
       }
-      const ds=document.getElementById('atr'+n+'Desc');
-      if (ds) ds.textContent = _tr('atr.'+k+'Info') + '. ' + _tr('atr.regra');
       const bt=document.getElementById('atrMais'+n);
-      if (bt) bt.textContent = noTeto(k) ? _tr('atr.teto') : (disp <= 0 ? _tr('atr.semPontos') : _tr('atr.investir'));
-      const lin=document.querySelector('.atrlinha[data-atr="'+k+'"]');
-      if (lin){
-        const aberta = (window.__atrAberto === k);
-        lin.classList.toggle('aberta', aberta);
-        const tp=lin.querySelector('.atrtopo'); if (tp) tp.setAttribute('aria-expanded', aberta ? 'true' : 'false');
-      }
+      if (bt) bt.textContent = noTeto(k) ? 'MAX' : '+';
+      const c=document.querySelector('.gcol[data-atr="'+k+'"]');
+      if (c) c.classList.toggle('sel', window.__atrSel === k);
     });
+    const info = document.getElementById('atrInfo');
+    if (info){
+      const k = window.__atrSel;
+      info.textContent = k ? (_tr('atr.'+k+'Info') + '. ' + _tr('atr.regra')) : _tr('atr.regra');
+    }
 
     const bFortuna = document.getElementById('atrMaisFortuna');
     if (bFortuna) bFortuna.disabled = disp <= 0 || noTeto('fortuna');
@@ -11183,12 +11171,13 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       renderAtributosPontos();
     };
   }
-  // toque numa linha abre/fecha (uma aberta por vez); comeca com Fortuna aberta
-  window.__atrAberto = 'fortuna';
-  document.querySelectorAll('.atrlinha .atrtopo').forEach(tp => {
-    tp.addEventListener('click', () => {
-      const k = tp.closest('.atrlinha').dataset.atr;
-      window.__atrAberto = (window.__atrAberto === k) ? null : k;
+  // toque na coluna seleciona o atributo e mostra a descricao dele (toque de novo limpa)
+  window.__atrSel = null;
+  document.querySelectorAll('.gcol').forEach(c => {
+    c.addEventListener('click', ev => {
+      if (ev.target.closest('.gplus')) return;
+      const k = c.dataset.atr;
+      window.__atrSel = (window.__atrSel === k) ? null : k;
       renderAtributosPontos();
     });
   });
@@ -17386,6 +17375,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'atr.focoInfo':    { pt:'Desconto nos preços da loja', en:'Discount on shop prices' },
     'atr.vigorInfo':   { pt:'Perdão no dano por tarefa largada', en:'Forgiveness on damage from skipped tasks' },
     'atr.regra':       { pt:'Cada ponto dá +2%, até 30%.', en:'Each point gives +2%, up to 30%.' },
+    'atr.pontoLbl':    { pt:'ponto p/ investir', en:'point to spend' },
+    'atr.pontosLbl':   { pt:'pontos p/ investir', en:'points to spend' },
     'atr.investir':    { pt:'Investir 1 ponto', en:'Invest 1 point' },
     'atr.semPontos':   { pt:'Sem pontos disponíveis', en:'No points available' },
     'atr.teto':        { pt:'Teto atingido', en:'Max reached' },

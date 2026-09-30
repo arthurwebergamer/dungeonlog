@@ -38,7 +38,7 @@
      alteracao aqui (bump manual) pra forcar cache-bust; SUBIR ESTE
      NUMERO sempre que style.css mudar e o problema persistir em
      producao. -->
-<link rel="stylesheet" href="style.css?v=20">
+<link rel="stylesheet" href="style.css?v=21">
 
 <!-- =====================================================================
      TOGGLE DEBUG — silenciar console (log/warn/error)  —  precisa ser o
@@ -570,19 +570,19 @@
             <div class="hexo"><div class="hexi"><span class="hexpts" id="atrFortunaPts">0</span><span class="hexde">/ 15</span></div></div>
             <span class="atrnome" data-i18n="atr.fortuna">Fortuna</span>
             <span class="atrvalor" id="atrFortunaValor">+0%</span>
-            <button class="atrmais2 hexbtn" id="atrMaisFortuna" type="button">+ 2%</button>
+            <button class="atrmais2 hexbtn" id="atrMaisFortuna" type="button">+</button>
           </div>
           <div class="hexcol">
             <div class="hexo"><div class="hexi"><span class="hexpts" id="atrFocoPts">0</span><span class="hexde">/ 15</span></div></div>
             <span class="atrnome" data-i18n="atr.foco">Foco</span>
             <span class="atrvalor" id="atrFocoValor">+0%</span>
-            <button class="atrmais2 hexbtn" id="atrMaisFoco" type="button">+ 2%</button>
+            <button class="atrmais2 hexbtn" id="atrMaisFoco" type="button">+</button>
           </div>
           <div class="hexcol">
             <div class="hexo"><div class="hexi"><span class="hexpts" id="atrVigorPts">0</span><span class="hexde">/ 15</span></div></div>
             <span class="atrnome" data-i18n="atr.vigor">Vigor</span>
             <span class="atrvalor" id="atrVigorValor">+0%</span>
-            <button class="atrmais2 hexbtn" id="atrMaisVigor" type="button">+ 2%</button>
+            <button class="atrmais2 hexbtn" id="atrMaisVigor" type="button">+</button>
           </div>
         </div>
       </div>
@@ -11087,7 +11087,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     // rotulo do botao ("+ 2%" ou "TETO").
     [['fortuna','Fortuna'],['foco','Foco'],['vigor','Vigor']].forEach(([k,n])=>{
       const e=document.getElementById('atr'+n+'Pts'); if(e) e.textContent=gasto[k];
-      const bt=document.getElementById('atrMais'+n); if(bt) bt.textContent = noTeto(k) ? 'TETO' : '+ 2%';
+      const bt=document.getElementById('atrMais'+n); if(bt) bt.textContent = noTeto(k) ? 'TETO' : '+';
     });
 
     const bFortuna = document.getElementById('atrMaisFortuna');

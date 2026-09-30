@@ -5684,3 +5684,13 @@
   caret-color:var(--text);
   transition:background-color 99999s ease-in-out 0s;
 }
+/* v4.136: placas menores; botao so "+" (o +2% por ponto ja esta implicito) */
+.atributospontos{padding:12px 8px 12px}
+.atributospontos .atrhead{margin:0 8px 10px}
+.hexo{width:82px;height:94px}
+.hexi{width:77px;height:88px}
+.hexpts{font-size:24px}
+.hexde{font-size:10px}
+.hexcol .atrnome{font-size:14px;margin-top:6px}
+.hexcol .atrvalor{font-size:16px;margin:0 0 6px}
+.hexbtn{min-width:44px;height:32px;padding:0 14px;font-size:20px;line-height:1}

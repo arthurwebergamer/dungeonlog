@@ -2037,6 +2037,13 @@ window.definirUidAtivo = function(uid){
     const pjSalvo = localStorage.getItem(chavePersonagemAtivo());
     _personagemAtivo = pjSalvo || 'pj1';
   } catch(e){ _personagemAtivo = 'pj1'; }
+  // v4.139: o offset de dia (debug "avancar dia") e guardado POR CONTA
+  // (chaveConta(CHAVE_DIA)), mas so era relido no boot -- que roda ANTES do
+  // login, com a chave de "sem conta" -- e no watchdog (foco/visibilidade).
+  // Resultado: ao logar, o app ficava no dia real ate o primeiro foco e depois
+  // "pulava" pro offset salvo da conta. Relê aqui, junto com o resto do estado
+  // que depende do uid.
+  try { if (typeof lerOffsetDia === 'function') lerOffsetDia(); } catch(e){}
 };
 
 // ---------------------------------------------------------------------

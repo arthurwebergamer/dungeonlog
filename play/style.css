@@ -5675,3 +5675,12 @@
 .hexrow>.hexcol:nth-child(2){--atr-cor:color-mix(in srgb,var(--accent) 68%,var(--bg))}
 .hexrow>.hexcol:nth-child(3){--atr-cor:color-mix(in srgb,var(--accent) 42%,var(--bg))}
 .atributospontos{padding-bottom:14px}
+/* v4.135: autofill do Chrome/Android pintava o campo de email de azul translucido
+   (#passoLogin) -- mantem o fundo e a cor do texto do tema */
+#passoLogin .campo input:-webkit-autofill,
+#passoLogin .campo input:-webkit-autofill:focus{
+  -webkit-box-shadow:0 0 0 1000px var(--panel-2) inset;
+  -webkit-text-fill-color:var(--text);
+  caret-color:var(--text);
+  transition:background-color 99999s ease-in-out 0s;
+}

@@ -38,7 +38,7 @@
      alteracao aqui (bump manual) pra forcar cache-bust; SUBIR ESTE
      NUMERO sempre que style.css mudar e o problema persistir em
      producao. -->
-<link rel="stylesheet" href="style.css?v=14">
+<link rel="stylesheet" href="style.css?v=15">
 
 <!-- =====================================================================
      TOGGLE DEBUG — silenciar console (log/warn/error)  —  precisa ser o
@@ -560,6 +560,39 @@
         </div>
       </div>
 
+      <div class="atributospontos">
+        <div class="atrhead">
+          <b data-i18n="perfil.atributos">Atributos</b>
+          <span class="atrpill" id="atrDisponiveis">0 disponíveis</span>
+        </div>
+        <div class="hexrow">
+          <div class="hexcol" style="--atr-cor:#F2A65A">
+            <div class="hexo"><div class="hexi"><svg class="atricone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5l2.9 6.6 7.1.7-5.4 4.8 1.6 7-6.2-3.8-6.2 3.8 1.6-7-5.4-4.8 7.1-.7z"/></svg><span class="hexpts" id="atrFortunaPts">0</span><span class="hexde">/ 15</span></div></div>
+            <span class="atrnome" data-i18n="atr.fortuna">Fortuna</span>
+            <span class="atrvalor" id="atrFortunaValor">+0%</span>
+            <button class="atrmais2 hexbtn" id="atrMaisFortuna" type="button">+ 2%</button>
+          </div>
+          <div class="hexcol" style="--atr-cor:#5AA9F2">
+            <div class="hexo"><div class="hexi"><svg class="atricone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".8" fill="currentColor"/></svg><span class="hexpts" id="atrFocoPts">0</span><span class="hexde">/ 15</span></div></div>
+            <span class="atrnome" data-i18n="atr.foco">Foco</span>
+            <span class="atrvalor" id="atrFocoValor">+0%</span>
+            <button class="atrmais2 hexbtn" id="atrMaisFoco" type="button">+ 2%</button>
+          </div>
+          <div class="hexcol" style="--atr-cor:#E5698A">
+            <div class="hexo"><div class="hexi"><svg class="atricone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5s-7.5-4.6-9.8-9.3C.9 8 2.4 4.8 5.6 4.1c2-.4 3.9.5 5 2.1a5.5 5.5 0 015-2.1c3.2.7 4.7 3.9 3.4 7.1-2.3 4.7-9.8 9.3-9.8 9.3z"/></svg><span class="hexpts" id="atrVigorPts">0</span><span class="hexde">/ 15</span></div></div>
+            <span class="atrnome" data-i18n="atr.vigor">Vigor</span>
+            <span class="atrvalor" id="atrVigorValor">+0%</span>
+            <button class="atrmais2 hexbtn" id="atrMaisVigor" type="button">+ 2%</button>
+          </div>
+        </div>
+        <div class="hexlegenda">
+          <div class="hexleg" style="--atr-cor:#F2A65A"><svg class="atricone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5l2.9 6.6 7.1.7-5.4 4.8 1.6 7-6.2-3.8-6.2 3.8 1.6-7-5.4-4.8 7.1-.7z"/></svg><span><b data-i18n="atr.fortuna">Fortuna</b>: <span data-i18n="atr.fortunaDesc">chance de raridade no espólio</span></span></div>
+          <div class="hexleg" style="--atr-cor:#5AA9F2"><svg class="atricone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".8" fill="currentColor"/></svg><span><b data-i18n="atr.foco">Foco</b>: <span data-i18n="atr.focoDesc">de desconto na loja</span></span></div>
+          <div class="hexleg" style="--atr-cor:#E5698A"><svg class="atricone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5s-7.5-4.6-9.8-9.3C.9 8 2.4 4.8 5.6 4.1c2-.4 3.9.5 5 2.1a5.5 5.5 0 015-2.1c3.2.7 4.7 3.9 3.4 7.1-2.3 4.7-9.8 9.3-9.8 9.3z"/></svg><span><b data-i18n="atr.vigor">Vigor</b>: <span data-i18n="atr.vigorDesc">de perdão no dano por tarefa largada</span></span></div>
+          <div class="rnota" data-i18n="perfil.atrNota">Cada ponto dá +2%. O teto é 30%.</div>
+        </div>
+      </div>
+
       <div class="statgrid">
         <div class="statcard">
           <span class="statlabel" data-i18n="perfil.vidaMaxima">Vida máxima</span>
@@ -579,47 +612,6 @@
         </div>
       </div>
 
-      <div class="fichaTabs" id="fichaTabs" role="tablist">
-        <button type="button" class="on" data-ft="atr"><span data-i18n="perfil.atributos">Atributos</span><span class="fichaBadge oculto" id="fichaBadge">0</span></button>
-        <button type="button" data-ft="conq"><span data-i18n="perfil.conquistas">Conquistas</span></button>
-        <button type="button" data-ft="best"><span data-i18n="perfil.bestiario">Bestiário</span></button>
-      </div>
-
-      <div class="fichaPainel" id="fichaPainelAtr">
-      <div class="atributospontos">
-        <div class="atrhead">
-          <b data-i18n="perfil.pontosDeAtributo">Pontos de atributo</b>
-          <span class="atrpill" id="atrDisponiveis">0 disponíveis</span>
-        </div>
-        <div class="radarbox">
-          <svg class="radarsvg" viewBox="0 0 320 250" aria-hidden="true">
-            <polygon id="radarR3" fill="none" stroke="#8779A8" stroke-width="1" stroke-dasharray="4 4"/>
-            <polygon id="radarR2" fill="none" stroke="#3B3057" stroke-width="1"/>
-            <polygon id="radarR1" fill="none" stroke="#3B3057" stroke-width="1"/>
-            <polygon id="radarPoly" fill="rgba(242,166,90,.22)" stroke="#F2A65A" stroke-width="2" stroke-linejoin="round"/>
-          </svg>
-          <div class="rnode rn-f" style="--atr-cor:#F2A65A">
-            <button class="atrmais2 rorb" id="atrMaisFortuna" type="button" aria-label="+ Fortuna"><svg class="atricone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5l2.9 6.6 7.1.7-5.4 4.8 1.6 7-6.2-3.8-6.2 3.8 1.6-7-5.4-4.8 7.1-.7z"/></svg><span class="rmais">+</span></button>
-            <div class="rlabel"><span class="atrnome" data-i18n="atr.fortuna">Fortuna</span><span class="atrvalor" id="atrFortunaValor">+0%</span></div>
-          </div>
-          <div class="rnode rn-o" style="--atr-cor:#5AA9F2">
-            <button class="atrmais2 rorb" id="atrMaisFoco" type="button" aria-label="+ Foco"><svg class="atricone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".8" fill="currentColor"/></svg><span class="rmais">+</span></button>
-            <div class="rlabel"><span class="atrnome" data-i18n="atr.foco">Foco</span><span class="atrvalor" id="atrFocoValor">+0%</span></div>
-          </div>
-          <div class="rnode rn-v" style="--atr-cor:#E5698A">
-            <button class="atrmais2 rorb" id="atrMaisVigor" type="button" aria-label="+ Vigor"><svg class="atricone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5s-7.5-4.6-9.8-9.3C.9 8 2.4 4.8 5.6 4.1c2-.4 3.9.5 5 2.1a5.5 5.5 0 015-2.1c3.2.7 4.7 3.9 3.4 7.1-2.3 4.7-9.8 9.3-9.8 9.3z"/></svg><span class="rmais">+</span></button>
-            <div class="rlabel"><span class="atrnome" data-i18n="atr.vigor">Vigor</span><span class="atrvalor" id="atrVigorValor">+0%</span></div>
-          </div>
-        </div>
-        <div class="rlegenda">
-        <div class="rleg" style="--atr-cor:#F2A65A"><svg class="atricone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5l2.9 6.6 7.1.7-5.4 4.8 1.6 7-6.2-3.8-6.2 3.8 1.6-7-5.4-4.8 7.1-.7z"/></svg><div><b class="atrnome" data-i18n="atr.fortuna">Fortuna</b><span class="atrdesc" data-i18n="atr.fortunaDesc">chance de raridade no espólio</span></div></div>
-        <div class="rleg" style="--atr-cor:#5AA9F2"><svg class="atricone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".8" fill="currentColor"/></svg><div><b class="atrnome" data-i18n="atr.foco">Foco</b><span class="atrdesc" data-i18n="atr.focoDesc">de desconto na loja</span></div></div>
-        <div class="rleg" style="--atr-cor:#E5698A"><svg class="atricone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5s-7.5-4.6-9.8-9.3C.9 8 2.4 4.8 5.6 4.1c2-.4 3.9.5 5 2.1a5.5 5.5 0 015-2.1c3.2.7 4.7 3.9 3.4 7.1-2.3 4.7-9.8 9.3-9.8 9.3z"/></svg><div><b class="atrnome" data-i18n="atr.vigor">Vigor</b><span class="atrdesc" data-i18n="atr.vigorDesc">de perdão no dano por tarefa largada</span></div></div>
-        </div>
-        <div class="rnota" data-i18n="perfil.atrNota">Cada ponto dá +2%. O anel tracejado é o teto de 30%.</div>
-      </div>
-      </div>
-
       <!-- previas -- item 18 do roadmap: secoes grandes aparecem resumidas
            aqui, conteudo completo mora nos overlays (mesmo padrao ja usado
            pra Config: reaproveita .cfgOverlay em vez de escrever CSS novo
@@ -633,7 +625,6 @@
            previa de Historico usava continua la, ainda e reaproveitada
            pela previa de Bestiario). -->
 
-      <div class="fichaPainel oculto" id="fichaPainelConq">
       <div class="cfgrow cfgcol" id="prevConquistas">
         <div class="cfgrowtopo">
           <div class="cfgtxt">
@@ -644,9 +635,7 @@
         </div>
         <div class="prevfaixa" id="prevConquistasFaixa"></div>
       </div>
-      </div>
 
-      <div class="fichaPainel oculto" id="fichaPainelBest">
       <div class="cfgrow cfgcol" id="prevBestiario">
         <div class="cfgrowtopo">
           <div class="cfgtxt">
@@ -656,7 +645,6 @@
           <button class="cfgbtn" id="verBestiarioBtn" data-i18n="acao.verTudo">Ver tudo</button>
         </div>
         <div class="prevfaixa" id="prevBestiarioFaixa"></div>
-      </div>
       </div>
     </div>
 
@@ -11101,20 +11089,12 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     const barraVigor = document.getElementById('atrVigorBarra');
     if (barraVigor) barraVigor.style.width = Math.min(100, (perdaoVigor() / VIGOR_TETO) * 100) + '%';
 
-    // v4.129: ficha de personagem -- radar (poligono proporcional ao investido)
-    // + badge de pontos na aba. Vertices: Fortuna topo, Foco inf-esq, Vigor inf-dir.
-    (function(){
-      const CX=160, CY=125, R=85, K=Math.SQRT1_2 * 0 + 0.8660254;
-      const dir=[[0,-1],[-K,0.5],[K,0.5]];
-      const pt=(i,f)=>(CX+dir[i][0]*R*f).toFixed(1)+','+(CY+dir[i][1]*R*f).toFixed(1);
-      const poly=(a,b,c)=>pt(0,a)+' '+pt(1,b)+' '+pt(2,c);
-      const set=(id,v)=>{ const e=document.getElementById(id); if(e) e.setAttribute('points',v); };
-      set('radarR1',poly(1/3,1/3,1/3)); set('radarR2',poly(2/3,2/3,2/3)); set('radarR3',poly(1,1,1));
-      const fr=v=>Math.max(0.05, Math.min(1, v));
-      set('radarPoly',poly(fr(bonusFortuna()/FORTUNA_TETO),fr(descontoFoco()/FOCO_TETO),fr(perdaoVigor()/VIGOR_TETO)));
-      const bd=document.getElementById('fichaBadge');
-      if (bd){ bd.textContent=disp; bd.classList.toggle('oculto', disp<=0); }
-    })();
+    // v4.130: placas hexagonais (ficha B) -- pontos investidos por atributo e
+    // rotulo do botao ("+ 2%" ou "TETO").
+    [['fortuna','Fortuna'],['foco','Foco'],['vigor','Vigor']].forEach(([k,n])=>{
+      const e=document.getElementById('atr'+n+'Pts'); if(e) e.textContent=gasto[k];
+      const bt=document.getElementById('atrMais'+n); if(bt) bt.textContent = noTeto(k) ? 'TETO' : '+ 2%';
+    });
 
     const bFortuna = document.getElementById('atrMaisFortuna');
     if (bFortuna) bFortuna.disabled = disp <= 0 || noTeto('fortuna');
@@ -11144,19 +11124,6 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       renderAtributosPontos();
     };
   }
-  /* v4.129: abas da ficha (Atributos / Conquistas / Bestiario) -- so troca
-     qual painel aparece; Conquistas/Bestiario continuam abrindo seus overlays
-     pelos mesmos botoes (#verConquistasBtn / #verBestiarioBtn). */
-  (function(){
-    const box=document.getElementById('fichaTabs'); if(!box) return;
-    const mapa={atr:'fichaPainelAtr',conq:'fichaPainelConq',best:'fichaPainelBest'};
-    box.addEventListener('click',e=>{
-      const b=e.target.closest('button[data-ft]'); if(!b) return;
-      box.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
-      Object.keys(mapa).forEach(k=>{ const el=document.getElementById(mapa[k]); if(el) el.classList.toggle('oculto',k!==b.dataset.ft); });
-    });
-  })();
-
   renderAtributosPontos();   // primeira pintura, sem esperar o primeiro render()
 
   /* ---------- preview/expandir: cartao comeca fechado (so icone/nome/
@@ -17229,7 +17196,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'perfil.pontosDeAtributo':{ pt:'Pontos de atributo', en:'Attribute points' },
     'perfil.historico':       { pt:'Histórico', en:'History' },
     'perfil.atributos':       { pt:'Atributos', en:'Attributes' },
-    'perfil.atrNota':         { pt:'Cada ponto dá +2%. O anel tracejado é o teto de 30%.', en:'Each point gives +2%. The dashed ring is the 30% cap.' },
+    'perfil.atrNota':         { pt:'Cada ponto dá +2%. O teto é 30%.', en:'Each point gives +2%. The cap is 30%.' },
     'perfil.conquistas':      { pt:'Conquistas', en:'Achievements' },
     'perfil.bestiario':       { pt:'Bestiário', en:'Bestiary' },
 

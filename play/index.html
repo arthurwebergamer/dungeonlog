@@ -38,7 +38,7 @@
      alteracao aqui (bump manual) pra forcar cache-bust; SUBIR ESTE
      NUMERO sempre que style.css mudar e o problema persistir em
      producao. -->
-<link rel="stylesheet" href="style.css?v=22">
+<link rel="stylesheet" href="style.css?v=23">
 
 <!-- =====================================================================
      TOGGLE DEBUG — silenciar console (log/warn/error)  —  precisa ser o
@@ -11452,6 +11452,21 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     btnEntrar.addEventListener('click', () => {
       if (introEl && introEl.classList.contains('off')) agendarDialogoTela('tarefas');
     });
+  }
+
+  // v4.138 (pedido do usuario -- o dialogo da aba Tarefas voltou a nao tocar
+  // de primeira, so depois de trocar de aba e voltar): cada caminho de
+  // entrada no app (novo jogador, login com conta que restaura da nuvem,
+  // "Bem-vindo de volta", etc.) fecha o #intro por conta propria, e so 2
+  // deles agendavam o dialogo. Em vez de ir remendando caminho por
+  // caminho, observa o proprio #intro: qualquer momento em que ele ganha
+  // .off (app aberto de verdade) agenda o dialogo da aba Tarefas.
+  // agendarDialogoTela() e idempotente (ignora se ja visto, reagenda o
+  // timer se chamada de novo), entao chamar de varios lugares e seguro.
+  if (introEl && typeof MutationObserver === 'function'){
+    new MutationObserver(() => {
+      if (introEl.classList.contains('off')) agendarDialogoTela('tarefas');
+    }).observe(introEl, { attributes: true, attributeFilter: ['class'] });
   }
 
   // "apagar tudo" (CHAVE_TELAS incluida) agora e feito num lugar so, na

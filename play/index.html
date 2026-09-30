@@ -16137,6 +16137,13 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       function entrarNoApp(){
         const intro = document.getElementById('intro');
         if (temSaveLocal) {
+          // v4.142: render() so chama salvar() quando jaComecou === true, e
+          // quem liga essa flag e o carregar() do BOOT (que, apos o Sair,
+          // roda sem uid e falha). Logando por aqui (Google) a flag ficava
+          // false pra sempre: criar() atualizava a memoria, mas NADA era
+          // salvo -- nem local, nem nuvem (log: "tarefas agora: 1" sem
+          // nenhum empurrarNuvem depois).
+          try { if (typeof jaComecou !== 'undefined') jaComecou = true; } catch(e){}
           intro.classList.add('off');
           intro.classList.remove('loginBg');
           intro.style.backgroundImage = '';

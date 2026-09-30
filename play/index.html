@@ -8043,12 +8043,7 @@ function montarCompra(grid){
     };
   });
 
-  const nota = document.createElement('div');
-  nota.className = 'lnota';
-  nota.textContent = en
-    ? 'The blacksmith swaps the shelf every midnight. Treasures can\'t be bought — only sold.'
-    : 'O ferreiro troca a prateleira toda meia-noite. Tesouros não se compram — só se vendem.';
-  grid.appendChild(nota);
+  // v4.128 (pedido do usuario): nota do ferreiro removida do rodape da loja
 }
 
 function montarVenda(grid){

@@ -5670,3 +5670,8 @@
 .hexrow>.hexcol:nth-child(2),.hexlegenda>.hexleg:nth-child(2){--atr-cor:var(--accent)}
 .hexrow>.hexcol:nth-child(3),.hexlegenda>.hexleg:nth-child(3){--atr-cor:color-mix(in srgb,var(--accent) 62%,var(--bg))}
 .hexleg::before{content:"";width:10px;height:10px;border-radius:3px;background:var(--atr-cor);flex:none}
+/* v4.134: 3 tons sempre distintos (accent -> accent+fundo), legenda removida */
+.hexrow>.hexcol:nth-child(1){--atr-cor:var(--accent)}
+.hexrow>.hexcol:nth-child(2){--atr-cor:color-mix(in srgb,var(--accent) 68%,var(--bg))}
+.hexrow>.hexcol:nth-child(3){--atr-cor:color-mix(in srgb,var(--accent) 42%,var(--bg))}
+.atributospontos{padding-bottom:14px}

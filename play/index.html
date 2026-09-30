@@ -38,7 +38,7 @@
      alteracao aqui (bump manual) pra forcar cache-bust; SUBIR ESTE
      NUMERO sempre que style.css mudar e o problema persistir em
      producao. -->
-<link rel="stylesheet" href="style.css?v=25">
+<link rel="stylesheet" href="style.css?v=26">
 
 <!-- =====================================================================
      TOGGLE DEBUG — silenciar console (log/warn/error)  —  precisa ser o
@@ -537,68 +537,60 @@
       </div>
     </div>
 
-    <div id="perfilAtributos">
-      <div class="perfilhero fichaHero">
-        <div class="perfilheroLinha">
-          <div class="hero-sprite" id="perfilHeroSprite"></div>
-          <div class="perfilheroInfo">
-            <div class="perfilnome" id="perfilNome"><span id="perfilNomeTxt">Aventureiro</span></div>
-            <div class="xpwrap">
-              <div class="xprow hprow">
-                <span class="xplabel" data-i18n="jogo.vida">Vida</span>
-                <span class="xpnum hpnum" id="perfilHpNum">0 / 0</span>
-              </div>
-              <div class="bar hpbar"><div class="fill hpfill" id="perfilHpFill"></div></div>
-
-              <div class="xprow">
-                <span class="xplabel" data-i18n="jogo.experiencia">Experiência</span>
-                <span class="xpnum" id="perfilXpNum">0 / 100 XP</span>
-              </div>
-              <div class="bar"><div class="fill" id="perfilFill"></div></div>
-            </div>
+    <div id="perfilAtributos" class="perfilPlano">
+      <div class="planoHero">
+        <div class="hero-sprite" id="perfilHeroSprite"></div>
+        <div class="planoNome">
+          <span class="perfilnome" id="perfilNome"><span id="perfilNomeTxt">Aventureiro</span></span>
+          <span class="planoNivel" id="perfilNivelChip"></span>
+        </div>
+        <div class="planoBarras">
+          <div class="planoBar">
+            <div class="xprow hprow"><span class="xplabel" data-i18n="jogo.vida">Vida</span><span class="xpnum hpnum" id="perfilHpNum">0 / 0</span></div>
+            <div class="bar hpbar"><div class="fill hpfill" id="perfilHpFill"></div></div>
+          </div>
+          <div class="planoBar">
+            <div class="xprow"><span class="xplabel" data-i18n="jogo.experiencia">Experiência</span><span class="xpnum" id="perfilXpNum">0 / 100 XP</span></div>
+            <div class="bar"><div class="fill" id="perfilFill"></div></div>
           </div>
         </div>
       </div>
 
-      <div class="bentorow">
-        <div class="atributospontos bentoAtr">
-          <div class="atrhead"><b data-i18n="perfil.atributos">Atributos</b></div>
-          <div class="atrbento">
-            <div class="gcol" data-atr="fortuna">
-              <span class="gico"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5l2.9 6.6 7.1.7-5.4 4.8 1.6 7-6.2-3.8-6.2 3.8 1.6-7-5.4-4.8 7.1-.7z"/></svg></span>
-              <span class="atrseg gauge" id="atrFortunaSeg"></span>
-              <span class="atrvalor" id="atrFortunaValor">+0%</span>
-              <span class="atrnome" data-i18n="atr.fortuna">Fortuna</span>
-              <button class="gplus" id="atrMaisFortuna" type="button" aria-label="Investir">+</button>
-              <span class="gpts"><span id="atrFortunaPts">0</span>/15</span>
-            </div>
-            <div class="gcol" data-atr="foco">
-              <span class="gico"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".8" fill="currentColor"/></svg></span>
-              <span class="atrseg gauge" id="atrFocoSeg"></span>
-              <span class="atrvalor" id="atrFocoValor">+0%</span>
-              <span class="atrnome" data-i18n="atr.foco">Foco</span>
-              <button class="gplus" id="atrMaisFoco" type="button" aria-label="Investir">+</button>
-              <span class="gpts"><span id="atrFocoPts">0</span>/15</span>
-            </div>
-            <div class="gcol" data-atr="vigor">
-              <span class="gico"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5s-7.5-4.6-9.8-9.3C.9 8 2.4 4.8 5.6 4.1c2-.4 3.9.5 5 2.1a5.5 5.5 0 015-2.1c3.2.7 4.7 3.9 3.4 7.1-2.3 4.7-9.8 9.3-9.8 9.3z"/></svg></span>
-              <span class="atrseg gauge" id="atrVigorSeg"></span>
-              <span class="atrvalor" id="atrVigorValor">+0%</span>
-              <span class="atrnome" data-i18n="atr.vigor">Vigor</span>
-              <button class="gplus" id="atrMaisVigor" type="button" aria-label="Investir">+</button>
-              <span class="gpts"><span id="atrVigorPts">0</span>/15</span>
-            </div>
+      <div class="planoStats">
+        <div class="planoStat"><span class="statval" id="statVida">—</span><span class="statlabel" data-i18n="perfil.vidaMaxima">Vida máxima</span></div>
+        <div class="planoStat"><span class="statval" id="statMoedas">—</span><span class="statlabel" data-i18n="inv.moedas">Moedas</span></div>
+        <div class="planoStat"><span class="statval" id="statBonusXp">—</span><span class="statlabel" data-i18n="perfil.bonusXpEquip">Bônus XP equip.</span></div>
+        <div class="planoStat"><span class="statval" id="statBonusMoedas">—</span><span class="statlabel" data-i18n="perfil.bonusMoedasEquip">Bônus moedas equip.</span></div>
+      </div>
+
+      <div class="planoAtr">
+        <div class="atrhead"><b data-i18n="perfil.atributos">Atributos</b><span class="atrpill" id="atrDisponiveis">0</span></div>
+        <div class="alinha" data-atr="fortuna">
+          <span class="aico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5l2.9 6.6 7.1.7-5.4 4.8 1.6 7-6.2-3.8-6.2 3.8 1.6-7-5.4-4.8 7.1-.7z"/></svg></span>
+          <div class="ameio">
+            <div class="atop"><b class="atrnome" data-i18n="atr.fortuna">Fortuna</b><b class="atrvalor" id="atrFortunaValor">+0%</b></div>
+            <span class="atrseg" id="atrFortunaSeg"></span>
+            <span class="adesc"><span id="atrFortunaDesc"></span> · <span id="atrFortunaPts">0</span>/15</span>
           </div>
-          <p class="atrinfo" id="atrInfo"></p>
+          <button class="gplus" id="atrMaisFortuna" type="button" aria-label="Investir">+</button>
         </div>
-        <div class="bentocol">
-          <div class="bentoPts"><span class="bentoPtsNum" id="atrDisponiveis">0</span><span class="bentoPtsLbl" id="atrDispLbl">pontos p/ investir</span></div>
-          <div class="statgrid">
-            <div class="statcard"><span class="statval" id="statVida">—</span><span class="statlabel" data-i18n="perfil.vidaMaxima">Vida máxima</span></div>
-            <div class="statcard"><span class="statval" id="statMoedas">—</span><span class="statlabel" data-i18n="inv.moedas">Moedas</span></div>
-            <div class="statcard"><span class="statval" id="statBonusXp">—</span><span class="statlabel" data-i18n="perfil.bonusXpEquip">Bônus XP equip.</span></div>
-            <div class="statcard"><span class="statval" id="statBonusMoedas">—</span><span class="statlabel" data-i18n="perfil.bonusMoedasEquip">Bônus moedas equip.</span></div>
+        <div class="alinha" data-atr="foco">
+          <span class="aico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".8" fill="currentColor"/></svg></span>
+          <div class="ameio">
+            <div class="atop"><b class="atrnome" data-i18n="atr.foco">Foco</b><b class="atrvalor" id="atrFocoValor">+0%</b></div>
+            <span class="atrseg" id="atrFocoSeg"></span>
+            <span class="adesc"><span id="atrFocoDesc"></span> · <span id="atrFocoPts">0</span>/15</span>
           </div>
+          <button class="gplus" id="atrMaisFoco" type="button" aria-label="Investir">+</button>
+        </div>
+        <div class="alinha" data-atr="vigor">
+          <span class="aico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5s-7.5-4.6-9.8-9.3C.9 8 2.4 4.8 5.6 4.1c2-.4 3.9.5 5 2.1a5.5 5.5 0 015-2.1c3.2.7 4.7 3.9 3.4 7.1-2.3 4.7-9.8 9.3-9.8 9.3z"/></svg></span>
+          <div class="ameio">
+            <div class="atop"><b class="atrnome" data-i18n="atr.vigor">Vigor</b><b class="atrvalor" id="atrVigorValor">+0%</b></div>
+            <span class="atrseg" id="atrVigorSeg"></span>
+            <span class="adesc"><span id="atrVigorDesc"></span> · <span id="atrVigorPts">0</span>/15</span>
+          </div>
+          <button class="gplus" id="atrMaisVigor" type="button" aria-label="Investir">+</button>
         </div>
       </div>
 
@@ -9360,6 +9352,8 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     if (typeof window.renderPreviewsPerfil === 'function') window.renderPreviewsPerfil();
 
     document.getElementById('perfilSub').textContent = (idiomaApp() === 'en' ? 'Level ' : 'Nível ') + romano(p.nivel);
+    const _chipN = document.getElementById('perfilNivelChip');
+    if (_chipN) _chipN.textContent = (idiomaApp() === 'en' ? 'LEVEL ' : 'NÍVEL ') + romano(p.nivel);
     document.getElementById('perfilNomeTxt').textContent = (typeof nomeHeroi !== 'undefined' && nomeHeroi) || (idiomaApp() === 'en' ? 'Adventurer' : 'Aventureiro');
     document.getElementById('perfilFill').style.width = Math.round((p.resto / p.meta) * 100) + '%';
     document.getElementById('perfilXpNum').textContent = p.resto + ' / ' + p.meta + ' XP';
@@ -11086,11 +11080,9 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     const disp = Math.max(0, pontosDisponiveis());   // nunca mostra negativo (save orfao de reset incompleto)
     const elDisp = document.getElementById('atrDisponiveis');
     if (elDisp){
-      elDisp.textContent = disp;
-      const lb = document.getElementById('atrDispLbl');
-      if (lb) lb.textContent = (typeof window.t === 'function') ? window.t(disp === 1 ? 'atr.pontoLbl' : 'atr.pontosLbl') : '';
-      const tile = elDisp.closest('.bentoPts');
-      if (tile) tile.classList.toggle('vazio', disp <= 0);
+      const lb = (typeof window.t === 'function') ? window.t(disp === 1 ? 'atr.pontoLbl' : 'atr.pontosLbl') : '';
+      elDisp.textContent = disp + ' ' + lb;
+      elDisp.classList.toggle('vazio', disp <= 0);
     }
 
     // Sinal unificado nos 3 (sempre "+N%") -- antes Fortuna usava "+",
@@ -11132,6 +11124,8 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
         }
         Array.prototype.forEach.call(seg.children, (el,i)=> el.classList.toggle('on', i < gasto[k]));
       }
+      const ds=document.getElementById('atr'+n+'Desc');
+      if (ds) ds.textContent = _tr('atr.'+k+'Info');
       const bt=document.getElementById('atrMais'+n);
       if (bt) bt.textContent = noTeto(k) ? 'MAX' : '+';
       const c=document.querySelector('.gcol[data-atr="'+k+'"]');

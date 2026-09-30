@@ -15768,8 +15768,16 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
     async function puxarNuvem(uid){
       const ref = doc(db, 'saves', uid);
+      puxarEntitlement(uid);
+      if (temSujo(uid)){
+        // ha alteracao local que nunca chegou na nuvem: o local e o mais
+        // novo. Empurra (nuvem fica igual ao local) em vez de sobrescrever.
+        window.dbgConta && window.dbgConta('puxarNuvem(' + uid.slice(0,6) + ') -- marcador SUJO: mantendo save local e reenviando pra nuvem');
+        await empurrarNuvem(uid);
+        return;
+      }
       const snap = await getDoc(ref);
-      puxarEntitlement(uid); // paralelo, nao bloqueia o resto de puxarNuvem() -- so precisa terminar antes da 1a checagem de assinaturaAtiva()/paywall, o que na pratica sempre acontece bem depois
+      // (puxarEntitlement ja disparado acima) paralelo, nao bloqueia o resto de puxarNuvem() -- so precisa terminar antes da 1a checagem de assinaturaAtiva()/paywall, o que na pratica sempre acontece bem depois
       window.dbgConta && window.dbgConta('puxarNuvem(' + uid.slice(0,6) + ') -- doc existe na nuvem? ' + snap.exists() + (snap.exists() ? (' | tamanho do data: ' + (snap.data().data||'').length) : ''));
       if (snap.exists() && snap.data().data) {
         try { localStorage.setItem(window.chaveSaveAtual(), snap.data().data); } catch(e){}
@@ -15812,7 +15820,25 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       }
     }
 
+    // v4.140: marcador "alteracao local ainda nao confirmada na nuvem".
+    // Liga de forma SINCRONA a cada salvar() (antes do setDoc, que e
+    // assincrono) e so desliga quando o setDoc do ULTIMO salvar() termina
+    // com sucesso. Se o envio falhar, for cancelado (reload, Sair, rede) ou
+    // negado, o marcador fica no localStorage -- e o proximo login NAO deixa
+    // puxarNuvem() sobrescrever o save local com a copia velha da nuvem
+    // (causa de "criei uma tarefa, sai, entrei e ela sumiu").
+    let _seqSalvar = 0;
+    const chaveSujo = uid => 'questlog.sujo.v1.uid.' + uid;
+    function marcarSujo(uid){
+      _seqSalvar++;
+      try { localStorage.setItem(chaveSujo(uid), String(Date.now())); } catch(e){}
+    }
+    function temSujo(uid){
+      try { return !!localStorage.getItem(chaveSujo(uid)); } catch(e){ return false; }
+    }
+
     async function empurrarNuvem(uid){
+      const seqInicio = _seqSalvar;
       try {
         const dados = localStorage.getItem(window.chaveSaveAtual()) || '';
         // FIX bug reset (ver CHAVES_SECUNDARIAS_CONTA, topo do arquivo):
@@ -15825,6 +15851,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         });
         window.dbgConta && window.dbgConta('empurrarNuvem(' + uid.slice(0,6) + ') INICIOU -- chave lida: ' + window.chaveSaveAtual() + ' | tamanho: ' + dados.length + ' | extras: ' + Object.keys(extras).length);
         await setDoc(doc(db, 'saves', uid), { data: dados, extras: extras, atualizadoEm: Date.now() });
+        if (seqInicio === _seqSalvar){ try { localStorage.removeItem(chaveSujo(uid)); } catch(e){} }
         window.dbgConta && window.dbgConta('empurrarNuvem(' + uid.slice(0,6) + ') TERMINOU com sucesso');
       } catch(e){
         window.dbgConta && window.dbgConta('empurrarNuvem(' + uid.slice(0,6) + ') FALHOU: ' + e.message);
@@ -15896,6 +15923,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           // a versao ANTIGA de volta, apagando a mudanca mais recente.
           // Guarda o Promise aqui pra quem for recarregar a pagina
           // poder esperar ele terminar antes (ver "CONTA — SAIR").
+          marcarSujo(user.uid);
           window._questlogUltimoPush = empurrarNuvem(user.uid);
           return r;
         };

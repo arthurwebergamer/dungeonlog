@@ -38,7 +38,7 @@
      alteracao aqui (bump manual) pra forcar cache-bust; SUBIR ESTE
      NUMERO sempre que style.css mudar e o problema persistir em
      producao. -->
-<link rel="stylesheet" href="style.css?v=21">
+<link rel="stylesheet" href="style.css?v=22">
 
 <!-- =====================================================================
      TOGGLE DEBUG — silenciar console (log/warn/error)  —  precisa ser o
@@ -1084,6 +1084,8 @@
   <div class="loadingMasmorra" id="loadingMasmorra">
     <img class="loadingMasmorraSprite" id="loadingMasmorraSprite" src="" alt="">
     <span class="loadingMasmorraTxt" id="loadingMasmorraTxt">Conectando com a masmorra...</span>
+    <span class="loadingMasmorraMsg" id="loadingMasmorraMsg"></span>
+    <button class="loadingMasmorraBtn" id="loadingMasmorraBtn" type="button">Tentar de novo</button>
   </div>
 
   <!-- PLANO PRO -- paywall em 2 etapas (pitch -> preco), tela cheia, sem
@@ -12394,6 +12396,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       if (txt) txt.textContent = frases[i];
     }, 1800);
 
+    overlay.classList.remove('erro');
     overlay.classList.add('on');
   }
 
@@ -12402,10 +12405,39 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     if (overlay) overlay.classList.remove('on');
     clearInterval(timer);
     timer = null;
+    // tira o estado de erro so depois do fade, pra tela nao "pular" pro loading ao sumir
+    setTimeout(() => { if (overlay && !overlay.classList.contains('on')) overlay.classList.remove('erro'); }, 300);
+  }
+
+  // v4.137 (pedido do usuario): estado de erro do loading -- o heroi para de
+  // pular, cai e fica deitado; mostra "Algo deu errado" + mensagem + botao
+  // "Tentar de novo" (fecha o overlay e devolve o usuario ao formulario).
+  // aviso() esta mudo (TOASTS_DESATIVADOS), entao erro de login nao tinha
+  // nenhum feedback visivel.
+  function erroLoadingMasmorra(msg){
+    const overlay = document.getElementById('loadingMasmorra');
+    if (!overlay) return;
+    const en = (typeof idiomaApp === 'function') ? idiomaApp() === 'en' : false;
+    const txt = document.getElementById('loadingMasmorraTxt');
+    const m = document.getElementById('loadingMasmorraMsg');
+    const b = document.getElementById('loadingMasmorraBtn');
+    clearInterval(timer);
+    timer = null;
+    if (txt) txt.textContent = en ? 'Something went wrong' : 'Algo deu errado';
+    if (m) m.textContent = msg || '';
+    if (b){
+      b.textContent = en ? 'Try again' : 'Tentar de novo';
+      b.onclick = esconderLoadingMasmorra;
+    }
+    // reinicia as animacoes de erro mesmo se ja estava em .erro
+    overlay.classList.remove('erro');
+    void overlay.offsetWidth;
+    overlay.classList.add('on', 'erro');
   }
 
   window.mostrarLoadingMasmorra = mostrarLoadingMasmorra;
   window.esconderLoadingMasmorra = esconderLoadingMasmorra;
+  window.erroLoadingMasmorra = erroLoadingMasmorra;
 })();
 </script>
 
@@ -16276,8 +16308,17 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       }
       catch(e){
         console.error('QuestLog/Firebase: Google falhou', e);
-        if (typeof window.aviso === 'function') window.aviso(idiomaAuth() === 'en' ? 'Couldn\'t sign in with Google' : 'Não deu pra entrar com Google');
-        if (typeof window.esconderLoadingMasmorra === 'function') window.esconderLoadingMasmorra();
+        const cancelou = e && (e.code === 'auth/popup-closed-by-user' || e.code === 'auth/cancelled-popup-request');
+        if (cancelou){
+          // usuario fechou o popup de proposito -- nao e erro, so volta
+          if (typeof window.esconderLoadingMasmorra === 'function') window.esconderLoadingMasmorra();
+        } else if (typeof window.erroLoadingMasmorra === 'function'){
+          window.erroLoadingMasmorra(idiomaAuth() === 'en'
+            ? (e && e.code === 'auth/network-request-failed' ? 'No connection. Check your internet and try again.' : 'Couldn\'t sign in with Google')
+            : (e && e.code === 'auth/network-request-failed' ? 'Sem conexão. Verifique a internet e tente de novo.' : 'Não deu pra entrar com Google'));
+        } else if (typeof window.esconderLoadingMasmorra === 'function'){
+          window.esconderLoadingMasmorra();
+        }
       }
     };
 
@@ -16287,7 +16328,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       const en = idiomaAuth() === 'en';
       if (typeof window.questlogLimparErroEmail === 'function') window.questlogLimparErroEmail();
       if (!email || !senha) {
-        if (typeof window.aviso === 'function') window.aviso(en ? 'Fill in email and password' : 'Preenche email e senha');
+        if (typeof window.questlogMostrarErroEmail === 'function') window.questlogMostrarErroEmail(en ? 'Fill in email and password' : 'Preencha email e senha');
         return;
       }
 
@@ -16302,11 +16343,11 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       if (window.questlogModoCadastro && window.questlogModoCadastro()){
         const senhaConfirmar = document.getElementById('loginSenhaConfirmar').value;
         if (senha !== senhaConfirmar){
-          if (typeof window.aviso === 'function') window.aviso(en ? 'Passwords don\'t match' : 'As senhas não são iguais');
+          if (typeof window.questlogMostrarErroEmail === 'function') window.questlogMostrarErroEmail(en ? 'Passwords don\'t match' : 'As senhas não são iguais');
           return;
         }
         if (!/^(?=.*[0-9]).{6,}$/.test(senha)){
-          if (typeof window.aviso === 'function') window.aviso(en ? 'Password needs at least 6 characters and 1 number' : 'Senha precisa de pelo menos 6 caracteres e 1 número');
+          if (typeof window.questlogMostrarErroEmail === 'function') window.questlogMostrarErroEmail(en ? 'Password needs at least 6 characters and 1 number' : 'Senha precisa de pelo menos 6 caracteres e 1 número');
           return;
         }
       }
@@ -16348,7 +16389,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           'auth/user-not-found': 'No account with this email -- switch to "Sign up"',
           'auth/wrong-password': 'Wrong password',
           'auth/invalid-credential': 'Wrong email or password',
-          'auth/too-many-requests': 'Too many attempts -- wait a bit and try again'
+          'auth/too-many-requests': 'Too many attempts -- wait a bit and try again',
+          'auth/network-request-failed': 'No connection. Check your internet and try again.'
         } : {
           'auth/email-already-in-use': 'Esse email já tem conta -- troca pra "Entrar"',
           'auth/invalid-email': 'Email inválido',
@@ -16356,7 +16398,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           'auth/user-not-found': 'Não existe conta com esse email -- troca pra "Cadastre-se"',
           'auth/wrong-password': 'Senha incorreta',
           'auth/invalid-credential': 'Email ou senha incorretos',
-          'auth/too-many-requests': 'Muitas tentativas -- espera um pouco e tenta de novo'
+          'auth/too-many-requests': 'Muitas tentativas -- espera um pouco e tenta de novo',
+          'auth/network-request-failed': 'Sem conexão. Verifique a internet e tente de novo.'
         };
         const msg = MENSAGENS[e && e.code] || (en ? 'Couldn\'t sign in' : 'Não deu pra entrar');
 
@@ -16366,10 +16409,12 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         // tentar cadastrar email ja existente.
         if (e && e.code === 'auth/email-already-in-use' && typeof window.questlogMostrarErroEmail === 'function') {
           window.questlogMostrarErroEmail(msg);
-        } else if (typeof window.aviso === 'function') {
-          window.aviso(msg);
+          if (typeof window.esconderLoadingMasmorra === 'function') window.esconderLoadingMasmorra();
+        } else if (typeof window.erroLoadingMasmorra === 'function') {
+          window.erroLoadingMasmorra(msg);
+        } else if (typeof window.esconderLoadingMasmorra === 'function') {
+          window.esconderLoadingMasmorra();
         }
-        if (typeof window.esconderLoadingMasmorra === 'function') window.esconderLoadingMasmorra();
       }
     };
 

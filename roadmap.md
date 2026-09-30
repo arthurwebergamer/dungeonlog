@@ -19086,3 +19086,56 @@ Não é código. O Firebase envia de `noreply@questlog-d4c11.firebaseapp.com`, s
 - [ ] **Risco:** `reauthenticateWithPopup` para contas Google no TWA/Android pode cair em redirect (mesma classe do bug do loop de login). Sem teste em aparelho.
 - [ ] Concluir a verificação de domínio do email no Firebase e testar entrega no Gmail/Outlook.
 - [ ] Merge do PR #65 na `main` (aberto, não mergeado).
+
+## [Sessão 27–29/09/2026] Categorias, teste grátis + push, landing/páginas legais, PRO vitalício, lote de bugs, menu debug e login
+
+Complementa a entrada de 30/09 (acima). Esta seção cobre tudo que veio antes dela no mesmo chat/ciclo; hashes entre parênteses são commits em `dev`/`main`.
+
+### 1. Categorias de tarefas (27/09)
+- [x] Sistema de categorias de tarefas estilo Skillion (`6017d22`, #53). Seta de recolher grupo removida (`f0e9847`, #55).
+
+### 2. Paywall, teste grátis e push (28/09)
+- [x] Paywall: vidro com blur nos cards de plano (`85476a7`), contraste dos ícones bloqueados na trilha (`5de72e6`), bug de flex-shrink que sobrepunha conteúdo (`4b03bbe`), ordem do fluxo pitch → lembrete → planos (`0c9439c`), tela de planos simplificada (teste grátis vira card de plano, CTA único) e compactada pra caber sem rolar; timeline removida da tela de planos (`9535864`, `43ed8a6`, `92046f1`).
+- [x] **Teste grátis de 7 dias** com escolha de quando avisar (`40b7f9d`).
+- [x] **Push (FCM)** para fim de teste, sequência e monstro do dia (`a771573`). Primeiro desenhado com Cloud Functions (exige Blaze), **trocado por Cloudflare Worker gratuito** (`f1b2300`), com leituras/escritas do Firestore agrupadas em lote (`b227238`). README corrigido: a VAPID key só vai em 1 lugar (`4253577`).
+- [x] Badge PRO ao lado do nome: criada, re-estilizada 4 vezes (`93fc113` → `95d7f47`) e **removida de vez** (`a8fb5ee`).
+- [x] Traduções: preços em destaque do paywall em inglês (`842cf50`); regressão de preço pequeno em Mensal/Anual corrigida (`bd9e0db`); rodapé "Termos · Privacidade · Restaurar compras" nas 3 telas do paywall (`1cef9aa`, `bbd41f0`).
+
+### 3. Landing e páginas legais (28/09)
+- [x] Waitlist substituída por landing page + páginas legais estáticas (`960bfec`). Landing redesenhada várias vezes (referências foundable/skillion): parede de tijolos animada → tile real da Arena (Grafite) → blocos que acendem no toque → contraste do texto via escurecimento suave do fundo (`8324a03` … `27b8f94`). Ícone borrado, rodapé sumindo no celular (100vh do Safari) corrigidos (`4364b51`, `639b704`).
+- [x] `/privacy` e `/terms`: botão voltar + seletor PT/EN (`e4d672f`, `8e46788`); ajustes de conteúdo — pagamentos via Google Play, vendedor Weberlabs, preços em BRL só de referência (`7d2b0dc`, `93dec8f`). Links de Política/Termos em Configurações (`6410a92`). Deploy que travou carregando infinito refeito (`9b59c44`).
+
+### 4. Conta, PRO vitalício e assinatura (29/09)
+- [x] Notificações removidas de Config; **Conta virou tela de gerenciamento** (`f84c798`).
+- [x] **PRO vitalício** via comando manual (`6d3fb3b`) e depois **sincronizado via Firestore `entitlements/{uid}`** (`7642e74`) — pra conta de revisor do Google Play. Causa-raiz de "não funcionava": **espaço no final do nome da coleção** no Firestore. A regra deixa o dono só ler.
+- [x] Debug: corrida no resumo de assinatura + expirar teste grátis (`eda5431`); botão "Cancelar assinatura" + bug real de CSS (`3716dcc`).
+- [x] Sublinhado azul em "Política de Privacidade"/"Termos de Uso" removido (`b5ab267`, `faa0a20`): `.cfgrow.cfglink{text-decoration:none;color:inherit}`.
+
+### 5. Lote de bugs (`77c32b5`)
+- [x] Rótulos dos slots do inventário em i18n (`CHAVE_I18N_SLOT`/`rotuloSlot()`, chaves `inv.slotArma/Peito/Elmo/Escudo/Acess`).
+- [x] **Paywall aparecia cedo demais:** `criar()` agora conta `tarefas.filter(ehDeHoje).length` contra `LIMITE_TAREFAS_GRATIS = 5`.
+- [x] Inglês vazando na UI em PT: `definirIdioma()` passou a chamar `renderPerfil` na lista de refresh.
+- [x] **Loop do botão voltar no login Google:** `getRedirectResult` importado e chamado no boot do Firebase.
+- [x] Contraste de "dia vencido": cor `#FFD65A` + text-shadow nas 3 regras `.faixa`.
+- [ ] **Monstro "fugindo do nada"**: investigado, **sem causa encontrada**. Segue aberto.
+
+### 6. Menu debug restrito e a questão do cloaking (29/09)
+- [x] Allowlist de contas (`UIDS_DEBUG_PERMITIDO`, `uidTemDebugPermitido()`, `__reavaliarModoDebugPosLogin`) + rótulos do debug fixos em inglês (`ad22a82`).
+- [x] Revertido por risco de "cloaking" (`9021202`), **reaplicado** (`85732f1`) após o argumento de que conta de teste **declarada** ao Google não é cloaking. **Obrigatório:** declarar a conta de revisor em Play Console → Conteúdo do app → Acesso ao app.
+- [ ] O UID do usuário ainda não está em `UIDS_DEBUG_PERMITIDO`.
+
+### 7. Login
+- [x] Login por e-mail sem botão voltar corrigido (`__loginSemVoltarAtual`, `__atualizarSetaVoltarLogin`, `5ff757f`).
+- Continuação (erro no loading, autofill, validações inline): ver entrada de 30/09.
+
+### 8. Exclusão de conta e nome (29/09)
+- [x] Páginas `/delete-account` (`bed212e`) → exclusão real no app (`ea05c4f`; apaga `saves/{uid}` **antes** de `deleteUser`, por causa da regra do Firestore) → "Apagar tudo" removido (`a849787`). Nome "Dungeonlog" padronizado e rodapé por categoria (`f870330`, `9276016`, `732aed8`, `9543120`). Detalhes na entrada de 30/09.
+
+### Pendências consolidadas deste chat
+- [ ] "Esqueceu a senha?" sem feedback (usa `aviso()`, mudo por `TOASTS_DESATIVADOS = true`, teste de 27/08 nunca revertido).
+- [ ] Monstro "fugindo do nada" (seção 5).
+- [ ] Verificação do domínio de e-mail no Firebase (DNS já adicionado; até 48h), depois trocar o remetente e o nome público do projeto — hoje o e-mail sai de `noreply@questlog-d4c11.firebaseapp.com` e cai no spam.
+- [ ] Conta de revisor declarada no Play Console; UID do dono na allowlist do debug.
+- [ ] `reauthenticateWithPopup` (Google) em TWA pode cair em redirect — não testado.
+- [ ] Descrições dos atributos sumiram do Perfil (ver 30/09).
+- [ ] PR #65 aberto, não mergeado.

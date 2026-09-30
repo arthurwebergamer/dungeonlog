@@ -38,7 +38,7 @@
      alteracao aqui (bump manual) pra forcar cache-bust; SUBIR ESTE
      NUMERO sempre que style.css mudar e o problema persistir em
      producao. -->
-<link rel="stylesheet" href="style.css?v=13">
+<link rel="stylesheet" href="style.css?v=23">
 
 <!-- =====================================================================
      TOGGLE DEBUG — silenciar console (log/warn/error)  —  precisa ser o
@@ -538,7 +538,7 @@
     </div>
 
     <div id="perfilAtributos">
-      <div class="perfilhero">
+      <div class="perfilhero fichaHero">
         <div class="perfilheroLinha">
           <div class="hero-sprite" id="perfilHeroSprite"></div>
           <div class="perfilheroInfo">
@@ -560,6 +560,33 @@
         </div>
       </div>
 
+      <div class="atributospontos">
+        <div class="atrhead">
+          <b data-i18n="perfil.atributos">Atributos</b>
+          <span class="atrpill" id="atrDisponiveis">0 disponíveis</span>
+        </div>
+        <div class="hexrow">
+          <div class="hexcol">
+            <div class="hexo"><div class="hexi"><span class="hexpts" id="atrFortunaPts">0</span><span class="hexde">/ 15</span></div></div>
+            <span class="atrnome" data-i18n="atr.fortuna">Fortuna</span>
+            <span class="atrvalor" id="atrFortunaValor">+0%</span>
+            <button class="atrmais2 hexbtn" id="atrMaisFortuna" type="button">+</button>
+          </div>
+          <div class="hexcol">
+            <div class="hexo"><div class="hexi"><span class="hexpts" id="atrFocoPts">0</span><span class="hexde">/ 15</span></div></div>
+            <span class="atrnome" data-i18n="atr.foco">Foco</span>
+            <span class="atrvalor" id="atrFocoValor">+0%</span>
+            <button class="atrmais2 hexbtn" id="atrMaisFoco" type="button">+</button>
+          </div>
+          <div class="hexcol">
+            <div class="hexo"><div class="hexi"><span class="hexpts" id="atrVigorPts">0</span><span class="hexde">/ 15</span></div></div>
+            <span class="atrnome" data-i18n="atr.vigor">Vigor</span>
+            <span class="atrvalor" id="atrVigorValor">+0%</span>
+            <button class="atrmais2 hexbtn" id="atrMaisVigor" type="button">+</button>
+          </div>
+        </div>
+      </div>
+
       <div class="statgrid">
         <div class="statcard">
           <span class="statlabel" data-i18n="perfil.vidaMaxima">Vida máxima</span>
@@ -576,52 +603,6 @@
         <div class="statcard">
           <span class="statlabel" data-i18n="perfil.bonusMoedasEquip">Bônus moedas equip.</span>
           <span class="statval" id="statBonusMoedas">—</span>
-        </div>
-      </div>
-
-      <div class="atributospontos">
-        <div class="atrhead">
-          <b data-i18n="perfil.pontosDeAtributo">Pontos de atributo</b>
-          <span class="atrpill" id="atrDisponiveis">0 disponíveis</span>
-        </div>
-
-        <div class="atrcard2" style="--atr-cor:#F2A65A">
-          <div class="atrcard2-topo">
-            <svg class="atricone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5l2.9 6.6 7.1.7-5.4 4.8 1.6 7-6.2-3.8-6.2 3.8 1.6-7-5.4-4.8 7.1-.7z"/></svg>
-            <span class="atrnome" data-i18n="atr.fortuna">Fortuna</span>
-            <span class="atrvalor" id="atrFortunaValor">+0%</span>
-          </div>
-          <div class="atrdesc" data-i18n="atr.fortunaDesc">chance de raridade no espólio</div>
-          <div class="atrcard2-linha">
-            <div class="atrbarrafundo"><div class="atrbarrafill" id="atrFortunaBarra"></div></div>
-            <button class="atrmais2" id="atrMaisFortuna" type="button">+</button>
-          </div>
-        </div>
-
-        <div class="atrcard2" style="--atr-cor:#5AA9F2">
-          <div class="atrcard2-topo">
-            <svg class="atricone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".8" fill="currentColor"/></svg>
-            <span class="atrnome" data-i18n="atr.foco">Foco</span>
-            <span class="atrvalor" id="atrFocoValor">0%</span>
-          </div>
-          <div class="atrdesc" data-i18n="atr.focoDesc">de desconto na loja</div>
-          <div class="atrcard2-linha">
-            <div class="atrbarrafundo"><div class="atrbarrafill" id="atrFocoBarra"></div></div>
-            <button class="atrmais2" id="atrMaisFoco" type="button">+</button>
-          </div>
-        </div>
-
-        <div class="atrcard2" style="--atr-cor:#E5698A">
-          <div class="atrcard2-topo">
-            <svg class="atricone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5s-7.5-4.6-9.8-9.3C.9 8 2.4 4.8 5.6 4.1c2-.4 3.9.5 5 2.1a5.5 5.5 0 015-2.1c3.2.7 4.7 3.9 3.4 7.1-2.3 4.7-9.8 9.3-9.8 9.3z"/></svg>
-            <span class="atrnome" data-i18n="atr.vigor">Vigor</span>
-            <span class="atrvalor" id="atrVigorValor">-0%</span>
-          </div>
-          <div class="atrdesc" data-i18n="atr.vigorDesc">de perdão no dano por tarefa largada</div>
-          <div class="atrcard2-linha">
-            <div class="atrbarrafundo"><div class="atrbarrafill" id="atrVigorBarra"></div></div>
-            <button class="atrmais2" id="atrMaisVigor" type="button">+</button>
-          </div>
         </div>
       </div>
 
@@ -1103,6 +1084,8 @@
   <div class="loadingMasmorra" id="loadingMasmorra">
     <img class="loadingMasmorraSprite" id="loadingMasmorraSprite" src="" alt="">
     <span class="loadingMasmorraTxt" id="loadingMasmorraTxt">Conectando com a masmorra...</span>
+    <span class="loadingMasmorraMsg" id="loadingMasmorraMsg"></span>
+    <button class="loadingMasmorraBtn" id="loadingMasmorraBtn" type="button">Tentar de novo</button>
   </div>
 
   <!-- PLANO PRO -- paywall em 2 etapas (pitch -> preco), tela cheia, sem
@@ -8043,12 +8026,7 @@ function montarCompra(grid){
     };
   });
 
-  const nota = document.createElement('div');
-  nota.className = 'lnota';
-  nota.textContent = en
-    ? 'The blacksmith swaps the shelf every midnight. Treasures can\'t be bought — only sold.'
-    : 'O ferreiro troca a prateleira toda meia-noite. Tesouros não se compram — só se vendem.';
-  grid.appendChild(nota);
+  // v4.128 (pedido do usuario): nota do ferreiro removida do rodape da loja
 }
 
 function montarVenda(grid){
@@ -11107,6 +11085,13 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     const barraVigor = document.getElementById('atrVigorBarra');
     if (barraVigor) barraVigor.style.width = Math.min(100, (perdaoVigor() / VIGOR_TETO) * 100) + '%';
 
+    // v4.130: placas hexagonais (ficha B) -- pontos investidos por atributo e
+    // rotulo do botao ("+ 2%" ou "TETO").
+    [['fortuna','Fortuna'],['foco','Foco'],['vigor','Vigor']].forEach(([k,n])=>{
+      const e=document.getElementById('atr'+n+'Pts'); if(e) e.textContent=gasto[k];
+      const bt=document.getElementById('atrMais'+n); if(bt) bt.textContent = noTeto(k) ? 'TETO' : '+';
+    });
+
     const bFortuna = document.getElementById('atrMaisFortuna');
     if (bFortuna) bFortuna.disabled = disp <= 0 || noTeto('fortuna');
     const bFoco = document.getElementById('atrMaisFoco');
@@ -11467,6 +11452,21 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     btnEntrar.addEventListener('click', () => {
       if (introEl && introEl.classList.contains('off')) agendarDialogoTela('tarefas');
     });
+  }
+
+  // v4.138 (pedido do usuario -- o dialogo da aba Tarefas voltou a nao tocar
+  // de primeira, so depois de trocar de aba e voltar): cada caminho de
+  // entrada no app (novo jogador, login com conta que restaura da nuvem,
+  // "Bem-vindo de volta", etc.) fecha o #intro por conta propria, e so 2
+  // deles agendavam o dialogo. Em vez de ir remendando caminho por
+  // caminho, observa o proprio #intro: qualquer momento em que ele ganha
+  // .off (app aberto de verdade) agenda o dialogo da aba Tarefas.
+  // agendarDialogoTela() e idempotente (ignora se ja visto, reagenda o
+  // timer se chamada de novo), entao chamar de varios lugares e seguro.
+  if (introEl && typeof MutationObserver === 'function'){
+    new MutationObserver(() => {
+      if (introEl.classList.contains('off')) agendarDialogoTela('tarefas');
+    }).observe(introEl, { attributes: true, attributeFilter: ['class'] });
   }
 
   // "apagar tudo" (CHAVE_TELAS incluida) agora e feito num lugar so, na
@@ -12411,6 +12411,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       if (txt) txt.textContent = frases[i];
     }, 1800);
 
+    overlay.classList.remove('erro');
     overlay.classList.add('on');
   }
 
@@ -12419,10 +12420,39 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     if (overlay) overlay.classList.remove('on');
     clearInterval(timer);
     timer = null;
+    // tira o estado de erro so depois do fade, pra tela nao "pular" pro loading ao sumir
+    setTimeout(() => { if (overlay && !overlay.classList.contains('on')) overlay.classList.remove('erro'); }, 300);
+  }
+
+  // v4.137 (pedido do usuario): estado de erro do loading -- o heroi para de
+  // pular, cai e fica deitado; mostra "Algo deu errado" + mensagem + botao
+  // "Tentar de novo" (fecha o overlay e devolve o usuario ao formulario).
+  // aviso() esta mudo (TOASTS_DESATIVADOS), entao erro de login nao tinha
+  // nenhum feedback visivel.
+  function erroLoadingMasmorra(msg){
+    const overlay = document.getElementById('loadingMasmorra');
+    if (!overlay) return;
+    const en = (typeof idiomaApp === 'function') ? idiomaApp() === 'en' : false;
+    const txt = document.getElementById('loadingMasmorraTxt');
+    const m = document.getElementById('loadingMasmorraMsg');
+    const b = document.getElementById('loadingMasmorraBtn');
+    clearInterval(timer);
+    timer = null;
+    if (txt) txt.textContent = en ? 'Something went wrong' : 'Algo deu errado';
+    if (m) m.textContent = msg || '';
+    if (b){
+      b.textContent = en ? 'Try again' : 'Tentar de novo';
+      b.onclick = esconderLoadingMasmorra;
+    }
+    // reinicia as animacoes de erro mesmo se ja estava em .erro
+    overlay.classList.remove('erro');
+    void overlay.offsetWidth;
+    overlay.classList.add('on', 'erro');
   }
 
   window.mostrarLoadingMasmorra = mostrarLoadingMasmorra;
   window.esconderLoadingMasmorra = esconderLoadingMasmorra;
+  window.erroLoadingMasmorra = erroLoadingMasmorra;
 })();
 </script>
 
@@ -16293,8 +16323,17 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       }
       catch(e){
         console.error('QuestLog/Firebase: Google falhou', e);
-        if (typeof window.aviso === 'function') window.aviso(idiomaAuth() === 'en' ? 'Couldn\'t sign in with Google' : 'Não deu pra entrar com Google');
-        if (typeof window.esconderLoadingMasmorra === 'function') window.esconderLoadingMasmorra();
+        const cancelou = e && (e.code === 'auth/popup-closed-by-user' || e.code === 'auth/cancelled-popup-request');
+        if (cancelou){
+          // usuario fechou o popup de proposito -- nao e erro, so volta
+          if (typeof window.esconderLoadingMasmorra === 'function') window.esconderLoadingMasmorra();
+        } else if (typeof window.erroLoadingMasmorra === 'function'){
+          window.erroLoadingMasmorra(idiomaAuth() === 'en'
+            ? (e && e.code === 'auth/network-request-failed' ? 'No connection. Check your internet and try again.' : 'Couldn\'t sign in with Google')
+            : (e && e.code === 'auth/network-request-failed' ? 'Sem conexão. Verifique a internet e tente de novo.' : 'Não deu pra entrar com Google'));
+        } else if (typeof window.esconderLoadingMasmorra === 'function'){
+          window.esconderLoadingMasmorra();
+        }
       }
     };
 
@@ -16304,7 +16343,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       const en = idiomaAuth() === 'en';
       if (typeof window.questlogLimparErroEmail === 'function') window.questlogLimparErroEmail();
       if (!email || !senha) {
-        if (typeof window.aviso === 'function') window.aviso(en ? 'Fill in email and password' : 'Preenche email e senha');
+        if (typeof window.questlogMostrarErroEmail === 'function') window.questlogMostrarErroEmail(en ? 'Fill in email and password' : 'Preencha email e senha');
         return;
       }
 
@@ -16319,11 +16358,11 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       if (window.questlogModoCadastro && window.questlogModoCadastro()){
         const senhaConfirmar = document.getElementById('loginSenhaConfirmar').value;
         if (senha !== senhaConfirmar){
-          if (typeof window.aviso === 'function') window.aviso(en ? 'Passwords don\'t match' : 'As senhas não são iguais');
+          if (typeof window.questlogMostrarErroEmail === 'function') window.questlogMostrarErroEmail(en ? 'Passwords don\'t match' : 'As senhas não são iguais');
           return;
         }
         if (!/^(?=.*[0-9]).{6,}$/.test(senha)){
-          if (typeof window.aviso === 'function') window.aviso(en ? 'Password needs at least 6 characters and 1 number' : 'Senha precisa de pelo menos 6 caracteres e 1 número');
+          if (typeof window.questlogMostrarErroEmail === 'function') window.questlogMostrarErroEmail(en ? 'Password needs at least 6 characters and 1 number' : 'Senha precisa de pelo menos 6 caracteres e 1 número');
           return;
         }
       }
@@ -16365,7 +16404,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           'auth/user-not-found': 'No account with this email -- switch to "Sign up"',
           'auth/wrong-password': 'Wrong password',
           'auth/invalid-credential': 'Wrong email or password',
-          'auth/too-many-requests': 'Too many attempts -- wait a bit and try again'
+          'auth/too-many-requests': 'Too many attempts -- wait a bit and try again',
+          'auth/network-request-failed': 'No connection. Check your internet and try again.'
         } : {
           'auth/email-already-in-use': 'Esse email já tem conta -- troca pra "Entrar"',
           'auth/invalid-email': 'Email inválido',
@@ -16373,7 +16413,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           'auth/user-not-found': 'Não existe conta com esse email -- troca pra "Cadastre-se"',
           'auth/wrong-password': 'Senha incorreta',
           'auth/invalid-credential': 'Email ou senha incorretos',
-          'auth/too-many-requests': 'Muitas tentativas -- espera um pouco e tenta de novo'
+          'auth/too-many-requests': 'Muitas tentativas -- espera um pouco e tenta de novo',
+          'auth/network-request-failed': 'Sem conexão. Verifique a internet e tente de novo.'
         };
         const msg = MENSAGENS[e && e.code] || (en ? 'Couldn\'t sign in' : 'Não deu pra entrar');
 
@@ -16383,10 +16424,12 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         // tentar cadastrar email ja existente.
         if (e && e.code === 'auth/email-already-in-use' && typeof window.questlogMostrarErroEmail === 'function') {
           window.questlogMostrarErroEmail(msg);
-        } else if (typeof window.aviso === 'function') {
-          window.aviso(msg);
+          if (typeof window.esconderLoadingMasmorra === 'function') window.esconderLoadingMasmorra();
+        } else if (typeof window.erroLoadingMasmorra === 'function') {
+          window.erroLoadingMasmorra(msg);
+        } else if (typeof window.esconderLoadingMasmorra === 'function') {
+          window.esconderLoadingMasmorra();
         }
-        if (typeof window.esconderLoadingMasmorra === 'function') window.esconderLoadingMasmorra();
       }
     };
 
@@ -17206,6 +17249,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'perfil.bonusMoedasEquip':{ pt:'Bônus moedas equip.', en:'Equip. coin bonus' },
     'perfil.pontosDeAtributo':{ pt:'Pontos de atributo', en:'Attribute points' },
     'perfil.historico':       { pt:'Histórico', en:'History' },
+    'perfil.atributos':       { pt:'Atributos', en:'Attributes' },
+    'perfil.atrNota':         { pt:'Cada ponto dá +2%. O teto é 30%.', en:'Each point gives +2%. The cap is 30%.' },
     'perfil.conquistas':      { pt:'Conquistas', en:'Achievements' },
     'perfil.bestiario':       { pt:'Bestiário', en:'Bestiary' },
 

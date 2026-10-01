@@ -5849,3 +5849,42 @@
 .pgPag:nth-child(2) .atrpill{display:flex;flex-direction:column;align-items:center;gap:4px}
 .pgPag:nth-child(2) .atrpill .pgNum{font-size:48px;font-weight:400}
 .pgPag:nth-child(2) .atrpill .pgLbl{margin:0;font-family:'Outfit',sans-serif;font-size:12px;color:var(--dim)}
+
+/* v4.147 — Perfil: Aneis (substitui paginas) */
+.perfilAneis{display:flex;flex-direction:column;gap:16px}
+.anelOculto{display:none!important}
+.anelHero{position:relative;width:210px;height:210px;margin:6px auto 0}
+.anelSvg{transform:rotate(-90deg);display:block}
+.anelHero .atrilho,.aneisAtr .atrilho{fill:none;stroke:var(--line);stroke-width:5}
+.aarco{fill:none;stroke:var(--text);stroke-width:5;stroke-linecap:round;transition:stroke-dashoffset .5s}
+.aarco.xp{stroke:#F2C94C}.aarco.hp{stroke:#E5698A}
+.anelHero .hero-sprite{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;width:auto;margin:0}
+.anelHero #perfilHeroSprite .heroimg{width:110px;height:110px;image-rendering:pixelated}
+.anelHero .sombra{display:none}
+.anelNome{text-align:center;margin-top:-2px}
+.anelNome>b{font-size:24px;font-weight:700}
+.anelNivel{display:block;font-size:13px;color:var(--muted);margin-top:2px}
+.anelLeg{display:flex;justify-content:center;gap:18px;margin-top:10px;font-size:12.5px;color:var(--muted)}
+.anelLeg b{color:var(--text)}
+.anelLeg i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+.anelLeg .dhp{background:#E5698A}.anelLeg .dxp{background:#F2C94C}
+.anelAtr .atrhead{display:flex;justify-content:space-between;align-items:baseline;margin:0 2px 12px}
+.anelAtr .atrhead b{font-size:13px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.anelAtr .atrpill{background:none;padding:0;font-family:'Outfit',sans-serif;font-size:13px;color:var(--text)}
+.anelAtr .atrpill.vazio{color:var(--dim)}
+.anelAtr .atrpill .pgNum,.anelAtr .atrpill .pgLbl{font-size:13px;font-family:'Outfit',sans-serif;font-weight:400;margin:0}
+.anelAtr .atrpill .pgLbl{margin-left:4px}
+.aneisLinha{display:flex}
+.aneisAtr{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.aelo{position:relative;width:64px;height:64px}
+.aelo svg{transform:rotate(-90deg);display:block}
+.aneisAtr .atrilho{stroke-width:4}.aneisAtr .aarco{stroke-width:4}
+.aneisAtr.sel .aarco{stroke:var(--accent)}
+.aval{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700}
+.anome{font-size:13px;font-weight:600}
+.aneisAtr .gplus{width:34px;height:34px;font-size:22px;line-height:1}
+.anelInfo{text-align:center;font-size:12px;color:var(--dim);margin-top:10px;min-height:16px}
+.anelStatsLinha{text-align:center;font-size:12.5px;color:var(--dim);line-height:1.7}
+.anelStatsLinha b{color:var(--muted);font-weight:600}
+.anelStatsLinha i{font-style:normal;margin:0 6px}
+.anelAtr .atrpill{display:inline-flex!important;flex-direction:row!important;align-items:baseline;gap:4px}

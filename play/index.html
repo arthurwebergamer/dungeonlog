@@ -38,7 +38,7 @@
      alteracao aqui (bump manual) pra forcar cache-bust; SUBIR ESTE
      NUMERO sempre que style.css mudar e o problema persistir em
      producao. -->
-<link rel="stylesheet" href="style.css?v=28">
+<link rel="stylesheet" href="style.css?v=29">
 
 <!-- =====================================================================
      TOGGLE DEBUG — silenciar console (log/warn/error)  —  precisa ser o
@@ -537,16 +537,17 @@
       </div>
     </div>
 
-    <div id="perfilAtributos" class="perfilPlano">
-     <div class="pgTrilho" id="perfilTrilho">
-     <section class="pgPag">
-      <div class="planoHero">
+    <div id="perfilAtributos" class="perfilPlano perfilAneis">
+      <div class="anelHero">
+        <svg class="anelSvg" viewBox="0 0 210 210" width="210" height="210"><circle class="atrilho" cx="105" cy="105" r="92"/><circle class="aarco xp" id="anelXp" cx="105" cy="105" r="92" stroke-dasharray="578.1" stroke-dashoffset="578.1"/><circle class="atrilho" cx="105" cy="105" r="76"/><circle class="aarco hp" id="anelHp" cx="105" cy="105" r="76" stroke-dasharray="477.5" stroke-dashoffset="477.5"/></svg>
         <div class="hero-sprite" id="perfilHeroSprite"></div>
-        <div class="planoNome">
-          <span class="perfilnome" id="perfilNome"><span id="perfilNomeTxt">Aventureiro</span></span>
-          <span class="planoNivel" id="perfilNivelChip"></span>
-        </div>
-        <div class="planoBarras">
+      </div>
+      <div class="anelNome"><b id="perfilNomeTxt">Aventureiro</b><span class="anelNivel" id="perfilNivelChip"></span>
+        <div class="anelLeg"><span><i class="dhp"></i><span data-i18n="jogo.vida">Vida</span> <b id="anelHpTxt">0 / 0</b></span><span><i class="dxp"></i>XP <b id="anelXpTxt">0 / 100</b></span></div>
+      </div>
+      <div class="anelOculto">
+        <span class="perfilnome" id="perfilNome"></span>
+<div>
           <div class="planoBar">
             <div class="xprow hprow"><span class="xplabel" data-i18n="jogo.vida">Vida</span><span class="xpnum hpnum" id="perfilHpNum">0 / 0</span></div>
             <div class="bar hpbar"><div class="fill hpfill" id="perfilHpFill"></div></div>
@@ -556,19 +557,24 @@
             <div class="bar"><div class="fill" id="perfilFill"></div></div>
           </div>
         </div>
-      </div>
 
-      <div class="planoStats">
+<div class="planoStats">
         <div class="planoStat"><span class="statval" id="statVida">—</span><span class="statlabel" data-i18n="perfil.vidaMaxima">Vida máxima</span></div>
         <div class="planoStat semMoedas"><span class="statval" id="statMoedas">—</span><span class="statlabel" data-i18n="inv.moedas">Moedas</span></div>
         <div class="planoStat"><span class="statval" id="statBonusXp">—</span><span class="statlabel" data-i18n="perfil.bonusXpEquip">Bônus XP equip.</span></div>
         <div class="planoStat"><span class="statval" id="statBonusMoedas">—</span><span class="statlabel" data-i18n="perfil.bonusMoedasEquip">Bônus moedas equip.</span></div>
       </div>
 
-     </section>
-     <section class="pgPag">
-      <div class="planoAtr">
+      </div>
+      <div class="anelAtr">
         <div class="atrhead"><b data-i18n="perfil.atributos">Atributos</b><span class="atrpill" id="atrDisponiveis">0</span></div>
+        <div class="aneisLinha"><div class="aneisAtr" data-atr="fortuna"><div class="aelo"><svg viewBox="0 0 64 64" width="64" height="64"><circle class="atrilho" cx="32" cy="32" r="26"/><circle class="aarco" id="anelFortuna" cx="32" cy="32" r="26" stroke-dasharray="163.4" stroke-dashoffset="163.4"/></svg><b class="aval" id="anelValFortuna">+0%</b></div><span class="anome" data-i18n="atr.fortuna">Fortuna</span><button class="gplus" id="atrMaisFortuna" type="button" aria-label="Investir">+</button></div><div class="aneisAtr" data-atr="foco"><div class="aelo"><svg viewBox="0 0 64 64" width="64" height="64"><circle class="atrilho" cx="32" cy="32" r="26"/><circle class="aarco" id="anelFoco" cx="32" cy="32" r="26" stroke-dasharray="163.4" stroke-dashoffset="163.4"/></svg><b class="aval" id="anelValFoco">+0%</b></div><span class="anome" data-i18n="atr.foco">Foco</span><button class="gplus" id="atrMaisFoco" type="button" aria-label="Investir">+</button></div><div class="aneisAtr" data-atr="vigor"><div class="aelo"><svg viewBox="0 0 64 64" width="64" height="64"><circle class="atrilho" cx="32" cy="32" r="26"/><circle class="aarco" id="anelVigor" cx="32" cy="32" r="26" stroke-dasharray="163.4" stroke-dashoffset="163.4"/></svg><b class="aval" id="anelValVigor">+0%</b></div><span class="anome" data-i18n="atr.vigor">Vigor</span><button class="gplus" id="atrMaisVigor" type="button" aria-label="Investir">+</button></div></div>
+        <div class="anelInfo" id="atrInfo"></div>
+      </div>
+      <div class="anelStatsLinha" id="anelStatsLinha"></div>
+      <div class="anelOculto">
+<div class="planoAtr">
+        
         <div class="alinha" data-atr="fortuna">
           <span class="aico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5l2.9 6.6 7.1.7-5.4 4.8 1.6 7-6.2-3.8-6.2 3.8 1.6-7-5.4-4.8 7.1-.7z"/></svg></span>
           <div class="ameio">
@@ -576,7 +582,7 @@
             <span class="atrseg" id="atrFortunaSeg"></span>
             <span class="adesc" id="atrFortunaDesc"></span>
           </div>
-          <button class="gplus" id="atrMaisFortuna" type="button" aria-label="Investir">+</button>
+          
         </div>
         <div class="alinha" data-atr="foco">
           <span class="aico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".8" fill="currentColor"/></svg></span>
@@ -585,7 +591,7 @@
             <span class="atrseg" id="atrFocoSeg"></span>
             <span class="adesc" id="atrFocoDesc"></span>
           </div>
-          <button class="gplus" id="atrMaisFoco" type="button" aria-label="Investir">+</button>
+          
         </div>
         <div class="alinha" data-atr="vigor">
           <span class="aico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5s-7.5-4.6-9.8-9.3C.9 8 2.4 4.8 5.6 4.1c2-.4 3.9.5 5 2.1a5.5 5.5 0 015-2.1c3.2.7 4.7 3.9 3.4 7.1-2.3 4.7-9.8 9.3-9.8 9.3z"/></svg></span>
@@ -594,12 +600,11 @@
             <span class="atrseg" id="atrVigorSeg"></span>
             <span class="adesc" id="atrVigorDesc"></span>
           </div>
-          <button class="gplus" id="atrMaisVigor" type="button" aria-label="Investir">+</button>
+          
         </div>
       </div>
+      </div>
 
-     </section>
-     <section class="pgPag">
       <!-- previas -- item 18 do roadmap: secoes grandes aparecem resumidas
            aqui, conteudo completo mora nos overlays (mesmo padrao ja usado
            pra Config: reaproveita .cfgOverlay em vez de escrever CSS novo
@@ -635,9 +640,6 @@
         </div>
         <div class="prevfaixa" id="prevBestiarioFaixa"></div>
       </div>
-     </section>
-     </div>
-     <div class="pgDots" id="perfilDots"><i class="on"></i><i></i><i></i></div>
     </div>
 
   </div>
@@ -11137,7 +11139,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       if (ds) ds.textContent = _tr('atr.'+k+'Info');
       const bt=document.getElementById('atrMais'+n);
       if (bt) bt.textContent = noTeto(k) ? 'MAX' : '+';
-      const c=document.querySelector('.alinha[data-atr="'+k+'"]');
+      const c=document.querySelector('.aneisAtr[data-atr="'+k+'"]');
       if (c) c.classList.toggle('sel', window.__atrSel === k);
     });
     const info = document.getElementById('atrInfo');
@@ -11146,6 +11148,29 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       info.textContent = k ? (_tr('atr.'+k+'Info') + '. ' + _tr('atr.regra')) : _tr('atr.regra');
     }
 
+
+    // ---- Aneis (Perfil): le os valores ja calculados nos elementos ocultos ----
+    (function(){
+      const arc=(id,pct,r)=>{const e=document.getElementById(id); if(!e) return; const c=2*Math.PI*r; e.style.strokeDasharray=c; e.style.strokeDashoffset=c*(1-Math.max(0,Math.min(100,pct))/100);};
+      const w=id=>{const e=document.getElementById(id); return e? (parseFloat(e.style.width)||0):0};
+      arc('anelXp',w('perfilFill'),92); arc('anelHp',w('perfilHpFill'),76);
+      const tx=(a,b)=>{const x=document.getElementById(a),y=document.getElementById(b); if(x&&y) x.textContent=y.textContent.replace(' XP','')};
+      tx('anelHpTxt','perfilHpNum'); tx('anelXpTxt','perfilXpNum');
+      [['fortuna','Fortuna'],['foco','Foco'],['vigor','Vigor']].forEach(([k,n])=>{
+        arc('anel'+n,(gasto[k]/15)*100,26);
+        const v=document.getElementById('atr'+n+'Valor'), o=document.getElementById('anelVal'+n);
+        if(v&&o) o.textContent=v.textContent;
+      });
+      const ln=document.getElementById('anelStatsLinha');
+      if(ln){
+        const it=[];
+        document.querySelectorAll('.anelOculto .planoStat:not(.semMoedas)').forEach(p=>{
+          const v=p.querySelector('.statval'), l=p.querySelector('.statlabel');
+          if(v&&l&&v.textContent!=='—') it.push('<span><b>'+v.textContent+'</b> '+l.textContent.toLowerCase()+'</span>');
+        });
+        ln.innerHTML=it.join('<i>·</i>');
+      }
+    })();
     const bFortuna = document.getElementById('atrMaisFortuna');
     if (bFortuna) bFortuna.disabled = disp <= 0 || noTeto('fortuna');
     const bFoco = document.getElementById('atrMaisFoco');
@@ -11176,7 +11201,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   }
   // toque na coluna seleciona o atributo e mostra a descricao dele (toque de novo limpa)
   window.__atrSel = null;
-  document.querySelectorAll('.alinha').forEach(c => {
+  document.querySelectorAll('.aneisAtr').forEach(c => {
     c.addEventListener('click', ev => {
       if (ev.target.closest('.gplus')) return;
       const k = c.dataset.atr;
@@ -11187,16 +11212,6 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   // troca de idioma: refaz os textos
   window.renderAtributosPontos = renderAtributosPontos;
   // o dicionario de i18n (TRADUCOES) so existe depois deste bloco -- repinta quando tudo carregou
-  // Perfil em paginas: dots seguem o scroll, toque no dot navega
-  (function(){
-    const tr=document.getElementById('perfilTrilho'), dots=document.querySelectorAll('#perfilDots i');
-    if(!tr||!dots.length) return;
-    tr.addEventListener('scroll',()=>{
-      const i=Math.round(tr.scrollLeft/Math.max(1,tr.clientWidth));
-      dots.forEach((d,k)=>d.classList.toggle('on',k===i));
-    },{passive:true});
-    dots.forEach((d,k)=>d.addEventListener('click',()=>tr.scrollTo({left:k*tr.clientWidth,behavior:'smooth'})));
-  })();
   window.addEventListener('load', () => renderAtributosPontos());
   renderAtributosPontos();   // primeira pintura, sem esperar o primeiro render()
 

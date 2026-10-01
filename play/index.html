@@ -38,7 +38,7 @@
      alteracao aqui (bump manual) pra forcar cache-bust; SUBIR ESTE
      NUMERO sempre que style.css mudar e o problema persistir em
      producao. -->
-<link rel="stylesheet" href="style.css?v=26">
+<link rel="stylesheet" href="style.css?v=27">
 
 <!-- =====================================================================
      TOGGLE DEBUG — silenciar console (log/warn/error)  —  precisa ser o
@@ -558,7 +558,7 @@
 
       <div class="planoStats">
         <div class="planoStat"><span class="statval" id="statVida">—</span><span class="statlabel" data-i18n="perfil.vidaMaxima">Vida máxima</span></div>
-        <div class="planoStat"><span class="statval" id="statMoedas">—</span><span class="statlabel" data-i18n="inv.moedas">Moedas</span></div>
+        <div class="planoStat semMoedas"><span class="statval" id="statMoedas">—</span><span class="statlabel" data-i18n="inv.moedas">Moedas</span></div>
         <div class="planoStat"><span class="statval" id="statBonusXp">—</span><span class="statlabel" data-i18n="perfil.bonusXpEquip">Bônus XP equip.</span></div>
         <div class="planoStat"><span class="statval" id="statBonusMoedas">—</span><span class="statlabel" data-i18n="perfil.bonusMoedasEquip">Bônus moedas equip.</span></div>
       </div>
@@ -568,27 +568,27 @@
         <div class="alinha" data-atr="fortuna">
           <span class="aico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5l2.9 6.6 7.1.7-5.4 4.8 1.6 7-6.2-3.8-6.2 3.8 1.6-7-5.4-4.8 7.1-.7z"/></svg></span>
           <div class="ameio">
-            <div class="atop"><b class="atrnome" data-i18n="atr.fortuna">Fortuna</b><b class="atrvalor" id="atrFortunaValor">+0%</b></div>
+            <div class="atop"><b class="atrnome" data-i18n="atr.fortuna">Fortuna</b><span class="adir"><b class="atrvalor" id="atrFortunaValor">+0%</b><span class="apts"><span id="atrFortunaPts">0</span>/15</span></span></div>
             <span class="atrseg" id="atrFortunaSeg"></span>
-            <span class="adesc"><span id="atrFortunaDesc"></span> · <span id="atrFortunaPts">0</span>/15</span>
+            <span class="adesc" id="atrFortunaDesc"></span>
           </div>
           <button class="gplus" id="atrMaisFortuna" type="button" aria-label="Investir">+</button>
         </div>
         <div class="alinha" data-atr="foco">
           <span class="aico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".8" fill="currentColor"/></svg></span>
           <div class="ameio">
-            <div class="atop"><b class="atrnome" data-i18n="atr.foco">Foco</b><b class="atrvalor" id="atrFocoValor">+0%</b></div>
+            <div class="atop"><b class="atrnome" data-i18n="atr.foco">Foco</b><span class="adir"><b class="atrvalor" id="atrFocoValor">+0%</b><span class="apts"><span id="atrFocoPts">0</span>/15</span></span></div>
             <span class="atrseg" id="atrFocoSeg"></span>
-            <span class="adesc"><span id="atrFocoDesc"></span> · <span id="atrFocoPts">0</span>/15</span>
+            <span class="adesc" id="atrFocoDesc"></span>
           </div>
           <button class="gplus" id="atrMaisFoco" type="button" aria-label="Investir">+</button>
         </div>
         <div class="alinha" data-atr="vigor">
           <span class="aico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5s-7.5-4.6-9.8-9.3C.9 8 2.4 4.8 5.6 4.1c2-.4 3.9.5 5 2.1a5.5 5.5 0 015-2.1c3.2.7 4.7 3.9 3.4 7.1-2.3 4.7-9.8 9.3-9.8 9.3z"/></svg></span>
           <div class="ameio">
-            <div class="atop"><b class="atrnome" data-i18n="atr.vigor">Vigor</b><b class="atrvalor" id="atrVigorValor">+0%</b></div>
+            <div class="atop"><b class="atrnome" data-i18n="atr.vigor">Vigor</b><span class="adir"><b class="atrvalor" id="atrVigorValor">+0%</b><span class="apts"><span id="atrVigorPts">0</span>/15</span></span></div>
             <span class="atrseg" id="atrVigorSeg"></span>
-            <span class="adesc"><span id="atrVigorDesc"></span> · <span id="atrVigorPts">0</span>/15</span>
+            <span class="adesc" id="atrVigorDesc"></span>
           </div>
           <button class="gplus" id="atrMaisVigor" type="button" aria-label="Investir">+</button>
         </div>
@@ -11128,7 +11128,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       if (ds) ds.textContent = _tr('atr.'+k+'Info');
       const bt=document.getElementById('atrMais'+n);
       if (bt) bt.textContent = noTeto(k) ? 'MAX' : '+';
-      const c=document.querySelector('.gcol[data-atr="'+k+'"]');
+      const c=document.querySelector('.alinha[data-atr="'+k+'"]');
       if (c) c.classList.toggle('sel', window.__atrSel === k);
     });
     const info = document.getElementById('atrInfo');
@@ -11167,7 +11167,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   }
   // toque na coluna seleciona o atributo e mostra a descricao dele (toque de novo limpa)
   window.__atrSel = null;
-  document.querySelectorAll('.gcol').forEach(c => {
+  document.querySelectorAll('.alinha').forEach(c => {
     c.addEventListener('click', ev => {
       if (ev.target.closest('.gplus')) return;
       const k = c.dataset.atr;

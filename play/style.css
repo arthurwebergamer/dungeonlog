@@ -5815,3 +5815,16 @@
 .adesc{font-family:'Outfit',sans-serif;font-size:11px;color:var(--dim)}
 .alinha .gplus{width:36px;height:36px}
 .perfilPlano #prevConquistas,.perfilPlano #prevBestiario{background:none;border:0;border-radius:0;box-shadow:none;padding:12px 0 0;margin:0;border-top:1px solid var(--line)}
+
+/* v4.145: menos informacao -- sem brilho, sem chip de nivel (ja no cabecalho), Moedas fora da faixa
+   (ja na barra de cima), descricao do atributo so ao tocar na linha */
+.planoHero::before{display:none}
+.planoNivel{display:none}
+.planoStat.semMoedas{display:none}
+.adir{display:flex;align-items:baseline;gap:8px}
+.apts{font-family:'Outfit',sans-serif;font-size:11px;color:var(--dim)}
+.alinha{cursor:pointer;-webkit-tap-highlight-color:transparent}
+.adesc{display:none;font-family:'Outfit',sans-serif;font-size:11.5px;line-height:1.35;color:var(--muted)}
+.alinha.sel .adesc{display:block}
+.alinha .atrseg{margin:7px 0 0}
+.alinha.sel .atrseg{margin-bottom:6px}

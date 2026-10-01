@@ -38,7 +38,7 @@
      alteracao aqui (bump manual) pra forcar cache-bust; SUBIR ESTE
      NUMERO sempre que style.css mudar e o problema persistir em
      producao. -->
-<link rel="stylesheet" href="style.css?v=40">
+<link rel="stylesheet" href="style.css?v=41">
 
 <!-- =====================================================================
      TOGGLE DEBUG — silenciar console (log/warn/error)  —  precisa ser o
@@ -14059,7 +14059,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     <div class="passo on" id="passoLogin">
       <div class="loginEscolha" id="loginEscolha">
         <div class="marca">
-          <span class="titulo logoDL">DUNGEON<b>LOG</b></span>
+          <span class="titulo logoDL">dungeon<b>log</b></span>
         </div>
         <p class="loginEscolhaTagline" data-i18n="login.tagline">Suas tarefas viram uma aventura</p>
         <button class="loginGoogleBtn" id="loginEscolhaGoogle">
@@ -14080,7 +14080,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
       <div class="loginFormWrap" id="loginFormWrap" style="display:none">
       <div class="marca">
-        <span class="titulo logoDL">DUNGEON<b>LOG</b></span>
+        <span class="titulo logoDL">dungeon<b>log</b></span>
         <p class="loginModo" id="loginModo" data-i18n="login.entreNaSuaConta">Entre na sua conta</p>
       </div>
 
@@ -14271,7 +14271,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   card.insertAdjacentHTML('afterbegin', `
     <div class="passo" id="passoVerificarEmail">
       <div class="marca">
-        <span class="titulo logoDL">DUNGEON<b>LOG</b></span>
+        <span class="titulo logoDL">dungeon<b>log</b></span>
       </div>
       <div class="verificarBloco">
         <span class="verificarIcone"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 7l8.5 6 8.5-6"/></svg></span>
@@ -15011,7 +15011,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   const htmlSplash = `
     <div class="passo on" id="passoSplash">
       <div class="marca">
-        <span class="titulo logoDL">DUNGEON<b>LOG</b></span>
+        <span class="titulo logoDL">dungeon<b>log</b></span>
       </div>
     </div>
   `;
@@ -16405,7 +16405,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       const emailSeguro = (user.email || '').replace(/</g,'');
       document.body.insertAdjacentHTML('beforeend', `
         <div id="bloqueioVerificacaoEmail">
-          <span class="titulo logoDL">DUNGEON<b>LOG</b></span>
+          <span class="titulo logoDL">dungeon<b>log</b></span>
           <div class="verificarBloco">
             <span class="verificarIcone"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 7l8.5 6 8.5-6"/></svg></span>
             <h2 class="verificarTitulo">${en ? 'Confirm your email' : 'Confirme seu e-mail'}</h2>

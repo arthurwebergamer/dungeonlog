@@ -5955,8 +5955,9 @@ body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 input,textarea,[contenteditable="true"]{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
 img{-webkit-user-drag:none;user-drag:none}
 
-/* v4.158 -- logo texto (Lilas suave): DUNGEON lilas medio + LOG creme */
+/* v4.158 -- logo texto (opcao 1): dungeon fino + log grosso, tudo creme */
 .titulo.logoDL,#passoLogin .titulo.logoDL,.loginEscolha .titulo.logoDL,#bloqueioVerificacaoEmail .titulo.logoDL{
-  font-family:'Outfit',sans-serif !important;font-weight:500 !important;color:#C9C2E0 !important;
-  font-size:clamp(26px,8.8vw,38px) !important;letter-spacing:.15em !important;padding-left:.15em;line-height:1;text-shadow:none !important}
+  font-family:'Outfit',sans-serif !important;font-weight:300 !important;color:#F5F0E9 !important;
+  font-size:clamp(36px,14vw,58px) !important;letter-spacing:-.012em !important;padding-left:0;line-height:1;text-shadow:none !important}
 .logoDL b{font-weight:700;color:#F5F0E9}
+#bloqueioVerificacaoEmail .titulo.logoDL{font-size:clamp(32px,11vw,44px) !important}

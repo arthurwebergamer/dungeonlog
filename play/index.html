@@ -15781,6 +15781,12 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       fbApp = initializeApp(firebaseConfig);
       auth = getAuth(fbApp);
       db = getFirestore(fbApp);
+      // idioma dos e-mails do Firebase (verificacao, recuperar senha): segue o idioma do app.
+      // Cada idioma usa o seu modelo no console (Authentication > Modelos).
+      window.__ajustarIdiomaEmail = function(){
+        try { auth.languageCode = (typeof idiomaApp === 'function' && idiomaApp() === 'en') ? 'en' : 'pt'; } catch(e){}
+      };
+      window.__ajustarIdiomaEmail();
     } catch(e){
       console.error('QuestLog/Firebase: falha ao inicializar (confere o firebaseConfig)', e);
       if (!passoLogin) return;
@@ -16079,6 +16085,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
       document.getElementById('verificarReenviar').onclick = async () => {
         try {
+          if (window.__ajustarIdiomaEmail) window.__ajustarIdiomaEmail();
           await sendEmailVerification(user);
           if (typeof window.aviso === 'function') window.aviso(en ? 'Email resent' : 'Email reenviado');
         } catch(e){
@@ -16332,6 +16339,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
       document.getElementById('bloqueioReenviar').onclick = async () => {
         try {
+          if (window.__ajustarIdiomaEmail) window.__ajustarIdiomaEmail();
           await sendEmailVerification(user);
           if (typeof window.aviso === 'function') window.aviso(en ? 'Email resent' : 'Email reenviado');
         } catch(e){
@@ -16521,7 +16529,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           // nao bloqueia a sessao que acabou de criar a conta (ver
           // "!contaNova" em aoLogar) -- so dispara o email e avisa.
           try {
-            await sendEmailVerification(cred.user);
+            if (window.__ajustarIdiomaEmail) window.__ajustarIdiomaEmail();
+          await sendEmailVerification(cred.user);
             if (typeof window.aviso === 'function') window.aviso(en ? 'Account created! We sent a confirmation link to your email.' : 'Conta criada! Enviamos um link de confirmação pro seu email.');
           } catch(e){
             console.error('QuestLog/Firebase: envio do email de verificacao falhou', e);
@@ -16575,7 +16584,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         return;
       }
       try {
-        await sendPasswordResetEmail(auth, email);
+        if (window.__ajustarIdiomaEmail) window.__ajustarIdiomaEmail();
+          await sendPasswordResetEmail(auth, email);
         if (typeof window.aviso === 'function') window.aviso(en ? 'Recovery email sent' : 'Email de recuperação enviado');
       } catch(e){
         console.error('QuestLog/Firebase: recuperar senha falhou', e);

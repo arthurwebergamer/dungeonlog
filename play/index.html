@@ -38,7 +38,7 @@
      alteracao aqui (bump manual) pra forcar cache-bust; SUBIR ESTE
      NUMERO sempre que style.css mudar e o problema persistir em
      producao. -->
-<link rel="stylesheet" href="style.css?v=37">
+<link rel="stylesheet" href="style.css?v=38">
 
 <!-- =====================================================================
      TOGGLE DEBUG — silenciar console (log/warn/error)  —  precisa ser o
@@ -14258,6 +14258,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         <span class="boasVindasNivel" id="boasVindasNivel"></span>
       </div>
       <button class="primario" id="boasVindasContinuar" data-i18n="acao.continuar">Continuar</button>
+      <button class="loginLink" id="boasVindasTrocar" data-i18n="login.trocarConta">Não é você? Trocar de conta</button>
     </div>
   `);
 
@@ -14446,6 +14447,26 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
   // expõe pro modulo Firebase (script type=module abaixo) saber se e cadastro ou login
   window.questlogModoCadastro = () => modoCadastro;
+
+  // mostrar/ocultar senha (olho) nos dois campos de senha
+  [campoSenha, campoConfirmar].forEach(inp => {
+    if (!inp) return;
+    const wrap = inp.closest('.campo'); if (!wrap) return;
+    wrap.classList.add('temOlho');
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'verSenha';
+    const OLHO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+    const OLHO_X = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path d="M4 4l16 16"/></svg>';
+    const atualizar = () => {
+      const en = (localStorage.getItem('questlog.idioma.v1') || 'pt') === 'en';
+      const vis = inp.type === 'text';
+      b.innerHTML = vis ? OLHO_X : OLHO;
+      b.setAttribute('aria-label', vis ? (en ? 'Hide password' : 'Ocultar senha') : (en ? 'Show password' : 'Mostrar senha'));
+    };
+    b.onclick = () => { inp.type = inp.type === 'password' ? 'text' : 'password'; atualizar(); };
+    atualizar();
+    wrap.appendChild(b);
+  });
 })();
 </script>
 
@@ -16332,6 +16353,13 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           entrarNoApp();
         }
         document.getElementById('boasVindasContinuar').onclick = continuar;
+        document.getElementById('boasVindasTrocar').onclick = async function(){
+          this.disabled = true;
+          try { if (window._questlogUltimoPush) await Promise.race([window._questlogUltimoPush, new Promise(r => setTimeout(r, 3000))]); } catch(e){}
+          try { await auth.signOut(); } catch(e){}
+          try { localStorage.removeItem('questlog.conta.v1'); localStorage.setItem('questlog.forcarLogin.v1', '1'); } catch(e){}
+          location.reload();
+        };
       }
     }
 
@@ -16489,10 +16517,24 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       // aoLogar() (ou mostrarTelaVerificacao()), no exato momento em que
       // a tela seguinte esta pronta -- ver esses dois blocos mais abaixo.
       if (typeof window.mostrarLoadingMasmorra === 'function') window.mostrarLoadingMasmorra();
+      // voltar/fechar a janela do Google: o Firebase so avisa o cancelamento
+      // bem depois, e o loading ficava preso sem a pessoa estar carregando
+      // nada. Ao voltar o foco pro app sem sessao, solta o loading.
+      let googleEncerrado = false;
+      const aoVoltarFoco = () => {
+        if (document.visibilityState === 'hidden') return;
+        setTimeout(() => {
+          if (!googleEncerrado && !auth.currentUser && typeof window.esconderLoadingMasmorra === 'function') window.esconderLoadingMasmorra();
+        }, 2500);
+      };
+      window.addEventListener('focus', aoVoltarFoco);
+      document.addEventListener('visibilitychange', aoVoltarFoco);
       try {
         await signInWithPopup(auth, new GoogleAuthProvider());
+        googleEncerrado = true;
       }
       catch(e){
+        googleEncerrado = true;
         console.error('QuestLog/Firebase: Google falhou', e);
         const cancelou = e && (e.code === 'auth/popup-closed-by-user' || e.code === 'auth/cancelled-popup-request');
         if (cancelou){
@@ -17534,6 +17576,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'login.cadastreSeAgora':   { pt:'Cadastre-se agora', en:'Sign up now' },
     'login.agoraNao':          { pt:'Agora não', en:'Not now' },
     'login.bemVindoDeVolta':   { pt:'Bem-vindo de volta', en:'Welcome back' },
+    'login.trocarConta':       { pt:'Não é você? Trocar de conta', en:'Not you? Switch account' },
     'login.confirmeTitulo':    { pt:'Confirme seu e-mail', en:'Confirm your email' },
     'login.confereSpam':       { pt:'Não achou? Confere o <b>spam</b>.', en:'Can\'t find it? Check your <b>spam</b>.' },
     'login.reenviarEmail':     { pt:'Reenviar email', en:'Resend email' },

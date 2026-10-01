@@ -5939,3 +5939,10 @@
 
 /* v4.155 -- sem destaque azul nativo do Android ao tocar (nav, botoes, links) */
 html,body,button,a,input,select,textarea,label,[role="button"],[onclick],.nav,.nav *{-webkit-tap-highlight-color:transparent}
+
+/* v4.156 -- olho de senha + trocar de conta */
+.campo.temOlho input[type=password],.campo.temOlho #loginSenha,.campo.temOlho #loginSenhaConfirmar{padding-right:46px !important}
+.verSenha{position:absolute;right:6px;bottom:6px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:none;border:0;color:var(--dim);cursor:pointer;padding:0}
+.verSenha svg{width:20px;height:20px}
+.campo.temOlho .campoStatus{right:46px}
+#boasVindasTrocar{margin-top:6px}

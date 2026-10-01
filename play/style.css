@@ -5900,3 +5900,8 @@
 .aneisAtr .gplus{margin-top:2px}
 .anelInfo{margin-top:18px;min-height:0}
 .anelInfo:empty{display:none}
+/* v4.149 — cabecalho Atributos: alinhado e mesma fonte */
+.anelAtr .atrhead{display:flex!important;justify-content:space-between!important;align-items:center!important}
+.anelAtr .atrpill,.anelAtr .atrpill .pgNum,.anelAtr .atrpill .pgLbl{font-family:'Outfit',sans-serif!important;font-size:13px!important;font-weight:500!important;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)!important;margin:0!important}
+.anelAtr .atrpill{flex:none;gap:6px!important;text-align:right}
+.anelAtr .atrpill:not(.vazio) .pgNum,.anelAtr .atrpill:not(.vazio) .pgLbl{color:var(--text)!important}

@@ -827,9 +827,25 @@
         <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14L21 3"/></svg>
       </a>
 
-      <!-- Zona de risco (Sair/Apagar tudo) MUDOU pra dentro de
-           #contaOverlay (pedido do usuario, v4.9x) -- ver bloco logo apos
-           #prefsOverlay mais abaixo pro HTML atual dos 2 botoes. -->
+      <!-- Zona de risco (Sair/Excluir conta): de volta ao fim da tela principal de Config (pedido do usuario). Mesmos ids/JS. -->
+      <div class="zonarisco">
+        <button class="cfgbtnfull perigo oculto" id="cfgSairBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span data-i18n="cfg.sair">Sair</span>
+        </button>
+        <!-- v4.127 (pedido do usuario): "Apagar tudo" (so zerava
+             saves/{uid} + localStorage, NUNCA apagou o usuario do Firebase
+             Auth) foi removido -- este botao herdou o icone de lixeira e
+             excluir de verdade a conta (deleteUser), apos reautenticar
+             (senha ou popup do Google, conforme o provider). So aparece
+             logado (mesmo padrao visual/oculto do cfgSairBtn, classe
+             alternada por JS -- ver perto de onAuthStateChanged).
+             Ver folha #excluirContaOverlay logo apos #contaOverlay. -->
+        <button class="cfgbtnfull perigo oculto" id="excluirContaBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          <span data-i18n="cfg.excluirConta">Excluir conta</span>
+        </button>
+      </div>
     </div>
   </div>
 
@@ -1056,24 +1072,6 @@
         🐞 Cancel subscription (debug)
       </button>
 
-      <div class="zonarisco">
-        <button class="cfgbtnfull perigo oculto" id="cfgSairBtn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-          <span data-i18n="cfg.sair">Sair</span>
-        </button>
-        <!-- v4.127 (pedido do usuario): "Apagar tudo" (so zerava
-             saves/{uid} + localStorage, NUNCA apagou o usuario do Firebase
-             Auth) foi removido -- este botao herdou o icone de lixeira e
-             excluir de verdade a conta (deleteUser), apos reautenticar
-             (senha ou popup do Google, conforme o provider). So aparece
-             logado (mesmo padrao visual/oculto do cfgSairBtn, classe
-             alternada por JS -- ver perto de onAuthStateChanged).
-             Ver folha #excluirContaOverlay logo apos #contaOverlay. -->
-        <button class="cfgbtnfull perigo oculto" id="excluirContaBtn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-          <span data-i18n="cfg.excluirConta">Excluir conta</span>
-        </button>
-      </div>
     </div>
   </div>
 

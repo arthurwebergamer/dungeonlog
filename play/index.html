@@ -38,7 +38,7 @@
      alteracao aqui (bump manual) pra forcar cache-bust; SUBIR ESTE
      NUMERO sempre que style.css mudar e o problema persistir em
      producao. -->
-<link rel="stylesheet" href="style.css?v=35">
+<link rel="stylesheet" href="style.css?v=36">
 
 <!-- =====================================================================
      TOGGLE DEBUG — silenciar console (log/warn/error)  —  precisa ser o
@@ -14377,6 +14377,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   function limparErroEmail(){
     statusEmail.classList.remove('erro');
     erroEmail.style.display = 'none';
+    erroEmail.style.color = '';
   }
   campoEmail.addEventListener('input', limparErroEmail);
 
@@ -14427,6 +14428,21 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     erroEmail.style.display = 'block';
   };
   window.questlogLimparErroEmail = limparErroEmail;
+  // mensagem de SUCESSO inline sob o email (ex: recuperacao enviada)
+  window.questlogMostrarOkEmail = (msg) => {
+    statusEmail.classList.remove('erro');
+    erroEmail.textContent = msg;
+    erroEmail.style.color = 'var(--sucesso, #4CAF7A)';
+    erroEmail.style.display = 'block';
+  };
+  // mensagem inline abaixo de um botao (telas de verificacao); some em 6s
+  window.questlogMsgInline = (botaoId, msg, ok) => {
+    const b = document.getElementById(botaoId); if (!b) return;
+    let p = document.getElementById(botaoId + 'Msg');
+    if (!p){ p = document.createElement('p'); p.id = botaoId + 'Msg'; p.className = 'loginSenhaErro msgInline'; b.insertAdjacentElement('afterend', p); }
+    p.textContent = msg; p.classList.toggle('ok', !!ok); p.style.display = 'block';
+    clearTimeout(p._t); p._t = setTimeout(() => { p.style.display = 'none'; }, 6000);
+  };
 
   // expõe pro modulo Firebase (script type=module abaixo) saber se e cadastro ou login
   window.questlogModoCadastro = () => modoCadastro;
@@ -16048,7 +16064,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // em mobile.
     async function corrigirEmailErrado(user, botao){
       botao.disabled = true;
-      botao.textContent = 'Corrigindo…';
+      botao.textContent = (localStorage.getItem('questlog.idioma.v1') === 'en') ? 'Fixing…' : 'Corrigindo…';
       try {
         await user.delete();
       } catch(e){
@@ -16093,10 +16109,10 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         try {
           if (window.__ajustarIdiomaEmail) window.__ajustarIdiomaEmail();
           await sendEmailVerification(user);
-          if (typeof window.aviso === 'function') window.aviso(en ? 'Email resent' : 'Email reenviado');
+          window.questlogMsgInline && window.questlogMsgInline('verificarReenviar', en ? 'Email resent' : 'Email reenviado', true);
         } catch(e){
           console.error('QuestLog/Firebase: reenvio de verificacao falhou', e);
-          if (typeof window.aviso === 'function') window.aviso(en ? 'Couldn\'t resend -- wait a bit and try again' : 'Não deu pra reenviar -- espera um pouco e tenta de novo');
+          window.questlogMsgInline && window.questlogMsgInline('verificarReenviar', en ? 'Couldn\'t resend -- wait a bit and try again' : 'Não deu pra reenviar -- espera um pouco e tenta de novo', false);
         }
       };
 
@@ -16354,10 +16370,10 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         try {
           if (window.__ajustarIdiomaEmail) window.__ajustarIdiomaEmail();
           await sendEmailVerification(user);
-          if (typeof window.aviso === 'function') window.aviso(en ? 'Email resent' : 'Email reenviado');
+          window.questlogMsgInline && window.questlogMsgInline('bloqueioReenviar', en ? 'Email resent' : 'Email reenviado', true);
         } catch(e){
           console.error('QuestLog/Firebase: reenvio de verificacao falhou', e);
-          if (typeof window.aviso === 'function') window.aviso(en ? 'Couldn\'t resend -- wait a bit and try again' : 'Não deu pra reenviar -- espera um pouco e tenta de novo');
+          window.questlogMsgInline && window.questlogMsgInline('bloqueioReenviar', en ? 'Couldn\'t resend -- wait a bit and try again' : 'Não deu pra reenviar -- espera um pouco e tenta de novo', false);
         }
       };
 
@@ -16578,7 +16594,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         // texto), mesma linguagem visual da tela de senha -- o toast fica
         // mudo com TOASTS_DESATIVADOS e ninguem via feedback nenhum ao
         // tentar cadastrar email ja existente.
-        if (e && e.code === 'auth/email-already-in-use' && typeof window.questlogMostrarErroEmail === 'function') {
+        if (e && (e.code === 'auth/email-already-in-use' || e.code === 'auth/invalid-email') && typeof window.questlogMostrarErroEmail === 'function') {
           window.questlogMostrarErroEmail(msg);
           if (typeof window.esconderLoadingMasmorra === 'function') window.esconderLoadingMasmorra();
         } else if (typeof window.erroLoadingMasmorra === 'function') {
@@ -16592,17 +16608,20 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     document.getElementById('loginEsqueci').onclick = async () => {
       const email = document.getElementById('loginEmail').value.trim();
       const en = idiomaAuth() === 'en';
-      if (!email) {
-        if (typeof window.aviso === 'function') window.aviso(en ? 'Type your email first' : 'Digita seu email primeiro');
-        return;
-      }
+      const erro = m => window.questlogMostrarErroEmail && window.questlogMostrarErroEmail(m);
+      if (window.questlogLimparErroEmail) window.questlogLimparErroEmail();
+      if (!email) { erro(en ? 'Type your email first' : 'Digita seu email primeiro'); return; }
       try {
         if (window.__ajustarIdiomaEmail) window.__ajustarIdiomaEmail();
-          await sendPasswordResetEmail(auth, email);
-        if (typeof window.aviso === 'function') window.aviso(en ? 'Recovery email sent' : 'Email de recuperação enviado');
+        await sendPasswordResetEmail(auth, email);
+        if (window.questlogMostrarOkEmail) window.questlogMostrarOkEmail(en ? 'Recovery email sent -- check your inbox' : 'Email de recuperação enviado -- confira sua caixa de entrada');
       } catch(e){
         console.error('QuestLog/Firebase: recuperar senha falhou', e);
-        if (typeof window.aviso === 'function') window.aviso(en ? 'Couldn\'t find that account' : 'Não achei essa conta');
+        const c = e && e.code;
+        erro(c === 'auth/invalid-email' ? (en ? 'Invalid email' : 'Email inválido')
+          : c === 'auth/network-request-failed' ? (en ? 'No connection. Check your internet and try again.' : 'Sem conexão. Verifique a internet e tente de novo.')
+          : c === 'auth/too-many-requests' ? (en ? 'Too many attempts -- wait a bit and try again' : 'Muitas tentativas -- espera um pouco e tenta de novo')
+          : (en ? 'Couldn\'t send the email -- try again' : 'Não deu pra enviar o email -- tenta de novo'));
       }
     };
 

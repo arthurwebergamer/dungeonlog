@@ -5932,3 +5932,7 @@
 .boasVindasNivel{font-family:'Silkscreen',monospace;font-size:11px;letter-spacing:.08em;color:var(--dim);text-transform:uppercase;text-shadow:0 1px 4px rgba(0,0,0,.85)}
 .boasVindasNivel:empty{display:none}
 #passoBoasVindas .primario{background:var(--accent)!important;color:#14101c!important;border:none!important}
+
+/* v4.154 -- feedback inline (login/verificacao) */
+.msgInline{margin:8px 0 0;text-align:center}
+.msgInline.ok{color:var(--sucesso,#4CAF7A)}

@@ -5909,3 +5909,8 @@
 #viewInventario .invfiltros{position:sticky;top:0;z-index:6;background:var(--bg);margin:0 -14px 8px;padding:8px 14px}
 .perfilAneis .aarco,.perfilAneis .aarco.xp{stroke:var(--accent)}
 .anelLeg .dxp{background:var(--accent)}
+/* v4.151 — XP/Vida mantêm cor fixa; só os arcos de atributo seguem o tema; Conquistas sem anel */
+.perfilAneis .aarco.xp{stroke:#F2C94C}
+.perfilAneis .aarco.hp{stroke:#E5698A}
+.anelLeg .dxp{background:#F2C94C}
+.perfilAneis .conqAnel{display:none}

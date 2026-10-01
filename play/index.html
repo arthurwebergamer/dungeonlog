@@ -17882,5 +17882,14 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 })();
 </script>
 
+<script>
+// sem menu de "baixar imagem"/copiar ao segurar o dedo (Android); campos de texto mantem o menu
+document.addEventListener('contextmenu', function(e){
+  var t = e.target;
+  if (t && t.closest && t.closest('input,textarea,[contenteditable="true"]')) return;
+  e.preventDefault();
+}, true);
+document.addEventListener('dragstart', function(e){ if (e.target && e.target.tagName === 'IMG') e.preventDefault(); }, true);
+</script>
 </body>
 </html>

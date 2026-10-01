@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Dungeonlog</title>
 <meta name="theme-color" content="#1A1526">
 <!-- pedido do usuario (print real, Android/Chrome): "linhas estranhas em
@@ -27,7 +27,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=Outfit:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=Outfit:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <!-- v4.24x (bug relatado pelo usuario: loading "masmorra" aparecendo
      pequeno/inline no canto em vez de tela cheia -- CSS local confirmado
      100% correto via computed style (position:fixed, z-index:10000,
@@ -38,7 +38,7 @@
      alteracao aqui (bump manual) pra forcar cache-bust; SUBIR ESTE
      NUMERO sempre que style.css mudar e o problema persistir em
      producao. -->
-<link rel="stylesheet" href="style.css?v=34">
+<link rel="stylesheet" href="style.css?v=41">
 
 <!-- =====================================================================
      TOGGLE DEBUG — silenciar console (log/warn/error)  —  precisa ser o
@@ -108,8 +108,12 @@
       const idiomasNavegador = (navigator.languages && navigator.languages.length)
         ? navigator.languages
         : [navigator.language || navigator.userLanguage || ''];
-      const primeiro = (idiomasNavegador[0] || '').toLowerCase();
-      const idioma = primeiro.indexOf('pt-br') === 0 ? 'pt' : 'en';
+      const lista = Array.prototype.map.call(idiomasNavegador, l => String(l || '').toLowerCase());
+      const primeiro = lista[0] || '';
+      // PT se: o 1o idioma e pt-BR ou 'pt' sem regiao; OU pt-BR aparece em qualquer posicao da lista
+      // (ex: Chrome com ingles no topo mas portugues do Brasil tambem configurado). pt-PT sozinho continua EN.
+      const ehPt = primeiro.indexOf('pt-br') === 0 || primeiro === 'pt' || lista.some(l => l.indexOf('pt-br') === 0);
+      const idioma = ehPt ? 'pt' : 'en';
       localStorage.setItem('questlog.idioma.v1', idioma);
     } catch(e){
       // localStorage indisponivel (modo privado restritivo, por
@@ -14055,7 +14059,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     <div class="passo on" id="passoLogin">
       <div class="loginEscolha" id="loginEscolha">
         <div class="marca">
-          <span class="titulo">DUNGEONLOG</span>
+          <span class="titulo logoDL">dungeon<b>log</b></span>
         </div>
         <p class="loginEscolhaTagline" data-i18n="login.tagline">Suas tarefas viram uma aventura</p>
         <button class="loginGoogleBtn" id="loginEscolhaGoogle">
@@ -14076,7 +14080,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
       <div class="loginFormWrap" id="loginFormWrap" style="display:none">
       <div class="marca">
-        <span class="titulo">DUNGEONLOG</span>
+        <span class="titulo logoDL">dungeon<b>log</b></span>
         <p class="loginModo" id="loginModo" data-i18n="login.entreNaSuaConta">Entre na sua conta</p>
       </div>
 
@@ -14248,10 +14252,13 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   card.insertAdjacentHTML('afterbegin', `
     <div class="passo" id="passoBoasVindas">
       <div class="marca">
+        <div class="boasVindasHeroi" id="boasVindasHeroi"></div>
         <span class="boasVindasRotulo" id="boasVindasRotulo" data-i18n="login.bemVindoDeVolta">Bem-vindo de volta</span>
         <span class="titulo" id="boasVindasNome">Aventureiro</span>
+        <span class="boasVindasNivel" id="boasVindasNivel"></span>
       </div>
       <button class="primario" id="boasVindasContinuar" data-i18n="acao.continuar">Continuar</button>
+      <button class="loginLink" id="boasVindasTrocar" data-i18n="login.trocarConta">Não é você? Trocar de conta</button>
     </div>
   `);
 
@@ -14264,12 +14271,12 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   card.insertAdjacentHTML('afterbegin', `
     <div class="passo" id="passoVerificarEmail">
       <div class="marca">
-        <span class="titulo">DUNGEONLOG</span>
+        <span class="titulo logoDL">dungeon<b>log</b></span>
       </div>
       <div class="verificarBloco">
-        <p class="verificarTexto" id="verificarTextoBloco">Confirma seu email pra continuar.<br>
-          Mandamos um link pra <span id="verificarEmailAlvo"></span>.</p>
-        <p class="verificarSpamAviso" data-i18n="login.confereSpam">Não achou? Confere o <b>spam</b>.</p>
+        <span class="verificarIcone"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 7l8.5 6 8.5-6"/></svg></span>
+        <h2 class="verificarTitulo" data-i18n="login.confirmeTitulo">Confirme seu e-mail</h2>
+        <p class="verificarTexto" id="verificarTextoBloco">Enviamos um link para <span id="verificarEmailAlvo"></span>.<br>Abra o link e volte aqui — a confirmação é automática.</p>
       </div>
       <button class="primario" id="verificarReenviar" data-i18n="login.reenviarEmail">Reenviar email</button>
       <button class="loginLink" id="verificarEmailErrado" data-i18n="login.emailErrado">Email errado? Corrigir</button>
@@ -14371,6 +14378,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   function limparErroEmail(){
     statusEmail.classList.remove('erro');
     erroEmail.style.display = 'none';
+    erroEmail.style.color = '';
   }
   campoEmail.addEventListener('input', limparErroEmail);
 
@@ -14421,9 +14429,68 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     erroEmail.style.display = 'block';
   };
   window.questlogLimparErroEmail = limparErroEmail;
+  // mensagem de SUCESSO inline sob o email (ex: recuperacao enviada)
+  window.questlogMostrarOkEmail = (msg) => {
+    statusEmail.classList.remove('erro');
+    erroEmail.textContent = msg;
+    erroEmail.style.color = 'var(--sucesso, #4CAF7A)';
+    erroEmail.style.display = 'block';
+  };
+  // mensagem inline abaixo de um botao (telas de verificacao); some em 6s
+  window.questlogMsgInline = (botaoId, msg, ok) => {
+    const b = document.getElementById(botaoId); if (!b) return;
+    let p = document.getElementById(botaoId + 'Msg');
+    if (!p){ p = document.createElement('p'); p.id = botaoId + 'Msg'; p.className = 'loginSenhaErro msgInline'; b.insertAdjacentElement('afterend', p); }
+    p.textContent = msg; p.classList.toggle('ok', !!ok); p.style.display = 'block';
+    clearTimeout(p._t); p._t = setTimeout(() => { p.style.display = 'none'; }, 6000);
+  };
 
   // expõe pro modulo Firebase (script type=module abaixo) saber se e cadastro ou login
   window.questlogModoCadastro = () => modoCadastro;
+
+  // mostrar/ocultar senha (olho) nos dois campos de senha
+  [campoSenha, campoConfirmar].forEach(inp => {
+    if (!inp) return;
+    const wrap = inp.closest('.campo'); if (!wrap) return;
+    wrap.classList.add('temOlho');
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'verSenha';
+    const OLHO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+    const OLHO_X = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path d="M4 4l16 16"/></svg>';
+    const atualizar = () => {
+      const en = (localStorage.getItem('questlog.idioma.v1') || 'pt') === 'en';
+      const vis = inp.type === 'text';
+      b.innerHTML = vis ? OLHO_X : OLHO;
+      b.setAttribute('aria-label', vis ? (en ? 'Hide password' : 'Ocultar senha') : (en ? 'Show password' : 'Mostrar senha'));
+    };
+    b.onclick = () => { inp.type = inp.type === 'password' ? 'text' : 'password'; atualizar(); };
+    atualizar();
+    wrap.appendChild(b);
+  });
+
+  // logo mais pro meio da tela: o formulario fica ancorado embaixo, entao o
+  // bloco do logo sobe ate ~36% da altura (so sobe, nunca desce)
+  const marcas = [document.querySelector('#loginEscolha .marca'), document.querySelector('#loginFormWrap .marca')].filter(Boolean);
+  function posicionarMarcas(){
+    marcas.forEach(m => {
+      if (!m.offsetParent) return;
+      m.style.transform = '';
+      const r = m.getBoundingClientRect();
+      const atual = r.top + r.height / 2;
+      const alvo = Math.max(window.innerHeight * 0.36, 96 + r.height / 2);
+      m.style.transform = alvo < atual ? 'translateY(' + Math.round(alvo - atual) + 'px)' : '';
+    });
+  }
+  let rafM = 0;
+  const agendarM = () => { cancelAnimationFrame(rafM); rafM = requestAnimationFrame(posicionarMarcas); };
+  window.addEventListener('resize', agendarM);
+  const mo = new MutationObserver(agendarM);
+  ['loginEscolha', 'loginFormWrap', 'passoLogin'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) mo.observe(el, { attributes: true, attributeFilter: ['style', 'class'] });
+  });
+  agendarM();
+  setTimeout(agendarM, 400);
 })();
 </script>
 
@@ -14944,7 +15011,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   const htmlSplash = `
     <div class="passo on" id="passoSplash">
       <div class="marca">
-        <span class="titulo">DUNGEONLOG</span>
+        <span class="titulo logoDL">dungeon<b>log</b></span>
       </div>
     </div>
   `;
@@ -15781,6 +15848,12 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       fbApp = initializeApp(firebaseConfig);
       auth = getAuth(fbApp);
       db = getFirestore(fbApp);
+      // idioma dos e-mails do Firebase (verificacao, recuperar senha): segue o idioma do app.
+      // Cada idioma usa o seu modelo no console (Authentication > Modelos).
+      window.__ajustarIdiomaEmail = function(){
+        try { auth.languageCode = (typeof idiomaApp === 'function' && idiomaApp() === 'en') ? 'en' : 'pt'; } catch(e){}
+      };
+      window.__ajustarIdiomaEmail();
     } catch(e){
       console.error('QuestLog/Firebase: falha ao inicializar (confere o firebaseConfig)', e);
       if (!passoLogin) return;
@@ -16036,7 +16109,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // em mobile.
     async function corrigirEmailErrado(user, botao){
       botao.disabled = true;
-      botao.textContent = 'Corrigindo…';
+      botao.textContent = (localStorage.getItem('questlog.idioma.v1') === 'en') ? 'Fixing…' : 'Corrigindo…';
       try {
         await user.delete();
       } catch(e){
@@ -16071,19 +16144,20 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       const bloco = document.getElementById('verificarTextoBloco');
       if (bloco){
         bloco.innerHTML = en
-          ? 'Confirm your email to continue.<br>\n          We sent a link to <span id="verificarEmailAlvo"></span>.'
-          : 'Confirma seu email pra continuar.<br>\n          Mandamos um link pra <span id="verificarEmailAlvo"></span>.';
+          ? 'We sent a link to <span id="verificarEmailAlvo"></span>.<br>Open it and come back — confirmation is automatic.'
+          : 'Enviamos um link para <span id="verificarEmailAlvo"></span>.<br>Abra o link e volte aqui — a confirmação é automática.';
       }
       document.getElementById('verificarEmailAlvo').textContent = user.email || '';
       passoVerificarEmail.classList.add('on');
 
       document.getElementById('verificarReenviar').onclick = async () => {
         try {
+          if (window.__ajustarIdiomaEmail) window.__ajustarIdiomaEmail();
           await sendEmailVerification(user);
-          if (typeof window.aviso === 'function') window.aviso(en ? 'Email resent' : 'Email reenviado');
+          window.questlogMsgInline && window.questlogMsgInline('verificarReenviar', en ? 'Email resent' : 'Email reenviado', true);
         } catch(e){
           console.error('QuestLog/Firebase: reenvio de verificacao falhou', e);
-          if (typeof window.aviso === 'function') window.aviso(en ? 'Couldn\'t resend -- wait a bit and try again' : 'Não deu pra reenviar -- espera um pouco e tenta de novo');
+          window.questlogMsgInline && window.questlogMsgInline('verificarReenviar', en ? 'Couldn\'t resend -- wait a bit and try again' : 'Não deu pra reenviar -- espera um pouco e tenta de novo', false);
         }
       };
 
@@ -16288,6 +16362,12 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         try { en = (localStorage.getItem('questlog.idioma.v1') || 'pt') === 'en'; } catch(e){}
         document.getElementById('boasVindasRotulo').textContent = en ? 'Welcome back' : 'Bem-vindo de volta';
         document.getElementById('boasVindasNome').textContent = nomeConta;
+        try {
+          const elH = document.getElementById('boasVindasHeroi');
+          if (elH && typeof heroiAtual === 'function') elH.innerHTML = '<img src="' + heroiAtual().img + '" alt="">';
+          const elN = document.getElementById('boasVindasNivel');
+          if (elN && typeof progresso === 'function' && typeof romano === 'function') elN.textContent = (en ? 'Level ' : 'Nível ') + romano(progresso().nivel);
+        } catch(e){}
         document.getElementById('passoBoasVindas').classList.add('on');
 
         let jaEntrou = false;
@@ -16297,6 +16377,13 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           entrarNoApp();
         }
         document.getElementById('boasVindasContinuar').onclick = continuar;
+        document.getElementById('boasVindasTrocar').onclick = async function(){
+          this.disabled = true;
+          try { if (window._questlogUltimoPush) await Promise.race([window._questlogUltimoPush, new Promise(r => setTimeout(r, 3000))]); } catch(e){}
+          try { await auth.signOut(); } catch(e){}
+          try { localStorage.removeItem('questlog.conta.v1'); localStorage.setItem('questlog.forcarLogin.v1', '1'); } catch(e){}
+          location.reload();
+        };
       }
     }
 
@@ -16318,12 +16405,13 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       const emailSeguro = (user.email || '').replace(/</g,'');
       document.body.insertAdjacentHTML('beforeend', `
         <div id="bloqueioVerificacaoEmail">
-          <span class="titulo">DUNGEONLOG</span>
+          <span class="titulo logoDL">dungeon<b>log</b></span>
           <div class="verificarBloco">
+            <span class="verificarIcone"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 7l8.5 6 8.5-6"/></svg></span>
+            <h2 class="verificarTitulo">${en ? 'Confirm your email' : 'Confirme seu e-mail'}</h2>
             <p class="verificarTexto">${en
-              ? ('Confirm your email to continue.<br>\n              We sent a link to <b>' + emailSeguro + '</b>.')
-              : ('Confirma seu email pra continuar.<br>\n              Mandamos um link pra <b>' + emailSeguro + '</b>.')}</p>
-            <p class="verificarSpamAviso">${en ? 'Can\'t find it? Check your <b>spam</b>.' : 'Não achou? Confere o <b>spam</b>.'}</p>
+              ? ('We sent a link to <b>' + emailSeguro + '</b>.<br>Open it and come back — confirmation is automatic.')
+              : ('Enviamos um link para <b>' + emailSeguro + '</b>.<br>Abra o link e volte aqui — a confirmação é automática.')}</p>
           </div>
           <button class="primario" id="bloqueioReenviar">${en ? 'Resend email' : 'Reenviar email'}</button>
           <button class="loginLink" id="bloqueioEmailErrado">${en ? 'Wrong email? Fix it' : 'Email errado? Corrigir'}</button>
@@ -16332,11 +16420,12 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
       document.getElementById('bloqueioReenviar').onclick = async () => {
         try {
+          if (window.__ajustarIdiomaEmail) window.__ajustarIdiomaEmail();
           await sendEmailVerification(user);
-          if (typeof window.aviso === 'function') window.aviso(en ? 'Email resent' : 'Email reenviado');
+          window.questlogMsgInline && window.questlogMsgInline('bloqueioReenviar', en ? 'Email resent' : 'Email reenviado', true);
         } catch(e){
           console.error('QuestLog/Firebase: reenvio de verificacao falhou', e);
-          if (typeof window.aviso === 'function') window.aviso(en ? 'Couldn\'t resend -- wait a bit and try again' : 'Não deu pra reenviar -- espera um pouco e tenta de novo');
+          window.questlogMsgInline && window.questlogMsgInline('bloqueioReenviar', en ? 'Couldn\'t resend -- wait a bit and try again' : 'Não deu pra reenviar -- espera um pouco e tenta de novo', false);
         }
       };
 
@@ -16452,10 +16541,24 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       // aoLogar() (ou mostrarTelaVerificacao()), no exato momento em que
       // a tela seguinte esta pronta -- ver esses dois blocos mais abaixo.
       if (typeof window.mostrarLoadingMasmorra === 'function') window.mostrarLoadingMasmorra();
+      // voltar/fechar a janela do Google: o Firebase so avisa o cancelamento
+      // bem depois, e o loading ficava preso sem a pessoa estar carregando
+      // nada. Ao voltar o foco pro app sem sessao, solta o loading.
+      let googleEncerrado = false;
+      const aoVoltarFoco = () => {
+        if (document.visibilityState === 'hidden') return;
+        setTimeout(() => {
+          if (!googleEncerrado && !auth.currentUser && typeof window.esconderLoadingMasmorra === 'function') window.esconderLoadingMasmorra();
+        }, 2500);
+      };
+      window.addEventListener('focus', aoVoltarFoco);
+      document.addEventListener('visibilitychange', aoVoltarFoco);
       try {
         await signInWithPopup(auth, new GoogleAuthProvider());
+        googleEncerrado = true;
       }
       catch(e){
+        googleEncerrado = true;
         console.error('QuestLog/Firebase: Google falhou', e);
         const cancelou = e && (e.code === 'auth/popup-closed-by-user' || e.code === 'auth/cancelled-popup-request');
         if (cancelou){
@@ -16521,7 +16624,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           // nao bloqueia a sessao que acabou de criar a conta (ver
           // "!contaNova" em aoLogar) -- so dispara o email e avisa.
           try {
-            await sendEmailVerification(cred.user);
+            if (window.__ajustarIdiomaEmail) window.__ajustarIdiomaEmail();
+          await sendEmailVerification(cred.user);
             if (typeof window.aviso === 'function') window.aviso(en ? 'Account created! We sent a confirmation link to your email.' : 'Conta criada! Enviamos um link de confirmação pro seu email.');
           } catch(e){
             console.error('QuestLog/Firebase: envio do email de verificacao falhou', e);
@@ -16556,7 +16660,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         // texto), mesma linguagem visual da tela de senha -- o toast fica
         // mudo com TOASTS_DESATIVADOS e ninguem via feedback nenhum ao
         // tentar cadastrar email ja existente.
-        if (e && e.code === 'auth/email-already-in-use' && typeof window.questlogMostrarErroEmail === 'function') {
+        if (e && (e.code === 'auth/email-already-in-use' || e.code === 'auth/invalid-email') && typeof window.questlogMostrarErroEmail === 'function') {
           window.questlogMostrarErroEmail(msg);
           if (typeof window.esconderLoadingMasmorra === 'function') window.esconderLoadingMasmorra();
         } else if (typeof window.erroLoadingMasmorra === 'function') {
@@ -16570,16 +16674,20 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     document.getElementById('loginEsqueci').onclick = async () => {
       const email = document.getElementById('loginEmail').value.trim();
       const en = idiomaAuth() === 'en';
-      if (!email) {
-        if (typeof window.aviso === 'function') window.aviso(en ? 'Type your email first' : 'Digita seu email primeiro');
-        return;
-      }
+      const erro = m => window.questlogMostrarErroEmail && window.questlogMostrarErroEmail(m);
+      if (window.questlogLimparErroEmail) window.questlogLimparErroEmail();
+      if (!email) { erro(en ? 'Type your email first' : 'Digita seu email primeiro'); return; }
       try {
+        if (window.__ajustarIdiomaEmail) window.__ajustarIdiomaEmail();
         await sendPasswordResetEmail(auth, email);
-        if (typeof window.aviso === 'function') window.aviso(en ? 'Recovery email sent' : 'Email de recuperação enviado');
+        if (window.questlogMostrarOkEmail) window.questlogMostrarOkEmail(en ? 'Recovery email sent -- check your inbox' : 'Email de recuperação enviado -- confira sua caixa de entrada');
       } catch(e){
         console.error('QuestLog/Firebase: recuperar senha falhou', e);
-        if (typeof window.aviso === 'function') window.aviso(en ? 'Couldn\'t find that account' : 'Não achei essa conta');
+        const c = e && e.code;
+        erro(c === 'auth/invalid-email' ? (en ? 'Invalid email' : 'Email inválido')
+          : c === 'auth/network-request-failed' ? (en ? 'No connection. Check your internet and try again.' : 'Sem conexão. Verifique a internet e tente de novo.')
+          : c === 'auth/too-many-requests' ? (en ? 'Too many attempts -- wait a bit and try again' : 'Muitas tentativas -- espera um pouco e tenta de novo')
+          : (en ? 'Couldn\'t send the email -- try again' : 'Não deu pra enviar o email -- tenta de novo'));
       }
     };
 
@@ -17492,6 +17600,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'login.cadastreSeAgora':   { pt:'Cadastre-se agora', en:'Sign up now' },
     'login.agoraNao':          { pt:'Agora não', en:'Not now' },
     'login.bemVindoDeVolta':   { pt:'Bem-vindo de volta', en:'Welcome back' },
+    'login.trocarConta':       { pt:'Não é você? Trocar de conta', en:'Not you? Switch account' },
+    'login.confirmeTitulo':    { pt:'Confirme seu e-mail', en:'Confirm your email' },
     'login.confereSpam':       { pt:'Não achou? Confere o <b>spam</b>.', en:'Can\'t find it? Check your <b>spam</b>.' },
     'login.reenviarEmail':     { pt:'Reenviar email', en:'Resend email' },
     'login.emailErrado':       { pt:'Email errado? Corrigir', en:'Wrong email? Fix it' },
@@ -17796,5 +17906,14 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 })();
 </script>
 
+<script>
+// sem menu de "baixar imagem"/copiar ao segurar o dedo (Android); campos de texto mantem o menu
+document.addEventListener('contextmenu', function(e){
+  var t = e.target;
+  if (t && t.closest && t.closest('input,textarea,[contenteditable="true"]')) return;
+  e.preventDefault();
+}, true);
+document.addEventListener('dragstart', function(e){ if (e.target && e.target.tagName === 'IMG') e.preventDefault(); }, true);
+</script>
 </body>
 </html>

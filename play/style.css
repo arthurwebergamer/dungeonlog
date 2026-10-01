@@ -5828,3 +5828,24 @@
 .alinha.sel .adesc{display:block}
 .alinha .atrseg{margin:7px 0 0}
 .alinha.sel .atrseg{margin-bottom:6px}
+
+/* v4.146 — Perfil em 3 paginas (swipe) */
+.pgTrilho{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;align-items:flex-start}
+.pgTrilho::-webkit-scrollbar{display:none}
+.pgPag{flex:0 0 100%;scroll-snap-align:start;scroll-snap-stop:always;box-sizing:border-box;display:flex;flex-direction:column;gap:18px;min-height:60vh;padding:0 2px}
+.pgDots{display:flex;justify-content:center;gap:7px;padding-top:10px}
+.pgDots i{width:6px;height:6px;border-radius:50%;background:var(--line);cursor:pointer;transition:.2s}
+.pgDots i.on{background:var(--text);width:18px;border-radius:4px}
+.pgPag:nth-child(1) .planoHero{padding-top:18px}
+.pgPag:nth-child(1) .planoHero #perfilHeroSprite .heroimg{width:150px;height:150px}
+.pgPag:nth-child(1) .planoNome .perfilnome{font-size:26px}
+.pgPag:nth-child(2) .atrhead{flex-direction:column;align-items:center;gap:2px;margin-bottom:10px}
+.pgPag:nth-child(2) .atrhead b{font-size:12px;font-weight:500;color:var(--dim);letter-spacing:.12em;text-transform:uppercase}
+.pgPag:nth-child(2) .atrpill{font-family:'Silkscreen',monospace;font-size:44px;line-height:1;background:none;padding:0;color:var(--text)}
+.pgPag:nth-child(2) .atrpill.vazio{color:var(--dim)}
+.pgPag:nth-child(3) #prevConquistas,.pgPag:nth-child(3) #prevBestiario{border-top:0;padding-top:0}
+
+.atrpill .pgLbl{margin-left:6px}
+.pgPag:nth-child(2) .atrpill{display:flex;flex-direction:column;align-items:center;gap:4px}
+.pgPag:nth-child(2) .atrpill .pgNum{font-size:48px;font-weight:400}
+.pgPag:nth-child(2) .atrpill .pgLbl{margin:0;font-family:'Outfit',sans-serif;font-size:12px;color:var(--dim)}

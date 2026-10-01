@@ -38,7 +38,7 @@
      alteracao aqui (bump manual) pra forcar cache-bust; SUBIR ESTE
      NUMERO sempre que style.css mudar e o problema persistir em
      producao. -->
-<link rel="stylesheet" href="style.css?v=27">
+<link rel="stylesheet" href="style.css?v=28">
 
 <!-- =====================================================================
      TOGGLE DEBUG — silenciar console (log/warn/error)  —  precisa ser o
@@ -538,6 +538,8 @@
     </div>
 
     <div id="perfilAtributos" class="perfilPlano">
+     <div class="pgTrilho" id="perfilTrilho">
+     <section class="pgPag">
       <div class="planoHero">
         <div class="hero-sprite" id="perfilHeroSprite"></div>
         <div class="planoNome">
@@ -563,6 +565,8 @@
         <div class="planoStat"><span class="statval" id="statBonusMoedas">—</span><span class="statlabel" data-i18n="perfil.bonusMoedasEquip">Bônus moedas equip.</span></div>
       </div>
 
+     </section>
+     <section class="pgPag">
       <div class="planoAtr">
         <div class="atrhead"><b data-i18n="perfil.atributos">Atributos</b><span class="atrpill" id="atrDisponiveis">0</span></div>
         <div class="alinha" data-atr="fortuna">
@@ -594,6 +598,8 @@
         </div>
       </div>
 
+     </section>
+     <section class="pgPag">
       <!-- previas -- item 18 do roadmap: secoes grandes aparecem resumidas
            aqui, conteudo completo mora nos overlays (mesmo padrao ja usado
            pra Config: reaproveita .cfgOverlay em vez de escrever CSS novo
@@ -629,6 +635,9 @@
         </div>
         <div class="prevfaixa" id="prevBestiarioFaixa"></div>
       </div>
+     </section>
+     </div>
+     <div class="pgDots" id="perfilDots"><i class="on"></i><i></i><i></i></div>
     </div>
 
   </div>
@@ -11081,7 +11090,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     const elDisp = document.getElementById('atrDisponiveis');
     if (elDisp){
       const lb = (typeof window.t === 'function') ? window.t(disp === 1 ? 'atr.pontoLbl' : 'atr.pontosLbl') : '';
-      elDisp.textContent = disp + ' ' + lb;
+      elDisp.innerHTML = '<b class="pgNum">' + disp + '</b><small class="pgLbl">' + String(lb).replace(/</g,'') + '</small>';
       elDisp.classList.toggle('vazio', disp <= 0);
     }
 
@@ -11178,6 +11187,16 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   // troca de idioma: refaz os textos
   window.renderAtributosPontos = renderAtributosPontos;
   // o dicionario de i18n (TRADUCOES) so existe depois deste bloco -- repinta quando tudo carregou
+  // Perfil em paginas: dots seguem o scroll, toque no dot navega
+  (function(){
+    const tr=document.getElementById('perfilTrilho'), dots=document.querySelectorAll('#perfilDots i');
+    if(!tr||!dots.length) return;
+    tr.addEventListener('scroll',()=>{
+      const i=Math.round(tr.scrollLeft/Math.max(1,tr.clientWidth));
+      dots.forEach((d,k)=>d.classList.toggle('on',k===i));
+    },{passive:true});
+    dots.forEach((d,k)=>d.addEventListener('click',()=>tr.scrollTo({left:k*tr.clientWidth,behavior:'smooth'})));
+  })();
   window.addEventListener('load', () => renderAtributosPontos());
   renderAtributosPontos();   // primeira pintura, sem esperar o primeiro render()
 

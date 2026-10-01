@@ -15876,6 +15876,10 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       if (snap.exists() && snap.data().extras) {
         const extras = snap.data().extras;
         window.CHAVES_SECUNDARIAS_CONTA.forEach(chaveBase => {
+          // offset de dia e so do menu de debug (local, por aparelho): restaurar da nuvem
+          // mudava o dia depois do login e o watchdog (tick de 30s) tratava como virada real
+          // -> dano/morte "do nada". Nunca vem da nuvem.
+          if (chaveBase === 'questlog.dia.v1') return;
           if (Object.prototype.hasOwnProperty.call(extras, chaveBase)) {
             try { localStorage.setItem(window.chaveConta(chaveBase), extras[chaveBase]); } catch(e){}
           }
@@ -15933,6 +15937,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         // num segundo campo do mesmo doc.
         const extras = {};
         window.CHAVES_SECUNDARIAS_CONTA.forEach(chaveBase => {
+          if (chaveBase === 'questlog.dia.v1') return;   // debug local: nao sobe pra nuvem
           const v = localStorage.getItem(window.chaveConta(chaveBase));
           if (v !== null) extras[chaveBase] = v;
         });

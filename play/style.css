@@ -5717,3 +5717,203 @@
 @media (prefers-reduced-motion: reduce){
   .loadingMasmorra.erro .loadingMasmorraSprite{animation:none;transform:rotate(-90deg)}
 }
+
+/* ===== v4.139 — Atributos: lista expansível (ideia H) ===== */
+.atributospontos{padding:0;overflow:hidden}
+.atributospontos .atrhead{margin:0;padding:14px 14px 10px}
+.atrlinha{border-top:1px solid var(--line)}
+.atrlinha.aberta{background:color-mix(in srgb,var(--panel-3,#2A2240) 40%,transparent)}
+.atrtopo{all:unset;box-sizing:border-box;width:100%;display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.atrtopo:focus-visible{outline:2px solid var(--text);outline-offset:-2px}
+.atricone2{width:38px;height:38px;flex:none;border-radius:10px;background:var(--panel-3,#2A2240);color:var(--accent);display:flex;align-items:center;justify-content:center}
+.atrmeio{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.atrlinha .atrnome{font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;color:var(--text)}
+.atrseg{display:flex;gap:3px}
+.atrseg i{flex:1;height:6px;border-radius:2px;background:var(--line);display:block}
+.atrseg i.on{background:var(--accent)}
+.atrnum{display:flex;flex-direction:column;align-items:flex-end}
+.atrlinha .atrvalor{font-family:'Silkscreen',monospace;font-size:16px;color:var(--accent);margin:0}
+.atrptsl{font-size:11px;color:var(--dim)}
+.atrchev{display:flex;color:var(--dim);transition:transform .2s}
+.atrlinha.aberta .atrchev{transform:rotate(90deg)}
+.atrdet{display:grid;grid-template-rows:0fr;transition:grid-template-rows .25s ease}
+.atrlinha.aberta .atrdet{grid-template-rows:1fr}
+.atrdetIn{overflow:hidden;min-height:0;padding:0 14px 0 64px}
+.atrlinha.aberta .atrdetIn{padding-bottom:14px}
+.atrdetxt{margin:0;font-family:'Outfit',sans-serif;font-size:12.5px;line-height:1.4;color:var(--muted)}
+.atrinvestir{margin-top:10px;width:100%;height:44px;border:none;border-radius:12px;background:var(--accent);color:var(--bg);font-family:'Outfit',sans-serif;font-size:14.5px;font-weight:700;cursor:pointer}
+.atrinvestir:disabled{background:var(--panel-3,#2A2240);color:var(--dim);cursor:not-allowed}
+@media (prefers-reduced-motion: reduce){.atrdet,.atrchev{transition:none}}
+
+/* ===== v4.143 — Perfil: Bento ===== */
+.fichaHero{border-radius:18px}
+.fichaHero .hero-sprite{background:radial-gradient(ellipse at 50% 90%,color-mix(in srgb,var(--accent) 28%,transparent),var(--panel-3,#2A2240));border-radius:14px}
+.bentorow{display:flex;gap:8px;align-items:stretch;margin:14px 0}
+.bentoAtr{flex:1.35;min-width:0;margin:0!important;padding:12px!important;display:flex;flex-direction:column}
+.bentoAtr .atrhead{padding:0;margin:0 0 10px}
+.atrbento{display:flex;gap:2px;flex:1}
+.gcol{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;border-radius:12px;padding:4px 0;-webkit-tap-highlight-color:transparent}
+.gcol.sel{background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.gico{color:var(--accent);display:flex}
+.gauge{display:flex!important;flex-direction:column-reverse;gap:2px;width:26px}
+.gauge i{height:7px;border-radius:2px;background:var(--line);display:block;flex:none}
+.gauge i.on{background:var(--accent)}
+.gcol .atrvalor{font-family:'Silkscreen',monospace;font-size:12px;color:var(--accent)}
+.gcol .atrnome{font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;color:var(--muted)}
+.gplus{width:34px;height:34px;border-radius:50%;border:none;background:var(--accent);color:var(--bg);font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.gplus:not(:disabled){font-size:22px}
+.gplus:disabled{background:transparent;border:1px solid var(--line);color:var(--dim);cursor:not-allowed}
+.gpts{font-size:10.5px;color:var(--dim)}
+.atrinfo{margin:8px 0 0;font-family:'Outfit',sans-serif;font-size:11px;line-height:1.35;color:var(--dim);text-align:center;min-height:30px}
+.bentocol{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
+.bentoPts{background:var(--accent);color:var(--bg);border-radius:18px;padding:12px 8px;text-align:center;display:flex;flex-direction:column;align-items:center}
+.bentoPts.vazio{background:var(--panel-2);color:var(--dim);border:1px solid var(--line)}
+.bentoPtsNum{font-family:'Silkscreen',monospace;font-size:30px;line-height:1;background:none;padding:0;color:inherit}
+.bentoPtsLbl{font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;margin-top:4px;line-height:1.2}
+.bentocol .statgrid{display:flex;flex-direction:column;gap:8px;margin:0;flex:1}
+.bentocol .statcard{flex:1;border-radius:14px;padding:8px 10px;display:flex;flex-direction:column;justify-content:center;gap:1px}
+.bentocol .statval{font-size:15px;order:0}
+.bentocol .statlabel{font-size:10px;order:1}
+.conqAnel{--p:0;width:56px;height:56px;flex:none;border-radius:50%;background:conic-gradient(var(--accent) calc(var(--p)*1%),var(--line) 0);display:flex;align-items:center;justify-content:center;position:relative}
+.conqAnel::before{content:"";position:absolute;inset:6px;border-radius:50%;background:var(--panel-2)}
+.conqAnel b{position:relative;font-family:'Silkscreen',monospace;font-size:11px;color:var(--text)}
+#prevConquistas .cfgrowtopo{gap:12px}
+#prevConquistas .cfgtxt{flex:1;min-width:0}
+#prevBestiarioFaixa{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;min-height:0}
+.bestcel{aspect-ratio:1;border-radius:10px;background:var(--panel-3,#2A2240);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.bestcel .prevbestimg{width:70%;height:70%}
+.bestcel.vazia{background:var(--bg);border:1px dashed var(--line);color:var(--dim);font-family:'Silkscreen',monospace;font-size:13px}
+
+/* ===== v4.144 — Perfil: plano, sem painéis (ideia b) ===== */
+.perfilPlano{display:flex;flex-direction:column;gap:16px}
+.planoHero{text-align:center;position:relative;padding-top:4px}
+.planoHero::before{content:"";position:absolute;left:50%;top:34px;width:230px;height:120px;transform:translateX(-50%);background:radial-gradient(ellipse,color-mix(in srgb,var(--accent) 22%,transparent),transparent 70%);pointer-events:none}
+.planoHero .hero-sprite{position:relative;display:flex;justify-content:center;margin:0 auto;width:auto}
+.planoHero #perfilHeroSprite .heroimg{width:120px;height:120px;image-rendering:pixelated;filter:drop-shadow(0 8px 10px rgba(0,0,0,.5))}
+.planoHero .sombra{display:none}
+.planoNome{position:relative;display:flex;justify-content:center;align-items:center;gap:8px;margin-top:2px}
+.planoNome .perfilnome{font-size:22px;font-weight:700;margin:0}
+.planoNivel{font-family:'Silkscreen',monospace;font-size:11px;letter-spacing:.05em;padding:3px 9px;border-radius:7px;background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent)}
+.planoBarras{display:flex;gap:16px;margin-top:12px;text-align:left}
+.planoBar{flex:1;min-width:0}
+.planoBar .bar{margin:4px 0 0}
+.planoStats{display:flex;padding:10px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.planoStat{flex:1;min-width:0;text-align:center;display:flex;flex-direction:column;gap:2px}
+.planoStat .statval{font-size:14px}
+.planoStat .statlabel{font-size:10px}
+.planoAtr .atrhead{display:flex;justify-content:space-between;align-items:center;margin:0 0 6px}
+.planoAtr .atrhead b{font-size:16px;font-weight:700}
+.atrpill.vazio{background:var(--panel-3,#2A2240);color:var(--dim)}
+.alinha{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--line)}
+.aico{color:var(--accent);display:flex;flex:none}
+.ameio{flex:1;min-width:0}
+.atop{display:flex;justify-content:space-between;align-items:baseline}
+.alinha .atrnome{font-family:'Outfit',sans-serif;font-size:14.5px;font-weight:700;color:var(--text)}
+.alinha .atrvalor{font-family:'Silkscreen',monospace;font-size:13px;color:var(--accent);margin:0}
+.alinha .atrseg{margin:6px 0 4px}
+.alinha .atrseg i{height:5px}
+.adesc{font-family:'Outfit',sans-serif;font-size:11px;color:var(--dim)}
+.alinha .gplus{width:36px;height:36px}
+.perfilPlano #prevConquistas,.perfilPlano #prevBestiario{background:none;border:0;border-radius:0;box-shadow:none;padding:12px 0 0;margin:0;border-top:1px solid var(--line)}
+
+/* v4.145: menos informacao -- sem brilho, sem chip de nivel (ja no cabecalho), Moedas fora da faixa
+   (ja na barra de cima), descricao do atributo so ao tocar na linha */
+.planoHero::before{display:none}
+.planoNivel{display:none}
+.planoStat.semMoedas{display:none}
+.adir{display:flex;align-items:baseline;gap:8px}
+.apts{font-family:'Outfit',sans-serif;font-size:11px;color:var(--dim)}
+.alinha{cursor:pointer;-webkit-tap-highlight-color:transparent}
+.adesc{display:none;font-family:'Outfit',sans-serif;font-size:11.5px;line-height:1.35;color:var(--muted)}
+.alinha.sel .adesc{display:block}
+.alinha .atrseg{margin:7px 0 0}
+.alinha.sel .atrseg{margin-bottom:6px}
+
+/* v4.146 — Perfil em 3 paginas (swipe) */
+.pgTrilho{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;align-items:flex-start}
+.pgTrilho::-webkit-scrollbar{display:none}
+.pgPag{flex:0 0 100%;scroll-snap-align:start;scroll-snap-stop:always;box-sizing:border-box;display:flex;flex-direction:column;gap:18px;min-height:60vh;padding:0 2px}
+.pgDots{display:flex;justify-content:center;gap:7px;padding-top:10px}
+.pgDots i{width:6px;height:6px;border-radius:50%;background:var(--line);cursor:pointer;transition:.2s}
+.pgDots i.on{background:var(--text);width:18px;border-radius:4px}
+.pgPag:nth-child(1) .planoHero{padding-top:18px}
+.pgPag:nth-child(1) .planoHero #perfilHeroSprite .heroimg{width:150px;height:150px}
+.pgPag:nth-child(1) .planoNome .perfilnome{font-size:26px}
+.pgPag:nth-child(2) .atrhead{flex-direction:column;align-items:center;gap:2px;margin-bottom:10px}
+.pgPag:nth-child(2) .atrhead b{font-size:12px;font-weight:500;color:var(--dim);letter-spacing:.12em;text-transform:uppercase}
+.pgPag:nth-child(2) .atrpill{font-family:'Silkscreen',monospace;font-size:44px;line-height:1;background:none;padding:0;color:var(--text)}
+.pgPag:nth-child(2) .atrpill.vazio{color:var(--dim)}
+.pgPag:nth-child(3) #prevConquistas,.pgPag:nth-child(3) #prevBestiario{border-top:0;padding-top:0}
+
+.atrpill .pgLbl{margin-left:6px}
+.pgPag:nth-child(2) .atrpill{display:flex;flex-direction:column;align-items:center;gap:4px}
+.pgPag:nth-child(2) .atrpill .pgNum{font-size:48px;font-weight:400}
+.pgPag:nth-child(2) .atrpill .pgLbl{margin:0;font-family:'Outfit',sans-serif;font-size:12px;color:var(--dim)}
+
+/* v4.147 — Perfil: Aneis (substitui paginas) */
+.perfilAneis{display:flex;flex-direction:column;gap:16px}
+.anelOculto{display:none!important}
+.anelHero{position:relative;width:210px;height:210px;margin:6px auto 0}
+.anelSvg{transform:rotate(-90deg);display:block}
+.anelHero .atrilho,.aneisAtr .atrilho{fill:none;stroke:var(--line);stroke-width:5}
+.aarco{fill:none;stroke:var(--text);stroke-width:5;stroke-linecap:round;transition:stroke-dashoffset .5s}
+.aarco.xp{stroke:#F2C94C}.aarco.hp{stroke:#E5698A}
+.anelHero .hero-sprite{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;width:auto;margin:0}
+.anelHero #perfilHeroSprite .heroimg{width:110px;height:110px;image-rendering:pixelated}
+.anelHero .sombra{display:none}
+.anelNome{text-align:center;margin-top:-2px}
+.anelNome>b{font-size:24px;font-weight:700}
+.anelNivel{display:block;font-size:13px;color:var(--muted);margin-top:2px}
+.anelLeg{display:flex;justify-content:center;gap:18px;margin-top:10px;font-size:12.5px;color:var(--muted)}
+.anelLeg b{color:var(--text)}
+.anelLeg i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+.anelLeg .dhp{background:#E5698A}.anelLeg .dxp{background:#F2C94C}
+.anelAtr .atrhead{display:flex;justify-content:space-between;align-items:baseline;margin:0 2px 12px}
+.anelAtr .atrhead b{font-size:13px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.anelAtr .atrpill{background:none;padding:0;font-family:'Outfit',sans-serif;font-size:13px;color:var(--text)}
+.anelAtr .atrpill.vazio{color:var(--dim)}
+.anelAtr .atrpill .pgNum,.anelAtr .atrpill .pgLbl{font-size:13px;font-family:'Outfit',sans-serif;font-weight:400;margin:0}
+.anelAtr .atrpill .pgLbl{margin-left:4px}
+.aneisLinha{display:flex}
+.aneisAtr{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.aelo{position:relative;width:64px;height:64px}
+.aelo svg{transform:rotate(-90deg);display:block}
+.aneisAtr .atrilho{stroke-width:4}.aneisAtr .aarco{stroke-width:4}
+.aneisAtr.sel .aarco{stroke:var(--accent)}
+.aval{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700}
+.anome{font-size:13px;font-weight:600}
+.aneisAtr .gplus{width:34px;height:34px;font-size:22px;line-height:1}
+.anelInfo{text-align:center;font-size:12px;color:var(--dim);margin-top:10px;min-height:16px}
+.anelStatsLinha{text-align:center;font-size:12.5px;color:var(--dim);line-height:1.7}
+.anelStatsLinha b{color:var(--muted);font-weight:600}
+.anelStatsLinha i{font-style:normal;margin:0 6px}
+.anelAtr .atrpill{display:inline-flex!important;flex-direction:row!important;align-items:baseline;gap:4px}
+
+/* v4.148 — Aneis: menos informacao, mais respiro */
+.perfilAneis{gap:28px}
+.anelStatsLinha,.anelNivel{display:none}
+.anelHero{margin-top:12px}
+.anelNome{margin-top:4px}
+.anelLeg{margin-top:14px}
+.anelAtr .atrhead{margin-bottom:20px}
+.aneisAtr{gap:10px}
+.aneisAtr .gplus{margin-top:2px}
+.anelInfo{margin-top:18px;min-height:0}
+.anelInfo:empty{display:none}
+/* v4.149 — cabecalho Atributos: alinhado e mesma fonte */
+.anelAtr .atrhead{display:flex!important;justify-content:space-between!important;align-items:center!important}
+.anelAtr .atrpill,.anelAtr .atrpill .pgNum,.anelAtr .atrpill .pgLbl{font-family:'Outfit',sans-serif!important;font-size:13px!important;font-weight:500!important;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)!important;margin:0!important}
+.anelAtr .atrpill{flex:none;gap:6px!important;text-align:right}
+.anelAtr .atrpill:not(.vazio) .pgNum,.anelAtr .atrpill:not(.vazio) .pgLbl{color:var(--text)!important}
+/* v4.150 — filtros do inventario ficam fixos no topo ao rolar; graficos do Perfil seguem a cor do tema */
+#viewInventario .invfiltros{position:sticky;top:0;z-index:6;background:var(--bg);margin:0 -14px 8px;padding:8px 14px}
+.perfilAneis .aarco,.perfilAneis .aarco.xp{stroke:var(--accent)}
+.anelLeg .dxp{background:var(--accent)}
+/* v4.151 — XP/Vida mantêm cor fixa; só os arcos de atributo seguem o tema; Conquistas sem anel */
+.perfilAneis .aarco.xp{stroke:#F2C94C}
+.perfilAneis .aarco.hp{stroke:#E5698A}
+.anelLeg .dxp{background:#F2C94C}
+.perfilAneis .conqAnel{display:none}
+/* v4.152 — .view e flex coluna: sem flex:none os filtros encolhiam e sumiam */
+#viewInventario>*{flex:none}
+#viewInventario .invfiltros{min-height:44px;box-sizing:border-box;align-items:center}

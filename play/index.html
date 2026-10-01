@@ -38,7 +38,7 @@
      alteracao aqui (bump manual) pra forcar cache-bust; SUBIR ESTE
      NUMERO sempre que style.css mudar e o problema persistir em
      producao. -->
-<link rel="stylesheet" href="style.css?v=23">
+<link rel="stylesheet" href="style.css?v=34">
 
 <!-- =====================================================================
      TOGGLE DEBUG — silenciar console (log/warn/error)  —  precisa ser o
@@ -537,73 +537,72 @@
       </div>
     </div>
 
-    <div id="perfilAtributos">
-      <div class="perfilhero fichaHero">
-        <div class="perfilheroLinha">
-          <div class="hero-sprite" id="perfilHeroSprite"></div>
-          <div class="perfilheroInfo">
-            <div class="perfilnome" id="perfilNome"><span id="perfilNomeTxt">Aventureiro</span></div>
-            <div class="xpwrap">
-              <div class="xprow hprow">
-                <span class="xplabel" data-i18n="jogo.vida">Vida</span>
-                <span class="xpnum hpnum" id="perfilHpNum">0 / 0</span>
-              </div>
-              <div class="bar hpbar"><div class="fill hpfill" id="perfilHpFill"></div></div>
-
-              <div class="xprow">
-                <span class="xplabel" data-i18n="jogo.experiencia">Experiência</span>
-                <span class="xpnum" id="perfilXpNum">0 / 100 XP</span>
-              </div>
-              <div class="bar"><div class="fill" id="perfilFill"></div></div>
-            </div>
+    <div id="perfilAtributos" class="perfilPlano perfilAneis">
+      <div class="anelHero">
+        <svg class="anelSvg" viewBox="0 0 210 210" width="210" height="210"><circle class="atrilho" cx="105" cy="105" r="92"/><circle class="aarco xp" id="anelXp" cx="105" cy="105" r="92" stroke-dasharray="578.1" stroke-dashoffset="578.1"/><circle class="atrilho" cx="105" cy="105" r="76"/><circle class="aarco hp" id="anelHp" cx="105" cy="105" r="76" stroke-dasharray="477.5" stroke-dashoffset="477.5"/></svg>
+        <div class="hero-sprite" id="perfilHeroSprite"></div>
+      </div>
+      <div class="anelNome"><b id="perfilNomeTxt">Aventureiro</b><span class="anelNivel" id="perfilNivelChip"></span>
+        <div class="anelLeg"><span><i class="dhp"></i><span data-i18n="jogo.vida">Vida</span> <b id="anelHpTxt">0 / 0</b></span><span><i class="dxp"></i>XP <b id="anelXpTxt">0 / 100</b></span></div>
+      </div>
+      <div class="anelOculto">
+        <span class="perfilnome" id="perfilNome"></span>
+<div>
+          <div class="planoBar">
+            <div class="xprow hprow"><span class="xplabel" data-i18n="jogo.vida">Vida</span><span class="xpnum hpnum" id="perfilHpNum">0 / 0</span></div>
+            <div class="bar hpbar"><div class="fill hpfill" id="perfilHpFill"></div></div>
+          </div>
+          <div class="planoBar">
+            <div class="xprow"><span class="xplabel" data-i18n="jogo.experiencia">Experiência</span><span class="xpnum" id="perfilXpNum">0 / 100 XP</span></div>
+            <div class="bar"><div class="fill" id="perfilFill"></div></div>
           </div>
         </div>
+
+<div class="planoStats">
+        <div class="planoStat"><span class="statval" id="statVida">—</span><span class="statlabel" data-i18n="perfil.vidaMaxima">Vida máxima</span></div>
+        <div class="planoStat semMoedas"><span class="statval" id="statMoedas">—</span><span class="statlabel" data-i18n="inv.moedas">Moedas</span></div>
+        <div class="planoStat"><span class="statval" id="statBonusXp">—</span><span class="statlabel" data-i18n="perfil.bonusXpEquip">Bônus XP equip.</span></div>
+        <div class="planoStat"><span class="statval" id="statBonusMoedas">—</span><span class="statlabel" data-i18n="perfil.bonusMoedasEquip">Bônus moedas equip.</span></div>
       </div>
 
-      <div class="atributospontos">
-        <div class="atrhead">
-          <b data-i18n="perfil.atributos">Atributos</b>
-          <span class="atrpill" id="atrDisponiveis">0 disponíveis</span>
+      </div>
+      <div class="anelAtr">
+        <div class="atrhead"><b data-i18n="perfil.atributos">Atributos</b><span class="atrpill" id="atrDisponiveis">0</span></div>
+        <div class="aneisLinha"><div class="aneisAtr" data-atr="fortuna"><div class="aelo"><svg viewBox="0 0 64 64" width="64" height="64"><circle class="atrilho" cx="32" cy="32" r="26"/><circle class="aarco" id="anelFortuna" cx="32" cy="32" r="26" stroke-dasharray="163.4" stroke-dashoffset="163.4"/></svg><b class="aval" id="anelValFortuna">+0%</b></div><span class="anome" data-i18n="atr.fortuna">Fortuna</span><button class="gplus" id="atrMaisFortuna" type="button" aria-label="Investir">+</button></div><div class="aneisAtr" data-atr="foco"><div class="aelo"><svg viewBox="0 0 64 64" width="64" height="64"><circle class="atrilho" cx="32" cy="32" r="26"/><circle class="aarco" id="anelFoco" cx="32" cy="32" r="26" stroke-dasharray="163.4" stroke-dashoffset="163.4"/></svg><b class="aval" id="anelValFoco">+0%</b></div><span class="anome" data-i18n="atr.foco">Foco</span><button class="gplus" id="atrMaisFoco" type="button" aria-label="Investir">+</button></div><div class="aneisAtr" data-atr="vigor"><div class="aelo"><svg viewBox="0 0 64 64" width="64" height="64"><circle class="atrilho" cx="32" cy="32" r="26"/><circle class="aarco" id="anelVigor" cx="32" cy="32" r="26" stroke-dasharray="163.4" stroke-dashoffset="163.4"/></svg><b class="aval" id="anelValVigor">+0%</b></div><span class="anome" data-i18n="atr.vigor">Vigor</span><button class="gplus" id="atrMaisVigor" type="button" aria-label="Investir">+</button></div></div>
+        <div class="anelInfo" id="atrInfo"></div>
+      </div>
+      <div class="anelStatsLinha" id="anelStatsLinha"></div>
+      <div class="anelOculto">
+<div class="planoAtr">
+        
+        <div class="alinha" data-atr="fortuna">
+          <span class="aico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5l2.9 6.6 7.1.7-5.4 4.8 1.6 7-6.2-3.8-6.2 3.8 1.6-7-5.4-4.8 7.1-.7z"/></svg></span>
+          <div class="ameio">
+            <div class="atop"><b class="atrnome" data-i18n="atr.fortuna">Fortuna</b><span class="adir"><b class="atrvalor" id="atrFortunaValor">+0%</b><span class="apts"><span id="atrFortunaPts">0</span>/15</span></span></div>
+            <span class="atrseg" id="atrFortunaSeg"></span>
+            <span class="adesc" id="atrFortunaDesc"></span>
+          </div>
+          
         </div>
-        <div class="hexrow">
-          <div class="hexcol">
-            <div class="hexo"><div class="hexi"><span class="hexpts" id="atrFortunaPts">0</span><span class="hexde">/ 15</span></div></div>
-            <span class="atrnome" data-i18n="atr.fortuna">Fortuna</span>
-            <span class="atrvalor" id="atrFortunaValor">+0%</span>
-            <button class="atrmais2 hexbtn" id="atrMaisFortuna" type="button">+</button>
+        <div class="alinha" data-atr="foco">
+          <span class="aico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".8" fill="currentColor"/></svg></span>
+          <div class="ameio">
+            <div class="atop"><b class="atrnome" data-i18n="atr.foco">Foco</b><span class="adir"><b class="atrvalor" id="atrFocoValor">+0%</b><span class="apts"><span id="atrFocoPts">0</span>/15</span></span></div>
+            <span class="atrseg" id="atrFocoSeg"></span>
+            <span class="adesc" id="atrFocoDesc"></span>
           </div>
-          <div class="hexcol">
-            <div class="hexo"><div class="hexi"><span class="hexpts" id="atrFocoPts">0</span><span class="hexde">/ 15</span></div></div>
-            <span class="atrnome" data-i18n="atr.foco">Foco</span>
-            <span class="atrvalor" id="atrFocoValor">+0%</span>
-            <button class="atrmais2 hexbtn" id="atrMaisFoco" type="button">+</button>
+          
+        </div>
+        <div class="alinha" data-atr="vigor">
+          <span class="aico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.5s-7.5-4.6-9.8-9.3C.9 8 2.4 4.8 5.6 4.1c2-.4 3.9.5 5 2.1a5.5 5.5 0 015-2.1c3.2.7 4.7 3.9 3.4 7.1-2.3 4.7-9.8 9.3-9.8 9.3z"/></svg></span>
+          <div class="ameio">
+            <div class="atop"><b class="atrnome" data-i18n="atr.vigor">Vigor</b><span class="adir"><b class="atrvalor" id="atrVigorValor">+0%</b><span class="apts"><span id="atrVigorPts">0</span>/15</span></span></div>
+            <span class="atrseg" id="atrVigorSeg"></span>
+            <span class="adesc" id="atrVigorDesc"></span>
           </div>
-          <div class="hexcol">
-            <div class="hexo"><div class="hexi"><span class="hexpts" id="atrVigorPts">0</span><span class="hexde">/ 15</span></div></div>
-            <span class="atrnome" data-i18n="atr.vigor">Vigor</span>
-            <span class="atrvalor" id="atrVigorValor">+0%</span>
-            <button class="atrmais2 hexbtn" id="atrMaisVigor" type="button">+</button>
-          </div>
+          
         </div>
       </div>
-
-      <div class="statgrid">
-        <div class="statcard">
-          <span class="statlabel" data-i18n="perfil.vidaMaxima">Vida máxima</span>
-          <span class="statval" id="statVida">—</span>
-        </div>
-        <div class="statcard">
-          <span class="statlabel" data-i18n="inv.moedas">Moedas</span>
-          <span class="statval" id="statMoedas">—</span>
-        </div>
-        <div class="statcard">
-          <span class="statlabel" data-i18n="perfil.bonusXpEquip">Bônus XP equip.</span>
-          <span class="statval" id="statBonusXp">—</span>
-        </div>
-        <div class="statcard">
-          <span class="statlabel" data-i18n="perfil.bonusMoedasEquip">Bônus moedas equip.</span>
-          <span class="statval" id="statBonusMoedas">—</span>
-        </div>
       </div>
 
       <!-- previas -- item 18 do roadmap: secoes grandes aparecem resumidas
@@ -621,6 +620,7 @@
 
       <div class="cfgrow cfgcol" id="prevConquistas">
         <div class="cfgrowtopo">
+          <span class="conqAnel" id="prevConquistasAnel"><b id="prevConquistasAnelTxt">0/0</b></span>
           <div class="cfgtxt">
             <b data-i18n="perfil.conquistas">Conquistas</b>
             <span id="prevConquistasTxt">—</span>
@@ -9363,6 +9363,8 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     if (typeof window.renderPreviewsPerfil === 'function') window.renderPreviewsPerfil();
 
     document.getElementById('perfilSub').textContent = (idiomaApp() === 'en' ? 'Level ' : 'Nível ') + romano(p.nivel);
+    const _chipN = document.getElementById('perfilNivelChip');
+    if (_chipN) _chipN.textContent = (idiomaApp() === 'en' ? 'LEVEL ' : 'NÍVEL ') + romano(p.nivel);
     document.getElementById('perfilNomeTxt').textContent = (typeof nomeHeroi !== 'undefined' && nomeHeroi) || (idiomaApp() === 'en' ? 'Adventurer' : 'Aventureiro');
     document.getElementById('perfilFill').style.width = Math.round((p.resto / p.meta) * 100) + '%';
     document.getElementById('perfilXpNum').textContent = p.resto + ' / ' + p.meta + ' XP';
@@ -9900,6 +9902,14 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
         : (en ? (r.resgatadas + ' of ' + r.total + ' unlocked') : (r.resgatadas + ' de ' + r.total + ' desbloqueadas'));
     }
 
+    if (typeof window.resumoConquistasPerfil === 'function'){
+      const r2 = window.resumoConquistasPerfil();
+      const an = document.getElementById('prevConquistasAnel');
+      if (an) an.style.setProperty('--p', r2.total ? Math.round(100 * r2.resgatadas / r2.total) : 0);
+      const at = document.getElementById('prevConquistasAnelTxt');
+      if (at) at.textContent = r2.resgatadas + '/' + r2.total;
+    }
+
     // Faixa das conquistas recentes -- removida a pedido do usuario (nem
     // texto nem bolinha, nada mesmo). O cabecalho (nome + "X de Y
     // desbloqueadas" + botao "Ver todas") ja diz o essencial; detalhe
@@ -9948,25 +9958,26 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
         if (jaVisto.has(v.monstroId)) continue;
         jaVisto.add(v.monstroId);
         vistos.push(v.monstroId);
-        if (vistos.length >= 5) break;
+        if (vistos.length >= 6) break;
       }
       faixaBest.innerHTML = '';
-      if (!vistos.length){
-        const vazio = document.createElement('span');
-        vazio.className = 'prevvazio';
-        vazio.textContent = en ? 'No monster defeated yet' : 'Nenhum monstro derrotado ainda';
-        faixaBest.appendChild(vazio);
-      } else {
-        vistos.forEach(idx => {
-          const m = MONSTROS[idx];
-          if (!m) return;
-          const img = document.createElement('img');
-          img.className = 'prevbestimg';
-          img.src = m.img;
-          img.alt = m.nome;
-          img.title = m.nome;
-          faixaBest.appendChild(img);
-        });
+      // v4.143 (Bento): mosaico fixo de 6 celulas -- vistos primeiro, '?' no resto
+      let _n = 0;
+      vistos.forEach(idx => {
+        const m = MONSTROS[idx];
+        if (!m) return;
+        const cel = document.createElement('span'); cel.className = 'bestcel';
+        const img = document.createElement('img');
+        img.className = 'prevbestimg';
+        img.src = m.img;
+        img.alt = m.nome;
+        img.title = m.nome;
+        cel.appendChild(img);
+        faixaBest.appendChild(cel); _n++;
+      });
+      for (; _n < 6; _n++){
+        const cel = document.createElement('span'); cel.className = 'bestcel vazia'; cel.textContent = '?';
+        faixaBest.appendChild(cel);
       }
     }
   }
@@ -11080,10 +11091,9 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     const disp = Math.max(0, pontosDisponiveis());   // nunca mostra negativo (save orfao de reset incompleto)
     const elDisp = document.getElementById('atrDisponiveis');
     if (elDisp){
-      const en = idiomaApp() === 'en';
-      elDisp.textContent = en
-        ? (disp + (disp === 1 ? ' available' : ' available'))
-        : (disp + (disp === 1 ? ' disponível' : ' disponíveis'));
+      const lb = (typeof window.t === 'function') ? window.t(disp === 1 ? 'atr.pontoLbl' : 'atr.pontosLbl') : '';
+      elDisp.innerHTML = '<b class="pgNum">' + disp + '</b><small class="pgLbl">' + String(lb).replace(/</g,'') + '</small>';
+      elDisp.classList.toggle('vazio', disp <= 0);
     }
 
     // Sinal unificado nos 3 (sempre "+N%") -- antes Fortuna usava "+",
@@ -11112,11 +11122,55 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 
     // v4.130: placas hexagonais (ficha B) -- pontos investidos por atributo e
     // rotulo do botao ("+ 2%" ou "TETO").
+    // v4.143: Bento -- medidor vertical de 15 segmentos por atributo (enche de baixo
+    // pra cima), "+" redondo, e a linha de ajuda do atributo selecionado.
+    const _tr = (c) => (typeof window.t === 'function') ? window.t(c) : c;
     [['fortuna','Fortuna'],['foco','Foco'],['vigor','Vigor']].forEach(([k,n])=>{
       const e=document.getElementById('atr'+n+'Pts'); if(e) e.textContent=gasto[k];
-      const bt=document.getElementById('atrMais'+n); if(bt) bt.textContent = noTeto(k) ? 'TETO' : '+';
+      const seg=document.getElementById('atr'+n+'Seg');
+      if (seg){
+        if (seg.childElementCount !== 15){
+          seg.innerHTML = '';
+          for (let i=0;i<15;i++) seg.appendChild(document.createElement('i'));
+        }
+        Array.prototype.forEach.call(seg.children, (el,i)=> el.classList.toggle('on', i < gasto[k]));
+      }
+      const ds=document.getElementById('atr'+n+'Desc');
+      if (ds) ds.textContent = _tr('atr.'+k+'Info');
+      const bt=document.getElementById('atrMais'+n);
+      if (bt) bt.textContent = noTeto(k) ? 'MAX' : '+';
+      const c=document.querySelector('.aneisAtr[data-atr="'+k+'"]');
+      if (c) c.classList.toggle('sel', window.__atrSel === k);
     });
+    const info = document.getElementById('atrInfo');
+    if (info){
+      const k = window.__atrSel;
+      info.textContent = k ? (_tr('atr.'+k+'Info') + '. ' + _tr('atr.regra')) : '';
+    }
 
+
+    // ---- Aneis (Perfil): le os valores ja calculados nos elementos ocultos ----
+    (function(){
+      const arc=(id,pct,r)=>{const e=document.getElementById(id); if(!e) return; const c=2*Math.PI*r; e.style.strokeDasharray=c; e.style.strokeDashoffset=c*(1-Math.max(0,Math.min(100,pct))/100);};
+      const w=id=>{const e=document.getElementById(id); return e? (parseFloat(e.style.width)||0):0};
+      arc('anelXp',w('perfilFill'),92); arc('anelHp',w('perfilHpFill'),76);
+      const tx=(a,b)=>{const x=document.getElementById(a),y=document.getElementById(b); if(x&&y) x.textContent=y.textContent.replace(' XP','')};
+      tx('anelHpTxt','perfilHpNum'); tx('anelXpTxt','perfilXpNum');
+      [['fortuna','Fortuna'],['foco','Foco'],['vigor','Vigor']].forEach(([k,n])=>{
+        arc('anel'+n,(gasto[k]/15)*100,26);
+        const v=document.getElementById('atr'+n+'Valor'), o=document.getElementById('anelVal'+n);
+        if(v&&o) o.textContent=v.textContent;
+      });
+      const ln=document.getElementById('anelStatsLinha');
+      if(ln){
+        const it=[];
+        document.querySelectorAll('.anelOculto .planoStat:not(.semMoedas)').forEach(p=>{
+          const v=p.querySelector('.statval'), l=p.querySelector('.statlabel');
+          if(v&&l&&v.textContent!=='—') it.push('<span><b>'+v.textContent+'</b> '+l.textContent.toLowerCase()+'</span>');
+        });
+        ln.innerHTML=it.join('<i>·</i>');
+      }
+    })();
     const bFortuna = document.getElementById('atrMaisFortuna');
     if (bFortuna) bFortuna.disabled = disp <= 0 || noTeto('fortuna');
     const bFoco = document.getElementById('atrMaisFoco');
@@ -11142,9 +11196,24 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   if (typeof _renderAtrib === 'function'){
     window.render = function(){
       _renderAtrib.apply(this, arguments);
+      try { if (typeof window.renderPerfil === 'function') window.renderPerfil(); } catch(e){}
       renderAtributosPontos();
     };
   }
+  // toque na coluna seleciona o atributo e mostra a descricao dele (toque de novo limpa)
+  window.__atrSel = null;
+  document.querySelectorAll('.aneisAtr').forEach(c => {
+    c.addEventListener('click', ev => {
+      if (ev.target.closest('.gplus')) return;
+      const k = c.dataset.atr;
+      window.__atrSel = (window.__atrSel === k) ? null : k;
+      renderAtributosPontos();
+    });
+  });
+  // troca de idioma: refaz os textos
+  window.renderAtributosPontos = renderAtributosPontos;
+  // o dicionario de i18n (TRADUCOES) so existe depois deste bloco -- repinta quando tudo carregou
+  window.addEventListener('load', () => { try { if (typeof window.renderPerfil === 'function') window.renderPerfil(); } catch(e){} renderAtributosPontos(); });
   renderAtributosPontos();   // primeira pintura, sem esperar o primeiro render()
 
   /* ---------- preview/expandir: cartao comeca fechado (so icone/nome/
@@ -17331,6 +17400,15 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'atr.focoDesc':    { pt:'de desconto na loja', en:'shop discount' },
     'atr.vigor':       { pt:'Vigor', en:'Vigor' },
     'atr.vigorDesc':   { pt:'de perdão no dano por tarefa largada', en:'forgiveness on damage from skipped tasks' },
+    'atr.fortunaInfo': { pt:'Chance de raridade melhor no espólio', en:'Better rarity chance on loot' },
+    'atr.focoInfo':    { pt:'Desconto nos preços da loja', en:'Discount on shop prices' },
+    'atr.vigorInfo':   { pt:'Perdão no dano por tarefa largada', en:'Forgiveness on damage from skipped tasks' },
+    'atr.regra':       { pt:'Cada ponto dá +2%, até 30%.', en:'Each point gives +2%, up to 30%.' },
+    'atr.pontoLbl':    { pt:'ponto p/ investir', en:'point to spend' },
+    'atr.pontosLbl':   { pt:'pontos p/ investir', en:'points to spend' },
+    'atr.investir':    { pt:'Investir 1 ponto', en:'Invest 1 point' },
+    'atr.semPontos':   { pt:'Sem pontos disponíveis', en:'No points available' },
+    'atr.teto':        { pt:'Teto atingido', en:'Max reached' },
 
     'acao.verTudo':  { pt:'Ver tudo', en:'View all' },
     'acao.verTodas': { pt:'Ver todas', en:'View all' },
@@ -17508,7 +17586,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // aba forcar um re-render por outro motivo. renderPerfil() ja chama
     // renderPreviewsPerfil() sozinha (ve o bloco logo acima), cobrindo
     // Conquistas/Bestiario tambem.
-    ['render','renderInventario','renderLoja','renderConquistasV2','renderBestiario','renderHistorico','renderGrimorio','desenharHeroi','renderPerfil']
+    ['render','renderInventario','renderLoja','renderConquistasV2','renderBestiario','renderHistorico','renderGrimorio','desenharHeroi','renderPerfil','renderAtributosPontos']
       .forEach(fn => { if (typeof window[fn] === 'function') window[fn](); });
     if (typeof window.atualizarTextosDificuldade === 'function') window.atualizarTextosDificuldade();
     if (typeof window.pintarTemaGrid === 'function') window.pintarTemaGrid();

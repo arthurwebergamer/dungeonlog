@@ -108,8 +108,12 @@
       const idiomasNavegador = (navigator.languages && navigator.languages.length)
         ? navigator.languages
         : [navigator.language || navigator.userLanguage || ''];
-      const primeiro = (idiomasNavegador[0] || '').toLowerCase();
-      const idioma = primeiro.indexOf('pt-br') === 0 ? 'pt' : 'en';
+      const lista = Array.prototype.map.call(idiomasNavegador, l => String(l || '').toLowerCase());
+      const primeiro = lista[0] || '';
+      // PT se: o 1o idioma e pt-BR ou 'pt' sem regiao; OU pt-BR aparece em qualquer posicao da lista
+      // (ex: Chrome com ingles no topo mas portugues do Brasil tambem configurado). pt-PT sozinho continua EN.
+      const ehPt = primeiro.indexOf('pt-br') === 0 || primeiro === 'pt' || lista.some(l => l.indexOf('pt-br') === 0);
+      const idioma = ehPt ? 'pt' : 'en';
       localStorage.setItem('questlog.idioma.v1', idioma);
     } catch(e){
       // localStorage indisponivel (modo privado restritivo, por

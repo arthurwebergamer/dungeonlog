@@ -38,7 +38,7 @@
      alteracao aqui (bump manual) pra forcar cache-bust; SUBIR ESTE
      NUMERO sempre que style.css mudar e o problema persistir em
      producao. -->
-<link rel="stylesheet" href="style.css?v=29">
+<link rel="stylesheet" href="style.css?v=30">
 
 <!-- =====================================================================
      TOGGLE DEBUG — silenciar console (log/warn/error)  —  precisa ser o
@@ -11145,7 +11145,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     const info = document.getElementById('atrInfo');
     if (info){
       const k = window.__atrSel;
-      info.textContent = k ? (_tr('atr.'+k+'Info') + '. ' + _tr('atr.regra')) : _tr('atr.regra');
+      info.textContent = k ? (_tr('atr.'+k+'Info') + '. ' + _tr('atr.regra')) : '';
     }
 
 
@@ -11196,6 +11196,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   if (typeof _renderAtrib === 'function'){
     window.render = function(){
       _renderAtrib.apply(this, arguments);
+      try { if (typeof window.renderPerfil === 'function') window.renderPerfil(); } catch(e){}
       renderAtributosPontos();
     };
   }
@@ -11212,7 +11213,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   // troca de idioma: refaz os textos
   window.renderAtributosPontos = renderAtributosPontos;
   // o dicionario de i18n (TRADUCOES) so existe depois deste bloco -- repinta quando tudo carregou
-  window.addEventListener('load', () => renderAtributosPontos());
+  window.addEventListener('load', () => { try { if (typeof window.renderPerfil === 'function') window.renderPerfil(); } catch(e){} renderAtributosPontos(); });
   renderAtributosPontos();   // primeira pintura, sem esperar o primeiro render()
 
   /* ---------- preview/expandir: cartao comeca fechado (so icone/nome/

@@ -5888,3 +5888,15 @@
 .anelStatsLinha b{color:var(--muted);font-weight:600}
 .anelStatsLinha i{font-style:normal;margin:0 6px}
 .anelAtr .atrpill{display:inline-flex!important;flex-direction:row!important;align-items:baseline;gap:4px}
+
+/* v4.148 — Aneis: menos informacao, mais respiro */
+.perfilAneis{gap:28px}
+.anelStatsLinha,.anelNivel{display:none}
+.anelHero{margin-top:12px}
+.anelNome{margin-top:4px}
+.anelLeg{margin-top:14px}
+.anelAtr .atrhead{margin-bottom:20px}
+.aneisAtr{gap:10px}
+.aneisAtr .gplus{margin-top:2px}
+.anelInfo{margin-top:18px;min-height:0}
+.anelInfo:empty{display:none}

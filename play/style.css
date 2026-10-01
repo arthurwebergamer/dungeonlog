@@ -5917,3 +5917,18 @@
 /* v4.152 — .view e flex coluna: sem flex:none os filtros encolhiam e sumiam */
 #viewInventario>*{flex:none}
 #viewInventario .invfiltros{min-height:44px;box-sizing:border-box;align-items:center}
+
+/* v4.153 — telas de login: e-mail enviado + bem-vindo de volta */
+.verificarBloco{align-items:center;gap:10px}
+.verificarIcone{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,transparent);border:1px solid color-mix(in srgb,var(--accent) 35%,transparent);margin-bottom:4px}
+.verificarTitulo{margin:0;font-family:'Outfit',sans-serif;font-size:22px;font-weight:700;color:var(--fg,#fff);text-shadow:0 2px 10px rgba(0,0,0,.85)}
+.verificarTexto{font-size:14px;line-height:1.55}
+.verificarTexto b,#verificarEmailAlvo{color:var(--fg,#fff);font-weight:600;word-break:break-all}
+#passoBoasVindas .marca{align-items:center;gap:4px}
+.boasVindasHeroi{width:96px;height:96px;display:flex;align-items:center;justify-content:center;margin-bottom:6px}
+.boasVindasHeroi img{width:96px;height:96px;image-rendering:pixelated;filter:drop-shadow(0 6px 10px rgba(0,0,0,.6))}
+.boasVindasHeroi:empty{display:none}
+.boasVindasNivel{font-family:'Silkscreen',monospace;font-size:11px;letter-spacing:.08em;color:var(--dim);text-transform:uppercase;text-shadow:0 1px 4px rgba(0,0,0,.85)}
+.boasVindasNivel:empty{display:none}
+#passoBoasVindas .primario{background:var(--accent)!important;color:#14101c!important;border:none!important}

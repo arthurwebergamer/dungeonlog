@@ -38,7 +38,7 @@
      alteracao aqui (bump manual) pra forcar cache-bust; SUBIR ESTE
      NUMERO sempre que style.css mudar e o problema persistir em
      producao. -->
-<link rel="stylesheet" href="style.css?v=34">
+<link rel="stylesheet" href="style.css?v=35">
 
 <!-- =====================================================================
      TOGGLE DEBUG — silenciar console (log/warn/error)  —  precisa ser o
@@ -14252,8 +14252,10 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   card.insertAdjacentHTML('afterbegin', `
     <div class="passo" id="passoBoasVindas">
       <div class="marca">
+        <div class="boasVindasHeroi" id="boasVindasHeroi"></div>
         <span class="boasVindasRotulo" id="boasVindasRotulo" data-i18n="login.bemVindoDeVolta">Bem-vindo de volta</span>
         <span class="titulo" id="boasVindasNome">Aventureiro</span>
+        <span class="boasVindasNivel" id="boasVindasNivel"></span>
       </div>
       <button class="primario" id="boasVindasContinuar" data-i18n="acao.continuar">Continuar</button>
     </div>
@@ -14271,9 +14273,9 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         <span class="titulo">DUNGEONLOG</span>
       </div>
       <div class="verificarBloco">
-        <p class="verificarTexto" id="verificarTextoBloco">Confirma seu email pra continuar.<br>
-          Mandamos um link pra <span id="verificarEmailAlvo"></span>.</p>
-        <p class="verificarSpamAviso" data-i18n="login.confereSpam">Não achou? Confere o <b>spam</b>.</p>
+        <span class="verificarIcone"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 7l8.5 6 8.5-6"/></svg></span>
+        <h2 class="verificarTitulo" data-i18n="login.confirmeTitulo">Confirme seu e-mail</h2>
+        <p class="verificarTexto" id="verificarTextoBloco">Enviamos um link para <span id="verificarEmailAlvo"></span>.<br>Abra o link e volte aqui — a confirmação é automática.</p>
       </div>
       <button class="primario" id="verificarReenviar" data-i18n="login.reenviarEmail">Reenviar email</button>
       <button class="loginLink" id="verificarEmailErrado" data-i18n="login.emailErrado">Email errado? Corrigir</button>
@@ -16081,8 +16083,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       const bloco = document.getElementById('verificarTextoBloco');
       if (bloco){
         bloco.innerHTML = en
-          ? 'Confirm your email to continue.<br>\n          We sent a link to <span id="verificarEmailAlvo"></span>.'
-          : 'Confirma seu email pra continuar.<br>\n          Mandamos um link pra <span id="verificarEmailAlvo"></span>.';
+          ? 'We sent a link to <span id="verificarEmailAlvo"></span>.<br>Open it and come back — confirmation is automatic.'
+          : 'Enviamos um link para <span id="verificarEmailAlvo"></span>.<br>Abra o link e volte aqui — a confirmação é automática.';
       }
       document.getElementById('verificarEmailAlvo').textContent = user.email || '';
       passoVerificarEmail.classList.add('on');
@@ -16299,6 +16301,12 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         try { en = (localStorage.getItem('questlog.idioma.v1') || 'pt') === 'en'; } catch(e){}
         document.getElementById('boasVindasRotulo').textContent = en ? 'Welcome back' : 'Bem-vindo de volta';
         document.getElementById('boasVindasNome').textContent = nomeConta;
+        try {
+          const elH = document.getElementById('boasVindasHeroi');
+          if (elH && typeof heroiAtual === 'function') elH.innerHTML = '<img src="' + heroiAtual().img + '" alt="">';
+          const elN = document.getElementById('boasVindasNivel');
+          if (elN && typeof progresso === 'function' && typeof romano === 'function') elN.textContent = (en ? 'Level ' : 'Nível ') + romano(progresso().nivel);
+        } catch(e){}
         document.getElementById('passoBoasVindas').classList.add('on');
 
         let jaEntrou = false;
@@ -16331,10 +16339,11 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         <div id="bloqueioVerificacaoEmail">
           <span class="titulo">DUNGEONLOG</span>
           <div class="verificarBloco">
+            <span class="verificarIcone"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 7l8.5 6 8.5-6"/></svg></span>
+            <h2 class="verificarTitulo">${en ? 'Confirm your email' : 'Confirme seu e-mail'}</h2>
             <p class="verificarTexto">${en
-              ? ('Confirm your email to continue.<br>\n              We sent a link to <b>' + emailSeguro + '</b>.')
-              : ('Confirma seu email pra continuar.<br>\n              Mandamos um link pra <b>' + emailSeguro + '</b>.')}</p>
-            <p class="verificarSpamAviso">${en ? 'Can\'t find it? Check your <b>spam</b>.' : 'Não achou? Confere o <b>spam</b>.'}</p>
+              ? ('We sent a link to <b>' + emailSeguro + '</b>.<br>Open it and come back — confirmation is automatic.')
+              : ('Enviamos um link para <b>' + emailSeguro + '</b>.<br>Abra o link e volte aqui — a confirmação é automática.')}</p>
           </div>
           <button class="primario" id="bloqueioReenviar">${en ? 'Resend email' : 'Reenviar email'}</button>
           <button class="loginLink" id="bloqueioEmailErrado">${en ? 'Wrong email? Fix it' : 'Email errado? Corrigir'}</button>
@@ -17506,6 +17515,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'login.cadastreSeAgora':   { pt:'Cadastre-se agora', en:'Sign up now' },
     'login.agoraNao':          { pt:'Agora não', en:'Not now' },
     'login.bemVindoDeVolta':   { pt:'Bem-vindo de volta', en:'Welcome back' },
+    'login.confirmeTitulo':    { pt:'Confirme seu e-mail', en:'Confirm your email' },
     'login.confereSpam':       { pt:'Não achou? Confere o <b>spam</b>.', en:'Can\'t find it? Check your <b>spam</b>.' },
     'login.reenviarEmail':     { pt:'Reenviar email', en:'Resend email' },
     'login.emailErrado':       { pt:'Email errado? Corrigir', en:'Wrong email? Fix it' },

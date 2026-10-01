@@ -5936,3 +5936,6 @@
 /* v4.154 -- feedback inline (login/verificacao) */
 .msgInline{margin:8px 0 0;text-align:center}
 .msgInline.ok{color:var(--sucesso,#4CAF7A)}
+
+/* v4.155 -- sem destaque azul nativo do Android ao tocar (nav, botoes, links) */
+html,body,button,a,input,select,textarea,label,[role="button"],[onclick],.nav,.nav *{-webkit-tap-highlight-color:transparent}

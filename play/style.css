@@ -5914,3 +5914,6 @@
 .perfilAneis .aarco.hp{stroke:#E5698A}
 .anelLeg .dxp{background:#F2C94C}
 .perfilAneis .conqAnel{display:none}
+/* v4.152 — .view e flex coluna: sem flex:none os filtros encolhiam e sumiam */
+#viewInventario>*{flex:none}
+#viewInventario .invfiltros{min-height:44px;box-sizing:border-box;align-items:center}

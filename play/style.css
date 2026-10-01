@@ -5905,3 +5905,7 @@
 .anelAtr .atrpill,.anelAtr .atrpill .pgNum,.anelAtr .atrpill .pgLbl{font-family:'Outfit',sans-serif!important;font-size:13px!important;font-weight:500!important;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)!important;margin:0!important}
 .anelAtr .atrpill{flex:none;gap:6px!important;text-align:right}
 .anelAtr .atrpill:not(.vazio) .pgNum,.anelAtr .atrpill:not(.vazio) .pgLbl{color:var(--text)!important}
+/* v4.150 — filtros do inventario ficam fixos no topo ao rolar; graficos do Perfil seguem a cor do tema */
+#viewInventario .invfiltros{position:sticky;top:0;z-index:6;background:var(--bg);margin:0 -14px 8px;padding:8px 14px}
+.perfilAneis .aarco,.perfilAneis .aarco.xp{stroke:var(--accent)}
+.anelLeg .dxp{background:var(--accent)}

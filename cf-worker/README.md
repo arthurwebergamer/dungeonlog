@@ -139,3 +139,28 @@ projeto. Ler e escrever no Firestore, e mandar mensagens pelo FCM, são
 chamadas HTTP diretas (REST API do Firestore + API v1 do FCM,
 autenticado como a Service Account do passo 1), exatamente o que as
 Cloud Functions fariam — sem precisar do Blaze pra nada.
+
+## Google Play Billing: `POST /billing/verify`
+
+O app (TWA) compra via Digital Goods API e manda `{sku, purchaseToken}` com
+`Authorization: Bearer <ID token do Firebase>`. O Worker:
+
+1. valida o ID token (JWKS do Firebase) e pega o `uid`;
+2. consulta a Google Play Developer API (`subscriptionsv2` / `purchases/products`);
+3. confirma (acknowledge) a compra pendente (senao a Google estorna em 3 dias);
+4. amarra o token a um unico uid (`playPurchases/{sha256(token)}`);
+5. grava `entitlements/{uid}` (`assinaturaAte`, `assinaturaProduto`, `assinaturaEstado`
+   ou `proVitalicio`/`proVitalicioPlay`).
+
+Para ativar:
+
+- Google Cloud: ativar a **Google Play Android Developer API** no projeto.
+- Play Console > Usuarios e permissoes: convidar o `client_email` da service account
+  com permissao de **ver dados financeiros / gerenciar pedidos e assinaturas** do app.
+- (Opcional) secret `PLAY_SERVICE_ACCOUNT` com outra service account so pra Play;
+  sem ele usa `FIREBASE_SERVICE_ACCOUNT`.
+- `npx wrangler deploy`
+- Em `play/index.html`, preencher `BILLING_VERIFY_URL` com `https://<worker>/billing/verify`
+  (vazio = o pop-up de compra nunca abre, de proposito).
+- Ainda nao ha RTDN: renovacoes/cancelamentos sao pegos quando o app abre
+  (`billingSincronizar`, a cada 6h).

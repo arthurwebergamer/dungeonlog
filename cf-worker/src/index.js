@@ -413,6 +413,207 @@ async function checarFimDeDia(env){
   await firestoreCommitLote(projectId, tokenFirestore, escritas);
 }
 
+// =============================================================================
+// GOOGLE PLAY BILLING -- POST /billing/verify
+//
+// O app (TWA) paga pela Digital Goods API e manda pra ca o purchaseToken +
+// o ID token do Firebase de quem esta logado. Este endpoint:
+//   1. confere o ID token (assinatura RS256 contra as chaves publicas do
+//      Firebase, aud/iss/exp) -> descobre o uid. NUNCA confia no uid que o
+//      client "diz" ser;
+//   2. consulta a compra na Google Play Developer API (so o servidor
+//      consegue, com a service account) e confere o produto e o estado;
+//   3. CONFIRMA (acknowledge) a compra -- sem isso a Google estorna em 3 dias;
+//   4. amarra o token a esse uid (playPurchases/{sha256}) pra a mesma compra
+//      nao liberar PRO em varias contas;
+//   5. grava em entitlements/{uid}: assinaturaAte (ms) p/ mensal/anual, ou
+//      proVitalicio=true p/ o produto unico. O client so le (firestore.rules).
+//
+// Renovacoes: o app revalida (listPurchases -> este endpoint) a cada login,
+// no maximo 1x/6h, e a Google devolve a nova data de validade. Cancelamento
+// e estorno em tempo real dependem de RTDN (PR seguinte) -- por ora o
+// cancelamento vale ate o fim do periodo ja pago (comportamento normal).
+// =============================================================================
+
+const PLAY_PACKAGE = 'com.dungeonlog';
+const PLAY_SCOPE = 'https://www.googleapis.com/auth/androidpublisher';
+const PLAY_BASE = 'https://androidpublisher.googleapis.com/androidpublisher/v3/applications/' + PLAY_PACKAGE;
+const BILLING_SKUS_ASSINATURA = ['pro_mensal', 'pro_anual'];
+const BILLING_SKUS_UNICO = ['pro_vitalicio'];
+const BILLING_ORIGENS = ['https://dungeonlog.weberlabs.com.br'];
+const FIREBASE_JWK_URL = 'https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com';
+const ESTADOS_COM_ACESSO = ['SUBSCRIPTION_STATE_ACTIVE', 'SUBSCRIPTION_STATE_IN_GRACE_PERIOD', 'SUBSCRIPTION_STATE_CANCELED'];
+
+function base64UrlParaBytes(str){
+  const b64 = str.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((str.length + 3) % 4);
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return bytes;
+}
+
+let _jwkCache = { chaves: null, ate: 0 };
+async function chavesFirebase(){
+  if (_jwkCache.chaves && Date.now() < _jwkCache.ate) return _jwkCache.chaves;
+  const resp = await fetch(FIREBASE_JWK_URL);
+  if (!resp.ok) throw new Error('JWK do Firebase indisponivel: ' + resp.status);
+  const dados = await resp.json();
+  _jwkCache = { chaves: dados.keys || [], ate: Date.now() + 3600 * 1000 };
+  return _jwkCache.chaves;
+}
+
+// Retorna o uid se o ID token do Firebase for valido; lanca erro se nao.
+async function verificarIdTokenFirebase(idToken, projectId){
+  const partes = String(idToken || '').split('.');
+  if (partes.length !== 3) throw new Error('token malformado');
+  const header = JSON.parse(new TextDecoder().decode(base64UrlParaBytes(partes[0])));
+  const claims = JSON.parse(new TextDecoder().decode(base64UrlParaBytes(partes[1])));
+  if (header.alg !== 'RS256' || !header.kid) throw new Error('alg invalido');
+  const jwk = (await chavesFirebase()).find(k => k.kid === header.kid);
+  if (!jwk) throw new Error('kid desconhecido');
+  const chave = await crypto.subtle.importKey('jwk', jwk, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['verify']);
+  const ok = await crypto.subtle.verify(
+    'RSASSA-PKCS1-v1_5', chave, base64UrlParaBytes(partes[2]), new TextEncoder().encode(partes[0] + '.' + partes[1])
+  );
+  if (!ok) throw new Error('assinatura invalida');
+  const agora = Math.floor(Date.now() / 1000);
+  if (claims.aud !== projectId) throw new Error('aud invalido');
+  if (claims.iss !== 'https://securetoken.google.com/' + projectId) throw new Error('iss invalido');
+  if (typeof claims.exp !== 'number' || claims.exp <= agora) throw new Error('token expirado');
+  if (typeof claims.iat !== 'number' || claims.iat > agora + 60) throw new Error('iat no futuro');
+  if (!claims.sub || typeof claims.sub !== 'string') throw new Error('sem sub');
+  return claims.sub;
+}
+
+async function sha256Hex(texto){
+  const h = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(texto));
+  return Array.from(new Uint8Array(h)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function playGet(accessToken, caminho){
+  const resp = await fetch(PLAY_BASE + caminho, { headers: { Authorization: 'Bearer ' + accessToken } });
+  if (!resp.ok) throw new Error('Play API ' + resp.status + ': ' + (await resp.text()).slice(0, 200));
+  return resp.json();
+}
+async function playAcknowledge(accessToken, caminho){
+  const resp = await fetch(PLAY_BASE + caminho + ':acknowledge', {
+    method: 'POST',
+    headers: { Authorization: 'Bearer ' + accessToken, 'Content-Type': 'application/json' },
+    body: '{}',
+  });
+  // 400 "already acknowledged" nao e' falha de verdade
+  if (!resp.ok && resp.status !== 400) throw new Error('acknowledge falhou: ' + resp.status);
+}
+
+async function firestoreLerDoc(projectId, accessToken, caminho){
+  const resp = await fetch(FIRESTORE_BASE + '/projects/' + projectId + '/databases/(default)/documents/' + caminho, {
+    headers: { Authorization: 'Bearer ' + accessToken },
+  });
+  if (resp.status === 404) return null;
+  if (!resp.ok) throw new Error('Firestore get falhou: ' + resp.status);
+  const doc = await resp.json();
+  return fsFieldsParaObjeto(doc.fields || {});
+}
+
+function respostaJson(corpo, status, origem){
+  const headers = { 'Content-Type': 'application/json' };
+  if (origem && BILLING_ORIGENS.indexOf(origem) !== -1){
+    headers['Access-Control-Allow-Origin'] = origem;
+    headers['Vary'] = 'Origin';
+  }
+  return new Response(JSON.stringify(corpo), { status: status, headers: headers });
+}
+
+async function tratarBillingVerify(request, env){
+  const origem = request.headers.get('Origin');
+  if (request.method === 'OPTIONS'){
+    const headers = {
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Access-Control-Max-Age': '86400',
+    };
+    if (origem && BILLING_ORIGENS.indexOf(origem) !== -1){ headers['Access-Control-Allow-Origin'] = origem; headers['Vary'] = 'Origin'; }
+    return new Response(null, { status: 204, headers: headers });
+  }
+  if (request.method !== 'POST') return respostaJson({ ok: false, erro: 'metodo' }, 405, origem);
+
+  const serviceAccount = JSON.parse(env.FIREBASE_SERVICE_ACCOUNT);
+  const projectId = serviceAccount.project_id;
+
+  let corpo;
+  try { corpo = await request.json(); } catch(e){ return respostaJson({ ok: false, erro: 'json' }, 400, origem); }
+  const sku = corpo && corpo.sku;
+  const purchaseToken = corpo && corpo.purchaseToken;
+  const ehAssinatura = BILLING_SKUS_ASSINATURA.indexOf(sku) !== -1;
+  const ehUnico = BILLING_SKUS_UNICO.indexOf(sku) !== -1;
+  if ((!ehAssinatura && !ehUnico) || typeof purchaseToken !== 'string' || purchaseToken.length < 10 || purchaseToken.length > 1000){
+    return respostaJson({ ok: false, erro: 'parametros' }, 400, origem);
+  }
+
+  let uid;
+  try {
+    const auth = request.headers.get('Authorization') || '';
+    uid = await verificarIdTokenFirebase(auth.replace(/^Bearer\s+/i, ''), projectId);
+  } catch(e){
+    return respostaJson({ ok: false, erro: 'nao-autenticado' }, 401, origem);
+  }
+
+  try {
+    const playSa = env.PLAY_SERVICE_ACCOUNT ? JSON.parse(env.PLAY_SERVICE_ACCOUNT) : serviceAccount;
+    const tokenPlay = await obterAccessToken(playSa, PLAY_SCOPE);
+    const tokenFirestore = await obterAccessToken(serviceAccount, FIRESTORE_SCOPE);
+    const tokenEnc = encodeURIComponent(purchaseToken);
+
+    // 1) Valida na Google e descobre ate quando vale
+    let campos;
+    if (ehAssinatura){
+      const compra = await playGet(tokenPlay, '/purchases/subscriptionsv2/tokens/' + tokenEnc);
+      const item = (compra.lineItems || []).find(li => li.productId === sku);
+      if (!item) return respostaJson({ ok: false, erro: 'produto-diferente' }, 400, origem);
+      if (ESTADOS_COM_ACESSO.indexOf(compra.subscriptionState) === -1 && compra.subscriptionState !== 'SUBSCRIPTION_STATE_EXPIRED'){
+        return respostaJson({ ok: false, erro: 'estado-' + compra.subscriptionState }, 402, origem);
+      }
+      const ate = Date.parse(item.expiryTime) || 0;
+      campos = {
+        assinaturaAte: ESTADOS_COM_ACESSO.indexOf(compra.subscriptionState) !== -1 ? ate : 0,
+        assinaturaProduto: sku,
+        assinaturaEstado: compra.subscriptionState,
+      };
+      // 2) token amarrado a um uid so
+      const hash = await sha256Hex(purchaseToken);
+      const dono = await firestoreLerDoc(projectId, tokenFirestore, 'playPurchases/' + hash);
+      if (dono && dono.uid && dono.uid !== uid) return respostaJson({ ok: false, erro: 'compra-de-outra-conta' }, 409, origem);
+      // 3) acknowledge (pendente -> confirmada)
+      if (compra.acknowledgementState === 'ACKNOWLEDGEMENT_STATE_PENDING' && campos.assinaturaAte > 0){
+        await playAcknowledge(tokenPlay, '/purchases/subscriptions/' + encodeURIComponent(sku) + '/tokens/' + tokenEnc);
+      }
+      await firestoreCommitLote(projectId, tokenFirestore, [
+        escritaParcial(projectId, 'playPurchases/' + hash, { uid: uid, sku: sku, atualizadoEm: Date.now() }),
+        escritaParcial(projectId, 'entitlements/' + uid, campos),
+      ]);
+      return respostaJson({ ok: true, ate: campos.assinaturaAte }, 200, origem);
+    }
+
+    // produto unico (vitalicio)
+    const compra = await playGet(tokenPlay, '/purchases/products/' + encodeURIComponent(sku) + '/tokens/' + tokenEnc);
+    if (compra.purchaseState !== 0) return respostaJson({ ok: false, erro: 'nao-comprado' }, 402, origem);
+    const hash = await sha256Hex(purchaseToken);
+    const dono = await firestoreLerDoc(projectId, tokenFirestore, 'playPurchases/' + hash);
+    if (dono && dono.uid && dono.uid !== uid) return respostaJson({ ok: false, erro: 'compra-de-outra-conta' }, 409, origem);
+    if (compra.acknowledgementState === 0){
+      await playAcknowledge(tokenPlay, '/purchases/products/' + encodeURIComponent(sku) + '/tokens/' + tokenEnc);
+    }
+    await firestoreCommitLote(projectId, tokenFirestore, [
+      escritaParcial(projectId, 'playPurchases/' + hash, { uid: uid, sku: sku, atualizadoEm: Date.now() }),
+      escritaParcial(projectId, 'entitlements/' + uid, { proVitalicio: true, proVitalicioPlay: true }),
+    ]);
+    return respostaJson({ ok: true, vitalicio: true }, 200, origem);
+  } catch(e){
+    console.error('billing/verify falhou', e && e.message);
+    return respostaJson({ ok: false, erro: 'servidor' }, 502, origem);
+  }
+}
+
 export default {
   async scheduled(event, env, ctx){
     if (event.cron === '0 13 * * *'){
@@ -428,6 +629,7 @@ export default {
   // isso, e nao expoe nenhum dado, so dispara os envios) mas se quiser
   // travar de vez depois de testar, e' so apagar este handler `fetch`.
   async fetch(request, env, ctx){
+    if (new URL(request.url).pathname === '/billing/verify') return tratarBillingVerify(request, env);
     await Promise.all([checarTesteGratisAcabando(env), checarFimDeDia(env)]);
     return new Response('OK -- checagens rodadas manualmente\n');
   },

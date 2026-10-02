@@ -38,7 +38,7 @@
      alteracao aqui (bump manual) pra forcar cache-bust; SUBIR ESTE
      NUMERO sempre que style.css mudar e o problema persistir em
      producao. -->
-<link rel="stylesheet" href="style.css?v=41">
+<link rel="stylesheet" href="style.css?v=42">
 
 <!-- =====================================================================
      TOGGLE DEBUG — silenciar console (log/warn/error)  —  precisa ser o
@@ -3395,6 +3395,9 @@ function assinaturaAtiva(){
   // mais abaixo no arquivo).
   if (proVitalicioAtivo()) return true;
   if (typeof window.proVitalicioServidorAtivo === 'function' && window.proVitalicioServidorAtivo()) return true;
+  // ASSINATURA GOOGLE PLAY (mensal/anual), validada pelo Worker e gravada
+  // em entitlements/{uid}.assinaturaAte -- ver bloco GOOGLE PLAY BILLING.
+  if (typeof window.assinaturaServidorAtiva === 'function' && window.assinaturaServidorAtiva()) return true;
   // TESTE GRATIS (pedido do usuario): enquanto o trial estiver dentro da
   // janela de 7 dias, conta como assinatura ativa -- ver bloco
   // "TESTE GRATIS" logo depois de iniciarCompraAssinatura(), poucas
@@ -3477,6 +3480,7 @@ function abrirPaywall(motivo){
   // do usuario: "demora pra tela aparecer, deveria ser mais rapido"),
   // 120ms ja da pro toast aparecer primeiro sem o paywall parecer lento.
   setTimeout(() => overlay.classList.add('on'), 120);
+  if (typeof billingPintarPrecos === 'function') billingPintarPrecos();
 }
 window.abrirPaywall = abrirPaywall;
 
@@ -3626,25 +3630,243 @@ window.aplicarCtaPlano = aplicarCtaPlano;
   aplicarCtaPlano(_pwPlanoSelecionado); // sincroniza o CTA com o default ('trial') logo no boot
 })();
 
-function iniciarCompraAssinatura(){
-  // TODO (integracao real, ver comentario acima do bloco): chamar o
-  // Digital Goods API / Play Billing daqui, mandar o purchase token pra
-  // Cloud Function verificar, e so entao marcar a assinatura como ativa
-  // (hoje assinaturaAtiva() so reflete o modo debug).
-  if (typeof window.aviso === 'function'){
-    window.aviso((typeof idiomaApp === 'function' && idiomaApp() === 'en') ? 'Payments coming soon' : 'Pagamento ainda não disponível');
+// ---------------------------------------------------------------------
+// GOOGLE PLAY BILLING (Digital Goods API + PaymentRequest, so dentro da
+// TWA -- no navegador/PWA comum esses 2 objetos nao existem e o botao
+// "Assinar" so avisa que e' preciso o app da Play Store).
+//
+// Fluxo da compra (iniciarCompraAssinatura):
+//   1. PaymentRequest com o SKU abre o pop-up de pagamento da Google.
+//   2. Se pagou, o Chrome devolve o purchaseToken.
+//   3. O token vai pro Worker (BILLING_VERIFY_URL, POST /billing/verify)
+//      junto com o ID token do Firebase. O Worker confere o token na
+//      Google Play Developer API, CONFIRMA (acknowledge) a compra e grava
+//      entitlements/{uid}.assinaturaAte (ou .proVitalicio) no Firestore.
+//   4. So entao o client chama response.complete('success') e relê o
+//      entitlement (puxarEntitlementAgora) -- assinaturaAtiva() passa a
+//      enxergar o PRO. NENHUM caminho do client concede PRO sozinho.
+//
+// TRAVA DE SEGURANCA: com BILLING_VERIFY_URL vazio o botao NAO abre o
+// pop-up (senao a pessoa pagaria sem receber PRO). Preencher a URL so
+// depois de publicar o Worker (ver cf-worker/README.md).
+//
+// SKUs (IDs do Play Console): pro_mensal, pro_anual (assinaturas) e
+// pro_vitalicio (produto unico, opcional -- se a Google nao devolver
+// detalhes dele, o card Vitalicio some do paywall).
+// ---------------------------------------------------------------------
+const BILLING_SERVICO_URL = 'https://play.google.com/billing';
+const BILLING_SKUS = { mensal: 'pro_mensal', anual: 'pro_anual', vitalicio: 'pro_vitalicio' };
+const BILLING_VERIFY_URL = ''; // ex.: 'https://dungeonlog-push.SEU-SUBDOMINIO.workers.dev/billing/verify'
+
+let _billingServico = null;
+let _billingDetalhes = null;
+let _billingOcupado = false;
+
+function _billingTexto(chave, pt, en){
+  if (typeof window.t === 'function'){
+    const v = window.t(chave);
+    if (v && v !== chave) return v;
+  }
+  return (typeof idiomaApp === 'function' && idiomaApp() === 'en') ? en : pt;
+}
+
+// aviso() esta mudo (TOASTS_DESATIVADOS) -- feedback proprio, um chip
+// dentro do #paywallOverlay (mesma ideia do chip do bau). Criado sob demanda.
+function billingMsg(texto){
+  const ov = document.getElementById('paywallOverlay');
+  if (!ov) return;
+  let el = document.getElementById('pwBillingMsg');
+  if (!el){
+    el = document.createElement('div');
+    el.id = 'pwBillingMsg';
+    el.setAttribute('role', 'status');
+    ov.appendChild(el);
+  }
+  el.textContent = texto;
+  el.classList.add('on');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('on'), 4500);
+}
+
+function billingDisponivel(){
+  return typeof window.getDigitalGoodsService === 'function' && typeof window.PaymentRequest === 'function';
+}
+
+async function billingServico(){
+  if (_billingServico) return _billingServico;
+  if (!billingDisponivel()) return null;
+  try { _billingServico = await window.getDigitalGoodsService(BILLING_SERVICO_URL); }
+  catch(e){ _billingServico = null; }
+  return _billingServico;
+}
+
+function billingFormatarPreco(valor, moeda){
+  try {
+    return new Intl.NumberFormat(navigator.language || 'pt-BR', { style: 'currency', currency: moeda }).format(Number(valor));
+  } catch(e){ return String(valor) + ' ' + moeda; }
+}
+
+async function billingCarregarDetalhes(){
+  const s = await billingServico();
+  if (!s) return null;
+  try {
+    const itens = await s.getDetails(Object.keys(BILLING_SKUS).map(k => BILLING_SKUS[k]));
+    const mapa = {};
+    (itens || []).forEach(i => { if (i && i.itemId) mapa[i.itemId] = i; });
+    _billingDetalhes = mapa;
+    return mapa;
+  } catch(e){ return null; }
+}
+
+// Troca os precos escritos a mao no HTML (R$17,90 etc.) pelos que a Google
+// devolve, ja na moeda/formatacao de quem esta vendo. Sem detalhes (fora da
+// TWA, sem rede) deixa o texto padrao. Remove o data-i18n dos spans que
+// pinta, senao uma troca de idioma sobrescreveria o preco vivo.
+async function billingPintarPrecos(){
+  const d = await billingCarregarDetalhes();
+  if (!d) return;
+  const en = (typeof idiomaApp === 'function' && idiomaApp() === 'en');
+  const por = (el, txt) => { if (!el) return; el.removeAttribute('data-i18n'); el.textContent = txt; };
+  const m = d[BILLING_SKUS.mensal], a = d[BILLING_SKUS.anual], v = d[BILLING_SKUS.vitalicio];
+  if (m && m.price){
+    por(document.querySelector('#pwPlanoMensal .pwPlanoPreco > span:first-child'), billingFormatarPreco(m.price.value, m.price.currency));
+  }
+  if (a && a.price){
+    const anual = billingFormatarPreco(a.price.value, a.price.currency);
+    const porMes = billingFormatarPreco(Number(a.price.value) / 12, a.price.currency);
+    por(document.querySelector('#pwPlanoAnual .pwPlanoPreco > span:first-child'), porMes);
+    por(document.querySelector('#pwPlanoAnual .pwPlanoSub'), en ? ('Billed ' + anual + '/year') : ('Cobrado ' + anual + '/ano'));
+    por(document.querySelector('#pwPlanoTrial .pwPlanoSub'), en ? ('Then, Annual ' + porMes + '/mo') : ('Depois, Anual ' + porMes + '/mês'));
+    const badge = document.querySelector('#pwPlanoAnual .pwBadge');
+    if (badge && m && m.price){
+      const pct = Math.round((1 - (Number(a.price.value) / 12) / Number(m.price.value)) * 100);
+      if (pct > 0 && pct < 100){ badge.textContent = '-' + pct + '%'; badge.style.display = ''; }
+      else badge.style.display = 'none';
+    }
+  }
+  const cardV = document.getElementById('pwPlanoVitalicio');
+  if (cardV){
+    if (v && v.price){
+      por(cardV.querySelector('.pwPlanoPreco'), billingFormatarPreco(v.price.value, v.price.currency));
+      cardV.style.display = '';
+    } else {
+      cardV.style.display = 'none';
+      if (_pwPlanoSelecionado === 'vitalicio' && typeof window.selecionarPlanoPaywall === 'function') window.selecionarPlanoPaywall('anual');
+    }
+  }
+}
+window.billingPintarPrecos = billingPintarPrecos;
+
+// Manda o purchaseToken pro Worker validar. Lanca erro se nao foi aceito.
+async function billingVerificar(sku, purchaseToken){
+  const idToken = (typeof window.questlogIdToken === 'function') ? await window.questlogIdToken() : null;
+  if (!idToken) throw new Error('sem-login');
+  const r = await fetch(BILLING_VERIFY_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
+    body: JSON.stringify({ sku: sku, purchaseToken: purchaseToken }),
+  });
+  let dados = null;
+  try { dados = await r.json(); } catch(e){}
+  if (!r.ok || !dados || dados.ok !== true) throw new Error((dados && dados.erro) || ('http-' + r.status));
+  if (typeof window.puxarEntitlementAgora === 'function') await window.puxarEntitlementAgora();
+  return dados;
+}
+
+function billingAtualizarTelas(){
+  if (typeof window.atualizarResumoAssinatura === 'function') window.atualizarResumoAssinatura();
+  if (typeof render === 'function') { try { render(); } catch(e){} }
+}
+
+async function iniciarCompraAssinatura(){
+  if (_billingOcupado) return;
+  const sku = BILLING_SKUS[_pwPlanoSelecionado] || BILLING_SKUS.anual;
+  if (!BILLING_VERIFY_URL){
+    billingMsg(_billingTexto('pro.pagamentoIndisponivel', 'Pagamento ainda não disponível', 'Payments coming soon'));
+    return;
+  }
+  if (!billingDisponivel()){
+    billingMsg(_billingTexto('pro.soNoApp', 'Disponível no app instalado pela Google Play', 'Available in the app installed from Google Play'));
+    return;
+  }
+  const idToken = (typeof window.questlogIdToken === 'function') ? await window.questlogIdToken() : null;
+  if (!idToken){
+    billingMsg(_billingTexto('pro.entrarParaAssinar', 'Entre na sua conta para assinar', 'Sign in to subscribe'));
+    return;
+  }
+  _billingOcupado = true;
+  const btn = document.getElementById('paywallAssinarBtn');
+  if (btn) btn.disabled = true;
+  let resposta = null;
+  try {
+    const req = new PaymentRequest(
+      [{ supportedMethods: BILLING_SERVICO_URL, data: { sku: sku } }],
+      { total: { label: 'Total', amount: { currency: 'BRL', value: '0' } } }
+    );
+    resposta = await req.show();
+    const token = resposta.details && resposta.details.purchaseToken;
+    if (!token) throw new Error('sem-token');
+    billingMsg(_billingTexto('pro.compraVerificando', 'Confirmando pagamento…', 'Confirming payment…'));
+    try {
+      await billingVerificar(sku, token);
+    } catch(e){
+      try { await resposta.complete('fail'); } catch(_){}
+      resposta = null;
+      throw e;
+    }
+    try { await resposta.complete('success'); } catch(_){}
+    resposta = null;
+    billingMsg(_billingTexto('pro.compraOk', 'Plano Pro ativado!', 'Pro plan activated!'));
+    billingAtualizarTelas();
+    setTimeout(() => { if (typeof fecharPaywall === 'function') fecharPaywall(); }, 900);
+  } catch(e){
+    // Pessoa fechou o pop-up da Google: nao e' erro, nao mostra nada.
+    const cancelou = e && (e.name === 'AbortError' || e.name === 'NotAllowedError');
+    if (!cancelou){
+      window.dbgConta && window.dbgConta('iniciarCompraAssinatura FALHOU: ' + (e && (e.name + ' ' + e.message)));
+      billingMsg(_billingTexto('pro.compraErro', 'Não foi possível concluir a compra. Tente de novo.', 'Could not complete the purchase. Try again.'));
+    }
+  } finally {
+    _billingOcupado = false;
+    if (btn) btn.disabled = false;
   }
 }
 window.iniciarCompraAssinatura = iniciarCompraAssinatura;
 
-// "Restaurar compras" (.pwLegal no paywall, pedido do usuario: mesmo
-// rodape do Skillion) -- mesmo estagio que iniciarCompraAssinatura():
-// so um aviso, ate a integracao real com Google Play Billing existir
-// (a real so vai poder checar compras de verdade quando o Digital
-// Goods API estiver ligado, ver comentario grande acima deste bloco).
+// Lista as compras do Google (listPurchases) e revalida cada uma no
+// Worker. Serve pra "Restaurar compras" (manual) e pra manter a data de
+// validade em dia sem esperar notificacao do servidor (billingSincronizar).
+async function billingRevalidarCompras(){
+  const s = await billingServico();
+  if (!s) return { total: 0, ok: 0 };
+  let compras = [];
+  try { compras = await s.listPurchases(); } catch(e){ compras = []; }
+  let ok = 0;
+  for (const c of (compras || [])){
+    try { await billingVerificar(c.itemId, c.purchaseToken); ok++; } catch(e){}
+  }
+  return { total: (compras || []).length, ok: ok };
+}
+
 function restaurarCompras(){
-  const texto = (typeof window.t === 'function') ? window.t('pro.restaurarEmBreve') : 'Restauração de compras em breve';
-  if (typeof window.aviso === 'function'){ window.aviso(texto); }
+  if (!BILLING_VERIFY_URL || !billingDisponivel()){
+    billingMsg(_billingTexto('pro.restaurarEmBreve', 'Restauração de compras em breve', 'Restore purchases coming soon'));
+    return;
+  }
+  (async () => {
+    const idToken = (typeof window.questlogIdToken === 'function') ? await window.questlogIdToken() : null;
+    if (!idToken){
+      billingMsg(_billingTexto('pro.entrarParaAssinar', 'Entre na sua conta para assinar', 'Sign in to subscribe'));
+      return;
+    }
+    const r = await billingRevalidarCompras();
+    if (r.ok > 0){
+      billingMsg(_billingTexto('pro.restaurado', 'Compras restauradas', 'Purchases restored'));
+      billingAtualizarTelas();
+    } else {
+      billingMsg(_billingTexto('pro.nadaRestaurar', 'Nenhuma compra encontrada', 'No purchases found'));
+    }
+  })();
 }
 window.restaurarCompras = restaurarCompras;
 document.addEventListener('DOMContentLoaded', () => {
@@ -3653,6 +3875,21 @@ document.addEventListener('DOMContentLoaded', () => {
   // vez de getElementById unico.
   document.querySelectorAll('.pwRestaurarBtn').forEach(btn => { btn.onclick = restaurarCompras; });
 });
+
+// Chamada a cada login (puxarNuvem). Se houver compra no Google, revalida
+// no Worker pra renovar `assinaturaAte` (mensal/anual renovam sozinhos,
+// sem nenhum aviso do servidor). No maximo 1x a cada 6h por aparelho.
+async function billingSincronizar(){
+  if (!BILLING_VERIFY_URL || !billingDisponivel()) return;
+  const CHAVE = 'questlog.billingSync.v1';
+  try {
+    const ult = Number(localStorage.getItem(CHAVE) || 0);
+    if (Date.now() - ult < 6 * 3600 * 1000) return;
+    localStorage.setItem(CHAVE, String(Date.now()));
+  } catch(e){}
+  try { await billingRevalidarCompras(); billingAtualizarTelas(); } catch(e){}
+}
+window.billingSincronizar = billingSincronizar;
 
 // ---------------------------------------------------------------------
 // TESTE GRATIS (pedido do usuario): 7 dias de Plano Pro sem cadastrar
@@ -15894,6 +16131,11 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // roda em todo login, ver aoLogar() mais abaixo).
     let _proVitalicioServidor = false;
     window.proVitalicioServidorAtivo = () => _proVitalicioServidor;
+    // Assinatura Google Play (mensal/anual) validada pelo Worker: o doc
+    // entitlements/{uid} ganha `assinaturaAte` (ms epoch do fim do periodo
+    // pago). Mesma regra do vitalicio: client so le, nunca escreve.
+    let _assinaturaServidorAte = 0;
+    window.assinaturaServidorAtiva = () => _assinaturaServidorAte > Date.now();
     // DEBUG (pedido do usuario: testar o app sem PRO sem esperar o teste
     // gratis expirar de verdade, ja que cancelar de verdade so vai
     // existir via Google Play). So zera o CACHE em memoria desta aba --
@@ -15902,11 +16144,12 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // proximo login/reload volta a puxar o valor real de la. Usado pelo
     // botao #debugCancelarAssinaturaBtn (#contaOverlay, so aparece com
     // modo debug ligado -- clique nas moedas).
-    window.forcarProVitalicioServidorOffDebug = function(){ _proVitalicioServidor = false; };
+    window.forcarProVitalicioServidorOffDebug = function(){ _proVitalicioServidor = false; _assinaturaServidorAte = 0; };
     async function puxarEntitlement(uid){
       try {
         const snap = await getDoc(doc(db, 'entitlements', uid));
         _proVitalicioServidor = snap.exists() && snap.data().proVitalicio === true;
+        _assinaturaServidorAte = snap.exists() ? (Number(snap.data().assinaturaAte) || 0) : 0;
         window.dbgConta && window.dbgConta('puxarEntitlement(' + uid.slice(0,6) + ') -- proVitalicio=' + _proVitalicioServidor + ' | doc existe? ' + snap.exists() + (snap.exists() ? (' | campos: ' + JSON.stringify(snap.data())) : ''));
       } catch(e){
         // se falhar (offline, doc nao existe, regra etc.) mantem false --
@@ -15924,9 +16167,21 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       if (typeof window.atualizarResumoAssinatura === 'function') window.atualizarResumoAssinatura();
     }
 
+    // Usados pelo bloco GOOGLE PLAY BILLING (script principal): ID token
+    // do Firebase pra provar ao Worker quem esta comprando, e re-leitura do
+    // entitlement logo depois da compra ser validada.
+    window.questlogIdToken = async function(){
+      try { return (auth && auth.currentUser) ? await auth.currentUser.getIdToken() : null; }
+      catch(e){ return null; }
+    };
+    window.puxarEntitlementAgora = function(){
+      return (auth && auth.currentUser) ? puxarEntitlement(auth.currentUser.uid) : Promise.resolve();
+    };
+
     async function puxarNuvem(uid){
       const ref = doc(db, 'saves', uid);
       puxarEntitlement(uid);
+      if (typeof window.billingSincronizar === 'function') window.billingSincronizar();
       if (temSujo(uid)){
         // ha alteracao local que nunca chegou na nuvem: o local e o mais
         // novo. Empurra (nuvem fica igual ao local) em vez de sobrescrever.
@@ -17558,6 +17813,13 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'pro.legalPrivacidade': { pt:'Privacidade', en:'Privacy' },
     'pro.legalRestaurar':   { pt:'Restaurar compras', en:'Restore purchases' },
     'pro.restaurarEmBreve': { pt:'Restauração de compras em breve', en:'Restore purchases coming soon' },
+    'pro.soNoApp':        { pt:'Disponível no app instalado pela Google Play', en:'Available in the app installed from Google Play' },
+    'pro.entrarParaAssinar': { pt:'Entre na sua conta para assinar', en:'Sign in to subscribe' },
+    'pro.compraOk':       { pt:'Plano Pro ativado!', en:'Pro plan activated!' },
+    'pro.compraErro':     { pt:'Não foi possível concluir a compra. Tente de novo.', en:'Could not complete the purchase. Try again.' },
+    'pro.compraVerificando': { pt:'Confirmando pagamento…', en:'Confirming payment…' },
+    'pro.restaurado':     { pt:'Compras restauradas', en:'Purchases restored' },
+    'pro.nadaRestaurar':  { pt:'Nenhuma compra encontrada', en:'No purchases found' },
     'cfg.historicoDesc':   { pt:'Calendário de vitórias, fugas e dias sem tarefa', en:'Calendar of wins, escapes and days with no tasks' },
     'cfg.nomeDoHeroi':     { pt:'Nome do herói', en:'Hero name' },
     'cfg.renomear':        { pt:'Renomear', en:'Rename' },

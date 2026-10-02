@@ -1,3 +1,6 @@
+// Billing: entitlements/{uid} ganha assinaturaAte/assinaturaProduto/assinaturaEstado e
+// a colecao playPurchases/{hash} guarda token->uid. Ambos escritos so pelo Worker (admin);
+// o catch-all abaixo ja nega qualquer acesso do client a playPurchases.
 rules_version = '2';
 
 // =============================================================================

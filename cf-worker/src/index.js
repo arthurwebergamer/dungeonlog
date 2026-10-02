@@ -630,7 +630,7 @@ export default {
   // travar de vez depois de testar, e' so apagar este handler `fetch`.
   async fetch(request, env, ctx){
     if (new URL(request.url).pathname === '/billing/verify') return tratarBillingVerify(request, env);
-    await Promise.all([checarTesteGratisAcabando(env), checarFimDeDia(env)]);
-    return new Response('OK -- checagens rodadas manualmente\n');
+    // GET manual travado: antes qualquer pessoa com a URL disparava as checagens.
+    return new Response('Not found', { status: 404 });
   },
 };

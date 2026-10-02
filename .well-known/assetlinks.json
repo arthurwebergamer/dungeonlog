@@ -4,7 +4,8 @@
     "namespace": "android_app",
     "package_name": "com.dungeonlog",
     "sha256_cert_fingerprints": [
-      "46:A1:D8:6C:C5:54:1B:79:1F:88:B9:80:3D:F4:A8:85:7C:64:91:0D:69:C1:DF:AE:CE:ED:1F:2C:C5:53:0B:C8"
+      "46:A1:D8:6C:C5:54:1B:79:1F:88:B9:80:3D:F4:A8:85:7C:64:91:0D:69:C1:DF:AE:CE:ED:1F:2C:C5:53:0B:C8",
+      "53:21:B7:B7:E4:D5:A2:60:2A:F5:F3:C6:3D:F7:BC:A0:22:BD:4F:98:39:F4:A7:8C:0D:E4:0B:F4:DF:9A:75:59"
     ]
   }
 }]

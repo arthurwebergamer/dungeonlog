@@ -38,7 +38,15 @@
      alteracao aqui (bump manual) pra forcar cache-bust; SUBIR ESTE
      NUMERO sempre que style.css mudar e o problema persistir em
      producao. -->
-<link rel="stylesheet" href="style.css?v=42">
+<script>
+// Evita o "piscar laranja" ao abrir: o :root base do CSS e laranja/roxo e o
+// tema salvo so era aplicado la embaixo, no script principal. Aplica o
+// data-tema ANTES do style.css pintar a primeira vez (mesma chave e mesmo
+// padrao 'grafite' de temaSalvo()).
+try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
+catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
+</script>
+<link rel="stylesheet" href="style.css?v=43">
 
 <!-- =====================================================================
      TOGGLE DEBUG — silenciar console (log/warn/error)  —  precisa ser o

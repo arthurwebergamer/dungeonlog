@@ -18294,11 +18294,22 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
     if (window.scrollX || window.scrollY) window.scrollTo(0, 0);
     if (document.documentElement.scrollTop) document.documentElement.scrollTop = 0;
     if (document.body.scrollTop) document.body.scrollTop = 0;
+    // .app/.topbar etc. sao overflow:hidden mas AINDA rolam por JS: focar um
+    // input (login) chama scrollIntoView e empurra o conteudo pra cima,
+    // cortando o topo mesmo depois de trocar de tela. Nada aqui rola pelo
+    // usuario, entao e seguro zerar sempre (exceto se um input estiver em foco).
+    const ae = document.activeElement;
+    const digitando = ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA');
+    if (!digitando){
+      document.querySelectorAll('.app, #app, .arena, .topbar').forEach(el => { if (el.scrollTop) el.scrollTop = 0; if (el.scrollLeft) el.scrollLeft = 0; });
+    }
   }
   function agendar(){ ajustar(); clearTimeout(t); t = setTimeout(ajustar, 250); }
   window.addEventListener('resize', agendar);
   window.addEventListener('orientationchange', agendar);
+  window.addEventListener('focusout', () => setTimeout(agendar, 60));
   window.addEventListener('focusout', agendar);
+  document.addEventListener('transitionend', agendar, true);
   window.addEventListener('pageshow', agendar);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) agendar(); });
   if (window.visualViewport) window.visualViewport.addEventListener('resize', agendar);

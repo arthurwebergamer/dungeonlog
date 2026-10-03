@@ -18294,11 +18294,40 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
     if (window.scrollX || window.scrollY) window.scrollTo(0, 0);
     if (document.documentElement.scrollTop) document.documentElement.scrollTop = 0;
     if (document.body.scrollTop) document.body.scrollTop = 0;
+    // .app/.topbar etc. sao overflow:hidden mas AINDA rolam por JS: focar um
+    // input (login) chama scrollIntoView e empurra o conteudo pra cima,
+    // cortando o topo mesmo depois de trocar de tela. Nada aqui rola pelo
+    // usuario, entao e seguro zerar sempre (exceto se um input estiver em foco).
+    const ae = document.activeElement;
+    const digitando = ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA');
+    if (!digitando){
+      document.querySelectorAll('.app, #app, .arena, .topbar').forEach(el => { if (el.scrollTop) el.scrollTop = 0; if (el.scrollLeft) el.scrollLeft = 0; });
+    }
   }
-  function agendar(){ ajustar(); clearTimeout(t); t = setTimeout(ajustar, 250); }
+  // DEBUG (tela cortada na barra de navegacao): registra as medidas toda vez
+  // que mudam, pra comparar "antes do login" x "depois do login" no log.
+  let _ultMed = '';
+  function medir(motivo){
+    try {
+      const vv = window.visualViewport, app = document.querySelector('.app'), nav = document.querySelector('.nav');
+      const probe = document.createElement('div');
+      probe.style.cssText = 'position:fixed;left:0;bottom:0;width:1px;height:env(safe-area-inset-bottom,0px);visibility:hidden;pointer-events:none';
+      document.body.appendChild(probe); const inset = probe.getBoundingClientRect().height; probe.remove();
+      const ar = app ? app.getBoundingClientRect() : null, nr = nav ? nav.getBoundingClientRect() : null;
+      const m = 'inner=' + window.innerHeight + ' vv=' + (vv ? Math.round(vv.height) : '-') + ' client=' + document.documentElement.clientHeight +
+        ' screen=' + screen.height + ' inset=' + inset + ' appBottom=' + (ar ? Math.round(ar.bottom) : '-') + ' navBottom=' + (nr ? Math.round(nr.bottom) : '-');
+      if (m !== _ultMed){ _ultMed = m; window.dbgConta && window.dbgConta('medidas[' + motivo + '] ' + m); }
+    } catch(e){}
+  }
+  window.medirTela = medir;
+  setTimeout(() => medir('boot'), 1500);
+  setInterval(() => medir('tick'), 2000); // so loga quando algo muda (DEBUG)
+  function agendar(e){ ajustar(); clearTimeout(t); t = setTimeout(() => { ajustar(); medir(e && e.type || 'auto'); }, 250); }
   window.addEventListener('resize', agendar);
   window.addEventListener('orientationchange', agendar);
+  window.addEventListener('focusout', () => setTimeout(agendar, 60));
   window.addEventListener('focusout', agendar);
+  document.addEventListener('transitionend', agendar, true);
   window.addEventListener('pageshow', agendar);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) agendar(); });
   if (window.visualViewport) window.visualViewport.addEventListener('resize', agendar);

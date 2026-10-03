@@ -18205,5 +18205,29 @@ document.addEventListener('contextmenu', function(e){
 }, true);
 document.addEventListener('dragstart', function(e){ if (e.target && e.target.tagName === 'IMG') e.preventDefault(); }, true);
 </script>
+<script>
+// Corrige tela cortada ao trocar de tela/teclado: o 100dvh nem sempre se
+// atualiza na TWA (teclado do login, barras do sistema) e o foco de input
+// pode deixar o documento rolado. Recalcula a altura real e zera a rolagem.
+(function(){
+  let t = null;
+  function ajustar(){
+    const vv = window.visualViewport;
+    const h = Math.round(vv ? vv.height : window.innerHeight);
+    if (h > 0) document.documentElement.style.setProperty('--app-h', h + 'px');
+    if (window.scrollX || window.scrollY) window.scrollTo(0, 0);
+    if (document.documentElement.scrollTop) document.documentElement.scrollTop = 0;
+    if (document.body.scrollTop) document.body.scrollTop = 0;
+  }
+  function agendar(){ ajustar(); clearTimeout(t); t = setTimeout(ajustar, 250); }
+  window.addEventListener('resize', agendar);
+  window.addEventListener('orientationchange', agendar);
+  window.addEventListener('focusout', agendar);
+  window.addEventListener('pageshow', agendar);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) agendar(); });
+  if (window.visualViewport) window.visualViewport.addEventListener('resize', agendar);
+  ajustar();
+})();
+</script>
 </body>
 </html>

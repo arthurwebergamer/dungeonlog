@@ -686,7 +686,7 @@
 /* ===== Bloco style #4 ===== */
 /* ---------- layout: tela cheia, so a lista rola ---------- */
   html,body{height:100%;overflow:hidden}
-  .app{height:100dvh;max-height:100dvh;overflow:hidden}
+  .app{height:var(--app-h,100dvh);max-height:var(--app-h,100dvh);overflow:hidden}
   .topbar,.arena,.xpwrap,.nav{flex:none}
   .tasks{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
   .thead{flex:none}

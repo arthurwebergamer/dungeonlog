@@ -537,7 +537,9 @@ async function tratarBillingVerify(request, env){
   }
   if (request.method !== 'POST') return respostaJson({ ok: false, erro: 'metodo' }, 405, origem);
 
-  const serviceAccount = JSON.parse(env.FIREBASE_SERVICE_ACCOUNT);
+  let serviceAccount;
+  try { serviceAccount = JSON.parse(env.FIREBASE_SERVICE_ACCOUNT); }
+  catch(e){ console.error('FIREBASE_SERVICE_ACCOUNT ausente/invalido'); return respostaJson({ ok: false, erro: 'config-servidor' }, 500, origem); }
   const projectId = serviceAccount.project_id;
 
   let corpo;

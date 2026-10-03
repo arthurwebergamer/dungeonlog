@@ -3880,7 +3880,15 @@ async function iniciarCompraAssinatura(){
     resposta = await req.show();
     const token = resposta.details && resposta.details.purchaseToken;
     if (!token) throw new Error('sem-token');
-    billingMsg(_billingTexto('pro.compraVerificando', 'Confirmando pagamento…', 'Confirming payment…'));
+    if (typeof window.mostrarLoadingMasmorra === 'function'){
+      window.mostrarLoadingMasmorra(null, [
+        _billingTexto('pro.loadPag1', 'Processando seu pagamento...', 'Processing your payment...'),
+        _billingTexto('pro.loadPag2', 'Confirmando com a Google Play...', 'Confirming with Google Play...'),
+        _billingTexto('pro.loadPag3', 'Liberando o Plano Pro...', 'Unlocking Pro plan...')
+      ]);
+      const _l = document.getElementById('loadingMasmorraTxt');
+      if (_l) _l.textContent = _billingTexto('pro.loadPag1', 'Processando seu pagamento...', 'Processing your payment...');
+    }
     try {
       await billingVerificar(sku, token);
     } catch(e){
@@ -3891,6 +3899,7 @@ async function iniciarCompraAssinatura(){
     try { await resposta.complete('success'); } catch(_){}
     resposta = null;
     billingAtualizarTelas();
+    if (typeof window.esconderLoadingMasmorra === 'function') window.esconderLoadingMasmorra();
     billingMostrarCompraOk(sku);
   } catch(e){
     // Pessoa fechou o pop-up da Google: nao e' erro, nao mostra nada.
@@ -3901,6 +3910,7 @@ async function iniciarCompraAssinatura(){
       billingMsg(_billingTexto('pro.compraErro', 'Não foi possível concluir a compra. Tente de novo.', 'Could not complete the purchase. Try again.'));
     }
   } finally {
+    if (typeof window.esconderLoadingMasmorra === 'function') window.esconderLoadingMasmorra();
     _billingOcupado = false;
     if (btn) btn.disabled = false;
   }
@@ -12792,14 +12802,14 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
   let timer = null;
 
-  function mostrarLoadingMasmorra(fraseInicial){
+  function mostrarLoadingMasmorra(fraseInicial, frasesCustom){
     const overlay = document.getElementById('loadingMasmorra');
     const txt = document.getElementById('loadingMasmorraTxt');
     const img = document.getElementById('loadingMasmorraSprite');
     if (!overlay) return;
 
     const en = (typeof idiomaApp === 'function') ? idiomaApp() === 'en' : false;
-    const frases = en ? FRASES_LOADING.en : FRASES_LOADING.pt;
+    const frases = (Array.isArray(frasesCustom) && frasesCustom.length) ? frasesCustom : (en ? FRASES_LOADING.en : FRASES_LOADING.pt);
 
     // FIXO no "Loiro" (pedido do usuario), independente do heroi ATIVO
     // do jogador -- indice 1 em HEROIS (assets.js). Cai pro indice 0 se

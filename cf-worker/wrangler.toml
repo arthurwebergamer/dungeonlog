@@ -5,9 +5,10 @@ compatibility_date = "2026-01-01"
 # 10h e 20h no horario de Brasilia, convertido pra UTC (Brasil nao tem
 # mais horario de verao desde 2019 -- America/Sao_Paulo e' sempre
 # UTC-3, fixo o ano todo, entao dá pra hardcodar em UTC sem se preocupar
-# com a troca de horario).
+# com a troca de horario). 08:00 UTC (5h em Brasilia) = revogacao de
+# compras reembolsadas (revogarComprasAnuladas).
 [triggers]
-crons = ["0 13 * * *", "0 23 * * *"]
+crons = ["0 13 * * *", "0 23 * * *", "0 8 * * *"]
 
 # Nao precisa de [vars] nem KV/D1 -- o estado de verdade mora no
 # Firestore (mesmo banco que o app ja usa). As credenciais (a service

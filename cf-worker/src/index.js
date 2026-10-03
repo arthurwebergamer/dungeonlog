@@ -580,6 +580,7 @@ async function tratarBillingVerify(request, env){
         assinaturaAte: ESTADOS_COM_ACESSO.indexOf(compra.subscriptionState) !== -1 ? ate : 0,
         assinaturaProduto: sku,
         assinaturaEstado: compra.subscriptionState,
+        assinaturaToken: await sha256Hex(purchaseToken),
       };
       // 2) token amarrado a um uid so
       const hash = await sha256Hex(purchaseToken);
@@ -607,7 +608,7 @@ async function tratarBillingVerify(request, env){
     }
     await firestoreCommitLote(projectId, tokenFirestore, [
       escritaParcial(projectId, 'playPurchases/' + hash, { uid: uid, sku: sku, atualizadoEm: Date.now() }),
-      escritaParcial(projectId, 'entitlements/' + uid, { proVitalicio: true, proVitalicioPlay: true }),
+      escritaParcial(projectId, 'entitlements/' + uid, { proVitalicio: true, proVitalicioPlay: true, proVitalicioToken: hash }),
     ]);
     return respostaJson({ ok: true, vitalicio: true }, 200, origem);
   } catch(e){
@@ -616,12 +617,65 @@ async function tratarBillingVerify(request, env){
   }
 }
 
+
+// ---------------------------------------------------------------------
+// COMPRAS ANULADAS (reembolso/estorno). A Google nao avisa o app, e o
+// entitlement ficava ligado (vitalicio pra sempre, assinatura ate
+// `assinaturaAte`). Este job roda 1x/dia: lista as compras anuladas dos
+// ultimos dias (purchases.voidedpurchases, type=1 inclui assinaturas),
+// acha o dono pelo hash do token (playPurchases/{hash}) e desliga so o
+// campo daquela compra. Idempotente: marca playPurchases/{hash}.anuladaEm.
+// ---------------------------------------------------------------------
+const JANELA_ANULADAS_MS = 7 * 24 * 3600 * 1000;
+async function revogarComprasAnuladas(env){
+  if (!env.FIREBASE_SERVICE_ACCOUNT) return { erro: 'sem-secret' };
+  const serviceAccount = JSON.parse(env.FIREBASE_SERVICE_ACCOUNT);
+  const playSa = env.PLAY_SERVICE_ACCOUNT ? JSON.parse(env.PLAY_SERVICE_ACCOUNT) : serviceAccount;
+  const projectId = serviceAccount.project_id;
+  const tokenPlay = await obterAccessToken(playSa, PLAY_SCOPE);
+  const tokenFirestore = await obterAccessToken(serviceAccount, FIRESTORE_SCOPE);
+  const desde = Date.now() - JANELA_ANULADAS_MS;
+  let pagina = '';
+  let vistas = 0, revogadas = 0;
+  do {
+    const caminho = '/purchases/voidedpurchases?type=1&maxResults=1000&startTime=' + desde + (pagina ? '&token=' + encodeURIComponent(pagina) : '');
+    const resp = await playGet(tokenPlay, caminho);
+    for (const v of (resp.voidedPurchases || [])){
+      vistas++;
+      if (!v.purchaseToken) continue;
+      const hash = await sha256Hex(v.purchaseToken);
+      const dono = await firestoreLerDoc(projectId, tokenFirestore, 'playPurchases/' + hash);
+      if (!dono || !dono.uid || dono.anuladaEm) continue;
+      const ent = (await firestoreLerDoc(projectId, tokenFirestore, 'entitlements/' + dono.uid)) || {};
+      const escritas = [escritaParcial(projectId, 'playPurchases/' + hash, { anuladaEm: Date.now() })];
+      if (BILLING_SKUS_UNICO.indexOf(dono.sku) !== -1){
+        // so desliga se o vitalicio atual e' DESSA compra (ou de uma antiga sem token gravado)
+        if (!ent.proVitalicioToken || ent.proVitalicioToken === hash){
+          escritas.push(escritaParcial(projectId, 'entitlements/' + dono.uid, { proVitalicio: false, proVitalicioPlay: false }));
+          revogadas++;
+        }
+      } else {
+        if (!ent.assinaturaToken || ent.assinaturaToken === hash){
+          escritas.push(escritaParcial(projectId, 'entitlements/' + dono.uid, { assinaturaAte: 0, assinaturaEstado: 'REVOKED' }));
+          revogadas++;
+        }
+      }
+      await firestoreCommitLote(projectId, tokenFirestore, escritas);
+    }
+    pagina = (resp.tokenPagination && resp.tokenPagination.nextPageToken) || '';
+  } while (pagina);
+  console.log('compras anuladas: vistas=' + vistas + ' revogadas=' + revogadas);
+  return { vistas, revogadas };
+}
+
 export default {
   async scheduled(event, env, ctx){
     if (event.cron === '0 13 * * *'){
       ctx.waitUntil(checarTesteGratisAcabando(env).catch(e => console.error('checarTesteGratisAcabando falhou', e)));
     } else if (event.cron === '0 23 * * *'){
       ctx.waitUntil(checarFimDeDia(env).catch(e => console.error('checarFimDeDia falhou', e)));
+    } else if (event.cron === '0 8 * * *'){
+      ctx.waitUntil(revogarComprasAnuladas(env).catch(e => console.error('revogarComprasAnuladas falhou', e)));
     }
   },
 

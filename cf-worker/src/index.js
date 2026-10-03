@@ -685,7 +685,21 @@ export default {
   // isso, e nao expoe nenhum dado, so dispara os envios) mas se quiser
   // travar de vez depois de testar, e' so apagar este handler `fetch`.
   async fetch(request, env, ctx){
-    if (new URL(request.url).pathname === '/billing/verify') return tratarBillingVerify(request, env);
+    const caminho = new URL(request.url).pathname;
+    if (caminho === '/billing/verify') return tratarBillingVerify(request, env);
+    // Disparo manual do robo de reembolsos (so p/ o dono): exige o secret
+    // ADMIN_TOKEN no header Authorization. Sem o secret configurado = 404.
+    if (caminho === '/admin/revogar-anuladas' && request.method === 'POST' && env.ADMIN_TOKEN){
+      const enviado = (request.headers.get('Authorization') || '').replace(/^Bearer\s+/i, '');
+      const [h1, h2] = await Promise.all([sha256Hex(enviado), sha256Hex(env.ADMIN_TOKEN)]);
+      if (h1 !== h2) return new Response('Unauthorized', { status: 401 });
+      try {
+        const r = await revogarComprasAnuladas(env);
+        return new Response(JSON.stringify({ ok: true, ...r }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+      } catch(e){
+        return new Response(JSON.stringify({ ok: false, erro: String(e && e.message || e).slice(0, 300) }), { status: 502, headers: { 'Content-Type': 'application/json' } });
+      }
+    }
     // GET manual travado: antes qualquer pessoa com a URL disparava as checagens.
     return new Response('Not found', { status: 404 });
   },

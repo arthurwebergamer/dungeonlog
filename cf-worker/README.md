@@ -175,3 +175,9 @@ O cron `0 8 * * *` (5h em Brasilia) roda `revogarComprasAnuladas`: lista
 `playPurchases/{hash}.anuladaEm` (idempotente). A service account precisa
 da permissao de dados financeiros no Play Console (a mesma do billing).
 Depois de mexer no cron: `npx wrangler deploy` (o novo cron entra no deploy).
+
+### Disparo manual (so o dono)
+
+`POST /admin/revogar-anuladas` com `Authorization: Bearer <ADMIN_TOKEN>` roda
+o robo na hora e devolve `{ok, vistas, revogadas}`. Precisa do secret
+`ADMIN_TOKEN` (`wrangler secret put ADMIN_TOKEN`); sem ele o caminho da 404.

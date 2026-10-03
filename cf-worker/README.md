@@ -164,3 +164,14 @@ Para ativar:
   (vazio = o pop-up de compra nunca abre, de proposito).
 - Ainda nao ha RTDN: renovacoes/cancelamentos sao pegos quando o app abre
   (`billingSincronizar`, a cada 6h).
+
+
+## Reembolsos (compras anuladas)
+
+O cron `0 8 * * *` (5h em Brasilia) roda `revogarComprasAnuladas`: lista
+`purchases.voidedpurchases` (type=1, ultimos 7 dias), acha o dono por
+`playPurchases/{sha256(token)}` e desliga so aquela compra em
+`entitlements/{uid}` (`proVitalicio=false` ou `assinaturaAte=0`). Marca
+`playPurchases/{hash}.anuladaEm` (idempotente). A service account precisa
+da permissao de dados financeiros no Play Console (a mesma do billing).
+Depois de mexer no cron: `npx wrangler deploy` (o novo cron entra no deploy).

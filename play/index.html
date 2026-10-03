@@ -3796,12 +3796,14 @@ function billingAtualizarTelas(){
 // Tela de confirmacao da compra: plano comprado + beneficios liberados.
 // Overlay proprio (reusa o visual .paywallOverlay/.pwEtapa do paywall),
 // criado na 1a vez. "Comecar" fecha ela e o paywall.
-function billingMostrarCompraOk(sku){
+function billingMostrarCompraOk(sku, restaurada){
   const T = _billingTexto;
   const ehVit = sku === BILLING_SKUS.vitalicio;
   const nomePlano = ehVit ? T('pro.planoVitalicio', 'Vitalício', 'Lifetime')
     : (sku === BILLING_SKUS.mensal ? T('pro.planoMensal', 'Mensal', 'Monthly') : T('pro.planoAnual', 'Anual', 'Annual'));
-  const sub = ehVit
+  const sub = restaurada
+    ? T('pro.okSubRestaurada', 'Encontramos a sua compra anterior do Plano Pro.', 'We found your previous Pro plan purchase.')
+    : ehVit
     ? T('pro.okSubVit', 'Pagamento único. O Pro é seu para sempre.', 'One-time payment. Pro is yours forever.')
     : T('pro.okSubAss', 'Renova automaticamente. Cancele quando quiser em Configurações.', 'Renews automatically. Cancel anytime in Settings.');
   const ico = {
@@ -3826,7 +3828,7 @@ function billingMostrarCompraOk(sku){
     '<div class="pwFloresta"><img id="compraOkFlorestaImg" alt=""></div>' +
     '<div class="pwEtapa on"><div class="pwConteudo" style="padding-top:72px">' +
       '<span class="pwEyebrow">' + T('pro.titulo', 'Plano Pro', 'Pro plan') + ' · ' + nomePlano + '</span>' +
-      '<h2 class="pwHeadline">' + T('pro.compraOk', 'Plano Pro ativado!', 'Pro plan activated!') + '</h2>' +
+      '<h2 class="pwHeadline">' + (restaurada ? T('pro.okRestaurada', 'Compra restaurada!', 'Purchase restored!') : T('pro.compraOk', 'Plano Pro ativado!', 'Pro plan activated!')) + '</h2>' +
       '<p class="pwSub">' + sub + '</p>' +
       '<div class="pwTrilha" style="flex:none;gap:18px"><div class="pwTrilhaLinha"></div>' +
         itens.map(it => '<div class="pwPasso on"><div class="pwPassoNo">' + svg(it[0], 2) + '</div>' +
@@ -3942,7 +3944,7 @@ async function iniciarCompraAssinatura(){
     // de aparelho. Antes de desistir, tenta restaurar a compra existente.
     if (cancelou && await billingRestaurarSku(sku)){
       billingAtualizarTelas();
-      billingMostrarCompraOk(sku);
+      billingMostrarCompraOk(sku, true);
       return;
     }
     if (!cancelou){

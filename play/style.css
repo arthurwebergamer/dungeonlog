@@ -5965,3 +5965,9 @@ img{-webkit-user-drag:none;user-drag:none}
 /* billing -- chip de feedback do paywall (aviso() esta mudo; compra/restaurar mostram aqui) */
 #pwBillingMsg{position:absolute;left:16px;right:16px;bottom:calc(env(safe-area-inset-bottom,0px) + 22px);z-index:5;padding:12px 14px;border-radius:14px;background:#251E38;color:#F5F0E9;border:1px solid rgba(242,166,90,.45);font:500 14px/1.3 'Outfit',system-ui,sans-serif;text-align:center;opacity:0;transform:translateY(8px);pointer-events:none;transition:opacity .2s,transform .2s}
 #pwBillingMsg.on{opacity:1;transform:none}
+
+/* tela de compra confirmada: monstros no espaco livre */
+.compraOkMobs{display:flex;align-items:center;justify-content:center;gap:28px;min-height:140px}
+.compraOkMob{width:112px;height:112px;image-rendering:pixelated;filter:drop-shadow(0 6px 0 rgba(0,0,0,.35));animation:compraOkBob 2.4s ease-in-out infinite}
+.compraOkMob.b{animation-delay:-1.2s;transform:scaleX(-1)}
+@keyframes compraOkBob{0%,100%{translate:0 0}50%{translate:0 -8px}}

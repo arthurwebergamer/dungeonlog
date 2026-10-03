@@ -3785,6 +3785,73 @@ function billingAtualizarTelas(){
   if (typeof render === 'function') { try { render(); } catch(e){} }
 }
 
+// Tela de confirmacao da compra: plano comprado + beneficios liberados.
+// Overlay proprio (reusa o visual .paywallOverlay/.pwEtapa do paywall),
+// criado na 1a vez. "Comecar" fecha ela e o paywall.
+function billingMostrarCompraOk(sku){
+  const T = _billingTexto;
+  const ehVit = sku === BILLING_SKUS.vitalicio;
+  const nomePlano = ehVit ? T('pro.planoVitalicio', 'Vitalício', 'Lifetime')
+    : (sku === BILLING_SKUS.mensal ? T('pro.planoMensal', 'Mensal', 'Monthly') : T('pro.planoAnual', 'Anual', 'Annual'));
+  const sub = ehVit
+    ? T('pro.okSubVit', 'Pagamento único. O Pro é seu para sempre.', 'One-time payment. Pro is yours forever.')
+    : T('pro.okSubAss', 'Renova automaticamente. Cancele quando quiser em Configurações.', 'Renews automatically. Cancel anytime in Settings.');
+  const ico = {
+    check: '<path d="M20 6 9 17l-5-5"/>',
+    inf: '<path d="M18.2 8.5a4 4 0 1 0 0 7c2-1.7 3-3.4 3.8-3.5-.8-.1-1.8-1.8-3.8-3.5zM5.8 15.5a4 4 0 1 0 0-7c-2 1.7-3 3.4-3.8 3.5.8.1 1.8 1.8 3.8 3.5z"/>',
+    star: '<path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',
+    stats: '<path d="M3 3v18h18M8 17V10M13 17V6M18 17v-4"/>'
+  };
+  const itens = [
+    [ico.star, T('pro.beneficio2Titulo', 'Temas & heróis', 'Themes & heroes'), T('pro.beneficio2', '6 temas, 4 heróis', '6 themes, 4 heroes')],
+    [ico.inf,  T('pro.beneficio1Titulo', 'Sem limite diário', 'No daily limit'), T('pro.beneficio1', 'Tarefas ilimitadas', 'Unlimited tasks')],
+    [ico.stats,T('pro.beneficio3Titulo', 'Estatísticas', 'Statistics'), T('pro.beneficio3', 'Histórico completo', 'Full history')]
+  ];
+  let ov = document.getElementById('compraOkOverlay');
+  if (ov) ov.remove();
+  ov = document.createElement('div');
+  ov.className = 'paywallOverlay';
+  ov.id = 'compraOkOverlay';
+  ov.style.zIndex = '9600';
+  const svg = (d, w) => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="' + (w || 2) + '" stroke-linecap="round" stroke-linejoin="round">' + d + '</svg>';
+  ov.innerHTML =
+    '<div class="pwFloresta"><img id="compraOkFlorestaImg" alt=""></div>' +
+    '<div class="pwEtapa on"><div class="pwConteudo" style="padding-top:72px">' +
+      '<span class="pwEyebrow">' + T('pro.titulo', 'Plano Pro', 'Pro plan') + ' · ' + nomePlano + '</span>' +
+      '<h2 class="pwHeadline">' + T('pro.compraOk', 'Plano Pro ativado!', 'Pro plan activated!') + '</h2>' +
+      '<p class="pwSub">' + sub + '</p>' +
+      '<div class="pwTrilha" style="flex:none;gap:18px"><div class="pwTrilhaLinha"></div>' +
+        itens.map(it => '<div class="pwPasso on"><div class="pwPassoNo">' + svg(it[0], 2) + '</div>' +
+          '<div class="pwPassoTxt"><b>' + it[1] + '</b><span>' + it[2] + '</span></div></div>').join('') +
+      '</div>' +
+      '<div class="pwSpacer compraOkMobs"></div>' +
+      '<button class="pwCTA" type="button">' + T('pro.okComecar', 'Começar', 'Get started') + '</button>' +
+    '</div></div>';
+  ov.querySelector('.pwCTA').onclick = () => {
+    ov.classList.remove('on');
+    setTimeout(() => ov.remove(), 450);
+    if (typeof fecharPaywall === 'function') fecharPaywall();
+  };
+  const fundo = ov.querySelector('#compraOkFlorestaImg');
+  if (fundo && typeof TEMAS_ARENA !== 'undefined'){
+    const floresta = TEMAS_ARENA.find(t => t.id === 'floresta');
+    if (floresta) fundo.src = 'data:image/png;base64,' + floresta.arte;
+  }
+  // 2 monstros da floresta (mesma arte da Arena), tamanho medio, no espaco livre
+  const palco = ov.querySelector('.compraOkMobs');
+  if (palco && typeof MONSTROS !== 'undefined'){
+    const pool = MONSTROS.filter(m => m && m.img && m.bioma === 'floresta');
+    for (let k = 0; k < 2 && pool.length; k++){
+      const m = pool.splice(Math.floor(Math.random() * pool.length), 1)[0];
+      const im = document.createElement('img');
+      im.src = m.img; im.alt = ''; im.className = 'compraOkMob' + (k ? ' b' : '');
+      palco.appendChild(im);
+    }
+  }
+  document.body.appendChild(ov);
+  requestAnimationFrame(() => requestAnimationFrame(() => ov.classList.add('on')));
+}
+
 async function iniciarCompraAssinatura(){
   if (_billingOcupado) return;
   const sku = BILLING_SKUS[_pwPlanoSelecionado] || BILLING_SKUS.anual;
@@ -3823,9 +3890,8 @@ async function iniciarCompraAssinatura(){
     }
     try { await resposta.complete('success'); } catch(_){}
     resposta = null;
-    billingMsg(_billingTexto('pro.compraOk', 'Plano Pro ativado!', 'Pro plan activated!'));
     billingAtualizarTelas();
-    setTimeout(() => { if (typeof fecharPaywall === 'function') fecharPaywall(); }, 900);
+    billingMostrarCompraOk(sku);
   } catch(e){
     // Pessoa fechou o pop-up da Google: nao e' erro, nao mostra nada.
     const cancelou = e && (e.name === 'AbortError' || e.name === 'NotAllowedError');

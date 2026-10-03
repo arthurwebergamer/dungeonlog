@@ -3860,6 +3860,30 @@ function billingMostrarCompraOk(sku){
   requestAnimationFrame(() => requestAnimationFrame(() => ov.classList.add('on')));
 }
 
+// Procura no Google uma compra ja existente desse SKU e revalida no Worker.
+// true = achou e o Worker aceitou (PRO liberado); false em qualquer outro caso.
+async function billingRestaurarSku(sku){
+  try {
+    const s = await billingServico();
+    if (!s) return false;
+    const compras = await s.listPurchases();
+    const c = (compras || []).find(x => x && x.itemId === sku && x.purchaseToken);
+    if (!c) return false;
+    if (typeof window.mostrarLoadingMasmorra === 'function'){
+      window.mostrarLoadingMasmorra(null, [
+        _billingTexto('pro.loadPag2', 'Confirmando com a Google Play...', 'Confirming with Google Play...'),
+        _billingTexto('pro.loadPag3', 'Liberando o Plano Pro...', 'Unlocking Pro plan...')
+      ]);
+    }
+    await billingVerificar(c.itemId, c.purchaseToken);
+    window.dbgConta && window.dbgConta('billingRestaurarSku: compra existente restaurada sku=' + sku);
+    return true;
+  } catch(e){
+    window.dbgConta && window.dbgConta('billingRestaurarSku falhou: ' + (e && (e.name + ' ' + e.message)));
+    return false;
+  }
+}
+
 async function iniciarCompraAssinatura(){
   if (_billingOcupado) return;
   const sku = BILLING_SKUS[_pwPlanoSelecionado] || BILLING_SKUS.anual;
@@ -3913,6 +3937,14 @@ async function iniciarCompraAssinatura(){
     // Pessoa fechou o pop-up da Google: nao e' erro, nao mostra nada.
     const cancelou = e && (e.name === 'AbortError' || e.name === 'NotAllowedError');
     if (cancelou) window.dbgConta && window.dbgConta('compra fechada/recusada: sku=' + sku + ' ' + (e && (e.name + ' ' + e.message)) + ' detalhes=' + Object.keys(_billingDetalhes || {}).join(','));
+    // O Google devolve esse mesmo erro quando a pessoa JA e dona do item
+    // ("Este item ja e seu") -- caso comum de quem reinstalou o app ou trocou
+    // de aparelho. Antes de desistir, tenta restaurar a compra existente.
+    if (cancelou && await billingRestaurarSku(sku)){
+      billingAtualizarTelas();
+      billingMostrarCompraOk(sku);
+      return;
+    }
     if (!cancelou){
       window.dbgConta && window.dbgConta('iniciarCompraAssinatura FALHOU: ' + (e && (e.name + ' ' + e.message)));
       billingMsg(_billingTexto('pro.compraErro', 'Não foi possível concluir a compra. Tente de novo.', 'Could not complete the purchase. Try again.'));

@@ -3824,7 +3824,7 @@ function billingMostrarCompraOk(sku){
         itens.map(it => '<div class="pwPasso on"><div class="pwPassoNo">' + svg(it[0], 2) + '</div>' +
           '<div class="pwPassoTxt"><b>' + it[1] + '</b><span>' + it[2] + '</span></div></div>').join('') +
       '</div>' +
-      '<div class="pwSpacer"></div>' +
+      '<div class="pwSpacer compraOkMobs"></div>' +
       '<button class="pwCTA" type="button">' + T('pro.okComecar', 'Começar', 'Get started') + '</button>' +
     '</div></div>';
   ov.querySelector('.pwCTA').onclick = () => {
@@ -3836,6 +3836,17 @@ function billingMostrarCompraOk(sku){
   if (fundo && typeof TEMAS_ARENA !== 'undefined'){
     const floresta = TEMAS_ARENA.find(t => t.id === 'floresta');
     if (floresta) fundo.src = 'data:image/png;base64,' + floresta.arte;
+  }
+  // 2 monstros da floresta (mesma arte da Arena), tamanho medio, no espaco livre
+  const palco = ov.querySelector('.compraOkMobs');
+  if (palco && typeof MONSTROS !== 'undefined'){
+    const pool = MONSTROS.filter(m => m && m.img && m.bioma === 'floresta');
+    for (let k = 0; k < 2 && pool.length; k++){
+      const m = pool.splice(Math.floor(Math.random() * pool.length), 1)[0];
+      const im = document.createElement('img');
+      im.src = m.img; im.alt = ''; im.className = 'compraOkMob' + (k ? ' b' : '');
+      palco.appendChild(im);
+    }
   }
   document.body.appendChild(ov);
   requestAnimationFrame(() => requestAnimationFrame(() => ov.classList.add('on')));

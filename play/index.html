@@ -1057,6 +1057,13 @@
         <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
       </div>
 
+      <div class="cfgrow cfglink" id="cfgCancelarPlay" style="display:none">
+        <div class="cfgtxt">
+          <b id="cfgCancelarPlayTxt">Cancelar ou alterar na Google Play</b>
+        </div>
+        <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+      </div>
+
       <!-- DEBUG (pedido do usuario): so aparece com modo debug ligado
            (classe .debug-el, mesma pilula de log/coins do resto do app --
            clique no icone de moedas liga/desliga). Cancelar de VERDADE so
@@ -16135,6 +16142,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // entitlements/{uid} ganha `assinaturaAte` (ms epoch do fim do periodo
     // pago). Mesma regra do vitalicio: client so le, nunca escreve.
     let _assinaturaServidorAte = 0;
+    let _assinaturaProduto = '';
+    window.assinaturaProdutoServidor = () => (_assinaturaServidorAte > Date.now() ? _assinaturaProduto : '');
     window.assinaturaServidorAtiva = () => _assinaturaServidorAte > Date.now();
     // DEBUG (pedido do usuario: testar o app sem PRO sem esperar o teste
     // gratis expirar de verdade, ja que cancelar de verdade so vai
@@ -16144,12 +16153,13 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // proximo login/reload volta a puxar o valor real de la. Usado pelo
     // botao #debugCancelarAssinaturaBtn (#contaOverlay, so aparece com
     // modo debug ligado -- clique nas moedas).
-    window.forcarProVitalicioServidorOffDebug = function(){ _proVitalicioServidor = false; _assinaturaServidorAte = 0; };
+    window.forcarProVitalicioServidorOffDebug = function(){ _proVitalicioServidor = false; _assinaturaServidorAte = 0; _assinaturaProduto = ''; };
     async function puxarEntitlement(uid){
       try {
         const snap = await getDoc(doc(db, 'entitlements', uid));
         _proVitalicioServidor = snap.exists() && snap.data().proVitalicio === true;
         _assinaturaServidorAte = snap.exists() ? (Number(snap.data().assinaturaAte) || 0) : 0;
+        _assinaturaProduto = snap.exists() ? String(snap.data().assinaturaProduto || '') : '';
         window.dbgConta && window.dbgConta('puxarEntitlement(' + uid.slice(0,6) + ') -- proVitalicio=' + _proVitalicioServidor + ' | doc existe? ' + snap.exists() + (snap.exists() ? (' | campos: ' + JSON.stringify(snap.data())) : ''));
       } catch(e){
         // se falhar (offline, doc nao existe, regra etc.) mantem false --
@@ -17127,8 +17137,27 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       resumoAssinatura.textContent = emIngles ? 'No PRO plan' : 'Sem plano PRO';
     }
   }
-  window.atualizarResumoAssinatura = atualizarResumoAssinatura;
-  atualizarResumoAssinatura(); // primeira pintura, sem esperar abrir a sub-tela
+  // Assinatura da Google Play (mensal/anual): cancelar so e' possivel la.
+  // A linha abre a pagina de assinaturas da Play Store no produto certo.
+  const linhaCancelarPlay = document.getElementById('cfgCancelarPlay');
+  function atualizarLinhaCancelarPlay(){
+    if (!linhaCancelarPlay) return;
+    const sku = (typeof window.assinaturaProdutoServidor === 'function') ? window.assinaturaProdutoServidor() : '';
+    const vitalicio = (typeof proVitalicioAtivo === 'function' && proVitalicioAtivo())
+      || (typeof window.proVitalicioServidorAtivo === 'function' && window.proVitalicioServidorAtivo());
+    let emIngles = false;
+    try { emIngles = (localStorage.getItem('questlog.idioma.v1') || 'pt') === 'en'; } catch(e){}
+    const txt = document.getElementById('cfgCancelarPlayTxt');
+    if (txt) txt.textContent = emIngles ? 'Cancel or change on Google Play' : 'Cancelar ou alterar na Google Play';
+    linhaCancelarPlay.style.display = (sku && !vitalicio) ? '' : 'none';
+  }
+  if (linhaCancelarPlay) linhaCancelarPlay.onclick = () => {
+    const sku = (typeof window.assinaturaProdutoServidor === 'function') ? window.assinaturaProdutoServidor() : '';
+    const url = 'https://play.google.com/store/account/subscriptions?package=com.dungeonlog' + (sku ? '&sku=' + encodeURIComponent(sku) : '');
+    window.open(url, '_blank');
+  };
+  window.atualizarResumoAssinatura = function(){ atualizarResumoAssinatura(); atualizarLinhaCancelarPlay(); };
+  window.atualizarResumoAssinatura(); // primeira pintura, sem esperar abrir a sub-tela
 
   if (linhaAssinatura) linhaAssinatura.onclick = () => {
     const temPro = (typeof assinaturaAtiva === 'function' && assinaturaAtiva());
@@ -17155,7 +17184,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     if (typeof window.expirarTrialAgora === 'function') window.expirarTrialAgora();
     if (typeof window.revogarProVitalicio === 'function') window.revogarProVitalicio();
     if (typeof window.forcarProVitalicioServidorOffDebug === 'function') window.forcarProVitalicioServidorOffDebug();
-    atualizarResumoAssinatura();
+    window.atualizarResumoAssinatura();
     if (typeof render === 'function') render();
     if (typeof window.aviso === 'function'){
       const en = (typeof idiomaApp === 'function' && idiomaApp() === 'en');

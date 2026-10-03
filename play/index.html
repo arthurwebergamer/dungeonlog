@@ -3829,6 +3829,7 @@ async function iniciarCompraAssinatura(){
   } catch(e){
     // Pessoa fechou o pop-up da Google: nao e' erro, nao mostra nada.
     const cancelou = e && (e.name === 'AbortError' || e.name === 'NotAllowedError');
+    if (cancelou) window.dbgConta && window.dbgConta('compra fechada/recusada: sku=' + sku + ' ' + (e && (e.name + ' ' + e.message)) + ' detalhes=' + Object.keys(_billingDetalhes || {}).join(','));
     if (!cancelou){
       window.dbgConta && window.dbgConta('iniciarCompraAssinatura FALHOU: ' + (e && (e.name + ' ' + e.message)));
       billingMsg(_billingTexto('pro.compraErro', 'Não foi possível concluir a compra. Tente de novo.', 'Could not complete the purchase. Try again.'));

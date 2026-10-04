@@ -2305,12 +2305,41 @@ function _dbgContaRepintar(){
 
   if (!debugMestreLigado){
     pilula.style.display = 'none';
+    ['dbgContaCopiarTudo','dbgContaCopiarMed'].forEach(i => { const e = document.getElementById(i); if (e) e.style.display = 'none'; });
     const painelExistente = document.getElementById('dbgContaPainel');
     if (painelExistente) painelExistente.style.display = 'none';
     return;
   }
   pilula.style.display = '';
   pilula.textContent = (_dbgContaAberto ? '✕ fechar' : '☰ log') + ' (' + _dbgContaLinhas.length + ')';
+
+  // botoes de copiar (so com o painel aberto): evita tirar print do log.
+  // "copiar tudo" = log inteiro; "copiar medidas" = so as linhas medidas[...]
+  // (ultimas 25), pro bug da nav cortada.
+  [['dbgContaCopiarTudo', '⧉ tudo', 84, () => _dbgContaLinhas.slice()],
+   ['dbgContaCopiarMed', '⧉ medidas', 150, () => _dbgContaLinhas.filter(l => l.indexOf('medidas[') !== -1).slice(-25)]
+  ].forEach(([id, rotulo, dir, pegar]) => {
+    let bt = document.getElementById(id);
+    if (!bt){
+      bt = document.createElement('button');
+      bt.id = id; bt.className = 'debug-el'; bt.type = 'button'; bt.textContent = rotulo;
+      bt.style.cssText = 'position:fixed;bottom:8px;right:' + dir + 'px;z-index:99999;background:#001a00;color:#0f0;font:10px monospace;padding:4px 8px;border:1px solid #0f0;border-radius:999px;line-height:1.4';
+      bt.onclick = () => {
+        const cab = 'DungeonLog log | ' + new Date().toISOString() + ' | ' + navigator.userAgent + ' | dpr=' + window.devicePixelRatio;
+        const texto = cab + '\n' + pegar().join('\n');
+        const ok = () => { bt.textContent = '✓ copiado'; setTimeout(() => { bt.textContent = rotulo; }, 1500); };
+        const fallback = () => {
+          try {
+            const ta = document.createElement('textarea'); ta.value = texto; ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+            document.body.appendChild(ta); ta.focus(); ta.select(); document.execCommand('copy'); ta.remove(); ok();
+          } catch(e){ bt.textContent = '✗ falhou'; }
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(texto).then(ok, fallback); else fallback();
+      };
+      document.body.appendChild(bt);
+    }
+    bt.style.display = (_dbgContaAberto && debugMestreLigado) ? '' : 'none';
+  });
 
   let painel = document.getElementById('dbgContaPainel');
   if (_dbgContaAberto){

@@ -4010,12 +4010,24 @@ async function billingSincronizar(){
   const CHAVE = 'questlog.billingSync.v1';
   try {
     const ult = Number(localStorage.getItem(CHAVE) || 0);
-    if (Date.now() - ult < 6 * 3600 * 1000) return;
+    // assinatura vencida ou a <1h de vencer: renovou na Google mas a data
+    // gravada ficou velha -> revalida ja (trava curta de 5 min), sem esperar 6h.
+    const ate = (typeof window.assinaturaServidorExpiraEm === 'function') ? window.assinaturaServidorExpiraEm() : 0;
+    const vencendo = ate > 0 && (ate - Date.now()) < 3600 * 1000;
+    if (Date.now() - ult < (vencendo ? 5 * 60 * 1000 : 6 * 3600 * 1000)) return;
     localStorage.setItem(CHAVE, String(Date.now()));
   } catch(e){}
   try { await billingRevalidarCompras(); billingAtualizarTelas(); } catch(e){}
 }
 window.billingSincronizar = billingSincronizar;
+window.billingAtualizarTelas = billingAtualizarTelas;
+// ao voltar pro app (foco), revalida se a assinatura venceu/esta vencendo
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) return;
+  if (typeof window.puxarEntitlementAgora === 'function'){
+    window.puxarEntitlementAgora().then(() => billingSincronizar()).catch(() => {});
+  }
+});
 
 // ---------------------------------------------------------------------
 // TESTE GRATIS (pedido do usuario): 7 dias de Plano Pro sem cadastrar
@@ -16264,6 +16276,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     let _assinaturaProduto = '';
     window.assinaturaProdutoServidor = () => (_assinaturaServidorAte > Date.now() ? _assinaturaProduto : '');
     window.assinaturaServidorAtiva = () => _assinaturaServidorAte > Date.now();
+    window.assinaturaServidorExpiraEm = () => _assinaturaServidorAte;
     // DEBUG (pedido do usuario: testar o app sem PRO sem esperar o teste
     // gratis expirar de verdade, ja que cancelar de verdade so vai
     // existir via Google Play). So zera o CACHE em memoria desta aba --
@@ -16863,12 +16876,25 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         bloquearPorEmailNaoVerificado(user, () => {
           window.__emailDebugAtivo = user.emailVerified ? (user.email || '') : ''; window.definirUidAtivo(user.uid);
           reconectarEnvio(user);
+          puxarPlanoSilencioso(user.uid);
         });
         return;
       }
 
       window.__emailDebugAtivo = user.emailVerified ? (user.email || '') : ''; window.definirUidAtivo(user.uid);
       reconectarEnvio(user);
+      puxarPlanoSilencioso(user.uid);
+    }
+
+    // FIX (assinatura "sumia" ao reabrir o app): o caminho silencioso nao
+    // chama puxarNuvem(), que e onde puxarEntitlement()/billingSincronizar()
+    // rodavam -- sem isso o plano Pro (vitalicio ou assinatura) ficava off ate
+    // um login completo. Isto le SO entitlements/{uid} e revalida a compra;
+    // nao toca no save local (mantem a decisao de nao puxar a nuvem aqui).
+    async function puxarPlanoSilencioso(uid){
+      try { await puxarEntitlement(uid); } catch(e){}
+      if (typeof window.billingSincronizar === 'function') window.billingSincronizar();
+      if (typeof window.billingAtualizarTelas === 'function') window.billingAtualizarTelas();
     }
 
     onAuthStateChanged(auth, user => {

@@ -594,7 +594,9 @@ async function tratarBillingVerify(request, env){
         escritaParcial(projectId, 'playPurchases/' + hash, { uid: uid, sku: sku, atualizadoEm: Date.now() }),
         escritaParcial(projectId, 'entitlements/' + uid, campos),
       ]);
-      return respostaJson({ ok: true, ate: campos.assinaturaAte }, 200, origem);
+      // teste gratis = oferta 'teste-gratis' (plano anual-1) ainda vigente; so pra a tela de confirmacao
+      const emTeste = !!(item.offerDetails && item.offerDetails.offerId === 'teste-gratis') && campos.assinaturaAte > Date.now();
+      return respostaJson({ ok: true, ate: campos.assinaturaAte, trial: emTeste }, 200, origem);
     }
 
     // produto unico (vitalicio)

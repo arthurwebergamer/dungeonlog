@@ -976,7 +976,7 @@ catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
       <div class="cfgrow" id="cfgRowFeedback">
         <div class="cfgtxt">
           <b data-i18n="cfg.feedbackDeClique">Feedback de clique</b>
-          <span data-i18n="cfg.feedbackDeCliqueDesc">Vibração ou som ao tocar em botões</span>
+          <span data-i18n="cfg.feedbackDeCliqueDesc">Vibração ao tocar em botões e nos eventos do jogo</span>
         </div>
         <button class="swch" id="cfgFeedbackBtn" type="button" role="switch" aria-checked="true" aria-label="Feedback tátil">
           <span class="swch-bolinha"></span>
@@ -2582,7 +2582,7 @@ function pintarCatTabs(){
   bTodos.type = 'button';
   bTodos.className = 'cattab' + (filtroCategoriaTarefa === null ? ' on' : '');
   bTodos.textContent = en ? 'All' : 'Todos';
-  bTodos.onclick = () => { filtroCategoriaTarefa = null; if (typeof render === 'function') render(); };
+  bTodos.onclick = () => { window.feedbackClique?.('clique', 10); filtroCategoriaTarefa = null; if (typeof render === 'function') render(); };
   linha.appendChild(bTodos);
 
   // pedido do usuario: tira o lapis de editar de cada aba -- cada aba
@@ -2597,6 +2597,7 @@ function pintarCatTabs(){
     // toca de novo na mesma aba = volta pra "Todos" (mesmo padrao toggle
     // dos chips de categoria do composer/editor)
     b.onclick = () => {
+      window.feedbackClique?.('clique', 10);
       filtroCategoriaTarefa = (filtroCategoriaTarefa === cat.id) ? null : cat.id;
       if (typeof render === 'function') render();
     };
@@ -2607,7 +2608,7 @@ function pintarCatTabs(){
   bNova.type = 'button';
   bNova.className = 'cattab cattabnova';
   bNova.textContent = '+ ' + (en ? 'Add' : 'Adicionar');
-  bNova.onclick = () => { if (typeof abrirCategoriasOverlay === 'function') abrirCategoriasOverlay(); };
+  bNova.onclick = () => { window.feedbackClique?.('clique', 10); if (typeof abrirCategoriasOverlay === 'function') abrirCategoriasOverlay(); };
   linha.appendChild(bNova);
 }
 
@@ -3833,6 +3834,7 @@ function billingAtualizarTelas(){
 // criado na 1a vez. "Comecar" fecha ela e o paywall.
 function billingMostrarCompraOk(sku, restaurada){
   const T = _billingTexto;
+  window.tocarSom?.('proAtivado'); // som + vibracao de celebracao (tambem na compra restaurada)
   const ehVit = sku === BILLING_SKUS.vitalicio;
   const nomePlano = ehVit ? T('pro.planoVitalicio', 'Vitalício', 'Lifetime')
     : (sku === BILLING_SKUS.mensal ? T('pro.planoMensal', 'Mensal', 'Monthly') : T('pro.planoAnual', 'Anual', 'Annual'));
@@ -5222,7 +5224,7 @@ function render(){
       if (dragArmado || e.target.closest('.del') || e.target.closest('.box')) return;
       if (typeof abrirEditor === 'function') abrirEditor(i);
     };
-    el.querySelector('.del').onclick = e => { e.stopPropagation(); tarefas.splice(i,1); verificarVitoriaAoExcluir(); render(); };
+    el.querySelector('.del').onclick = e => { e.stopPropagation(); window.tocarSom?.('desequipar'); tarefas.splice(i,1); verificarVitoriaAoExcluir(); render(); };
     return el;
   }
 
@@ -6821,12 +6823,13 @@ window.spring = spring;
       onUpdate:v=>{ escala.set(el, v); el.style.transform = 'scale(' + v + ')'; }});
   }
   document.addEventListener('pointerdown', e => {
-    const btn = e.target.closest('.cfgbtnfull');
+    const btn = e.target.closest ? e.target.closest('.cfgbtnfull') : null;
     if (btn) squish(btn, 0.94, 420, 26);
   });
   ['pointerup','pointerleave','pointercancel'].forEach(ev => {
     document.addEventListener(ev, e => {
-      const btn = e.target.closest('.cfgbtnfull');
+      // pointerleave pode ter o proprio document como alvo (sem .closest) -> TypeError
+      const btn = e.target.closest ? e.target.closest('.cfgbtnfull') : null;
       if (btn) squish(btn, 1, 260, 13);
     });
   });
@@ -9247,6 +9250,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       if (t) t.ordem = i * 10;
     });
     dragEl = null; placeholder = null; pid = null;
+    window.tocarSom?.('soltar'); // fim do arrasto (o inicio ja vibra)
     if (typeof salvar === 'function') salvar();
     setTimeout(() => { dragArmado = false; }, 50);   // deixa o click "fantasma" do soltar morrer antes de reliberar
     // categoria mudou: a secao onde o card esta fisicamente na hora nao
@@ -10056,6 +10060,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   // conta propria.
   function trocarPersonagemComTransicao(id, aoTrocar){
     fecharDropdownPersonagens();
+    window.tocarSom?.('trocarHeroi');
     if (!pjCortina){
       trocarPersonagem(id);
       atualizarNomeTopoPersonagem();
@@ -10914,6 +10919,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   function confirmar(){
     const nome = campo.value.trim();
     if (!nome){ campo.focus(); return; }
+    window.tocarSom?.('tarefa'); // criar/editar categoria
     if (idEmEdicao){
       if (typeof editarCategoriaTarefa === 'function') editarCategoriaTarefa(idEmEdicao, nome);
     } else {
@@ -10929,6 +10935,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     const nomeCat = cat ? cat.nome : '';
     const idAlvo = idEmEdicao;
     const feito = () => {
+      window.tocarSom?.('desequipar'); // categoria apagada
       if (typeof apagarCategoriaTarefa === 'function') apagarCategoriaTarefa(idAlvo);
       if (typeof render === 'function') render();
       fechar();
@@ -13976,8 +13983,36 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     }
   };
 
+  // eventos novos que reaproveitam sons ja catalogados (sem criar som novo)
+  SONS.proAtivado = SONS.levelup;       // compra do Plano Pro concluida / restaurada
+  SONS.trocarHeroi = SONS.equipar;      // troca de heroi ativo
+  SONS.soltar = SONS.clique;            // fim do arrasto de tarefa
+  SONS.erro = c => {                    // erro de login/cadastro -- thud curto e surdo (nao o sawtooth do danoHeroi)
+    tom(c, { freq:200, freqFinal:130, tipo:'triangle', duracao:0.14, ganho:0.3 });
+  };
+
+  // VIBRACAO POR EVENTO (ms: [vibra, pausa, vibra, ...]). Mesma chave do SONS:
+  // todo tocarSom(nome) vibra junto, entao eventos novos so precisam de uma
+  // entrada aqui. Respeita o mute (ativo) e a preferencia 'vibrar'/'desativado'.
+  // Sem entrada = nao vibra ('clique' e 'blip' tem fluxo proprio).
+  const VIBRACAO = {
+    golpe: [30], danoHeroi: [80], fuga: [60, 40, 60], morte: [200],
+    levelup: [40, 60, 40, 60, 120], proAtivado: [40, 60, 40, 60, 120], estagioNovo: [40, 60, 40, 60, 120],
+    grimorio: [30, 50, 30, 50, 100], loot: [20, 40, 20], chegadaRecompensa: [12], poofBau: [15],
+    tarefa: [20], compra: [20, 30, 20], venda: [20, 30, 20], investir: [15],
+    equipar: [15, 30, 15], desequipar: [20], trocarHeroi: [15, 30, 15], usar: [25], abrirGrimorio: [15],
+    soltar: [12], erro: [60, 50, 60]
+  };
+  function vibrarEvento(nome){
+    const padrao = VIBRACAO[nome];
+    if (!padrao || feedback !== 'vibrar' || !('vibrate' in navigator)) return;
+    try { navigator.vibrate(padrao); } catch(e){}
+  }
+
   window.tocarSom = function(nome, arg){
+    window.__fbN = (window.__fbN || 0) + 1; // contador p/ o fallback global de clique (abaixo)
     if (!ativo) return;
+    vibrarEvento(nome); // vibra mesmo se o AudioContext ainda estiver suspenso
     const fn = SONS[nome];
     if (!fn) return;
     const c = contexto();
@@ -14034,6 +14069,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // perceptivel (atraso fisico de partida/parada do motor ERM), voltou
   // pra 10ms.
   window.feedbackClique = function(som, ms){
+    window.__fbN = (window.__fbN || 0) + 1;
     if (!ativo) return;
     const usarVibracao = feedback === 'vibrar' && ('vibrate' in navigator);
     if (!usarVibracao){ window.tocarSom(som); return; }
@@ -14044,6 +14080,21 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       window.tocarSom(som);
     }
   };
+
+  // FALLBACK GLOBAL DE CLIQUE: todo botao tocado que NAO disparou nenhum som/
+  // vibracao proprio naquele clique recebe o clique leve (10ms). Cobre de uma
+  // vez as lacunas (formulario de tarefa, paywall, popups, config, login...) e
+  // botoes futuros. Captura = roda antes dos handlers do alvo (nao e barrado por
+  // stopPropagation); o setTimeout(0) confere depois que eles rodaram.
+  // Silenciar um botao de proposito: atributo data-sem-feedback nele ou no pai.
+  document.addEventListener('click', function(e){
+    const t = e.target && e.target.closest ? e.target.closest('button, [role="button"], .cfgrow, .opcao, .catchip, .cattab') : null;
+    if (!t || t.disabled || t.closest('[data-sem-feedback], .debug-el')) return;
+    const antes = window.__fbN || 0;
+    setTimeout(function(){
+      if ((window.__fbN || 0) === antes) window.feedbackClique('clique', 10);
+    }, 0);
+  }, true);
 })();
 </script>
 
@@ -17098,6 +17149,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           'auth/network-request-failed': 'Sem conexão. Verifique a internet e tente de novo.'
         };
         const msg = MENSAGENS[e && e.code] || (en ? 'Couldn\'t sign in' : 'Não deu pra entrar');
+        window.tocarSom?.('erro');
 
         // auth/email-already-in-use usa o padrao inline do campo (icone +
         // texto), mesma linguagem visual da tela de senha -- o toast fica
@@ -18037,7 +18089,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'cfg.tema':            { pt:'Tema', en:'Theme' },
     'cfg.paletaDeCores':   { pt:'Paleta de cores do app', en:'App color palette' },
     'cfg.feedbackDeClique':     { pt:'Feedback de clique', en:'Click feedback' },
-    'cfg.feedbackDeCliqueDesc': { pt:'Vibração ou som ao tocar em botões', en:'Vibration or sound when tapping buttons' },
+    'cfg.feedbackDeCliqueDesc': { pt:'Vibração ao tocar em botões e nos eventos do jogo', en:'Vibration on buttons and game events' },
     'cfg.som':     { pt:'Som', en:'Sound' },
     'cfg.somDesc': { pt:'Efeitos sonoros do jogo', en:'Game sound effects' },
     'cfg.novoHeroi': { pt:'Criar novo herói', en:'Create new hero' },

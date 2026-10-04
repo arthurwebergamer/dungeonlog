@@ -2582,7 +2582,7 @@ function pintarCatTabs(){
   bTodos.type = 'button';
   bTodos.className = 'cattab' + (filtroCategoriaTarefa === null ? ' on' : '');
   bTodos.textContent = en ? 'All' : 'Todos';
-  bTodos.onclick = () => { filtroCategoriaTarefa = null; if (typeof render === 'function') render(); };
+  bTodos.onclick = () => { window.feedbackClique?.('clique', 10); filtroCategoriaTarefa = null; if (typeof render === 'function') render(); };
   linha.appendChild(bTodos);
 
   // pedido do usuario: tira o lapis de editar de cada aba -- cada aba
@@ -2597,6 +2597,7 @@ function pintarCatTabs(){
     // toca de novo na mesma aba = volta pra "Todos" (mesmo padrao toggle
     // dos chips de categoria do composer/editor)
     b.onclick = () => {
+      window.feedbackClique?.('clique', 10);
       filtroCategoriaTarefa = (filtroCategoriaTarefa === cat.id) ? null : cat.id;
       if (typeof render === 'function') render();
     };
@@ -2607,7 +2608,7 @@ function pintarCatTabs(){
   bNova.type = 'button';
   bNova.className = 'cattab cattabnova';
   bNova.textContent = '+ ' + (en ? 'Add' : 'Adicionar');
-  bNova.onclick = () => { if (typeof abrirCategoriasOverlay === 'function') abrirCategoriasOverlay(); };
+  bNova.onclick = () => { window.feedbackClique?.('clique', 10); if (typeof abrirCategoriasOverlay === 'function') abrirCategoriasOverlay(); };
   linha.appendChild(bNova);
 }
 
@@ -10917,6 +10918,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   function confirmar(){
     const nome = campo.value.trim();
     if (!nome){ campo.focus(); return; }
+    window.tocarSom?.('tarefa'); // criar/editar categoria
     if (idEmEdicao){
       if (typeof editarCategoriaTarefa === 'function') editarCategoriaTarefa(idEmEdicao, nome);
     } else {
@@ -10932,6 +10934,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     const nomeCat = cat ? cat.nome : '';
     const idAlvo = idEmEdicao;
     const feito = () => {
+      window.tocarSom?.('desequipar'); // categoria apagada
       if (typeof apagarCategoriaTarefa === 'function') apagarCategoriaTarefa(idAlvo);
       if (typeof render === 'function') render();
       fechar();

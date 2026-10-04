@@ -5976,3 +5976,17 @@ img{-webkit-user-drag:none;user-drag:none}
 .compraOkMob{width:112px;height:112px;image-rendering:pixelated;filter:drop-shadow(0 6px 0 rgba(0,0,0,.35));animation:compraOkBob 2.4s ease-in-out infinite}
 .compraOkMob.b{animation-delay:-1.2s;transform:scaleX(-1)}
 @keyframes compraOkBob{0%,100%{translate:0 0}50%{translate:0 -8px}}
+
+
+/* DIA MANUAL: botao 'Terminar dia' (aparece quando nao ha pendentes) */
+.terminarDiaBtn{position:relative;overflow:hidden;display:block;width:100%;margin:16px 0 6px;padding:17px 16px;border:none;border-radius:14px;
+background:linear-gradient(135deg,var(--accent),#ffd76a);color:var(--bg);font-family:'Outfit',sans-serif;font-size:17px;font-weight:700;letter-spacing:.5px;cursor:pointer;
+box-shadow:0 0 0 0 rgba(255,200,80,.55),0 6px 18px rgba(0,0,0,.35);
+animation:tdEntra .6s cubic-bezier(.2,1.4,.4,1) both,tdPulso 2s ease-in-out .7s infinite}
+.terminarDiaBtn::after{content:'';position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-20deg);animation:tdBrilho 2.6s ease-in-out 1s infinite}
+.terminarDiaBtn[hidden]{display:none}
+.terminarDiaBtn:active{transform:scale(.97);animation-play-state:paused}
+@keyframes tdEntra{0%{opacity:0;transform:translateY(24px) scale(.85)}100%{opacity:1;transform:none}}
+@keyframes tdPulso{0%,100%{box-shadow:0 0 0 0 rgba(255,200,80,.55),0 6px 18px rgba(0,0,0,.35)}50%{box-shadow:0 0 0 10px rgba(255,200,80,0),0 6px 18px rgba(0,0,0,.35)}}
+@keyframes tdBrilho{0%{left:-60%}55%,100%{left:130%}}
+@media (prefers-reduced-motion:reduce){.terminarDiaBtn,.terminarDiaBtn::after{animation:none}}

@@ -52,40 +52,13 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=47">
+<link rel="stylesheet" href="style.css?v=48">
 
-<!-- =====================================================================
-     TOGGLE DEBUG — silenciar console (log/warn/error)  —  precisa ser o
-     primeiro bloco de script dentro do cabecalho do documento, antes de
-     qualquer outro codigo (inclusive assets.js e o bloco de i18n logo
-     abaixo), pra garantir que nenhuma chamada de console escape do gate
-     antes do toggle entrar em vigor.
-
-     Mesma chave/flag do toggle de UI (icone de moedas):
-     localStorage['questlog.modoDebug.v1']. Default false -> console
-     100% mudo (log, warn E error) ate o jogador clicar nas moedas.
-     Ao religar em runtime (sem reload), volta a imprimir na hora,
-     porque cada chamada consulta o localStorage de novo, nao um
-     valor cacheado na carga da pagina.
-
-     Import.: console.error tambem fica mudo por padrao -- inclui
-     erros reais de Firebase/rede (ver blocos "Firebase" mais abaixo).
-     Decisao explicita do usuario: log e debug, debug fica escondido
-     junto com o resto ate o toggle ligar.
-     ===================================================================== -->
 <script>
+// Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
 (function(){
-  const CHAVE = 'questlog.modoDebug.v1';
-  function modoDebugLigado(){
-    try { return localStorage.getItem(CHAVE) === 'true'; } catch(e){ return false; }
-  }
-  const original = { log: console.log, warn: console.warn, error: console.error, table: console.table, info: console.info, debug: console.debug };
-  window.__consoleOriginal = original; // acesso de emergencia via devtools, se precisar depurar o proprio silenciador
-  ['log','warn','error','table','info','debug'].forEach(function(metodo){
-    console[metodo] = function(){
-      if (modoDebugLigado()) original[metodo].apply(console, arguments);
-    };
-  });
+  ['log','warn','error','table','info','debug'].forEach(function(m){ console[m] = function(){}; });
+  try { ['questlog.modoDebug.v1','questlog.dbgLog.v1'].forEach(function(k){ localStorage.removeItem(k); }); } catch(e){}
 })();
 </script>
 
@@ -1079,21 +1052,6 @@ catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
         <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
       </div>
 
-      <!-- DEBUG (pedido do usuario): so aparece com modo debug ligado
-           (classe .debug-el, mesma pilula de log/coins do resto do app --
-           clique no icone de moedas liga/desliga). Cancelar de VERDADE so
-           vai existir via Google Play (nao ha billing real ainda, ver
-           iniciarCompraAssinatura()) -- este botao e' so pra poder testar
-           as telas de "sem PRO"/paywall sem esperar 7 dias de teste
-           gratis de verdade. Zera teste gratis (expirarTrialAgora()), PRO
-           vitalicio local (revogarProVitalicio()) e o cache em memoria do
-           PRO vitalicio vindo do servidor (forcarProVitalicioServidorOffDebug(),
-           NAO apaga o doc no Firestore -- so a leitura ja feita nesta
-           aba). Ver JS logo apos #cfgAbrirAssinatura. -->
-      <button class="cfgbtnfull perigo debug-el" id="debugCancelarAssinaturaBtn" type="button" style="margin-bottom:14px">
-        🐞 Cancel subscription (debug)
-      </button>
-
     </div>
   </div>
 
@@ -1925,16 +1883,6 @@ catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 })();
 </script>
 
-<!-- pedido do usuario: textos do menu debug sempre em ingles, fixos --
-     ferramenta de dev/QA (revisor do Google Play), nao roda pelo i18n do
-     app (data-i18n), de proposito. -->
-<div class="debugbar"><button class="debugbtn" id="debugbtn">next day →</button><button class="debugbtn" id="pularTutoriaisBtn">skip tutorial</button><button class="debugbtn" id="debugArmasBtn">+ all weapons</button><button class="debugbtn" id="debugEstagioBtn">force stage</button></div>
-<!-- #estagioDebugPanel (terminal verde de log dos Estagios) removido a
-     pedido do usuario -- debugEstagio() ja tem "if (!painel) return"
-     logo no inicio (ver funcao, perto de "Painel de debug VISIVEL NA
-     TELA"), entao vira no-op sozinha sem #estagioDebugPanel no DOM; os
-     varios call sites de debugEstagio(...) espalhados pelo Sistema de
-     Estagios nao precisaram ser tocados. -->
 <div class="toast" id="toast"></div>
 
 <script src="assets.js"></script>
@@ -1951,33 +1899,6 @@ try {
   if (uidSalvo) _uidAtivo = uidSalvo;
 } catch(e){}
 
-// MENU DEBUG RESTRITO POR CONTA (pedido do usuario: revisor do Google
-// Play precisa testar o menu debug, mas nenhum jogador comum deveria
-// conseguir ligar isso so tocando no icone de moedas -- ver TOGGLE DEBUG
-// perto do fim do arquivo). Allowlist client-side: nao e' seguranca de
-// verdade (da pra ler no devtools), so impede o usuario comum de achar
-// por acidente -- suficiente pra uma ferramenta de dev/QA, nao pra algo
-// que concede PRO de verdade (isso continua so via Firestore, ver
-// entitlements/{uid} em firestore.rules). Pra liberar debug numa conta
-// nova, pega o uid em Authentication > Users no Firebase Console e
-// adiciona aqui.
-const UIDS_DEBUG_PERMITIDO = [
-  'CVNPbBxIFebPmnmCEw6iYYYKWRS2', // conta de revisor do Google Play (mesma do PRO vitalicio)
-  // 'SEU_UID_AQUI', // sua propria conta, se quiser testar tambem
-];
-// Tambem libera por e-mail (so conta com e-mail VERIFICADO -- Google sempre
-// e). Util quando nao se tem o UID em maos. window.__emailDebugAtivo e
-// preenchido em aoLogar()/aoLogarSilencioso(), antes de definirUidAtivo().
-const EMAILS_DEBUG_PERMITIDO = [
-  'arthurwebergamer@gmail.com',
-  'contateste81402@gmail.com',     // conta de teste
-];
-function uidTemDebugPermitido(){
-  if (UIDS_DEBUG_PERMITIDO.includes(_uidAtivo)) return true;
-  const em = (window.__emailDebugAtivo || '').toLowerCase();
-  return !!em && EMAILS_DEBUG_PERMITIDO.includes(em);
-}
-window.uidTemDebugPermitido = uidTemDebugPermitido;
 
 // PLANO PRO (roadmap: item 1 do Plano de Lancamento) -- personagem ativo
 // dentro da conta. Precisa ser resolvido ANTES de chaveSaveAtual()/
@@ -2058,10 +1979,6 @@ window.definirUidAtivo = function(uid){
     if (_uidAtivo) localStorage.setItem('questlog.uidAtivo.v1', _uidAtivo);
     else localStorage.removeItem('questlog.uidAtivo.v1');
   } catch(e){}
-  // menu debug restrito por conta (ver UIDS_DEBUG_PERMITIDO, alguns
-  // paragrafos acima) -- uid so muda de verdade aqui, entao e aqui que
-  // reavalia se o debug deve continuar visivel/ficar visivel agora.
-  if (typeof window.__reavaliarModoDebugPosLogin === 'function') window.__reavaliarModoDebugPosLogin();
   // PLANO PRO: personagemAtivo e por CONTA -- troca de uid precisa reler
   // qual personagem essa conta especifica tinha ativo, senao
   // _personagemAtivo fica "vazado" da conta anterior (mesma classe de
@@ -2262,124 +2179,6 @@ function criarPersonagem(nome, heroiIdx){
 }
 window.criarPersonagem = criarPersonagem;
 
-// ---------------------------------------------------------------------
-// PAINEL DE DEBUG -- fluxo de login/troca de conta. Religado temporario
-// pra investigar o relato do usuario: tarefa recorrente sumindo ao
-// alternar entre contas mesmo depois do fix de carregar()/migracao e do
-// fix de esperar o envio pendente no Sair. Simulacao local nao
-// reproduziu o bug -- precisa de dado real do aparelho. Mesmo padrao
-// que resolveu o bug do arrasto de tarefas nesta mesma sessao: painel
-// visivel em vez de continuar adivinhando. DESLIGAR (DEBUG_CONTA=false)
-// depois de diagnosticar.
-//
-// v2 (mesma sessao, ajuste pedido pelo usuario): a 1a versao crescia ate
-// 40vh conforme o log enchia e cobria botoes de verdade (mesmo com
-// pointer-events:none no PAINEL, a pilula/indicador continuava visivel
-// por cima). Agora comeca RECOLHIDO -- so uma pilula pequena no canto
-// inferior direito ("LOG N"), fora do caminho de qualquer botao normal
-// do app. Toca nela pra abrir o log completo (aí sim ocupa mais espaco,
-// mas so enquanto o usuario pediu pra ver).
-const DEBUG_CONTA = true;
-let _dbgContaT0 = performance.now();
-let _dbgContaLinhas = [];
-// v4.141: o log sobrevive ao reload (o "Sair" recarrega a pagina e apagava
-// justamente o trecho que importa). Guarda as ultimas 120 linhas; as da
-// sessao anterior voltam marcadas com "[antes]".
-const _CHAVE_DBG_LOG = 'questlog.dbgLog.v1';
-try {
-  const _ant = JSON.parse(localStorage.getItem(_CHAVE_DBG_LOG) || '[]');
-  if (Array.isArray(_ant)) _dbgContaLinhas = _ant.slice(-120).map(l => '[antes] ' + String(l).replace(/^\[antes\] /, ''));
-} catch(e){}
-let _dbgContaAberto = false;
-function _dbgContaRepintar(){
-  // item: TOGGLE DEBUG (clique nas moedas) -- esta pilula usa
-  // painel.style.display inline (abaixo), que sempre vence a regra CSS
-  // .debug-el{display:none} (inline bate qualquer seletor de stylesheet).
-  // Por isso o toggle mestre precisa ser checado AQUI em JS tambem, nao
-  // so via classe -- senao um painel deixado aberto reaparece sozinho
-  // na proxima linha de log, mesmo com o mestre desligado.
-  const debugMestreLigado = (typeof window.modoDebugAtivo === 'function') ? window.modoDebugAtivo() : false;
-
-  let pilula = document.getElementById('dbgContaPilula');
-  if (!pilula){
-    pilula = document.createElement('button');
-    pilula.id = 'dbgContaPilula';
-    pilula.className = 'debug-el';
-    pilula.type = 'button';
-    pilula.style.cssText = 'position:fixed;bottom:8px;right:8px;z-index:99999;background:#001a00;color:#0f0;font:10px monospace;padding:4px 8px;border:1px solid #0f0;border-radius:999px;line-height:1.4';
-    pilula.onclick = () => { _dbgContaAberto = !_dbgContaAberto; _dbgContaRepintar(); };
-    document.body.appendChild(pilula);
-  }
-
-  if (!debugMestreLigado){
-    pilula.style.display = 'none';
-    ['dbgContaCopiarTudo','dbgContaCopiarMed'].forEach(i => { const e = document.getElementById(i); if (e) e.style.display = 'none'; });
-    const painelExistente = document.getElementById('dbgContaPainel');
-    if (painelExistente) painelExistente.style.display = 'none';
-    return;
-  }
-  pilula.style.display = '';
-  pilula.textContent = (_dbgContaAberto ? '✕ fechar' : '☰ log') + ' (' + _dbgContaLinhas.length + ')';
-
-  // botoes de copiar (so com o painel aberto): evita tirar print do log.
-  // "copiar tudo" = log inteiro; "copiar medidas" = so as linhas medidas[...]
-  // (ultimas 25), pro bug da nav cortada.
-  [['dbgContaCopiarTudo', '⧉ tudo', 84, () => _dbgContaLinhas.slice()],
-   ['dbgContaCopiarMed', '⧉ medidas', 150, () => _dbgContaLinhas.filter(l => l.indexOf('medidas[') !== -1).slice(-25)]
-  ].forEach(([id, rotulo, dir, pegar]) => {
-    let bt = document.getElementById(id);
-    if (!bt){
-      bt = document.createElement('button');
-      bt.id = id; bt.className = 'debug-el'; bt.type = 'button'; bt.textContent = rotulo;
-      bt.style.cssText = 'position:fixed;bottom:8px;right:' + dir + 'px;z-index:99999;background:#001a00;color:#0f0;font:10px monospace;padding:4px 8px;border:1px solid #0f0;border-radius:999px;line-height:1.4';
-      bt.onclick = () => {
-        const cab = 'DungeonLog log | ' + new Date().toISOString() + ' | ' + navigator.userAgent + ' | dpr=' + window.devicePixelRatio;
-        const texto = cab + '\n' + pegar().join('\n');
-        const ok = () => { bt.textContent = '✓ copiado'; setTimeout(() => { bt.textContent = rotulo; }, 1500); };
-        const fallback = () => {
-          try {
-            const ta = document.createElement('textarea'); ta.value = texto; ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
-            document.body.appendChild(ta); ta.focus(); ta.select(); document.execCommand('copy'); ta.remove(); ok();
-          } catch(e){ bt.textContent = '✗ falhou'; }
-        };
-        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(texto).then(ok, fallback); else fallback();
-      };
-      document.body.appendChild(bt);
-    }
-    bt.style.display = (_dbgContaAberto && debugMestreLigado) ? '' : 'none';
-  });
-
-  let painel = document.getElementById('dbgContaPainel');
-  if (_dbgContaAberto){
-    if (!painel){
-      painel = document.createElement('div');
-      painel.id = 'dbgContaPainel';
-      painel.className = 'debug-el';
-      painel.style.cssText = 'position:fixed;bottom:36px;right:8px;left:8px;z-index:99998;background:#001a00;color:#0f0;font:10px monospace;padding:6px;max-height:45vh;overflow-y:auto;white-space:pre-wrap;border:1px solid #0f0;border-radius:8px';
-      document.body.appendChild(painel);
-    }
-    painel.innerHTML = '';
-    _dbgContaLinhas.forEach(l => {
-      const linha = document.createElement('div');
-      linha.textContent = l;
-      painel.appendChild(linha);
-    });
-    painel.style.display = 'block';
-    painel.scrollTop = painel.scrollHeight;
-  } else if (painel){
-    painel.style.display = 'none';
-  }
-}
-window.__dbgContaAtualizarVisibilidade = _dbgContaRepintar; // hook pro toggle mestre forcar repintura na hora do clique
-function dbgConta(msg){
-  if (!DEBUG_CONTA) return;
-  const t = Math.round(performance.now() - _dbgContaT0);
-  _dbgContaLinhas.push('+' + t + 'ms  ' + msg);
-  if (_dbgContaLinhas.length > 200) _dbgContaLinhas.splice(0, _dbgContaLinhas.length - 200);
-  try { localStorage.setItem(_CHAVE_DBG_LOG, JSON.stringify(_dbgContaLinhas.slice(-120))); } catch(e){}
-  _dbgContaRepintar();
-}
-window.dbgConta = dbgConta;
 
 /* =======================================================================
    ECONOMIA  —  ponto unico de balanceamento
@@ -2796,7 +2595,6 @@ const SIGLAS_EN = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
    mesmo tempo persistente e invisivel.
    -------------------------------------------------------------------------*/
 const CHAVE_DIA = 'questlog.dia.v1';
-const MAX_OFFSET = 365;
 let diaOffset = 0;
 
 function isoDe(d){
@@ -2810,33 +2608,9 @@ function diffDias(isoA, isoB){                       // A - B, em dias inteiros
   return Math.round((a - b) / 86400000);
 }
 function lerOffsetDia(){
-  try {
-    const bruto = localStorage.getItem(window.chaveConta(CHAVE_DIA));
-    if (!bruto){ diaOffset = 0; return; }
-    const d = JSON.parse(bruto);
-    if (!d || typeof d.off !== 'number') throw 0;    // formato antigo (ISO)
-    diaOffset = Math.max(0, Math.min(MAX_OFFSET, Math.round(d.off)));
-    if (diaOffset === 0) localStorage.removeItem(window.chaveConta(CHAVE_DIA));
-  } catch(e){
-    // v4.3/v4.32 gravavam um ISO aqui. Essa divida acumulada e justamente o
-    // bug do dia congelado: descarta e volta pro dia real.
-    diaOffset = 0;
-    try { localStorage.removeItem(window.chaveConta(CHAVE_DIA)); } catch(err){}
-  }
-}
-function gravarOffsetDia(){
-  try {
-    if (diaOffset <= 0) localStorage.removeItem(window.chaveConta(CHAVE_DIA));
-    else localStorage.setItem(window.chaveConta(CHAVE_DIA), JSON.stringify({off: diaOffset}));
-  } catch(e){}
-}
-function avancarDia(){
-  diaOffset = Math.min(MAX_OFFSET, diaOffset + 1);
-  gravarOffsetDia();
-}
-function voltarAoDiaReal(){
+  // O app sempre usa o dia real. Descarta qualquer offset de teste que tenha ficado salvo.
   diaOffset = 0;
-  gravarOffsetDia();
+  try { localStorage.removeItem(window.chaveConta(CHAVE_DIA)); } catch(err){}
 }
 
 function dataAtual(){
@@ -3408,74 +3182,15 @@ function renderEstagioBar(){
 window.renderEstagioBar = renderEstagioBar;
 
 
-// PRO VITALICIO MANUAL (pedido do usuario: "dá pra definir uma conta
-// como pro vitalício?", depois "vou ter que dar uma conta pro de acesso
-// pros revisores do Google e preciso de uma conta com acesso vitalício")
-// -- ainda NAO existe integracao real com Google Play Billing (ver
-// comentario grande antes de iniciarCompraAssinatura() mais abaixo),
-// entao nao ha "assinatura de verdade" pra conceder. Existem 2 formas,
-// pra 2 necessidades diferentes:
-//
-// 1) LOCAL (aqui embaixo, window.concederProVitalicio()) -- fica so em
-//    localStorage, NESTE aparelho/navegador. Rapido, sem depender do
-//    Firebase, mas NAO sincroniza: se a conta logar em outro aparelho,
-//    o PRO nao vai junto. Serve pra voce mesmo testar localmente.
-//
-// 2) SERVIDOR (Firestore, coleção entitlements/{uid} -- ver
-//    firestore.rules e puxarEntitlement() no bloco AUTH/Firebase mais
-//    abaixo) -- sincroniza de verdade entre aparelhos, e' a forma certa
-//    pra dar acesso PRO a uma conta de revisor do Google Play (eles vao
-//    logar no aparelho DELES, nao no seu). So pode ser concedido
-//    manualmente pelo Firebase Console (Firestore Database > coleção
-//    "entitlements" > novo documento com ID = uid da conta > campo
-//    "proVitalicio" boolean = true) -- de proposito NENHUM caminho do
-//    app escreve nessa coleção, senao qualquer usuario tecnico se
-//    autoconcederia PRO direto pelo DevTools sem pagar nada.
-//
-// Uso da versao LOCAL (abra o Console do navegador com o app aberto):
-//   window.concederProVitalicio()        -- concede pra conta logada agora
-//   window.concederProVitalicio('UID_X') -- concede pra um uid especifico
-//   window.revogarProVitalicio()         -- remove da conta logada agora
-// O uid de uma conta aparece em window.dbgConta ligado, ou no Firebase
-// Console (Authentication > Users) -- mesmo lugar onde achar o uid pra
-// conceder a versao SERVIDOR (acima).
-const CHAVE_PRO_VITALICIO = 'questlog.proVitalicio.v1';
-function chaveProVitalicio(uid){
-  const alvo = uid || _uidAtivo;
-  return alvo ? (CHAVE_PRO_VITALICIO + '.uid.' + alvo) : CHAVE_PRO_VITALICIO;
-}
-function proVitalicioAtivo(){
-  try { return localStorage.getItem(chaveProVitalicio()) === 'true'; } catch(e){ return false; }
-}
-window.concederProVitalicio = function(uid){
-  try {
-    localStorage.setItem(chaveProVitalicio(uid), 'true');
-    console.log('PRO vitalício concedido (neste aparelho) para uid=' + (uid || _uidAtivo || '(conta convidado/local)'));
-  } catch(e){ console.error('Falha ao conceder PRO vitalício', e); }
-};
-window.revogarProVitalicio = function(uid){
-  try {
-    localStorage.removeItem(chaveProVitalicio(uid));
-    console.log('PRO vitalício revogado (neste aparelho) para uid=' + (uid || _uidAtivo || '(conta convidado/local)'));
-  } catch(e){ console.error('Falha ao revogar PRO vitalício', e); }
-};
+// PRO vitalicio vem so do servidor (Firestore entitlements/{uid}, escrito pelo Worker ou
+// manualmente pelo Firebase Console) -- ver puxarEntitlement() no bloco AUTH/Firebase.
+// Nenhum caminho do app concede PRO localmente.
 
 function assinaturaAtiva(){
-  // FIX: o alternador real de modo debug (clicar no icone das moedas,
-  // ver modulo perto do fim do arquivo) salva a STRING 'true', nao '1'
-  // -- essa funcao comparava com '1' por engano, entao nunca detectava
-  // o modo debug como ativo mesmo com ele ligado (debugbar visivel).
-  // window.modoDebugAtivo() ja existe e e a fonte da verdade -- usa ela
-  // direto se disponivel, com o mesmo fallback de string por baixo.
-  try {
-    if (typeof window.modoDebugAtivo === 'function'){ if (window.modoDebugAtivo()) return true; }
-    else if (localStorage.getItem('questlog.modoDebug.v1') === 'true') return true;
-  } catch(e){}
   // PRO VITALICIO MANUAL, versao local (localStorage, ver bloco logo
   // acima) OU versao servidor (Firestore entitlements/{uid}, sincroniza
   // entre aparelhos -- ver puxarEntitlement() no bloco AUTH/Firebase,
   // mais abaixo no arquivo).
-  if (proVitalicioAtivo()) return true;
   if (typeof window.proVitalicioServidorAtivo === 'function' && window.proVitalicioServidorAtivo()) return true;
   // ASSINATURA GOOGLE PLAY (mensal/anual), validada pelo Worker e gravada
   // em entitlements/{uid}.assinaturaAte -- ver bloco GOOGLE PLAY BILLING.
@@ -3514,7 +3229,6 @@ let _pwPlanoSelecionado = 'trial'; // pedido do usuario (tela "planos" simplific
 let _pwAvisoSelecionado = 1; // TESTE GRATIS -- "1 dia antes" vem pre-selecionado (etapa 3, #pwEtapa3)
 
 function abrirPaywall(motivo){
-  window.dbgConta && window.dbgConta('abrirPaywall() -- motivo=' + motivo);
   // Fundo = MESMA arte "Floresta" de TEMAS_ARENA (assets.js) usada na
   // Arena de verdade, pintada aqui (nao no <script> logo apos o HTML)
   // porque TEMAS_ARENA so existe mais abaixo no arquivo -- nesse ponto da
@@ -3830,7 +3544,7 @@ async function billingPintarPrecos(){
   const m = d[BILLING_SKUS.mensal], a = d[BILLING_SKUS.anual], v = d[BILLING_SKUS.vitalicio];
   // Teste gratis do Play: so mostra o card se a oferta existe (freeTrialPeriod)
   // e a pessoa ainda nao tem PRO. Se ja usou o teste, o Play nao devolve o campo.
-  try { window.dbgConta && window.dbgConta('billing detalhes pro_anual: ' + JSON.stringify(a || null) + ' | assinaturaAtiva=' + ((typeof assinaturaAtiva === 'function') ? assinaturaAtiva() : '?')); } catch(e){}
+  try {  } catch(e){}
   // O Chrome/TWA nao manda freeTrialPeriod: o teste gratis chega como
   // introductoryPrice de valor 0 (visto no log real). Aceita os dois.
   const _temTesteGratis = !!(a && (a.freeTrialPeriod || (a.introductoryPrice && Number(a.introductoryPrice.value) === 0)));
@@ -3992,10 +3706,8 @@ async function billingRestaurarSku(sku){
     const dr = await billingVerificar(c.itemId, c.purchaseToken, true);
     _billingUltimaMovida = !!(dr && dr.movida);
     if (sku !== BILLING_SKUS.vitalicio) billingMarcarJaAssinou();
-    window.dbgConta && window.dbgConta('billingRestaurarSku: compra existente restaurada sku=' + sku);
     return true;
   } catch(e){
-    window.dbgConta && window.dbgConta('billingRestaurarSku falhou: ' + (e && (e.name + ' ' + e.message)));
     return false;
   }
 }
@@ -4054,7 +3766,6 @@ async function iniciarCompraAssinatura(){
   } catch(e){
     // Pessoa fechou o pop-up da Google: nao e' erro, nao mostra nada.
     const cancelou = e && (e.name === 'AbortError' || e.name === 'NotAllowedError');
-    if (cancelou) window.dbgConta && window.dbgConta('compra fechada/recusada: sku=' + sku + ' ' + (e && (e.name + ' ' + e.message)) + ' detalhes=' + Object.keys(_billingDetalhes || {}).join(','));
     // O Google devolve esse mesmo erro quando a pessoa JA e dona do item
     // ("Este item ja e seu") -- caso comum de quem reinstalou o app ou trocou
     // de aparelho. Antes de desistir, tenta restaurar a compra existente.
@@ -4064,7 +3775,6 @@ async function iniciarCompraAssinatura(){
       return;
     }
     if (!cancelou){
-      window.dbgConta && window.dbgConta('iniciarCompraAssinatura FALHOU: ' + (e && (e.name + ' ' + e.message)));
       billingMsg(_billingTexto('pro.compraErro', 'Não foi possível concluir a compra. Tente de novo.', 'Could not complete the purchase. Try again.'));
     }
   } finally {
@@ -4188,25 +3898,6 @@ function trialAtivo(){
   return false;
 }
 window.trialAtivo = trialAtivo;
-
-// DEBUG (pedido do usuario: "avancando o dia parece que o teste gratis
-// nao acaba") -- nao e' bug, e' esperado: trialAtivo() compara com
-// Date.now() (relogio de verdade do aparelho), enquanto "avancar dia"
-// (window.avancarDia(), bloco DATA EFETIVA DO APP) so soma um offset
-// pra logica de streak/tarefa diaria, sem tocar no relogio real. Pra
-// testar o expirar do teste gratis sem esperar 7 dias de verdade, usa
-// isto no Console do navegador (com o app aberto):
-//   window.expirarTrialAgora() -- forca trialAtivo() a virar false JA,
-//   mantendo trialSalvo() != null (mesmo estado de "ja usei o teste,
-//   expirou" que aconteceria organicamente).
-window.expirarTrialAgora = function(){
-  const t = trialSalvo();
-  if (!t) { console.log('Nenhum teste gratis registrado nesta conta ainda.'); return; }
-  t.fim = Date.now() - 1000;
-  salvarTrial(t);
-  console.log('Teste gratis expirado manualmente (so pra teste).');
-  if (typeof render === 'function') render();
-};
 
 function diasRestantesTrial(){
   const t = trialSalvo();
@@ -4400,10 +4091,8 @@ function verificarDesbloqueiosTemaArena(){
       // comentario "SINCRONIZACAO defensiva" perto dela), entao a trava
       // tem que estar no ponto que os dois passam, nao duplicada em cada
       // chamador.
-      debugEstagio('verificarDesbloqueiosTemaArena: estagio ' + estagioReal + ' ainda nao foi celebrado, chamando viajarParaTemaEstagio()');
       viajarParaTemaEstagio();
     } else {
-      debugEstagio('verificarDesbloqueiosTemaArena: marcou tema(s) retroativamente, mas o estagio atual ja foi celebrado -- nao reabre a cerimonia');
     }
   }
 }
@@ -4508,7 +4197,6 @@ function renderTemaArena(){
     // EXIBIDO no momento (isso e responsabilidade separada, do swipe).
     const estagioReal = estagioAtual();
     if (estagioReal > estagioCerimoniaMostradaAte()){
-      debugEstagio('renderTemaArena() detectou estagio ' + estagioReal + ' ainda nao celebrado -- chamando viajarParaTemaEstagio() (com cerimonia)');
       if (typeof viajarParaTemaEstagio === 'function'){
         viajarParaTemaEstagio();
         // sai cedo -- o resto desta funcao (mais abaixo) reseta
@@ -4798,30 +4486,6 @@ window.mudarTemaArena = mudarTemaArena;
 // aqui. Coreografia pedida pelo usuario: heroi corre pra fora de cena
 // (direita) -> troca o fundo enquanto ele esta fora -> heroi corre de
 // volta (entrando pela esquerda), como se tivesse chegado num lugar novo.
-// Painel de debug VISIVEL NA TELA (nao so console.log) pro Sistema de
-// Estagios -- pedido depois que o usuario relatou "ainda sem animacao/
-// popup" testando no CELULAR, onde abrir o console do navegador nao e
-// pratico. Escreve no #estagioDebugPanel (so visivel em modo-debug,
-// mesmo gate que .debugbar).
-//
-// FIX (pedido do usuario: "tira o console dos estagios") -- o
-// console.log rodava SEMPRE, pra qualquer jogador, mesmo fora do modo
-// debug (poluindo o console de quem abrisse o devtools por qualquer
-// outro motivo). Agora so loga no console quando o painel visivel
-// tambem existe -- ou seja, so em modo debug, os dois juntos.
-function debugEstagio(msg){
-  const painel = document.getElementById('estagioDebugPanel');
-  if (!painel) return;
-  console.log('[ESTAGIO-DEBUG]', msg);
-  const hora = new Date().toLocaleTimeString('pt-BR', { hour12:false, minute:'2-digit', second:'2-digit', fractionalSecondDigits:3 });
-  const linha = document.createElement('div');
-  linha.textContent = hora + ' ' + msg;
-  painel.appendChild(linha);
-  painel.scrollTop = painel.scrollHeight;
-  // limite de 40 linhas -- evita o painel crescer pra sempre numa sessao de teste longa
-  while (painel.children.length > 40) painel.removeChild(painel.firstChild);
-}
-window.debugEstagio = debugEstagio;
 
 // REESCRITA (pedido do usuario, comparando com video de referencia de
 // outro app): em vez do heroi deslizar DENTRO do card pequeno da Arena
@@ -4834,18 +4498,17 @@ window.debugEstagio = debugEstagio;
 // heroi saindo/entrando com timers separados, e o card pequeno nunca
 // mais precisa lidar com sobreposicao de sprite nenhuma.
 function viajarParaTemaEstagio(){
-  debugEstagio('viajarParaTemaEstagio() chamada. _arenaBgEmTransicao=' + _arenaBgEmTransicao);
   if (typeof TEMAS_ARENA === 'undefined' || typeof estagioAtual !== 'function'){
-    debugEstagio('saiu cedo: TEMAS_ARENA ou estagioAtual indefinidos');
     return;
   }
   const temaAlvo = TEMAS_ARENA[estagioAtual() - 1];
   if (!temaAlvo){
-    debugEstagio('saiu cedo: temaAlvo nao encontrado pra estagioAtual()=' + estagioAtual());
     return;
   }
   if (temaArenaSalvo() === temaAlvo.id){
-    debugEstagio('saiu cedo: temaArenaSalvo() ja e ' + temaAlvo.id + ' -- nada a fazer');
+    return;
+  }
+  if (window._recompensaVoando){
     return;
   }
   if (_vitoriaSequenciaEmAndamento){
@@ -4858,7 +4521,6 @@ function viajarParaTemaEstagio(){
     // vitoria terminar (mostrarBauEContadores() zera a flag), o proximo
     // render() vai chamar viajarParaTemaEstagio() de novo e a cerimonia
     // abre normalmente, so que depois do bau.
-    debugEstagio('saiu cedo: vitoria do dia em andamento -- cerimonia de estagio adiada');
     return;
   }
   if (_arenaBgEmTransicao){
@@ -4870,11 +4532,9 @@ function viajarParaTemaEstagio(){
     // essa troca acontecer adiantada em vez de sincronizada com a tela.
     // Persistencia + pintura agora sao atomicas, dentro de
     // mostrarEstagioDesbloqueado() (ver BUG CORRIGIDO la).
-    debugEstagio('ja em transicao -- ignorando chamada duplicada');
     return;
   }
 
-  debugEstagio('abrindo tela cheia pra ' + temaAlvo.id);
   _arenaBgEmTransicao = true;
   atualizarTravaTransicaoEstagio();
 
@@ -4885,7 +4545,6 @@ function viajarParaTemaEstagio(){
   const seguranca = setTimeout(() => {
     if (finalizado) return;
     finalizado = true;
-    debugEstagio('REDE DE SEGURANCA disparou (8s sem terminar) -- forcando reset');
     if (typeof fecharEstagioTelaCompleta === 'function') fecharEstagioTelaCompleta();
     _arenaBgEmTransicao = false;
     atualizarTravaTransicaoEstagio();
@@ -4925,23 +4584,18 @@ function viajarParaTemaEstagio(){
     clearTimeout(seguranca);
     _arenaBgEmTransicao = false;
     atualizarTravaTransicaoEstagio();
-    debugEstagio('viagem finalizada normalmente, _arenaBgEmTransicao voltou pra false');
   };
 
-  debugEstagio('fundo trocado (escondido). enfileirarPopup existe=' + (typeof window.enfileirarPopup === 'function') + ', mostrarEstagioDesbloqueado existe=' + (typeof window.mostrarEstagioDesbloqueado === 'function'));
   if (typeof window.enfileirarPopup === 'function' && typeof window.mostrarEstagioDesbloqueado === 'function'){
     window.enfileirarPopup(prox => {
-      debugEstagio('funcao da fila de popups executando -- chamando mostrarEstagioDesbloqueado() (tela cheia) agora');
       try {
         window.mostrarEstagioDesbloqueado(temaAlvo, () => { finalizarViagem(); prox(); });
       } catch(e){
-        debugEstagio('ERRO ao chamar mostrarEstagioDesbloqueado(): ' + (e && e.message));
         finalizarViagem();
         prox();
       }
     });
   } else {
-    debugEstagio('fallback SEM tela cheia tomado -- enfileirarPopup ou mostrarEstagioDesbloqueado nao existem');
     finalizarViagem();
   }
 }
@@ -5939,10 +5593,14 @@ function alternar(i){
   // que so estava corrigido pra ele. NAO suprime quando vai ter
   // level-up: esse caminho chama mostrarNivelUp() e nao tem voo, quer
   // o contador atualizado na hora.
-  const suprimirContadores = ehGolpeFinal || !subiuNivel;
-  if (suprimirContadores) window._adiarContadoresRecompensa = true;
+  // PEDIDO DO USUARIO: level-up e cerimonia de estagio so aparecem DEPOIS da animacao
+  // do +XP/+moedas (antes cortavam o voo). Contadores sempre adiados; popups seguram em
+  // _recompensaVoando (ver viajarParaTemaEstagio) e abrem no fim da animacao.
+  const suprimirContadores = true;
+  if (!ehGolpeFinal) window._recompensaVoando = true;
+  window._adiarContadoresRecompensa = true;
   render();
-  if (suprimirContadores) window._adiarContadoresRecompensa = false; // so vale por ESSE render() -- o de dentro da sequencia atrasada (mostrarBauEContadores) roda com a flag ja desligada
+  window._adiarContadoresRecompensa = false; // so vale por ESSE render() -- o de dentro da sequencia atrasada (mostrarBauEContadores) roda com a flag ja desligada
 
   if (ehGolpeFinal){
     // BUG CORRIGIDO (relatado pelo usuario: "animacao do monstro morrendo
@@ -5971,10 +5629,18 @@ function alternar(i){
   }
   if (!venceuAgora) derrotadoEm = null;
 
-  if (subiuNivel){
-    if (typeof mostrarNivelUp === 'function') mostrarNivelUp(nivelDepois);
-  }
-  else voarRecompensaFinal(xpGanho, moedasGanhas, () => render()); // mesmo voo de icones do golpe final, barra so anda quando ele chega (aoTerminar)
+  // voo -> "+X" -> contadores; so entao (folga p/ ler o "+X") libera level-up e estagio
+  voarRecompensaFinal(xpGanho, moedasGanhas, () => {
+    render();
+    setTimeout(() => {
+      window._recompensaVoando = false;
+      if (subiuNivel){
+        if (typeof window.enfileirarPopup === 'function' && typeof mostrarNivelUp === 'function') window.enfileirarPopup(prox => mostrarNivelUp(nivelDepois, prox));
+        else if (typeof mostrarNivelUp === 'function') mostrarNivelUp(nivelDepois);
+      }
+      render(); // re-checa estagio (viajarParaTemaEstagio foi adiado) -- entra na fila depois do level-up
+    }, 900);
+  });
   return true;
 }
 
@@ -6162,7 +5828,6 @@ function criar(){
   else if (modo === 'mensal') tarefas.push({ texto, tipo:'mensal', diaMes:diaMesEscolhido, feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined, categoriaId: categoriaEscolhida || undefined });
   else if (modo === 'anual') tarefas.push({ texto, tipo:'anual', diaAno:diaAnoEscolhido, mesAno:mesAnoEscolhido, feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined, categoriaId: categoriaEscolhida || undefined });
   else tarefas.push({ texto, tipo:'repete', dias:[...diasEscolhidos], feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined, categoriaId: categoriaEscolhida || undefined });
-  window.dbgConta && window.dbgConta('criar() -- tarefa "' + texto + '" adicionada | uidAtivo=' + (typeof _uidAtivo!=='undefined'?_uidAtivo:'?') + ' | chave=' + (typeof chaveSaveAtual==='function'?chaveSaveAtual():'?') + ' | tarefas agora: ' + tarefas.length);
 
   input.value = '';
   input.blur();
@@ -6340,26 +6005,6 @@ input.addEventListener('keydown', e => { if (e.key === 'Enter') criar(); });
 // o botao que sobrou na zona de risco (#excluirContaBtn) tem seu proprio
 // bloco de JS self-contained perto de #excluirContaOverlay.
 
-document.getElementById('debugbtn').onclick = () => {
-  const doDia = tarefas.filter(ehDeHoje);
-  const escapou = doDia.length > 0 && doDia.some(t => !feitaHoje(t));
-  const nomeFujao = monstroDoDia().nome;
-
-  const avancar = () => {
-    avancarDia();                       // persiste o novo dia
-    document.getElementById('mobSprite').classList.remove('fugiu');
-    render();
-    if (escapou) aviso(nomeFujao.toUpperCase() + (idiomaApp() === 'en' ? ' FLED' : ' FUGIU'), false, true);
-    else aviso((idiomaApp() === 'en' ? 'ADVANCED TO ' : 'AVANCOU PARA ') + nomeDiaLocal(diaDaSemana()).toUpperCase());
-  };
-
-  if (escapou){
-    document.getElementById('mobSprite').classList.add('fugiu');
-    setTimeout(avancar, 560);
-  } else {
-    avancar();
-  }
-};
 
 // ---------- nome do heroi ----------
 // HISTORICO: nome do heroi ("a" no print -- nome curto usado em teste)
@@ -7394,12 +7039,10 @@ document.querySelectorAll('#nav button').forEach(b => {
 });
 
 // ---------- inicio ----------
-window.dbgConta && window.dbgConta('BOOT: antes do carregar() automatico -- uidAtivo=' + _uidAtivo + ' | chave=' + chaveSaveAtual());
 if (carregar()){
   jaComecou = true;
   document.getElementById('intro').classList.add('off');
 }
-window.dbgConta && window.dbgConta('BOOT: depois do carregar() automatico -- tarefas: ' + tarefas.length + ' [' + tarefas.map(t=>t.texto).join(', ') + ']');
 
 // BUG REAL ENCONTRADO E CORRIGIDO (confirmado com log real do usuario,
 // nao suposicao): existe uma janela de 9-11 SEGUNDOS entre a pagina
@@ -7455,7 +7098,6 @@ window.dbgConta && window.dbgConta('BOOT: depois do carregar() automatico -- tar
   const timerRedeLenta = setTimeout(function(){
     if (jaResolvido) return;
     if (typeof window.mostrarLoadingMasmorra === 'function') window.mostrarLoadingMasmorra();
-    window.dbgConta && window.dbgConta('overlay de sessao ficou visivel -- rede lenta (> ' + LIMIAR_REDE_LENTA_MS + 'ms)');
   }, LIMIAR_REDE_LENTA_MS);
 
   window.confirmarSessaoResolvida = function(){
@@ -7465,7 +7107,6 @@ window.dbgConta && window.dbgConta('BOOT: depois do carregar() automatico -- tar
     const el = document.getElementById('aguardandoSessaoOverlay');
     if (el) el.remove();
     if (typeof window.esconderLoadingMasmorra === 'function') window.esconderLoadingMasmorra();
-    window.dbgConta && window.dbgConta('overlay de confirmacao de sessao removido');
   };
   setTimeout(window.confirmarSessaoResolvida, 8000); // teto de seguranca -- rede ruim/offline nao trava o app pra sempre
 })();
@@ -9065,36 +8706,6 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   const LIMIAR_TOQUE = 18;     // px de tolerancia antes de virar "e so um scroll"
   const ATRASO_LONGPRESS = 220; // ms segurando parado ate armar o arrasto
 
-  // ------------------------------------------------------------------
-  // DEBUG TEMPORARIO DO ARRASTO -- painel fixo no topo mostrando o ciclo
-  // de vida real do gesto (pointerdown/timer/iniciarArrasto/cancel/solta)
-  // com timestamp relativo em ms. Existe so pra diagnosticar por que o
-  // arrasto nao esta engatando num aparelho real especifico -- duas
-  // tentativas anteriores (tap-highlight-color, LIMIAR_TOQUE) nao
-  // resolveram, entao em vez de arriscar um 3o palpite as cegas, este
-  // bloco captura o que REALMENTE acontece no toque real. REMOVER (ou
-  // trocar DEBUG_ARRASTO pra false) depois de diagnosticado -- nao e
-  // feature, e ferramenta de sessao.
-  const DEBUG_ARRASTO = false; // confirmado no log: ciclo de arrasto correto, sem pointercancel -- "pisca" era so toques rapidos repetidos, nao bug. Painel desligado de novo.
-  let dbgT0 = 0, dbgLinhas = [];
-  let dbgPainel = null;
-  function dbgArrasto(msg){
-    if (!DEBUG_ARRASTO) return;
-    if (!dbgPainel){
-      dbgPainel = document.createElement('div');
-      dbgPainel.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;'
-        + 'background:rgba(0,0,0,.88);color:#0f0;font:10px/1.4 monospace;'
-        + 'padding:6px 8px;max-height:38vh;overflow-y:auto;pointer-events:none;'
-        + 'white-space:pre-wrap;border-bottom:2px solid #0f0';
-      document.body.appendChild(dbgPainel);
-    }
-    if (!dbgT0) dbgT0 = performance.now();
-    const t = Math.round(performance.now() - dbgT0);
-    dbgLinhas.push('+' + t + 'ms  ' + msg);
-    if (dbgLinhas.length > 40) dbgLinhas.shift();
-    dbgPainel.textContent = dbgLinhas.join('\n');
-  }
-  // ------------------------------------------------------------------
 
   let dragEl = null, placeholder = null, offX = 0, offY = 0, pid = null;
   let pendente = null;   // { task, startX, startY, timer }
@@ -9220,7 +8831,6 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   }
 
   function iniciarArrasto(task, e){
-    dbgArrasto('iniciarArrasto() rodando -- dragEl vai ser setado, position:fixed aplicado');
     pid = e.pointerId;
     const r = task.getBoundingClientRect();
     offX = e.clientX - r.left; offY = e.clientY - r.top;
@@ -9249,7 +8859,6 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   }
 
   list.addEventListener('pointerdown', e => {
-    dbgArrasto('pointerdown recebido em .task? ' + !!e.target.closest('.task') + ' (pointerType=' + e.pointerType + ')');
     if (e.target.closest('.del') || e.target.closest('.box')) return;
     const task = e.target.closest('.task');
     if (!task) return;
@@ -9257,7 +8866,6 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     pendente = {
       task, startX, startY, lastY: startY, veloc: 0,
       timer: setTimeout(() => {
-        dbgArrasto('timer de ' + ATRASO_LONGPRESS + 'ms disparou -- chamando iniciarArrasto()');
         if (pendente) iniciarArrasto(task, e);
         pendente = null;
       }, ATRASO_LONGPRESS)
@@ -9280,7 +8888,6 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     if (pendente.timer && (Math.abs(dx) > LIMIAR_TOQUE || Math.abs(dy) > LIMIAR_TOQUE)){
       // virou scroll, nao arrasto: cancela o long-press mas mantem a pendencia
       // rolando a lista manualmente (touch-action:none tira isso do navegador)
-      dbgArrasto('CANCELADO por movimento -- dx=' + Math.round(dx) + ' dy=' + Math.round(dy) + ' (limiar=' + LIMIAR_TOQUE + 'px)');
       clearTimeout(pendente.timer);
       pendente.timer = null;
     }
@@ -9304,7 +8911,6 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   }
 
   function soltar(e){
-    dbgArrasto('soltar() chamado (tipo=' + e.type + ') -- dragEl existia? ' + !!dragEl);
     if (pendente && !pendente.timer) soltarComoScroll();
     limparPendente();
     if (!dragEl || e.pointerId !== pid) return;
@@ -9350,9 +8956,9 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     if (categoriaMudou && typeof render === 'function') render();
   }
   list.addEventListener('pointerup', soltar);
-  list.addEventListener('pointercancel', e => { dbgArrasto('!!! pointercancel recebido !!!'); soltar(e); });
+  list.addEventListener('pointercancel', e => {  soltar(e); });
   list.addEventListener('pointerup', limparPendente);
-  list.addEventListener('pointerleave', e => { dbgArrasto('pointerleave no #list (pendente ainda existia? ' + !!pendente + ')'); limparPendente(); });
+  list.addEventListener('pointerleave', e => {  limparPendente(); });
 })();
 </script>
 
@@ -9645,15 +9251,6 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     pintar();
   };
 
-  // o botao de depuracao avanca o dia: reavalia a virada depois dele
-  const btn = document.getElementById('debugbtn');
-  if (btn){
-    const _dbg = btn.onclick;
-    btn.onclick = function(e){
-      if (_dbg) _dbg.call(this, e);
-      setTimeout(verificarVirada, 620);
-    };
-  }
 
   // "apagar tudo" (CHAVE_VIDA incluida) agora e feito num lugar so, na
   // folha de confirmacao -- ver "CONFIRMAR APAGAR TUDO EM FOLHA" perto do
@@ -9720,15 +9317,6 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   // app aberto atravessando a meia-noite
   setInterval(checar, 30000);
 
-  // o botao de depuracao ja avanca e redesenha sozinho: so sincroniza o "visto"
-  const btn = document.getElementById('debugbtn');
-  if (btn){
-    const _dbg = btn.onclick;
-    btn.onclick = function(e){
-      if (_dbg) _dbg.call(this, e);
-      setTimeout(() => { visto = isoAtual(); }, 700);
-    };
-  }
 
   window.checarDia = checar;
 })();
@@ -11251,7 +10839,6 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     // renderTemaArena() ficariam tentando chamar isso pra sempre, sem
     // nunca resolver (silencioso, mas desperdicio).
     if (typeof temaArenaSalvo === 'function' && temaArenaSalvo() === tema.id){
-      debugEstagio('mostrarEstagioDesbloqueado: tema ja e ' + tema.id + ' -- ignorando chamada (guard redundante)');
       if (typeof estagioAtual === 'function' && typeof definirEstagioCerimoniaMostradaAte === 'function'){
         definirEstagioCerimoniaMostradaAte(estagioAtual());
       }
@@ -11281,7 +10868,6 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
         definirEstagioCerimoniaMostradaAte(estagioAtual());
       }
     } catch(e){
-      debugEstagio('ERRO ao persistir o tema (mostrarEstagioDesbloqueado): ' + (e && e.message));
     }
     const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
     const heroImg = (typeof heroiAtual === 'function') ? heroiAtual().img : '';
@@ -11363,7 +10949,6 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       try {
         if (typeof renderTemaArena === 'function') renderTemaArena();
       } catch(e){
-        debugEstagio('ERRO ao pintar o fundo (mostrarEstagioDesbloqueado): ' + (e && e.message));
       }
     }, 350);
   }
@@ -12093,22 +11678,6 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   // Loja/Vida/Atributos: como addEventListener em zerarbtn, disparava so
   // de abrir a folha, resetando o tutorial mesmo se o usuario cancelasse.
 
-  // debug: pular todos os dialogos de uma vez. So pra testar sem precisar
-  // clicar 2x no overlay toda hora que "apagar tudo" reseta o tutorial
-  // junto -- nao muda o comportamento real do reset (continua mostrando o
-  // tutorial de novo pro jogador de verdade). Botao vive na .debugbar,
-  // mesmo lugar do "proximo dia". Precisa estar AQUI dentro (nao da pra
-  // envolver por fora): vistas/salvarVistas/overlay/fechar sao locais
-  // desta IIFE, nenhuma delas exposta em window.
-  const btnPularTutoriais = document.getElementById('pularTutoriaisBtn');
-  if (btnPularTutoriais){
-    btnPularTutoriais.onclick = () => {
-      Object.keys(DIALOGOS).forEach(k => { vistas[k] = true; });
-      salvarVistas();
-      overlay.classList.remove('on');
-      abaPendente = null;
-    };
-  }
 })();
 </script>
 
@@ -12947,14 +12516,6 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   }
 
   window.totalTarefasConcluidas = function(){ return total; };
-  // DEBUG apenas: forca o contador lifetime pra um valor especifico, sem
-  // mexer em XP/moeda/tarefas reais -- usado pelo botao de debug
-  // "forcar estagio" pra testar o Sistema de Estagios sem precisar
-  // completar 30+ tarefas de verdade em sessoes reais.
-  window._debugDefinirTotalTarefas = function(n){
-    total = Math.max(0, Math.round(n));
-    persistir();
-  };
 
   // chamado por puxarNuvem() apos restaurar CHAVE_CONCLUIDAS vinda da
   // nuvem -- mesmo motivo do vidaHeroi.recarregar() (ver bloco VIDA DO
@@ -14194,7 +13755,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // Silenciar um botao de proposito: atributo data-sem-feedback nele ou no pai.
   document.addEventListener('click', function(e){
     const t = e.target && e.target.closest ? e.target.closest('button, [role="button"], .cfgrow, .opcao, .catchip, .cattab') : null;
-    if (!t || t.disabled || t.closest('[data-sem-feedback], .debug-el')) return;
+    if (!t || t.disabled || t.closest('[data-sem-feedback]')) return;
     const antes = window.__fbN || 0;
     setTimeout(function(){
       if ((window.__fbN || 0) === antes) window.feedbackClique('clique', 10);
@@ -16443,9 +16004,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // fecha esse buraco pra quem cai no fallback.
     try {
       const redirectResult = await getRedirectResult(auth);
-      window.dbgConta && window.dbgConta('getRedirectResult() no boot -- teve resultado? ' + !!redirectResult);
     } catch(e){
-      window.dbgConta && window.dbgConta('getRedirectResult() no boot FALHOU: ' + e.code + ' -- ' + e.message);
     }
 
     // PRO VITALICIO MANUAL, versao servidor (pedido do usuario: conta de
@@ -16469,26 +16028,15 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     window.assinaturaServidorAtiva = () => _assinaturaServidorAte > Date.now();
     window.assinaturaJaTeveServidor = () => !!_assinaturaProduto; // doc entitlements tem assinaturaProduto mesmo vencida
     window.assinaturaServidorExpiraEm = () => _assinaturaServidorAte;
-    // DEBUG (pedido do usuario: testar o app sem PRO sem esperar o teste
-    // gratis expirar de verdade, ja que cancelar de verdade so vai
-    // existir via Google Play). So zera o CACHE em memoria desta aba --
-    // nao apaga o doc entitlements/{uid} no Firestore (o client nem
-    // pode, write e' sempre negado, ver firestore.rules), entao um
-    // proximo login/reload volta a puxar o valor real de la. Usado pelo
-    // botao #debugCancelarAssinaturaBtn (#contaOverlay, so aparece com
-    // modo debug ligado -- clique nas moedas).
-    window.forcarProVitalicioServidorOffDebug = function(){ _proVitalicioServidor = false; _assinaturaServidorAte = 0; _assinaturaProduto = ''; };
     async function puxarEntitlement(uid){
       try {
         const snap = await getDoc(doc(db, 'entitlements', uid));
         _proVitalicioServidor = snap.exists() && snap.data().proVitalicio === true;
         _assinaturaServidorAte = snap.exists() ? (Number(snap.data().assinaturaAte) || 0) : 0;
         _assinaturaProduto = snap.exists() ? String(snap.data().assinaturaProduto || '') : '';
-        window.dbgConta && window.dbgConta('puxarEntitlement(' + uid.slice(0,6) + ') -- proVitalicio=' + _proVitalicioServidor + ' | doc existe? ' + snap.exists() + (snap.exists() ? (' | campos: ' + JSON.stringify(snap.data())) : ''));
       } catch(e){
         // se falhar (offline, doc nao existe, regra etc.) mantem false --
         // nunca libera PRO por erro, so por doc existente de verdade.
-        window.dbgConta && window.dbgConta('puxarEntitlement(' + uid.slice(0,6) + ') FALHOU: ' + e.code + ' -- ' + e.message);
       }
       // FIX (pedido do usuario, testando com a conta de revisor): esta
       // funcao roda em PARALELO dentro de puxarNuvem() (comentario acima),
@@ -16519,13 +16067,11 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       if (temSujo(uid)){
         // ha alteracao local que nunca chegou na nuvem: o local e o mais
         // novo. Empurra (nuvem fica igual ao local) em vez de sobrescrever.
-        window.dbgConta && window.dbgConta('puxarNuvem(' + uid.slice(0,6) + ') -- marcador SUJO: mantendo save local e reenviando pra nuvem');
         await empurrarNuvem(uid);
         return;
       }
       const snap = await getDoc(ref);
       // (puxarEntitlement ja disparado acima) paralelo, nao bloqueia o resto de puxarNuvem() -- so precisa terminar antes da 1a checagem de assinaturaAtiva()/paywall, o que na pratica sempre acontece bem depois
-      window.dbgConta && window.dbgConta('puxarNuvem(' + uid.slice(0,6) + ') -- doc existe na nuvem? ' + snap.exists() + (snap.exists() ? (' | tamanho do data: ' + (snap.data().data||'').length) : ''));
       if (snap.exists() && snap.data().data) {
         try { localStorage.setItem(window.chaveSaveAtual(), snap.data().data); } catch(e){}
       }
@@ -16601,12 +16147,9 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           const v = localStorage.getItem(window.chaveConta(chaveBase));
           if (v !== null) extras[chaveBase] = v;
         });
-        window.dbgConta && window.dbgConta('empurrarNuvem(' + uid.slice(0,6) + ') INICIOU -- chave lida: ' + window.chaveSaveAtual() + ' | tamanho: ' + dados.length + ' | extras: ' + Object.keys(extras).length);
         await setDoc(doc(db, 'saves', uid), { data: dados, extras: extras, atualizadoEm: Date.now() });
         if (seqInicio === _seqSalvar){ try { localStorage.removeItem(chaveSujo(uid)); } catch(e){} }
-        window.dbgConta && window.dbgConta('empurrarNuvem(' + uid.slice(0,6) + ') TERMINOU com sucesso');
       } catch(e){
-        window.dbgConta && window.dbgConta('empurrarNuvem(' + uid.slice(0,6) + ') FALHOU: ' + e.message);
       }
     }
     // v4.125: watchdog leve que confere emailVerified a cada 60s DENTRO
@@ -16779,7 +16322,6 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       const contaNova = !!(user.metadata &&
         user.metadata.creationTime === user.metadata.lastSignInTime);
 
-      window.dbgConta && window.dbgConta('aoLogar() rodando -- uid=' + user.uid.slice(0,6) + ' | contaNova=' + contaNova + ' | tarefas na memoria ANTES de tudo: ' + (typeof tarefas !== 'undefined' ? tarefas.length : '?') + ' [' + (typeof tarefas !== 'undefined' ? tarefas.map(t=>t.texto).join(', ') : '') + ']');
 
       // v4.126 (mudanca de decisao pedida pelo usuario, revertendo a
       // escolha original do item 34): agora bloqueia JA NO CADASTRO,
@@ -16804,7 +16346,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         return;
       }
 
-      window.__emailDebugAtivo = user.emailVerified ? (user.email || '') : ''; window.definirUidAtivo(user.uid);
+      window.definirUidAtivo(user.uid);
 
       // BUG REAL ENCONTRADO E CORRIGIDO (testado pelo usuario, nao
       // suposicao): a migracao abaixo rodava pra TODA conta nova que
@@ -16856,16 +16398,13 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
       try {
         await puxarNuvem(user.uid);
-        window.dbgConta && window.dbgConta('puxarNuvem() terminou. Chave lida: ' + window.chaveSaveAtual() + ' | bruto no localStorage agora: ' + (localStorage.getItem(window.chaveSaveAtual()) || '').slice(0,200));
       } catch(e){
         console.error('QuestLog/Firebase: puxar da nuvem falhou, login segue so com dados locais', e);
-        window.dbgConta && window.dbgConta('puxarNuvem() FALHOU: ' + e.message);
       }
 
       const nomeConta = reconectarEnvio(user);
 
       const temSaveLocal = typeof window.carregar === 'function' && window.carregar();
-      window.dbgConta && window.dbgConta('carregar() retornou ' + temSaveLocal + ' | tarefas na memoria DEPOIS: ' + (typeof tarefas !== 'undefined' ? tarefas.length : '?') + ' [' + (typeof tarefas !== 'undefined' ? tarefas.map(t=>t.texto).join(', ') : '') + ']');
 
       // finaliza de verdade: some com a tela de login/boas-vindas e
       // entra no app (se ja tinha save) ou no onboarding (conta nova)
@@ -17052,7 +16591,6 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // pro raciocinio completo dessa escolha.
     async function aoLogarSilencioso(user){
       if (typeof window.confirmarSessaoResolvida === 'function') window.confirmarSessaoResolvida();
-      window.dbgConta && window.dbgConta('!!! aoLogarSilencioso() rodando (NAO aoLogar) -- uid=' + user.uid.slice(0,6) + ' -- ATENCAO: esse caminho NAO chama carregar() nem puxarNuvem(). tarefas na memoria neste instante: ' + (typeof tarefas !== 'undefined' ? tarefas.length : '?') + ' [' + (typeof tarefas !== 'undefined' ? tarefas.map(t=>t.texto).join(', ') : '') + ']');
       const contaNovaOBastante = !!(user.metadata &&
         new Date(user.metadata.creationTime).getTime() > DATA_CORTE_VERIFICACAO_EMAIL);
       const precisaVerificar = !user.emailVerified && contaNovaOBastante;
@@ -17066,14 +16604,14 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         // coisa por baixo, o suficiente na pratica mesmo sem ser um
         // gate "puro" antes do primeiro paint.
         bloquearPorEmailNaoVerificado(user, () => {
-          window.__emailDebugAtivo = user.emailVerified ? (user.email || '') : ''; window.definirUidAtivo(user.uid);
+          window.definirUidAtivo(user.uid);
           reconectarEnvio(user);
           puxarPlanoSilencioso(user.uid);
         });
         return;
       }
 
-      window.__emailDebugAtivo = user.emailVerified ? (user.email || '') : ''; window.definirUidAtivo(user.uid);
+      window.definirUidAtivo(user.uid);
       reconectarEnvio(user);
       puxarPlanoSilencioso(user.uid);
     }
@@ -17092,7 +16630,6 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     onAuthStateChanged(auth, user => {
         if (!user) return;
         const passoLoginOn = !!(passoLogin && passoLogin.classList.contains('on'));
-        window.dbgConta && window.dbgConta('onAuthStateChanged disparou -- uid=' + user.uid.slice(0,6) + ' | #passoLogin tem .on? ' + passoLoginOn + ' -> vai chamar ' + (passoLoginOn ? 'aoLogar (normal)' : 'aoLogarSilencioso'));
         if (passoLoginOn) {
           aoLogar(user).catch(e => console.error('QuestLog/Firebase: aoLogar() falhou', e));
         } else {
@@ -17462,8 +16999,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     if (!resumoAssinatura) return;
     let emIngles = false;
     try { emIngles = (localStorage.getItem('questlog.idioma.v1') || 'pt') === 'en'; } catch(e){}
-    const vitalicio = (typeof proVitalicioAtivo === 'function' && proVitalicioAtivo())
-      || (typeof window.proVitalicioServidorAtivo === 'function' && window.proVitalicioServidorAtivo());
+    const vitalicio = (typeof window.proVitalicioServidorAtivo === 'function' && window.proVitalicioServidorAtivo());
     const emTrial = (typeof trialAtivo === 'function' && trialAtivo());
     if (vitalicio){
       resumoAssinatura.textContent = emIngles ? 'PRO active (lifetime)' : 'PRO ativo (vitalício)';
@@ -17481,8 +17017,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   function atualizarLinhaCancelarPlay(){
     if (!linhaCancelarPlay) return;
     const sku = (typeof window.assinaturaProdutoServidor === 'function') ? window.assinaturaProdutoServidor() : '';
-    const vitalicio = (typeof proVitalicioAtivo === 'function' && proVitalicioAtivo())
-      || (typeof window.proVitalicioServidorAtivo === 'function' && window.proVitalicioServidorAtivo());
+    const vitalicio = (typeof window.proVitalicioServidorAtivo === 'function' && window.proVitalicioServidorAtivo());
     let emIngles = false;
     try { emIngles = (localStorage.getItem('questlog.idioma.v1') || 'pt') === 'en'; } catch(e){}
     const txt = document.getElementById('cfgCancelarPlayTxt');
@@ -17500,34 +17035,6 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   if (linhaAssinatura) linhaAssinatura.onclick = () => {
     const temPro = (typeof assinaturaAtiva === 'function' && assinaturaAtiva());
     if (!temPro && typeof window.abrirPaywall === 'function') window.abrirPaywall('conta');
-  };
-
-  // DEBUG -- "Cancelar assinatura (debug)" (pedido do usuario: testar as
-  // telas de "sem PRO" sem esperar o teste gratis expirar de verdade nem
-  // depender de cancelar pela Google Play, que ainda nem existe de
-  // verdade aqui). So visivel com modo debug ligado (.debug-el, ver CSS).
-  // Zera as 3 fontes que assinaturaAtiva() consulta:
-  //   1. teste gratis (expirarTrialAgora(), bloco TESTE GRATIS)
-  //   2. PRO vitalicio LOCAL (revogarProVitalicio(), bloco PRO VITALICIO MANUAL)
-  //   3. cache em memoria do PRO vitalicio do SERVIDOR
-  //      (forcarProVitalicioServidorOffDebug(), bloco AUTH/Firebase --
-  //      NAO apaga o doc entitlements/{uid} de verdade, so a leitura ja
-  //      feita nesta aba; um proximo login volta a puxar o valor real)
-  // Modo debug tambem faz assinaturaAtiva() retornar true direto (ver
-  // topo da funcao) -- por isso NAO desliga o modo debug sozinho aqui:
-  // se desligasse, "cancelar" reativaria o PRO na mesma hora por outro
-  // motivo, o oposto do que o botao promete.
-  const btnDebugCancelarAssinatura = document.getElementById('debugCancelarAssinaturaBtn');
-  if (btnDebugCancelarAssinatura) btnDebugCancelarAssinatura.onclick = () => {
-    if (typeof window.expirarTrialAgora === 'function') window.expirarTrialAgora();
-    if (typeof window.revogarProVitalicio === 'function') window.revogarProVitalicio();
-    if (typeof window.forcarProVitalicioServidorOffDebug === 'function') window.forcarProVitalicioServidorOffDebug();
-    window.atualizarResumoAssinatura();
-    if (typeof render === 'function') render();
-    if (typeof window.aviso === 'function'){
-      const en = (typeof idiomaApp === 'function' && idiomaApp() === 'en');
-      window.aviso(en ? '[Debug] Subscription cancelled locally' : '[Debug] Assinatura cancelada localmente');
-    }
   };
 
   btnSair.onclick = async () => {
@@ -17589,19 +17096,15 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // sucedido tenta de novo (mesmo espirito do teto de 8s ali em cima).
     try {
       if (window._questlogUltimoPush){
-        window.dbgConta && window.dbgConta('Sair: existe push pendente, esperando (teto 3s)...');
         const _inicioEspera = performance.now();
         await Promise.race([
           window._questlogUltimoPush,
           new Promise(res => setTimeout(res, 3000))
         ]);
-        window.dbgConta && window.dbgConta('Sair: espera terminou apos ' + Math.round(performance.now()-_inicioEspera) + 'ms');
       } else {
-        window.dbgConta && window.dbgConta('Sair: NENHUM push pendente encontrado (window._questlogUltimoPush vazio)');
       }
     } catch(e){}
 
-    window.dbgConta && window.dbgConta('Sair: chamando location.reload() AGORA');
     location.reload();
   };
 })();
@@ -17854,51 +17357,6 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // TESTE: todas as 5 usam o mesmo grid Slash 3 (9 frames, .42s) agora --
     // duracao unica, sem branch por classe.
     fxSpriteSlash(arena, origem, classeUsada, escala, 420);
-  }
-
-  const btnArmas = document.getElementById('debugArmasBtn');
-  if (btnArmas){
-    btnArmas.onclick = () => {
-      if (typeof ITENS === 'undefined' || typeof darItem !== 'function'){
-        console.error('debug +todas armas: ITENS ou darItem indisponivel');
-        return;
-      }
-      let qtd = 0;
-      ITENS.forEach((a, id) => {
-        // a: [spriteIdx, nome, tipo, raridade, valor, bonusMoedas, bonusXp, cura, morto]
-        if (a[2] === 'arma' && !a[8]){ // pula placeholders mortos (dead-placeholder strategy)
-          darItem(id, 1);
-          qtd++;
-        }
-      });
-      if (typeof persistir === 'function') persistir();
-      if (typeof render === 'function') render();
-      if (typeof renderInventario === 'function') renderInventario();
-      if (typeof aviso === 'function') aviso(qtd + ' ARMAS ADICIONADAS AO INVENTARIO');
-    };
-  }
-
-  const btnEstagio = document.getElementById('debugEstagioBtn');
-  if (btnEstagio){
-    btnEstagio.onclick = () => {
-      // DEBUG: pula o contador lifetime de tarefas direto pro proximo
-      // limiar de estagio (ver LIMIARES_ESTAGIO/_debugDefinirTotalTarefas),
-      // sem completar tarefa nenhuma de verdade -- so pra testar a
-      // viagem/popup do Sistema de Estagios sem grind.
-      if (typeof window._debugDefinirTotalTarefas !== 'function' || typeof window.totalTarefasConcluidas !== 'function'){
-        console.error('debug forcar estagio: _debugDefinirTotalTarefas indisponivel');
-        return;
-      }
-      const atual = window.totalTarefasConcluidas();
-      const limiares = (typeof LIMIARES_ESTAGIO !== 'undefined') ? LIMIARES_ESTAGIO : [30, 90, 200];
-      const proximo = limiares.find(v => v > atual);
-      if (proximo === undefined){
-        if (typeof aviso === 'function') aviso('JÁ ESTÁ NO ÚLTIMO ESTÁGIO');
-        return;
-      }
-      window._debugDefinirTotalTarefas(proximo);
-      if (typeof render === 'function') render();
-    };
   }
 
   const _animarGolpeOriginal = window.animarGolpe;
@@ -18423,71 +17881,6 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 </script>
 
 <!-- =====================================================================
-     TOGGLE DEBUG — clique unico no icone de moedas  —  bloco autonomo,
-     cole antes de </body>
-
-     Persistencia: localStorage['questlog.modoDebug.v1'] (boolean,
-     default false). Efeito: classe .modo-debug no <body> -- CSS decide o
-     que aparece (.debugbar e qualquer .debug-el futuro; ver style.css,
-     perto da linha 216). Mesma chave tambem controla o silenciador de
-     console (log/warn/error), instalado como primeiro bloco de script do
-     cabecalho -- ver bloco no topo do arquivo, antes do i18n. Zero
-     feedback visual no icone -- fica indistinguivel do normal de proposito.
-
-     DEBUG_ARRASTO e outras flags booleanas fixas no codigo ficam de fora
-     disso: continuam exigindo trocar a constante manualmente, porque sao
-     instrumentacao de log, nao elemento de UI pra esconder/mostrar.
-     ===================================================================== -->
-<script>
-(function(){
-  const CHAVE = 'questlog.modoDebug.v1';
-  const alvo = document.querySelector('.coins');
-  if (!alvo) return;
-
-  // flag bruta, so o que o usuario "destravou" tocando nas moedas
-  function flagLigada(){
-    try { return localStorage.getItem(CHAVE) === 'true'; } catch(e){ return false; }
-  }
-
-  // BUG/PEDIDO (revisor do Google Play testando, mas nenhum jogador
-  // comum deveria achar isso por acidente): modo debug so fica ativo de
-  // verdade se a flag estiver ligada E a conta logada estiver na
-  // allowlist (UIDS_DEBUG_PERMITIDO, ver topo do arquivo). Continua
-  // escrevendo a flag normalmente pra quem nao esta na lista (inofensivo,
-  // ela so nunca produz efeito visivel) -- assim, se essa mesma conta um
-  // dia entrar na allowlist, nao precisa tocar nas moedas de novo.
-  function lerModoDebug(){
-    return flagLigada() && (typeof window.uidTemDebugPermitido === 'function') && window.uidTemDebugPermitido();
-  }
-
-  function aplicar(ligado){
-    document.body.classList.toggle('modo-debug', ligado);
-    // pilula do item 81 (dbgContaPilula) usa display inline, que a regra
-    // .debug-el do CSS sozinha nao alcanca -- forca a repintura dela
-    // tambem, na hora, pra sumir/aparecer junto com o resto.
-    if (typeof window.__dbgContaAtualizarVisibilidade === 'function') window.__dbgContaAtualizarVisibilidade();
-  }
-
-  window.modoDebugAtivo = lerModoDebug; // exposto p/ outros blocos consultarem se precisar
-
-  aplicar(lerModoDebug()); // pintura inicial, persiste entre aberturas
-
-  // reavalia depois que o login termina (uid so fica disponivel de
-  // verdade apos aoLogar()/aoLogarSilencioso() -- ver definirUidAtivo()
-  // no topo do arquivo). Sem isso, quem abre o app deslogado e loga
-  // durante a sessao so veria o debug aparecer no proximo toque nas
-  // moedas, mesmo ja estando numa conta permitida.
-  window.__reavaliarModoDebugPosLogin = () => aplicar(lerModoDebug());
-
-  alvo.addEventListener('click', () => {
-    const novo = !flagLigada();
-    try { localStorage.setItem(CHAVE, String(novo)); } catch(e){}
-    aplicar(lerModoDebug());
-  });
-})();
-</script>
-
-<!-- =====================================================================
      ESTATISTICAS — atualizacao em tempo real (sem esperar trocar de aba)
 
      Antes disso, renderEstatisticas() so rodava quando mostrarAba() abria
@@ -18566,39 +17959,6 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
       document.querySelectorAll('.app, #app, .arena, .topbar').forEach(el => { if (el.scrollTop) el.scrollTop = 0; if (el.scrollLeft) el.scrollLeft = 0; });
     }
   }
-  // DEBUG (tela cortada na barra de navegacao): registra as medidas toda vez
-  // que mudam, pra comparar "antes do login" x "depois do login" no log.
-  let _ultMed = '';
-  function medir(motivo){
-    try {
-      const vv = window.visualViewport, app = document.querySelector('.app'), nav = document.querySelector('.nav');
-      const probe = document.createElement('div');
-      probe.style.cssText = 'position:fixed;left:0;bottom:0;width:1px;height:env(safe-area-inset-bottom,0px);visibility:hidden;pointer-events:none';
-      document.body.appendChild(probe); const inset = probe.getBoundingClientRect().height; probe.remove();
-      const ar = app ? app.getBoundingClientRect() : null, nr = nav ? nav.getBoundingClientRect() : null;
-      // fixo: caixa position:fixed top:0/bottom:0 = altura real do viewport de layout
-      const fx = document.createElement('div');
-      fx.style.cssText = 'position:fixed;left:0;top:0;bottom:0;width:1px;visibility:hidden;pointer-events:none';
-      document.body.appendChild(fx); const fixoH = Math.round(fx.getBoundingClientRect().height); fx.remove();
-      const m = 'inner=' + window.innerHeight + ' vv=' + (vv ? Math.round(vv.height) : '-') + ' client=' + document.documentElement.clientHeight +
-        ' fixo=' + fixoH + ' appH=' + document.documentElement.style.getPropertyValue('--app-h') +
-        ' screen=' + screen.height + ' inset=' + inset + ' appBottom=' + (ar ? Math.round(ar.bottom) : '-') + ' navBottom=' + (nr ? Math.round(nr.bottom) : '-');
-      if (m !== _ultMed){ _ultMed = m; window.dbgConta && window.dbgConta('medidas[' + motivo + '] ' + m); }
-    } catch(e){}
-  }
-  window.medirTela = medir;
-  setTimeout(() => medir('boot'), 1500);
-  // DEBUG (tela preta no boot): tempos de pintura e estado das fontes, pra
-  // ver no log se o 1o paint demorou (rede travada) quando acontecer de novo.
-  setTimeout(() => {
-    try {
-      const pt = {}; (performance.getEntriesByType('paint') || []).forEach(e => { pt[e.name] = Math.round(e.startTime); });
-      const nv = performance.getEntriesByType('navigation')[0];
-      window.dbgConta && window.dbgConta('boot-paint fp=' + (pt['first-paint'] || '-') + 'ms fcp=' + (pt['first-contentful-paint'] || '-') +
-        'ms domReady=' + (nv ? Math.round(nv.domContentLoadedEventEnd) : '-') + 'ms load=' + (nv ? Math.round(nv.loadEventEnd) : '-') +
-        'ms fonts=' + (document.fonts ? document.fonts.status : '-') + ' online=' + navigator.onLine);
-    } catch(e){}
-  }, 4000);
   // auto-correcao: se --app-h ficou diferente do viewport real (ex.: 895 = tela
   // inteira, sem descontar barras do sistema), refaz a medida. Antes o tick so
   // registrava; nenhum evento de resize chegava e a nav ficava cortada ate
@@ -18608,9 +17968,8 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
     const h = Math.round(vv ? vv.height : window.innerHeight);
     const atual = parseInt(document.documentElement.style.getPropertyValue('--app-h'), 10) || 0;
     if (h > 0 && atual !== h) ajustar();
-    medir('tick');
   }, 1000);
-  function agendar(e){ ajustar(); clearTimeout(t); t = setTimeout(() => { ajustar(); medir(e && e.type || 'auto'); }, 250); }
+  function agendar(e){ ajustar(); clearTimeout(t); t = setTimeout(() => { ajustar(); }, 250); }
   window.addEventListener('resize', agendar);
   window.addEventListener('orientationchange', agendar);
   window.addEventListener('focusout', () => setTimeout(agendar, 60));

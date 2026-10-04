@@ -3730,6 +3730,31 @@ function billingMsg(texto){
   el._t = setTimeout(() => el.classList.remove('on'), 4500);
 }
 
+// TESTE GRATIS so vale pra quem nunca assinou. O Play manda introductoryPrice
+// zerado pra qualquer conta e nao diz se ela e elegivel, entao o app esconde o
+// card quando ha sinal de assinatura anterior: (1) flag do aparelho, que nao
+// depende da conta do app e e gravada em toda assinatura feita aqui; (2) o doc
+// do servidor da conta tem assinaturaProduto, mesmo vencida; (3) a Google ja
+// lista uma assinatura nossa pra esta conta (_billingJaAssinouPlay).
+// Nao e perfeito (reinstalar apaga o 1); quem decide de verdade e o pop-up do Google.
+const CHAVE_JA_ASSINOU = 'questlog.playJaAssinou.v1'; // proposital: NAO usa chaveConta (vale pro aparelho)
+let _billingJaAssinouPlay = false;
+function billingMarcarJaAssinou(){ try { localStorage.setItem(CHAVE_JA_ASSINOU, '1'); } catch(e){} }
+function billingJaUsouTeste(){
+  let flag = false;
+  try { flag = localStorage.getItem(CHAVE_JA_ASSINOU) === '1'; } catch(e){}
+  const servidor = (typeof window.assinaturaJaTeveServidor === 'function') && window.assinaturaJaTeveServidor();
+  return flag || servidor || _billingJaAssinouPlay;
+}
+async function billingChecarAssinaturasPlay(){
+  try {
+    const s = await billingServico();
+    if (!s) return;
+    const compras = await s.listPurchases();
+    _billingJaAssinouPlay = (compras || []).some(x => x && (x.itemId === BILLING_SKUS.mensal || x.itemId === BILLING_SKUS.anual));
+  } catch(e){}
+}
+
 function billingDisponivel(){
   return typeof window.getDigitalGoodsService === 'function' && typeof window.PaymentRequest === 'function';
 }
@@ -3767,6 +3792,7 @@ async function billingCarregarDetalhes(){
 async function billingPintarPrecos(){
   const d = await billingCarregarDetalhes();
   if (!d) return;
+  await billingChecarAssinaturasPlay();
   const en = (typeof idiomaApp === 'function' && idiomaApp() === 'en');
   const por = (el, txt) => { if (!el) return; el.removeAttribute('data-i18n'); el.textContent = txt; };
   const m = d[BILLING_SKUS.mensal], a = d[BILLING_SKUS.anual], v = d[BILLING_SKUS.vitalicio];
@@ -3776,7 +3802,7 @@ async function billingPintarPrecos(){
   // O Chrome/TWA nao manda freeTrialPeriod: o teste gratis chega como
   // introductoryPrice de valor 0 (visto no log real). Aceita os dois.
   const _temTesteGratis = !!(a && (a.freeTrialPeriod || (a.introductoryPrice && Number(a.introductoryPrice.value) === 0)));
-  _billingTrialOk = _temTesteGratis && !(typeof assinaturaAtiva === 'function' && assinaturaAtiva());
+  _billingTrialOk = _temTesteGratis && !billingJaUsouTeste() && !(typeof assinaturaAtiva === 'function' && assinaturaAtiva());
   const cardT = document.getElementById('pwPlanoTrial');
   if (cardT) cardT.style.display = _billingTrialOk ? '' : 'none';
   if (_billingTrialOk && _pwPlanoSelecionado === 'anual' && typeof window.selecionarPlanoPaywall === 'function') window.selecionarPlanoPaywall('trial');
@@ -3930,6 +3956,7 @@ async function billingRestaurarSku(sku){
       ]);
     }
     await billingVerificar(c.itemId, c.purchaseToken);
+    if (sku !== BILLING_SKUS.vitalicio) billingMarcarJaAssinou();
     window.dbgConta && window.dbgConta('billingRestaurarSku: compra existente restaurada sku=' + sku);
     return true;
   } catch(e){
@@ -3985,6 +4012,7 @@ async function iniciarCompraAssinatura(){
     }
     try { await resposta.complete('success'); } catch(_){}
     resposta = null;
+    if (sku !== BILLING_SKUS.vitalicio) billingMarcarJaAssinou();
     billingAtualizarTelas();
     if (typeof window.esconderLoadingMasmorra === 'function') window.esconderLoadingMasmorra();
     billingMostrarCompraOk(sku, false, dadosVerif);
@@ -16382,6 +16410,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     let _assinaturaProduto = '';
     window.assinaturaProdutoServidor = () => (_assinaturaServidorAte > Date.now() ? _assinaturaProduto : '');
     window.assinaturaServidorAtiva = () => _assinaturaServidorAte > Date.now();
+    window.assinaturaJaTeveServidor = () => !!_assinaturaProduto; // doc entitlements tem assinaturaProduto mesmo vencida
     window.assinaturaServidorExpiraEm = () => _assinaturaServidorAte;
     // DEBUG (pedido do usuario: testar o app sem PRO sem esperar o teste
     // gratis expirar de verdade, ja que cancelar de verdade so vai

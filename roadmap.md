@@ -388,6 +388,8 @@ Alterar qualquer campo salva em `rpg_eco_v1` e redesenha o app na hora. "Ver có
 
 ## 4. Próximas tarefas
 
+> **Aviso (03/10/2026):** os itens de curto prazo abaixo são de ago/set e boa parte já foi feita ou mudou de prioridade. O estado atual do que falta pro lançamento está em **"Pendências de lançamento"**, na última entrada do arquivo (sessão 30/09–03/10).
+
 ### Em andamento
 
 
@@ -19085,7 +19087,7 @@ Não é código. O Firebase envia de `noreply@questlog-d4c11.firebaseapp.com`, s
 - [ ] UID pessoal do usuário ainda não está em `UIDS_DEBUG_PERMITIDO`; conta de teste do revisor precisa ser declarada no Play Console → App access.
 - [ ] **Risco:** `reauthenticateWithPopup` para contas Google no TWA/Android pode cair em redirect (mesma classe do bug do loop de login). Sem teste em aparelho.
 - [ ] Concluir a verificação de domínio do email no Firebase e testar entrega no Gmail/Outlook.
-- [ ] Merge do PR #65 na `main` (aberto, não mergeado).
+- [x] Merge do PR #65 na `main` — **feito em 30/09** (atualizado em 03/10).
 
 ## [Sessão 27–29/09/2026] Categorias, teste grátis + push, landing/páginas legais, PRO vitalício, lote de bugs, menu debug e login
 
@@ -19138,4 +19140,68 @@ Complementa a entrada de 30/09 (acima). Esta seção cobre tudo que veio antes d
 - [ ] Conta de revisor declarada no Play Console; UID do dono na allowlist do debug.
 - [ ] `reauthenticateWithPopup` (Google) em TWA pode cair em redirect — não testado.
 - [ ] Descrições dos atributos sumiram do Perfil (ver 30/09).
-- [ ] PR #65 aberto, não mergeado.
+- [x] PR #65 — mergeado em 30/09 (atualizado em 03/10).
+
+## [Sessão 30/09–03/10/2026] Google Play Billing de ponta a ponta, robô de reembolso, telas de compra, bugs de layout/boot e feedback tátil
+
+Cobre os PRs #66 a #87 (todos mergeados em `main`). Foco da sessão: **lançar**. Os hashes não foram listados; use o número do PR.
+
+### 1. Login, Perfil e ajustes (30/09–01/10)
+- [x] #66 offset de dia no login e tarefa sumindo ao relogar; #68 offset de dia (debug) não sincroniza mais com a nuvem.
+- [x] #67 Perfil: layout "Anéis" + fix dos filtros do inventário.
+- [x] #69 Login: feedback, olho de senha, trocar conta, "cara de app", nova logo em texto; #70 "Sair" e "Excluir conta" de volta ao menu principal de Config.
+
+### 2. Google Play Billing (02/10)
+- [x] **#71 Compra via Digital Goods API.** Cliente: `getDigitalGoodsService` + `PaymentRequest` com `https://play.google.com/billing`. TWA via Bubblewrap, pacote `com.dungeonlog`. Produtos: `pro_mensal`, `pro_anual`, `pro_vitalicio` (R$ 17,90 / 89,90 / 199,90).
+- [x] **Verificação no Worker** (`cf-worker`, `POST /billing/verify`): valida o ID token do Firebase, consulta a Play Developer API (`subscriptionsv2` para assinaturas, `purchases.products` para o vitalício), faz o *acknowledge*, grava a posse em `playPurchases/{sha256(token)}` (um token não vale para duas contas) e escreve `entitlements/{uid}` via Firestore REST.
+  - Assinatura: `assinaturaAte`, `assinaturaProduto`, `assinaturaEstado`, `assinaturaToken` (hash).
+  - Vitalício: `proVitalicio`, `proVitalicioPlay`, `proVitalicioToken` (hash).
+  - O cliente só **lê** o `entitlements`; nunca escreve (regra do Firestore).
+- [x] #72 `assetlinks`: SHA-256 da chave do Play App Signing.
+- [x] #73 Linha "Gerenciar assinatura" em Config (`#cfgCancelarPlay`) abre a gestão na Play Store. #74 log de recusa do pop-up da Play (debug).
+- [x] **Contas de teste de licença:** renovações aceleradas (mensal 5 min, anual 30 min) e a Google corta depois de ~6 renovações. O "Anual sumiu" visto nos testes era em parte isso (não é bug).
+
+### 3. Telas de compra (03/10)
+- [x] #76 Tela de compra confirmada (`billingMostrarCompraOk`): fundo de floresta, 3 benefícios com ícone, 2 monstros do bioma floresta, botão "Começar". Mesmo visual/fonte do app (reusa as classes do paywall).
+- [x] #77 Loading de pagamento: `mostrarLoadingMasmorra(frase, frasesCustom)` com "Processando seu pagamento...", "Confirmando com a Google Play...", "Liberando o Plano Pro...".
+- [x] #82/#83 **Restaurar compra existente:** se a Google responde "este item já é seu" (pop-up cancelado/erro), o app lista as compras, acha o `itemId` e revalida no Worker. A tela mostra **"Compra restaurada!"** (não "Plano Pro ativado!"), porque a pessoa não pagou de novo.
+
+### 4. Reembolso (03/10)
+- [x] #81 **Robô de reembolso** no Worker: cron diário `0 8 * * *` (`revogarComprasAnuladas`) lê `purchases/voidedpurchases?type=1` (janela de 7 dias, paginado), localiza o dono pelo hash do token e zera `assinaturaAte` / `proVitalicio` **só se** o token do entitlement for o mesmo da compra anulada; marca `anuladaEm`. Disparo manual protegido: `POST /admin/revogar-anuladas` (exige o secret `ADMIN_TOKEN`; sem ele responde 404).
+- [x] Reembolso no Play Console exige marcar **"Remover titularidade"**. Pedir reembolso pelo site da Google (conta pessoal) **não** cancela o item e mantém o "item já é seu".
+
+### 5. Bugs de layout e boot (03/10)
+- [x] **Plano Pro sumia ao reabrir o app (#84).** Causa: ao reabrir logado, o Firebase chama `aoLogarSilencioso()`, que **não** chama `puxarNuvem()`, e é lá que `puxarEntitlement()` e `billingSincronizar()` rodavam. Agora há `puxarPlanoSilencioso(uid)` (lê só `entitlements/{uid}` e revalida a compra, sem tocar no save).
+  - `billingSincronizar()` usa trava de **5 min** (em vez de 6 h) quando `assinaturaAte` venceu ou vence em < 1 h; também roda ao voltar ao foco (`visibilitychange`).
+- [x] **Nav cortada (#75, #84, #86).** Tentativas anteriores (`--app-h` via `visualViewport`, re-medição a cada 1 s) não resolveram. **Causa real (visível no log `medidas[...]`: `appH=842px` mas `appBottom=898`):** o `.app` tinha `min-height:100vh/100dvh` no `@media` mobile, e **`min-height` vence `max-height`**. Quando o `100dvh` do WebView pula para ~898 (tela inteira) o app cresce e a nav sai da tela. Fix: `min-height:0` no `.app` (`style.css` → `?v=44`).
+- [x] **Tela preta no boot (#86).** Causa: o `<link rel=stylesheet>` do Google Fonts (outro domínio) **bloqueia a primeira pintura**; se o servidor trava (em vez de recusar) a página fica preta até o timeout. Só voltava desligando a internet. Fix: `media="print" onload="this.media='all'"` + `<noscript>`. Reproduzido em teste (fonte travada: antigo > 12 s sem aparecer, novo 335 ms). Log `boot-paint` (fp/fcp/domReady/load/fonts/online) 4 s após abrir.
+- [x] #80 Piscada laranja do tema: `data-tema` aplicado num script inline no `<head>`, antes do `style.css`.
+- [x] #78/#79 12 heróis de recolor de cabelo foram feitos e **revertidos** a pedido (foco no lançamento); `HEROIS` voltou a 8 entradas.
+
+### 6. Feedback tátil e sonoro (03/10)
+- [x] #87 **Vibração por evento:** `tocarSom(nome)` agora vibra junto, com a tabela `VIBRACAO` (golpe 30 ms, dano 80, level up `[40,60,40,60,120]`, loot, compra/venda, equipar, erro de login etc.). Respeita o mudo da topbar e a preferência "feedback tátil" (`'vibrar'|'desativado'`). Eventos novos reaproveitam sons existentes: `proAtivado`, `trocarHeroi`, `soltar`, `erro`.
+- [x] **Lacunas cobertas:** compra do Pro, erro de login, trocar herói, fim do arrasto, abas e folha de categoria, excluir tarefa (`desequipar`).
+- [x] **Fallback global de clique:** ouvinte em captura no `document`; todo `button/[role=button]/.cfgrow/.opcao/.catchip/.cattab` que não disparou som/vibração no clique recebe `feedbackClique('clique', 10)`. Silenciar de propósito: atributo **`data-sem-feedback`** no botão ou no pai. Contador `window.__fbN` incrementado em `tocarSom` e `feedbackClique`.
+- [x] Corrigido `TypeError` antigo em `pointerleave` (`e.target.closest` com alvo `document`).
+- Limitação do teste: o rastreador automático não passou do diálogo de tutorial nas telas de Config/conquistas/bestiário; essas ficam por confirmar no aparelho.
+
+### 7. Debug
+- [x] #85 Painel de log (toque no contador de moedas → "☰ log") ganhou **"⧉ tudo"** e **"⧉ medidas"** (copiam o log com cabeçalho de data/UA/dpr; medidas = últimas 25 linhas `medidas[...]`). Log de medidas inclui `inner/vv/client/fixo/appH/screen/inset/appBottom/navBottom`.
+
+### Aprendizados (para não repetir)
+- `min-height` ganha de `max-height`; qualquer `100dvh` em `min-height` pode furar um teto controlado por JS.
+- CSS de outro domínio no `<head>` sem `media`/`preload` bloqueia a pintura: usar carga não bloqueante.
+- No caminho de login silencioso nada de rede/entitlement roda sozinho: tudo que o app precisa ao abrir tem que estar nele.
+- Cada aba nova abre o seu diálogo de tutorial por cima (testes automáticos precisam fechá-lo a cada passo).
+- Nunca colar chave de keystore, token do Cloudflare nem JSON de conta de serviço no chat.
+
+### Pendências de lançamento
+- [ ] **Mensal de teste** continua renovando a cada 5 min: cancelar em Play Store → Assinaturas.
+- [ ] **Vitalício de teste:** confirmar o pedido como **Reembolsado** (Play Console, com "Remover titularidade"), limpar cache da Play Store, apagar o doc `entitlements/{uid}` e recomprar para ver a tela "Plano Pro ativado!" de ponta a ponta.
+- [ ] **Robô de reembolso** só será validado de verdade com um reembolso real (compras de teste podem não aparecer em `voidedpurchases`). `ADMIN_TOKEN` não está configurado, então o disparo manual está desligado.
+- [ ] **RTDN** (notificações em tempo real da Play) não implementado: hoje só robô diário + sincronização ao abrir/voltar ao app.
+- [ ] Confirmar no aparelho: **nav cortada** (fix do `min-height`), **tela preta no boot** (fix das fontes; se voltar, mandar "⧉ tudo" com a linha `boot-paint`) e o **feedback global** nas telas de Config, conquistas e bestiário.
+- [ ] Texto do paywall ("6 temas, 4 heróis") provavelmente desatualizado: revisar contra o app atual.
+- [ ] Play Console: benefícios/descrições dos produtos, nome do `pro_mensal`, conta de revisor declarada em App access (trocar a senha dela).
+- [ ] **Segurança:** apagar o `.json` da conta de serviço do Firebase em Downloads e revogar o token antigo do Cloudflare.
+- [ ] Ainda abertos de antes: "Esqueceu a senha?" sem feedback (`TOASTS_DESATIVADOS`), monstro "fugindo do nada" (sem causa), UID do dono fora de `UIDS_DEBUG_PERMITIDO`, `reauthenticateWithPopup` no TWA sem teste, verificação do domínio de e-mail no Firebase, descrições dos atributos sumidas do Perfil.

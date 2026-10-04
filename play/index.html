@@ -27,7 +27,13 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=Outfit:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<!-- FIX (tela preta so saia desligando a internet): um <link rel=stylesheet>
+     de outro dominio BLOQUEIA a primeira pintura; se fonts.googleapis.com
+     travar (nao falhar), a pagina fica preta ate o timeout do navegador.
+     media=print + onload troca pra all = carrega sem bloquear o render
+     (display=swap ja mostra o texto com fonte do sistema ate a fonte chegar). -->
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=Outfit:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=Outfit:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet"></noscript>
 <!-- v4.24x (bug relatado pelo usuario: loading "masmorra" aparecendo
      pequeno/inline no canto em vez de tela cheia -- CSS local confirmado
      100% correto via computed style (position:fixed, z-index:10000,
@@ -46,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=43">
+<link rel="stylesheet" href="style.css?v=44">
 
 <!-- =====================================================================
      TOGGLE DEBUG — silenciar console (log/warn/error)  —  precisa ser o
@@ -18423,6 +18429,17 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
   }
   window.medirTela = medir;
   setTimeout(() => medir('boot'), 1500);
+  // DEBUG (tela preta no boot): tempos de pintura e estado das fontes, pra
+  // ver no log se o 1o paint demorou (rede travada) quando acontecer de novo.
+  setTimeout(() => {
+    try {
+      const pt = {}; (performance.getEntriesByType('paint') || []).forEach(e => { pt[e.name] = Math.round(e.startTime); });
+      const nv = performance.getEntriesByType('navigation')[0];
+      window.dbgConta && window.dbgConta('boot-paint fp=' + (pt['first-paint'] || '-') + 'ms fcp=' + (pt['first-contentful-paint'] || '-') +
+        'ms domReady=' + (nv ? Math.round(nv.domContentLoadedEventEnd) : '-') + 'ms load=' + (nv ? Math.round(nv.loadEventEnd) : '-') +
+        'ms fonts=' + (document.fonts ? document.fonts.status : '-') + ' online=' + navigator.onLine);
+    } catch(e){}
+  }, 4000);
   // auto-correcao: se --app-h ficou diferente do viewport real (ex.: 895 = tela
   // inteira, sem descontar barras do sistema), refaz a medida. Antes o tick so
   // registrava; nenhum evento de resize chegava e a nav ficava cortada ate

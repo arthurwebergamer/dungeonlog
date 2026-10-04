@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=44">
+<link rel="stylesheet" href="style.css?v=45">
 
 <!-- =====================================================================
      TOGGLE DEBUG — silenciar console (log/warn/error)  —  precisa ser o
@@ -413,6 +413,7 @@ catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
     </div>
     <div class="cattabs" id="catTabsRow"></div>
     <div class="list" id="list"></div>
+    <button class="terminarDiaBtn" id="terminarDiaBtn" type="button" hidden data-i18n="jogo.terminarDia">Terminar dia</button>
 
     <div class="composer" id="composer">
       <input id="input" placeholder="O que precisa ser feito?" data-i18n-placeholder="jogo.oQuePrecisaSerFeito" autocomplete="off">
@@ -2859,6 +2860,28 @@ let xpTotal = 0, moedas = 0, derrotadoEm = null, jaComecou = false;
 let _vitoriaSequenciaEmAndamento = false;
 function monstroJaCaiu(){ return derrotadoEm === isoAtual(); }
 
+// DIA MANUAL: o botao 'Terminar dia' aparece quando nao ha pendentes (>=1 concluida) e o
+// monstro ainda nao caiu. Tocar nele roda a mesma sequencia do antigo golpe final.
+function podeTerminarDia(){
+  return avaliarVitoriaDoDia() && !monstroJaCaiu() && !_vitoriaSequenciaEmAndamento;
+}
+function terminarDia(){
+  if (!podeTerminarDia()) return;
+  if (typeof _arenaBgEmTransicao !== 'undefined' && _arenaBgEmTransicao) return;
+  const nivelAntes = progresso().nivel;
+  _vitoriaSequenciaEmAndamento = true;
+  if (typeof animarGolpe === 'function') animarGolpe();
+  window.tocarSom?.('golpe');
+  render(); // esconde o botao ja
+  setTimeout(() => {
+    dispararVitoriaDoDia(tarefas.filter(ehDeHoje), nivelAntes);
+    if (typeof window.curarVitoriaDia === 'function') window.curarVitoriaDia();
+    // garante o bau do dia (antes era criado pelo gancho em volta de alternar())
+    setTimeout(() => { if (typeof window.atualizarBauArena === 'function') window.atualizarBauArena(); }, 2600);
+  }, 300);
+}
+window.terminarDia = terminarDia;
+
 // fonte da verdade da vitoria do dia -- desacoplada de hpTotal/hpDano
 // (que so existem pra desenhar a barra visual). Criterio: zero pendentes
 // E pelo menos 1 concluida (bloqueia o exploit de excluir tudo sem
@@ -5159,6 +5182,13 @@ function render(){
   if (addBtnEl) addBtnEl.disabled = (typeof monstroJaCaiu === 'function' && monstroJaCaiu()) || _arenaBgEmTransicao;
   if (typeof atualizarEstadoSave === 'function') atualizarEstadoSave();
 
+  const terminarBtnEl = document.getElementById('terminarDiaBtn');
+  if (terminarBtnEl){
+    terminarBtnEl.hidden = !podeTerminarDia();
+    terminarBtnEl.onclick = terminarDia;
+    terminarBtnEl.textContent = (idiomaApp() === 'en') ? 'End day' : 'Terminar dia';
+  }
+
   document.getElementById('hoje').textContent = (idiomaApp() === 'en' ? 'Tasks for ' : 'Tarefas de ') + nomeDiaLocal(diaDaSemana());
 
   if (doDia.length === 0){
@@ -5170,7 +5200,7 @@ function render(){
   if (doDia.length > 0 && pendentes.length === 0){
     lista.innerHTML = monstroJaCaiu()
       ? '<div class="empty">' + (idiomaApp() === 'en' ? 'All done.<br>Today\'s monster has been defeated.' : 'Tudo concluído.<br>O monstro de hoje foi derrotado.') + '</div>'
-      : '<div class="empty">' + (idiomaApp() === 'en' ? 'No pending tasks here.' : 'Nenhuma tarefa pendente por aqui.') + '</div>';
+      : '<div class="empty">' + (idiomaApp() === 'en' ? 'All done for now.<br>Add more tasks or tap End day.' : 'Tudo concluído por enquanto.<br>Adicione mais tarefas ou toque em Terminar dia.') + '</div>';
   }
 
   // ordem estavel: tarefa sem "ordem" (antiga ou recem-criada) mantem a posicao atual
@@ -5878,7 +5908,10 @@ function alternar(i){
   // a barra/contador nesse render() especifico (ver
   // _adiarContadoresRecompensa em render()).
   const venceuAgora = avaliarVitoriaDoDia();
-  const ehGolpeFinal = venceuAgora && !monstroJaCaiu() && !_vitoriaSequenciaEmAndamento;
+  // DIA MANUAL (pedido do usuario): concluir a ultima tarefa NAO derrota mais o monstro
+  // sozinho -- isso travava o '+ Adicionar' no meio do dia. A vitoria agora dispara
+  // pelo botao 'Terminar dia' (terminarDia()). Fica ehGolpeFinal=false de proposito.
+  const ehGolpeFinal = false;
 
   // MOVIDO pra antes do render() (era depois) -- progresso() e pura, so
   // olha xpTotal (ja somado acima), nao depende de nada que render()
@@ -5942,14 +5975,8 @@ function alternar(i){
 // So garante que derrotadoEm nao fique com um valor indevido depois da exclusao.
 function verificarVitoriaAoExcluir(){
   if (monstroJaCaiu()) return;   // ja venceu de verdade antes: exclusao nao desfaz
-  if (_vitoriaSequenciaEmAndamento) return; // golpe final ja disparado (por alternar()) e ainda rodando -- ver comentario na declaracao da flag
-  if (avaliarVitoriaDoDia()){
-    // excluir a ultima pendente fechou o dia (0 pendentes, >=1 concluida)
-    const nivelAntes = progresso().nivel;
-    _vitoriaSequenciaEmAndamento = true;
-    dispararVitoriaDoDia(tarefas.filter(ehDeHoje), nivelAntes);
-    return;
-  }
+  if (_vitoriaSequenciaEmAndamento) return; // vitoria ja disparada (botao Terminar dia) e ainda rodando
+  // DIA MANUAL: excluir a ultima pendente nao fecha mais o dia; o botao 'Terminar dia' aparece (render).
   derrotadoEm = null;
 }
 
@@ -9551,6 +9578,17 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       window.registrarHistorico(ultimoDia, tarefasEm(ultimoDia).length, largadas.length);
     }
 
+    // DIA MANUAL: todas concluidas mas 'Terminar dia' nao foi tocado -> vitoria automatica
+    // na virada. Credita as moedas do monstro (sem bau: ele e do dia corrente) + cura de vitoria.
+    try {
+      const totalDiaVirada = tarefasEm(diaVirada).length;
+      if (largadas.length === 0 && totalDiaVirada > 0 && derrotadoEm !== diaVirada && typeof recompensaVitoria === 'function'){
+        moedas += recompensaVitoria(totalDiaVirada);
+        if (typeof salvar === 'function') salvar();
+        curar(Math.round(vidaMax() * ECO.curaVitoria));
+      }
+    } catch(e){}
+
     ultimoDia = hoje;
     gravar();
 
@@ -9574,6 +9612,8 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       }, 700);
     }
   }
+
+  window.curarVitoriaDia = function(){ curar(Math.round(vidaMax() * ECO.curaVitoria)); }; // DIA MANUAL: bonus de vitoria agora vem do botao Terminar dia
 
   /* ---------- ganchos ---------- */
   // cura por tarefa concluida + bonus na vitoria, sem reescrever alternar()
@@ -18016,6 +18056,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'pro.confirmarFimSub':     { pt:'Teste acaba e volta pro plano grátis, sem cobrança', en:'Trial ends and reverts to the free plan, no charge' },
     'pro.meusDiasGratis':      { pt:'Meus 7 dias grátis', en:'My 7 free days' },
     'jogo.addTarefa':        { pt:'+ Adicionar', en:'+ Add' },
+    'jogo.terminarDia':      { pt:'Terminar dia', en:'End day' },
     'jogo.oQuePrecisaSerFeito': { pt:'O que precisa ser feito?', en:'What needs to be done?' },
     'jogo.soHoje':           { pt:'Só hoje', en:'Today only' },
     'jogo.repeteSemana':     { pt:'Repete toda semana', en:'Repeats weekly' },

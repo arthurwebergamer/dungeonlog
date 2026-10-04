@@ -3508,28 +3508,18 @@ function abrirPaywall(motivo){
   // ainda estava em 'trial' (default), forca pra 'anual' -- senao o CTA
   // ficaria tentando iniciar um teste que nao existe mais.
   const cardTrialVisibilidade = document.getElementById('pwPlanoTrial');
-  const jaUsouTrial = (typeof window.trialSalvo === 'function' && window.trialSalvo());
-  if (cardTrialVisibilidade) cardTrialVisibilidade.style.display = jaUsouTrial ? 'none' : '';
-  if (jaUsouTrial && _pwPlanoSelecionado === 'trial' && typeof window.selecionarPlanoPaywall === 'function'){
+  if (cardTrialVisibilidade) cardTrialVisibilidade.style.display = _billingTrialOk ? '' : 'none';
+  if (!_billingTrialOk && _pwPlanoSelecionado === 'trial' && typeof window.selecionarPlanoPaywall === 'function'){
     window.selecionarPlanoPaywall('anual');
   }
   const overlay = document.getElementById('paywallOverlay');
   if (!overlay) return;
-  // Quem ja usou o teste gratis (jaUsouTrial) nao tem teste pra oferecer
-  // -- pula direto pra tela final de planos (passo 3), sem passar pela
-  // tela de teste gratis (passo 1) nem pela de lembrete (passo 2), que
-  // nao fariam sentido pra essa conta.
-  irParaEtapaPaywall(jaUsouTrial ? 3 : 1, false);
-  if (jaUsouTrial){
-    // sem tela 1/2 pra voltar (nao fariam sentido pra quem ja usou o
-    // teste) -- esconde a seta de voltar so nesse caso.
-    const back = document.getElementById('paywallVoltarBtn');
-    if (back) back.classList.remove('on');
-  }
-  // atraso bem curto so pra o toast ("descobriu um recurso premium") nao
-  // nascer e morrer debaixo do paywall no mesmo frame -- era 550ms (pedido
-  // do usuario: "demora pra tela aparecer, deveria ser mais rapido"),
-  // 120ms ja da pro toast aparecer primeiro sem o paywall parecer lento.
+  // Sem pitch/lembrete locais: o teste gratis e' do Play, entao vai direto
+  // pra lista de planos (passo 3) e sem seta de voltar.
+  irParaEtapaPaywall(3, false);
+  const back = document.getElementById('paywallVoltarBtn');
+  if (back) back.classList.remove('on');
+  // atraso bem curto so pra o toast nao nascer e morrer debaixo do paywall
   setTimeout(() => overlay.classList.add('on'), 120);
   if (typeof billingPintarPrecos === 'function') billingPintarPrecos();
 }
@@ -3592,7 +3582,7 @@ function aplicarCtaPlano(id){
   const en = (typeof idiomaApp === 'function' && idiomaApp() === 'en');
   if (id === 'trial'){
     btn.textContent = en ? 'Try free for 7 days' : 'Testar grátis por 7 dias';
-    btn.onclick = () => iniciarTesteGratis(_pwAvisoSelecionado);
+    btn.onclick = iniciarCompraAssinatura; // sku 'anual': o Play aplica a oferta de teste gratis
   } else {
     btn.textContent = en ? 'Subscribe to Pro' : 'Assinar Plano Pro';
     btn.onclick = iniciarCompraAssinatura;
@@ -3712,6 +3702,7 @@ const BILLING_VERIFY_URL = 'https://dungeonlog-push.arthurwebergamer.workers.dev
 let _billingServico = null;
 let _billingDetalhes = null;
 let _billingOcupado = false;
+let _billingTrialOk = false; // true quando o Play devolve freeTrialPeriod pro pro_anual
 
 function _billingTexto(chave, pt, en){
   if (typeof window.t === 'function'){
@@ -3779,6 +3770,13 @@ async function billingPintarPrecos(){
   const en = (typeof idiomaApp === 'function' && idiomaApp() === 'en');
   const por = (el, txt) => { if (!el) return; el.removeAttribute('data-i18n'); el.textContent = txt; };
   const m = d[BILLING_SKUS.mensal], a = d[BILLING_SKUS.anual], v = d[BILLING_SKUS.vitalicio];
+  // Teste gratis do Play: so mostra o card se a oferta existe (freeTrialPeriod)
+  // e a pessoa ainda nao tem PRO. Se ja usou o teste, o Play nao devolve o campo.
+  _billingTrialOk = !!(a && a.freeTrialPeriod) && !(typeof assinaturaAtiva === 'function' && assinaturaAtiva());
+  const cardT = document.getElementById('pwPlanoTrial');
+  if (cardT) cardT.style.display = _billingTrialOk ? '' : 'none';
+  if (_billingTrialOk && _pwPlanoSelecionado === 'anual' && typeof window.selecionarPlanoPaywall === 'function') window.selecionarPlanoPaywall('trial');
+  if (!_billingTrialOk && _pwPlanoSelecionado === 'trial' && typeof window.selecionarPlanoPaywall === 'function') window.selecionarPlanoPaywall('anual');
   if (m && m.price){
     por(document.querySelector('#pwPlanoMensal .pwPlanoPreco > span:first-child'), billingFormatarPreco(m.price.value, m.price.currency));
   }
@@ -3787,7 +3785,7 @@ async function billingPintarPrecos(){
     const porMes = billingFormatarPreco(Number(a.price.value) / 12, a.price.currency);
     por(document.querySelector('#pwPlanoAnual .pwPlanoPreco > span:first-child'), porMes);
     por(document.querySelector('#pwPlanoAnual .pwPlanoSub'), en ? ('Billed ' + anual + '/year') : ('Cobrado ' + anual + '/ano'));
-    por(document.querySelector('#pwPlanoTrial .pwPlanoSub'), en ? ('Then, Annual ' + porMes + '/mo') : ('Depois, Anual ' + porMes + '/mês'));
+    por(document.querySelector('#pwPlanoTrial .pwPlanoSub'), en ? ('Then ' + anual + '/year') : ('Depois, ' + anual + '/ano'));
     const badge = document.querySelector('#pwPlanoAnual .pwBadge');
     if (badge && m && m.price){
       const pct = Math.round((1 - (Number(a.price.value) / 12) / Number(m.price.value)) * 100);
@@ -4101,8 +4099,10 @@ function salvarTrial(obj){
 }
 
 function trialAtivo(){
-  const t = trialSalvo();
-  return !!(t && typeof t.fim === 'number' && Date.now() < t.fim);
+  // Teste gratis agora e' oferta do Google Play (plano base anual-1, oferta
+  // teste-gratis): quem manda e' o entitlement do servidor. O trial LOCAL
+  // antigo nao concede mais PRO (nao cobrava no fim nem tinha cancelamento).
+  return false;
 }
 window.trialAtivo = trialAtivo;
 

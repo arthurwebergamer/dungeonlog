@@ -3702,6 +3702,7 @@ const BILLING_VERIFY_URL = 'https://dungeonlog-push.arthurwebergamer.workers.dev
 let _billingServico = null;
 let _billingDetalhes = null;
 let _billingOcupado = false;
+let _billingUltimaMovida = false; // a ultima restauracao tirou o plano de OUTRA conta do app
 let _billingTrialOk = false; // true quando o Play devolve freeTrialPeriod pro pro_anual
 
 function _billingTexto(chave, pt, en){
@@ -3837,13 +3838,13 @@ async function billingPintarPrecos(){
 window.billingPintarPrecos = billingPintarPrecos;
 
 // Manda o purchaseToken pro Worker validar. Lanca erro se nao foi aceito.
-async function billingVerificar(sku, purchaseToken){
+async function billingVerificar(sku, purchaseToken, transferir){
   const idToken = (typeof window.questlogIdToken === 'function') ? await window.questlogIdToken() : null;
   if (!idToken) throw new Error('sem-login');
   const r = await fetch(BILLING_VERIFY_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
-    body: JSON.stringify({ sku: sku, purchaseToken: purchaseToken }),
+    body: JSON.stringify({ sku: sku, purchaseToken: purchaseToken, transferir: transferir === true }),
   });
   let dados = null;
   try { dados = await r.json(); } catch(e){}
@@ -3880,7 +3881,9 @@ function billingMostrarCompraOk(sku, restaurada, dados){
       T('pro.okSubTesteCancela', 'Cancele antes disso em Configurações para não ser cobrado.', 'Cancel before then in Settings to avoid being charged.');
   }
   const sub = emTeste ? subTeste : restaurada
-    ? T('pro.okSubRestaurada', 'Encontramos a sua compra anterior do Plano Pro.', 'We found your previous Pro plan purchase.')
+    ? (_billingUltimaMovida
+      ? T('pro.okSubMovida', 'Sua assinatura estava em outra conta do app e foi movida para esta. A outra conta deixa de ter o Pro.', 'Your subscription was on another app account and has been moved to this one. The other account no longer has Pro.')
+      : T('pro.okSubRestaurada', 'Encontramos a sua compra anterior do Plano Pro.', 'We found your previous Pro plan purchase.'))
     : ehVit
     ? T('pro.okSubVit', 'Pagamento único. O Pro é seu para sempre.', 'One-time payment. Pro is yours forever.')
     : T('pro.okSubAss', 'Renova automaticamente. Cancele quando quiser em Configurações.', 'Renews automatically. Cancel anytime in Settings.');
@@ -3955,7 +3958,8 @@ async function billingRestaurarSku(sku){
         _billingTexto('pro.loadPag3', 'Liberando o Plano Pro...', 'Unlocking Pro plan...')
       ]);
     }
-    await billingVerificar(c.itemId, c.purchaseToken);
+    const dr = await billingVerificar(c.itemId, c.purchaseToken, true);
+    _billingUltimaMovida = !!(dr && dr.movida);
     if (sku !== BILLING_SKUS.vitalicio) billingMarcarJaAssinou();
     window.dbgConta && window.dbgConta('billingRestaurarSku: compra existente restaurada sku=' + sku);
     return true;
@@ -4043,16 +4047,16 @@ window.iniciarCompraAssinatura = iniciarCompraAssinatura;
 // Lista as compras do Google (listPurchases) e revalida cada uma no
 // Worker. Serve pra "Restaurar compras" (manual) e pra manter a data de
 // validade em dia sem esperar notificacao do servidor (billingSincronizar).
-async function billingRevalidarCompras(){
+async function billingRevalidarCompras(transferir){
   const s = await billingServico();
-  if (!s) return { total: 0, ok: 0 };
+  if (!s) return { total: 0, ok: 0, movidas: 0 };
   let compras = [];
   try { compras = await s.listPurchases(); } catch(e){ compras = []; }
-  let ok = 0;
+  let ok = 0, movidas = 0;
   for (const c of (compras || [])){
-    try { await billingVerificar(c.itemId, c.purchaseToken); ok++; } catch(e){}
+    try { const d = await billingVerificar(c.itemId, c.purchaseToken, transferir === true); ok++; if (d && d.movida) movidas++; } catch(e){}
   }
-  return { total: (compras || []).length, ok: ok };
+  return { total: (compras || []).length, ok: ok, movidas: movidas };
 }
 
 function restaurarCompras(){
@@ -4066,9 +4070,11 @@ function restaurarCompras(){
       billingMsg(_billingTexto('pro.entrarParaAssinar', 'Entre na sua conta para assinar', 'Sign in to subscribe'));
       return;
     }
-    const r = await billingRevalidarCompras();
+    const r = await billingRevalidarCompras(true);
     if (r.ok > 0){
-      billingMsg(_billingTexto('pro.restaurado', 'Compras restauradas', 'Purchases restored'));
+      billingMsg(r.movidas > 0
+        ? _billingTexto('pro.restauradoMovida', 'Compra movida para esta conta', 'Purchase moved to this account')
+        : _billingTexto('pro.restaurado', 'Compras restauradas', 'Purchases restored'));
       billingAtualizarTelas();
     } else {
       billingMsg(_billingTexto('pro.nadaRestaurar', 'Nenhuma compra encontrada', 'No purchases found'));

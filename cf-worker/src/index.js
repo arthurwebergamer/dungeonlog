@@ -546,6 +546,9 @@ async function tratarBillingVerify(request, env){
   try { corpo = await request.json(); } catch(e){ return respostaJson({ ok: false, erro: 'json' }, 400, origem); }
   const sku = corpo && corpo.sku;
   const purchaseToken = corpo && corpo.purchaseToken;
+  // transferir=true so em acao explicita da pessoa (compra "ja e sua" ou botao Restaurar compras);
+  // o sync automatico NAO manda, pra logar na conta de outro nao tirar o plano dela.
+  const transferir = !!(corpo && corpo.transferir === true);
   const ehAssinatura = BILLING_SKUS_ASSINATURA.indexOf(sku) !== -1;
   const ehUnico = BILLING_SKUS_UNICO.indexOf(sku) !== -1;
   if ((!ehAssinatura && !ehUnico) || typeof purchaseToken !== 'string' || purchaseToken.length < 10 || purchaseToken.length > 1000){
@@ -585,18 +588,27 @@ async function tratarBillingVerify(request, env){
       // 2) token amarrado a um uid so
       const hash = await sha256Hex(purchaseToken);
       const dono = await firestoreLerDoc(projectId, tokenFirestore, 'playPurchases/' + hash);
-      if (dono && dono.uid && dono.uid !== uid) return respostaJson({ ok: false, erro: 'compra-de-outra-conta' }, 409, origem);
+      const movida = !!(dono && dono.uid && dono.uid !== uid);
+      if (movida && !transferir) return respostaJson({ ok: false, erro: 'compra-de-outra-conta' }, 409, origem);
       // 3) acknowledge (pendente -> confirmada)
       if (compra.acknowledgementState === 'ACKNOWLEDGEMENT_STATE_PENDING' && campos.assinaturaAte > 0){
         await playAcknowledge(tokenPlay, '/purchases/subscriptions/' + encodeURIComponent(sku) + '/tokens/' + tokenEnc);
       }
-      await firestoreCommitLote(projectId, tokenFirestore, [
+      const escritasAss = [
         escritaParcial(projectId, 'playPurchases/' + hash, { uid: uid, sku: sku, atualizadoEm: Date.now() }),
         escritaParcial(projectId, 'entitlements/' + uid, campos),
-      ]);
+      ];
+      if (movida){
+        // tira o plano da conta antiga so se o doc dela aponta pra ESTA compra
+        const antigo = await firestoreLerDoc(projectId, tokenFirestore, 'entitlements/' + dono.uid);
+        if (antigo && antigo.assinaturaToken === hash){
+          escritasAss.push(escritaParcial(projectId, 'entitlements/' + dono.uid, { assinaturaAte: 0, assinaturaEstado: 'TRANSFERIDA' }));
+        }
+      }
+      await firestoreCommitLote(projectId, tokenFirestore, escritasAss);
       // teste gratis = oferta 'teste-gratis' (plano anual-1) ainda vigente; so pra a tela de confirmacao
       const emTeste = !!(item.offerDetails && item.offerDetails.offerId === 'teste-gratis') && campos.assinaturaAte > Date.now();
-      return respostaJson({ ok: true, ate: campos.assinaturaAte, trial: emTeste }, 200, origem);
+      return respostaJson({ ok: true, ate: campos.assinaturaAte, trial: emTeste, movida: movida }, 200, origem);
     }
 
     // produto unico (vitalicio)
@@ -604,15 +616,23 @@ async function tratarBillingVerify(request, env){
     if (compra.purchaseState !== 0) return respostaJson({ ok: false, erro: 'nao-comprado' }, 402, origem);
     const hash = await sha256Hex(purchaseToken);
     const dono = await firestoreLerDoc(projectId, tokenFirestore, 'playPurchases/' + hash);
-    if (dono && dono.uid && dono.uid !== uid) return respostaJson({ ok: false, erro: 'compra-de-outra-conta' }, 409, origem);
+    const movidaV = !!(dono && dono.uid && dono.uid !== uid);
+    if (movidaV && !transferir) return respostaJson({ ok: false, erro: 'compra-de-outra-conta' }, 409, origem);
     if (compra.acknowledgementState === 0){
       await playAcknowledge(tokenPlay, '/purchases/products/' + encodeURIComponent(sku) + '/tokens/' + tokenEnc);
     }
-    await firestoreCommitLote(projectId, tokenFirestore, [
+    const escritasVit = [
       escritaParcial(projectId, 'playPurchases/' + hash, { uid: uid, sku: sku, atualizadoEm: Date.now() }),
       escritaParcial(projectId, 'entitlements/' + uid, { proVitalicio: true, proVitalicioPlay: true, proVitalicioToken: hash }),
-    ]);
-    return respostaJson({ ok: true, vitalicio: true }, 200, origem);
+    ];
+    if (movidaV){
+      const antigoV = await firestoreLerDoc(projectId, tokenFirestore, 'entitlements/' + dono.uid);
+      if (antigoV && antigoV.proVitalicioToken === hash){
+        escritasVit.push(escritaParcial(projectId, 'entitlements/' + dono.uid, { proVitalicio: false, proVitalicioPlay: false }));
+      }
+    }
+    await firestoreCommitLote(projectId, tokenFirestore, escritasVit);
+    return respostaJson({ ok: true, vitalicio: true, movida: movidaV }, 200, origem);
   } catch(e){
     console.error('billing/verify falhou', e && e.message);
     return respostaJson({ ok: false, erro: 'servidor' }, 502, origem);

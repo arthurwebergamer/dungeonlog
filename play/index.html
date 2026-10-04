@@ -4848,6 +4848,10 @@ function viajarParaTemaEstagio(){
     debugEstagio('saiu cedo: temaArenaSalvo() ja e ' + temaAlvo.id + ' -- nada a fazer');
     return;
   }
+  if (window._recompensaVoando){
+    debugEstagio('saiu cedo: animacao de +XP/+moedas em andamento -- cerimonia adiada');
+    return;
+  }
   if (_vitoriaSequenciaEmAndamento){
     // BUG CORRIGIDO: a cerimonia de estagio nao pode abrir NO MEIO da
     // sequencia de vitoria do dia (poof -> tela cheia -> bau/contadores).
@@ -5939,10 +5943,14 @@ function alternar(i){
   // que so estava corrigido pra ele. NAO suprime quando vai ter
   // level-up: esse caminho chama mostrarNivelUp() e nao tem voo, quer
   // o contador atualizado na hora.
-  const suprimirContadores = ehGolpeFinal || !subiuNivel;
-  if (suprimirContadores) window._adiarContadoresRecompensa = true;
+  // PEDIDO DO USUARIO: level-up e cerimonia de estagio so aparecem DEPOIS da animacao
+  // do +XP/+moedas (antes cortavam o voo). Contadores sempre adiados; popups seguram em
+  // _recompensaVoando (ver viajarParaTemaEstagio) e abrem no fim da animacao.
+  const suprimirContadores = true;
+  if (!ehGolpeFinal) window._recompensaVoando = true;
+  window._adiarContadoresRecompensa = true;
   render();
-  if (suprimirContadores) window._adiarContadoresRecompensa = false; // so vale por ESSE render() -- o de dentro da sequencia atrasada (mostrarBauEContadores) roda com a flag ja desligada
+  window._adiarContadoresRecompensa = false; // so vale por ESSE render() -- o de dentro da sequencia atrasada (mostrarBauEContadores) roda com a flag ja desligada
 
   if (ehGolpeFinal){
     // BUG CORRIGIDO (relatado pelo usuario: "animacao do monstro morrendo
@@ -5971,10 +5979,18 @@ function alternar(i){
   }
   if (!venceuAgora) derrotadoEm = null;
 
-  if (subiuNivel){
-    if (typeof mostrarNivelUp === 'function') mostrarNivelUp(nivelDepois);
-  }
-  else voarRecompensaFinal(xpGanho, moedasGanhas, () => render()); // mesmo voo de icones do golpe final, barra so anda quando ele chega (aoTerminar)
+  // voo -> "+X" -> contadores; so entao (folga p/ ler o "+X") libera level-up e estagio
+  voarRecompensaFinal(xpGanho, moedasGanhas, () => {
+    render();
+    setTimeout(() => {
+      window._recompensaVoando = false;
+      if (subiuNivel){
+        if (typeof window.enfileirarPopup === 'function' && typeof mostrarNivelUp === 'function') window.enfileirarPopup(prox => mostrarNivelUp(nivelDepois, prox));
+        else if (typeof mostrarNivelUp === 'function') mostrarNivelUp(nivelDepois);
+      }
+      render(); // re-checa estagio (viajarParaTemaEstagio foi adiado) -- entra na fila depois do level-up
+    }, 900);
+  });
   return true;
 }
 

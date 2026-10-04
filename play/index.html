@@ -18356,14 +18356,29 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
       probe.style.cssText = 'position:fixed;left:0;bottom:0;width:1px;height:env(safe-area-inset-bottom,0px);visibility:hidden;pointer-events:none';
       document.body.appendChild(probe); const inset = probe.getBoundingClientRect().height; probe.remove();
       const ar = app ? app.getBoundingClientRect() : null, nr = nav ? nav.getBoundingClientRect() : null;
+      // fixo: caixa position:fixed top:0/bottom:0 = altura real do viewport de layout
+      const fx = document.createElement('div');
+      fx.style.cssText = 'position:fixed;left:0;top:0;bottom:0;width:1px;visibility:hidden;pointer-events:none';
+      document.body.appendChild(fx); const fixoH = Math.round(fx.getBoundingClientRect().height); fx.remove();
       const m = 'inner=' + window.innerHeight + ' vv=' + (vv ? Math.round(vv.height) : '-') + ' client=' + document.documentElement.clientHeight +
+        ' fixo=' + fixoH + ' appH=' + document.documentElement.style.getPropertyValue('--app-h') +
         ' screen=' + screen.height + ' inset=' + inset + ' appBottom=' + (ar ? Math.round(ar.bottom) : '-') + ' navBottom=' + (nr ? Math.round(nr.bottom) : '-');
       if (m !== _ultMed){ _ultMed = m; window.dbgConta && window.dbgConta('medidas[' + motivo + '] ' + m); }
     } catch(e){}
   }
   window.medirTela = medir;
   setTimeout(() => medir('boot'), 1500);
-  setInterval(() => medir('tick'), 2000); // so loga quando algo muda (DEBUG)
+  // auto-correcao: se --app-h ficou diferente do viewport real (ex.: 895 = tela
+  // inteira, sem descontar barras do sistema), refaz a medida. Antes o tick so
+  // registrava; nenhum evento de resize chegava e a nav ficava cortada ate
+  // fechar/abrir o app.
+  setInterval(() => {
+    const vv = window.visualViewport;
+    const h = Math.round(vv ? vv.height : window.innerHeight);
+    const atual = parseInt(document.documentElement.style.getPropertyValue('--app-h'), 10) || 0;
+    if (h > 0 && atual !== h) ajustar();
+    medir('tick');
+  }, 1000);
   function agendar(e){ ajustar(); clearTimeout(t); t = setTimeout(() => { ajustar(); medir(e && e.type || 'auto'); }, 250); }
   window.addEventListener('resize', agendar);
   window.addEventListener('orientationchange', agendar);

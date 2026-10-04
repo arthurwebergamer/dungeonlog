@@ -3773,7 +3773,10 @@ async function billingPintarPrecos(){
   // Teste gratis do Play: so mostra o card se a oferta existe (freeTrialPeriod)
   // e a pessoa ainda nao tem PRO. Se ja usou o teste, o Play nao devolve o campo.
   try { window.dbgConta && window.dbgConta('billing detalhes pro_anual: ' + JSON.stringify(a || null) + ' | assinaturaAtiva=' + ((typeof assinaturaAtiva === 'function') ? assinaturaAtiva() : '?')); } catch(e){}
-  _billingTrialOk = !!(a && a.freeTrialPeriod) && !(typeof assinaturaAtiva === 'function' && assinaturaAtiva());
+  // O Chrome/TWA nao manda freeTrialPeriod: o teste gratis chega como
+  // introductoryPrice de valor 0 (visto no log real). Aceita os dois.
+  const _temTesteGratis = !!(a && (a.freeTrialPeriod || (a.introductoryPrice && Number(a.introductoryPrice.value) === 0)));
+  _billingTrialOk = _temTesteGratis && !(typeof assinaturaAtiva === 'function' && assinaturaAtiva());
   const cardT = document.getElementById('pwPlanoTrial');
   if (cardT) cardT.style.display = _billingTrialOk ? '' : 'none';
   if (_billingTrialOk && _pwPlanoSelecionado === 'anual' && typeof window.selecionarPlanoPaywall === 'function') window.selecionarPlanoPaywall('trial');

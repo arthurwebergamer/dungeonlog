@@ -3772,6 +3772,7 @@ async function billingPintarPrecos(){
   const m = d[BILLING_SKUS.mensal], a = d[BILLING_SKUS.anual], v = d[BILLING_SKUS.vitalicio];
   // Teste gratis do Play: so mostra o card se a oferta existe (freeTrialPeriod)
   // e a pessoa ainda nao tem PRO. Se ja usou o teste, o Play nao devolve o campo.
+  try { window.dbgConta && window.dbgConta('billing detalhes pro_anual: ' + JSON.stringify(a || null) + ' | assinaturaAtiva=' + ((typeof assinaturaAtiva === 'function') ? assinaturaAtiva() : '?')); } catch(e){}
   _billingTrialOk = !!(a && a.freeTrialPeriod) && !(typeof assinaturaAtiva === 'function' && assinaturaAtiva());
   const cardT = document.getElementById('pwPlanoTrial');
   if (cardT) cardT.style.display = _billingTrialOk ? '' : 'none';

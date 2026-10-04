@@ -686,7 +686,12 @@
 /* ===== Bloco style #4 ===== */
 /* ---------- layout: tela cheia, so a lista rola ---------- */
   html,body{height:100%;overflow:hidden}
-  .app{height:var(--app-h,100dvh);max-height:var(--app-h,100dvh);overflow:hidden}
+  /* min-height:0 -- o @media mobile mais acima poe min-height:100vh/100dvh no
+     .app, e min-height VENCE max-height: quando 100dvh fica maior que o
+     viewport real (898 = tela cheia, vs 842 sem as barras do sistema; visto
+     no log medidas[...] appH=842px mas appBottom=898) o app crescia e a nav
+     ficava cortada. A altura passa a vir SO de --app-h. */
+  .app{height:var(--app-h,100dvh);max-height:var(--app-h,100dvh);min-height:0;overflow:hidden}
   .topbar,.arena,.xpwrap,.nav{flex:none}
   .tasks{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
   .thead{flex:none}

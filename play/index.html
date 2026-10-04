@@ -3834,13 +3834,26 @@ function billingAtualizarTelas(){
 // Tela de confirmacao da compra: plano comprado + beneficios liberados.
 // Overlay proprio (reusa o visual .paywallOverlay/.pwEtapa do paywall),
 // criado na 1a vez. "Comecar" fecha ela e o paywall.
-function billingMostrarCompraOk(sku, restaurada){
+function billingMostrarCompraOk(sku, restaurada, dados){
   const T = _billingTexto;
   window.tocarSom?.('proAtivado'); // som + vibracao de celebracao (tambem na compra restaurada)
   const ehVit = sku === BILLING_SKUS.vitalicio;
   const nomePlano = ehVit ? T('pro.planoVitalicio', 'Vitalício', 'Lifetime')
     : (sku === BILLING_SKUS.mensal ? T('pro.planoMensal', 'Mensal', 'Monthly') : T('pro.planoAnual', 'Anual', 'Annual'));
-  const sub = restaurada
+  // TESTE GRATIS do Play: o Worker devolve trial:true quando a compra esta na oferta
+  const emTeste = !!(dados && dados.trial && !restaurada && !ehVit);
+  let subTeste = '';
+  if (emTeste){
+    const ate = new Date(Number(dados.ate) || Date.now());
+    const curto = (Number(dados.ate) - Date.now()) < 24 * 3600 * 1000;
+    const quando = curto ? ate.toLocaleString(navigator.language || 'pt-BR', { dateStyle: 'short', timeStyle: 'short' }) : ate.toLocaleDateString(navigator.language || 'pt-BR');
+    const det = _billingDetalhes && _billingDetalhes[sku];
+    const preco = (det && det.price) ? billingFormatarPreco(det.price.value, det.price.currency) : '';
+    subTeste = T('pro.okSubTeste', 'Seu teste grátis vai até ', 'Your free trial runs until ') + quando + '. ' +
+      (preco ? T('pro.okSubTesteCobra', 'Depois, ' + preco + '/ano. ', 'Then ' + preco + '/year. ') : '') +
+      T('pro.okSubTesteCancela', 'Cancele antes disso em Configurações para não ser cobrado.', 'Cancel before then in Settings to avoid being charged.');
+  }
+  const sub = emTeste ? subTeste : restaurada
     ? T('pro.okSubRestaurada', 'Encontramos a sua compra anterior do Plano Pro.', 'We found your previous Pro plan purchase.')
     : ehVit
     ? T('pro.okSubVit', 'Pagamento único. O Pro é seu para sempre.', 'One-time payment. Pro is yours forever.')
@@ -3866,8 +3879,8 @@ function billingMostrarCompraOk(sku, restaurada){
   ov.innerHTML =
     '<div class="pwFloresta"><img id="compraOkFlorestaImg" alt=""></div>' +
     '<div class="pwEtapa on"><div class="pwConteudo" style="padding-top:72px">' +
-      '<span class="pwEyebrow">' + T('pro.titulo', 'Plano Pro', 'Pro plan') + ' · ' + nomePlano + '</span>' +
-      '<h2 class="pwHeadline">' + (restaurada ? T('pro.okRestaurada', 'Compra restaurada!', 'Purchase restored!') : T('pro.compraOk', 'Plano Pro ativado!', 'Pro plan activated!')) + '</h2>' +
+      '<span class="pwEyebrow">' + T('pro.titulo', 'Plano Pro', 'Pro plan') + ' · ' + (emTeste ? T('pro.testeGratisEyebrow', 'Teste grátis', 'Free trial') : nomePlano) + '</span>' +
+      '<h2 class="pwHeadline">' + (restaurada ? T('pro.okRestaurada', 'Compra restaurada!', 'Purchase restored!') : emTeste ? T('pro.testeOk', 'Teste grátis ativado!', 'Free trial activated!') : T('pro.compraOk', 'Plano Pro ativado!', 'Pro plan activated!')) + '</h2>' +
       '<p class="pwSub">' + sub + '</p>' +
       '<div class="pwTrilha" style="flex:none;gap:18px"><div class="pwTrilhaLinha"></div>' +
         itens.map(it => '<div class="pwPasso on"><div class="pwPassoNo">' + svg(it[0], 2) + '</div>' +
@@ -3962,8 +3975,9 @@ async function iniciarCompraAssinatura(){
       const _l = document.getElementById('loadingMasmorraTxt');
       if (_l) _l.textContent = _billingTexto('pro.loadPag1', 'Processando seu pagamento...', 'Processing your payment...');
     }
+    let dadosVerif = null;
     try {
-      await billingVerificar(sku, token);
+      dadosVerif = await billingVerificar(sku, token);
     } catch(e){
       try { await resposta.complete('fail'); } catch(_){}
       resposta = null;
@@ -3973,7 +3987,7 @@ async function iniciarCompraAssinatura(){
     resposta = null;
     billingAtualizarTelas();
     if (typeof window.esconderLoadingMasmorra === 'function') window.esconderLoadingMasmorra();
-    billingMostrarCompraOk(sku);
+    billingMostrarCompraOk(sku, false, dadosVerif);
   } catch(e){
     // Pessoa fechou o pop-up da Google: nao e' erro, nao mostra nada.
     const cancelou = e && (e.name === 'AbortError' || e.name === 'NotAllowedError');

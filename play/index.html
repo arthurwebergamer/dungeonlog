@@ -9991,7 +9991,9 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     // so mostra rotulo quando o personagem tem NOME PROPRIO dado na
     // criacao -- grátis com 1 personagem só fica igual sempre foi
     // (so "Nível X"), sem rotulo extra poluindo a topbar.
-    pjNomeTopoEl.textContent = (p && p.nome) ? p.nome : '';
+    // O nome do heroi ja aparece centralizado em #nomeTopo; repetir aqui, antes
+    // do "Nível", duplicava o nome (visto ao criar o 2o heroi). Fica sempre vazio.
+    pjNomeTopoEl.textContent = '';
   }
   window.atualizarNomeTopoPersonagem = atualizarNomeTopoPersonagem;
 

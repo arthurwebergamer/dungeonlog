@@ -11756,9 +11756,15 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     // futuros caminhos) sem precisar de gancho especifico em cada um --
     // exclusao so reduz a lista ao vivo, nunca o teto, entao isso e seguro:
     // o teto so sobe aqui, nunca desce.
+    // (pedido do usuario) o teto agora ACOMPANHA a lista: apagar/mover uma
+    // tarefa pendente baixa o total (antes ficava preso, ex.: 4/4 com 1
+    // tarefa). Dano ja causado nao some: total = tarefas de hoje + dano das
+    // ja concluidas que nao estao mais na lista. viva = tarefas pendentes.
     const doDiaAgora = tarefas.filter(ehDeHoje);
-    if (doDiaAgora.length > hpTotal){
-      hpTotal = doDiaAgora.length;
+    const feitasAgora = doDiaAgora.filter(feitaHoje).length;
+    const novoTotal = doDiaAgora.length + Math.max(0, hpDano - feitasAgora);
+    if (novoTotal !== hpTotal){
+      hpTotal = novoTotal;
       gravar();
     }
     return { total: hpTotal, viva: Math.max(0, hpTotal - hpDano) };

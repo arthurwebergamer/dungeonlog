@@ -4644,6 +4644,9 @@ window.atualizarTravaTransicaoEstagio = atualizarTravaTransicaoEstagio;
     // usuario: so no final "voce pode escolher qualquer um dos 4").
     // Era `< 2` antes do Sistema de Estagios (liberava assim que houvesse
     // 2 temas desbloqueados) -- trocado pro tamanho total da lista.
+    // (pedido do usuario) vale tambem pra Pro: o Pro libera os temas, mas o
+    // arrasto so abre depois do ultimo estagio (4), igual pra todo mundo.
+    if (typeof estagioAtual === 'function' && estagioAtual() < 4) return;
     if (TEMAS_ARENA.filter(temaArenaDesbloqueado).length < TEMAS_ARENA.length) return;
     sx = e.touches[0].clientX; sy = e.touches[0].clientY;
     rastreando = true; decidiu = false; cancelado = false;

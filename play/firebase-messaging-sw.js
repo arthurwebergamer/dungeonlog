@@ -44,7 +44,7 @@ const PAGINA_OFFLINE = '<!doctype html><html lang="pt-BR"><head><meta charset="u
   'h1{font-size:22px;margin:0}p{margin:0;color:#B8B5AF;line-height:1.5;max-width:300px}' +
   'button{margin-top:10px;background:#EDEBE7;color:#282828;border:0;border-radius:12px;padding:14px 26px;font-size:16px;font-weight:700}' +
   '</style></head><body><main><h1>Sem conexão</h1>' +
-  '<p>Abra o Dungeonlog uma vez com internet para ele funcionar offline. Depois disso, ele abre sem conexão.</p>' +
+  '<p>O Dungeonlog precisa de internet para abrir. Conecte-se e tente de novo.</p>' +
   '<button onclick="location.reload()">Tentar de novo</button></main></body></html>';
 
 // Resposta vinda de REDIRECIONAMENTO (o Cloudflare Pages manda /play/index.html
@@ -95,6 +95,8 @@ self.addEventListener('fetch', (event) => {
       if (resp && resp.ok && resp.type === 'basic') cache.put(chave, limpa(resp.clone()));
       return resp;
     } catch (e) {
+      // navegacao sem rede: SEMPRE a tela "Sem conexao" (o app exige internet)
+      if (req.mode === 'navigate') return new Response(PAGINA_OFFLINE, { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8' } });
       const guardado = await cache.match(chave, { ignoreSearch: true });
       if (guardado) return limpa(guardado);
       // sem cache E sem rede: nunca deixa aparecer a tela de erro do Chrome --

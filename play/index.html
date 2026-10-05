@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=49">
+<link rel="stylesheet" href="style.css?v=50">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -393,16 +393,8 @@ catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
       <div class="advcatrow catvisivel">
         <span class="diflabel">Categoria</span>
         <div class="catchips" id="catChips"></div>
-        <button type="button" class="catnova" id="catNovaBtn">+ Nova categoria</button>
-        <div class="catform" id="catForm">
-          <input type="text" class="catnomeinput" id="catNomeInput" placeholder="Nome da categoria" maxlength="24" autocomplete="off">
-          <div class="catformacoes">
-            <button type="button" class="catformcancelar" id="catFormCancelar">Cancelar</button>
-            <button type="button" class="catformok" id="catFormOk">Criar</button>
-          </div>
-        </div>
+        <button type="button" class="catnova" id="catNovaBtn">⚙ Categorias</button>
       </div>
-
       <!-- v4.162 (pedido do usuario): secao "Repeticao" reorganizada -- rotulo
            igual ao padrao ja usado por "Dificuldade"/"Vezes por dia" (antes os
            3 botoes de modo nao tinham nenhum rotulo acima), textos curtos pra
@@ -5943,40 +5935,11 @@ function pintarCategorias(){
 }
 
 (function montarCategoria(){
-  const novaBtn = document.getElementById('catNovaBtn');
-  const form = document.getElementById('catForm');
-  const nomeInput = document.getElementById('catNomeInput');
-  const ok = document.getElementById('catFormOk');
-  const cancelar = document.getElementById('catFormCancelar');
-  if (!novaBtn || !form || !nomeInput || !ok || !cancelar) return;
-
-  // pedido do usuario: "a gente nao precisa de cores nas categorias" --
-  // saiu o seletor de cor (era a mesma paleta CORES_PRESET do corBox).
-
-  function abrirForm(){
-    form.classList.add('on');
-    novaBtn.classList.add('off');
-    nomeInput.value = '';
-    nomeInput.focus();
-  }
-  function fecharForm(){
-    form.classList.remove('on');
-    novaBtn.classList.remove('off');
-  }
-
-  novaBtn.onclick = abrirForm;
-  cancelar.onclick = fecharForm;
-  ok.onclick = () => {
-    const nome = nomeInput.value.trim();
-    if (!nome){ nomeInput.focus(); return; }
-    const cat = criarCategoriaTarefa(nome);
-    if (!cat) return;
-    categoriaEscolhida = cat.id;   // categoria recem-criada ja entra selecionada
-    fecharForm();
-    pintarCategorias();
-  };
-  nomeInput.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); ok.click(); } });
-
+  // UM so lugar pra criar/editar/apagar categoria: a tela "Categorias"
+  // (abrirCategoriasOverlay). Aqui no composer so seleciona; o botao leva
+  // pra mesma tela (feedback da mae do usuario: criar em 2 lugares confundia).
+  const gerenciar = document.getElementById('catNovaBtn');
+  if (gerenciar) gerenciar.onclick = () => { if (typeof abrirCategoriasOverlay === 'function') abrirCategoriasOverlay(); };
   pintarCategorias();
 })();
 
@@ -8394,14 +8357,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
         <div class="advcatrow">
           <span class="diflabel">Categoria</span>
           <div class="catchips" id="edCatChips"></div>
-          <button type="button" class="catnova" id="edCatNovaBtn">+ Nova categoria</button>
-          <div class="catform" id="edCatForm">
-            <input type="text" class="catnomeinput" id="edCatNomeInput" placeholder="Nome da categoria" maxlength="24" autocomplete="off">
-            <div class="catformacoes">
-              <button type="button" class="catformcancelar" id="edCatFormCancelar">Cancelar</button>
-              <button type="button" class="catformok" id="edCatFormOk">Criar</button>
-            </div>
-          </div>
+          <button type="button" class="catnova" id="edCatNovaBtn">⚙ Categorias</button>
         </div>
       </div>
     </div>
@@ -8440,10 +8396,6 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   const corGrupo  = document.getElementById('edCorBoxSwatches');
   const catChips  = document.getElementById('edCatChips');
   const catNovaBtn = document.getElementById('edCatNovaBtn');
-  const catForm    = document.getElementById('edCatForm');
-  const catNomeInput = document.getElementById('edCatNomeInput');
-  const catFormOk = document.getElementById('edCatFormOk');
-  const catFormCancelar = document.getElementById('edCatFormCancelar');
   const VEZES_MIN_ED = 1, VEZES_MAX_ED = 9;
 
   let idx = -1, dif = 'media', modo = 'hoje', dias = [], diaMes = 1, diaAno = 1, mesAno = 1, vezes = 1, corBox = null, categoriaId = null;
@@ -8506,29 +8458,9 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 
   // pedido do usuario: "a gente nao precisa de cores nas categorias" --
   // saiu o seletor de cor (era a mesma paleta CORES_PRESET do corBox).
-  if (catNovaBtn && catForm && catNomeInput && catFormOk && catFormCancelar){
-    catNovaBtn.onclick = () => {
-      catForm.classList.add('on');
-      catNovaBtn.classList.add('off');
-      catNomeInput.value = '';
-      catNomeInput.focus();
-    };
-    catFormCancelar.onclick = () => {
-      catForm.classList.remove('on');
-      catNovaBtn.classList.remove('off');
-    };
-    catFormOk.onclick = () => {
-      const nome = catNomeInput.value.trim();
-      if (!nome){ catNomeInput.focus(); return; }
-      const cat = criarCategoriaTarefa(nome);
-      if (!cat) return;
-      categoriaId = cat.id;
-      catForm.classList.remove('on');
-      catNovaBtn.classList.remove('off');
-      pintarCategoriasEd();
-    };
-    catNomeInput.addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); catFormOk.click(); } });
-  }
+  // um so lugar pra criar/editar/apagar: tela "Categorias" (mesmo botao do composer)
+  if (catNovaBtn) catNovaBtn.onclick = () => { if (typeof abrirCategoriasOverlay === 'function') abrirCategoriasOverlay(); };
+  window._pintarCategoriasEd = pintarCategoriasEd;
 
   // os botoes de dificuldade sao montados a partir da mesma tabela DIFS
   DIFS.forEach(d => {
@@ -10546,6 +10478,8 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   // usado no resto do app (ex: atualizarResumosConfig).
   window.atualizarCategoriasOverlaySeAberta = function(){
     if (ov.classList.contains('on')) repintar();
+    if (typeof pintarCategorias === 'function') pintarCategorias();
+    if (typeof window._pintarCategoriasEd === 'function') window._pintarCategoriasEd();
   };
 
   window.abrirCategoriasOverlay = abrir;

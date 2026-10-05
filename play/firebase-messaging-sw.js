@@ -35,13 +35,36 @@
    quando a internet voltar. Mudou os arquivos do shell? Troque o nome do
    cache abaixo so se precisar forcar limpeza -- o conteudo se atualiza sozinho.
    ========================================================================= */
-const CACHE_APP = 'dungeonlog-app-v1';
-const SHELL_APP = ['./', 'index.html', 'style.css', 'assets.js', 'manifest.json', 'icon-192.png', 'icon-512.png'];
+const CACHE_APP = 'dungeonlog-app-v2';
+const SHELL_APP = ['style.css', 'assets.js', 'manifest.json', 'icon-192.png', 'icon-512.png'];
+
+const PAGINA_OFFLINE = '<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#282828"><title>Dungeonlog</title><style>' +
+  'html,body{margin:0;height:100%;background:#282828;color:#EDEBE7;font-family:system-ui,sans-serif}' +
+  'main{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center}' +
+  'h1{font-size:22px;margin:0}p{margin:0;color:#B8B5AF;line-height:1.5;max-width:300px}' +
+  'button{margin-top:10px;background:#EDEBE7;color:#282828;border:0;border-radius:12px;padding:14px 26px;font-size:16px;font-weight:700}' +
+  '</style></head><body><main><h1>Sem conexão</h1>' +
+  '<p>Abra o Dungeonlog uma vez com internet para ele funcionar offline. Depois disso, ele abre sem conexão.</p>' +
+  '<button onclick="location.reload()">Tentar de novo</button></main></body></html>';
+
+// Resposta vinda de REDIRECIONAMENTO (o Cloudflare Pages manda /play/index.html
+// pra /play/) NAO pode ser usada pra responder uma navegacao -- o Chrome
+// recusa e mostra ERR_FAILED. Copia limpa, sem a marca de redirecionada.
+function limpa(resp) {
+  if (resp && resp.redirected) {
+    return new Response(resp.body, { status: resp.status, statusText: resp.statusText, headers: resp.headers });
+  }
+  return resp;
+}
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_APP)
-      .then((c) => Promise.all(SHELL_APP.map((u) => c.add(u).catch(() => {}))))   // um arquivo faltando nao derruba a instalacao
+      .then(async (c) => {
+        // pagina do app: busca a URL "de verdade" do escopo (./ = /play/), nao index.html
+        try { const r = await fetch('./', { cache: 'reload' }); if (r.ok) await c.put('index.html', limpa(r)); } catch (e) {}
+        await Promise.all(SHELL_APP.map((u) => fetch(u, { cache: 'reload' }).then((r) => r.ok ? c.put(u, limpa(r)) : null).catch(() => {})));
+      })
       .then(() => self.skipWaiting())
   );
 });
@@ -69,15 +92,14 @@ self.addEventListener('fetch', (event) => {
         fetch(req),
         new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 4000)),
       ]);
-      if (resp && resp.ok && resp.type === 'basic') cache.put(chave, resp.clone());
+      if (resp && resp.ok && resp.type === 'basic') cache.put(chave, limpa(resp.clone()));
       return resp;
     } catch (e) {
       const guardado = await cache.match(chave, { ignoreSearch: true });
-      if (guardado) return guardado;
-      if (req.mode === 'navigate') {
-        const shell = await cache.match('index.html');
-        if (shell) return shell;
-      }
+      if (guardado) return limpa(guardado);
+      // sem cache E sem rede: nunca deixa aparecer a tela de erro do Chrome --
+      // mostra uma tela propria (so em navegacao; subrecurso ausente = erro normal)
+      if (req.mode === 'navigate') return new Response(PAGINA_OFFLINE, { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8' } });
       return Response.error();
     }
   })());

@@ -18114,7 +18114,18 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
 (function(){
   if (!('serviceWorker' in navigator)) return;
   window.addEventListener('load', function(){
-    try { navigator.serviceWorker.register('firebase-messaging-sw.js').catch(function(){}); } catch(e){}
+    try {
+      navigator.serviceWorker.register('firebase-messaging-sw.js').catch(function(){});
+      // garante o app no cache mesmo se o precache da instalacao falhou: guarda a
+      // pagina que acabou de carregar online (mesma chave que o SW usa: /play/index.html)
+      navigator.serviceWorker.ready.then(function(){
+        if (!navigator.onLine || !window.caches) return;
+        fetch(location.pathname, { cache:'reload' }).then(function(r){
+          if (!r.ok) return;
+          return caches.open('dungeonlog-app-v2').then(function(c){ return c.put(new URL('index.html', location.href), r); });
+        }).catch(function(){});
+      }).catch(function(){});
+    } catch(e){}
   });
 })();
 </script>

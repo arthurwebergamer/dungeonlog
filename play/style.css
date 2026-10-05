@@ -3072,6 +3072,7 @@
   .catrowbtn svg{width:17px;height:17px;stroke:currentColor}
   .catrowbtn:active{transform:scale(.93)}
   .catrowbtn.del{color:var(--perigo);border-color:var(--perigo)}
+  .catnovarow[hidden]{display:none}
   .catnovarow{
     display:flex;align-items:center;gap:10px;padding:14px;
     background:none;border:1.5px dashed var(--line);border-radius:12px;

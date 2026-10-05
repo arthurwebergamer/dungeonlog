@@ -5915,7 +5915,9 @@ function pintarAdvColor(){
 
 function resetAdvColor(){
   corBoxEscolhida = null;
-  categoriaEscolhida = null;
+  // categoria pre-selecionada = a aba de filtro ativa na lista (se houver)
+  categoriaEscolhida = (typeof filtroCategoriaTarefa !== 'undefined' && filtroCategoriaTarefa && categoriaTarefaPorId(filtroCategoriaTarefa))
+    ? filtroCategoriaTarefa : null;
   const panel = document.getElementById('advPanel');
   const toggle = document.getElementById('advToggle');
   if (panel) panel.classList.remove('on');

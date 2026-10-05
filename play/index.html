@@ -5915,7 +5915,9 @@ function pintarAdvColor(){
 
 function resetAdvColor(){
   corBoxEscolhida = null;
-  categoriaEscolhida = null;
+  // categoria pre-selecionada = a aba de filtro ativa na lista (se houver)
+  categoriaEscolhida = (typeof filtroCategoriaTarefa !== 'undefined' && filtroCategoriaTarefa && categoriaTarefaPorId(filtroCategoriaTarefa))
+    ? filtroCategoriaTarefa : null;
   const panel = document.getElementById('advPanel');
   const toggle = document.getElementById('advToggle');
   if (panel) panel.classList.remove('on');
@@ -9198,6 +9200,13 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     // ultimoDia e atualizado e persistido logo em seguida.
     if (typeof window.registrarHistorico === 'function'){
       window.registrarHistorico(ultimoDia, tarefasEm(ultimoDia).length, largadas.length);
+    } else {
+      // BUG (streak sumia): no boot, verificarVirada() roda ANTES do modulo
+      // Historico (fim do arquivo) existir -- o registro era descartado em
+      // silencio e o dia fechado nunca entrava no historico (sequencia zerava
+      // sempre que o app abria so no dia seguinte). Enfileira; o modulo
+      // Historico drena a fila assim que registrarHistorico existir.
+      (window._histPendentes = window._histPendentes || []).push([ultimoDia, tarefasEm(ultimoDia).length, largadas.length]);
     }
 
     // DIA MANUAL: todas concluidas mas 'Terminar dia' nao foi tocado -> vitoria automatica
@@ -12461,6 +12470,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // precisar reabrir este modulo. Retorna copia -- quem consome nao pode
   // mutar o array real por acidente.
   window.registrarHistorico = registrarHistorico;
+  (window._histPendentes || []).forEach(a => registrarHistorico(a[0], a[1], a[2]));
+  window._histPendentes = [];
   window.obterHistorico = function(){ return historico.slice(); };
   // chamado por puxarNuvem() apos restaurar CHAVE_HIST vinda da nuvem --
   // mesmo motivo do vidaHeroi.recarregar() (ver bloco VIDA DO HEROI):

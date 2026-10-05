@@ -19240,3 +19240,44 @@ Cobre os PRs #66 a #87 (todos mergeados em `main`). Foco da sessão: **lançar**
 - [ ] Linha 'vitória' do histórico não é gravada na virada automática ao abrir o app (`registrarHistorico` ainda não existe no boot) — pré-existente.
 - [ ] Atualizar o texto do tutorial ("No final do dia, se eu concluir todas as tarefas, o monstro morre…") para citar o **Terminar dia**.
 - [ ] Demais pendências de lançamento da seção anterior continuam abertas (RTDN, `ADMIN_TOKEN`, texto do paywall, descrições do Play Console, senha da conta de revisor, limpeza de credenciais).
+
+## [Sessão 05/10/2026] Categorias redesenhadas, histórico/streak corrigidos, botão voltar, barra de status, modo sem internet, diálogos menores
+
+### 1. Categorias (UX)
+- [x] **Um único lugar para criar categoria:** no criar/editar tarefa (chips + "+ Nova categoria" inline). Na lista só o lápis "Editar categorias"; a tela `#categoriasOverlay` não adiciona mais.
+- [x] **Categoria automática:** se há filtro de categoria ativo na tela de tarefas, a nova tarefa já nasce nela (`resetAdvColor()` usa `filtroCategoriaTarefa`).
+
+### 2. Histórico, streak e bestiário (bug "a sequência sumiu")
+- [x] Causa 1: `verificarVirada()` rodava no boot **antes** do módulo Histórico existir; o `typeof window.registrarHistorico` falhava calado. Agora enfileira em `window._histPendentes` e o módulo Histórico esvazia a fila.
+- [x] Causa 2: `puxarNuvem()` sobrescrevia o histórico local. Novo `window.recarregarHistoricoNuvem` e `_registradosSessao`.
+- [x] Recuperação do "ontem" quando o dia já tinha tarefas concluídas mas sem linha no histórico.
+- [x] **HP do monstro** (`hpMonstroDoDia`) passa a seguir o total real da lista (não mais "4/4" com 1 tarefa).
+
+### 3. Arena e navegação
+- [x] **Arrastar a arena só no estágio 4**, inclusive para Pro (gate no `touchstart`: `estagioAtual() < 4`).
+- [x] **Botão voltar do Android:** sentinela no `history`; fecha popup → camada mais alta → volta para a aba Tarefas → só então sai do app.
+- [x] **Cor da barra de status** acompanha o `--bg` do tema (`<meta theme-color>`); `theme_color` e `background_color` do `manifest.json` = `#282828`.
+
+### 4. Modo sem internet (TWA)
+- [x] Decisão: **o app exige internet**. Offline, abrir o app mostra a tela de "loading da masmorra" (herói pulando) e depois o herói cai, "Sem conexão" + "Tentar de novo". Nunca mais a tela de erro do Chrome (ERR_FAILED).
+- [x] Implementado dentro do `firebase-messaging-sw.js` (só pode existir 1 SW por escopo). Navegação sem rede → `PAGINA_OFFLINE` inline (sprite do herói "Loiro" embutido, sem fontes externas). Subrecursos ainda vêm do cache (`dungeonlog-app-v2`), o Firebase fica num `try/catch`.
+- Aprendizados:
+  - `context.setOffline(true)` do Playwright **não** afeta requisições do Service Worker: para testar offline de verdade, **derrubar o servidor**. Os "testes offline" da v1 eram inválidos e a v1 falhou no aparelho.
+  - Resposta com `redirected:true` não pode responder uma navegação (ERR_FAILED); o Cloudflare Pages redireciona `/play/index.html` → `/play/`. Usar `limpa()` ao guardar no cache.
+  - Para reaproveitar CSS/sprites do app em página inline do SW, inline tudo (nada de Silkscreen/Outfit: sem rede não carregam).
+
+### 5. Diálogos do tutorial
+- [x] Caixa menor (148→124 px), herói 126→96 px, fonte **Outfit 15 px** (era Cormorant 18 px, fina demais).
+- [x] **Falas encurtadas:** 22 → 16 falas (PT e EN), maior fala com 104 caracteres. O tutorial só aparece 1× por aba, então só vale para quem ainda não viu.
+
+### 6. Loja e identidade
+- [x] Classificação etária 14+ vem só de "Compras no Aplicativo" (Play Console).
+- [x] Ícone de Halloween (portal de pedra) foi gerado e **adiado**: o app nem lançou. Removido da `main` (PR #111), continua no histórico em `38dc753`. Para usar: `iconUrl`/`maskableIconUrl` do `twa-manifest.json` em `https://dungeonlog.weberlabs.com.br/play/icon-halloween-512.png`, `themeColor`/`backgroundColor` `#282828`, novo AAB (versionCode > 7) e trocar o ícone da ficha da Play (512×512 PNG).
+- A barra "Executando no Chrome" é o aviso do TWA; não há como esconder pelo app.
+
+### Pendências
+- [ ] Testar o offline no aparelho depois do deploy (abrir 2× com internet, modo avião, fechar o app, abrir).
+- [ ] Texto do tutorial não cita o **Terminar dia** (a fala de "concluir todas" foi encurtada).
+- [ ] `themeColor` do `twa-manifest.json` ainda `#191919` (barra do Android); precisa de novo AAB, junto de qualquer outra mudança nativa.
+- [ ] A pendência "linha vitória do histórico não gravada na virada automática" (seção anterior) está **resolvida** em 2.
+- [ ] Demais pendências de lançamento da seção 03–04/10 continuam abertas.

@@ -39,12 +39,26 @@ const CACHE_APP = 'dungeonlog-app-v2';
 const SHELL_APP = ['style.css', 'assets.js', 'manifest.json', 'icon-192.png', 'icon-512.png'];
 
 const PAGINA_OFFLINE = '<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#282828"><title>Dungeonlog</title><style>' +
-  'html,body{margin:0;height:100%;background:#282828;color:#EDEBE7;font-family:system-ui,sans-serif}' +
-  'main{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center}' +
-  'h1{font-size:22px;margin:0}p{margin:0;color:#B8B5AF;line-height:1.5;max-width:300px}' +
-  'button{margin-top:10px;background:#EDEBE7;color:#282828;border:0;border-radius:12px;padding:14px 26px;font-size:16px;font-weight:700}' +
-  '</style></head><body><main><h1>Sem conexão</h1>' +
-  '<p>O Dungeonlog precisa de internet para abrir. Conecte-se e tente de novo.</p>' +
+  'html,body{margin:0;height:100%;background:#282828;color:#EDEBE7;font-family:Georgia,"Times New Roman",serif}' +
+  'body{background:radial-gradient(ellipse at 50% 38%,#3a3630 0,#282828 62%)}' +
+  'main{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px;text-align:center}' +
+  'svg{width:150px;height:auto;margin-bottom:6px}' +
+  '.rune{animation:p 2.4s ease-in-out infinite}@keyframes p{0%,100%{opacity:.35}50%{opacity:1}}' +
+  'small{letter-spacing:.28em;text-transform:uppercase;font-size:11px;color:#C9A24A;font-family:system-ui,sans-serif}' +
+  'h1{font-size:26px;margin:0;font-weight:700}' +
+  'p{margin:0;color:#B8B5AF;line-height:1.55;max-width:290px;font-size:15px}' +
+  'button{margin-top:14px;background:#C9A24A;color:#282828;border:0;border-radius:12px;padding:14px 28px;font-size:16px;font-weight:700;font-family:system-ui,sans-serif;box-shadow:0 4px 0 #8a6d2c}' +
+  'button:active{transform:translateY(3px);box-shadow:0 1px 0 #8a6d2c}' +
+  '</style></head><body><main>' +
+  '<svg viewBox="0 0 120 140" fill="none" stroke-linejoin="round"><path d="M14 138V58C14 26 36 8 60 8s46 18 46 50v80Z" fill="#1d1c1a" stroke="#6b645a" stroke-width="4"/>' +
+  '<path d="M30 138V60c0-22 14-36 30-36s30 14 30 36v78Z" fill="#14130f" stroke="#4a453d" stroke-width="3"/>' +
+  '<path d="M60 24v114M30 82h60" stroke="#4a453d" stroke-width="2"/>' +
+  '<rect x="46" y="74" width="28" height="24" rx="4" fill="#C9A24A" stroke="#8a6d2c" stroke-width="2"/>' +
+  '<path d="M51 74v-8a9 9 0 0 1 18 0v8" stroke="#C9A24A" stroke-width="4" stroke-linecap="round"/>' +
+  '<circle cx="60" cy="86" r="3" fill="#14130f"/>' +
+  '<g class="rune" stroke="#C9A24A" stroke-width="2.5" stroke-linecap="round"><path d="M60 38v10M55 43h10"/><path d="M22 112l6-6m0 6l-6-6M98 112l-6-6m0 6l6-6"/></g></svg>' +
+  '<small>Portal selado</small><h1>Sem conexão</h1>' +
+  '<p>As runas do reino se apagaram. O Dungeonlog precisa de internet para abrir a masmorra — reconecte e tente de novo.</p>' +
   '<button onclick="location.reload()">Tentar de novo</button></main></body></html>';
 
 // Resposta vinda de REDIRECIONAMENTO (o Cloudflare Pages manda /play/index.html

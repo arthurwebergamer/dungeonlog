@@ -78,6 +78,11 @@ self.addEventListener('fetch', (event) => {
   if (url.pathname.indexOf('/play/') !== 0) return;       // so o que e' do app
 
   event.respondWith((async () => {
+    // sem rede declarada pelo aparelho (modo aviao etc.): responde na hora com a
+    // tela offline, sem tentar fetch nem abrir o cache -- evita a espera antes do loading
+    if (req.mode === 'navigate' && self.navigator && self.navigator.onLine === false) {
+      return new Response(PAGINA_OFFLINE, { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8' } });
+    }
     const cache = await caches.open(CACHE_APP);
     const chave = req.mode === 'navigate' ? 'index.html' : req;
     try {

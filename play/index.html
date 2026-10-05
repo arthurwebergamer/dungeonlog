@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=49">
+<link rel="stylesheet" href="style.css?v=52">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -11411,34 +11411,30 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 
   const DIALOGOS = {
     tarefas: [
-      'Essa é minha lista de tarefas diárias.',
-      'Cada tarefa concluída é um golpe no monstro, e me recompensa com experiência e moedas.',
-      'No final do dia, se eu concluir todas as tarefas, o monstro morre e eu ganho recompensas: armaduras, espadas, acessórios e muitos outros equipamentos.',
-      'Se eu não conseguir concluir todas, o monstro me golpeia — o dano é baseado em quantas tarefas eu deixar de fazer.',
-      'Toque em uma tarefa para marcar como feita ou editar. Segure uma tarefa para reordenar a lista.',
-      'E tem mais: quanto mais tarefas eu completo, mais eu avanço de estágio — e o cenário da Arena muda de verdade, não é só decoração.',
-      'Ao alcançar o último estágio, desbloqueio todos os cenários e posso escolher qualquer um deles, arrastando a Arena pro lado.'
+      'Essa é minha lista de tarefas do dia.',
+      'Cada tarefa concluída fere o monstro e rende XP e moedas.',
+      'Se eu concluir todas, ele morre e eu ganho equipamentos. Se não, ele me golpeia.',
+      'Toque numa tarefa para concluir ou editar. Segure para reordenar.',
+      'Quanto mais tarefas, mais estágios, e a Arena muda. No último, posso arrastá-la para escolher o cenário.'
     ],
     inventario: [
-      'Aqui guardo tudo que saqueei das batalhas: armas, armaduras, acessórios e alguns tesouros raros.',
-      'Equipar um item bom aumenta minha experiência ou minhas moedas por tarefa.',
-      'Não uso mais um item? Vendo aqui mesmo por moedas. E existe um livro antigo que é desbloqueado em certo nível que revela todos os itens que eu posso obter.'
+      'Aqui ficam os itens que saqueei: armas, armaduras e acessórios.',
+      'Itens bons aumentam meu XP ou minhas moedas. Os que não uso, eu vendo.',
+      'Um livro antigo, em certo nível, revela todos os itens possíveis.'
     ],
     loja: [
-      'A loja renova o estoque todo dia — itens diferentes, sempre com uma oferta em destaque.',
-      'Quanto mais raro o item, mais caro — e alguns só são liberados para comprar quando eu atingo certo nível.',
-      'Meu atributo de Foco me dá desconto nas compras. E claro, também posso vender o que não uso mais aqui.'
+      'A loja renova todo dia, sempre com uma oferta em destaque.',
+      'Itens raros custam mais e alguns exigem nível. Meu Foco dá desconto.'
     ],
     perfil: [
-      'Aqui vejo meus atributos, minhas conquistas e todo o progresso da jornada.',
-      'Cada nível me dá pontos pra investir em Fortuna, que melhora minha sorte no saque, ou em Foco, que barateia a loja.',
-      'As Conquistas recompensam marcos que eu alcanço — e o Bestiário guarda o registro de cada monstro que já enfrentei.',
-      'Aqui também posso ajustar as configurações da minha experiência, como o tema, verificar meu histórico de dias completados, entre outras funções.'
+      'Aqui vejo meus atributos, conquistas e progresso.',
+      'Cada nível dá pontos: Fortuna melhora o saque e Foco barateia a loja.',
+      'O Bestiário registra cada monstro enfrentado. Tema e histórico ficam nas configurações.'
     ],
     estatisticas: [
-      'Essa aba mostra como venho me saindo — minha sequência de vitórias, o quanto completei no mês e o histórico completo dos meus dias.',
-      'Essa tocha ali em cima cresce e fica mais forte a cada dia que eu vencer sem parar. Se eu deixar a sequência quebrar, ela apaga.',
-      'Toque em Histórico pra ver dia a dia, semana, mês ou o ano inteiro — cada quadradinho mostra se eu venci, fugi ou nem tinha tarefa naquele dia.'
+      'Aqui vejo minha sequência de vitórias, o mês e meu histórico.',
+      'A tocha cresce a cada dia vencido. Se a sequência quebra, ela apaga.',
+      'Em Histórico vejo cada dia: venci, fugi ou sem tarefas.'
     ]
   };
 
@@ -11447,34 +11443,30 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   // palavra, é a mesma fala reescrita naturalmente em inglês.
   const DIALOGOS_EN = {
     tarefas: [
-      'This is my daily task list.',
-      'Every task I finish is a hit on the monster, and rewards me with experience and coins.',
-      'By the end of the day, if I finish every task, the monster dies and I get rewards: armor, swords, accessories, and lots of other gear.',
-      'If I can\'t finish them all, the monster hits me back — the damage depends on how many tasks I leave undone.',
-      'Tap a task to mark it done or edit it. Hold a task to reorder the list.',
-      'There\'s more: the more tasks I complete, the further I advance through stages — and the Arena\'s scenery actually changes, it\'s not just decoration.',
-      'Once I reach the final stage, I unlock every scenery and can pick any of them by dragging the Arena sideways.'
+      'This is my task list for the day.',
+      'Every finished task hurts the monster and earns XP and coins.',
+      'If I finish them all, it dies and I get gear. If not, it hits me.',
+      'Tap a task to finish or edit it. Hold to reorder.',
+      'More tasks, more stages, and the Arena changes. At the last one, I can drag it to pick a scenery.'
     ],
     inventario: [
-      'This is where I keep everything I\'ve looted from battle: weapons, armor, accessories, and a few rare treasures.',
-      'Equipping a good item boosts my experience or my coins per task.',
-      'Not using an item anymore? I can sell it right here for coins. And there\'s an old book, unlocked at a certain level, that reveals every item I can ever get.'
+      'Here are the items I looted: weapons, armor and accessories.',
+      'Good items boost my XP or coins. What I don\'t use, I sell.',
+      'An old book, at a certain level, reveals every possible item.'
     ],
     loja: [
-      'The shop restocks every day — different items, always with one deal on offer.',
-      'The rarer the item, the pricier it gets — and some only unlock once I reach a certain level.',
-      'My Focus attribute gives me a discount on purchases. And of course, I can also sell what I don\'t use here.'
+      'The shop restocks daily, always with one featured deal.',
+      'Rare items cost more and some need a level. My Focus gives a discount.'
     ],
     perfil: [
-      'This is where I see my attributes, my achievements, and my whole journey\'s progress.',
-      'Every level gives me points to invest in Fortune, which improves my luck on loot, or Focus, which makes the shop cheaper.',
-      'Achievements reward the milestones I reach — and the Bestiary keeps a record of every monster I\'ve faced.',
-      'I can also tweak my experience here, like the theme, check my history of completed days, and a few other things.'
+      'Here I see my attributes, achievements and progress.',
+      'Each level gives points: Fortune improves loot and Focus makes the shop cheaper.',
+      'The Bestiary logs every monster I\'ve faced. Theme and history are in settings.'
     ],
     estatisticas: [
-      'This tab shows how I\'ve been doing — my win streak, how much I finished this month, and the full history of my days.',
-      'That torch up top grows and burns stronger every day I keep the streak alive. Let it break, and it goes out.',
-      'Tap History to see it day by day, week, month, or the whole year — each little square shows whether I won, fled, or had no tasks that day.'
+      'Here I see my win streak, the month and my history.',
+      'The torch grows with each winning day. If the streak breaks, it goes out.',
+      'In History I see each day: won, fled or no tasks.'
     ]
   };
 

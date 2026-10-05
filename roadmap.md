@@ -19205,3 +19205,38 @@ Cobre os PRs #66 a #87 (todos mergeados em `main`). Foco da sessão: **lançar**
 - [ ] Play Console: benefícios/descrições dos produtos, nome do `pro_mensal`, conta de revisor declarada em App access (trocar a senha dela).
 - [ ] **Segurança:** apagar o `.json` da conta de serviço do Firebase em Downloads e revogar o token antigo do Cloudflare.
 - [ ] Ainda abertos de antes: "Esqueceu a senha?" sem feedback (`TOASTS_DESATIVADOS`), monstro "fugindo do nada" (sem causa), UID do dono fora de `UIDS_DEBUG_PERMITIDO`, `reauthenticateWithPopup` no TWA sem teste, verificação do domínio de e-mail no Firebase, descrições dos atributos sumidas do Perfil.
+
+## [Sessão 03–04/10/2026] Teste grátis via Google Play, troca de conta da assinatura, "Terminar dia", baús, remoção do debug e versão 7 na Play
+
+### 1. Teste grátis e assinatura (03–04/10)
+- [x] **Teste local de 7 dias removido** (`trialAtivo()` sempre `false`): o teste agora é a **oferta `teste-gratis`** do plano base `anual-1` do `pro_anual` na Play. Cobra no fim e cancela pela Play ("Gerenciar assinatura").
+- [x] **Detecção do teste:** a Google manda `introductoryPrice.value = 0` (não `freeTrialPeriod`); `_billingTrialOk = _temTesteGratis && !billingJaUsouTeste() && !assinaturaAtiva()`. Card do teste some para quem já assinou (`questlog.playJaAssinou.v1` + `assinaturaJaTeveServidor()`).
+- [x] **Tela de confirmação própria do teste:** o Worker devolve `trial:true` (`offerId === 'teste-gratis'` e `ate > agora`).
+- [x] **Mover assinatura entre contas do app:** `POST /billing/verify` aceita `transferir:true` (ação explícita em "Restaurar compras"); sem isso continua 409 `compra-de-outra-conta`. A conta antiga só perde o PRO se o hash do token ainda for o dela. Resposta: `{ok, ate, trial, movida}`. Worker deployado (v057580db).
+- [x] Nome do herói duplicado antes do "Nível" corrigido (`#pjNomeTopo` fica vazio).
+- Aprendizados: o Play Billing do TWA usa a conta Google ligada à **instalação**; para repetir o teste com contas de teste é preciso o app **Play Billing Lab** (teste grátis, expira em 2 h); ofertas precisam de plano base compatível com versões anteriores; períodos acelerados (teste 3 min, anual 30 min).
+
+### 2. Jogo (04/10)
+- [x] **Botão "Terminar dia"** (`terminarDia()`, `podeTerminarDia()`): concluir todas as tarefas **não** encerra mais o dia, então dá para adicionar mais. O botão aparece quando não há pendentes; ao tocar: golpe final, vitória, baú e cura; depois fica bloqueado. Sem tocar, na **virada do dia** a vitória é automática (moedas creditadas, **sem baú**, cura aplicada).
+- [x] **Baú trancado de volta com cadeado novo** (SVG pixel em `.bauArena.trancado::after`).
+- [x] **Mais baús trancados:** chance 20–40% (era 10–30%), **Fortuna** soma até +15 pts (metade do bônus), **garantia** após 6 dias vencidos sem baú trancado (`PITY_BAU_ESPECIAL`, chave `questlog.bauSemEspecial.v1`).
+- [x] **Level-up e cerimônia de estágio só depois** da animação de +XP/+moedas (`_recompensaVoando` trava `viajarParaTemaEstagio`; fila: nível → estágio).
+
+### 3. Debug removido por completo (04/10)
+- [x] Saíram: botões (next day, skip tutorial, + all weapons, force stage, cancelar assinatura), toggle nas moedas, allowlist de contas (`UIDS/EMAILS_DEBUG_PERMITIDO`), painéis de log (conta, estágios, arrasto, medidas de tela) e todas as chamadas, `concederProVitalicio`/`revogarProVitalicio`/`expirarTrialAgora`/`_debugDefinirTotalTarefas`, offset de dia (o app usa sempre o dia real) e o atalho que fazia `assinaturaAtiva()` devolver PRO com debug ligado.
+- [x] Console mudo em produção; chaves legadas (`questlog.modoDebug.v1`, `questlog.dbgLog.v1`) são limpas no boot.
+- Consequência: sem os botões não dá mais para pular dia/estágio no aparelho (só voltando a um commit anterior ao 3c5aac0).
+- Os itens "Painel de log…" e "UID do dono fora de `UIDS_DEBUG_PERMITIDO`" das listas anteriores ficam obsoletos.
+
+### 4. Publicação na Play (04/10)
+- [x] App na loja como **"Dungeonlog: Hábitos RPG"** (pacote `com.dungeonlog`). `assetlinks` confirmado pela API do Google com as duas assinaturas (keystore `46:A1…` e Play App Signing `53:21…`).
+- [x] **Versão 7 (versionCode 7)**: o `.aab` com `versionCode` repetido é recusado; `gradlew bundleRelease` gera AAB **sem assinatura**, então assina com `jarsigner` (JDK 17, keystore `android.keystore`, alias `dungeonlog`) → `app-release-signed.aab`. Teste fechado enviado para análise; **Teste interno** não passa por análise e libera em minutos.
+- Mudanças só de site (tudo desta sessão) **não exigem AAB novo**: o TWA abre o site no Cloudflare Pages.
+- "O item não foi encontrado" para testador = versão não publicada/em análise, e-mail fora da lista da faixa ou convite de opt-in não aceito (não é versão do Android; `minSdk` 24).
+
+### Pendências
+- [ ] **Barra do Chrome no app:** confirmar quando aparece (ao abrir = falha de verificação; só no login do Google = normal) e comparar o SHA-256 `53:21…` com o certificado da chave de assinatura do app no Play Console.
+- [ ] Cancelar a assinatura de teste (renova a cada 30 min) e fazer o teste final de elegibilidade do teste grátis com conta limpa e Billing Lab desligado.
+- [ ] Linha 'vitória' do histórico não é gravada na virada automática ao abrir o app (`registrarHistorico` ainda não existe no boot) — pré-existente.
+- [ ] Atualizar o texto do tutorial ("No final do dia, se eu concluir todas as tarefas, o monstro morre…") para citar o **Terminar dia**.
+- [ ] Demais pendências de lançamento da seção anterior continuam abertas (RTDN, `ADMIN_TOKEN`, texto do paywall, descrições do Play Console, senha da conta de revisor, limpeza de credenciais).

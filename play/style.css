@@ -2988,6 +2988,11 @@
     color:var(--accent);cursor:pointer;
   }
   .catnova.off{display:none}
+  /* categoria visivel logo abaixo do nome da tarefa (feedback: estava escondida em Opcoes avancadas) */
+  .catvisivel{padding:2px 0 6px}
+  .catvisivel .catchip{height:40px;padding:0 16px;border-radius:100px;font-size:14px;font-weight:600}
+  .catvisivel .catchip.on{border-color:var(--accent);background:var(--accent-dim)}
+  .catvisivel .catnova{font-size:13.5px}
   .catform{
     max-height:0;overflow:hidden;opacity:0;display:flex;flex-direction:column;gap:9px;
     transition:max-height .2s ease,opacity .16s;

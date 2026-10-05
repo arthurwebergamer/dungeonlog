@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=48">
+<link rel="stylesheet" href="style.css?v=49">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -390,6 +390,19 @@ catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 
     <div class="composer" id="composer">
       <input id="input" placeholder="O que precisa ser feito?" data-i18n-placeholder="jogo.oQuePrecisaSerFeito" autocomplete="off">
+      <div class="advcatrow catvisivel">
+        <span class="diflabel">Categoria</span>
+        <div class="catchips" id="catChips"></div>
+        <button type="button" class="catnova" id="catNovaBtn">+ Nova categoria</button>
+        <div class="catform" id="catForm">
+          <input type="text" class="catnomeinput" id="catNomeInput" placeholder="Nome da categoria" maxlength="24" autocomplete="off">
+          <div class="catformacoes">
+            <button type="button" class="catformcancelar" id="catFormCancelar">Cancelar</button>
+            <button type="button" class="catformok" id="catFormOk">Criar</button>
+          </div>
+        </div>
+      </div>
+
       <!-- v4.162 (pedido do usuario): secao "Repeticao" reorganizada -- rotulo
            igual ao padrao ja usado por "Dificuldade"/"Vezes por dia" (antes os
            3 botoes de modo nao tinham nenhum rotulo acima), textos curtos pra
@@ -468,18 +481,6 @@ catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
             <button type="button" class="advreset" id="corBoxReset" data-i18n="jogo.semCor">Sem cor</button>
           </div>
           <div class="advswatches" id="corBoxSwatches"></div>
-        </div>
-        <div class="advcatrow">
-          <span class="diflabel">Categoria</span>
-          <div class="catchips" id="catChips"></div>
-          <button type="button" class="catnova" id="catNovaBtn">+ Nova categoria</button>
-          <div class="catform" id="catForm">
-            <input type="text" class="catnomeinput" id="catNomeInput" placeholder="Nome da categoria" maxlength="24" autocomplete="off">
-            <div class="catformacoes">
-              <button type="button" class="catformcancelar" id="catFormCancelar">Cancelar</button>
-              <button type="button" class="catformok" id="catFormOk">Criar</button>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -2408,7 +2409,7 @@ function pintarCatTabs(){
   const bNova = document.createElement('button');
   bNova.type = 'button';
   bNova.className = 'cattab cattabnova';
-  bNova.textContent = '+ ' + (en ? 'Add' : 'Adicionar');
+  bNova.textContent = '⚙ ' + (en ? 'Categories' : 'Categorias');
   bNova.onclick = () => { window.feedbackClique?.('clique', 10); if (typeof abrirCategoriasOverlay === 'function') abrirCategoriasOverlay(); };
   linha.appendChild(bNova);
 }

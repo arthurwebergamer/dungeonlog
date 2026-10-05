@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Dungeonlog</title>
-<meta name="theme-color" content="#1A1526">
+<meta name="theme-color" content="#282828">
 <!-- pedido do usuario (print real, Android/Chrome): "linhas estranhas em
      cima" de Politica de Privacidade/Termos de Uso na tela de Config --
      essas 2 linhas sao <a> de verdade (abrem o site em nova aba, ver
@@ -18033,6 +18033,77 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
   document.addEventListener('visibilitychange', () => { if (!document.hidden) agendar(); });
   if (window.visualViewport) window.visualViewport.addEventListener('resize', agendar);
   ajustar();
+})();
+</script>
+
+<!-- =====================================================================
+     BOTAO VOLTAR DO ANDROID + COR DA BARRA DE STATUS — bloco autonomo
+     Voltar: fecha a camada mais alta aberta (folha/overlay/paywall/ficha), depois
+     volta pra aba Tarefas, e so entao sai do app. Popups de recompensa/nivel
+     (.baubg) e o tutorial NAO fecham com o voltar (o jogador precisa tocar neles).
+     Tecnica: uma entrada "sentinela" no historico; cada voltar cai nela, a gente
+     age e recoloca a sentinela. Sem nada a fazer, history.back() deixa sair.
+     Cor: <meta theme-color> segue o --bg do tema ativo.
+     ===================================================================== -->
+<script>
+(function(){
+  /* ---- cor da barra de status = fundo do tema ---- */
+  function sincronizarCorBarra(){
+    try {
+      const cor = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+      if (!cor) return;
+      let m = document.querySelector('meta[name="theme-color"]');
+      if (!m){ m = document.createElement('meta'); m.name = 'theme-color'; document.head.appendChild(m); }
+      if (m.content !== cor) m.content = cor;
+    } catch(e){}
+  }
+  sincronizarCorBarra();
+  new MutationObserver(sincronizarCorBarra).observe(document.documentElement, { attributes:true, attributeFilter:['data-tema','class','style'] });
+
+  /* ---- botao voltar ---- */
+  if (!window.history || typeof history.pushState !== 'function') return;
+
+  const CAMADAS = '.cfgOverlay.on, .edov.on, .paywallOverlay.on, .sheetbg.on';
+  const BLOQUEIOS = '.baubg.on, .dlgOverlay.on';
+
+  function z(el){ return parseInt(getComputedStyle(el).zIndex, 10) || 0; }
+
+  function camadaDoTopo(){
+    const abertas = Array.from(document.querySelectorAll(CAMADAS));
+    if (!abertas.length) return null;
+    let topo = abertas[0], zt = z(topo);
+    abertas.forEach(el => { const ze = z(el); if (ze >= zt){ topo = el; zt = ze; } });
+    return topo;
+  }
+
+  function fecharCamada(el){
+    const btn = el.querySelector('.cfgvoltar, .edfechar, .pwClose');
+    if (btn) btn.click(); else el.click();   // sem botao: toque no fundo (e.target === overlay)
+    if (el.classList.contains('on')) el.classList.remove('on');   // ultimo recurso
+    if (el.id === 'fichaBG'){ const f = document.getElementById('ficha'); if (f) f.classList.remove('on'); }
+  }
+
+  // true = o voltar foi consumido pelo app
+  function tratarVoltar(){
+    if (document.querySelector(BLOQUEIOS)) return true;          // popup que exige toque: engole
+    const topo = camadaDoTopo();
+    if (topo){ fecharCamada(topo); return true; }
+    if (typeof abaAtual !== 'undefined' && abaAtual !== 'tarefas' && typeof mostrarAba === 'function'){
+      mostrarAba('tarefas'); return true;
+    }
+    return false;
+  }
+
+  const st = history.state;
+  if (!(st && st.ql === 1)){
+    history.replaceState({ ql:0 }, '');
+    history.pushState({ ql:1 }, '');
+  }
+
+  window.addEventListener('popstate', () => {
+    if (tratarVoltar()){ history.pushState({ ql:1 }, ''); return; }
+    history.back();   // nada a fechar: deixa o Android sair do app
+  });
 })();
 </script>
 </body>

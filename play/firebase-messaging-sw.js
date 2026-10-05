@@ -24,6 +24,66 @@
    real mora nas regras do Firestore/Auth, nao aqui), so precisa ficar
    igual dos dois lados. Se a apiKey mudar um dia, atualiza os DOIS
    lugares. */
+/* =========================================================================
+   OFFLINE (TWA / Play Store): sem internet, o Chrome mostrava a tela padrao
+   de "Sem conexao" no lugar do app (motivo de rejeicao/avaliacao ruim). Este
+   mesmo Service Worker (um so por escopo) agora guarda o app (HTML/CSS/JS/
+   icones) e serve do cache quando a rede falha. Estrategia: rede primeiro
+   (sempre pega a versao nova quando ha internet), cache como reserva, com
+   limite de 4s pra nao travar em rede ruim. O app em si ja e' local-first
+   (localStorage), entao abre e funciona offline; login/nuvem sincronizam
+   quando a internet voltar. Mudou os arquivos do shell? Troque o nome do
+   cache abaixo so se precisar forcar limpeza -- o conteudo se atualiza sozinho.
+   ========================================================================= */
+const CACHE_APP = 'dungeonlog-app-v1';
+const SHELL_APP = ['./', 'index.html', 'style.css', 'assets.js', 'manifest.json', 'icon-192.png', 'icon-512.png'];
+
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_APP)
+      .then((c) => Promise.all(SHELL_APP.map((u) => c.add(u).catch(() => {}))))   // um arquivo faltando nao derruba a instalacao
+      .then(() => self.skipWaiting())
+  );
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys()
+      .then((ks) => Promise.all(ks.filter((k) => k.startsWith('dungeonlog-app-') && k !== CACHE_APP).map((k) => caches.delete(k))))
+      .then(() => self.clients.claim())
+  );
+});
+
+self.addEventListener('fetch', (event) => {
+  const req = event.request;
+  if (req.method !== 'GET') return;
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin) return;        // Firebase, fontes, Worker: seguem direto pela rede
+  if (url.pathname.indexOf('/play/') !== 0) return;       // so o que e' do app
+
+  event.respondWith((async () => {
+    const cache = await caches.open(CACHE_APP);
+    const chave = req.mode === 'navigate' ? 'index.html' : req;
+    try {
+      const resp = await Promise.race([
+        fetch(req),
+        new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 4000)),
+      ]);
+      if (resp && resp.ok && resp.type === 'basic') cache.put(chave, resp.clone());
+      return resp;
+    } catch (e) {
+      const guardado = await cache.match(chave, { ignoreSearch: true });
+      if (guardado) return guardado;
+      if (req.mode === 'navigate') {
+        const shell = await cache.match('index.html');
+        if (shell) return shell;
+      }
+      return Response.error();
+    }
+  })());
+});
+
+try {
 importScripts('https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.13.2/firebase-messaging-compat.js');
 
@@ -55,6 +115,8 @@ messaging.onBackgroundMessage((payload) => {
     data: dados,
   });
 });
+
+} catch (e) { /* sem rede na instalacao: so o cache offline funciona ate o proximo update */ }
 
 // Clique na notificacao -- foca uma aba do app ja aberta se existir,
 // senao abre uma nova em /play/. Nao usa a URL absoluta (dominio pode

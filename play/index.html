@@ -18106,5 +18106,17 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
   });
 })();
 </script>
+
+<script>
+// Service Worker registrado ja no carregamento (nao so ao ligar notificacoes):
+// e' ele que guarda o app pra abrir SEM internet (senao o TWA mostra a tela
+// padrao de "sem conexao" do Chrome). Mesmo arquivo/escopo do push (FCM).
+(function(){
+  if (!('serviceWorker' in navigator)) return;
+  window.addEventListener('load', function(){
+    try { navigator.serviceWorker.register('firebase-messaging-sw.js').catch(function(){}); } catch(e){}
+  });
+})();
+</script>
 </body>
 </html>

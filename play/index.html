@@ -12475,6 +12475,18 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   window.registrarHistorico = registrarHistorico;
   (window._histPendentes || []).forEach(a => registrarHistorico(a[0], a[1], a[2]));
   window._histPendentes = [];
+  // RECUPERACAO (bug da sequencia que sumia): se ONTEM nao tem registro mas
+  // as tarefas de ontem estao todas feitas com feitaEm === ontem, o dia foi
+  // vencido de verdade e so nao foi gravado (bug acima, em versoes antigas).
+  // Grava como vitoria. So olha ontem (feitaEm de recorrentes so guarda a
+  // ultima data) e so vitoria -- nunca inventa fuga.
+  try {
+    const ontem = isoDe(new Date(new Date(isoAtual() + 'T12:00:00').getTime() - 86400000));
+    if (typeof tarefas !== 'undefined' && typeof ocorreNoDia === 'function' && !historico.some(h => h.data === ontem)){
+      const doDia = tarefas.filter(t => ocorreNoDia(t, ontem));
+      if (doDia.length > 0 && doDia.every(t => t.feitaEm === ontem)) registrarHistorico(ontem, doDia.length, 0);
+    }
+  } catch(e){}
   window.obterHistorico = function(){ return historico.slice(); };
   // chamado por puxarNuvem() apos restaurar CHAVE_HIST vinda da nuvem --
   // mesmo motivo do vidaHeroi.recarregar() (ver bloco VIDA DO HEROI):

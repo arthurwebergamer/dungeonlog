@@ -12394,6 +12394,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 (function(){
   const CHAVE_HIST = 'questlog.hist.v1';
   let historico = [];
+  const _registradosSessao = [];   // dias fechados NESTA abertura do app (ver recarregarHistoricoNuvem)
 
   function carregar(){
     try {
@@ -12457,12 +12458,14 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     else if (largadas > 0) resultado = 'fuga';
     else resultado = 'vitoria';
 
-    historico.push({
+    const entrada = {
       data: iso,
       resultado: resultado,
       monstroId: monstroIdDoDia(iso),
       tarefas: totalTarefas
-    });
+    };
+    historico.push(entrada);
+    _registradosSessao.push(entrada);
     persistir();
   }
 
@@ -12477,6 +12480,19 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // mesmo motivo do vidaHeroi.recarregar() (ver bloco VIDA DO HEROI):
   // este modulo tambem le localStorage so 1x, no boot da IIFE.
   window.recarregarHistorico = carregar;
+  // Usado SO por puxarNuvem(): o historico da nuvem e' o do ultimo push, que
+  // nao tem o dia que acabou de fechar no boot (virada). Sem isto, o pull
+  // sobrescrevia o registro recem-gravado e a sequencia sumia de novo pra
+  // quem esta logado. Re-aplica os dias fechados nesta sessao que a nuvem
+  // nao tem (a nuvem ganha se ja tem a mesma data) e empurra de volta.
+  window.recarregarHistoricoNuvem = function(){
+    carregar();
+    let mudou = false;
+    _registradosSessao.forEach(h => {
+      if (!historico.some(x => x.data === h.data)){ historico.push(h); mudou = true; }
+    });
+    if (mudou){ persistir(); if (typeof window.salvar === 'function') window.salvar(); }
+  };
 })();
 </script>
 
@@ -16125,7 +16141,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         // total antigo e pode gravar um desbloqueio de tema errado.
         if (typeof window.recarregarTarefasConcluidas === 'function') window.recarregarTarefasConcluidas();
         if (window.vidaHeroi && typeof window.vidaHeroi.recarregar === 'function') window.vidaHeroi.recarregar();
-        if (typeof window.recarregarHistorico === 'function') window.recarregarHistorico();
+        if (typeof window.recarregarHistoricoNuvem === 'function') window.recarregarHistoricoNuvem();
+        else if (typeof window.recarregarHistorico === 'function') window.recarregarHistorico();
         if (typeof window.recarregarAtributos === 'function') window.recarregarAtributos();
         if (typeof window.recarregarLoja === 'function') window.recarregarLoja();
         if (typeof window.recarregarHpMonstro === 'function') window.recarregarHpMonstro();

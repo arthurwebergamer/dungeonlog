@@ -535,7 +535,7 @@ function respostaJson(corpo, status, origem){
 // -----------------------------------------------------------------------
 const CONSENT_VERSOES_VALIDAS = ['2026-10-06'];   // adicionar a nova data a cada mudanca dos textos
 const CONSENT_ORIGENS = BILLING_ORIGENS.concat(['https://dev.questlog-911.pages.dev']);
-const CONSENT_METODOS = ['google', 'email'];
+const CONSENT_METODOS = ['google', 'email', 'google_implicito', 'email_implicito'];   // *_implicito: aceite por continuacao (aparelho ja tinha aceitado a mesma versao)
 const CONSENT_PLATAFORMAS = ['twa', 'pwa', 'web'];
 
 async function tratarConsentimento(request, env){

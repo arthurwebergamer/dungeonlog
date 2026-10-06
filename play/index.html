@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=56">
+<link rel="stylesheet" href="style.css?v=57">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -265,7 +265,7 @@ catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
          justify-content:space-between ja empurra ela pro canto direito
          de novo sozinha, sem CSS novo. -->
     <span class="coins">
-      <svg viewBox="0 0 21 21" shape-rendering="crispEdges"><image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAACAklEQVR42p2VMW/aQBiGH7uA6gkpg2EihSVzVKWKWDJkCulSKXJkFv5AGdqJ/gJQlw7pH2BpVSsSHRozdeiCKkVV5iykYcNDJNQhEal9HeCuOQzY7Y3nu8fv973vZxv82xJL9ozEjXWwULgAmP7gL+DwOsbKpAEKIYioc9rsMQxmdyv2THQoXEx/gHF4LSQ4CSpC4eI1LYaBwf5ulr3tKaNJDoBSfqpeFAqXR8ZHARiJSk1/MAdmKOV14GiSY297SnmS1VpiJkG9/phWw+bpq+cxYCk/pVAssrO1gdcfpzZKiLNNdcE5uSWirpkln5UrWZ69/kWq8r3+GOegQFSr4jWt2HPnoMD55Q1fv/9OVKry2HYs5baES6XnlzdcDe9jSo21eeQD+E8A6HQDLUrLlL7xbmNQIc42iWpV3h5/jgGOTl5g+gM63YD93Qw7WxtKqUzHolIRClfBlsXn24Wh4PIcQKthK/jx+zvdKNMfULEF5Up2ZR5Hk5w6J8v2+mM1GHCnj+lDl3+8+7I0j4UiCqJitsZ9PY9z+KJRspKr4b0Gq9hClq73tO1YtBo2Ua3KabOnOTwMDNU7qUia+ACmRK5USu0nEXUtjwsur/yEqp52ugGthpycHvQtpXLmckEL+7oR13LadqyVkyPLngc8NVRN1KeXj5VCudLAUs/+f/x6+AP09TeN3e014AAAAABJRU5ErkJggg==" width="21" height="21" style="image-rendering:pixelated"/></svg>
+      <svg viewBox="0 0 13 13" shape-rendering="crispEdges"><image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAANCAYAAABy6+R8AAAA6ElEQVR42r2Rv2rCYBTFf1/8g7gEHBKniFmcS+ni4qx2EcRgn6FLx76BdLUv4CR16mKcu2T1DQTdzOakBMx1CB/yVaXQwbNcuJxz77nnwr2grvTkL576TRYRUl6wwuhM6q4Nfl4LZF4j7TQZBWV8x1x2lCFWGKG6awGUAuQoQz6Cb3xHqPsFPDthsysC4NkJP8vMUH/cI6em2SYrjG4KNrsirYesassWwGyxZdB2eXx7vhB4doJbrfLUqDCaxEYQ8vVaAmDQdkk7TbQDPXQVK95ne/RNRnpaDLCKFb4jBJ8HI71//el+OAGCX1H6QFBjYAAAAABJRU5ErkJggg==" width="13" height="13" style="image-rendering:pixelated"/></svg>
       <span id="coinnum">0</span>
     </span>
   </div>
@@ -324,7 +324,7 @@ catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
     <div class="vitoria" id="vitoria">
       <span class="faixa" data-i18n="jogo.diaVencido">DIA VENCIDO</span>
       <span class="ganho">
-        <svg viewBox="0 0 21 21" shape-rendering="crispEdges"><image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAACAklEQVR42p2VMW/aQBiGH7uA6gkpg2EihSVzVKWKWDJkCulSKXJkFv5AGdqJ/gJQlw7pH2BpVSsSHRozdeiCKkVV5iykYcNDJNQhEal9HeCuOQzY7Y3nu8fv973vZxv82xJL9ozEjXWwULgAmP7gL+DwOsbKpAEKIYioc9rsMQxmdyv2THQoXEx/gHF4LSQ4CSpC4eI1LYaBwf5ulr3tKaNJDoBSfqpeFAqXR8ZHARiJSk1/MAdmKOV14GiSY297SnmS1VpiJkG9/phWw+bpq+cxYCk/pVAssrO1gdcfpzZKiLNNdcE5uSWirpkln5UrWZ69/kWq8r3+GOegQFSr4jWt2HPnoMD55Q1fv/9OVKry2HYs5baES6XnlzdcDe9jSo21eeQD+E8A6HQDLUrLlL7xbmNQIc42iWpV3h5/jgGOTl5g+gM63YD93Qw7WxtKqUzHolIRClfBlsXn24Wh4PIcQKthK/jx+zvdKNMfULEF5Up2ZR5Hk5w6J8v2+mM1GHCnj+lDl3+8+7I0j4UiCqJitsZ9PY9z+KJRspKr4b0Gq9hClq73tO1YtBo2Ua3KabOnOTwMDNU7qUia+ACmRK5USu0nEXUtjwsur/yEqp52ugGthpycHvQtpXLmckEL+7oR13LadqyVkyPLngc8NVRN1KeXj5VCudLAUs/+f/x6+AP09TeN3e014AAAAABJRU5ErkJggg==" width="21" height="21" style="image-rendering:pixelated"/></svg>
+        <svg viewBox="0 0 13 13" shape-rendering="crispEdges"><image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAANCAYAAABy6+R8AAAA6ElEQVR42r2Rv2rCYBTFf1/8g7gEHBKniFmcS+ni4qx2EcRgn6FLx76BdLUv4CR16mKcu2T1DQTdzOakBMx1CB/yVaXQwbNcuJxz77nnwr2grvTkL576TRYRUl6wwuhM6q4Nfl4LZF4j7TQZBWV8x1x2lCFWGKG6awGUAuQoQz6Cb3xHqPsFPDthsysC4NkJP8vMUH/cI6em2SYrjG4KNrsirYesassWwGyxZdB2eXx7vhB4doJbrfLUqDCaxEYQ8vVaAmDQdkk7TbQDPXQVK95ne/RNRnpaDLCKFb4jBJ8HI71//el+OAGCX1H6QFBjYAAAAABJRU5ErkJggg==" width="13" height="13" style="image-rendering:pixelated"/></svg>
         <span id="ganhoTxt"></span>
       </span>
     </div>
@@ -1326,7 +1326,7 @@ catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 
     <div class="lojatopo">
       <span class="saldo">
-        <svg viewBox="0 0 21 21" shape-rendering="crispEdges"><image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAACAklEQVR42p2VMW/aQBiGH7uA6gkpg2EihSVzVKWKWDJkCulSKXJkFv5AGdqJ/gJQlw7pH2BpVSsSHRozdeiCKkVV5iykYcNDJNQhEal9HeCuOQzY7Y3nu8fv973vZxv82xJL9ozEjXWwULgAmP7gL+DwOsbKpAEKIYioc9rsMQxmdyv2THQoXEx/gHF4LSQ4CSpC4eI1LYaBwf5ulr3tKaNJDoBSfqpeFAqXR8ZHARiJSk1/MAdmKOV14GiSY297SnmS1VpiJkG9/phWw+bpq+cxYCk/pVAssrO1gdcfpzZKiLNNdcE5uSWirpkln5UrWZ69/kWq8r3+GOegQFSr4jWt2HPnoMD55Q1fv/9OVKry2HYs5baES6XnlzdcDe9jSo21eeQD+E8A6HQDLUrLlL7xbmNQIc42iWpV3h5/jgGOTl5g+gM63YD93Qw7WxtKqUzHolIRClfBlsXn24Wh4PIcQKthK/jx+zvdKNMfULEF5Up2ZR5Hk5w6J8v2+mM1GHCnj+lDl3+8+7I0j4UiCqJitsZ9PY9z+KJRspKr4b0Gq9hClq73tO1YtBo2Ua3KabOnOTwMDNU7qUia+ACmRK5USu0nEXUtjwsur/yEqp52ugGthpycHvQtpXLmckEL+7oR13LadqyVkyPLngc8NVRN1KeXj5VCudLAUs/+f/x6+AP09TeN3e014AAAAABJRU5ErkJggg==" width="21" height="21" style="image-rendering:pixelated"/></svg>
+        <svg viewBox="0 0 13 13" shape-rendering="crispEdges"><image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAANCAYAAABy6+R8AAAA6ElEQVR42r2Rv2rCYBTFf1/8g7gEHBKniFmcS+ni4qx2EcRgn6FLx76BdLUv4CR16mKcu2T1DQTdzOakBMx1CB/yVaXQwbNcuJxz77nnwr2grvTkL576TRYRUl6wwuhM6q4Nfl4LZF4j7TQZBWV8x1x2lCFWGKG6awGUAuQoQz6Cb3xHqPsFPDthsysC4NkJP8vMUH/cI6em2SYrjG4KNrsirYesassWwGyxZdB2eXx7vhB4doJbrfLUqDCaxEYQ8vVaAmDQdkk7TbQDPXQVK95ne/RNRnpaDLCKFb4jBJ8HI71//el+OAGCX1H6QFBjYAAAAABJRU5ErkJggg==" width="13" height="13" style="image-rendering:pixelated"/></svg>
         <span id="saldoLoja">0</span> <span data-i18n="inv.moedasMinusculo">moedas</span>
       </span>
       <div class="lojatabs" id="lojaTabs">
@@ -2710,6 +2710,7 @@ function dispararVitoriaDoDia(doDia, nivelAntes, xpGanho, moedasGanhas){
     const ganho = recompensaVitoria(doDia.length);
     moedas += ganho;
     ultimoGanho = ganho;
+    _gravarGanhoDia(isoAtual(), ganho);
     // moedasCaindo(...) removida daqui a pedido do usuario -- particula de
     // moedas no fim do dia nao deveria mais aparecer. Funcao moedasCaindo()
     // continua existindo (~linha 2493) e nao foi apagada, so este gancho.
@@ -2941,6 +2942,23 @@ function _lerCelebracaoDiaMostrada(){
 }
 function _gravarCelebracaoDiaMostrada(iso, ganho){
   try { localStorage.setItem(window.chaveConta(CHAVE_CELEBRACAO_DIA), JSON.stringify({dia: iso, ganho: ganho})); } catch(e){}
+}
+// ganho do dia gravado NO MOMENTO da vitoria (separado do registro de
+// celebracao, que so existe depois do 1o render). Antes, reentrar no app
+// com o dia ja vencido gravava/mostrava "+0" porque ultimoGanho so vive em
+// memoria. Fallback (vitoria feita por versao antiga, sem nada gravado):
+// recalcula pela formula atual.
+const CHAVE_GANHO_DIA = 'questlog.ganhoDia.v1';
+function _gravarGanhoDia(iso, ganho){
+  try { localStorage.setItem(window.chaveConta(CHAVE_GANHO_DIA), JSON.stringify({dia: iso, ganho: ganho})); } catch(e){}
+}
+function _ganhoDoDiaResolvido(){
+  if (ultimoGanho > 0) return ultimoGanho;
+  try {
+    const r = JSON.parse(localStorage.getItem(window.chaveConta(CHAVE_GANHO_DIA)));
+    if (r && r.dia === isoAtual() && r.ganho > 0) return r.ganho;
+  } catch(e){}
+  try { return recompensaVitoria(tarefas.filter(ehDeHoje).length) || 0; } catch(e){ return 0; }
 }
 function _limparCelebracaoDiaMostrada(){
   try { localStorage.removeItem(window.chaveConta(CHAVE_CELEBRACAO_DIA)); } catch(e){}
@@ -5098,10 +5116,11 @@ function render(){
     const registro = _lerCelebracaoDiaMostrada();
     if (registro && registro.dia === isoAtual()){
       _vitoriaCelebrada = true;
-      ultimoGanho = registro.ganho;
+      ultimoGanho = registro.ganho > 0 ? registro.ganho : _ganhoDoDiaResolvido();
       document.getElementById('ganhoTxt').textContent = '+' + ultimoGanho;
     } else {
       _vitoriaCelebrada = true;
+      ultimoGanho = _ganhoDoDiaResolvido();
       _gravarCelebracaoDiaMostrada(isoAtual(), ultimoGanho);
       celebrarVitoria(ultimoGanho);
     }
@@ -5196,7 +5215,7 @@ function animarGolpe(){
   setTimeout(()=>{h.classList.remove('hit');m.classList.remove('shake');},320);
 }
 
-const COIN_SVG = '<svg viewBox="0 0 21 21" shape-rendering="crispEdges"><image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAACAklEQVR42p2VMW/aQBiGH7uA6gkpg2EihSVzVKWKWDJkCulSKXJkFv5AGdqJ/gJQlw7pH2BpVSsSHRozdeiCKkVV5iykYcNDJNQhEal9HeCuOQzY7Y3nu8fv973vZxv82xJL9ozEjXWwULgAmP7gL+DwOsbKpAEKIYioc9rsMQxmdyv2THQoXEx/gHF4LSQ4CSpC4eI1LYaBwf5ulr3tKaNJDoBSfqpeFAqXR8ZHARiJSk1/MAdmKOV14GiSY297SnmS1VpiJkG9/phWw+bpq+cxYCk/pVAssrO1gdcfpzZKiLNNdcE5uSWirpkln5UrWZ69/kWq8r3+GOegQFSr4jWt2HPnoMD55Q1fv/9OVKry2HYs5baES6XnlzdcDe9jSo21eeQD+E8A6HQDLUrLlL7xbmNQIc42iWpV3h5/jgGOTl5g+gM63YD93Qw7WxtKqUzHolIRClfBlsXn24Wh4PIcQKthK/jx+zvdKNMfULEF5Up2ZR5Hk5w6J8v2+mM1GHCnj+lDl3+8+7I0j4UiCqJitsZ9PY9z+KJRspKr4b0Gq9hClq73tO1YtBo2Ua3KabOnOTwMDNU7qUia+ACmRK5USu0nEXUtjwsur/yEqp52ugGthpycHvQtpXLmckEL+7oR13LadqyVkyPLngc8NVRN1KeXj5VCudLAUs/+f/x6+AP09TeN3e014AAAAABJRU5ErkJggg==" width="21" height="21" style="image-rendering:pixelated"/></svg>';
+const COIN_SVG = '<svg viewBox="0 0 13 13" shape-rendering="crispEdges"><image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAANCAYAAABy6+R8AAAA6ElEQVR42r2Rv2rCYBTFf1/8g7gEHBKniFmcS+ni4qx2EcRgn6FLx76BdLUv4CR16mKcu2T1DQTdzOakBMx1CB/yVaXQwbNcuJxz77nnwr2grvTkL576TRYRUl6wwuhM6q4Nfl4LZF4j7TQZBWV8x1x2lCFWGKG6awGUAuQoQz6Cb3xHqPsFPDthsysC4NkJP8vMUH/cI6em2SYrjG4KNrsirYesassWwGyxZdB2eXx7vhB4doJbrfLUqDCaxEYQ8vVaAmDQdkk7TbQDPXQVK95ne/RNRnpaDLCKFb4jBJ8HI71//el+OAGCX1H6QFBjYAAAAABJRU5ErkJggg==" width="13" height="13" style="image-rendering:pixelated"/></svg>';
 
 // diamante verde -- mesmo padrao crispEdges do COIN_SVG, cor da paleta
 // de XP ja usada no resto do app (--verde, ver dmg-xp em style.css)
@@ -8141,7 +8160,7 @@ function venderTesouros(){
 }
 
 /* ---------- render ---------- */
-const MOEDA = '<svg class="lmoeda" viewBox="0 0 21 21" shape-rendering="crispEdges"><image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAACAklEQVR42p2VMW/aQBiGH7uA6gkpg2EihSVzVKWKWDJkCulSKXJkFv5AGdqJ/gJQlw7pH2BpVSsSHRozdeiCKkVV5iykYcNDJNQhEal9HeCuOQzY7Y3nu8fv973vZxv82xJL9ozEjXWwULgAmP7gL+DwOsbKpAEKIYioc9rsMQxmdyv2THQoXEx/gHF4LSQ4CSpC4eI1LYaBwf5ulr3tKaNJDoBSfqpeFAqXR8ZHARiJSk1/MAdmKOV14GiSY297SnmS1VpiJkG9/phWw+bpq+cxYCk/pVAssrO1gdcfpzZKiLNNdcE5uSWirpkln5UrWZ69/kWq8r3+GOegQFSr4jWt2HPnoMD55Q1fv/9OVKry2HYs5baES6XnlzdcDe9jSo21eeQD+E8A6HQDLUrLlL7xbmNQIc42iWpV3h5/jgGOTl5g+gM63YD93Qw7WxtKqUzHolIRClfBlsXn24Wh4PIcQKthK/jx+zvdKNMfULEF5Up2ZR5Hk5w6J8v2+mM1GHCnj+lDl3+8+7I0j4UiCqJitsZ9PY9z+KJRspKr4b0Gq9hClq73tO1YtBo2Ua3KabOnOTwMDNU7qUia+ACmRK5USu0nEXUtjwsur/yEqp52ugGthpycHvQtpXLmckEL+7oR13LadqyVkyPLngc8NVRN1KeXj5VCudLAUs/+f/x6+AP09TeN3e014AAAAABJRU5ErkJggg==" width="21" height="21" style="image-rendering:pixelated"/></svg>';
+const MOEDA = '<svg class="lmoeda" viewBox="0 0 13 13" shape-rendering="crispEdges"><image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAANCAYAAABy6+R8AAAA6ElEQVR42r2Rv2rCYBTFf1/8g7gEHBKniFmcS+ni4qx2EcRgn6FLx76BdLUv4CR16mKcu2T1DQTdzOakBMx1CB/yVaXQwbNcuJxz77nnwr2grvTkL576TRYRUl6wwuhM6q4Nfl4LZF4j7TQZBWV8x1x2lCFWGKG6awGUAuQoQz6Cb3xHqPsFPDthsysC4NkJP8vMUH/cI6em2SYrjG4KNrsirYesassWwGyxZdB2eXx7vhB4doJbrfLUqDCaxEYQ8vVaAmDQdkk7TbQDPXQVK95ne/RNRnpaDLCKFb4jBJ8HI71//el+OAGCX1H6QFBjYAAAAABJRU5ErkJggg==" width="13" height="13" style="image-rendering:pixelated"/></svg>';
 
 function textoBonus(it){
   const en = idiomaApp() === 'en';

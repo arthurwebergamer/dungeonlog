@@ -16656,8 +16656,12 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // ---- registro de aceite dos Termos/Privacidade (prova) ----
     // Versao dos textos: a cada mudanca, atualizar aqui, em CONSENT_VERSOES_VALIDAS (Worker) e arquivar a copia em /terms/<versao>/.
     const TERMOS_VERSAO = '2026-10-06', PRIVACIDADE_VERSAO = '2026-10-06';
+    // diagnostico: abrir /play/?dbg=1 mostra toasts "[dbg]" com cada etapa do registro de aceite
+    const DBG_ACEITE = /[?&]dbg=1/.test(location.search);
+    function dbgAceite(m){ console.info('QuestLog dbg:', m); if (DBG_ACEITE && typeof window.aviso === 'function') window.aviso('[dbg] ' + m); }
     async function registrarAceiteSeNecessario(user){
       try {
+        dbgAceite('registrar: flag=' + window._aceiteMarcado);
         if (!window._aceiteMarcado){ console.info('QuestLog: aceite nao marcado nesta sessao, nada a registrar'); return; }
         if (typeof BILLING_VERIFY_URL !== 'string') return;
         let atual = false;
@@ -16666,6 +16670,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           const d = snap.exists() ? snap.data() : null;
           atual = !!(d && d.termosVersao === TERMOS_VERSAO && d.privacidadeVersao === PRIVACIDADE_VERSAO);
         } catch(e){ /* regras ainda nao publicadas: tenta gravar mesmo assim (Worker e idempotente) */ }
+        dbgAceite('doc atual=' + atual);
         if (atual){ window._aceiteMarcado = false; return; }
         const prov = (user.providerData && user.providerData[0] && user.providerData[0].providerId) || '';
         const twa = (document.referrer || '').indexOf('android-app://') === 0;
@@ -16679,9 +16684,10 @@ window.mostrarNivelUp = function(nivel, aoFechar){
             plataforma: twa ? 'twa' : (standalone ? 'pwa' : 'web')
           })
         });
+        dbgAceite('worker HTTP ' + resp.status);
         if (resp.ok){ window._aceiteMarcado = false; console.info('QuestLog: aceite registrado'); }
         else console.warn('QuestLog: registro de aceite falhou HTTP ' + resp.status, await resp.text().catch(()=>''));
-      } catch(e){ console.warn('QuestLog: registro de aceite falhou (tenta no proximo login)', e); }
+      } catch(e){ dbgAceite('ERRO ' + (e && e.message)); console.warn('QuestLog: registro de aceite falhou (tenta no proximo login)', e); }
     }
 
     async function aoLogar(user){
@@ -16999,6 +17005,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     onAuthStateChanged(auth, user => {
         if (!user) return;
         const passoLoginOn = !!(passoLogin && passoLogin.classList.contains('on'));
+        dbgAceite('auth ok, passoLogin=' + passoLoginOn);
         if (passoLoginOn) {
           aoLogar(user).catch(e => console.error('QuestLog/Firebase: aoLogar() falhou', e));
         } else {

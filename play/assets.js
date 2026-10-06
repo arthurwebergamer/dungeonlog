@@ -238,7 +238,7 @@ const ITENS = [
   [268, "Varinha de Prata", "arma", 2, 38, 20, 0, 0, false, "Silver Wand"],
   [269, "Cajado de Ferro", "arma", 2, 39, 20, 0, 0, false, "Iron Staff"],
   [270, "Bastão Arcano", "arma", 2, 40, 20, 0, 0, false, "Arcane Rod"],
-  [271, "Tsurugi", "arma", 3, 77, 32, 0, 0, false, "Tsurugi"],
+  [271, "Tsurugi", "arma", 3, 77, 32, 0, 0, true, "Tsurugi"],
   [272, "Lâmina Veloz", "arma", 3, 80, 32, 0, 0, false, "Quickblade"],
   [273, "Espada Tripla", "arma", 3, 70, 32, 0, 0, false, "Triple Sword"],
   [274, "Grande Mangual", "arma", 3, 73, 32, 0, 0, false, "Great Flail"],

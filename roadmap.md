@@ -19291,7 +19291,12 @@ Cobre os PRs #66 a #87 (todos mergeados em `main`). Foco da sessão: **lançar**
 - Ícone de moeda trocado pelo `gold_pile_8` (topbar, loja, `COIN_SVG`, `MOEDA`).
 - `--sheet` agora 512×864 (SHEET_ROWS 27), ~300KB base64 no CSS.
 
-- **PENDENTE antes do merge pra main:** remover o bloco "MODO TESTE DE ITENS" (`index.html`, logo após `carregar()`), que enche o inventário e desliga `salvar()` fora de produção.
+- **Feito antes do merge pra main:** bloco "MODO TESTE DE ITENS" removido (inventário cheio, `salvar()` desligado e limite de tarefas infinito eram só do `dev`).
+- **Arma e escudo no herói (arena):** arma/escudo equipados aparecem no sprite (`desenharHeroi()`); golpe corpo a corpo = herói corre até o monstro, golpeia e volta (900 ms, `animarGolpe()`); arco/besta/arbalesta/zarabatana/estilingue/funda ficam parados e disparam projétil (flecha/virote em pixel art, pedra), sem efeito de corte. Armas grandes (Martelo de Guerra, Machado de Guerra, Chicote) são encolhidas. Armadura/elmo NÃO aparecem no sprite (decisão do usuário; código das camadas e `EQ_BB` ficaram no arquivo).
+- **Sprites de armas:** tomahawks, zarabatana, martelo de guerra, katana e clava gigante reorientados; sombra da Espada de Ferro removida.
+- **Teste grátis:** na 1ª vez que a conta termina o dia inteiro, ~6,5 s depois das animações abre a tela do teste grátis (`abrirPaywall('primeira')`, passo 1/pitch), uma vez por conta (`questlog.ofertaTrialPrimeira.v1`); em produção só se o Play oferecer o trial.
+- **+moedas/+XP do golpe:** agora uma linha só, centralizada no topo da arena (antes colava na borda esquerda).
+- **Notebook/tela baixa (≤860px de altura, desktop):** a página inteira rola e a nav fica fixa (antes a lista de tarefas ficava com 0px).
 - Baú por estágio: E1 = 1 item, E2 = 2–3, E3 = 3–4, E4 = 4 (substitui a regra por tarefas do dia); bônus de sorte de raridade por estágio `[0, .2, .4, .6]` (`ECO.lootPorEstagio`, `ECO.sorteEstagio`, `lootDoEstagio()`). Vale pro baú padrão e pro especial. Ícone de moeda da topbar/loja ampliado (21/20/16px).
 - Ícone de moeda: o pacote Dungeon Crawl não tem moeda de frente (só moedas deitadas, que pareciam uma bacia). Moeda: pilha completa do `gold_pile_8` (21px natural) na topbar e loja (saldo e preços); pilha pequena recortada do mesmo sprite (13px) em "Dia vencido", "+N" e moedas voando.
 - Loja: prateleira de 8 = 6 itens (equipamento/chave) + **sempre 2 consumíveis no fim** (`ECO.lojaConsumiveis`); estoque salvo em formato antigo é regerado.

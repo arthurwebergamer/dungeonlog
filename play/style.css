@@ -59,7 +59,7 @@
   .topbar{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;border-bottom:1px solid var(--line)}
   .lvl{font-family:'Silkscreen',monospace;font-size:9px;color:var(--accent);background:var(--accent-dim);padding:5px 9px;border-radius:4px}
   .coins{display:flex;align-items:center;gap:6px;font-family:'Silkscreen',monospace;font-size:10px;color:var(--gold)}
-  .coins svg{width:18px;height:18px}
+  .coins svg{width:30px;height:30px}
 
   .arena{padding:22px 18px 18px;border-bottom:1px solid var(--line);position:relative;overflow:hidden}
   .fight{display:flex;align-items:flex-end;justify-content:center;gap:28px;margin-bottom:16px}
@@ -1059,7 +1059,7 @@
   .saldo{display:inline-flex;align-items:center;gap:5px;font-family:'Outfit',sans-serif;
          font-size:13px;font-weight:600;color:var(--gold);background:rgba(245,190,74,.10);
          border:1px solid rgba(245,190,74,.22);border-radius:999px;padding:5px 11px;margin-top:4px}
-  .saldo svg{width:17px;height:17px}
+  .saldo svg{width:28px;height:28px}
 
   .nav button{cursor:pointer}
 
@@ -1157,7 +1157,7 @@
   .lpreco{font-family:'Outfit',sans-serif;font-size:12.5px;font-weight:700;color:var(--gold);
           font-variant-numeric:tabular-nums;white-space:nowrap}
   .lpreco s{color:var(--dim);font-weight:500;font-size:10.5px;margin-right:4px}
-  .lpreco .lmoeda{width:14px;height:14px;margin-left:3px;vertical-align:-3px}
+  .lpreco .lmoeda{width:24px;height:24px;margin-left:2px;vertical-align:-7px}
   .lbtn{font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;padding:6px 14px;border-radius:9px;
         border:1px solid var(--accent);background:var(--accent);color:var(--bg);cursor:pointer;white-space:nowrap}
   .lbtn.sec{background:var(--poco);border-color:var(--line);color:var(--muted)}
@@ -2828,7 +2828,7 @@
   .lpreco{font-family:'Outfit',sans-serif;font-size:12.5px;font-weight:700;color:var(--gold);
           font-variant-numeric:tabular-nums;white-space:nowrap}
   .lpreco s{color:var(--dim);font-weight:500;font-size:10.5px;margin-right:4px}
-  .lpreco .lmoeda{width:14px;height:14px;margin-left:3px;vertical-align:-3px}
+  .lpreco .lmoeda{width:24px;height:24px;margin-left:2px;vertical-align:-7px}
   .lbtn{font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;padding:6px 14px;border-radius:9px;
         border:1px solid var(--accent);background:var(--accent);color:var(--bg);cursor:pointer;white-space:nowrap}
   .lbtn.sec{background:var(--poco);border-color:var(--line);color:var(--muted)}

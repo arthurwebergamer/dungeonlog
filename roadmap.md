@@ -19281,3 +19281,23 @@ Cobre os PRs #66 a #87 (todos mergeados em `main`). Foco da sessão: **lançar**
 - [ ] `themeColor` do `twa-manifest.json` ainda `#191919` (barra do Android); precisa de novo AAB, junto de qualquer outra mudança nativa.
 - [ ] A pendência "linha vitória do histórico não gravada na virada automática" (seção anterior) está **resolvida** em 2.
 - [ ] Demais pendências de lançamento da seção 03–04/10 continuam abertas.
+
+
+## [Sessão 06/10/2026] Pacote de itens Dungeon Crawl
+- Sprites dos itens migrados pro **Dungeon Crawl Stone Soup** (tiles 32px, **CC0** — sem exigência de crédito; fonte: github.com/crawl/crawl, pasta `crawl-ref/source/rltiles`). Sombras removidas por script (alpha parcial + pixels pretos sem vizinho colorido).
+- 73 itens existentes trocaram só o sprite (id, nome, stats e raridade intactos — saves e itens com lógica própria: Grimório, baú, chaves, Poção de Vida, preservados).
+- 31 itens sem equivalente no pacote (gemas, barras, chaves, cinto, tocha, baú, crânio, corda, gazuas, ampulheta etc.) continuam com o sprite antigo (JedimeisterX); a sheet antiga ocupa as 144 primeiras células, novos sprites vêm depois.
+- +213 itens novos no fim de `ITENS` (ids 106–318): stats por (tipo, raridade) iguais aos itens atuais, então o teto de bônus não muda. Nunca reordenar `ITENS` (id = índice).
+- Ícone de moeda trocado pelo `gold_pile_8` (topbar, loja, `COIN_SVG`, `MOEDA`).
+- `--sheet` agora 512×864 (SHEET_ROWS 27), ~300KB base64 no CSS.
+
+- **Feito antes do merge pra main:** bloco "MODO TESTE DE ITENS" removido (inventário cheio, `salvar()` desligado e limite de tarefas infinito eram só do `dev`).
+- **Arma e escudo no herói (arena):** arma/escudo equipados aparecem no sprite (`desenharHeroi()`); golpe corpo a corpo = herói corre até o monstro, golpeia e volta (900 ms, `animarGolpe()`); arco/besta/arbalesta/zarabatana/estilingue/funda ficam parados e disparam projétil (flecha/virote em pixel art, pedra), sem efeito de corte. Armas grandes (Martelo de Guerra, Machado de Guerra, Chicote) são encolhidas. Armadura/elmo NÃO aparecem no sprite (decisão do usuário; código das camadas e `EQ_BB` ficaram no arquivo).
+- **Sprites de armas:** tomahawks, zarabatana, martelo de guerra, katana e clava gigante reorientados; sombra da Espada de Ferro removida.
+- **Teste grátis:** na 1ª vez que a conta termina o dia inteiro, ~6,5 s depois das animações abre a tela do teste grátis (`abrirPaywall('primeira')`, passo 1/pitch), uma vez por conta (`questlog.ofertaTrialPrimeira.v1`); em produção só se o Play oferecer o trial.
+- **+moedas/+XP do golpe:** agora uma linha só, centralizada no topo da arena (antes colava na borda esquerda).
+- **Notebook/tela baixa (≤860px de altura, desktop):** a página inteira rola e a nav fica fixa (antes a lista de tarefas ficava com 0px).
+- Baú por estágio: E1 = 1 item, E2 = 2–3, E3 = 3–4, E4 = 4 (substitui a regra por tarefas do dia); bônus de sorte de raridade por estágio `[0, .2, .4, .6]` (`ECO.lootPorEstagio`, `ECO.sorteEstagio`, `lootDoEstagio()`). Vale pro baú padrão e pro especial. Ícone de moeda da topbar/loja ampliado (21/20/16px).
+- Ícone de moeda: o pacote Dungeon Crawl não tem moeda de frente (só moedas deitadas, que pareciam uma bacia). Moeda: pilha completa do `gold_pile_8` (21px natural) na topbar e loja (saldo e preços); pilha pequena recortada do mesmo sprite (13px) em "Dia vencido", "+N" e moedas voando.
+- Loja: prateleira de 8 = 6 itens (equipamento/chave) + **sempre 2 consumíveis no fim** (`ECO.lojaConsumiveis`); estoque salvo em formato antigo é regerado.
+- Loja: sempre pelo menos 2 itens Raros na prateleira, em qualquer nível (`ECO.lojaRarosMin`); abaixo do nível aparecem travados ("Level V").

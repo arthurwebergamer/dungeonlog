@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=89">
+<link rel="stylesheet" href="style.css?v=90">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -3301,7 +3301,7 @@ function abrirPaywall(motivo){
     const floresta = TEMAS_ARENA.find(t => t.id === 'floresta');
     if (floresta) fundo.src = 'data:image/png;base64,' + floresta.arte;
   }
-  if (typeof window.aviso === 'function'){
+  if (motivo !== 'primeira' && typeof window.aviso === 'function'){   // oferta pos-1a-tarefa nao e "recurso premium": sem toast
     window.aviso((typeof idiomaApp === 'function' && idiomaApp() === 'en') ? 'You found a premium feature!' : 'Você descobriu um recurso premium!');
   }
   // TESTE GRATIS -- o card "7 dias gratis" (tela de planos) e a linha do
@@ -12706,6 +12706,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       if (r !== false){
         total++;
         persistir();
+        if (total === 1) ofertarTrialPrimeiraTarefa();
         // FIX (relatado pelo usuario: "a barra de estagio deveria aumentar
         // no momento que a tarefa e concluida por que ela tem um delay
         // muito grande"). Causa raiz: total++ acima so roda DEPOIS que
@@ -12722,6 +12723,32 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       }
       return r;
     };
+  }
+
+  // OFERTA DO TESTE GRATIS NA 1a TAREFA (pedido do usuario): depois da primeira tarefa
+  // concluida da conta, espera as animacoes/popups acabarem e abre o paywall UMA vez,
+  // pra pessoa ja ter sentido o app antes de ver a oferta. So aparece se o teste gratis
+  // esta disponivel (nao assinante, Play ofereceu trial) -- no preview/dev (sem Billing)
+  // aparece mesmo assim pra dar pra testar o fluxo.
+  function ofertarTrialPrimeiraTarefa(){
+    const CHAVE = 'questlog.ofertaTrialPrimeira.v1';
+    try { if (localStorage.getItem(window.chaveConta(CHAVE))) return; } catch(e){}
+    const ocupado = () => [...document.querySelectorAll('.dlgOverlay.on, #paywallOverlay.on, .vitoria, [class*="verlay"].on, .levelup.on, .nivelUp.on')]
+      .some(e => { const c = getComputedStyle(e); return c.display !== 'none' && c.visibility !== 'hidden' && Number(c.opacity) > 0; });
+    let tentativas = 0;
+    const tentar = () => {
+      tentativas++;
+      if (ocupado() && tentativas < 20) return setTimeout(tentar, 1000);
+      try {
+        const emProducao = location.hostname === 'dungeonlog.weberlabs.com.br';
+        const disponivel = (typeof _billingTrialOk !== 'undefined' && _billingTrialOk) || !emProducao;
+        if (!disponivel) return;
+        if (typeof window.assinaturaAtiva === 'function' && window.assinaturaAtiva()) return;
+        localStorage.setItem(window.chaveConta(CHAVE), '1');
+        if (typeof window.abrirPaywall === 'function') window.abrirPaywall('primeira');
+      } catch(e){}
+    };
+    setTimeout(tentar, 4500);
   }
 
   window.totalTarefasConcluidas = function(){ return total; };

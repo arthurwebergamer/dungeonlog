@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=68">
+<link rel="stylesheet" href="style.css?v=69">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -2214,6 +2214,7 @@ const ECO = {
   // --- loja ---
   lojaMargem:           2.20,   // preco de compra = valor do item x margem
   lojaVagas:               8,   // itens diferentes na prateleira por dia
+  lojaConsumiveis:         2,   // desses, sempre N consumiveis no fim da prateleira
   lojaDesconto:         0.70,   // fator do preco no item em oferta do dia
   lojaNivelPorRaridade:    2,   // niveis exigidos a mais por degrau de raridade
   lojaMargemConsumivel: 3.60,   // margem so dos consumiveis (XP comprado custa mais caro)
@@ -8051,24 +8052,28 @@ function montarEstoque(){
   const nivelAtual = (typeof progresso === 'function') ? progresso().nivel : 1;
   const pesos = pesosLojaPorNivel(nivelAtual);
   const total = pesos.reduce((a, b) => a + b, 0);
-  const ids = [];
-  let voltas = 0;
 
-  while (ids.length < vagas && voltas < 500){
-    voltas++;
-    let x = r() * total, rar = 0;
-    for (let i = 0; i < pesos.length; i++){ x -= pesos[i]; if (x <= 0){ rar = i; break; } }
-    let sub = pool.filter(i => ITENS[i][3] === rar && ids.indexOf(i) < 0);
-    if (!sub.length) sub = pool.filter(i => ids.indexOf(i) < 0);
-    if (!sub.length) break;
-    ids.push(sub[Math.floor(r() * sub.length)]);
-  }
-
-  // a prateleira sempre tem pelo menos um consumivel
-  if (!ids.some(i => ITENS[i][2] === 'cons')){
-    const cons = pool.filter(i => ITENS[i][2] === 'cons' && ids.indexOf(i) < 0);
-    if (cons.length) ids[ids.length - 1] = cons[Math.floor(r() * cons.length)];
-  }
+  // pedido do usuario: SEMPRE 2 consumiveis no fim da prateleira, o resto
+  // (vagas - 2) e equipamento/chave. Cada bloco sorteia por raridade com os
+  // mesmos pesos de antes, sem repetir item.
+  const nCons = Math.min(ECO.lojaConsumiveis, vagas);
+  const sortear = (poolBase, qtd) => {
+    const out = [];
+    let voltas = 0;
+    while (out.length < qtd && voltas < 500){
+      voltas++;
+      let x = r() * total, rar = 0;
+      for (let i = 0; i < pesos.length; i++){ x -= pesos[i]; if (x <= 0){ rar = i; break; } }
+      let sub = poolBase.filter(i => ITENS[i][3] === rar && out.indexOf(i) < 0);
+      if (!sub.length) sub = poolBase.filter(i => out.indexOf(i) < 0);
+      if (!sub.length) break;
+      out.push(sub[Math.floor(r() * sub.length)]);
+    }
+    return out;
+  };
+  const outros = sortear(pool.filter(i => ITENS[i][2] !== 'cons'), vagas - nCons);
+  const cons = sortear(pool.filter(i => ITENS[i][2] === 'cons'), nCons);
+  const ids = outros.concat(cons);
 
   const iOferta = ids.length ? Math.floor(r() * ids.length) : -1;
   return ids.map((id, i) => ({id: id, oferta: i === iOferta}));
@@ -8109,7 +8114,9 @@ window.recarregarLoja = function(){
 function garantirEstoque(){
   const hoje = isoAtual();
   const vagas = Math.max(1, Math.round(ECO.lojaVagas));
-  if (lojaDia !== hoje || lojaEstoque.length === 0 || lojaEstoque.length !== vagas){
+  const nCons = Math.min(ECO.lojaConsumiveis, vagas);
+  const formatoOk = lojaEstoque.length === vagas && lojaEstoque.every((s, i) => (ITENS[s.id][2] === 'cons') === (i >= vagas - nCons));
+  if (lojaDia !== hoje || lojaEstoque.length === 0 || !formatoOk){
     lojaDia = hoje;
     lojaEstoque = montarEstoque();
     lojaVendidos = [];

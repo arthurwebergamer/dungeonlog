@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=75">
+<link rel="stylesheet" href="style.css?v=76">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -3045,8 +3045,15 @@ function desenharHeroi(){
   if (!el) return;
   // PROTOTIPO: arma equipada na mao do heroi (ver .heroArma no CSS)
   const idArma = (typeof equipado !== 'undefined') ? equipado.arma : null;
-  const armaHTML = (idArma !== null && idArma !== undefined && ITENS[idArma])
-    ? '<div class="heroArma' + (/^(Arco|Besta|Estilingue|Funda)/i.test(ITENS[idArma][1]) ? ' ranged' : '') + '"><div class="pxi" style="' + estiloArma(ITENS[idArma][0], 56) + '"></div></div>' : '';
+  let armaHTML = '';
+  if (idArma !== null && idArma !== undefined && ITENS[idArma]){
+    const nomeArma = ITENS[idArma][1];
+    const ranged = /^(Arco|Besta|Estilingue|Funda)/i.test(nomeArma);
+    // armas de sprite grande encolhem pra nao dominar o heroi; o cabo continua na mao
+    const S = /Martelo de Guerra/i.test(nomeArma) ? 34 : /Machado de Guerra|Chicote/i.test(nomeArma) ? 44 : 56;
+    const pos = (ranged || S === 56) ? '' : 'width:'+S+'px;height:'+S+'px;left:'+(59 - 0.12*S).toFixed(1)+'px;top:'+(64 - 0.88*S).toFixed(1)+'px;';
+    armaHTML = '<div class="heroArma' + (ranged ? ' ranged' : '') + '"' + (pos ? ' style="'+pos+'"' : '') + '><div class="pxi" style="' + estiloArma(ITENS[idArma][0], S) + '"></div></div>';
+  }
   el.innerHTML = '<img class="heroimg" src="' + heroiAtual().img + '" alt="' + (idiomaApp() === 'en' ? 'hero' : 'herói') + '">' +
                  armaHTML + '<div class="sombra"></div>';
 }
@@ -5238,6 +5245,22 @@ function animarGolpe(){
       {transform:'translateX('+dx+'px) translateY(0) scale(1.08)',offset:.55},             // golpe
       {transform:'translateX(0) translateY(0) scale(1)',offset:1}                          // volta
     ], {duration:T, easing:'cubic-bezier(.3,.7,.3,1)'});
+  }
+  if (ranged){   // projetil voa do heroi ate o monstro e chega junto com o impacto
+    const nomeA = (typeof equipado !== 'undefined' && equipado.arma != null && ITENS[equipado.arma]) ? ITENS[equipado.arma][1] : '';
+    const pedra = /Estilingue|Funda/i.test(nomeA);
+    const p = document.createElement('div');
+    p.className = 'projetil' + (pedra ? ' pedra' : '');
+    const x0 = hr.right - 8, y0 = hr.top + hr.height*0.62, x1 = mr.left + mr.width*0.35, y1 = mr.top + mr.height*0.5;
+    p.style.cssText = 'left:'+x0+'px;top:'+y0+'px';
+    document.body.appendChild(p);
+    const voo = p.animate([
+      {transform:'translate(0,0)',opacity:0,offset:0},
+      {transform:'translate(0,0)',opacity:1,offset:.12},
+      {transform:'translate('+(x1-x0)+'px,'+(y1-y0)+'px)',opacity:1,offset:.92},
+      {transform:'translate('+(x1-x0)+'px,'+(y1-y0)+'px)',opacity:0,offset:1}
+    ], {duration:T*0.36, delay:T*0.04, fill:'both', easing:'cubic-bezier(.4,0,.8,.6)'});
+    voo.onfinish = () => p.remove();
   }
   setTimeout(()=>m.classList.add('shake'), T*0.42);
   setTimeout(()=>{ h.classList.remove('golpeando'); h.style.zIndex=''; m.classList.remove('shake'); }, T+30);

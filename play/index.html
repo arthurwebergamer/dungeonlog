@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=73">
+<link rel="stylesheet" href="style.css?v=74">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -3046,7 +3046,7 @@ function desenharHeroi(){
   // PROTOTIPO: arma equipada na mao do heroi (ver .heroArma no CSS)
   const idArma = (typeof equipado !== 'undefined') ? equipado.arma : null;
   const armaHTML = (idArma !== null && idArma !== undefined && ITENS[idArma])
-    ? '<div class="heroArma"><div class="pxi" style="' + estiloArma(ITENS[idArma][0], 40) + '"></div></div>' : '';
+    ? '<div class="heroArma"><div class="pxi" style="' + estiloArma(ITENS[idArma][0], 56) + '"></div></div>' : '';
   el.innerHTML = '<img class="heroimg" src="' + heroiAtual().img + '" alt="' + (idiomaApp() === 'en' ? 'hero' : 'herói') + '">' +
                  armaHTML + '<div class="sombra"></div>';
 }

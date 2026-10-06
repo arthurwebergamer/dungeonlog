@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=106">
+<link rel="stylesheet" href="style.css?v=107">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -3054,7 +3054,9 @@ function desenharHeroi(){
     // armas de sprite grande encolhem pra nao dominar o heroi; o cabo continua na mao
     const S = /Martelo de Guerra/i.test(nomeArma) ? 34 : /Machado de Guerra|Chicote/i.test(nomeArma) ? 44 : 56;
     const pos = (ranged || S === 56) ? '' : 'width:'+S+'px;height:'+S+'px;left:'+(59 - 0.12*S).toFixed(1)+'px;top:'+(64 - 0.88*S).toFixed(1)+'px;';
-    armaHTML = '<div class="heroArma' + (ranged ? ' ranged' : '') + '"' + (pos ? ' style="'+pos+'"' : '') + '><div class="pxi" style="' + estiloArma(ITENS[idArma][0], S) + '"></div></div>';
+    // arcos diagonais (Arco Real/Longo) ficam retos (em pe) na arena; os verticais ja vem em pe
+    const arcoDiag = /^Arco (Real|Longo)/i.test(nomeArma);
+    armaHTML = '<div class="heroArma' + (ranged ? ' ranged' : '') + (arcoDiag ? ' arcoDiag' : '') + '"' + (pos ? ' style="'+pos+'"' : '') + '><div class="pxi" style="' + estiloArma(ITENS[idArma][0], S) + '"></div></div>';
   }
   // PROTOTIPO: armadura, elmo e escudo equipados. Cada peca e ajustada pelo retangulo real do desenho
   // (EQ_BB) pra caber numa area alvo do heroi (caixa 83x87): ordem corpo < armadura < elmo < escudo < arma.
@@ -5315,7 +5317,10 @@ function animarGolpe(){
     // origem = mao do heroi (retangulo do herói, sem transform); alvo = centro do slot do monstro
     // (o .fighter pai nao tem a animacao de entrada/tremor do sprite, que desviava a mira)
     const slotM = (m.closest('.fighter') || m).getBoundingClientRect();
-    const x0 = hr.left + hr.width*0.72, y0 = hr.top + hr.height*0.62;
+    // a flecha/pedra sai da propria arma (centro do arco/besta), nao do corpo do heroi
+    const armaEl = h.querySelector('.heroArma');
+    const ar = armaEl ? armaEl.getBoundingClientRect() : null;
+    const x0 = ar ? ar.left + ar.width*0.5 : hr.left + hr.width*0.72, y0 = ar ? ar.top + ar.height*0.5 : hr.top + hr.height*0.62;
     const x1 = slotM.left + slotM.width*0.4, y1 = slotM.top + Math.min(slotM.height, 90)*0.55;
     p.style.cssText = 'left:'+x0+'px;top:'+y0+'px;';
     const ang = Math.atan2(y1-y0, x1-x0);

@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=111">
+<link rel="stylesheet" href="style.css?v=112">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -5883,8 +5883,27 @@ daysEl.querySelectorAll('.day').forEach(b => {
     atualizarEstadoSave();
   };
 });
+// maior dia possivel de cada mes (fevereiro = 29: em ano nao bissexto cai no dia 28, ver anualOcorreNoDia)
+const DIAS_MAX_MES = [31,29,31,30,31,30,31,31,30,31,30,31];
+// aviso sob o seletor de dia: dias 29-31 nao existem em todo mes
+function dicaDiaMes(wrap, texto){
+  if (!wrap) return;
+  let el = wrap.querySelector('.dicadiames');
+  if (!el){ el = document.createElement('div'); el.className = 'dicadiames'; wrap.appendChild(el); }
+  el.textContent = texto || '';
+  el.style.display = texto ? 'block' : 'none';
+}
+function textoDicaMensal(dia){
+  if (dia < 29) return '';
+  return idiomaApp() === 'en' ? 'In shorter months it repeats on the last day of the month.' : 'Em meses mais curtos, repete no último dia do mês.';
+}
+function textoDicaAnual(dia, mes){
+  if (mes === 2 && dia === 29) return idiomaApp() === 'en' ? 'In non-leap years it repeats on Feb 28.' : 'Em anos não bissextos, repete em 28/02.';
+  return '';
+}
 function pintarDiaMes(){
   if (diaMesNumEl) diaMesNumEl.innerHTML = '<b>' + diaMesEscolhido + '</b>';
+  dicaDiaMes(document.getElementById('diaMesWrap'), textoDicaMensal(diaMesEscolhido));
 }
 pintarDiaMes();
 const diaMesMenosBtn = document.getElementById('diaMesMenos');
@@ -5896,6 +5915,8 @@ if (diaMesMaisBtn) diaMesMaisBtn.onclick = () => { diaMesEscolhido = Math.min(DI
 // (nome curto, ver NOMES_MES_CURTO declarado mais abaixo no arquivo --
 // so e lido dentro de uma funcao chamada depois do load, entao ja existe).
 function pintarAnual(){
+  diaAnoEscolhido = Math.min(diaAnoEscolhido, DIAS_MAX_MES[mesAnoEscolhido - 1]);   // mes sem esse dia: ajusta
+  dicaDiaMes(document.getElementById('anualWrap'), textoDicaAnual(diaAnoEscolhido, mesAnoEscolhido));
   if (anualDiaNumEl) anualDiaNumEl.innerHTML = '<b>' + diaAnoEscolhido + '</b>';
   if (anualMesNumEl){
     const en = idiomaApp() === 'en';
@@ -5909,7 +5930,7 @@ const anualDiaMaisBtn = document.getElementById('anualDiaMais');
 const anualMesMenosBtn = document.getElementById('anualMesMenos');
 const anualMesMaisBtn = document.getElementById('anualMesMais');
 if (anualDiaMenosBtn) anualDiaMenosBtn.onclick = () => { diaAnoEscolhido = Math.max(1, diaAnoEscolhido - 1); pintarAnual(); };
-if (anualDiaMaisBtn) anualDiaMaisBtn.onclick = () => { diaAnoEscolhido = Math.min(31, diaAnoEscolhido + 1); pintarAnual(); };
+if (anualDiaMaisBtn) anualDiaMaisBtn.onclick = () => { diaAnoEscolhido = Math.min(DIAS_MAX_MES[mesAnoEscolhido - 1], diaAnoEscolhido + 1); pintarAnual(); };
 if (anualMesMenosBtn) anualMesMenosBtn.onclick = () => { mesAnoEscolhido = mesAnoEscolhido <= 1 ? 12 : mesAnoEscolhido - 1; pintarAnual(); };
 if (anualMesMaisBtn) anualMesMaisBtn.onclick = () => { mesAnoEscolhido = mesAnoEscolhido >= 12 ? 1 : mesAnoEscolhido + 1; pintarAnual(); };
 
@@ -8677,7 +8698,10 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     gDias.classList.toggle('on', modo === 'repete');
     if (diaMesWrapEd) diaMesWrapEd.classList.toggle('on', modo === 'mensal');
     if (diaMesNumEd) diaMesNumEd.innerHTML = '<b>' + diaMes + '</b>';
+    dicaDiaMes(diaMesWrapEd, textoDicaMensal(diaMes));
     if (anualWrapEd) anualWrapEd.classList.toggle('on', modo === 'anual');
+    diaAno = Math.min(diaAno, DIAS_MAX_MES[mesAno - 1]);
+    dicaDiaMes(anualWrapEd, textoDicaAnual(diaAno, mesAno));
     if (anualDiaNumEd) anualDiaNumEd.innerHTML = '<b>' + diaAno + '</b>';
     if (anualMesNumEd){
       const en = idiomaApp() === 'en';
@@ -8792,7 +8816,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   const anualMesMenosEd = document.getElementById('edAnualMesMenos');
   const anualMesMaisEd  = document.getElementById('edAnualMesMais');
   if (anualDiaMenosEd) anualDiaMenosEd.onclick = () => { diaAno = Math.max(1, diaAno - 1); pintar(); };
-  if (anualDiaMaisEd)  anualDiaMaisEd.onclick  = () => { diaAno = Math.min(31, diaAno + 1); pintar(); };
+  if (anualDiaMaisEd)  anualDiaMaisEd.onclick  = () => { diaAno = Math.min(DIAS_MAX_MES[mesAno - 1], diaAno + 1); pintar(); };
   if (anualMesMenosEd) anualMesMenosEd.onclick = () => { mesAno = mesAno <= 1 ? 12 : mesAno - 1; pintar(); };
   if (anualMesMaisEd)  anualMesMaisEd.onclick  = () => { mesAno = mesAno >= 12 ? 1 : mesAno + 1; pintar(); };
   if (vMenos) vMenos.onclick = () => { vezes = Math.max(VEZES_MIN_ED, vezes - 1); pintar(); };

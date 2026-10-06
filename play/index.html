@@ -16658,7 +16658,19 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     const TERMOS_VERSAO = '2026-10-06', PRIVACIDADE_VERSAO = '2026-10-06';
     // diagnostico: abrir /play/?dbg=1 mostra toasts "[dbg]" com cada etapa do registro de aceite
     const DBG_ACEITE = /[?&]dbg=1/.test(location.search);
-    function dbgAceite(m){ console.info('QuestLog dbg:', m); if (DBG_ACEITE && typeof window.aviso === 'function') window.aviso('[dbg] ' + m); }
+    function dbgAceite(m){
+      console.info('QuestLog dbg:', m);
+      if (!DBG_ACEITE) return;
+      try {
+        let el = document.getElementById('dbgAceitePainel');
+        if (!el){
+          el = document.createElement('div'); el.id = 'dbgAceitePainel';
+          el.style.cssText = 'position:fixed;left:0;right:0;top:0;z-index:2147483647;background:rgba(0,0,0,.85);color:#7CFC00;font:11px/1.35 monospace;padding:4px 6px;pointer-events:none;white-space:pre-wrap';
+          document.body.appendChild(el);
+        }
+        el.textContent += new Date().toLocaleTimeString() + ' ' + m + '\n';
+      } catch(e){}
+    }
     async function registrarAceiteSeNecessario(user){
       try {
         dbgAceite('registrar: flag=' + window._aceiteMarcado);

@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=82">
+<link rel="stylesheet" href="style.css?v=83">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -17586,6 +17586,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   window.animarGolpe = function(){
     _animarGolpeOriginal();
     // o corte aparece no IMPACTO (heroi ja encostou no monstro), nao no inicio da corrida
+    // arco/besta/funda: sem corte (so a flecha + monstro piscando branco)
+    if (document.querySelector('#heroSprite .heroArma.ranged')) return;
     setTimeout(function(){
       try{
         efeitoGolpeRaridade(armaEhLendaria(), raridadeArmaAtual());

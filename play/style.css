@@ -2047,6 +2047,12 @@
   .loginLink{background:none;border:none;color:var(--accent);font-family:'Outfit',sans-serif;
              font-size:12.5px;cursor:pointer;padding:4px 0}
   .loginRodape{text-align:center;font-size:13px;color:var(--dim)}
+  .loginAceite{display:flex;align-items:flex-start;gap:8px;font-family:'Outfit',sans-serif;font-size:13px;line-height:1.35;color:var(--dim);text-align:left;margin:2px 0}
+  .loginAceite input{flex:none;width:18px;height:18px;margin:1px 0 0;accent-color:var(--accent)}
+  .loginAceite a{color:var(--accent);text-decoration:underline}
+  .loginAceite.erro{animation:aceiteErro .45s}
+  .loginAceite.erro span{color:#F45781}
+  @keyframes aceiteErro{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
   .loginSenhaErro{font-size:12px;color:var(--perigo);margin-top:-8px}
 
   #passoBoasVindas{align-items:center;text-align:center;gap:28px}

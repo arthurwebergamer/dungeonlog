@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=112">
+<link rel="stylesheet" href="style.css?v=113">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -16266,7 +16266,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     let vigiaVerificacaoAtiva = false;
     const PRAZO_TOLERANCIA_VERIFICACAO_MS = 10 * 60 * 1000; // 10 minutos (valor de produção)
 
-    let initializeApp, getAuth, GoogleAuthProvider, signInWithPopup,
+    let initializeApp, getAuth, GoogleAuthProvider, signInWithPopup, signInWithCredential,
         signInWithEmailAndPassword, createUserWithEmailAndPassword,
         sendPasswordResetEmail, onAuthStateChanged, sendEmailVerification,
         getRedirectResult,
@@ -16289,7 +16289,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       ]);
       ({ initializeApp } = modApp);
       ({
-        getAuth, GoogleAuthProvider, signInWithPopup,
+        getAuth, GoogleAuthProvider, signInWithPopup, signInWithCredential,
         signInWithEmailAndPassword, createUserWithEmailAndPassword,
         sendPasswordResetEmail, onAuthStateChanged, sendEmailVerification,
         getRedirectResult
@@ -16995,7 +16995,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // voltava null (causa exata nao identificada, provavelmente
     // reconciliacao entre o dominio do app e o authDomain do Firebase
     // falhando). signInWithPopup foi CONFIRMADO funcionando em ambos.
-    document.getElementById('loginGoogleBtn').onclick = async () => {
+    const entrarGooglePopup = async () => {
       // v4.24x (pedido do usuario): loading "bonequinho correndo" durante
       // a espera do login.
       //
@@ -17044,6 +17044,65 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         } else if (typeof window.esconderLoadingMasmorra === 'function'){
           window.esconderLoadingMasmorra();
         }
+      }
+    };
+
+    // ---- Google One Tap (seletor de contas em janelinha, sem sair do app) ----
+    // Web client ID do projeto (publico). Se o seletor nao puder abrir
+    // (script bloqueado, sem conta no aparelho, FedCM indisponivel), cai
+    // no fluxo antigo de popup/tela cheia: ninguem fica sem conseguir logar.
+    const GOOGLE_WEB_CLIENT_ID = '991047001122-mq3ofpduhb4ssbvk6ctiuiptfb45aggb.apps.googleusercontent.com';
+    function carregarGIS(){
+      return new Promise((ok, falha) => {
+        if (window.google && window.google.accounts && window.google.accounts.id) return ok();
+        const sc = document.createElement('script');
+        sc.src = 'https://accounts.google.com/gsi/client';
+        sc.async = true;
+        sc.onload = () => (window.google && window.google.accounts && window.google.accounts.id) ? ok() : falha(new Error('gis'));
+        sc.onerror = () => falha(new Error('gis-load'));
+        document.head.appendChild(sc);
+        setTimeout(() => falha(new Error('gis-timeout')), 6000);
+      });
+    }
+    let umToqueEmCurso = false;
+    document.getElementById('loginGoogleBtn').onclick = async () => {
+      if (umToqueEmCurso) return;
+      umToqueEmCurso = true;
+      let resolvido = false;
+      const cair = () => { if (resolvido) return; resolvido = true; umToqueEmCurso = false; entrarGooglePopup(); };
+      try {
+        await carregarGIS();
+        window.google.accounts.id.initialize({
+          client_id: GOOGLE_WEB_CLIENT_ID,
+          use_fedcm_for_prompt: true,
+          auto_select: false,
+          cancel_on_tap_outside: true,
+          callback: async (resp) => {
+            if (resolvido) return;
+            resolvido = true; umToqueEmCurso = false;
+            if (typeof window.mostrarLoadingMasmorra === 'function') window.mostrarLoadingMasmorra();
+            try {
+              await signInWithCredential(auth, GoogleAuthProvider.credential(resp.credential));
+              // sucesso: quem esconde o loading e o aoLogar() (ver comentario do fluxo de popup)
+            } catch(e){
+              console.error('QuestLog/Firebase: One Tap falhou', e);
+              if (typeof window.erroLoadingMasmorra === 'function') window.erroLoadingMasmorra(idiomaAuth() === 'en'
+                ? (e && e.code === 'auth/network-request-failed' ? 'No connection. Check your internet and try again.' : 'Couldn\'t sign in with Google')
+                : (e && e.code === 'auth/network-request-failed' ? 'Sem conexão. Verifique a internet e tente de novo.' : 'Não deu pra entrar com Google'));
+              else if (typeof window.esconderLoadingMasmorra === 'function') window.esconderLoadingMasmorra();
+            }
+          }
+        });
+        window.google.accounts.id.prompt((n) => {
+          // nao exibiu / foi pulado (sem conta, bloqueio, cooldown do Google): fluxo antigo
+          if (n.isNotDisplayed && n.isNotDisplayed()) return cair();
+          if (n.isSkippedMoment && n.isSkippedMoment()) return cair();
+          // pessoa dispensou o seletor de proposito: so libera o botao
+          if (n.isDismissedMoment && n.isDismissedMoment() && !resolvido) { resolvido = true; umToqueEmCurso = false; }
+        });
+      } catch(e){
+        console.warn('QuestLog: One Tap indisponivel, usando popup', e);
+        cair();
       }
     };
 

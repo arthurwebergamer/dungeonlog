@@ -19290,3 +19290,5 @@ Cobre os PRs #66 a #87 (todos mergeados em `main`). Foco da sessão: **lançar**
 - +213 itens novos no fim de `ITENS` (ids 106–318): stats por (tipo, raridade) iguais aos itens atuais, então o teto de bônus não muda. Nunca reordenar `ITENS` (id = índice).
 - Ícone de moeda trocado pelo `gold_pile_8` (topbar, loja, `COIN_SVG`, `MOEDA`).
 - `--sheet` agora 512×864 (SHEET_ROWS 27), ~300KB base64 no CSS.
+
+- **PENDENTE antes do merge pra main:** remover o bloco "MODO TESTE DE ITENS" (`index.html`, logo após `carregar()`), que enche o inventário e desliga `salvar()` fora de produção.

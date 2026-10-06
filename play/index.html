@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=53">
+<link rel="stylesheet" href="style.css?v=54">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -4799,7 +4799,8 @@ function carregar(){
   }
 }
 
-// MODO TESTE DE ITENS (so fora de producao): abrir a dev com ?testeitens=1
+// TEMPORARIO -- REMOVER ANTES DE MERGEAR NA MAIN (pedido do usuario).
+// MODO TESTE DE ITENS (so fora de producao, LIGADO por padrao na dev; ?testeitens=0 desliga)
 // enche o inventario com todos os itens do catalogo e DESLIGA salvar(),
 // entao nada vai pro localStorage nem pra nuvem (nao polui a conta real).
 // ?testeitens=0 desliga. A flag fica em localStorage so nessa origem.
@@ -4808,7 +4809,7 @@ function carregar(){
     if (location.hostname === 'dungeonlog.weberlabs.com.br') return;
     const q = /[?&]testeitens=([01])/.exec(location.search);
     if (q) localStorage.setItem('dl_teste_itens', q[1]);
-    if (localStorage.getItem('dl_teste_itens') !== '1') return;
+    if (localStorage.getItem('dl_teste_itens') === '0') return; // padrao: LIGADO fora de producao
     const _carregar = carregar;
     carregar = function(){
       const r = _carregar();

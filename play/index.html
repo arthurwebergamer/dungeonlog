@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=110">
+<link rel="stylesheet" href="style.css?v=111">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -10737,6 +10737,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
           if (typeof apagarCategoriaTarefa === 'function') apagarCategoriaTarefa(cat.id);
           if (typeof render === 'function') render();
           repintar();
+          if (!obterCategoriasTarefa().length) fechar();   // sem categorias: nada pra gerenciar, fecha a tela
         };
         if (typeof window.pedirConfirmacao === 'function'){
           window.pedirConfirmacao(
@@ -10772,7 +10773,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   // ao lado do pintarCatTabs() que ja chamam) -- mesmo padrao de hook ja
   // usado no resto do app (ex: atualizarResumosConfig).
   window.atualizarCategoriasOverlaySeAberta = function(){
-    if (ov.classList.contains('on')) repintar();
+    if (ov.classList.contains('on')){ repintar(); if (!obterCategoriasTarefa().length) fechar(); }
   };
 
   window.abrirCategoriasOverlay = abrir;

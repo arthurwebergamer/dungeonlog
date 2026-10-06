@@ -19303,3 +19303,11 @@ Cobre os PRs #66 a #87 (todos mergeados em `main`). Foco da sessão: **lançar**
 - Loja: sempre pelo menos 2 itens Raros na prateleira, em qualquer nível (`ECO.lojaRarosMin`); abaixo do nível aparecem travados ("Level V").
 
 - **Merge 2 (06/10):** bloco de teste e botão "dia +1" removidos antes do merge; limite grátis segue em 5. Novidades: busca e subcategorias no inventário; sprites corrigidos (clava gigante, espada larga élfica, foices, espelho, arcos); arcos retos na arena e flecha sai do arco; chapéus não aparecem mais no herói; removidos Tsurugi e Martelo de Guerra; Boné de Couro, Gorro e Cornuthaum de volta ao catálogo.
+
+## [Sessão 06/10] Registro de aceite dos Termos/Privacidade (prova de consentimento)
+- **Worker:** `POST /consent/accept` (`tratarConsentimento`): valida o ID token, aceita só versões em `CONSENT_VERSOES_VALIDAS`, grava `consents/{uid}` (estado atual) e `consents/{uid}/aceites/{versões}` (histórico imutável, só cria se não existe) com `aceitoEm` = hora do SERVIDOR; guarda idioma, método, plataforma, país, user-agent e origem.
+- **Regras:** `consents/{uid}` e `aceites/*`: o dono só LÊ; escrita do client sempre negada.
+- **App:** `registrarAceiteSeNecessario(user)` no `aoLogar`, só quando a pessoa marcou o checkbox nesta sessão e a conta não tem o aceite da versão atual. Não bloqueia o login.
+- **Textos arquivados:** `/terms/2026-10-06/`, `/privacy/2026-10-06/` (e `/en/...`). Ao mudar os textos: nova pasta datada + atualizar `TERMOS_VERSAO`/`PRIVACIDADE_VERSAO` (app) e `CONSENT_VERSOES_VALIDAS` (Worker).
+- **Deploy (feito pelo dono):** `firebase deploy --only firestore:rules` e `wrangler deploy` em `cf-worker/`.
+- **Pendente:** tela de aceite bloqueante para sessão restaurada sem aceite registrado / versão nova; decidir se tira o checkbox de quem já tem aceite.

@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=85">
+<link rel="stylesheet" href="style.css?v=87">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -3036,6 +3036,7 @@ let heroiEscolhido = 0;
 let semente = Math.floor(Math.random() * 64);   // ponto de partida no ciclo, sorteado uma vez
 function heroiAtual(){ return HEROIS[heroiEscolhido] || HEROIS[0]; }
 
+window.EQ_BB = {"23":[3,3,31,31],"24":[6,1,25,30],"25":[1,5,28,30],"26":[1,1,30,31],"27":[3,4,29,31],"28":[3,2,25,31],"30":[2,5,30,26],"31":[6,7,26,30],"32":[3,4,30,30],"33":[5,1,27,31],"34":[4,4,28,30],"35":[6,7,25,26],"36":[2,3,28,31],"37":[6,4,26,30],"103":[3,4,30,29],"104":[4,1,27,31],"179":[3,2,27,30],"180":[3,3,25,31],"181":[2,1,30,30],"182":[4,2,29,28],"183":[1,5,28,30],"184":[4,6,26,28],"185":[4,4,27,30],"186":[2,1,30,30],"187":[1,5,28,30],"188":[5,4,30,28],"189":[6,4,27,30],"190":[1,5,28,30],"191":[2,2,28,29],"192":[2,3,29,30],"193":[2,3,29,31],"194":[7,4,30,29],"195":[7,5,26,27],"196":[8,1,25,31],"197":[2,4,30,31],"198":[2,1,31,30],"199":[5,1,27,30],"200":[7,3,26,26],"201":[6,3,30,26],"202":[3,6,30,31],"203":[0,3,32,29],"204":[3,4,30,29],"205":[3,4,30,29],"206":[3,4,30,29],"207":[3,4,30,29],"208":[3,6,30,31],"209":[0,3,32,31],"210":[4,2,29,32],"211":[2,5,30,26],"212":[2,0,29,31],"213":[0,7,26,25],"214":[2,5,30,30],"215":[4,8,31,28],"216":[0,5,32,27],"217":[1,5,31,27],"218":[3,5,27,30],"219":[4,5,27,30],"220":[5,2,29,31],"221":[6,0,27,31],"222":[6,1,26,30],"223":[4,8,31,28],"224":[3,1,32,32],"225":[1,0,32,32],"226":[3,1,27,31],"227":[4,0,28,32],"228":[1,4,30,30],"229":[7,7,25,26],"230":[7,7,25,26],"231":[5,5,26,26],"232":[6,5,26,29],"233":[5,2,26,31],"234":[4,7,24,26],"235":[6,7,26,31],"236":[5,3,27,31],"237":[5,2,27,30],"238":[5,2,27,31],"239":[6,1,27,28]};
 function estiloArma(sp, s){   // proprio: o script da sheet (estiloSprite) carrega depois deste
   const COLS = 16, ROWS = 27, c = sp % COLS, r = Math.floor(sp / COLS);
   return 'width:'+s+'px;height:'+s+'px;background-size:'+(COLS*s)+'px '+(ROWS*s)+'px;background-position:-'+(c*s)+'px -'+(r*s)+'px';
@@ -3054,13 +3055,22 @@ function desenharHeroi(){
     const pos = (ranged || S === 56) ? '' : 'width:'+S+'px;height:'+S+'px;left:'+(59 - 0.12*S).toFixed(1)+'px;top:'+(64 - 0.88*S).toFixed(1)+'px;';
     armaHTML = '<div class="heroArma' + (ranged ? ' ranged' : '') + '"' + (pos ? ' style="'+pos+'"' : '') + '><div class="pxi" style="' + estiloArma(ITENS[idArma][0], S) + '"></div></div>';
   }
-  // PROTOTIPO: armadura, elmo e escudo equipados (camadas sobre o sprite, ordem: corpo < armadura < elmo < escudo < arma)
-  const camada = (slot, cls, S) => {
+  // PROTOTIPO: armadura, elmo e escudo equipados. Cada peca e ajustada pelo retangulo real do desenho
+  // (EQ_BB) pra caber numa area alvo do heroi (caixa 83x87): ordem corpo < armadura < elmo < escudo < arma.
+  const camada = (slot, cls, W, H, cx, top, esticaMax) => {
     const id = (typeof equipado !== 'undefined') ? equipado[slot] : null;
     if (id === null || id === undefined || !ITENS[id]) return '';
-    return '<div class="heroEq ' + cls + '"><div class="pxi" style="' + estiloArma(ITENS[id][0], S) + '"></div></div>';
+    const bb = (window.EQ_BB && window.EQ_BB[id]) || [2, 2, 30, 30];
+    const bw = bb[2] - bb[0], bh = bb[3] - bb[1];
+    const ky = H / bh, kx = Math.min(W / bw, ky * esticaMax);
+    const sp = ITENS[id][0], c = sp % 16, r = Math.floor(sp / 16);
+    const left = cx - (bb[0] + bw / 2) * kx, t = top - bb[1] * ky;
+    return '<div class="heroEq ' + cls + '" style="left:' + left.toFixed(1) + 'px;top:' + t.toFixed(1) + 'px;width:' + (32*kx).toFixed(1) + 'px;height:' + (32*ky).toFixed(1) + 'px">' +
+           '<div class="pxi" style="width:100%;height:100%;background-size:' + (16*32*kx).toFixed(1) + 'px ' + (27*32*ky).toFixed(1) + 'px;background-position:-' + (c*32*kx).toFixed(1) + 'px -' + (r*32*ky).toFixed(1) + 'px"></div></div>';
   };
-  const eqHTML = camada('armadura', 'eqArmadura', 32) + camada('elmo', 'eqElmo', 38) + camada('escudo', 'eqEscudo', 36);
+  const eqHTML = camada('armadura', 'eqArmadura', 46, 36, 42, 49, 1.3) +
+                 camada('elmo', 'eqElmo', 64, 35, 42, 1, 1.6) +
+                 camada('escudo', 'eqEscudo', 34, 34, 9, 47, 1.2);
   el.innerHTML = '<img class="heroimg" src="' + heroiAtual().img + '" alt="' + (idiomaApp() === 'en' ? 'hero' : 'herói') + '">' +
                  eqHTML + armaHTML + '<div class="sombra"></div>';
 }

@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=103">
+<link rel="stylesheet" href="style.css?v=104">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -3069,25 +3069,10 @@ function desenharHeroi(){
     return '<div class="heroEq ' + cls + '" style="left:' + left.toFixed(1) + 'px;top:' + t.toFixed(1) + 'px;width:' + (32*kx).toFixed(1) + 'px;height:' + (32*ky).toFixed(1) + 'px">' +
            '<div class="pxi" style="width:100%;height:100%;background-size:' + (16*32*kx).toFixed(1) + 'px ' + (27*32*ky).toFixed(1) + 'px;background-position:-' + (c*32*kx).toFixed(1) + 'px -' + (r*32*ky).toFixed(1) + 'px"></div></div>';
   };
-  // CHAPEU (acessorio de cabeca): so itens cujo nome e chapeu/gorro/capuz/bone/cornuthaum aparecem; ancorado
-  // no topo da cabeca (base do chapeu na linha da testa), tamanho pelo retangulo real do desenho (EQ_BB).
-  const chapeuHTML = (() => {
-    const id = (typeof equipado !== 'undefined') ? equipado.elmo : null;
-    // chapeus continuam sendo ELMO (slot elmo); so estes aparecem no heroi, e o "Gorro" simples (212) fica sem sprite
-    if (id === null || id === undefined || !ITENS[id] || id === 212 || !/Chap[eé]u|Gorro|Capuz|Bon[eé]|Cornuthaum/i.test(ITENS[id][1])) return '';
-    const bb = (window.EQ_BB && window.EQ_BB[id]) || [4, 4, 28, 28];
-    const bw = bb[2] - bb[0], bh = bb[3] - bb[1];
-    const aj = ({222: {m: 1.15, dy: 0}})[id] || {m: 1, dy: 0};   // ajuste por chapeu (222 Cornuthaum: maior e mais alto)
-    const k = Math.min(66 / bw, 48 / bh) * aj.m;
-    const sp = ITENS[id][0], c = sp % 16, r = Math.floor(sp / 16);
-    const left = 42 - (bb[0] + bw / 2) * k, top = 34 + aj.dy - bb[3] * k;
-    return '<div class="heroEq eqChapeu" style="left:' + left.toFixed(1) + 'px;top:' + top.toFixed(1) + 'px;width:' + (32*k).toFixed(1) + 'px;height:' + (32*k).toFixed(1) + 'px">' +
-           '<div class="pxi" style="width:100%;height:100%;background-size:' + (16*32*k).toFixed(1) + 'px ' + (27*32*k).toFixed(1) + 'px;background-position:-' + (c*32*k).toFixed(1) + 'px -' + (r*32*k).toFixed(1) + 'px"></div></div>';
-  })();
   // so escudo (e a arma, acima) aparecem no heroi; armadura/elmo ficaram de fora por decisao do usuario
   const eqHTML = camada('escudo', 'eqEscudo', 34, 34, 19, 47, 1.2);
   el.innerHTML = '<img class="heroimg" src="' + heroiAtual().img + '" alt="' + (idiomaApp() === 'en' ? 'hero' : 'herói') + '">' +
-                 eqHTML + chapeuHTML + armaHTML + '<div class="sombra"></div>';
+                 eqHTML + armaHTML + '<div class="sombra"></div>';
 }
 
 function diasCorridos(){

@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=72">
+<link rel="stylesheet" href="style.css?v=73">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -5221,9 +5221,25 @@ function animarContagemNumero(el, valorFinal, duracaoMs, sufixo){
 
 function animarGolpe(){
   const h = document.getElementById('heroSprite'), m = document.getElementById('mobSprite');
-  h.classList.add('hit');
-  setTimeout(()=>m.classList.add('shake'),120);
-  setTimeout(()=>{h.classList.remove('hit');m.classList.remove('shake');},320);
+  if (!h || !m) return;
+  const hr = h.getBoundingClientRect(), mr = m.getBoundingClientRect();
+  // distancia ate encostar no monstro (a ponta da espada passa ~20px da borda do heroi)
+  const dx = Math.max(0, Math.round(mr.left - hr.right - 4));
+  if (h._golpeAnim) h._golpeAnim.cancel();
+  h.classList.add('golpeando');
+  h.style.zIndex = 5;
+  const T = 520;
+  if (h.animate){
+    h._golpeAnim = h.animate([
+      {transform:'translateX(0) scale(1)',offset:0},
+      {transform:'translateX('+(dx*0.55)+'px) translateY(-6px) scale(1.04)',offset:.22},   // corre
+      {transform:'translateX('+dx+'px) translateY(0) scale(1.08)',offset:.40},             // chega
+      {transform:'translateX('+dx+'px) translateY(0) scale(1.08)',offset:.55},             // golpe
+      {transform:'translateX(0) translateY(0) scale(1)',offset:1}                          // volta
+    ], {duration:T, easing:'cubic-bezier(.3,.7,.3,1)'});
+  }
+  setTimeout(()=>m.classList.add('shake'), T*0.42);
+  setTimeout(()=>{ h.classList.remove('golpeando'); h.style.zIndex=''; m.classList.remove('shake'); }, T+30);
 }
 
 const COIN_SVG = '<svg viewBox="0 0 13 13" shape-rendering="crispEdges"><image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAANCAYAAABy6+R8AAABNElEQVR42p2SsUrDUBSGvxtr0angcNup0SzOIop0cXBqcBGkpS59AR10qk+guOoLuCgWQZe2k4NLKXRwzhKlWzMEioOl2hyHkpQmBcG73cP3n//8h6NIPon9VRwwYrCMpcJYKogI0jCj+rwuIg2TwC5wVX4GwNJT7vD6gAV1H/Eq7B7Cezsp8pkRvUEagHxmxOvbpHf5ZgigUgBGs42lhTVrMSHoDdLsboS14TRTvdWnVMyyebqfEOQzI7K5HFvrKzOZRBom9VYfgFIxS2AXMLiD5ioAl7celpZoPAXIRWmZWlUT2AUeT55m1ut6ilpV03V8ts8+p6K4E/YHAUcYzTZdx+fd/cb1FOf1r7+dXG+ytXlOhEJLS5Qp3GrX8Xnp/EQu8RMRgIfjpcgBCOEZVv3n9n4BeByMZhegdHgAAAAASUVORK5CYII=" width="13" height="13" style="image-rendering:pixelated"/></svg>';
@@ -17526,12 +17542,15 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
   window.animarGolpe = function(){
     _animarGolpeOriginal();
-    try{
-      efeitoGolpeRaridade(armaEhLendaria(), raridadeArmaAtual());
-    }catch(e){
-      // efeito visual nunca pode quebrar o golpe/combate em si
-      console.error('efeito de golpe por categoria falhou:', e);
-    }
+    // o corte aparece no IMPACTO (heroi ja encostou no monstro), nao no inicio da corrida
+    setTimeout(function(){
+      try{
+        efeitoGolpeRaridade(armaEhLendaria(), raridadeArmaAtual());
+      }catch(e){
+        // efeito visual nunca pode quebrar o golpe/combate em si
+        console.error('efeito de golpe por categoria falhou:', e);
+      }
+    }, 210);
   };
 })();
 </script>

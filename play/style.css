@@ -59,7 +59,7 @@
   .topbar{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;border-bottom:1px solid var(--line)}
   .lvl{font-family:'Silkscreen',monospace;font-size:9px;color:var(--accent);background:var(--accent-dim);padding:5px 9px;border-radius:4px}
   .coins{display:flex;align-items:center;gap:6px;font-family:'Silkscreen',monospace;font-size:10px;color:var(--gold)}
-  .coins svg{width:30px;height:30px}
+  .coins svg{width:18px;height:18px}
 
   .arena{padding:22px 18px 18px;border-bottom:1px solid var(--line);position:relative;overflow:hidden}
   .fight{display:flex;align-items:flex-end;justify-content:center;gap:28px;margin-bottom:16px}
@@ -105,7 +105,7 @@
     25%{transform:translateX(6px) translateY(-4px)}
     100%{opacity:0;transform:translateX(46px) translateY(-10px) scale(.65)}
   }
-  .coin-drop{position:absolute;width:26px;height:26px;pointer-events:none;animation:coinFall .85s ease-in forwards;left:0;top:0}
+  .coin-drop{position:absolute;width:15px;height:15px;pointer-events:none;animation:coinFall .85s ease-in forwards;left:0;top:0}
   .coin-drop svg{width:100%;height:100%;image-rendering:pixelated}
   @keyframes coinFall{
     0%{transform:translate(-50%,-50%) scale(1) rotate(0deg);opacity:1}
@@ -138,7 +138,7 @@
   .dmg-float.msg{display:block;white-space:normal;text-align:center;max-width:190px;
     line-height:1.4;font-size:10.5px;font-weight:600;letter-spacing:.02em}
   .dmg-float svg{width:13px;height:13px;image-rendering:pixelated;flex-shrink:0}
-  .dmg-float .dmg-moeda svg{width:26px;height:26px}
+  .dmg-float .dmg-moeda svg{width:16px;height:16px}
   /* variante empilhada (pedido do usuario, golpe final): em vez de
      "+moedas · +XP" numa linha só horizontal, empilha +moedas em cima e
      +XP embaixo -- cada linha e seu proprio flex row (icone+numero).
@@ -190,7 +190,7 @@
      claro) + sombra escura funciona em qualquer fundo, claro ou escuro. */
   .vitoria .faixa{font-family:'Silkscreen',monospace;font-size:11px;color:#FFD65A;text-shadow:0 1px 3px rgba(0,0,0,.65);letter-spacing:1px;display:inline-block}
   .vitoria .ganho{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--gold)}
-  .vitoria .ganho svg{width:28px;height:28px;image-rendering:pixelated}
+  .vitoria .ganho svg{width:16px;height:16px;image-rendering:pixelated}
   /* item pedido pelo usuario: burst de faiscas radiando da faixa DIA
      VENCIDO, mesma tecnica posicional de .coin-drop/.dmg-float */
   .vitoria-spark{position:absolute;left:0;top:0;width:8px;height:8px;pointer-events:none;
@@ -1059,7 +1059,7 @@
   .saldo{display:inline-flex;align-items:center;gap:5px;font-family:'Outfit',sans-serif;
          font-size:13px;font-weight:600;color:var(--gold);background:rgba(245,190,74,.10);
          border:1px solid rgba(245,190,74,.22);border-radius:999px;padding:5px 11px;margin-top:4px}
-  .saldo svg{width:28px;height:28px}
+  .saldo svg{width:17px;height:17px}
 
   .nav button{cursor:pointer}
 
@@ -1157,7 +1157,7 @@
   .lpreco{font-family:'Outfit',sans-serif;font-size:12.5px;font-weight:700;color:var(--gold);
           font-variant-numeric:tabular-nums;white-space:nowrap}
   .lpreco s{color:var(--dim);font-weight:500;font-size:10.5px;margin-right:4px}
-  .lpreco .lmoeda{width:24px;height:24px;margin-left:2px;vertical-align:-7px}
+  .lpreco .lmoeda{width:14px;height:14px;margin-left:3px;vertical-align:-3px}
   .lbtn{font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;padding:6px 14px;border-radius:9px;
         border:1px solid var(--accent);background:var(--accent);color:var(--bg);cursor:pointer;white-space:nowrap}
   .lbtn.sec{background:var(--poco);border-color:var(--line);color:var(--muted)}
@@ -2828,7 +2828,7 @@
   .lpreco{font-family:'Outfit',sans-serif;font-size:12.5px;font-weight:700;color:var(--gold);
           font-variant-numeric:tabular-nums;white-space:nowrap}
   .lpreco s{color:var(--dim);font-weight:500;font-size:10.5px;margin-right:4px}
-  .lpreco .lmoeda{width:24px;height:24px;margin-left:2px;vertical-align:-7px}
+  .lpreco .lmoeda{width:14px;height:14px;margin-left:3px;vertical-align:-3px}
   .lbtn{font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;padding:6px 14px;border-radius:9px;
         border:1px solid var(--accent);background:var(--accent);color:var(--bg);cursor:pointer;white-space:nowrap}
   .lbtn.sec{background:var(--poco);border-color:var(--line);color:var(--muted)}

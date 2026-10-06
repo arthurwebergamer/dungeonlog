@@ -19293,4 +19293,4 @@ Cobre os PRs #66 a #87 (todos mergeados em `main`). Foco da sessão: **lançar**
 
 - **PENDENTE antes do merge pra main:** remover o bloco "MODO TESTE DE ITENS" (`index.html`, logo após `carregar()`), que enche o inventário e desliga `salvar()` fora de produção.
 - Baú por estágio: E1 = 1 item, E2 = 2–3, E3 = 3–4, E4 = 4 (substitui a regra por tarefas do dia); bônus de sorte de raridade por estágio `[0, .2, .4, .6]` (`ECO.lootPorEstagio`, `ECO.sorteEstagio`, `lootDoEstagio()`). Vale pro baú padrão e pro especial. Ícone de moeda da topbar/loja ampliado (21/20/16px).
-- Ícone de moeda: o pacote Dungeon Crawl não tem moeda de frente (só moedas deitadas, que pareciam uma bacia). Moeda atual = `gold_pile_8` do pacote (só a pilha pequena da frente), ampliada (30px topbar).
+- Ícone de moeda: o pacote Dungeon Crawl não tem moeda de frente (só moedas deitadas, que pareciam uma bacia). Moeda atual = `gold_pile_8` do pacote (só a pilha pequena da frente), (18px topbar).

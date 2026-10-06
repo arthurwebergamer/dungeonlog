@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=109">
+<link rel="stylesheet" href="style.css?v=110">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -8540,6 +8540,21 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     <input class="edcampo" id="edTexto" maxlength="80" autocomplete="off" placeholder="O que precisa ser feito?" data-i18n-placeholder="jogo.oQuePrecisaSerFeito">
 
     <div class="edbloco">
+        <div class="advcatrow catvisivel">
+          <span class="diflabel">Categoria</span>
+          <div class="catchips" id="edCatChips"></div>
+          <button type="button" class="catnova" id="edCatNovaBtn">+ Nova categoria</button>
+          <div class="catform" id="edCatForm">
+            <input type="text" class="catnomeinput" id="edCatNomeInput" placeholder="Nome da categoria" maxlength="24" autocomplete="off">
+            <div class="catformacoes">
+              <button type="button" class="catformcancelar" id="edCatFormCancelar">Cancelar</button>
+              <button type="button" class="catformok" id="edCatFormOk">Criar</button>
+            </div>
+          </div>
+        </div>
+    </div>
+
+    <div class="edbloco">
       <div class="edsec" data-i18n="jogo.dificuldade">Dificuldade</div>
       <div class="difs" id="edDifs"></div>
     </div>
@@ -8607,18 +8622,6 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
             <button type="button" class="advreset" id="edCorBoxReset" data-i18n="jogo.semCor">Sem cor</button>
           </div>
           <div class="advswatches" id="edCorBoxSwatches"></div>
-        </div>
-        <div class="advcatrow">
-          <span class="diflabel">Categoria</span>
-          <div class="catchips" id="edCatChips"></div>
-          <button type="button" class="catnova" id="edCatNovaBtn">+ Nova categoria</button>
-          <div class="catform" id="edCatForm">
-            <input type="text" class="catnomeinput" id="edCatNomeInput" placeholder="Nome da categoria" maxlength="24" autocomplete="off">
-            <div class="catformacoes">
-              <button type="button" class="catformcancelar" id="edCatFormCancelar">Cancelar</button>
-              <button type="button" class="catformok" id="edCatFormOk">Criar</button>
-            </div>
-          </div>
         </div>
       </div>
     </div>

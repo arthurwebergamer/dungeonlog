@@ -3266,7 +3266,7 @@ window.assinaturaAtiva = assinaturaAtiva;
 // preco) e decidir onde a Cloud Function vai rodar. Ate la, o botao
 // "Assinar" so avisa que ainda nao esta disponivel.
 // ---------------------------------------------------------------------
-const LIMITE_TAREFAS_GRATIS = 5; // pedido do usuario -- plano gratis para em 5 tarefas ativas
+let LIMITE_TAREFAS_GRATIS = 5; // pedido do usuario -- plano gratis para em 5 tarefas ativas
 
 let _pwEtapaAtual = 1;
 let _pwPlanoSelecionado = 'trial'; // pedido do usuario (tela "planos" simplificada) -- teste gratis vem pre-selecionado, junto na mesma lista dos planos pagos
@@ -4838,7 +4838,7 @@ function carregar(){
   }
 }
 
-// TEMPORARIO -- REMOVER ANTES DE MERGEAR NA MAIN (pedido do usuario).
+// TEMPORARIO -- REMOVER ANTES DE MERGEAR NA MAIN  (inclui LIMITE_TAREFAS_GRATIS = Infinity) (pedido do usuario).
 // MODO TESTE DE ITENS (so fora de producao, LIGADO por padrao na dev; ?testeitens=0 desliga)
 // enche o inventario com todos os itens do catalogo e DESLIGA salvar(),
 // entao nada vai pro localStorage nem pra nuvem (nao polui a conta real).
@@ -4856,6 +4856,7 @@ function carregar(){
       if (equipado.arma === null || equipado.arma === undefined) equipado.arma = 2;   // Espada de Aco, so pra ver o prototipo da arma na mao
       return r;
     };
+    LIMITE_TAREFAS_GRATIS = Infinity;   // teste: sem limite de tarefas (so dev)
     salvar = function(){};
     console.warn('MODO TESTE DE ITENS ativo: salvar() desligado');
   } catch(e){}

@@ -16658,7 +16658,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     const TERMOS_VERSAO = '2026-10-06', PRIVACIDADE_VERSAO = '2026-10-06';
     async function registrarAceiteSeNecessario(user){
       try {
-        if (!window._aceiteMarcado) return;                  // so quando a pessoa marcou o checkbox NESTA sessao
+        if (!window._aceiteMarcado){ console.info('QuestLog: aceite nao marcado nesta sessao, nada a registrar'); return; }
         if (typeof BILLING_VERIFY_URL !== 'string') return;
         let atual = false;
         try {
@@ -16679,7 +16679,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
             plataforma: twa ? 'twa' : (standalone ? 'pwa' : 'web')
           })
         });
-        if (resp.ok) window._aceiteMarcado = false;
+        if (resp.ok){ window._aceiteMarcado = false; console.info('QuestLog: aceite registrado'); }
+        else console.warn('QuestLog: registro de aceite falhou HTTP ' + resp.status, await resp.text().catch(()=>''));
       } catch(e){ console.warn('QuestLog: registro de aceite falhou (tenta no proximo login)', e); }
     }
 
@@ -16979,6 +16980,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       }
 
       window.definirUidAtivo(user.uid);
+      registrarAceiteSeNecessario(user);   // login feito sem #passoLogin.on (ex.: tela trocada) tambem registra
       reconectarEnvio(user);
       puxarPlanoSilencioso(user.uid);
     }

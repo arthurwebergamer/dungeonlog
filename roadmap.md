@@ -19301,3 +19301,5 @@ Cobre os PRs #66 a #87 (todos mergeados em `main`). Foco da sessão: **lançar**
 - Ícone de moeda: o pacote Dungeon Crawl não tem moeda de frente (só moedas deitadas, que pareciam uma bacia). Moeda: pilha completa do `gold_pile_8` (21px natural) na topbar e loja (saldo e preços); pilha pequena recortada do mesmo sprite (13px) em "Dia vencido", "+N" e moedas voando.
 - Loja: prateleira de 8 = 6 itens (equipamento/chave) + **sempre 2 consumíveis no fim** (`ECO.lojaConsumiveis`); estoque salvo em formato antigo é regerado.
 - Loja: sempre pelo menos 2 itens Raros na prateleira, em qualquer nível (`ECO.lojaRarosMin`); abaixo do nível aparecem travados ("Level V").
+
+- **ATENCAO (branch dev):** o bloco "MODO TESTE DE ITENS" (inventário cheio, sem limite de tarefas, `salvar()` desligado) voltou SÓ na `dev` a pedido do usuário. NÃO mergear na `main` com ele; remover (e voltar `LIMITE_TAREFAS_GRATIS` para `const`) antes de qualquer merge.

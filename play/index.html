@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=111">
+<link rel="stylesheet" href="style.css?v=114">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -5883,8 +5883,27 @@ daysEl.querySelectorAll('.day').forEach(b => {
     atualizarEstadoSave();
   };
 });
+// maior dia possivel de cada mes (fevereiro = 29: em ano nao bissexto cai no dia 28, ver anualOcorreNoDia)
+const DIAS_MAX_MES = [31,29,31,30,31,30,31,31,30,31,30,31];
+// aviso sob o seletor de dia: dias 29-31 nao existem em todo mes
+function dicaDiaMes(wrap, texto){
+  if (!wrap) return;
+  let el = wrap.querySelector('.dicadiames');
+  if (!el){ el = document.createElement('div'); el.className = 'dicadiames'; wrap.appendChild(el); }
+  el.textContent = texto || '';
+  el.style.display = texto ? 'block' : 'none';
+}
+function textoDicaMensal(dia){
+  if (dia < 29) return '';
+  return idiomaApp() === 'en' ? 'In shorter months it repeats on the last day of the month.' : 'Em meses mais curtos, repete no último dia do mês.';
+}
+function textoDicaAnual(dia, mes){
+  if (mes === 2 && dia === 29) return idiomaApp() === 'en' ? 'In non-leap years it repeats on Feb 28.' : 'Em anos não bissextos, repete em 28/02.';
+  return '';
+}
 function pintarDiaMes(){
   if (diaMesNumEl) diaMesNumEl.innerHTML = '<b>' + diaMesEscolhido + '</b>';
+  dicaDiaMes(document.getElementById('diaMesWrap'), textoDicaMensal(diaMesEscolhido));
 }
 pintarDiaMes();
 const diaMesMenosBtn = document.getElementById('diaMesMenos');
@@ -5896,6 +5915,8 @@ if (diaMesMaisBtn) diaMesMaisBtn.onclick = () => { diaMesEscolhido = Math.min(DI
 // (nome curto, ver NOMES_MES_CURTO declarado mais abaixo no arquivo --
 // so e lido dentro de uma funcao chamada depois do load, entao ja existe).
 function pintarAnual(){
+  diaAnoEscolhido = Math.min(diaAnoEscolhido, DIAS_MAX_MES[mesAnoEscolhido - 1]);   // mes sem esse dia: ajusta
+  dicaDiaMes(document.getElementById('anualWrap'), textoDicaAnual(diaAnoEscolhido, mesAnoEscolhido));
   if (anualDiaNumEl) anualDiaNumEl.innerHTML = '<b>' + diaAnoEscolhido + '</b>';
   if (anualMesNumEl){
     const en = idiomaApp() === 'en';
@@ -5909,7 +5930,7 @@ const anualDiaMaisBtn = document.getElementById('anualDiaMais');
 const anualMesMenosBtn = document.getElementById('anualMesMenos');
 const anualMesMaisBtn = document.getElementById('anualMesMais');
 if (anualDiaMenosBtn) anualDiaMenosBtn.onclick = () => { diaAnoEscolhido = Math.max(1, diaAnoEscolhido - 1); pintarAnual(); };
-if (anualDiaMaisBtn) anualDiaMaisBtn.onclick = () => { diaAnoEscolhido = Math.min(31, diaAnoEscolhido + 1); pintarAnual(); };
+if (anualDiaMaisBtn) anualDiaMaisBtn.onclick = () => { diaAnoEscolhido = Math.min(DIAS_MAX_MES[mesAnoEscolhido - 1], diaAnoEscolhido + 1); pintarAnual(); };
 if (anualMesMenosBtn) anualMesMenosBtn.onclick = () => { mesAnoEscolhido = mesAnoEscolhido <= 1 ? 12 : mesAnoEscolhido - 1; pintarAnual(); };
 if (anualMesMaisBtn) anualMesMaisBtn.onclick = () => { mesAnoEscolhido = mesAnoEscolhido >= 12 ? 1 : mesAnoEscolhido + 1; pintarAnual(); };
 
@@ -8677,7 +8698,10 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     gDias.classList.toggle('on', modo === 'repete');
     if (diaMesWrapEd) diaMesWrapEd.classList.toggle('on', modo === 'mensal');
     if (diaMesNumEd) diaMesNumEd.innerHTML = '<b>' + diaMes + '</b>';
+    dicaDiaMes(diaMesWrapEd, textoDicaMensal(diaMes));
     if (anualWrapEd) anualWrapEd.classList.toggle('on', modo === 'anual');
+    diaAno = Math.min(diaAno, DIAS_MAX_MES[mesAno - 1]);
+    dicaDiaMes(anualWrapEd, textoDicaAnual(diaAno, mesAno));
     if (anualDiaNumEd) anualDiaNumEd.innerHTML = '<b>' + diaAno + '</b>';
     if (anualMesNumEd){
       const en = idiomaApp() === 'en';
@@ -8792,7 +8816,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   const anualMesMenosEd = document.getElementById('edAnualMesMenos');
   const anualMesMaisEd  = document.getElementById('edAnualMesMais');
   if (anualDiaMenosEd) anualDiaMenosEd.onclick = () => { diaAno = Math.max(1, diaAno - 1); pintar(); };
-  if (anualDiaMaisEd)  anualDiaMaisEd.onclick  = () => { diaAno = Math.min(31, diaAno + 1); pintar(); };
+  if (anualDiaMaisEd)  anualDiaMaisEd.onclick  = () => { diaAno = Math.min(DIAS_MAX_MES[mesAno - 1], diaAno + 1); pintar(); };
   if (anualMesMenosEd) anualMesMenosEd.onclick = () => { mesAno = mesAno <= 1 ? 12 : mesAno - 1; pintar(); };
   if (anualMesMaisEd)  anualMesMaisEd.onclick  = () => { mesAno = mesAno >= 12 ? 1 : mesAno + 1; pintar(); };
   if (vMenos) vMenos.onclick = () => { vezes = Math.max(VEZES_MIN_ED, vezes - 1); pintar(); };
@@ -16242,7 +16266,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     let vigiaVerificacaoAtiva = false;
     const PRAZO_TOLERANCIA_VERIFICACAO_MS = 10 * 60 * 1000; // 10 minutos (valor de produção)
 
-    let initializeApp, getAuth, GoogleAuthProvider, signInWithPopup,
+    let initializeApp, getAuth, GoogleAuthProvider, signInWithPopup, signInWithCredential,
         signInWithEmailAndPassword, createUserWithEmailAndPassword,
         sendPasswordResetEmail, onAuthStateChanged, sendEmailVerification,
         getRedirectResult,
@@ -16265,7 +16289,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       ]);
       ({ initializeApp } = modApp);
       ({
-        getAuth, GoogleAuthProvider, signInWithPopup,
+        getAuth, GoogleAuthProvider, signInWithPopup, signInWithCredential,
         signInWithEmailAndPassword, createUserWithEmailAndPassword,
         sendPasswordResetEmail, onAuthStateChanged, sendEmailVerification,
         getRedirectResult
@@ -16971,7 +16995,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // voltava null (causa exata nao identificada, provavelmente
     // reconciliacao entre o dominio do app e o authDomain do Firebase
     // falhando). signInWithPopup foi CONFIRMADO funcionando em ambos.
-    document.getElementById('loginGoogleBtn').onclick = async () => {
+    const entrarGooglePopup = async () => {
       // v4.24x (pedido do usuario): loading "bonequinho correndo" durante
       // a espera do login.
       //
@@ -17020,6 +17044,72 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         } else if (typeof window.esconderLoadingMasmorra === 'function'){
           window.esconderLoadingMasmorra();
         }
+      }
+    };
+
+    // ---- Google One Tap (seletor de contas em janelinha, sem sair do app) ----
+    // Web client ID do projeto (publico). Se o seletor nao puder abrir
+    // (script bloqueado, sem conta no aparelho, FedCM indisponivel), cai
+    // no fluxo antigo de popup/tela cheia: ninguem fica sem conseguir logar.
+    const GOOGLE_WEB_CLIENT_ID = '991047001122-mq3ofpduhb4ssbvk6ctiuiptfb45aggb.apps.googleusercontent.com';
+    function carregarGIS(){
+      return new Promise((ok, falha) => {
+        if (window.google && window.google.accounts && window.google.accounts.id) return ok();
+        const sc = document.createElement('script');
+        sc.src = 'https://accounts.google.com/gsi/client';
+        sc.async = true;
+        sc.onload = () => (window.google && window.google.accounts && window.google.accounts.id) ? ok() : falha(new Error('gis'));
+        sc.onerror = () => falha(new Error('gis-load'));
+        document.head.appendChild(sc);
+        setTimeout(() => falha(new Error('gis-timeout')), 6000);
+      });
+    }
+    let umToqueEmCurso = false;
+    document.getElementById('loginGoogleBtn').onclick = async () => {
+      if (umToqueEmCurso) return;
+      umToqueEmCurso = true;
+      let resolvido = false;
+      // loading ja no toque: a pessoa ve o "bonequinho correndo" enquanto o seletor abre/ela escolhe a conta
+      if (typeof window.mostrarLoadingMasmorra === 'function') window.mostrarLoadingMasmorra();
+      const cair = () => { if (resolvido) return; resolvido = true; umToqueEmCurso = false; entrarGooglePopup(); };
+      try {
+        await carregarGIS();
+        window.google.accounts.id.initialize({
+          client_id: GOOGLE_WEB_CLIENT_ID,
+          use_fedcm_for_prompt: true,
+          auto_select: false,
+          cancel_on_tap_outside: true,
+          callback: async (resp) => {
+            if (resolvido) return;
+            resolvido = true; umToqueEmCurso = false;
+            if (typeof window.mostrarLoadingMasmorra === 'function') window.mostrarLoadingMasmorra();
+            try {
+              await signInWithCredential(auth, GoogleAuthProvider.credential(resp.credential));
+              // sucesso: quem esconde o loading e o aoLogar() (ver comentario do fluxo de popup)
+            } catch(e){
+              console.error('QuestLog/Firebase: One Tap falhou', e);
+              if (typeof window.erroLoadingMasmorra === 'function') window.erroLoadingMasmorra(idiomaAuth() === 'en'
+                ? (e && e.code === 'auth/network-request-failed' ? 'No connection. Check your internet and try again.' : 'Couldn\'t sign in with Google')
+                : (e && e.code === 'auth/network-request-failed' ? 'Sem conexão. Verifique a internet e tente de novo.' : 'Não deu pra entrar com Google'));
+              else if (typeof window.esconderLoadingMasmorra === 'function') window.esconderLoadingMasmorra();
+            }
+          }
+        });
+        window.google.accounts.id.prompt((n) => {
+          // nao exibiu / foi pulado (sem conta, bloqueio, cooldown do Google): fluxo antigo
+          if (n.isNotDisplayed && n.isNotDisplayed()) return cair();
+          if (n.isSkippedMoment && n.isSkippedMoment()) return cair();
+          // pessoa dispensou o seletor de proposito: so libera o botao
+          if (n.isDismissedMoment && n.isDismissedMoment() && !resolvido){
+            const motivo = n.getDismissedReason ? n.getDismissedReason() : '';
+            if (motivo === 'credential_returned') return;   // sucesso: o callback cuida do resto
+            resolvido = true; umToqueEmCurso = false;
+            if (typeof window.esconderLoadingMasmorra === 'function') window.esconderLoadingMasmorra();   // fechou o seletor: volta pro login
+          }
+        });
+      } catch(e){
+        console.warn('QuestLog: One Tap indisponivel, usando popup', e);
+        cair();
       }
     };
 

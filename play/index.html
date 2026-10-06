@@ -4799,6 +4799,27 @@ function carregar(){
   }
 }
 
+// MODO TESTE DE ITENS (so fora de producao): abrir a dev com ?testeitens=1
+// enche o inventario com todos os itens do catalogo e DESLIGA salvar(),
+// entao nada vai pro localStorage nem pra nuvem (nao polui a conta real).
+// ?testeitens=0 desliga. A flag fica em localStorage so nessa origem.
+(function(){
+  try {
+    if (location.hostname === 'dungeonlog.weberlabs.com.br') return;
+    const q = /[?&]testeitens=([01])/.exec(location.search);
+    if (q) localStorage.setItem('dl_teste_itens', q[1]);
+    if (localStorage.getItem('dl_teste_itens') !== '1') return;
+    const _carregar = carregar;
+    carregar = function(){
+      const r = _carregar();
+      inventario = ITENS.map((a, i) => ({id: i, q: 1})).filter(s => !ITENS[s.id][8]);
+      return r;
+    };
+    salvar = function(){};
+    console.warn('MODO TESTE DE ITENS ativo: salvar() desligado');
+  } catch(e){}
+})();
+
 // BUG REAL ENCONTRADO E CORRIGIDO (testado pelo usuario em producao, nao
 // suposicao): carregar() SO escrevia as variaveis de estado (tarefas,
 // xpTotal, moedas, inventario, etc.) no caminho de SUCESSO -- quando a

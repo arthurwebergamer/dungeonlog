@@ -14800,7 +14800,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // botao: roda antes do onclick e, se falta aceite, barra o clique.
   (function(){
     const chks = () => document.querySelectorAll('.loginAceiteChk');
-    chks().forEach(c => c.addEventListener('change', () => { chks().forEach(o => { o.checked = c.checked; }); document.querySelectorAll('.loginAceite').forEach(l => l.classList.remove('erro')); }));
+    chks().forEach(c => c.addEventListener('change', () => { chks().forEach(o => { o.checked = c.checked; }); window._aceiteMarcado = !!c.checked; document.querySelectorAll('.loginAceite').forEach(l => l.classList.remove('erro')); }));
     document.querySelectorAll('.loginTermosLink').forEach(a => a.addEventListener('click', () => {
       const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
       a.href = 'https://dungeonlog.weberlabs.com.br/' + (en ? 'en/' : '') + a.dataset.k;

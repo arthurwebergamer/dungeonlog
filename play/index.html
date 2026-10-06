@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=54">
+<link rel="stylesheet" href="style.css?v=55">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -2224,6 +2224,10 @@ const ECO = {
   lootBase:                1,   // itens garantidos por vitoria
   lootExtraCada:           5,   // +1 item a cada N tarefas do dia
   lootMax:                 3,
+  // loot do bau por ESTAGIO (pedido do usuario): [min,max] de itens e bonus
+  // de sorte (desloca o sorteio pra raridade alta). Indice = estagio-1.
+  lootPorEstagio:  [[1,1],[2,3],[3,4],[4,4]],
+  sorteEstagio:    [0, 0.20, 0.40, 0.60],
 
   // --- bau trancado (Spec 4b: chave por dificuldade media do dia) ---
   chanceBauTrancadoMin: 0.20,   // chance minima (dia so com tarefas trivial/facil) -- era 0.10
@@ -7375,9 +7379,18 @@ function sortearItem(sorte, permitirLendario){
   return pool[Math.floor(Math.random()*pool.length)];
 }
 
+// quantidade de itens e bonus de sorte do bau conforme o estagio atual
+function lootDoEstagio(){
+  const e = Math.min(4, Math.max(1, (typeof window.estagioAtual === 'function') ? window.estagioAtual() : 1));
+  const [mn, mx] = ECO.lootPorEstagio[e - 1];
+  return { qtd: mn + Math.floor(Math.random() * (mx - mn + 1)), bonus: ECO.sorteEstagio[e - 1] };
+}
+window.lootDoEstagio = lootDoEstagio;
+
 function darLoot(nTarefas){
-  const sorte = Math.min(1, nTarefas / 10);
-  const qtd = Math.min(ECO.lootMax, ECO.lootBase + Math.floor(nTarefas / ECO.lootExtraCada));
+  const le = lootDoEstagio();
+  const sorte = Math.min(1, nTarefas / 10 + le.bonus);
+  const qtd = le.qtd;
   const ganhos = [];
   for (let i=0;i<qtd;i++){
     const id = sortearItem(sorte, false);   // false = sem Lendario -- exclusivo do bau especial
@@ -7397,8 +7410,9 @@ function darLoot(nTarefas){
 // sozinho e fraco demais pra se notar (a formula de sortearItem satura
 // rapido), entao o bau especial usa os dois: bonus + garantia
 function sortearGanhos(nTarefas, bonusSorte, rarMinima){
-  const sorte = Math.min(1, nTarefas / 10 + (bonusSorte || 0));
-  const qtd = Math.min(ECO.lootMax, ECO.lootBase + Math.floor(nTarefas / ECO.lootExtraCada));
+  const le = lootDoEstagio();
+  const sorte = Math.min(1, nTarefas / 10 + (bonusSorte || 0) + le.bonus);
+  const qtd = le.qtd;
   const ids = [];
   for (let i=0;i<qtd;i++) ids.push(sortearItem(sorte));
   if (rarMinima != null){

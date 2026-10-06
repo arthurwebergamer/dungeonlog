@@ -19301,3 +19301,5 @@ Cobre os PRs #66 a #87 (todos mergeados em `main`). Foco da sessão: **lançar**
 - Ícone de moeda: o pacote Dungeon Crawl não tem moeda de frente (só moedas deitadas, que pareciam uma bacia). Moeda: pilha completa do `gold_pile_8` (21px natural) na topbar e loja (saldo e preços); pilha pequena recortada do mesmo sprite (13px) em "Dia vencido", "+N" e moedas voando.
 - Loja: prateleira de 8 = 6 itens (equipamento/chave) + **sempre 2 consumíveis no fim** (`ECO.lojaConsumiveis`); estoque salvo em formato antigo é regerado.
 - Loja: sempre pelo menos 2 itens Raros na prateleira, em qualquer nível (`ECO.lojaRarosMin`); abaixo do nível aparecem travados ("Level V").
+
+- **Merge 2 (06/10):** bloco de teste e botão "dia +1" removidos antes do merge; limite grátis segue em 5. Novidades: busca e subcategorias no inventário; sprites corrigidos (clava gigante, espada larga élfica, foices, espelho, arcos); arcos retos na arena e flecha sai do arco; chapéus não aparecem mais no herói; removidos Tsurugi e Martelo de Guerra; Boné de Couro, Gorro e Cornuthaum de volta ao catálogo.

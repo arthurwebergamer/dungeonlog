@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=101">
+<link rel="stylesheet" href="style.css?v=102">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -4863,17 +4863,11 @@ function carregar(){
     if (typeof d.semente === 'number') semente = d.semente;
     inventario = Array.isArray(d.inventario) ? d.inventario : [];
     if (d.equipado && typeof d.equipado === 'object') equipado = Object.assign(equipado, d.equipado);
-    // MIGRACAO: chapeus/gorros/capuz viraram ACESSORIO (antes eram elmo). Quem tinha um equipado no
-    // slot elmo passa pro slot acessorio (se estiver livre); senao ele so sai de equipado (continua no inventario).
-    if (equipado.elmo != null && ITENS[equipado.elmo] && ITENS[equipado.elmo][2] !== 'elmo'){
-      if (equipado.acess == null) equipado.acess = equipado.elmo;
-      equipado.elmo = null;
-    }
-    // e o inverso: item de elmo que ficou no slot acessorio (ex.: Gorro voltou a ser elmo)
-    if (equipado.acess != null && ITENS[equipado.acess] && ITENS[equipado.acess][2] === 'elmo'){
-      if (equipado.elmo == null) equipado.elmo = equipado.acess;
-      equipado.acess = null;
-    }
+    // LIMPEZA: itens removidos do catalogo (marcados morto em assets.js, ex.: Boné de Couro, Gorro, Cornuthaum)
+    // saem do inventario e do equipamento de quem ja os tinha.
+    const morto = id => !ITENS[id] || !!ITENS[id][8];
+    inventario = inventario.filter(sl => sl && !morto(sl.id));
+    ['arma','armadura','elmo','escudo','acess'].forEach(sl => { if (equipado[sl] != null && morto(equipado[sl])) equipado[sl] = null; });
     return true;
   } catch(e){
     console.warn('dado salvo invalido, comecando do zero', e);
@@ -8245,7 +8239,7 @@ function garantirEstoque(){
   const hoje = isoAtual();
   const vagas = Math.max(1, Math.round(ECO.lojaVagas));
   const nCons = Math.min(ECO.lojaConsumiveis, vagas);
-  const formatoOk = lojaEstoque.length === vagas && lojaEstoque.every((s, i) => (ITENS[s.id][2] === 'cons') === (i >= vagas - nCons));
+  const formatoOk = lojaEstoque.length === vagas && lojaEstoque.every((s, i) => !ITENS[s.id][8] && (ITENS[s.id][2] === 'cons') === (i >= vagas - nCons));
   if (lojaDia !== hoje || lojaEstoque.length === 0 || !formatoOk){
     lojaDia = hoje;
     lojaEstoque = montarEstoque();

@@ -6022,3 +6022,10 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
   .list{flex:none;overflow:visible}
   .nav{position:sticky;bottom:0;z-index:20;background:var(--panel) !important}
 }
+
+/* PROTOTIPO: armadura/elmo/escudo no heroi (caixa do heroi = 83x87) */
+.hero-sprite .heroEq{position:absolute;pointer-events:none}
+.hero-sprite .heroEq .pxi{filter:drop-shadow(0 1px 0 rgba(0,0,0,.45))}
+.hero-sprite .eqArmadura{left:26px;top:48px;width:32px;height:32px;z-index:1}
+.hero-sprite .eqElmo{left:22px;top:3px;width:38px;height:38px;z-index:2}
+.hero-sprite .eqEscudo{left:-9px;top:46px;width:36px;height:36px;z-index:3}

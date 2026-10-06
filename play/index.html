@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=83">
+<link rel="stylesheet" href="style.css?v=85">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -3054,8 +3054,15 @@ function desenharHeroi(){
     const pos = (ranged || S === 56) ? '' : 'width:'+S+'px;height:'+S+'px;left:'+(59 - 0.12*S).toFixed(1)+'px;top:'+(64 - 0.88*S).toFixed(1)+'px;';
     armaHTML = '<div class="heroArma' + (ranged ? ' ranged' : '') + '"' + (pos ? ' style="'+pos+'"' : '') + '><div class="pxi" style="' + estiloArma(ITENS[idArma][0], S) + '"></div></div>';
   }
+  // PROTOTIPO: armadura, elmo e escudo equipados (camadas sobre o sprite, ordem: corpo < armadura < elmo < escudo < arma)
+  const camada = (slot, cls, S) => {
+    const id = (typeof equipado !== 'undefined') ? equipado[slot] : null;
+    if (id === null || id === undefined || !ITENS[id]) return '';
+    return '<div class="heroEq ' + cls + '"><div class="pxi" style="' + estiloArma(ITENS[id][0], S) + '"></div></div>';
+  };
+  const eqHTML = camada('armadura', 'eqArmadura', 32) + camada('elmo', 'eqElmo', 38) + camada('escudo', 'eqEscudo', 36);
   el.innerHTML = '<img class="heroimg" src="' + heroiAtual().img + '" alt="' + (idiomaApp() === 'en' ? 'hero' : 'herói') + '">' +
-                 armaHTML + '<div class="sombra"></div>';
+                 eqHTML + armaHTML + '<div class="sombra"></div>';
 }
 
 function diasCorridos(){
@@ -4853,7 +4860,10 @@ function carregar(){
     carregar = function(){
       const r = _carregar();
       inventario = ITENS.map((a, i) => ({id: i, q: 1})).filter(s => !ITENS[s.id][8]);
-      if (equipado.arma === null || equipado.arma === undefined) equipado.arma = 2;   // Espada de Aco, so pra ver o prototipo da arma na mao
+      if (equipado.arma === null || equipado.arma === undefined) equipado.arma = 2;
+      if (equipado.armadura == null) equipado.armadura = 27;   // Peitoral (so pra ver o prototipo)
+      if (equipado.elmo == null) equipado.elmo = 31;           // Elmo de Ferro
+      if (equipado.escudo == null) equipado.escudo = 36;       // Escudo Redondo   // Espada de Aco, so pra ver o prototipo da arma na mao
       return r;
     };
     LIMITE_TAREFAS_GRATIS = Infinity;   // teste: sem limite de tarefas (so dev)
@@ -7406,7 +7416,7 @@ function equipar(id){
   if (!EQUIPAVEL(id)) return;
   equipado[it.tipo] = (equipado[it.tipo] === id) ? null : id;
   persistir(); renderInventario(); fecharFicha();
-  if (it.tipo === 'arma' && typeof desenharHeroi === 'function') desenharHeroi();
+  if (['arma','armadura','elmo','escudo'].includes(it.tipo) && typeof desenharHeroi === 'function') desenharHeroi();
   const en = idiomaApp() === 'en';
   aviso(equipado[it.tipo] === id ? (en ? 'EQUIPPED' : 'EQUIPADO') : (en ? 'UNEQUIPPED' : 'DESEQUIPADO'));
 }

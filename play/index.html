@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=58">
+<link rel="stylesheet" href="style.css?v=59">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -14347,7 +14347,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         </span>
       </div>
       <p class="loginSenhaErro" id="loginSenhaConfirmarErro" style="display:none" data-i18n="login.senhasNaoCoincidem">As senhas não coincidem</p>
-      <div id="loginAceiteForm" style="display:none"><label class="loginAceite"><input type="checkbox" class="loginAceiteChk"><span><span data-i18n="login.aceitoPre">Li e concordo com os </span><a class="loginTermosLink" data-k="terms" target="_blank" rel="noopener" data-i18n="login.termos">Termos de Uso</a><span data-i18n="login.aceitoE"> e a </span><a class="loginTermosLink" data-k="privacy" target="_blank" rel="noopener" data-i18n="login.privacidade">Política de Privacidade</a></span></label></div>
+      <div id="loginAceiteForm"><label class="loginAceite"><input type="checkbox" class="loginAceiteChk"><span><span data-i18n="login.aceitoPre">Li e concordo com os </span><a class="loginTermosLink" data-k="terms" target="_blank" rel="noopener" data-i18n="login.termos">Termos de Uso</a><span data-i18n="login.aceitoE"> e a </span><a class="loginTermosLink" data-k="privacy" target="_blank" rel="noopener" data-i18n="login.privacidade">Política de Privacidade</a></span></label></div>
 
       <div class="loginLinha" id="loginLinhaSenha">
         <span></span>
@@ -14578,7 +14578,6 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       document.getElementById('loginModo').textContent = modoCadastro ? (en ? 'Create your account' : 'Crie sua conta') : (en ? 'Log into your account' : 'Entre na sua conta');
       document.getElementById('loginLinhaSenha').style.display = modoCadastro ? 'none' : 'flex';
       document.getElementById('loginCampoConfirmarSenha').style.display = modoCadastro ? 'flex' : 'none';
-      document.getElementById('loginAceiteForm').style.display = modoCadastro ? 'block' : 'none';
       document.getElementById('loginRodape').innerHTML = modoCadastro
         ? (en ? 'Already have an account? <button class="loginLink" id="loginToggleCadastro" style="padding:0">Log in</button>' : 'Já tem conta? <button class="loginLink" id="loginToggleCadastro" style="padding:0">Entrar</button>')
         : (en ? 'Don\'t have an account? <button class="loginLink" id="loginToggleCadastro" style="padding:0">Sign up now</button>' : 'Não tem conta? <button class="loginLink" id="loginToggleCadastro" style="padding:0">Cadastre-se agora</button>');
@@ -14589,8 +14588,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   ligarToggleCadastro();
 
   // ---------- aceite dos Termos/Privacidade (feedback de tester) ----------
-  // Criar conta (email ou Google) so com o checkbox marcado. "Entrar" numa
-  // conta existente (modo login) nao exige. Listener em CAPTURA no proprio
+  // TODO mundo precisa marcar o checkbox antes de Google/email/Entrar/Criar
+  // conta (pedido do usuario). Listener em CAPTURA no proprio
   // botao: roda antes do onclick e, se falta aceite, barra o clique.
   (function(){
     const chks = () => document.querySelectorAll('.loginAceiteChk');
@@ -14599,8 +14598,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
       a.href = 'https://dungeonlog.weberlabs.com.br/' + (en ? 'en/' : '') + a.dataset.k;
     }));
-    const cadastroVisivel = () => document.getElementById('loginCampoConfirmarSenha').style.display !== 'none';
-    const precisa = id => (id === 'loginEscolhaGoogle' || id === 'loginEscolhaEmail') || cadastroVisivel();
+    const precisa = () => true;   // TODOS passam pelo aceite (cadastro, login e Google)
     ['loginEscolhaGoogle','loginEscolhaEmail','loginEntrarBtn','loginGoogleBtn'].forEach(id => {
       const el = document.getElementById(id);
       if (!el) return;

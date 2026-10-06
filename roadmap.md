@@ -19281,3 +19281,12 @@ Cobre os PRs #66 a #87 (todos mergeados em `main`). Foco da sessão: **lançar**
 - [ ] `themeColor` do `twa-manifest.json` ainda `#191919` (barra do Android); precisa de novo AAB, junto de qualquer outra mudança nativa.
 - [ ] A pendência "linha vitória do histórico não gravada na virada automática" (seção anterior) está **resolvida** em 2.
 - [ ] Demais pendências de lançamento da seção 03–04/10 continuam abertas.
+
+
+## [Sessão 06/10/2026] Pacote de itens Dungeon Crawl
+- Sprites dos itens migrados pro **Dungeon Crawl Stone Soup** (tiles 32px, **CC0** — sem exigência de crédito; fonte: github.com/crawl/crawl, pasta `crawl-ref/source/rltiles`). Sombras removidas por script (alpha parcial + pixels pretos sem vizinho colorido).
+- 73 itens existentes trocaram só o sprite (id, nome, stats e raridade intactos — saves e itens com lógica própria: Grimório, baú, chaves, Poção de Vida, preservados).
+- 31 itens sem equivalente no pacote (gemas, barras, chaves, cinto, tocha, baú, crânio, corda, gazuas, ampulheta etc.) continuam com o sprite antigo (JedimeisterX); a sheet antiga ocupa as 144 primeiras células, novos sprites vêm depois.
+- +213 itens novos no fim de `ITENS` (ids 106–318): stats por (tipo, raridade) iguais aos itens atuais, então o teto de bônus não muda. Nunca reordenar `ITENS` (id = índice).
+- Ícone de moeda trocado pelo `gold_pile_8` (topbar, loja, `COIN_SVG`, `MOEDA`).
+- `--sheet` agora 512×864 (SHEET_ROWS 27), ~300KB base64 no CSS.

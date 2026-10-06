@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=52">
+<link rel="stylesheet" href="style.css?v=53">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -265,7 +265,7 @@ catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
          justify-content:space-between ja empurra ela pro canto direito
          de novo sozinha, sem CSS novo. -->
     <span class="coins">
-      <svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="5" y="2" width="6" height="1" fill="#F2C94C"/><rect x="3" y="3" width="10" height="2" fill="#F2C94C"/><rect x="2" y="5" width="12" height="6" fill="#F2C94C"/><rect x="3" y="11" width="10" height="2" fill="#F2C94C"/><rect x="5" y="13" width="6" height="1" fill="#F2C94C"/><rect x="6" y="5" width="2" height="6" fill="#B8942E"/></svg>
+      <svg viewBox="0 0 21 21" shape-rendering="crispEdges"><image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAACAklEQVR42p2VMW/aQBiGH7uA6gkpg2EihSVzVKWKWDJkCulSKXJkFv5AGdqJ/gJQlw7pH2BpVSsSHRozdeiCKkVV5iykYcNDJNQhEal9HeCuOQzY7Y3nu8fv973vZxv82xJL9ozEjXWwULgAmP7gL+DwOsbKpAEKIYioc9rsMQxmdyv2THQoXEx/gHF4LSQ4CSpC4eI1LYaBwf5ulr3tKaNJDoBSfqpeFAqXR8ZHARiJSk1/MAdmKOV14GiSY297SnmS1VpiJkG9/phWw+bpq+cxYCk/pVAssrO1gdcfpzZKiLNNdcE5uSWirpkln5UrWZ69/kWq8r3+GOegQFSr4jWt2HPnoMD55Q1fv/9OVKry2HYs5baES6XnlzdcDe9jSo21eeQD+E8A6HQDLUrLlL7xbmNQIc42iWpV3h5/jgGOTl5g+gM63YD93Qw7WxtKqUzHolIRClfBlsXn24Wh4PIcQKthK/jx+zvdKNMfULEF5Up2ZR5Hk5w6J8v2+mM1GHCnj+lDl3+8+7I0j4UiCqJitsZ9PY9z+KJRspKr4b0Gq9hClq73tO1YtBo2Ua3KabOnOTwMDNU7qUia+ACmRK5USu0nEXUtjwsur/yEqp52ugGthpycHvQtpXLmckEL+7oR13LadqyVkyPLngc8NVRN1KeXj5VCudLAUs/+f/x6+AP09TeN3e014AAAAABJRU5ErkJggg==" width="21" height="21" style="image-rendering:pixelated"/></svg>
       <span id="coinnum">0</span>
     </span>
   </div>
@@ -324,7 +324,7 @@ catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
     <div class="vitoria" id="vitoria">
       <span class="faixa" data-i18n="jogo.diaVencido">DIA VENCIDO</span>
       <span class="ganho">
-        <svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="5" y="2" width="6" height="1" fill="#F2C94C"/><rect x="3" y="3" width="10" height="2" fill="#F2C94C"/><rect x="2" y="5" width="12" height="6" fill="#F2C94C"/><rect x="3" y="11" width="10" height="2" fill="#F2C94C"/><rect x="5" y="13" width="6" height="1" fill="#F2C94C"/><rect x="6" y="5" width="2" height="6" fill="#B8942E"/></svg>
+        <svg viewBox="0 0 21 21" shape-rendering="crispEdges"><image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAACAklEQVR42p2VMW/aQBiGH7uA6gkpg2EihSVzVKWKWDJkCulSKXJkFv5AGdqJ/gJQlw7pH2BpVSsSHRozdeiCKkVV5iykYcNDJNQhEal9HeCuOQzY7Y3nu8fv973vZxv82xJL9ozEjXWwULgAmP7gL+DwOsbKpAEKIYioc9rsMQxmdyv2THQoXEx/gHF4LSQ4CSpC4eI1LYaBwf5ulr3tKaNJDoBSfqpeFAqXR8ZHARiJSk1/MAdmKOV14GiSY297SnmS1VpiJkG9/phWw+bpq+cxYCk/pVAssrO1gdcfpzZKiLNNdcE5uSWirpkln5UrWZ69/kWq8r3+GOegQFSr4jWt2HPnoMD55Q1fv/9OVKry2HYs5baES6XnlzdcDe9jSo21eeQD+E8A6HQDLUrLlL7xbmNQIc42iWpV3h5/jgGOTl5g+gM63YD93Qw7WxtKqUzHolIRClfBlsXn24Wh4PIcQKthK/jx+zvdKNMfULEF5Up2ZR5Hk5w6J8v2+mM1GHCnj+lDl3+8+7I0j4UiCqJitsZ9PY9z+KJRspKr4b0Gq9hClq73tO1YtBo2Ua3KabOnOTwMDNU7qUia+ACmRK5USu0nEXUtjwsur/yEqp52ugGthpycHvQtpXLmckEL+7oR13LadqyVkyPLngc8NVRN1KeXj5VCudLAUs/+f/x6+AP09TeN3e014AAAAABJRU5ErkJggg==" width="21" height="21" style="image-rendering:pixelated"/></svg>
         <span id="ganhoTxt"></span>
       </span>
     </div>
@@ -1326,7 +1326,7 @@ catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 
     <div class="lojatopo">
       <span class="saldo">
-        <svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="5" y="2" width="6" height="1" fill="#F2C94C"/><rect x="3" y="3" width="10" height="2" fill="#F2C94C"/><rect x="2" y="5" width="12" height="6" fill="#F2C94C"/><rect x="3" y="11" width="10" height="2" fill="#F2C94C"/><rect x="5" y="13" width="6" height="1" fill="#F2C94C"/><rect x="6" y="5" width="2" height="6" fill="#B8942E"/></svg>
+        <svg viewBox="0 0 21 21" shape-rendering="crispEdges"><image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAACAklEQVR42p2VMW/aQBiGH7uA6gkpg2EihSVzVKWKWDJkCulSKXJkFv5AGdqJ/gJQlw7pH2BpVSsSHRozdeiCKkVV5iykYcNDJNQhEal9HeCuOQzY7Y3nu8fv973vZxv82xJL9ozEjXWwULgAmP7gL+DwOsbKpAEKIYioc9rsMQxmdyv2THQoXEx/gHF4LSQ4CSpC4eI1LYaBwf5ulr3tKaNJDoBSfqpeFAqXR8ZHARiJSk1/MAdmKOV14GiSY297SnmS1VpiJkG9/phWw+bpq+cxYCk/pVAssrO1gdcfpzZKiLNNdcE5uSWirpkln5UrWZ69/kWq8r3+GOegQFSr4jWt2HPnoMD55Q1fv/9OVKry2HYs5baES6XnlzdcDe9jSo21eeQD+E8A6HQDLUrLlL7xbmNQIc42iWpV3h5/jgGOTl5g+gM63YD93Qw7WxtKqUzHolIRClfBlsXn24Wh4PIcQKthK/jx+zvdKNMfULEF5Up2ZR5Hk5w6J8v2+mM1GHCnj+lDl3+8+7I0j4UiCqJitsZ9PY9z+KJRspKr4b0Gq9hClq73tO1YtBo2Ua3KabOnOTwMDNU7qUia+ACmRK5USu0nEXUtjwsur/yEqp52ugGthpycHvQtpXLmckEL+7oR13LadqyVkyPLngc8NVRN1KeXj5VCudLAUs/+f/x6+AP09TeN3e014AAAAABJRU5ErkJggg==" width="21" height="21" style="image-rendering:pixelated"/></svg>
         <span id="saldoLoja">0</span> <span data-i18n="inv.moedasMinusculo">moedas</span>
       </span>
       <div class="lojatabs" id="lojaTabs">
@@ -5170,7 +5170,7 @@ function animarGolpe(){
   setTimeout(()=>{h.classList.remove('hit');m.classList.remove('shake');},320);
 }
 
-const COIN_SVG = '<svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="5" y="2" width="6" height="1" fill="#F2C94C"/><rect x="3" y="3" width="10" height="2" fill="#F2C94C"/><rect x="2" y="5" width="12" height="6" fill="#F2C94C"/><rect x="3" y="11" width="10" height="2" fill="#F2C94C"/><rect x="5" y="13" width="6" height="1" fill="#F2C94C"/><rect x="6" y="5" width="2" height="6" fill="#B8942E"/></svg>';
+const COIN_SVG = '<svg viewBox="0 0 21 21" shape-rendering="crispEdges"><image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAACAklEQVR42p2VMW/aQBiGH7uA6gkpg2EihSVzVKWKWDJkCulSKXJkFv5AGdqJ/gJQlw7pH2BpVSsSHRozdeiCKkVV5iykYcNDJNQhEal9HeCuOQzY7Y3nu8fv973vZxv82xJL9ozEjXWwULgAmP7gL+DwOsbKpAEKIYioc9rsMQxmdyv2THQoXEx/gHF4LSQ4CSpC4eI1LYaBwf5ulr3tKaNJDoBSfqpeFAqXR8ZHARiJSk1/MAdmKOV14GiSY297SnmS1VpiJkG9/phWw+bpq+cxYCk/pVAssrO1gdcfpzZKiLNNdcE5uSWirpkln5UrWZ69/kWq8r3+GOegQFSr4jWt2HPnoMD55Q1fv/9OVKry2HYs5baES6XnlzdcDe9jSo21eeQD+E8A6HQDLUrLlL7xbmNQIc42iWpV3h5/jgGOTl5g+gM63YD93Qw7WxtKqUzHolIRClfBlsXn24Wh4PIcQKthK/jx+zvdKNMfULEF5Up2ZR5Hk5w6J8v2+mM1GHCnj+lDl3+8+7I0j4UiCqJitsZ9PY9z+KJRspKr4b0Gq9hClq73tO1YtBo2Ua3KabOnOTwMDNU7qUia+ACmRK5USu0nEXUtjwsur/yEqp52ugGthpycHvQtpXLmckEL+7oR13LadqyVkyPLngc8NVRN1KeXj5VCudLAUs/+f/x6+AP09TeN3e014AAAAABJRU5ErkJggg==" width="21" height="21" style="image-rendering:pixelated"/></svg>';
 
 // diamante verde -- mesmo padrao crispEdges do COIN_SVG, cor da paleta
 // de XP ja usada no resto do app (--verde, ver dmg-xp em style.css)
@@ -7157,7 +7157,7 @@ render();
    moedas, xpTotal, render(), aviso(), salvar(), jaComecou
    ======================================================================= */
 
-const SHEET_COLS = 16, SHEET_ROWS = 9;
+const SHEET_COLS = 16, SHEET_ROWS = 27;
 const RARIDADES = ['Comum','Incomum','Raro','Épico','Lendário','Único'];
 const RARIDADES_PT = RARIDADES.slice();
 const RARIDADES_EN = ['Common','Uncommon','Rare','Epic','Legendary','Unique'];
@@ -8101,10 +8101,7 @@ function venderTesouros(){
 }
 
 /* ---------- render ---------- */
-const MOEDA = '<svg class="lmoeda" viewBox="0 0 16 16" shape-rendering="crispEdges">' +
-  '<rect x="5" y="2" width="6" height="1" fill="#F2C94C"/><rect x="3" y="3" width="10" height="2" fill="#F2C94C"/>' +
-  '<rect x="2" y="5" width="12" height="6" fill="#F2C94C"/><rect x="3" y="11" width="10" height="2" fill="#F2C94C"/>' +
-  '<rect x="5" y="13" width="6" height="1" fill="#F2C94C"/><rect x="6" y="5" width="2" height="6" fill="#B8942E"/></svg>';
+const MOEDA = '<svg class="lmoeda" viewBox="0 0 21 21" shape-rendering="crispEdges"><image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAACpF6WWAAACAklEQVR42p2VMW/aQBiGH7uA6gkpg2EihSVzVKWKWDJkCulSKXJkFv5AGdqJ/gJQlw7pH2BpVSsSHRozdeiCKkVV5iykYcNDJNQhEal9HeCuOQzY7Y3nu8fv973vZxv82xJL9ozEjXWwULgAmP7gL+DwOsbKpAEKIYioc9rsMQxmdyv2THQoXEx/gHF4LSQ4CSpC4eI1LYaBwf5ulr3tKaNJDoBSfqpeFAqXR8ZHARiJSk1/MAdmKOV14GiSY297SnmS1VpiJkG9/phWw+bpq+cxYCk/pVAssrO1gdcfpzZKiLNNdcE5uSWirpkln5UrWZ69/kWq8r3+GOegQFSr4jWt2HPnoMD55Q1fv/9OVKry2HYs5baES6XnlzdcDe9jSo21eeQD+E8A6HQDLUrLlL7xbmNQIc42iWpV3h5/jgGOTl5g+gM63YD93Qw7WxtKqUzHolIRClfBlsXn24Wh4PIcQKthK/jx+zvdKNMfULEF5Up2ZR5Hk5w6J8v2+mM1GHCnj+lDl3+8+7I0j4UiCqJitsZ9PY9z+KJRspKr4b0Gq9hClq73tO1YtBo2Ua3KabOnOTwMDNU7qUia+ACmRK5USu0nEXUtjwsur/yEqp52ugGthpycHvQtpXLmckEL+7oR13LadqyVkyPLngc8NVRN1KeXj5VCudLAUs/+f/x6+AP09TeN3e014AAAAABJRU5ErkJggg==" width="21" height="21" style="image-rendering:pixelated"/></svg>';
 
 function textoBonus(it){
   const en = idiomaApp() === 'en';

@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=90">
+<link rel="stylesheet" href="style.css?v=93">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -2713,6 +2713,7 @@ function dispararVitoriaDoDia(doDia, nivelAntes, xpGanho, moedasGanhas){
     moedas += ganho;
     ultimoGanho = ganho;
     _gravarGanhoDia(isoAtual(), ganho);
+    if (typeof window.ofertarTrialPrimeiraVitoria === 'function') window.ofertarTrialPrimeiraVitoria();   // 1x por conta, depois das animacoes
     // moedasCaindo(...) removida daqui a pedido do usuario -- particula de
     // moedas no fim do dia nao deveria mais aparecer. Funcao moedasCaindo()
     // continua existindo (~linha 2493) e nao foi apagada, so este gancho.
@@ -3321,7 +3322,8 @@ function abrirPaywall(motivo){
   if (!overlay) return;
   // Sem pitch/lembrete locais: o teste gratis e' do Play, entao vai direto
   // pra lista de planos (passo 3) e sem seta de voltar.
-  irParaEtapaPaywall(3, false);
+  // oferta pos-1a-tarefa ('primeira'): abre na tela do TESTE GRATIS (pitch, passo 1); os demais gatilhos seguem direto pros planos
+  irParaEtapaPaywall(motivo === 'primeira' ? 1 : 3, false);
   const back = document.getElementById('paywallVoltarBtn');
   if (back) back.classList.remove('on');
   // atraso bem curto so pra o toast nao nascer e morrer debaixo do paywall
@@ -5476,17 +5478,20 @@ function numeroFlutuanteHeroi(xpGanho, moedasGanhas){
   // originY = centro vertical do sprite (nao mais topo/base) -- com o
   // texto empilhado em 2 linhas, o centro fica correto: moedas puxa pra
   // cima, XP puxa pra baixo, igual pedido.
-  const originX = heroiRect.left - arenaRect.left - 30;
-  const originY = heroiRect.top - arenaRect.top + heroiRect.height / 2;
+  // v3 (pedido do usuario: "muito no canto da tela"): uma linha so, centrada na arena,
+  // logo acima da cabeca de heroi/monstro (area livre entre as tochas), em vez de empilhada
+  // na borda esquerda (batia na tocha e no escudo).
+  const originX = arenaRect.width / 2;
+  const originY = heroiRect.top - arenaRect.top - 4;
 
   const el = document.createElement('div');
-  el.className = 'dmg-float pilha';
+  el.className = 'dmg-float centro';
   el.style.left = originX + 'px';
   el.style.top = originY + 'px';
   el.innerHTML = '<span class="dmg-moeda">+' + moedasGanhas + ' ' + COIN_SVG + '</span>'
-    + '<span class="dmg-xp">+' + xpGanho + ' XP</span>';
+    + '<span class="dmg-sep">·</span><span class="dmg-xp">+' + xpGanho + ' XP</span>';
   arena.appendChild(el);
-  setTimeout(() => el.remove(), 1100); // bate com a nova duracao de dmgFloat (1.9s -> 1.1s)
+  setTimeout(() => el.remove(), 1100);
 }
 window.numeroFlutuanteHeroi = numeroFlutuanteHeroi;
 
@@ -12706,7 +12711,6 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       if (r !== false){
         total++;
         persistir();
-        if (total === 1) ofertarTrialPrimeiraTarefa();
         // FIX (relatado pelo usuario: "a barra de estagio deveria aumentar
         // no momento que a tarefa e concluida por que ela tem um delay
         // muito grande"). Causa raiz: total++ acima so roda DEPOIS que
@@ -12725,15 +12729,15 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     };
   }
 
-  // OFERTA DO TESTE GRATIS NA 1a TAREFA (pedido do usuario): depois da primeira tarefa
-  // concluida da conta, espera as animacoes/popups acabarem e abre o paywall UMA vez,
+  // OFERTA DO TESTE GRATIS NO 1o DIA CONCLUIDO (pedido do usuario): quando a pessoa termina o dia
+  // inteiro (monstro derrotado), espera as animacoes/popups acabarem e abre o paywall UMA vez,
   // pra pessoa ja ter sentido o app antes de ver a oferta. So aparece se o teste gratis
   // esta disponivel (nao assinante, Play ofereceu trial) -- no preview/dev (sem Billing)
   // aparece mesmo assim pra dar pra testar o fluxo.
-  function ofertarTrialPrimeiraTarefa(){
+  function ofertarTrialPrimeiraVitoria(){
     const CHAVE = 'questlog.ofertaTrialPrimeira.v1';
     try { if (localStorage.getItem(window.chaveConta(CHAVE))) return; } catch(e){}
-    const ocupado = () => [...document.querySelectorAll('.dlgOverlay.on, #paywallOverlay.on, .vitoria, [class*="verlay"].on, .levelup.on, .nivelUp.on')]
+    const ocupado = () => [...document.querySelectorAll('.dlgOverlay.on, #paywallOverlay.on, [class*="verlay"].on, .levelup.on, .nivelUp.on')]
       .some(e => { const c = getComputedStyle(e); return c.display !== 'none' && c.visibility !== 'hidden' && Number(c.opacity) > 0; });
     let tentativas = 0;
     const tentar = () => {
@@ -12748,8 +12752,9 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         if (typeof window.abrirPaywall === 'function') window.abrirPaywall('primeira');
       } catch(e){}
     };
-    setTimeout(tentar, 4500);
+    setTimeout(tentar, 6500);   // deixa terminar bau, +XP/moedas, level-up e tela de vitoria
   }
+  window.ofertarTrialPrimeiraVitoria = ofertarTrialPrimeiraVitoria;
 
   window.totalTarefasConcluidas = function(){ return total; };
 

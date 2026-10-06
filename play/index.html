@@ -16692,7 +16692,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + await user.getIdToken() },
           body: JSON.stringify({
             termosVersao: TERMOS_VERSAO, privacidadeVersao: PRIVACIDADE_VERSAO,
-            idioma: idiomaAuth(), metodo: prov === 'google.com' ? 'google' : 'email',
+            idioma: (function(){ try { return (localStorage.getItem('questlog.idioma.v1') || 'pt') === 'en' ? 'en' : 'pt'; } catch(e){ return 'pt'; } })(), metodo: prov === 'google.com' ? 'google' : 'email',
             plataforma: twa ? 'twa' : (standalone ? 'pwa' : 'web')
           })
         });

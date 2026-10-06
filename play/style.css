@@ -6033,3 +6033,10 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 
 .dmg-float.centro{gap:6px;font-size:13px}
 .hero-sprite .eqChapeu{z-index:2}
+
+/* busca + subcategorias do inventario */
+.invbusca{margin:0 0 8px}
+.invbusca input{width:100%;box-sizing:border-box;font-family:'Outfit',sans-serif;font-size:13px;color:var(--text);background:var(--panel-3);border:1px solid var(--line);border-radius:999px;padding:8px 14px;outline:none}
+.invbusca input:focus{border-color:var(--accent)}
+#viewInventario .invfiltros.invsub{position:static;min-height:0;margin:0 0 10px;padding:0 0 2px}
+#viewInventario .invfiltros.invsub button{font-size:11px;padding:4px 10px}

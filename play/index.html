@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=107">
+<link rel="stylesheet" href="style.css?v=108">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -502,6 +502,7 @@ catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
       </div>
     </div>
 
+    <div class="invbusca" id="invBuscaWrap"><input id="invBusca" type="search" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Buscar item..."></div>
     <div class="invfiltros" id="invFiltros">
       <button class="on" data-f="tudo" data-i18n="inv.filtroTudo">Tudo</button>
       <button data-f="equip" data-i18n="inv.filtroEquip">Equipamento</button>
@@ -509,6 +510,8 @@ catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
       <button data-f="tesouro" data-i18n="inv.filtroTesouro">Tesouros</button>
       <button data-f="chave" data-i18n="inv.filtroChave">Item-chave</button>
     </div>
+
+    <div class="invfiltros invsub" id="invSubFiltros" style="display:none"></div>
 
     <div class="invgrid" id="invGrid"></div>
 
@@ -7583,6 +7586,28 @@ function creditarGanhos(ids){
 
 /* ---------- render ---------- */
 let filtroInv = 'tudo';
+let filtroSubEquip = 'todos';   // subcategoria quando filtroInv === 'equip'
+let buscaInv = '';
+
+// subcategorias de equipamento (armas por tipo + as demais pecas); chips vazios nao aparecem
+const SUBCATS_EQUIP = [
+  ['espada','Espadas','Swords'], ['adaga','Adagas','Daggers'], ['machado','Machados','Axes'],
+  ['haste','Lanças e hastes','Polearms'], ['impacto','Maças e martelos','Blunt'],
+  ['arco','Arcos','Bows'], ['besta','Bestas e fundas','Crossbows & slings'], ['magico','Cajados e varinhas','Staves & wands'],
+  ['escudo','Escudos','Shields'], ['elmo','Elmos','Helmets'], ['armadura','Armaduras','Armor'], ['acess','Acessórios','Accessories']
+];
+function subcatEquip(nome, tipo){
+  if (tipo !== 'arma') return tipo;   // escudo | elmo | armadura | acess
+  if (/^Arco/i.test(nome)) return 'arco';
+  if (/^(Besta|Arbalesta|Zarabatana|Estilingue|Funda)/i.test(nome)) return 'besta';
+  if (/Cajado|Varinha|Bast[aã]o Arcano|Cetro/i.test(nome)) return 'magico';
+  if (/Adaga|Faca/i.test(nome)) return 'adaga';
+  if (/Machad|Tomahawk|Bardiche/i.test(nome)) return 'machado';
+  if (/Lan[cç]a|Alabarda|Tridente|Trishula|Glaive|Foice|Lajatang|Bord[aã]o|Chicote/i.test(nome)) return 'haste';
+  if (/Ma[cç]a|Maca|Mangual|Martelo|Clava|Taco|Estrela|Flagelo/i.test(nome)) return 'impacto';
+  return 'espada';
+}
+function semAcento(t){ return String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); }
 
 // sprite generico usado como fantasma no slot vazio (indice no spritesheet)
 const SPRITE_SLOT = {arma:66, armadura:70, elmo:63, escudo:128, acess:102};
@@ -7620,6 +7645,10 @@ function renderInventario(){
   vazio.style.display = semNada ? 'flex' : 'none';
   box.style.display = semNada ? 'none' : 'block';
   filtros.style.display = semNada ? 'none' : 'flex';
+  const buscaWrap = document.getElementById('invBuscaWrap');
+  if (buscaWrap) buscaWrap.style.display = semNada ? 'none' : 'block';
+  const inBusca = document.getElementById('invBusca');
+  if (inBusca){ inBusca.placeholder = idiomaApp() === 'en' ? 'Search items...' : 'Buscar item...'; }
   grid.style.display = semNada ? 'none' : 'grid';
 
   // painel de equipamento
@@ -7641,10 +7670,32 @@ function renderInventario(){
   document.getElementById('bXp').textContent = (b.x >= 0 ? '+' : '') + b.x + '%';
 
   // grade
+  // chips de subcategoria (so com "Equipamento"; so categorias que tem item)
+  const sub = document.getElementById('invSubFiltros');
+  if (sub){
+    const en = idiomaApp() === 'en';
+    if (filtroInv === 'equip' && !semNada){
+      const cont = {};
+      inventario.forEach(s => { const it = item(s.id); if (SLOTS.includes(it.tipo)) { const k = subcatEquip(ITENS[s.id][1], it.tipo); cont[k] = (cont[k] || 0) + 1; } });
+      if (filtroSubEquip !== 'todos' && !cont[filtroSubEquip]) filtroSubEquip = 'todos';
+      const chips = [['todos', 'Todos', 'All']].concat(SUBCATS_EQUIP.filter(c => cont[c[0]]));
+      sub.innerHTML = '';
+      chips.forEach(c => {
+        const bt = document.createElement('button');
+        bt.textContent = en ? c[2] : c[1];
+        if (filtroSubEquip === c[0]) bt.className = 'on';
+        bt.onclick = () => { filtroSubEquip = c[0]; renderInventario(); };
+        sub.appendChild(bt);
+      });
+      sub.style.display = 'flex';
+    } else { sub.style.display = 'none'; }
+  }
+  const termoBusca = semAcento(buscaInv).trim();
   const visiveis = inventario.filter(s => {
-    const t = item(s.id).tipo;
+    const it = item(s.id), t = it.tipo;
+    if (termoBusca && semAcento(it.nome).indexOf(termoBusca) < 0 && semAcento(ITENS[s.id][1]).indexOf(termoBusca) < 0 && semAcento(ITENS[s.id][9]).indexOf(termoBusca) < 0) return false;
     if (filtroInv === 'tudo') return true;
-    if (filtroInv === 'equip') return SLOTS.includes(t);
+    if (filtroInv === 'equip') return SLOTS.includes(t) && (filtroSubEquip === 'todos' || subcatEquip(ITENS[s.id][1], t) === filtroSubEquip);
     return t === filtroInv;
   }).sort((a,z) => item(z.id).rar - item(a.id).rar);
 
@@ -7669,9 +7720,14 @@ function renderInventario(){
   }
 }
 
+(function(){
+  const ib = document.getElementById('invBusca');
+  if (ib) ib.addEventListener('input', () => { buscaInv = ib.value; renderInventario(); });
+})();
 document.getElementById('invFiltros').querySelectorAll('button').forEach(b => {
   b.onclick = () => {
     filtroInv = b.dataset.f;
+    filtroSubEquip = 'todos';
     document.getElementById('invFiltros').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
     renderInventario();
   };

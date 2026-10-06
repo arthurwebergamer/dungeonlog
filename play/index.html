@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=100">
+<link rel="stylesheet" href="style.css?v=101">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -3077,7 +3077,7 @@ function desenharHeroi(){
     if (id === null || id === undefined || !ITENS[id] || id === 212 || !/Chap[eé]u|Gorro|Capuz|Bon[eé]|Cornuthaum/i.test(ITENS[id][1])) return '';
     const bb = (window.EQ_BB && window.EQ_BB[id]) || [4, 4, 28, 28];
     const bw = bb[2] - bb[0], bh = bb[3] - bb[1];
-    const aj = ({222: {m: 1.3, dy: 0}})[id] || {m: 1, dy: 0};   // ajuste por chapeu (222 Cornuthaum: maior e mais alto)
+    const aj = ({222: {m: 1.15, dy: 0}})[id] || {m: 1, dy: 0};   // ajuste por chapeu (222 Cornuthaum: maior e mais alto)
     const k = Math.min(66 / bw, 48 / bh) * aj.m;
     const sp = ITENS[id][0], c = sp % 16, r = Math.floor(sp / 16);
     const left = 42 - (bb[0] + bw / 2) * k, top = 34 + aj.dy - bb[3] * k;

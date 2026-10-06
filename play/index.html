@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=69">
+<link rel="stylesheet" href="style.css?v=70">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -2215,6 +2215,7 @@ const ECO = {
   lojaMargem:           2.20,   // preco de compra = valor do item x margem
   lojaVagas:               8,   // itens diferentes na prateleira por dia
   lojaConsumiveis:         2,   // desses, sempre N consumiveis no fim da prateleira
+  lojaRarosMin:            2,   // minimo de itens Raros (ou melhores) na prateleira, em qualquer nivel
   lojaDesconto:         0.70,   // fator do preco no item em oferta do dia
   lojaNivelPorRaridade:    2,   // niveis exigidos a mais por degrau de raridade
   lojaMargemConsumivel: 3.60,   // margem so dos consumiveis (XP comprado custa mais caro)
@@ -8072,6 +8073,18 @@ function montarEstoque(){
     return out;
   };
   const outros = sortear(pool.filter(i => ITENS[i][2] !== 'cons'), vagas - nCons);
+  // pedido do usuario: independente do nivel, a prateleira mostra pelo menos
+  // N itens Raros (rar>=2) de vitrine -- da pro jogador ver que existe muito
+  // mais que Comum. Itens acima do nivel aparecem travados ("EXIGE NIVEL").
+  const poolEquip = pool.filter(i => ITENS[i][2] !== 'cons');
+  let raros = outros.filter(i => ITENS[i][3] >= 2).length;
+  for (let k = outros.length - 1; k >= 0 && raros < ECO.lojaRarosMin; k--){
+    if (ITENS[outros[k]][3] >= 2) continue;
+    const cand = poolEquip.filter(i => ITENS[i][3] === 2 && outros.indexOf(i) < 0);
+    if (!cand.length) break;
+    outros[k] = cand[Math.floor(r() * cand.length)];
+    raros++;
+  }
   const cons = sortear(pool.filter(i => ITENS[i][2] === 'cons'), nCons);
   const ids = outros.concat(cons);
 

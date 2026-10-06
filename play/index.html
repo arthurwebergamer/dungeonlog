@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=114">
+<link rel="stylesheet" href="style.css?v=115">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -14810,7 +14810,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       const el = document.getElementById(id);
       if (!el) return;
       el.addEventListener('click', e => {
-        if (!precisa(id) || (chks()[0] && chks()[0].checked)) return;
+        if (!precisa(id) || (chks()[0] && chks()[0].checked)){ if (chks()[0] && chks()[0].checked) window._aceiteMarcado = true; return; }
         e.stopImmediatePropagation(); e.preventDefault();
         document.querySelectorAll('.loginAceite').forEach(l => {
           l.classList.remove('erro'); void l.offsetWidth; l.classList.add('erro');
@@ -16653,6 +16653,36 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       }
     }
 
+    // ---- registro de aceite dos Termos/Privacidade (prova) ----
+    // Versao dos textos: a cada mudanca, atualizar aqui, em CONSENT_VERSOES_VALIDAS (Worker) e arquivar a copia em /terms/<versao>/.
+    const TERMOS_VERSAO = '2026-10-06', PRIVACIDADE_VERSAO = '2026-10-06';
+    async function registrarAceiteSeNecessario(user){
+      try {
+        if (!window._aceiteMarcado) return;                  // so quando a pessoa marcou o checkbox NESTA sessao
+        if (typeof BILLING_VERIFY_URL !== 'string') return;
+        let atual = false;
+        try {
+          const snap = await getDoc(doc(db, 'consents', user.uid));
+          const d = snap.exists() ? snap.data() : null;
+          atual = !!(d && d.termosVersao === TERMOS_VERSAO && d.privacidadeVersao === PRIVACIDADE_VERSAO);
+        } catch(e){ /* regras ainda nao publicadas: tenta gravar mesmo assim (Worker e idempotente) */ }
+        if (atual){ window._aceiteMarcado = false; return; }
+        const prov = (user.providerData && user.providerData[0] && user.providerData[0].providerId) || '';
+        const twa = (document.referrer || '').indexOf('android-app://') === 0;
+        const standalone = !!(window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+        const resp = await fetch(BILLING_VERIFY_URL.replace('/billing/verify', '/consent/accept'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + await user.getIdToken() },
+          body: JSON.stringify({
+            termosVersao: TERMOS_VERSAO, privacidadeVersao: PRIVACIDADE_VERSAO,
+            idioma: idiomaAuth(), metodo: prov === 'google.com' ? 'google' : 'email',
+            plataforma: twa ? 'twa' : (standalone ? 'pwa' : 'web')
+          })
+        });
+        if (resp.ok) window._aceiteMarcado = false;
+      } catch(e){ console.warn('QuestLog: registro de aceite falhou (tenta no proximo login)', e); }
+    }
+
     async function aoLogar(user){
       if (typeof window.confirmarSessaoResolvida === 'function') window.confirmarSessaoResolvida();
       const contaNova = !!(user.metadata &&
@@ -16683,6 +16713,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       }
 
       window.definirUidAtivo(user.uid);
+      registrarAceiteSeNecessario(user);   // nao bloqueia o login; falha so tenta de novo no proximo
 
       // BUG REAL ENCONTRADO E CORRIGIDO (testado pelo usuario, nao
       // suposicao): a migracao abaixo rodava pra TODA conta nova que

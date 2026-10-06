@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=102">
+<link rel="stylesheet" href="style.css?v=103">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -4897,6 +4897,31 @@ function carregar(){
     };
     LIMITE_TAREFAS_GRATIS = Infinity;
     salvar = function(){};
+    // botao DEV "avancar dia": offset so em memoria (nao persiste)
+    lerOffsetDia = function(){};
+    const mk = () => {
+      if (document.getElementById('devnextday')) return;
+      const b = document.createElement('button');
+      b.id = 'devnextday';
+      b.textContent = 'dia +1 \u2192';
+      b.style.cssText = "position:fixed;bottom:calc(72px + env(safe-area-inset-bottom));left:8px;z-index:50;background:rgba(29,34,43,.9);color:#9aa;border:1px dashed #555;border-radius:6px;padding:4px 8px;font-size:10px;cursor:pointer";
+      b.onclick = () => {
+        const doDia = tarefas.filter(ehDeHoje);
+        const escapou = doDia.length > 0 && doDia.some(t => !feitaHoje(t));
+        const nome = monstroDoDia().nome;
+        const mob = document.getElementById('mobSprite');
+        const av = () => {
+          diaOffset++;
+          if (mob) mob.classList.remove('fugiu');
+          render();
+          if (escapou) aviso(nome.toUpperCase() + ' FUGIU', false, true);
+          else aviso('AVANCOU PARA ' + nomeDiaLocal(diaDaSemana()).toUpperCase());
+        };
+        if (escapou && mob) { mob.classList.add('fugiu'); setTimeout(av, 560); } else av();
+      };
+      document.body.appendChild(b);
+    };
+    if (document.body) mk(); else document.addEventListener('DOMContentLoaded', mk);
     console.warn('MODO TESTE DE ITENS ativo: salvar() desligado');
   } catch(e){}
 })();

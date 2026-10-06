@@ -572,7 +572,10 @@ async function tratarConsentimento(request, env){
 
   const campos = {
     uid: uid, termosVersao: termos, privacidadeVersao: priv, idioma: idioma, metodo: metodo, plataforma: plataforma,
-  };   // minimizacao (LGPD): sem IP, pais, user agent ou origem -- so o que prova o aceite
+    pais: String(request.headers.get('CF-IPCountry') || '').slice(0, 2),
+    userAgent: String(request.headers.get('User-Agent') || '').slice(0, 200),
+    origem: String(origem || '').slice(0, 100),
+  };
   const comHora = (caminho, extra) => ({
     update: { name: 'projects/' + projectId + '/databases/(default)/documents/' + caminho, fields: objetoParaFsFields(campos) },
     updateMask: { fieldPaths: Object.keys(campos) },

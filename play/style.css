@@ -2061,6 +2061,9 @@
   .loginAceite input:active{transform:scale(.9)}
   .loginAceite:has(input:checked){border-color:var(--accent);background:rgba(255,255,255,.1)}
   .loginAceite a{color:#fff;font-weight:600;text-decoration:underline;text-decoration-color:var(--accent);text-decoration-thickness:2px;text-underline-offset:3px}
+  .loginAceiteNota{display:none;margin:6px 0;font-family:'Outfit',sans-serif;font-size:12.5px;line-height:1.4;color:#D5D8DE;text-align:center;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+  .loginAceiteNota.on{display:block}
+  .loginAceiteNota a{color:#fff;font-weight:600;text-decoration:underline;text-decoration-color:var(--accent);text-underline-offset:3px}
   .loginAceite.erro{border-color:#F45781;background:rgba(244,87,129,.14);animation:aceiteErro .45s}
   .loginAceite.erro input{border-color:#F45781}
   @keyframes aceiteErro{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}

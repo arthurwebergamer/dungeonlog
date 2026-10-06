@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=115">
+<link rel="stylesheet" href="style.css?v=116">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -14496,6 +14496,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         </div>
         <p class="loginEscolhaTagline" data-i18n="login.tagline">Suas tarefas viram uma aventura</p>
         <label class="loginAceite"><input type="checkbox" class="loginAceiteChk"><span><span data-i18n="login.aceitoPre">Li e concordo com os </span><a class="loginTermosLink" data-k="terms" target="_blank" rel="noopener" data-i18n="login.termos">Termos de Uso</a><span data-i18n="login.aceitoE"> e a </span><a class="loginTermosLink" data-k="privacy" target="_blank" rel="noopener" data-i18n="login.privacidade">Política de Privacidade</a></span></label>
+        <p class="loginAceiteNota" data-ctx="escolha"><span data-i18n="login.aceiteImplicito">Ao continuar, você concorda com os </span><a class="loginTermosLink" data-k="terms" target="_blank" rel="noopener" data-i18n="login.termos">Termos de Uso</a><span data-i18n="login.aceitoE"> e a </span><a class="loginTermosLink" data-k="privacy" target="_blank" rel="noopener" data-i18n="login.privacidade">Política de Privacidade</a></p>
         <button class="loginGoogleBtn" id="loginEscolhaGoogle">
           <svg viewBox="0 0 48 48">
             <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.7-6 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l6-6C34 5.1 29.3 3 24 3 12.4 3 3 12.4 3 24s9.4 21 21 21 21-9.4 21-21c0-1.4-.1-2.4-.4-3.5z"/>
@@ -14554,7 +14555,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         </span>
       </div>
       <p class="loginSenhaErro" id="loginSenhaConfirmarErro" style="display:none" data-i18n="login.senhasNaoCoincidem">As senhas não coincidem</p>
-      <div id="loginAceiteForm"><label class="loginAceite"><input type="checkbox" class="loginAceiteChk"><span><span data-i18n="login.aceitoPre">Li e concordo com os </span><a class="loginTermosLink" data-k="terms" target="_blank" rel="noopener" data-i18n="login.termos">Termos de Uso</a><span data-i18n="login.aceitoE"> e a </span><a class="loginTermosLink" data-k="privacy" target="_blank" rel="noopener" data-i18n="login.privacidade">Política de Privacidade</a></span></label></div>
+      <div id="loginAceiteForm"><label class="loginAceite"><input type="checkbox" class="loginAceiteChk"><span><span data-i18n="login.aceitoPre">Li e concordo com os </span><a class="loginTermosLink" data-k="terms" target="_blank" rel="noopener" data-i18n="login.termos">Termos de Uso</a><span data-i18n="login.aceitoE"> e a </span><a class="loginTermosLink" data-k="privacy" target="_blank" rel="noopener" data-i18n="login.privacidade">Política de Privacidade</a></span></label></div><p class="loginAceiteNota" data-ctx="form"><span data-i18n="login.aceiteImplicito">Ao continuar, você concorda com os </span><a class="loginTermosLink" data-k="terms" target="_blank" rel="noopener" data-i18n="login.termos">Termos de Uso</a><span data-i18n="login.aceitoE"> e a </span><a class="loginTermosLink" data-k="privacy" target="_blank" rel="noopener" data-i18n="login.privacidade">Política de Privacidade</a></p>
 
       <div class="loginLinha" id="loginLinhaSenha">
         <span></span>
@@ -14790,6 +14791,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         : (en ? 'Don\'t have an account? <button class="loginLink" id="loginToggleCadastro" style="padding:0">Sign up now</button>' : 'Não tem conta? <button class="loginLink" id="loginToggleCadastro" style="padding:0">Cadastre-se agora</button>');
       if (typeof window.questlogLimparStatusSenha === 'function') window.questlogLimparStatusSenha();
       ligarToggleCadastro(); // religa no novo <button>, o innerHTML acima descartou o antigo
+      if (typeof window.pintarAceiteLogin === 'function') window.pintarAceiteLogin();
     };
   }
   ligarToggleCadastro();
@@ -14799,24 +14801,42 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // conta (pedido do usuario). Listener em CAPTURA no proprio
   // botao: roda antes do onclick e, se falta aceite, barra o clique.
   (function(){
+    // Versao dos textos aceitos (fonte unica; o modulo Firebase le daqui). Mudou? Atualizar tambem em CONSENT_VERSOES_VALIDAS (Worker).
+    window.ACEITE_VERSAO = '2026-10-06';
+    const CH_DISP = 'questlog.aceiteDisp.v1';
+    // Aparelho ja aceitou ESTA versao (gravado so depois de o Worker confirmar): o checkbox some e vira a nota "Ao continuar...".
+    const dispAceito = () => { try { return localStorage.getItem(CH_DISP) === window.ACEITE_VERSAO; } catch(e){ return false; } };
+    window.pintarAceiteLogin = function(){
+      const disp = dispAceito();
+      document.querySelectorAll('#loginEscolha .loginAceite').forEach(l => { l.style.display = disp ? 'none' : ''; });
+      const f = document.getElementById('loginAceiteForm');
+      const formPede = !disp || modoCadastro;       // no cadastro por email o checkbox continua
+      if (f) f.style.display = formPede ? '' : 'none';
+      document.querySelectorAll('.loginAceiteNota').forEach(n => {
+        const mostrar = disp && (n.dataset.ctx === 'escolha' || !modoCadastro);
+        n.classList.toggle('on', mostrar);
+      });
+    };
     const chks = () => document.querySelectorAll('.loginAceiteChk');
     chks().forEach(c => c.addEventListener('change', () => { chks().forEach(o => { o.checked = c.checked; }); window._aceiteMarcado = !!c.checked; document.querySelectorAll('.loginAceite').forEach(l => l.classList.remove('erro')); }));
     document.querySelectorAll('.loginTermosLink').forEach(a => a.addEventListener('click', () => {
       const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
       a.href = 'https://dungeonlog.weberlabs.com.br/' + (en ? 'en/' : '') + a.dataset.k;
     }));
-    const precisa = () => true;   // TODOS passam pelo aceite (cadastro, login e Google)
+    const precisa = id => !dispAceito() || (id === 'loginEntrarBtn' && modoCadastro);   // aparelho ja aceitou: so o 'Criar conta' por email ainda exige o checkbox
     ['loginEscolhaGoogle','loginEscolhaEmail','loginEntrarBtn','loginGoogleBtn'].forEach(id => {
       const el = document.getElementById(id);
       if (!el) return;
       el.addEventListener('click', e => {
-        if (!precisa(id) || (chks()[0] && chks()[0].checked)){ if (chks()[0] && chks()[0].checked) window._aceiteMarcado = true; return; }
+        if (!precisa(id)){ window._aceiteImplicito = true; return; }   // aceite por continuacao (aparelho ja aceitou)
+        if (chks()[0] && chks()[0].checked){ window._aceiteMarcado = true; return; }
         e.stopImmediatePropagation(); e.preventDefault();
         document.querySelectorAll('.loginAceite').forEach(l => {
           l.classList.remove('erro'); void l.offsetWidth; l.classList.add('erro');
         });
       }, true);
     });
+    window.pintarAceiteLogin();
   })();
 
   // ---------- check/x em tempo real nos campos de senha (v4.127) ----------
@@ -16655,26 +16675,12 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
     // ---- registro de aceite dos Termos/Privacidade (prova) ----
     // Versao dos textos: a cada mudanca, atualizar aqui, em CONSENT_VERSOES_VALIDAS (Worker) e arquivar a copia em /terms/<versao>/.
-    const TERMOS_VERSAO = '2026-10-06', PRIVACIDADE_VERSAO = '2026-10-06';
-    // diagnostico: abrir /play/?dbg=1 mostra toasts "[dbg]" com cada etapa do registro de aceite
-    const DBG_ACEITE = /[?&]dbg=1/.test(location.search);
-    function dbgAceite(m){
-      console.info('QuestLog dbg:', m);
-      if (!DBG_ACEITE) return;
-      try {
-        let el = document.getElementById('dbgAceitePainel');
-        if (!el){
-          el = document.createElement('div'); el.id = 'dbgAceitePainel';
-          el.style.cssText = 'position:fixed;left:0;right:0;top:0;z-index:2147483647;background:rgba(0,0,0,.85);color:#7CFC00;font:11px/1.35 monospace;padding:4px 6px;pointer-events:none;white-space:pre-wrap';
-          document.body.appendChild(el);
-        }
-        el.textContent += new Date().toLocaleTimeString() + ' ' + m + '\n';
-      } catch(e){}
-    }
+    const TERMOS_VERSAO = window.ACEITE_VERSAO || '2026-10-06', PRIVACIDADE_VERSAO = TERMOS_VERSAO;
+    const marcarAparelhoAceito = () => { try { localStorage.setItem('questlog.aceiteDisp.v1', TERMOS_VERSAO); } catch(e){} };
     async function registrarAceiteSeNecessario(user){
       try {
-        dbgAceite('registrar: flag=' + window._aceiteMarcado);
-        if (!window._aceiteMarcado){ console.info('QuestLog: aceite nao marcado nesta sessao, nada a registrar'); return; }
+        const explicito = !!window._aceiteMarcado;
+        if (!explicito && !window._aceiteImplicito) return;   // nenhum aceite (nem por checkbox, nem por continuacao) nesta sessao
         if (typeof BILLING_VERIFY_URL !== 'string') return;
         let atual = false;
         try {
@@ -16682,8 +16688,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           const d = snap.exists() ? snap.data() : null;
           atual = !!(d && d.termosVersao === TERMOS_VERSAO && d.privacidadeVersao === PRIVACIDADE_VERSAO);
         } catch(e){ /* regras ainda nao publicadas: tenta gravar mesmo assim (Worker e idempotente) */ }
-        dbgAceite('doc atual=' + atual);
-        if (atual){ window._aceiteMarcado = false; return; }
+        if (atual){ window._aceiteMarcado = false; window._aceiteImplicito = false; marcarAparelhoAceito(); return; }
         const prov = (user.providerData && user.providerData[0] && user.providerData[0].providerId) || '';
         const twa = (document.referrer || '').indexOf('android-app://') === 0;
         const standalone = !!(window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
@@ -16692,14 +16697,13 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + await user.getIdToken() },
           body: JSON.stringify({
             termosVersao: TERMOS_VERSAO, privacidadeVersao: PRIVACIDADE_VERSAO,
-            idioma: (function(){ try { return (localStorage.getItem('questlog.idioma.v1') || 'pt') === 'en' ? 'en' : 'pt'; } catch(e){ return 'pt'; } })(), metodo: prov === 'google.com' ? 'google' : 'email',
+            idioma: (function(){ try { return (localStorage.getItem('questlog.idioma.v1') || 'pt') === 'en' ? 'en' : 'pt'; } catch(e){ return 'pt'; } })(), metodo: (prov === 'google.com' ? 'google' : 'email') + (explicito ? '' : '_implicito'),
             plataforma: twa ? 'twa' : (standalone ? 'pwa' : 'web')
           })
         });
-        dbgAceite('worker HTTP ' + resp.status);
-        if (resp.ok){ window._aceiteMarcado = false; console.info('QuestLog: aceite registrado'); }
+        if (resp.ok){ window._aceiteMarcado = false; window._aceiteImplicito = false; marcarAparelhoAceito(); }
         else console.warn('QuestLog: registro de aceite falhou HTTP ' + resp.status, await resp.text().catch(()=>''));
-      } catch(e){ dbgAceite('ERRO ' + (e && e.message)); console.warn('QuestLog: registro de aceite falhou (tenta no proximo login)', e); }
+      } catch(e){ console.warn('QuestLog: registro de aceite falhou (tenta no proximo login)', e); }
     }
 
     async function aoLogar(user){
@@ -17017,7 +17021,6 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     onAuthStateChanged(auth, user => {
         if (!user) return;
         const passoLoginOn = !!(passoLogin && passoLogin.classList.contains('on'));
-        dbgAceite('auth ok, passoLogin=' + passoLoginOn);
         if (passoLoginOn) {
           aoLogar(user).catch(e => console.error('QuestLog/Firebase: aoLogar() falhou', e));
         } else {
@@ -18156,6 +18159,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'login.aceitoPre':         { pt:'Li e concordo com os ', en:'I have read and agree to the ' },
     'login.termos':            { pt:'Termos de Uso', en:'Terms of Use' },
     'login.aceitoE':           { pt:' e a ', en:' and the ' },
+    'login.aceiteImplicito':   { pt:'Ao continuar, você concorda com os ', en:'By continuing, you agree to the ' },
     'login.privacidade':       { pt:'Política de Privacidade', en:'Privacy Policy' },
     'login.continuarComGoogle':{ pt:'Continuar com Google', en:'Continue with Google' },
     'login.continuarComEmail': { pt:'Continuar com email', en:'Continue with email' },

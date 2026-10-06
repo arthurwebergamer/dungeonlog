@@ -91,7 +91,7 @@ const ITENS = [
   [154, "Besta", "arma", 1, 26, 14, 0, 0, false, "Crossbow"],
   [155, "Chicote", "arma", 1, 18, 10, 0, 0, false, "Whip"],
   [156, "Machado de Guerra", "arma", 2, 40, 20, 0, 0, false, "War Axe"],
-  [157, "Martelo de Guerra", "arma", 2, 44, 22, 0, 0, false, "War Hammer"],
+  [157, "Martelo de Guerra", "arma", 2, 44, 22, 0, 0, true, "War Hammer"],
   [158, "Maça", "arma", 2, 38, 19, 0, 0, false, "Mace"],
   [159, "Mangual", "arma", 2, 36, 18, 0, 0, false, "Flail"],
   [160, "Maca Cravada", "arma", 2, 42, 21, 0, 0, false, "Spiked Mace"],

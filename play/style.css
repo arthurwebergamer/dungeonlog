@@ -5991,3 +5991,11 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 .terminarDiaBtn:active{transform:scale(.98)}
 @keyframes tdEntra{0%{opacity:0;transform:translateY(14px) scale(.94)}100%{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.terminarDiaBtn{animation:none}}
+
+/* PROTOTIPO: arma na mao do heroi. Ancora no canto inferior-esquerdo do
+   sprite (cabo) perto da mao direita do boneco; gira no golpe. */
+.hero-sprite .heroArma{position:absolute;left:54px;top:29px;width:40px;height:40px;z-index:3;pointer-events:none;
+  transform-origin:20% 85%;transform:rotate(8deg)}
+.hero-sprite .heroArma .pxi{filter:drop-shadow(0 1px 0 rgba(0,0,0,.5))}
+.hero-sprite.hit .heroArma{animation:armaGolpe .22s ease-out}
+@keyframes armaGolpe{0%{transform:rotate(8deg)}45%{transform:rotate(62deg)}100%{transform:rotate(8deg)}}

@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=70">
+<link rel="stylesheet" href="style.css?v=72">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -3036,11 +3036,19 @@ let heroiEscolhido = 0;
 let semente = Math.floor(Math.random() * 64);   // ponto de partida no ciclo, sorteado uma vez
 function heroiAtual(){ return HEROIS[heroiEscolhido] || HEROIS[0]; }
 
+function estiloArma(sp, s){   // proprio: o script da sheet (estiloSprite) carrega depois deste
+  const COLS = 16, ROWS = 27, c = sp % COLS, r = Math.floor(sp / COLS);
+  return 'width:'+s+'px;height:'+s+'px;background-size:'+(COLS*s)+'px '+(ROWS*s)+'px;background-position:-'+(c*s)+'px -'+(r*s)+'px';
+}
 function desenharHeroi(){
   const el = document.getElementById('heroSprite');
   if (!el) return;
+  // PROTOTIPO: arma equipada na mao do heroi (ver .heroArma no CSS)
+  const idArma = (typeof equipado !== 'undefined') ? equipado.arma : null;
+  const armaHTML = (idArma !== null && idArma !== undefined && ITENS[idArma])
+    ? '<div class="heroArma"><div class="pxi" style="' + estiloArma(ITENS[idArma][0], 40) + '"></div></div>' : '';
   el.innerHTML = '<img class="heroimg" src="' + heroiAtual().img + '" alt="' + (idiomaApp() === 'en' ? 'hero' : 'herói') + '">' +
-                 '<div class="sombra"></div>';
+                 armaHTML + '<div class="sombra"></div>';
 }
 
 function diasCorridos(){
@@ -4838,6 +4846,7 @@ function carregar(){
     carregar = function(){
       const r = _carregar();
       inventario = ITENS.map((a, i) => ({id: i, q: 1})).filter(s => !ITENS[s.id][8]);
+      if (equipado.arma === null || equipado.arma === undefined) equipado.arma = 2;   // Espada de Aco, so pra ver o prototipo da arma na mao
       return r;
     };
     salvar = function(){};
@@ -7338,6 +7347,7 @@ function equipar(id){
   if (!EQUIPAVEL(id)) return;
   equipado[it.tipo] = (equipado[it.tipo] === id) ? null : id;
   persistir(); renderInventario(); fecharFicha();
+  if (it.tipo === 'arma' && typeof desenharHeroi === 'function') desenharHeroi();
   const en = idiomaApp() === 'en';
   aviso(equipado[it.tipo] === id ? (en ? 'EQUIPPED' : 'EQUIPADO') : (en ? 'UNEQUIPPED' : 'DESEQUIPADO'));
 }

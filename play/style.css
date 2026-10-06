@@ -6009,3 +6009,7 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 .projetil::after{content:'';position:absolute;right:-3px;top:-2px;width:4px;height:6px;background:#cfd6dd;clip-path:polygon(0 0,100% 50%,0 100%)}
 .projetil.pedra{width:6px;height:6px;margin:-3px 0 0 0;border-radius:50%;background:#9a9a9a;box-shadow:0 0 0 1px rgba(0,0,0,.5)}
 .projetil.pedra::after{display:none}
+
+.projetil.flecha{width:auto;height:auto;background:none;box-shadow:none;margin:0}
+.projetil.flecha::after{display:none}
+.projetil.flecha img{display:block;image-rendering:pixelated;width:30px;height:auto;transform:translate(-50%,-50%)}

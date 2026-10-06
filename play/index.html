@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=76">
+<link rel="stylesheet" href="style.css?v=77">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -5249,16 +5249,19 @@ function animarGolpe(){
   if (ranged){   // projetil voa do heroi ate o monstro e chega junto com o impacto
     const nomeA = (typeof equipado !== 'undefined' && equipado.arma != null && ITENS[equipado.arma]) ? ITENS[equipado.arma][1] : '';
     const pedra = /Estilingue|Funda/i.test(nomeA);
+    const besta = /Besta/i.test(nomeA);
     const p = document.createElement('div');
-    p.className = 'projetil' + (pedra ? ' pedra' : '');
+    p.className = 'projetil' + (pedra ? ' pedra' : ' flecha');
+    if (!pedra) p.innerHTML = '<img alt="" src="data:image/png;base64,' + (besta ? 'iVBORw0KGgoAAAANSUhEUgAAABMAAAALCAYAAACd1bY6AAAAtklEQVR4nJ2SYQ3EIAyFH6dgEpBQCZWAhEmYFCRMQiUgYRLq5N0f1rHc5XLsS5oUCI/XloQLDnnCA17jwsy+Cf9NOHD3EMg5385mIQCaGVWVg7NphwTAbdsoIhG11lN0FP9JAoBSCnPOcHe4O5ZlQd+PHADWdT3vEFcbxvwqp5QSDnq5UFWese/7zbGZTTkPRvFaazzQB0cAfDwxEaGqQlXRq7r/sxmO40gigtYaWmtPZT6Inr0Bpcle0QNmEFkAAAAASUVORK5CYII=' : 'iVBORw0KGgoAAAANSUhEUgAAABYAAAAGCAYAAADHYm6gAAAAk0lEQVR4nJWRsQ3DIBBFH5GLFClSpmQERsgIGcEjMMqVKTNCRvAolC4pU0S6FBgEdpDsJ52+dIJ3OjAklC3mT283J0CnxVxnZ1gP7Z3XCVRXyc4KIaj3vu416+p4a6fZc5trwifV4/nGOQeAiCAiDFn6AuwMAbCklAtch42vEL8p7zEW4YIxWVoLLTAe+7z8vuXODwovQgGYoJL6AAAAAElFTkSuQmCC') + '">';
     const x0 = hr.right - 8, y0 = hr.top + hr.height*0.62, x1 = mr.left + mr.width*0.35, y1 = mr.top + mr.height*0.5;
-    p.style.cssText = 'left:'+x0+'px;top:'+y0+'px';
+    p.style.cssText = 'left:'+x0+'px;top:'+y0+'px;';
+    const ang = Math.atan2(y1-y0, x1-x0);
     document.body.appendChild(p);
     const voo = p.animate([
-      {transform:'translate(0,0)',opacity:0,offset:0},
-      {transform:'translate(0,0)',opacity:1,offset:.12},
-      {transform:'translate('+(x1-x0)+'px,'+(y1-y0)+'px)',opacity:1,offset:.92},
-      {transform:'translate('+(x1-x0)+'px,'+(y1-y0)+'px)',opacity:0,offset:1}
+      {transform:'translate(0,0) rotate('+ang+'rad)',opacity:0,offset:0},
+      {transform:'translate(0,0) rotate('+ang+'rad)',opacity:1,offset:.12},
+      {transform:'translate('+(x1-x0)+'px,'+(y1-y0)+'px) rotate('+ang+'rad)',opacity:1,offset:.92},
+      {transform:'translate('+(x1-x0)+'px,'+(y1-y0)+'px) rotate('+ang+'rad)',opacity:0,offset:1}
     ], {duration:T*0.36, delay:T*0.04, fill:'both', easing:'cubic-bezier(.4,0,.8,.6)'});
     voo.onfinish = () => p.remove();
   }

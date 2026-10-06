@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=55">
+<link rel="stylesheet" href="style.css?v=56">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -7502,16 +7502,20 @@ function renderInventario(){
   }).sort((a,z) => item(z.id).rar - item(a.id).rar);
 
   grid.innerHTML = '';
+  // fragment + innerHTML unico por celula (antes: 2-3 reparses por celula,
+  // custoso com centenas de itens)
+  const frag = document.createDocumentFragment();
   visiveis.forEach(s => {
     const it = item(s.id);
     const c = document.createElement('div');
     c.className = 'cel r' + it.rar;
-    c.innerHTML = spriteHTML(it.sp, 32);
-    if (s.q > 1) c.innerHTML += '<span class="qtd">'+s.q+'</span>';
-    if (SLOTS.some(k => equipado[k] === s.id)) c.innerHTML += '<span class="eq"></span>';
+    c.innerHTML = spriteHTML(it.sp, 32)
+      + (s.q > 1 ? '<span class="qtd">'+s.q+'</span>' : '')
+      + (SLOTS.some(k => equipado[k] === s.id) ? '<span class="eq"></span>' : '');
     c.onclick = () => { fichaOrigemEl = c; abrirFicha(s.id); };
-    grid.appendChild(c);
+    frag.appendChild(c);
   });
+  grid.appendChild(frag);
 
   if (!semNada && visiveis.length === 0){
     grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:22px 0;font-family:Outfit,sans-serif;font-size:13px;color:var(--dim)">' + (idiomaApp() === 'en' ? 'Nothing in this category.' : 'Nada nesta categoria.') + '</div>';

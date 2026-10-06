@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=113">
+<link rel="stylesheet" href="style.css?v=114">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -17069,6 +17069,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       if (umToqueEmCurso) return;
       umToqueEmCurso = true;
       let resolvido = false;
+      // loading ja no toque: a pessoa ve o "bonequinho correndo" enquanto o seletor abre/ela escolhe a conta
+      if (typeof window.mostrarLoadingMasmorra === 'function') window.mostrarLoadingMasmorra();
       const cair = () => { if (resolvido) return; resolvido = true; umToqueEmCurso = false; entrarGooglePopup(); };
       try {
         await carregarGIS();
@@ -17098,7 +17100,12 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           if (n.isNotDisplayed && n.isNotDisplayed()) return cair();
           if (n.isSkippedMoment && n.isSkippedMoment()) return cair();
           // pessoa dispensou o seletor de proposito: so libera o botao
-          if (n.isDismissedMoment && n.isDismissedMoment() && !resolvido) { resolvido = true; umToqueEmCurso = false; }
+          if (n.isDismissedMoment && n.isDismissedMoment() && !resolvido){
+            const motivo = n.getDismissedReason ? n.getDismissedReason() : '';
+            if (motivo === 'credential_returned') return;   // sucesso: o callback cuida do resto
+            resolvido = true; umToqueEmCurso = false;
+            if (typeof window.esconderLoadingMasmorra === 'function') window.esconderLoadingMasmorra();   // fechou o seletor: volta pro login
+          }
         });
       } catch(e){
         console.warn('QuestLog: One Tap indisponivel, usando popup', e);

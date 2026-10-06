@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=81">
+<link rel="stylesheet" href="style.css?v=82">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -3048,7 +3048,7 @@ function desenharHeroi(){
   let armaHTML = '';
   if (idArma !== null && idArma !== undefined && ITENS[idArma]){
     const nomeArma = ITENS[idArma][1];
-    const ranged = /^(Arco|Besta|Estilingue|Funda)/i.test(nomeArma);
+    const ranged = /^(Arco|Besta|Arbalesta|Zarabatana|Estilingue|Funda)/i.test(nomeArma);
     // armas de sprite grande encolhem pra nao dominar o heroi; o cabo continua na mao
     const S = /Martelo de Guerra/i.test(nomeArma) ? 34 : /Machado de Guerra|Chicote/i.test(nomeArma) ? 44 : 56;
     const pos = (ranged || S === 56) ? '' : 'width:'+S+'px;height:'+S+'px;left:'+(59 - 0.12*S).toFixed(1)+'px;top:'+(64 - 0.88*S).toFixed(1)+'px;';
@@ -5234,31 +5234,40 @@ function animarGolpe(){
   // distancia ate encostar no monstro (a ponta da espada passa ~20px da borda do heroi)
   const ranged = !!h.querySelector('.heroArma.ranged');   // arco/besta/funda: atira de onde esta, nao corre
   const dx = ranged ? 0 : Math.max(0, Math.round(mr.left - hr.right - 4));
-  if (h._golpeAnim && h._golpeAnim.playState === 'running'){   // toque durante o golpe anterior: nao reinicia (evita "teletransporte"), so treme o monstro
+  if (!ranged && h._golpeAnim && h._golpeAnim.playState === 'running'){   // toque durante o golpe anterior: nao reinicia (evita "teletransporte"), so treme o monstro
     m.classList.add('shake'); setTimeout(()=>m.classList.remove('shake'), 220);
     return;
   }
-  h.classList.add('golpeando');
-  h.style.zIndex = 5;
   const T = 900;   // duracao total do golpe (ida, golpe, volta)
   window._golpeImpactoMs = Math.round(T*0.42);
-  if (h.animate){
-    h._golpeAnim = h.animate([
-      {transform:'translateX(0) scale(1)',offset:0},
-      {transform:'translateX('+(dx*0.55)+'px) translateY(-6px) scale(1.04)',offset:.22},   // corre
-      {transform:'translateX('+dx+'px) translateY(0) scale(1.08)',offset:.40},             // chega
-      {transform:'translateX('+dx+'px) translateY(0) scale(1.08)',offset:.55},             // golpe
-      {transform:'translateX(0) translateY(0) scale(1)',offset:1}                          // volta
-    ], {duration:T, easing:'cubic-bezier(.3,.7,.3,1)'});
+  if (!ranged){
+    h.classList.add('golpeando');
+    h.style.zIndex = 5;
+    if (h.animate){
+      h._golpeAnim = h.animate([
+        {transform:'translateX(0) scale(1)',offset:0},
+        {transform:'translateX('+(dx*0.55)+'px) translateY(-6px) scale(1.04)',offset:.22},   // corre
+        {transform:'translateX('+dx+'px) translateY(0) scale(1.08)',offset:.40},             // chega
+        {transform:'translateX('+dx+'px) translateY(0) scale(1.08)',offset:.55},             // golpe
+        {transform:'translateX(0) translateY(0) scale(1)',offset:1}                          // volta
+      ], {duration:T, easing:'cubic-bezier(.3,.7,.3,1)'});
+    }
+  } else {
+    // arco/besta/funda: heroi PARADO (sem pulo/escala); so a arma recua (CSS .golpeando .heroArma.ranged)
+    h.classList.remove('golpeando'); void h.offsetWidth; h.classList.add('golpeando');
   }
   if (ranged){   // projetil voa do heroi ate o monstro e chega junto com o impacto
     const nomeA = (typeof equipado !== 'undefined' && equipado.arma != null && ITENS[equipado.arma]) ? ITENS[equipado.arma][1] : '';
     const pedra = /Estilingue|Funda/i.test(nomeA);
-    const besta = /Besta/i.test(nomeA);
+    const besta = /Besta|Arbalesta/i.test(nomeA);
     const p = document.createElement('div');
     p.className = 'projetil' + (pedra ? ' pedra' : ' flecha');
     if (!pedra) p.innerHTML = '<img alt="" src="data:image/png;base64,' + (besta ? 'iVBORw0KGgoAAAANSUhEUgAAABMAAAALCAYAAACd1bY6AAAAtklEQVR4nJ2SYQ3EIAyFH6dgEpBQCZWAhEmYFCRMQiUgYRLq5N0f1rHc5XLsS5oUCI/XloQLDnnCA17jwsy+Cf9NOHD3EMg5385mIQCaGVWVg7NphwTAbdsoIhG11lN0FP9JAoBSCnPOcHe4O5ZlQd+PHADWdT3vEFcbxvwqp5QSDnq5UFWese/7zbGZTTkPRvFaazzQB0cAfDwxEaGqQlXRq7r/sxmO40gigtYaWmtPZT6Inr0Bpcle0QNmEFkAAAAASUVORK5CYII=' : 'iVBORw0KGgoAAAANSUhEUgAAABYAAAAGCAYAAADHYm6gAAAAk0lEQVR4nJWRsQ3DIBBFH5GLFClSpmQERsgIGcEjMMqVKTNCRvAolC4pU0S6FBgEdpDsJ52+dIJ3OjAklC3mT283J0CnxVxnZ1gP7Z3XCVRXyc4KIaj3vu416+p4a6fZc5trwifV4/nGOQeAiCAiDFn6AuwMAbCklAtch42vEL8p7zEW4YIxWVoLLTAe+7z8vuXODwovQgGYoJL6AAAAAElFTkSuQmCC') + '">';
-    const x0 = hr.right - 8, y0 = hr.top + hr.height*0.62, x1 = mr.left + mr.width*0.35, y1 = mr.top + mr.height*0.5;
+    // origem = mao do heroi (retangulo do herói, sem transform); alvo = centro do slot do monstro
+    // (o .fighter pai nao tem a animacao de entrada/tremor do sprite, que desviava a mira)
+    const slotM = (m.closest('.fighter') || m).getBoundingClientRect();
+    const x0 = hr.left + hr.width*0.72, y0 = hr.top + hr.height*0.62;
+    const x1 = slotM.left + slotM.width*0.4, y1 = slotM.top + Math.min(slotM.height, 90)*0.55;
     p.style.cssText = 'left:'+x0+'px;top:'+y0+'px;';
     const ang = Math.atan2(y1-y0, x1-x0);
     document.body.appendChild(p);
@@ -5269,9 +5278,11 @@ function animarGolpe(){
       {transform:'translate('+(x1-x0)+'px,'+(y1-y0)+'px) rotate('+ang+'rad)',opacity:0,offset:1}
     ], {duration:T*0.36, delay:T*0.04, fill:'both', easing:'cubic-bezier(.4,0,.8,.6)'});
     voo.onfinish = () => p.remove();
+    setTimeout(() => p.remove(), T);   // garantia: nunca sobra projetil perdido na tela
   }
   setTimeout(()=>m.classList.add('shake'), T*0.42);
-  setTimeout(()=>{ h.classList.remove('golpeando'); h.style.zIndex=''; m.classList.remove('shake'); }, T+30);
+  clearTimeout(h._golpeFim);
+  h._golpeFim = setTimeout(()=>{ h.classList.remove('golpeando'); h.style.zIndex=''; m.classList.remove('shake'); }, T+30);
 }
 
 const COIN_SVG = '<svg viewBox="0 0 13 13" shape-rendering="crispEdges"><image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAANCAYAAABy6+R8AAABNElEQVR42p2SsUrDUBSGvxtr0angcNup0SzOIop0cXBqcBGkpS59AR10qk+guOoLuCgWQZe2k4NLKXRwzhKlWzMEioOl2hyHkpQmBcG73cP3n//8h6NIPon9VRwwYrCMpcJYKogI0jCj+rwuIg2TwC5wVX4GwNJT7vD6gAV1H/Eq7B7Cezsp8pkRvUEagHxmxOvbpHf5ZgigUgBGs42lhTVrMSHoDdLsboS14TRTvdWnVMyyebqfEOQzI7K5HFvrKzOZRBom9VYfgFIxS2AXMLiD5ioAl7celpZoPAXIRWmZWlUT2AUeT55m1ut6ilpV03V8ts8+p6K4E/YHAUcYzTZdx+fd/cb1FOf1r7+dXG+ytXlOhEJLS5Qp3GrX8Xnp/EQu8RMRgIfjpcgBCOEZVv3n9n4BeByMZhegdHgAAAAASUVORK5CYII=" width="13" height="13" style="image-rendering:pixelated"/></svg>';

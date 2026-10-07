@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=120">
+<link rel="stylesheet" href="style.css?v=121">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -18507,133 +18507,6 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
       }).catch(function(){});
     } catch(e){}
   });
-})();
-</script>
-<script>
-/* ------------------------------------------------------------------
-   EFEITO ELASTICO (rubber band) -- toque em QUALQUER ponto da tela.
-   - Tela inicial: arena + barra de XP + tarefas se movem juntas (topbar
-     e menu de baixo ficam parados).
-   - Abas (.view): a aba inteira se move.
-   - Overlays/telas com rolagem propria: o proprio elemento rolavel.
-   Engata NO MESMO ARRASTO assim que a rolagem chega no limite (reavalia a
-   cada movimento do dedo) e tambem da um repique leve quando a rolagem por
-   inercia (fling) bate no fim. Rolagem normal e gestos horizontais ficam
-   intactos. Listener PASSIVO de proposito (preventDefault travaria toda
-   rolagem). Desliga com "reduzir movimento".
-   ------------------------------------------------------------------ */
-(function(){
-  try { if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return; } catch(e){}
-  const MAX = 140;                 // deslocamento maximo (px) do puxao -- assintota da resistencia
-  const K = 180;                   // quanto maior, mais "duro" o inicio do puxao
-  const REPIQUE_MAX = 46;          // repique maximo (px) quando o fling bate no fim
-  const OVERLAYS = '.cfgOverlay, .paywallOverlay, .loadingMasmorra, .edov, .sheetbg, .isheet, .baubg, .baupop, .lvlpop, .quedapop, .largpop, .estagio-tela, .intro';
-  let sc = null, alvos = [], x0 = 0, y0 = 0, yIni = 0, yUlt = 0, modo = null, trava = false, mexeu = false, tocando = false, tokenInercia = 0;
-  let pend = null, raf = 0;
-
-  function rolavel(el){
-    while (el && el !== document.body && el !== document.documentElement){
-      if (el.nodeType === 1){
-        const oy = getComputedStyle(el).overflowY;
-        if ((oy === 'auto' || oy === 'scroll') && el.scrollHeight > el.clientHeight + 1) return el;
-      }
-      el = el.parentElement;
-    }
-    return null;
-  }
-  function alvosDe(t){
-    const rol = rolavel(t);
-    if (t.closest && t.closest(OVERLAYS)) return rol ? [rol] : [];     // overlay: so se tiver rolagem propria
-    const app = t.closest && t.closest('.app');
-    if (!app) return rol ? [rol] : [];
-    const view = [...app.querySelectorAll(':scope > .view')].find(v => getComputedStyle(v).display !== 'none');
-    if (view) return [view];
-    return [...app.querySelectorAll(':scope > .arena, :scope > #statsBarra, :scope > .tasks')];   // tela inicial
-  }
-  const resist = d => MAX * d / (d + K);
-  const noTopo = el => !el || el.scrollTop <= 0;
-  const noFim  = el => !el || el.scrollTop + el.clientHeight >= el.scrollHeight - 1;
-
-  // escreve o transform no maximo 1x por frame, em camada propria (GPU)
-  function aplicar(v){
-    pend = v;
-    if (raf) return;
-    raf = requestAnimationFrame(() => { raf = 0; if (pend === null) return; const t = 'translate3d(0,' + pend + 'px,0)'; alvos.forEach(a => { a.style.transform = t; }); });
-  }
-  function mola(lista){
-    lista.forEach(el => {
-      el.style.transition = 'transform .5s cubic-bezier(.2,1.1,.3,1)';
-      el.style.transform = 'translate3d(0,0,0)';
-      const fim = () => { el.style.transition = ''; el.style.transform = ''; el.style.willChange = ''; el.removeEventListener('transitionend', fim); };
-      el.addEventListener('transitionend', fim);
-      setTimeout(fim, 650);
-    });
-  }
-  // inercia: depois de soltar, acompanha a rolagem; se bater no limite com velocidade, faz um repique curto
-  function vigiarInercia(el, lista){
-    const tk = ++tokenInercia; let ult = el.scrollTop, t0 = performance.now(), parado = 0, vUlt = 0;
-    (function passo(){
-      if (tk !== tokenInercia) return;
-      const agora = el.scrollTop, v = agora - ult; ult = agora;
-      if (Math.abs(v) > 0.5) vUlt = v;
-      const bateuFim = v > 0 && noFim(el), bateuTopo = v < 0 && noTopo(el);
-      if ((bateuFim || bateuTopo) && Math.abs(vUlt) > 6){
-        const amp = Math.min(REPIQUE_MAX, Math.abs(vUlt) * 2.2) * (bateuFim ? -1 : 1);
-        lista.forEach(a => { a.style.willChange = 'transform'; a.style.transition = 'transform .12s ease-out'; a.style.transform = 'translate3d(0,' + amp + 'px,0)'; });
-        setTimeout(() => { if (tk === tokenInercia) mola(lista); }, 120);
-        return;
-      }
-      parado = Math.abs(v) < 0.3 ? parado + 1 : 0;
-      if (parado > 6 || performance.now() - t0 > 2500) return;
-      requestAnimationFrame(passo);
-    })();
-  }
-  function soltar(){
-    tocando = false;
-    const lista = alvos, el = sc, estava = modo;
-    alvos = []; sc = null; pend = null; modo = null; trava = false; mexeu = false;
-    if (!lista.length) return;
-    if (estava) mola(lista);
-    else if (el && el.scrollHeight > el.clientHeight + 1) vigiarInercia(el, lista);
-  }
-  function engatar(dir, y){
-    modo = dir; y0 = y;
-    alvos.forEach(a => { a.style.transition = 'none'; a.style.willChange = 'transform'; });
-  }
-
-  document.addEventListener('touchstart', e => {
-    tokenInercia++;                                          // cancela vigia de inercia anterior
-    if (modo) { const l = alvos; mola(l); }
-    if (e.touches.length !== 1){ alvos = []; sc = null; modo = null; return; }
-    tocando = true;
-    sc = rolavel(e.target); alvos = alvosDe(e.target); modo = null; trava = false; mexeu = false; pend = null;
-    if (sc) sc.style.overscrollBehaviorY = 'none';           // sem brilho/stretch nativo nem encadear no pai
-    x0 = e.touches[0].clientX; yIni = yUlt = y0 = e.touches[0].clientY;
-  }, { passive: true });
-
-  document.addEventListener('touchmove', e => {
-    if (!alvos.length || trava || e.touches.length !== 1) return;
-    const x = e.touches[0].clientX, y = e.touches[0].clientY;
-    const dx = x - x0, dyTot = y - yIni, delta = y - yUlt; yUlt = y;
-    if (!mexeu){
-      if (Math.abs(dx) > Math.abs(dyTot) && Math.abs(dx) > 12){ trava = true; return; }   // gesto horizontal
-      if (Math.abs(dyTot) < 3) return;                                                     // ainda e um toque
-      mexeu = true;
-    }
-    if (!modo){
-      // reavalia a cada movimento: assim o efeito comeca no MESMO arrasto, assim que chega no limite
-      if (delta > 0 && noTopo(sc)) engatar('topo', y);
-      else if (delta < 0 && noFim(sc)) engatar('fim', y);
-      return;
-    }
-    const d = y - y0;
-    if ((modo === 'topo' && d <= 0) || (modo === 'fim' && d >= 0)){    // dedo voltou: solta o elastico e deixa rolar normal
-      aplicar(0); modo = null; alvos.forEach(a => { a.style.willChange = ''; }); return;
-    }
-    aplicar((modo === 'topo' ? 1 : -1) * resist(Math.abs(d)));
-  }, { passive: true });
-  document.addEventListener('touchend', soltar, { passive: true });
-  document.addEventListener('touchcancel', soltar, { passive: true });
 })();
 </script>
 </body>

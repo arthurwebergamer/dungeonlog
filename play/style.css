@@ -6027,6 +6027,17 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
   .nav{position:sticky;bottom:0;z-index:20;background:var(--panel) !important}
 }
 
+/* celular: a tela inicial e UMA pagina so (arena + XP + tarefas rolam juntas, sem barra propria na lista);
+   topbar e menu de baixo ficam colados. Permite arrastar/esticar de qualquer ponto da tela. */
+@media (max-width:520px){
+  .app{overflow-y:auto;scrollbar-width:none}
+  .app::-webkit-scrollbar{display:none}
+  .tasks{flex:none;overflow:visible;min-height:auto}
+  .list{flex:none;overflow:visible}
+  .topbar{position:sticky;top:0;z-index:20;background:var(--bg)}
+  .nav{position:sticky;bottom:0;z-index:20;background:var(--panel) !important}
+}
+
 /* PROTOTIPO: armadura/elmo/escudo no heroi (caixa do heroi = 83x87) */
 .hero-sprite .heroEq{position:absolute;pointer-events:none}
 .hero-sprite .heroEq .pxi{filter:drop-shadow(0 1px 0 rgba(0,0,0,.45))}

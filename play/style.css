@@ -6045,3 +6045,8 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 #viewInventario .invfiltros.invsub button{font-size:11px;padding:4px 10px}
 
 .dicadiames{font-family:'Outfit',sans-serif;font-size:11.5px;color:var(--dim);margin-top:6px;line-height:1.3}
+
+/* --- cor da tarefa: checkbox concluido e fundo na cor --- */
+.task.comcor .box{border-color:color-mix(in srgb, var(--tc) 60%, transparent) !important}
+.task.comcor.done .box{background:color-mix(in srgb, var(--tc) 70%, var(--panel-2)) !important;border-color:transparent !important}
+.task.comcor{background:color-mix(in srgb, var(--tc) 10%, var(--panel-2)) !important}

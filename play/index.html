@@ -52,12 +52,14 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=122">
+<link rel="stylesheet" href="style.css?v=123">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
 (function(){
-  ['log','warn','error','table','info','debug'].forEach(function(m){ console[m] = function(){}; });
+  var h = location.hostname;
+  var dev = (/(^|\.)questlog-911\.pages\.dev$/.test(h) && h !== 'questlog-911.pages.dev') || h === 'localhost' || h === '127.0.0.1';
+  if (!dev) ['log','warn','error','table','info','debug'].forEach(function(m){ console[m] = function(){}; });
   try { ['questlog.modoDebug.v1','questlog.dbgLog.v1'].forEach(function(k){ localStorage.removeItem(k); }); } catch(e){}
 })();
 </script>
@@ -18527,6 +18529,45 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
       }).catch(function(){});
     } catch(e){}
   });
+})();
+</script>
+<script>
+/* FERRAMENTAS DE DEBUG -- SO DEV (window.EH_DEV: previews/dev do Cloudflare Pages e localhost).
+   Em producao (dungeonlog.weberlabs.com.br e questlog-911.pages.dev) este bloco nao faz nada,
+   entao pode ficar no main. Itens: ver devLiberarTodosItens() (todos os itens), aqui: tarefas
+   ilimitadas, equipamento inicial e botao "dia +1". Nada disso sobe pra nuvem (empurrarNuvem). */
+(function(){
+  try {
+    if (!window.EH_DEV) return;
+    LIMITE_TAREFAS_GRATIS = Infinity;
+    if (equipado.arma == null) equipado.arma = 2;      // Espada de Aco
+    if (equipado.escudo == null) equipado.escudo = 36; // Escudo Redondo
+    if (equipado.elmo == null) equipado.elmo = 215;    // Chapeu de Mago
+    lerOffsetDia = function(){};   // offset de dia so em memoria
+    const mk = () => {
+      if (document.getElementById('devnextday')) return;
+      const b = document.createElement('button');
+      b.id = 'devnextday';
+      b.textContent = 'dia +1 \u2192';
+      b.style.cssText = "position:fixed;bottom:calc(72px + env(safe-area-inset-bottom));left:8px;z-index:50;background:rgba(29,34,43,.9);color:#9aa;border:1px dashed #555;border-radius:6px;padding:4px 8px;font-size:10px;cursor:pointer";
+      b.onclick = () => {
+        const doDia = tarefas.filter(ehDeHoje);
+        const escapou = doDia.length > 0 && doDia.some(t => !feitaHoje(t));
+        const nome = monstroDoDia().nome;
+        const mob = document.getElementById('mobSprite');
+        const av = () => {
+          diaOffset++;
+          if (mob) mob.classList.remove('fugiu');
+          render();
+          if (escapou) aviso(nome.toUpperCase() + ' FUGIU', false, true);
+          else aviso('AVANCOU PARA ' + nomeDiaLocal(diaDaSemana()).toUpperCase());
+        };
+        if (escapou && mob) { mob.classList.add('fugiu'); setTimeout(av, 560); } else av();
+      };
+      document.body.appendChild(b);
+    };
+    mk();
+  } catch(e){}
 })();
 </script>
 </body>

@@ -18507,5 +18507,70 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
   });
 })();
 </script>
+<script>
+/* ------------------------------------------------------------------
+   EFEITO ELASTICO (rubber band) no fim/comeco de qualquer rolagem.
+   Generico: acha o elemento rolavel mais proximo do dedo; se ele ja esta
+   no limite e o dedo continua puxando, o proprio elemento acompanha o
+   dedo com resistencia e volta com mola ao soltar. Nao mexe em scroll
+   normal, em gestos horizontais, nem em gestos que outro codigo ja
+   tratou (preventDefault). Desliga com "reduzir movimento".
+   ------------------------------------------------------------------ */
+(function(){
+  try { if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return; } catch(e){}
+  const MAX = 140;                 // deslocamento maximo (px) -- assintota da resistencia
+  const K = 180;                   // quanto maior, mais "duro" o inicio do puxao
+  let sc = null, x0 = 0, y0 = 0, modo = null, trava = false;
+
+  function rolavel(el){
+    while (el && el !== document.body && el !== document.documentElement){
+      if (el.nodeType === 1){
+        const oy = getComputedStyle(el).overflowY;
+        if ((oy === 'auto' || oy === 'scroll') && el.scrollHeight > el.clientHeight + 1) return el;
+      }
+      el = el.parentElement;
+    }
+    return null;
+  }
+  const resist = d => MAX * d / (d + K);
+  function soltar(){
+    if (!sc) return;
+    const el = sc; sc = null;
+    if (modo){
+      el.style.transition = 'transform .5s cubic-bezier(.2,1.1,.3,1)';
+      el.style.transform = 'translateY(0px)';
+      const fim = () => { el.style.transition = ''; el.style.transform = ''; el.style.willChange = ''; el.removeEventListener('transitionend', fim); };
+      el.addEventListener('transitionend', fim);
+      setTimeout(fim, 650);
+    }
+    modo = null; trava = false;
+  }
+  document.addEventListener('touchstart', e => {
+    if (e.touches.length !== 1){ soltar(); return; }
+    sc = rolavel(e.target); modo = null; trava = false;
+    x0 = e.touches[0].clientX; y0 = e.touches[0].clientY;
+  }, { passive: true });
+  document.addEventListener('touchmove', e => {
+    if (!sc || trava || e.touches.length !== 1) return;
+    const dx = e.touches[0].clientX - x0, dy = e.touches[0].clientY - y0;
+    if (!modo){
+      if (Math.abs(dx) > Math.abs(dy) || Math.abs(dy) < 3){ if (Math.abs(dx) > 12 && Math.abs(dx) > Math.abs(dy)) trava = true; return; }
+      const noTopo = sc.scrollTop <= 0, noFim = sc.scrollTop + sc.clientHeight >= sc.scrollHeight - 1;
+      if (dy > 0 && noTopo) modo = 'topo';
+      else if (dy < 0 && noFim) modo = 'fim';
+      else { trava = true; return; }          // rolagem normal: nao interfere nesta tocada
+      y0 = e.touches[0].clientY - 0;          // o puxao conta a partir daqui
+      sc.style.transition = 'none'; sc.style.willChange = 'transform';
+      return;
+    }
+    const d = e.touches[0].clientY - y0;
+    if ((modo === 'topo' && d <= 0) || (modo === 'fim' && d >= 0)){ sc.style.transform = 'translateY(0px)'; return; }
+    if (e.cancelable && !e.defaultPrevented) e.preventDefault();
+    sc.style.transform = 'translateY(' + (modo === 'topo' ? 1 : -1) * resist(Math.abs(d)) + 'px)';
+  }, { passive: false });
+  document.addEventListener('touchend', soltar, { passive: true });
+  document.addEventListener('touchcancel', soltar, { passive: true });
+})();
+</script>
 </body>
 </html>

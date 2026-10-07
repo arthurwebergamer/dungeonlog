@@ -6060,3 +6060,4 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 /* --- cor da tarefa: identidade do card (faixa + checkbox concluido) --- */
 .task.comcor{box-shadow:inset 4px 0 0 var(--tc) !important}
 .task.comcor.done .box{background:var(--tc) !important;border-color:var(--tc) !important}
+.task.comcor{background:color-mix(in srgb, var(--tc) 10%, var(--panel-2)) !important}

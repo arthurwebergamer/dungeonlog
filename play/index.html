@@ -14801,7 +14801,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // conta (pedido do usuario). Listener em CAPTURA no proprio
   // botao: roda antes do onclick e, se falta aceite, barra o clique.
   (function(){
-    // Versao dos textos aceitos (fonte unica; o modulo Firebase le daqui). Mudou? Atualizar tambem em CONSENT_VERSOES_VALIDAS (Worker).
+    // Versao dos textos aceitos. Mudou? Atualizar aqui e arquivar a copia em /terms/<versao>/ e /privacy/<versao>/ (o checkbox volta pra todo mundo).
     window.ACEITE_VERSAO = '2026-10-06';
     const CH_DISP = 'questlog.aceiteDisp.v1';
     // Aparelho ja aceitou ESTA versao (gravado so depois de o Worker confirmar): o checkbox some e vira a nota "Ao continuar...".
@@ -14818,7 +14818,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       });
     };
     const chks = () => document.querySelectorAll('.loginAceiteChk');
-    chks().forEach(c => c.addEventListener('change', () => { chks().forEach(o => { o.checked = c.checked; }); window._aceiteMarcado = !!c.checked; document.querySelectorAll('.loginAceite').forEach(l => l.classList.remove('erro')); }));
+    chks().forEach(c => c.addEventListener('change', () => { chks().forEach(o => { o.checked = c.checked; }); document.querySelectorAll('.loginAceite').forEach(l => l.classList.remove('erro')); }));
     document.querySelectorAll('.loginTermosLink').forEach(a => a.addEventListener('click', () => {
       const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
       a.href = 'https://dungeonlog.weberlabs.com.br/' + (en ? 'en/' : '') + a.dataset.k;
@@ -14828,8 +14828,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       const el = document.getElementById(id);
       if (!el) return;
       el.addEventListener('click', e => {
-        if (!precisa(id)){ window._aceiteImplicito = true; return; }   // aceite por continuacao (aparelho ja aceitou)
-        if (chks()[0] && chks()[0].checked){ window._aceiteMarcado = true; return; }
+        if (!precisa(id)) return;   // aparelho ja aceitou esta versao
+        if (chks()[0] && chks()[0].checked){ try { localStorage.setItem(CH_DISP, window.ACEITE_VERSAO); } catch(e){} return; }   // marca o aparelho (so local, sem servidor)
         e.stopImmediatePropagation(); e.preventDefault();
         document.querySelectorAll('.loginAceite').forEach(l => {
           l.classList.remove('erro'); void l.offsetWidth; l.classList.add('erro');
@@ -16673,39 +16673,6 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       }
     }
 
-    // ---- registro de aceite dos Termos/Privacidade (prova) ----
-    // Versao dos textos: a cada mudanca, atualizar aqui, em CONSENT_VERSOES_VALIDAS (Worker) e arquivar a copia em /terms/<versao>/.
-    const TERMOS_VERSAO = window.ACEITE_VERSAO || '2026-10-06', PRIVACIDADE_VERSAO = TERMOS_VERSAO;
-    const marcarAparelhoAceito = () => { try { localStorage.setItem('questlog.aceiteDisp.v1', TERMOS_VERSAO); } catch(e){} };
-    async function registrarAceiteSeNecessario(user){
-      try {
-        const explicito = !!window._aceiteMarcado;
-        if (!explicito && !window._aceiteImplicito) return;   // nenhum aceite (nem por checkbox, nem por continuacao) nesta sessao
-        if (typeof BILLING_VERIFY_URL !== 'string') return;
-        let atual = false;
-        try {
-          const snap = await getDoc(doc(db, 'consents', user.uid));
-          const d = snap.exists() ? snap.data() : null;
-          atual = !!(d && d.termosVersao === TERMOS_VERSAO && d.privacidadeVersao === PRIVACIDADE_VERSAO);
-        } catch(e){ /* regras ainda nao publicadas: tenta gravar mesmo assim (Worker e idempotente) */ }
-        if (atual){ window._aceiteMarcado = false; window._aceiteImplicito = false; marcarAparelhoAceito(); return; }
-        const prov = (user.providerData && user.providerData[0] && user.providerData[0].providerId) || '';
-        const twa = (document.referrer || '').indexOf('android-app://') === 0;
-        const standalone = !!(window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
-        const resp = await fetch(BILLING_VERIFY_URL.replace('/billing/verify', '/consent/accept'), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + await user.getIdToken() },
-          body: JSON.stringify({
-            termosVersao: TERMOS_VERSAO, privacidadeVersao: PRIVACIDADE_VERSAO,
-            idioma: (function(){ try { return (localStorage.getItem('questlog.idioma.v1') || 'pt') === 'en' ? 'en' : 'pt'; } catch(e){ return 'pt'; } })(), metodo: (prov === 'google.com' ? 'google' : 'email') + (explicito ? '' : '_implicito'),
-            plataforma: twa ? 'twa' : (standalone ? 'pwa' : 'web')
-          })
-        });
-        if (resp.ok){ window._aceiteMarcado = false; window._aceiteImplicito = false; marcarAparelhoAceito(); }
-        else console.warn('QuestLog: registro de aceite falhou HTTP ' + resp.status, await resp.text().catch(()=>''));
-      } catch(e){ console.warn('QuestLog: registro de aceite falhou (tenta no proximo login)', e); }
-    }
-
     async function aoLogar(user){
       if (typeof window.confirmarSessaoResolvida === 'function') window.confirmarSessaoResolvida();
       const contaNova = !!(user.metadata &&
@@ -16736,7 +16703,6 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       }
 
       window.definirUidAtivo(user.uid);
-      registrarAceiteSeNecessario(user);   // nao bloqueia o login; falha so tenta de novo no proximo
 
       // BUG REAL ENCONTRADO E CORRIGIDO (testado pelo usuario, nao
       // suposicao): a migracao abaixo rodava pra TODA conta nova que
@@ -17002,7 +16968,6 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       }
 
       window.definirUidAtivo(user.uid);
-      registrarAceiteSeNecessario(user);   // login feito sem #passoLogin.on (ex.: tela trocada) tambem registra
       reconectarEnvio(user);
       puxarPlanoSilencioso(user.uid);
     }

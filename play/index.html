@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=124">
+<link rel="stylesheet" href="style.css?v=126">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -3070,6 +3070,8 @@ function desenharHeroi(){
     const arcoDiag = /^Arco (Real|Longo)/i.test(nomeArma);
     armaHTML = '<div class="heroArma' + (ranged ? ' ranged' : '') + (arcoDiag ? ' arcoDiag' : '') + '"' + (pos ? ' style="'+pos+'"' : '') + '><div class="pxi" style="' + estiloArma(ITENS[idArma][0], S) + '"></div></div>';
   }
+  // mao por cima da arma (recorte manga+punho do proprio sprite do heroi, ver .heroMao no CSS) -- so corpo a corpo
+  const maoHTML = (armaHTML && armaHTML.indexOf(' ranged') < 0) ? '<img class="heroMao' + (heroiEscolhido >= 4 ? ' f' : '') + '" src="' + heroiAtual().img + '" alt="">' : '';
   // PROTOTIPO: armadura, elmo e escudo equipados. Cada peca e ajustada pelo retangulo real do desenho
   // (EQ_BB) pra caber numa area alvo do heroi (caixa 83x87): ordem corpo < armadura < elmo < escudo < arma.
   const camada = (slot, cls, W, H, cx, top, esticaMax) => {
@@ -3086,7 +3088,7 @@ function desenharHeroi(){
   // so escudo (e a arma, acima) aparecem no heroi; armadura/elmo ficaram de fora por decisao do usuario
   const eqHTML = camada('escudo', 'eqEscudo', 34, 34, 19, 47, 1.2);
   el.innerHTML = '<img class="heroimg" src="' + heroiAtual().img + '" alt="' + (idiomaApp() === 'en' ? 'hero' : 'herói') + '">' +
-                 eqHTML + armaHTML + '<div class="sombra"></div>';
+                 eqHTML + armaHTML + maoHTML + '<div class="sombra"></div>';
 }
 
 function diasCorridos(){

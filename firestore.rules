@@ -95,18 +95,6 @@ service cloud.firestore {
       allow delete: if false;
     }
 
-    // consents/{uid} (+ subcolecao aceites) -- prova de aceite dos Termos/Privacidade.
-    // Escrito SO pelo Worker (Admin, hora do servidor, ver /consent/accept em cf-worker).
-    // O dono pode LER (o app checa se ja aceitou a versao atual); escrita do client sempre negada.
-    match /consents/{uid} {
-      allow read: if request.auth != null && request.auth.uid == uid;
-      allow write: if false;
-      match /aceites/{versao} {
-        allow read: if request.auth != null && request.auth.uid == uid;
-        allow write: if false;
-      }
-    }
-
     // Qualquer coisa fora das 3 colecoes acima: nega por padrao. Uma
     // colecao nova precisa de uma regra explicita ANTES de ser usada do
     // client -- nunca abre isto de volta pra "if true" geral.

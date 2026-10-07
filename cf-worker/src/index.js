@@ -524,87 +524,6 @@ function respostaJson(corpo, status, origem){
   return new Response(JSON.stringify(corpo), { status: status, headers: headers });
 }
 
-// -----------------------------------------------------------------------
-// CONSENTIMENTO (aceite dos Termos/Privacidade) -- POST /consent/accept
-// Registro de PROVA: quem escreve e' o Worker (Admin), com a hora do
-// SERVIDOR (REQUEST_TIME) -- o app nao consegue falsificar data nem apagar.
-// Estrutura:
-//   consents/{uid}                       -> ultimo aceite (estado atual)
-//   consents/{uid}/aceites/{versoes}     -> historico, 1 doc por par de versoes, imutavel
-// O client so le consents/{uid} (firestore.rules); escrita do client e' sempre negada.
-// -----------------------------------------------------------------------
-const CONSENT_VERSOES_VALIDAS = ['2026-10-06'];   // adicionar a nova data a cada mudanca dos textos
-const CONSENT_ORIGENS = BILLING_ORIGENS.concat(['https://dev.questlog-911.pages.dev']);
-const CONSENT_METODOS = ['google', 'email', 'google_implicito', 'email_implicito'];   // *_implicito: aceite por continuacao (aparelho ja tinha aceitado a mesma versao)
-const CONSENT_PLATAFORMAS = ['twa', 'pwa', 'web'];
-
-async function tratarConsentimento(request, env){
-  const origem = request.headers.get('Origin');
-  const cors = (o) => (o && CONSENT_ORIGENS.indexOf(o) !== -1) ? { 'Access-Control-Allow-Origin': o, 'Vary': 'Origin' } : {};
-  const json = (corpo, status) => new Response(JSON.stringify(corpo), { status: status, headers: Object.assign({ 'Content-Type': 'application/json' }, cors(origem)) });
-  if (request.method === 'OPTIONS'){
-    return new Response(null, { status: 204, headers: Object.assign({
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      'Access-Control-Max-Age': '86400',
-    }, cors(origem)) });
-  }
-  if (request.method !== 'POST') return json({ ok: false, erro: 'metodo' }, 405);
-
-  let serviceAccount;
-  try { serviceAccount = JSON.parse(env.FIREBASE_SERVICE_ACCOUNT); }
-  catch(e){ return json({ ok: false, erro: 'config-servidor' }, 500); }
-  const projectId = serviceAccount.project_id;
-
-  let uid;
-  try {
-    const auth = request.headers.get('Authorization') || '';
-    uid = await verificarIdTokenFirebase(auth.replace(/^Bearer\s+/i, ''), projectId);
-  } catch(e){ return json({ ok: false, erro: 'nao-autenticado' }, 401); }
-
-  let corpo;
-  try { corpo = await request.json(); } catch(e){ return json({ ok: false, erro: 'json' }, 400); }
-  const termos = corpo && corpo.termosVersao, priv = corpo && corpo.privacidadeVersao;
-  if (CONSENT_VERSOES_VALIDAS.indexOf(termos) === -1 || CONSENT_VERSOES_VALIDAS.indexOf(priv) === -1) return json({ ok: false, erro: 'versao' }, 400);
-  const metodo = CONSENT_METODOS.indexOf(corpo.metodo) !== -1 ? corpo.metodo : 'desconhecido';
-  const plataforma = CONSENT_PLATAFORMAS.indexOf(corpo.plataforma) !== -1 ? corpo.plataforma : 'web';
-  const idioma = corpo.idioma === 'en' ? 'en' : 'pt';
-
-  const campos = {
-    uid: uid, termosVersao: termos, privacidadeVersao: priv, idioma: idioma, metodo: metodo, plataforma: plataforma,
-    pais: String(request.headers.get('CF-IPCountry') || '').slice(0, 2),
-    userAgent: String(request.headers.get('User-Agent') || '').slice(0, 200),
-    origem: String(origem || '').slice(0, 100),
-  };
-  const comHora = (caminho, extra) => ({
-    update: { name: 'projects/' + projectId + '/databases/(default)/documents/' + caminho, fields: objetoParaFsFields(campos) },
-    updateMask: { fieldPaths: Object.keys(campos) },
-    updateTransforms: [{ fieldPath: 'aceitoEm', setToServerValue: 'REQUEST_TIME' }],
-  });
-
-  try {
-    const token = await obterAccessToken(serviceAccount, FIRESTORE_SCOPE);
-    const url = FIRESTORE_BASE + '/projects/' + projectId + '/databases/(default)/documents:commit';
-    const cab = { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' };
-    // 1) historico: so cria se ainda nao existe (imutavel, idempotente)
-    const hist = comHora('consents/' + uid + '/aceites/' + termos + '_' + priv);
-    hist.currentDocument = { exists: false };
-    const r1 = await fetch(url, { method: 'POST', headers: cab, body: JSON.stringify({ writes: [hist] }) });
-    if (!r1.ok){
-      const txt = await r1.text();
-      if (r1.status === 409 || r1.status === 400 && /ALREADY_EXISTS|FAILED_PRECONDITION/.test(txt)) return json({ ok: true, ja: true }, 200);
-      throw new Error('commit historico ' + r1.status + ' ' + txt.slice(0, 200));
-    }
-    // 2) estado atual
-    const r2 = await fetch(url, { method: 'POST', headers: cab, body: JSON.stringify({ writes: [comHora('consents/' + uid)] }) });
-    if (!r2.ok) throw new Error('commit atual ' + r2.status + ' ' + (await r2.text()).slice(0, 200));
-    return json({ ok: true }, 200);
-  } catch(e){
-    console.error('consent/accept falhou', e && e.message);
-    return json({ ok: false, erro: 'servidor' }, 502);
-  }
-}
-
 async function tratarBillingVerify(request, env){
   const origem = request.headers.get('Origin');
   if (request.method === 'OPTIONS'){
@@ -790,7 +709,6 @@ export default {
   async fetch(request, env, ctx){
     const caminho = new URL(request.url).pathname;
     if (caminho === '/billing/verify') return tratarBillingVerify(request, env);
-    if (caminho === '/consent/accept') return tratarConsentimento(request, env);
     // Disparo manual do robo de reembolsos (so p/ o dono): exige o secret
     // ADMIN_TOKEN no header Authorization. Sem o secret configurado = 404.
     if (caminho === '/admin/revogar-anuladas' && request.method === 'POST' && env.ADMIN_TOKEN){

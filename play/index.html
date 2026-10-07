@@ -18517,6 +18517,7 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
    So engata quando NAO ha rolagem possivel naquela direcao (lista no
    limite, ou nada rolando sob o dedo). Rolagem normal, gestos
    horizontais e gestos ja tratados por outro codigo ficam intactos.
+   Listener PASSIVO de proposito (preventDefault travaria toda rolagem).
    Desliga com "reduzir movimento".
    ------------------------------------------------------------------ */
 (function(){
@@ -18546,14 +18547,20 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
     return [...app.querySelectorAll(':scope > .arena, :scope > #statsBarra, :scope > .tasks')];   // tela inicial
   }
   const resist = d => MAX * d / (d + K);
-  function aplicar(v){ alvos.forEach(a => { a.style.transform = 'translateY(' + v + 'px)'; }); }
+  // escreve o transform no maximo 1x por frame, em camada propria (GPU)
+  let pend = null, raf = 0;
+  function aplicar(v){
+    pend = v;
+    if (raf) return;
+    raf = requestAnimationFrame(() => { raf = 0; if (pend === null) return; const t = 'translate3d(0,' + pend + 'px,0)'; alvos.forEach(a => { a.style.transform = t; }); });
+  }
   function soltar(){
     if (!alvos.length){ sc = null; modo = null; trava = false; return; }
-    const lista = alvos; alvos = []; sc = null;
+    const lista = alvos; alvos = []; sc = null; pend = null;
     if (modo){
       lista.forEach(el => {
         el.style.transition = 'transform .5s cubic-bezier(.2,1.1,.3,1)';
-        el.style.transform = 'translateY(0px)';
+        el.style.transform = 'translate3d(0,0,0)';
         const fim = () => { el.style.transition = ''; el.style.transform = ''; el.style.willChange = ''; el.removeEventListener('transitionend', fim); };
         el.addEventListener('transitionend', fim);
         setTimeout(fim, 650);
@@ -18564,7 +18571,8 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
   document.addEventListener('touchstart', e => {
     if (alvos.length && modo) soltar();
     if (e.touches.length !== 1){ alvos = []; sc = null; return; }
-    sc = rolavel(e.target); alvos = alvosDe(e.target); modo = null; trava = false;
+    sc = rolavel(e.target); alvos = alvosDe(e.target); modo = null; trava = false; pend = null;
+    if (sc) sc.style.overscrollBehaviorY = 'none';        // sem brilho/stretch nativo nem encadear no pai
     x0 = e.touches[0].clientX; y0 = e.touches[0].clientY;
   }, { passive: true });
   document.addEventListener('touchmove', e => {
@@ -18584,9 +18592,8 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
     }
     const d = e.touches[0].clientY - y0;
     if ((modo === 'topo' && d <= 0) || (modo === 'fim' && d >= 0)){ aplicar(0); return; }
-    if (e.cancelable) e.preventDefault();
     aplicar((modo === 'topo' ? 1 : -1) * resist(Math.abs(d)));
-  }, { passive: false });
+  }, { passive: true });   // passivo: o Chrome rola no compositor, sem esperar este JS (era a causa do 'travado')
   document.addEventListener('touchend', soltar, { passive: true });
   document.addEventListener('touchcancel', soltar, { passive: true });
 })();

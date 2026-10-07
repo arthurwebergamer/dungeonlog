@@ -6056,3 +6056,7 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 #viewInventario .invfiltros.invsub button{font-size:11px;padding:4px 10px}
 
 .dicadiames{font-family:'Outfit',sans-serif;font-size:11.5px;color:var(--dim);margin-top:6px;line-height:1.3}
+
+/* --- cor da tarefa: identidade do card (faixa + checkbox concluido) --- */
+.task.comcor{box-shadow:inset 4px 0 0 var(--tc) !important}
+.task.comcor.done .box{background:var(--tc) !important;border-color:var(--tc) !important}

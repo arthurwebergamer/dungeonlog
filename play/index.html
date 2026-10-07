@@ -4841,7 +4841,8 @@ function salvar(){
 // --- SO NO DEV (dev.questlog-911.pages.dev / localhost): todos os itens do
 // catalogo no inventario, pra teste. Nao sobe pra nuvem (ver empurrarNuvem),
 // entao nao contamina a conta real nem o main.
-window.EH_DEV = ['dev.questlog-911.pages.dev','localhost','127.0.0.1'].includes(location.hostname);
+window.EH_DEV = /(^|\.)questlog-911\.pages\.dev$/.test(location.hostname) && location.hostname !== 'questlog-911.pages.dev'
+  || ['localhost','127.0.0.1'].includes(location.hostname);   // previews/dev do Cloudflare Pages (<hash>.questlog-911.pages.dev, dev.…); NAO o dominio de producao
 function devLiberarTodosItens(){
   if (!window.EH_DEV) return;
   const idGrim = ITENS.findIndex(a => a[1] === 'Grimório');

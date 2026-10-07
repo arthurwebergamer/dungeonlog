@@ -4838,7 +4838,26 @@ function salvar(){
   }
 }
 
+// --- SO NO DEV (dev.questlog-911.pages.dev / localhost): todos os itens do
+// catalogo no inventario, pra teste. Nao sobe pra nuvem (ver empurrarNuvem),
+// entao nao contamina a conta real nem o main.
+window.EH_DEV = ['dev.questlog-911.pages.dev','localhost','127.0.0.1'].includes(location.hostname);
+function devLiberarTodosItens(){
+  if (!window.EH_DEV) return;
+  const idGrim = ITENS.findIndex(a => a[1] === 'Grimório');
+  ITENS.forEach((it, id) => {
+    if (!it || it[8] || it[2] === 'tesouro' || id === idGrim) return;
+    if (!inventario.some(s => s.id === id)) inventario.push({id, q: (it[2] === 'cons' || it[2] === 'chave') ? 5 : 1});
+  });
+}
+window.devLiberarTodosItens = devLiberarTodosItens;
+
 function carregar(){
+  const _r = _carregarBase();
+  devLiberarTodosItens();
+  return _r;
+}
+function _carregarBase(){
   try {
     const bruto = localStorage.getItem(chaveSaveAtual());
     if (!bruto){ resetarEstadoParaPadrao(); return false; }
@@ -16492,6 +16511,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     }
 
     async function empurrarNuvem(uid){
+      if (window.EH_DEV) return;   // dev: itens liberados nao sobem pra conta real
       const seqInicio = _seqSalvar;
       try {
         const dados = localStorage.getItem(window.chaveSaveAtual()) || '';

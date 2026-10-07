@@ -6052,7 +6052,7 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 .task.comcor{background:color-mix(in srgb, var(--tc) 10%, var(--panel-2)) !important}
 
 /* mao do heroi por cima da arma: mesmo sprite do heroi, recortado em manga+punho, pra parecer que segura o cabo */
-.hero-sprite .heroMao{position:absolute;left:0;top:0;width:83px;height:83px;z-index:5;pointer-events:none;image-rendering:pixelated;clip-path:inset(53.7px 19.6px 17.1px 53.7px)}
+.hero-sprite .heroMao{position:absolute;left:0;top:0;width:83px;height:83px;z-index:5;pointer-events:none;image-rendering:pixelated;clip-path:inset(56.1px 19.5px 17.1px 56.1px)}
 .hero-sprite.ferido .heroMao{filter:brightness(0) invert(1)}
 /* herois 5-8 (femininas): mao em outra posicao */
-.hero-sprite .heroMao.f{clip-path:inset(58.4px 17.1px 16.4px 56.7px)}
+.hero-sprite .heroMao.f{clip-path:inset(58.6px 14.6px 17.1px 61px)}

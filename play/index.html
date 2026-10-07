@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=117">
+<link rel="stylesheet" href="style.css?v=116">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -18509,24 +18509,19 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
 </script>
 <script>
 /* ------------------------------------------------------------------
-   EFEITO ELASTICO (rubber band) -- toque em QUALQUER ponto da tela.
-   - Tela inicial: arena + barra de XP + tarefas se movem juntas (topbar
-     e menu de baixo ficam parados).
-   - Abas (.view): a aba inteira se move.
-   - Overlays/telas com rolagem propria: o proprio elemento rolavel.
-   Engata NO MESMO ARRASTO assim que a rolagem chega no limite (reavalia a
-   cada movimento do dedo) e tambem da um repique leve quando a rolagem por
-   inercia (fling) bate no fim. Rolagem normal e gestos horizontais ficam
-   intactos. Listener PASSIVO de proposito (preventDefault travaria toda
-   rolagem). Desliga com "reduzir movimento".
+   EFEITO ELASTICO (rubber band) SO NA LISTA DE TAREFAS (e em telas com
+   rolagem propria). A tela inteira fica parada: so o elemento rolavel
+   sob o dedo se move. Engata NO MESMO ARRASTO assim que a rolagem chega
+   no limite (reavalia a cada movimento) e volta com mola ao soltar.
+   Listener PASSIVO de proposito (preventDefault travaria toda rolagem).
+   Desliga com "reduzir movimento".
    ------------------------------------------------------------------ */
 (function(){
   try { if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return; } catch(e){}
   const MAX = 140;                 // deslocamento maximo (px) do puxao -- assintota da resistencia
   const K = 180;                   // quanto maior, mais "duro" o inicio do puxao
-  const REPIQUE_MAX = 46;          // repique maximo (px) quando o fling bate no fim
   const OVERLAYS = '.cfgOverlay, .paywallOverlay, .loadingMasmorra, .edov, .sheetbg, .isheet, .baubg, .baupop, .lvlpop, .quedapop, .largpop, .estagio-tela, .intro';
-  let sc = null, alvos = [], x0 = 0, y0 = 0, yIni = 0, yUlt = 0, modo = null, trava = false, mexeu = false, tocando = false, tokenInercia = 0;
+  let sc = null, alvos = [], x0 = 0, y0 = 0, yIni = 0, yUlt = 0, modo = null, trava = false, mexeu = false;
   let pend = null, raf = 0;
 
   function rolavel(el){
@@ -18541,12 +18536,11 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
   }
   function alvosDe(t){
     const rol = rolavel(t);
-    if (t.closest && t.closest(OVERLAYS)) return rol ? [rol] : [];     // overlay: so se tiver rolagem propria
-    const app = t.closest && t.closest('.app');
-    if (!app) return rol ? [rol] : [];
-    const view = [...app.querySelectorAll(':scope > .view')].find(v => getComputedStyle(v).display !== 'none');
-    if (view) return [view];
-    return [...app.querySelectorAll(':scope > .arena, :scope > #statsBarra, :scope > .tasks')];   // tela inicial
+    if (rol) return [rol];
+    // lista de tarefas curta (nada pra rolar): ainda estica, so ela
+    const lista = document.getElementById('list');
+    if (lista && t.closest && t.closest('.tasks') && !t.closest(OVERLAYS)) return [lista];
+    return [];
   }
   const resist = d => MAX * d / (d + K);
   const noTopo = el => !el || el.scrollTop <= 0;
@@ -18567,32 +18561,11 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
       setTimeout(fim, 650);
     });
   }
-  // inercia: depois de soltar, acompanha a rolagem; se bater no limite com velocidade, faz um repique curto
-  function vigiarInercia(el, lista){
-    const tk = ++tokenInercia; let ult = el.scrollTop, t0 = performance.now(), parado = 0, vUlt = 0;
-    (function passo(){
-      if (tk !== tokenInercia) return;
-      const agora = el.scrollTop, v = agora - ult; ult = agora;
-      if (Math.abs(v) > 0.5) vUlt = v;
-      const bateuFim = v > 0 && noFim(el), bateuTopo = v < 0 && noTopo(el);
-      if ((bateuFim || bateuTopo) && Math.abs(vUlt) > 6){
-        const amp = Math.min(REPIQUE_MAX, Math.abs(vUlt) * 2.2) * (bateuFim ? -1 : 1);
-        lista.forEach(a => { a.style.willChange = 'transform'; a.style.transition = 'transform .12s ease-out'; a.style.transform = 'translate3d(0,' + amp + 'px,0)'; });
-        setTimeout(() => { if (tk === tokenInercia) mola(lista); }, 120);
-        return;
-      }
-      parado = Math.abs(v) < 0.3 ? parado + 1 : 0;
-      if (parado > 6 || performance.now() - t0 > 2500) return;
-      requestAnimationFrame(passo);
-    })();
-  }
   function soltar(){
-    tocando = false;
     const lista = alvos, el = sc, estava = modo;
     alvos = []; sc = null; pend = null; modo = null; trava = false; mexeu = false;
     if (!lista.length) return;
     if (estava) mola(lista);
-    else if (el && el.scrollHeight > el.clientHeight + 1) vigiarInercia(el, lista);
   }
   function engatar(dir, y){
     modo = dir; y0 = y;
@@ -18600,10 +18573,8 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
   }
 
   document.addEventListener('touchstart', e => {
-    tokenInercia++;                                          // cancela vigia de inercia anterior
     if (modo) { const l = alvos; mola(l); }
     if (e.touches.length !== 1){ alvos = []; sc = null; modo = null; return; }
-    tocando = true;
     sc = rolavel(e.target); alvos = alvosDe(e.target); modo = null; trava = false; mexeu = false; pend = null;
     if (sc) sc.style.overscrollBehaviorY = 'none';           // sem brilho/stretch nativo nem encadear no pai
     x0 = e.touches[0].clientX; yIni = yUlt = y0 = e.touches[0].clientY;

@@ -8346,7 +8346,7 @@ function comprar(i){
   const en = idiomaApp() === 'en';
 
   if (progresso().nivel < nivelExigido){ aviso((en ? 'REQUIRES LEVEL ' : 'EXIGE NIVEL ') + romano(nivelExigido)); return; }
-  if (moedas < preco){ aviso(en ? 'NOT ENOUGH COINS' : 'MOEDAS INSUFICIENTES'); return; }
+  if (moedas < preco){ window.tocarSom?.('semMoedas'); aviso(en ? 'NOT ENOUGH COINS' : 'MOEDAS INSUFICIENTES'); return; }
 
   moedas -= preco;
   darItem(s.id, 1);
@@ -13969,15 +13969,18 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     tarefa: c => {                                       // tarefa adicionada
       tom(c, { freq:440, freqFinal:660, tipo:'triangle', duracao:0.1, ganho:0.3 });
     },
-    compra: c => {                                       // compra confirmada na loja -- moedas caindo na pilha: 3 "clins" metalicos rapidos, descendo
-      const clim = (f, inicio, g, dur) => {
-        tom(c, { freq:f,       tipo:'sine', inicio, duracao:dur,  ganho:g });          // corpo do "clim"
-        tom(c, { freq:f*2.76,  tipo:'sine', inicio, duracao:0.06, ganho:g*0.45 });     // parcial inarmonica = brilho de metal
-        ruido(c, { inicio, duracao:0.012, ganho:0.22, passaAlta:5000 });               // estalo do impacto
-      };
-      clim(2093, 0,    0.30, 0.16);
-      clim(1760, 0.07, 0.28, 0.16);
-      clim(1976, 0.13, 0.26, 0.22);
+    compra: c => {                                       // compra confirmada na loja -- mercador aceita as moedas + "negocio fechado"
+      for (let i = 0; i < 4; i++) tinir(c, [3100 - i*170, 4600], i*0.05, 0.17, 0.07);
+      tom(c, { freq:392, tipo:'triangle', inicio:0.25, duracao:0.18, ganho:0.25 });
+      tom(c, { freq:523, tipo:'triangle', inicio:0.25, duracao:0.18, ganho:0.2 });
+      tom(c, { freq:587, tipo:'triangle', inicio:0.4,  duracao:0.35, ganho:0.25 });
+      tom(c, { freq:784, tipo:'triangle', inicio:0.4,  duracao:0.35, ganho:0.2 });
+    },
+    semMoedas: c => {                                    // moedas insuficientes na loja -- pancada de bigorna
+      tom(c, { freq:90, freqFinal:50, tipo:'sine', duracao:0.1, ganho:0.5 });
+      ruidoFaixa(c, { duracao:0.04, ganho:0.7, freq:2500, q:2 });
+      tinir(c, [1480, 2290, 3500, 5100], 0,    0.4,  0.7);
+      tinir(c, [1480, 2290, 3500],       0.18, 0.16, 0.4);
     },
     venda: c => {                                        // item vendido -- saco de couro de moedas: chacoalho + tilintares subindo + baque
       ruidoFaixa(c, { inicio:0,    duracao:0.22, ganho:0.5,  freq:900,  q:1.2 });

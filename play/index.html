@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=131">
+<link rel="stylesheet" href="style.css?v=132">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -13949,13 +13949,25 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     tarefa: c => {                                       // tarefa adicionada
       tom(c, { freq:440, freqFinal:660, tipo:'triangle', duracao:0.1, ganho:0.3 });
     },
-    compra: c => {                                       // compra confirmada na loja
-      [523, 659].forEach((f, i) => tom(c, { freq:f, tipo:'square', inicio:i*0.06, duracao:0.09, ganho:0.35 }));
+    compra: c => {                                       // compra confirmada na loja -- moedas caindo na pilha: 3 "clins" metalicos rapidos, descendo
+      const clim = (f, inicio, g, dur) => {
+        tom(c, { freq:f,       tipo:'sine', inicio, duracao:dur,  ganho:g });          // corpo do "clim"
+        tom(c, { freq:f*2.76,  tipo:'sine', inicio, duracao:0.06, ganho:g*0.45 });     // parcial inarmonica = brilho de metal
+        ruido(c, { inicio, duracao:0.012, ganho:0.22, passaAlta:5000 });               // estalo do impacto
+      };
+      clim(2093, 0,    0.30, 0.16);
+      clim(1760, 0.07, 0.28, 0.16);
+      clim(1976, 0.13, 0.26, 0.22);
     },
-    venda: c => {                                       // item vendido -- confirmacao de transacao: thud de peso + 2 notas medias em quinta (sine/triangle, nada acima de ~500Hz)
-      tom(c, { freq:180, freqFinal:120, tipo:'sine', duracao:0.09, ganho:0.35 });                    // thud (peso da moeda/bolsa)
-      tom(c, { freq:330, tipo:'triangle', inicio:0.04, duracao:0.14, ganho:0.3 });                   // nota 1
-      tom(c, { freq:494, tipo:'triangle', inicio:0.1, duracao:0.16, ganho:0.28 });                   // nota 2 (quinta acima, fecha a frase)
+    venda: c => {                                        // item vendido -- "ka-ching": moedas entrando, 3 "clins" subindo, o ultimo mais longo
+      const clim = (f, inicio, g, dur) => {
+        tom(c, { freq:f,       tipo:'sine', inicio, duracao:dur,  ganho:g });
+        tom(c, { freq:f*2.76,  tipo:'sine', inicio, duracao:0.06, ganho:g*0.45 });
+        ruido(c, { inicio, duracao:0.012, ganho:0.22, passaAlta:5000 });
+      };
+      clim(1568, 0,    0.28, 0.12);
+      clim(2093, 0.07, 0.30, 0.14);
+      clim(2637, 0.14, 0.32, 0.34);
     },
     investir: c => {                                     // ponto de atributo investido (Perfil > Atributos)
       tom(c, { freq:440, tipo:'triangle', duracao:0.05, ganho:0.25 });

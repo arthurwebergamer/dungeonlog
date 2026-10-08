@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=130">
+<link rel="stylesheet" href="style.css?v=131">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -7406,7 +7406,13 @@ function estiloSprite(sp, s){
   return 'width:'+s+'px;height:'+s+'px;background-size:'+(SHEET_COLS*s)+'px '+(SHEET_ROWS*s)+'px;'+
          'background-position:-'+(c*s)+'px -'+(r*s)+'px';
 }
-function spriteHTML(sp, s){ return '<div class="pxi" style="'+estiloSprite(sp,s)+'"></div>'; }
+// sprites (indice na sheet) das armas escuras -- mesmo clareamento da arma na mao do heroi, nos icones
+let _armaEscuraSp = null;
+function ehSpriteArmaEscura(sp){
+  if (!_armaEscuraSp) _armaEscuraSp = new Set([...window.ARMA_ESCURA].map(id => ITENS[id] && ITENS[id][0]));
+  return _armaEscuraSp.has(sp);
+}
+function spriteHTML(sp, s){ return '<div class="pxi' + (ehSpriteArmaEscura(sp) ? ' armaEscura' : '') + '" style="'+estiloSprite(sp,s)+'"></div>'; }
 
 /* ---------- estado ---------- */
 function acharSlot(id){ return inventario.findIndex(s => s.id === id); }

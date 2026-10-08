@@ -930,7 +930,7 @@
                  box-shadow:0 16px 32px rgba(0,0,0,.45);
                  transform:scale(1.03);pointer-events:none;transition:none}
   .task.settling{transition:transform .18s cubic-bezier(.2,.8,.3,1),box-shadow .18s,outline-color .18s}
-  .task-placeholder{background:transparent;border:none;margin-bottom:9px}
+  .task-placeholder{background:transparent;border:none;margin-bottom:9px;flex:none}
 
 /* ===== Bloco style #14 ===== */
 /* ---- escolha de personagem ---- */

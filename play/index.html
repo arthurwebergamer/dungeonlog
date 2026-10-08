@@ -8442,7 +8442,7 @@ function montarCompra(grid){
     row.className = 'lrow' + (s.oferta ? ' oferta' : '') + (vendido ? ' esgotado' : travado ? ' trava' : '');
 
     let acao;
-    if (vendido)      acao = '<button class="lbtn off">' + (en ? 'Sold out' : 'Esgotado') + '</button>';
+    if (vendido)      acao = '<button class="lbtn off" data-bloq="1">' + (en ? 'Sold out' : 'Esgotado') + '</button>';
     else if (travado) acao = '<button class="lbtn off" data-bloq="1">' + (en ? 'Level ' : 'Nível ') + romano(exig) + '</button>';
     else if (semGrana)acao = '<button class="lbtn off" data-bloq="1">' + (en ? 'No coins' : 'Sem moedas') + '</button>';
     else              acao = '<button class="lbtn" data-c="' + i + '">' + (en ? 'Buy' : 'Comprar') + '</button>';

@@ -13919,6 +13919,26 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     fonte.start(c.currentTime + inicio);
   }
 
+  // chiado filtrado (bandpass) -- "saco de couro/moedas roçando"
+  function ruidoFaixa(c, { inicio=0, duracao=0.1, ganho=0.4, freq=1000, q=1 }){
+    const n = Math.max(1, Math.floor(c.sampleRate * duracao));
+    const buf = c.createBuffer(1, n, c.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 1.5);
+    const f = c.createBufferSource(); f.buffer = buf;
+    const fl = c.createBiquadFilter(); fl.type = 'bandpass'; fl.frequency.value = freq; fl.Q.value = q;
+    const g = c.createGain();
+    g.gain.setValueAtTime(Math.max(0.0001, volume * ganho), c.currentTime + inicio);
+    g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + inicio + duracao);
+    f.connect(fl).connect(g).connect(c.destination);
+    f.start(c.currentTime + inicio);
+  }
+  // "tilintar" de metal: parciais empilhadas + estalo
+  function tinir(c, freqs, inicio, ganho, dur){
+    freqs.forEach((f, i) => tom(c, { freq:f, inicio, duracao:dur * (1 - i*0.2), ganho:ganho / (i+1) }));
+    ruidoFaixa(c, { inicio, duracao:0.015, ganho, freq:freqs[0], q:2 });
+  }
+
   // catalogo de efeitos -- primeira leva definida no roadmap.md (secao SFX)
   const SONS = {
     golpe: c => {                                     // dano no monstro (a cada tarefa concluida)
@@ -13959,15 +13979,11 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       clim(1760, 0.07, 0.28, 0.16);
       clim(1976, 0.13, 0.26, 0.22);
     },
-    venda: c => {                                        // item vendido -- "ka-ching": moedas entrando, 3 "clins" subindo, o ultimo mais longo
-      const clim = (f, inicio, g, dur) => {
-        tom(c, { freq:f,       tipo:'sine', inicio, duracao:dur,  ganho:g });
-        tom(c, { freq:f*2.76,  tipo:'sine', inicio, duracao:0.06, ganho:g*0.45 });
-        ruido(c, { inicio, duracao:0.012, ganho:0.22, passaAlta:5000 });
-      };
-      clim(1568, 0,    0.28, 0.12);
-      clim(2093, 0.07, 0.30, 0.14);
-      clim(2637, 0.14, 0.32, 0.34);
+    venda: c => {                                        // item vendido -- saco de couro de moedas: chacoalho + tilintares subindo + baque
+      ruidoFaixa(c, { inicio:0,    duracao:0.22, ganho:0.5,  freq:900,  q:1.2 });
+      ruidoFaixa(c, { inicio:0.02, duracao:0.15, ganho:0.35, freq:2200, q:3 });
+      for (let i = 0; i < 5; i++) tinir(c, [2600 + i*180, 3900], 0.06 + i*0.05, 0.16, 0.07);
+      tom(c, { freq:110, freqFinal:70, tipo:'sine', inicio:0.3, duracao:0.12, ganho:0.3 });
     },
     investir: c => {                                     // ponto de atributo investido (Perfil > Atributos)
       tom(c, { freq:440, tipo:'triangle', duracao:0.05, ganho:0.25 });

@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=131">
+<link rel="stylesheet" href="style.css?v=132">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -8345,8 +8345,8 @@ function comprar(i){
   const nivelExigido = nivelMinimo(it.rar);
   const en = idiomaApp() === 'en';
 
-  if (progresso().nivel < nivelExigido){ aviso((en ? 'REQUIRES LEVEL ' : 'EXIGE NIVEL ') + romano(nivelExigido)); return; }
-  if (moedas < preco){ aviso(en ? 'NOT ENOUGH COINS' : 'MOEDAS INSUFICIENTES'); return; }
+  if (progresso().nivel < nivelExigido){ window.tocarSom?.('semMoedas'); aviso((en ? 'REQUIRES LEVEL ' : 'EXIGE NIVEL ') + romano(nivelExigido)); return; }
+  if (moedas < preco){ window.tocarSom?.('semMoedas'); aviso(en ? 'NOT ENOUGH COINS' : 'MOEDAS INSUFICIENTES'); return; }
 
   moedas -= preco;
   darItem(s.id, 1);
@@ -13919,6 +13919,26 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     fonte.start(c.currentTime + inicio);
   }
 
+  // chiado filtrado (bandpass) -- "saco de couro/moedas roçando"
+  function ruidoFaixa(c, { inicio=0, duracao=0.1, ganho=0.4, freq=1000, q=1 }){
+    const n = Math.max(1, Math.floor(c.sampleRate * duracao));
+    const buf = c.createBuffer(1, n, c.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 1.5);
+    const f = c.createBufferSource(); f.buffer = buf;
+    const fl = c.createBiquadFilter(); fl.type = 'bandpass'; fl.frequency.value = freq; fl.Q.value = q;
+    const g = c.createGain();
+    g.gain.setValueAtTime(Math.max(0.0001, volume * ganho), c.currentTime + inicio);
+    g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + inicio + duracao);
+    f.connect(fl).connect(g).connect(c.destination);
+    f.start(c.currentTime + inicio);
+  }
+  // "tilintar" de metal: parciais empilhadas + estalo
+  function tinir(c, freqs, inicio, ganho, dur){
+    freqs.forEach((f, i) => tom(c, { freq:f, inicio, duracao:dur * (1 - i*0.2), ganho:ganho / (i+1) }));
+    ruidoFaixa(c, { inicio, duracao:0.015, ganho, freq:freqs[0], q:2 });
+  }
+
   // catalogo de efeitos -- primeira leva definida no roadmap.md (secao SFX)
   const SONS = {
     golpe: c => {                                     // dano no monstro (a cada tarefa concluida)
@@ -13949,13 +13969,24 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     tarefa: c => {                                       // tarefa adicionada
       tom(c, { freq:440, freqFinal:660, tipo:'triangle', duracao:0.1, ganho:0.3 });
     },
-    compra: c => {                                       // compra confirmada na loja
-      [523, 659].forEach((f, i) => tom(c, { freq:f, tipo:'square', inicio:i*0.06, duracao:0.09, ganho:0.35 }));
+    compra: c => {                                       // compra confirmada na loja -- mercador aceita as moedas + "negocio fechado"
+      for (let i = 0; i < 4; i++) tinir(c, [3100 - i*170, 4600], i*0.05, 0.17, 0.07);
+      tom(c, { freq:392, tipo:'triangle', inicio:0.25, duracao:0.18, ganho:0.25 });
+      tom(c, { freq:523, tipo:'triangle', inicio:0.25, duracao:0.18, ganho:0.2 });
+      tom(c, { freq:587, tipo:'triangle', inicio:0.4,  duracao:0.35, ganho:0.25 });
+      tom(c, { freq:784, tipo:'triangle', inicio:0.4,  duracao:0.35, ganho:0.2 });
     },
-    venda: c => {                                       // item vendido -- confirmacao de transacao: thud de peso + 2 notas medias em quinta (sine/triangle, nada acima de ~500Hz)
-      tom(c, { freq:180, freqFinal:120, tipo:'sine', duracao:0.09, ganho:0.35 });                    // thud (peso da moeda/bolsa)
-      tom(c, { freq:330, tipo:'triangle', inicio:0.04, duracao:0.14, ganho:0.3 });                   // nota 1
-      tom(c, { freq:494, tipo:'triangle', inicio:0.1, duracao:0.16, ganho:0.28 });                   // nota 2 (quinta acima, fecha a frase)
+    semMoedas: c => {                                    // moedas insuficientes na loja -- pancada de bigorna
+      tom(c, { freq:90, freqFinal:50, tipo:'sine', duracao:0.1, ganho:0.5 });
+      ruidoFaixa(c, { duracao:0.04, ganho:0.7, freq:2500, q:2 });
+      tinir(c, [1480, 2290, 3500, 5100], 0,    0.4,  0.7);
+      tinir(c, [1480, 2290, 3500],       0.18, 0.16, 0.4);
+    },
+    venda: c => {                                        // item vendido -- saco de couro de moedas: chacoalho + tilintares subindo + baque
+      ruidoFaixa(c, { inicio:0,    duracao:0.22, ganho:0.5,  freq:900,  q:1.2 });
+      ruidoFaixa(c, { inicio:0.02, duracao:0.15, ganho:0.35, freq:2200, q:3 });
+      for (let i = 0; i < 5; i++) tinir(c, [2600 + i*180, 3900], 0.06 + i*0.05, 0.16, 0.07);
+      tom(c, { freq:110, freqFinal:70, tipo:'sine', inicio:0.3, duracao:0.12, ganho:0.3 });
     },
     investir: c => {                                     // ponto de atributo investido (Perfil > Atributos)
       tom(c, { freq:440, tipo:'triangle', duracao:0.05, ganho:0.25 });

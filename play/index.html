@@ -9494,6 +9494,21 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       (window._histPendentes = window._histPendentes || []).push([ultimoDia, tarefasEm(ultimoDia).length, largadas.length]);
     }
 
+    // DIAS PULADOS (o app nao foi aberto): antes ficavam sem registro nenhum --
+    // nem fuga nem sem-tarefa -- e nao contavam em nada (taxa do mes inflada,
+    // calendario em branco). Agora cada dia entre o ultimo visto e hoje entra
+    // no historico (fuga se tinha tarefa agendada, sem_tarefa se nao tinha).
+    // So historico: o DANO continua sendo so do ultimo dia visto (regra acima).
+    try {
+      let d = isoDe(new Date(new Date(diaVirada + 'T12:00:00').getTime() + 86400000));
+      for (let n = 0; d < hoje && n < 366; n++){
+        const totalD = tarefasEm(d).length, largD = pendentesEm(d).length;
+        if (typeof window.registrarHistorico === 'function') window.registrarHistorico(d, totalD, largD);
+        else (window._histPendentes = window._histPendentes || []).push([d, totalD, largD]);
+        d = isoDe(new Date(new Date(d + 'T12:00:00').getTime() + 86400000));
+      }
+    } catch(e){}
+
     // DIA MANUAL: todas concluidas mas 'Terminar dia' nao foi tocado -> vitoria automatica
     // na virada. Credita as moedas do monstro (sem bau: ele e do dia corrente) + cura de vitoria.
     try {

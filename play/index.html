@@ -9166,6 +9166,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 
   list.addEventListener('pointermove', e => {
     if (dragEl && e.pointerId === pid){
+      if (!dragEl.isConnected){ abortarArrasto(); return; }   // lista foi re-renderizada durante o arrasto
       e.preventDefault();
       ultimoClientY = e.clientY;
       const nx = e.clientX - offX, ny = e.clientY - offY;
@@ -9202,10 +9203,27 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     })();
   }
 
+  // render() reconstroi #list inteiro (innerHTML): se isso acontecer no meio de um
+  // arrasto (ex.: tarefa concluida logo antes, sync da nuvem, tick de 30s), o card
+  // arrastado e o vao ficam soltos do DOM. Sem tratar, o proximo movimento
+  // reinseria o vao na lista nova e o soltar() recolocava o card VELHO ao lado do
+  // novo -- tarefa duplicada na tela. Aqui o arrasto e cancelado limpo.
+  function abortarArrasto(){
+    if (placeholder && placeholder.parentNode) placeholder.remove();
+    if (dragEl){
+      dragEl.classList.remove('dragging');
+      dragEl.style.position = ''; dragEl.style.left = ''; dragEl.style.top = ''; dragEl.style.width = '';
+      dragEl.style.transform = ''; dragEl.style.willChange = '';
+    }
+    dragEl = null; placeholder = null; pid = null;
+    setTimeout(() => { dragArmado = false; }, 50);
+  }
+
   function soltar(e){
     if (pendente && !pendente.timer) soltarComoScroll();
     limparPendente();
     if (!dragEl || e.pointerId !== pid) return;
+    if (!dragEl.isConnected){ abortarArrasto(); return; }   // lista foi re-renderizada durante o arrasto
     placeholder.replaceWith(dragEl);
     dragEl.classList.remove('dragging');
     dragEl.style.position = ''; dragEl.style.left = ''; dragEl.style.top = ''; dragEl.style.width = '';

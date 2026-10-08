@@ -8345,7 +8345,7 @@ function comprar(i){
   const nivelExigido = nivelMinimo(it.rar);
   const en = idiomaApp() === 'en';
 
-  if (progresso().nivel < nivelExigido){ aviso((en ? 'REQUIRES LEVEL ' : 'EXIGE NIVEL ') + romano(nivelExigido)); return; }
+  if (progresso().nivel < nivelExigido){ window.tocarSom?.('semMoedas'); aviso((en ? 'REQUIRES LEVEL ' : 'EXIGE NIVEL ') + romano(nivelExigido)); return; }
   if (moedas < preco){ window.tocarSom?.('semMoedas'); aviso(en ? 'NOT ENOUGH COINS' : 'MOEDAS INSUFICIENTES'); return; }
 
   moedas -= preco;

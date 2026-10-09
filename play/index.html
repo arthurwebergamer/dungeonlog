@@ -5985,6 +5985,14 @@ document.getElementById('addbtn').onclick = () => {
       pintarVezes();
     }
     if (typeof resetAdvColor === 'function') resetAdvColor();
+    // o modo (hoje/repete/mensal/anual) e os dias escolhidos NAO eram resetados: depois de
+    // criar uma tarefa "repete" (ex.: so segunda) ou mensal/anual, a proxima abertura do
+    // composer continuava nesse modo e a tarefa nova nascia fora de hoje -- parecia que
+    // "nao adicionou". Mesmo reset ja feito acima pra dificuldade/vezes/cor.
+    modo = 'hoje';
+    diasEscolhidos = [];
+    daysEl.querySelectorAll('.day').forEach(d => d.classList.remove('on'));
+    pintarModo();
     atualizarEstadoSave();
   }
 };
@@ -6027,7 +6035,13 @@ function criar(){
   if (typeof resetAdvColor === 'function') resetAdvColor();
   render();
   window.tocarSom?.('tarefa'); // SFX: o wrap de window.criar nao funciona aqui -- "save.onclick = criar" (linha abaixo) copia a REFERENCIA da funcao original no load, antes do gancho existir; editado direto, mesma logica de ferir()/investir()
-  aviso(idiomaApp() === 'en' ? 'TASK ADDED' : 'TAREFA ADICIONADA');
+  // tarefa criada que nao cai em hoje (repete em outros dias, mensal/anual de outra data):
+  // ela foi salva, so nao aparece na lista de hoje -- avisa em vez de parecer que sumiu
+  const _nova = tarefas[tarefas.length - 1];
+  const _foraDeHoje = _nova && !ehDeHoje(_nova);
+  aviso(_foraDeHoje
+    ? (idiomaApp() === 'en' ? 'TASK ADDED (NOT TODAY)' : 'TAREFA ADICIONADA (NÃO É DE HOJE)')
+    : (idiomaApp() === 'en' ? 'TASK ADDED' : 'TAREFA ADICIONADA'));
   atualizarEstadoSave();
 }
 

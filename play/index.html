@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=139">
+<link rel="stylesheet" href="style.css?v=142">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -975,6 +975,14 @@ catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
         <button class="swch" id="cfgSomBtn" type="button" role="switch" aria-checked="true" aria-label="Som">
           <span class="swch-bolinha"></span>
         </button>
+      </div>
+
+      <div class="cfgrow" id="cfgRowNotif">
+        <div class="cfgtxt">
+          <b data-i18n="cfg.notificacoes">Notificações</b>
+          <span id="cfgNotifInfo" data-i18n="cfg.notifDesc">Teste grátis, streak em risco e monstro do dia</span>
+        </div>
+        <button class="cfgbtn" id="cfgNotifBtn" type="button">Ativar</button>
       </div>
     </div>
   </div>
@@ -12410,7 +12418,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   // projeto Firebase (Console > Configuracoes do projeto > Cloud
   // Messaging > Configuracao Web > "Gerar par de chaves", se ainda nao
   // existir uma) <<<
-  const VAPID_KEY = 'COLE_AQUI_SUA_VAPID_KEY';
+  const VAPID_KEY = 'BEqvk8m0fORJ5mC-KX1FUEsumLgNxtTGq0NkhUY3DkRNtp4eJ1W6F8iwRDsGbepEQFl7gKqWWekFm9hxT2Yl_4A';
 
   async function aguardarUsuario(auth, onAuthStateChangedFn, timeoutMs){
     return new Promise(resolve => {
@@ -12444,7 +12452,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     if (typeof Notification === 'undefined' || !('serviceWorker' in navigator)){
       return { ok: false, motivo: 'sem_suporte' };
     }
-    if (VAPID_KEY === 'COLE_AQUI_SUA_VAPID_KEY'){
+    if (!VAPID_KEY || VAPID_KEY.startsWith('COLE_AQUI')){
       return { ok: false, motivo: 'vapid_nao_configurada' };
     }
 
@@ -18221,6 +18229,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'cfg.escolhaQuemEnfrenta': { pt:'Escolha quem enfrenta os monstros', en:'Choose who faces the monsters' },
     'cfg.tema':            { pt:'Tema', en:'Theme' },
     'cfg.paletaDeCores':   { pt:'Paleta de cores do app', en:'App color palette' },
+    'cfg.notificacoes':         { pt:'Notificações', en:'Notifications' },
+    'cfg.notifDesc':            { pt:'Teste grátis, streak em risco e monstro do dia', en:'Free trial, streak at risk and daily monster' },
     'cfg.feedbackDeClique':     { pt:'Feedback de clique', en:'Click feedback' },
     'cfg.feedbackDeCliqueDesc': { pt:'Vibração ao tocar em botões e nos eventos do jogo', en:'Vibration on buttons and game events' },
     'cfg.som':     { pt:'Som', en:'Sound' },

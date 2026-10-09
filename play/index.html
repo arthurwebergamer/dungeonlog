@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=142">
+<link rel="stylesheet" href="style.css?v=143">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -12456,9 +12456,6 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       return { ok: false, motivo: 'vapid_nao_configurada' };
     }
 
-    const permissao = await Notification.requestPermission();
-    if (permissao !== 'granted') return { ok: false, motivo: 'permissao_negada' };
-
     try {
       const [modApp, modAuth, modFirestore, modMessaging] = await Promise.all([
         import("https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js"),
@@ -12481,6 +12478,12 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       // silenciosamente nao funcionar.
       const usuario = await aguardarUsuario(auth, onAuthStateChanged, 4000);
       if (!usuario) return { ok: false, motivo: 'sem_conta' };
+
+      // permissao so DEPOIS de confirmar login: antes pedia primeiro e, sem
+      // conta, ficava 'granted' sem token salvo (botao virava "Ativado" e
+      // nunca mais registrava).
+      const permissao = (Notification.permission === 'granted') ? 'granted' : await Notification.requestPermission();
+      if (permissao !== 'granted') return { ok: false, motivo: 'permissao_negada' };
 
       const registro = await navigator.serviceWorker.register('firebase-messaging-sw.js');
       const messaging = getMessaging(app);
@@ -17814,6 +17817,36 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   };
 
   window.atualizarBotaoNotificacao(); // primeira pintura, mesmo antes de Config abrir pela 1a vez
+
+  // PEDIDO NATIVO DE PERMISSAO apos concluir uma tarefa (1x so por aparelho).
+  // Roda dentro do toque da tarefa (gesto do usuario). Se nao tiver conta,
+  // ativarNotificacaoPush() devolve sem_conta sem pedir permissao -- a flag
+  // so e marcada quando o pedido de fato aconteceu (ou ja estava decidido).
+  const CHAVE_PUSH_PEDIDO = 'questlog.pushPedido.v1';
+  const _alternarPush = window.alternar;
+  if (typeof _alternarPush === 'function'){
+    window.alternar = function(){
+      const r = _alternarPush.apply(this, arguments);
+      try {
+        if (r !== false && typeof window.ativarNotificacaoPush === 'function'
+            && typeof window.statusNotificacaoPush === 'function'
+            && !localStorage.getItem(CHAVE_PUSH_PEDIDO)){
+          const st = window.statusNotificacaoPush();
+          if (st !== 'default'){ localStorage.setItem(CHAVE_PUSH_PEDIDO, '1'); }
+          else {
+            setTimeout(async () => {
+              const res = await window.ativarNotificacaoPush();
+              if (res && res.motivo !== 'sem_conta' && res.motivo !== 'firebase_nao_configurado' && res.motivo !== 'vapid_nao_configurada'){
+                try { localStorage.setItem(CHAVE_PUSH_PEDIDO, '1'); } catch(e){}
+              }
+              window.atualizarBotaoNotificacao();
+            }, 700);
+          }
+        }
+      } catch(e){}
+      return r;
+    };
+  }
 })();
 </script>
 

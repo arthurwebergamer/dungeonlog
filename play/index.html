@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=133">
+<link rel="stylesheet" href="style.css?v=136">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -371,7 +371,7 @@ catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
          so escondido via CSS (#estagioTopoBar, ver style.css) -- continua
          existindo pra renderEstagioBar() nao precisar de nenhuma mudanca
          (ela so escreve o width nele, que agora nao aparece pra ninguem). -->
-    <div class="xprow">
+    <div class="xprow" id="estagioTopoRow">
       <span class="xplabel"><span data-i18n="jogo.tarefasParaEstagio">Tarefas para Estágio</span> <span id="estagioTopoNum">1</span></span>
       <span class="xpnum" id="estagioTopoLbl">0/10</span>
     </div>
@@ -1470,6 +1470,7 @@ catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
   </div>
 
   <div class="nav" id="nav">
+<div class="estFlut on" id="estFlut"><span class="estFlutTxt" id="estFlutTxt"></span><span class="estFlutBar"><i id="estFlutFill"></i></span></div>
 <div class="navpill" id="navPill"></div>
 
     <button class="on" data-aba="tarefas">
@@ -2380,6 +2381,11 @@ function apagarCategoriaTarefa(id){
    forma de abas horizontais acima da lista de tarefas: "Todos" + uma
    aba por categoria existente + "+ Nova categoria" no fim. Ve tambem o
    filtro real dentro de render() (variavel pendentesVisiveis). */
+// CHAVE MESTRA DO SISTEMA DE CATEGORIAS DE TAREFA (pedido do usuario: tirar do app).
+// false = sem abas de filtro, sem cabecalhos de grupo na lista, sem seletor de categoria
+// no composer/editor. Os dados (categoriaId nas tarefas, lista de categorias salva) ficam
+// intactos e sao ignorados -- religar e so trocar pra true.
+window.CATEGORIAS_ATIVAS = false;
 let filtroCategoriaTarefa = null;   // null = "Todos" (sem filtro)
 // pedido do usuario: com "Todos" selecionado, a lista agrupa por
 // categoria (cabecalho .catgrupo, ver render()). Recolher grupo foi
@@ -3246,8 +3252,10 @@ function renderEstagioBar(){
   // misturava QUAL estagio com QUANTO falta). O numero do estagio
   // agora mora so no label (linha de cima), o valor mostra so a fracao,
   // mesmo padrao limpo de "40 / 64" em Vida.
+  const flutEl = document.getElementById('estFlut'), flutTxt = document.getElementById('estFlutTxt'), flutFill = document.getElementById('estFlutFill'); // barra flutuante acima da nav
   if (max){
     numEl.textContent = 'MAX';
+    if (flutEl) flutEl.style.visibility = 'hidden';
   } else {
     // Contagem numerica (pedido do usuario: mostrar o numero na barra,
     // tipo "7/10") -- relativa ao corte do estagio ATUAL (quantas
@@ -3260,6 +3268,12 @@ function renderEstagioBar(){
     const alvo = LIMIARES_ESTAGIO[estagio - 1];
     const frac = Math.max(0, Math.min(alvo - inicio, total - inicio)) + '/' + (alvo - inicio);
     numEl.textContent = frac;
+    if (flutEl){
+      const en = (typeof idiomaApp === 'function') && idiomaApp() === 'en';
+      flutEl.style.visibility = '';
+      flutTxt.textContent = (en ? 'Stage ' : 'Estágio ') + (estagio + 1) + ' · ' + frac;
+      flutFill.style.width = Math.round(progressoEstagio() * 100) + '%';
+    }
   }
 }
 window.renderEstagioBar = renderEstagioBar;
@@ -4987,7 +5001,7 @@ function render(){
   // (todas as tarefas do dia, sem filtro): esconder uma categoria nao
   // pode mexer na vida do monstro nem fingir vitoria sem tarefa real
   // concluida.
-  const pendentesVisiveis = filtroCategoriaTarefa
+  const pendentesVisiveis = (window.CATEGORIAS_ATIVAS && filtroCategoriaTarefa)
     ? pendentes.filter(t => t.categoriaId === filtroCategoriaTarefa)
     : pendentes;
 
@@ -5085,8 +5099,8 @@ function render(){
     return el;
   }
 
-  if (filtroCategoriaTarefa){
-    // uma categoria especifica ja esta selecionada na aba -- lista
+  if (!window.CATEGORIAS_ATIVAS || filtroCategoriaTarefa){
+    // uma categoria especifica ja esta selecionada na aba (ou categorias desligadas) -- lista
     // simples, sem cabecalho (a propria aba ativa ja deixa claro qual
     // categoria e essa)
     pendentesVisiveis.forEach(t => lista.appendChild(montarLinhaTarefa(t)));
@@ -5985,6 +5999,14 @@ document.getElementById('addbtn').onclick = () => {
       pintarVezes();
     }
     if (typeof resetAdvColor === 'function') resetAdvColor();
+    // o modo (hoje/repete/mensal/anual) e os dias escolhidos NAO eram resetados: depois de
+    // criar uma tarefa "repete" (ex.: so segunda) ou mensal/anual, a proxima abertura do
+    // composer continuava nesse modo e a tarefa nova nascia fora de hoje -- parecia que
+    // "nao adicionou". Mesmo reset ja feito acima pra dificuldade/vezes/cor.
+    modo = 'hoje';
+    diasEscolhidos = [];
+    daysEl.querySelectorAll('.day').forEach(d => d.classList.remove('on'));
+    pintarModo();
     atualizarEstadoSave();
   }
 };
@@ -6016,10 +6038,10 @@ function criar(){
     return;
   }
 
-  if (modo === 'hoje') tarefas.push({ texto, tipo:'hoje', data:isoAtual(), feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined, categoriaId: categoriaEscolhida || undefined });
-  else if (modo === 'mensal') tarefas.push({ texto, tipo:'mensal', diaMes:diaMesEscolhido, feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined, categoriaId: categoriaEscolhida || undefined });
-  else if (modo === 'anual') tarefas.push({ texto, tipo:'anual', diaAno:diaAnoEscolhido, mesAno:mesAnoEscolhido, feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined, categoriaId: categoriaEscolhida || undefined });
-  else tarefas.push({ texto, tipo:'repete', dias:[...diasEscolhidos], feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined, categoriaId: categoriaEscolhida || undefined });
+  if (modo === 'hoje') tarefas.push({ texto, tipo:'hoje', data:isoAtual(), feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined, categoriaId: (window.CATEGORIAS_ATIVAS && categoriaEscolhida) || undefined });
+  else if (modo === 'mensal') tarefas.push({ texto, tipo:'mensal', diaMes:diaMesEscolhido, feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined, categoriaId: (window.CATEGORIAS_ATIVAS && categoriaEscolhida) || undefined });
+  else if (modo === 'anual') tarefas.push({ texto, tipo:'anual', diaAno:diaAnoEscolhido, mesAno:mesAnoEscolhido, feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined, categoriaId: (window.CATEGORIAS_ATIVAS && categoriaEscolhida) || undefined });
+  else tarefas.push({ texto, tipo:'repete', dias:[...diasEscolhidos], feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined, categoriaId: (window.CATEGORIAS_ATIVAS && categoriaEscolhida) || undefined });
 
   input.value = '';
   input.blur();
@@ -6027,7 +6049,13 @@ function criar(){
   if (typeof resetAdvColor === 'function') resetAdvColor();
   render();
   window.tocarSom?.('tarefa'); // SFX: o wrap de window.criar nao funciona aqui -- "save.onclick = criar" (linha abaixo) copia a REFERENCIA da funcao original no load, antes do gancho existir; editado direto, mesma logica de ferir()/investir()
-  aviso(idiomaApp() === 'en' ? 'TASK ADDED' : 'TAREFA ADICIONADA');
+  // tarefa criada que nao cai em hoje (repete em outros dias, mensal/anual de outra data):
+  // ela foi salva, so nao aparece na lista de hoje -- avisa em vez de parecer que sumiu
+  const _nova = tarefas[tarefas.length - 1];
+  const _foraDeHoje = _nova && !ehDeHoje(_nova);
+  aviso(_foraDeHoje
+    ? (idiomaApp() === 'en' ? 'TASK ADDED (NOT TODAY)' : 'TAREFA ADICIONADA (NÃO É DE HOJE)')
+    : (idiomaApp() === 'en' ? 'TASK ADDED' : 'TAREFA ADICIONADA'));
   atualizarEstadoSave();
 }
 
@@ -6635,6 +6663,7 @@ function mostrarAba(nome){
   if (nome !== 'tarefas') composer.classList.remove('on');
 
   blocosTarefas.forEach(el => { if (el) el.classList.toggle('oculto', nome !== 'tarefas'); });
+  const estFlutEl = document.getElementById('estFlut'); if (estFlutEl) estFlutEl.classList.toggle('on', nome === 'tarefas');
   document.getElementById('viewInventario').classList.toggle('on', nome === 'inventario');
   document.getElementById('viewLoja').classList.toggle('on', nome === 'loja');
   document.getElementById('viewPerfil').classList.toggle('on', nome === 'perfil');

@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=140">
+<link rel="stylesheet" href="style.css?v=141">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -12410,7 +12410,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   // projeto Firebase (Console > Configuracoes do projeto > Cloud
   // Messaging > Configuracao Web > "Gerar par de chaves", se ainda nao
   // existir uma) <<<
-  const VAPID_KEY = 'COLE_AQUI_SUA_VAPID_KEY';
+  const VAPID_KEY = 'BEqvk8m0fORJ5mC-KX1FUEsumLgNxtTGq0NkhUY3DkRNtp4eJ1W6F8iwRDsGbepEQFl7gKqWWekFm9hxT2Yl_4A';
 
   async function aguardarUsuario(auth, onAuthStateChangedFn, timeoutMs){
     return new Promise(resolve => {
@@ -12444,7 +12444,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     if (typeof Notification === 'undefined' || !('serviceWorker' in navigator)){
       return { ok: false, motivo: 'sem_suporte' };
     }
-    if (VAPID_KEY === 'COLE_AQUI_SUA_VAPID_KEY'){
+    if (!VAPID_KEY || VAPID_KEY.startsWith('COLE_AQUI')){
       return { ok: false, motivo: 'vapid_nao_configurada' };
     }
 

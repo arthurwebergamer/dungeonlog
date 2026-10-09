@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=144">
+<link rel="stylesheet" href="style.css?v=145">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -12450,6 +12450,24 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   // Preferencia local do switch: '0' = usuario desligou (permissao do
   // navegador continua 'granted', mas o token foi removido da conta).
   const CHAVE_PUSH_LIGADO = 'questlog.pushLigado.v1';
+  const CHAVE_PUSH_TOKEN = 'questlog.pushToken.v1';
+  // imports memoizados + pre-aquecidos: antes cada toque no switch baixava
+  // os 4 modulos do Firebase de novo (delay de segundos)
+  let _modsFcm = null;
+  function carregarModulosFcm(){
+    if (!_modsFcm){
+      _modsFcm = Promise.all([
+        import("https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js"),
+        import("https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js"),
+        import("https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js"),
+        import("https://www.gstatic.com/firebasejs/10.13.2/firebase-messaging.js")
+      ]).catch(e => { _modsFcm = null; throw e; });
+    }
+    return _modsFcm;
+  }
+  if (typeof Notification !== 'undefined' && 'serviceWorker' in navigator){
+    setTimeout(() => { carregarModulosFcm().catch(() => {}); }, 2500);
+  }
   window.notificacaoPushLigada = function(){
     if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return false;
     try { return localStorage.getItem(CHAVE_PUSH_LIGADO) !== '0'; } catch(e){ return true; }
@@ -12458,12 +12476,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   window.desativarNotificacaoPush = async function(){
     try { localStorage.setItem(CHAVE_PUSH_LIGADO, '0'); } catch(e){}
     try {
-      const [modApp, modAuth, modFirestore, modMessaging] = await Promise.all([
-        import("https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js"),
-        import("https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js"),
-        import("https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js"),
-        import("https://www.gstatic.com/firebasejs/10.13.2/firebase-messaging.js")
-      ]);
+      const [modApp, modAuth, modFirestore, modMessaging] = await carregarModulosFcm();
       const { getApps, getApp, initializeApp } = modApp;
       const app = getApps().length ? getApp() : initializeApp(window.firebaseConfig);
       const auth = modAuth.getAuth(app);
@@ -12472,7 +12485,8 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       const registro = await navigator.serviceWorker.getRegistration();
       const messaging = modMessaging.getMessaging(app);
       let token = null;
-      try { token = await modMessaging.getToken(messaging, { vapidKey: VAPID_KEY, serviceWorkerRegistration: registro }); } catch(e){}
+      try { token = localStorage.getItem(CHAVE_PUSH_TOKEN); } catch(e){}
+      if (!token){ try { token = await modMessaging.getToken(messaging, { vapidKey: VAPID_KEY, serviceWorkerRegistration: registro }); } catch(e){} }
       if (usuario && token){
         await modFirestore.setDoc(modFirestore.doc(db, 'fcmTokens', usuario.uid), {
           tokens: modFirestore.arrayRemove(token),
@@ -12499,12 +12513,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     }
 
     try {
-      const [modApp, modAuth, modFirestore, modMessaging] = await Promise.all([
-        import("https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js"),
-        import("https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js"),
-        import("https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js"),
-        import("https://www.gstatic.com/firebasejs/10.13.2/firebase-messaging.js")
-      ]);
+      const [modApp, modAuth, modFirestore, modMessaging] = await carregarModulosFcm();
       const { initializeApp, getApps, getApp } = modApp;
       const { getAuth, onAuthStateChanged } = modAuth;
       const { getFirestore, doc, setDoc, arrayUnion } = modFirestore;
@@ -12540,7 +12549,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
         atualizadoEm: Date.now(),
       }, { merge: true });
 
-      try { localStorage.setItem(CHAVE_PUSH_LIGADO, '1'); } catch(e){}
+      try { localStorage.setItem(CHAVE_PUSH_LIGADO, '1'); localStorage.setItem(CHAVE_PUSH_TOKEN, token); } catch(e){}
       return { ok: true };
     } catch(e){
       console.error('QuestLog/FCM: falha ao ativar notificacoes push', e);
@@ -17835,14 +17844,20 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   btn.onclick = async () => {
     const en = (typeof idiomaApp === 'function' && idiomaApp() === 'en');
     const ligadoAntes = (typeof window.notificacaoPushLigada === 'function') ? window.notificacaoPushLigada() : false;
-    btn.disabled = true;
+    if (btn.dataset.ocupado === '1') return;
+    btn.dataset.ocupado = '1';
+    // otimista: o switch vira na hora, a rede roda por tras (reverte se falhar)
+    btn.classList.toggle('on', !ligadoAntes);
+    btn.setAttribute('aria-checked', !ligadoAntes ? 'true' : 'false');
     if (ligadoAntes){
       const r = typeof window.desativarNotificacaoPush === 'function' ? await window.desativarNotificacaoPush() : { ok:false };
+      btn.dataset.ocupado = '';
       window.atualizarBotaoNotificacao();
       if (!r.ok && typeof window.aviso === 'function') window.aviso(en ? 'Couldn\'t fully turn off notifications' : 'Não deu pra desligar por completo');
       return;
     }
     const resultado = typeof window.ativarNotificacaoPush === 'function' ? await window.ativarNotificacaoPush() : { ok:false, motivo:'erro' };
+    btn.dataset.ocupado = '';
     window.atualizarBotaoNotificacao();
     if (!resultado.ok && typeof window.aviso === 'function'){
       if (resultado.motivo === 'sem_conta'){

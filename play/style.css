@@ -6060,3 +6060,7 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 .hero-sprite .heroArma.escura .pxi{filter:brightness(1.6) contrast(1.05) drop-shadow(0 1px 0 rgba(0,0,0,.5))}
 /* icones de armas escuras (inventario, slots, loja, bau): mesmo clareamento da arma na arena */
 .pxi.armaEscura{filter:brightness(1.6) contrast(1.05)}
+
+/* categorias de tarefa desligadas (window.CATEGORIAS_ATIVAS = false em index.html):
+   some a linha de abas e o seletor de categoria do composer/editor */
+.cattabs, .advcatrow, .catvisivel{display:none !important}

@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=133">
+<link rel="stylesheet" href="style.css?v=134">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -2380,6 +2380,11 @@ function apagarCategoriaTarefa(id){
    forma de abas horizontais acima da lista de tarefas: "Todos" + uma
    aba por categoria existente + "+ Nova categoria" no fim. Ve tambem o
    filtro real dentro de render() (variavel pendentesVisiveis). */
+// CHAVE MESTRA DO SISTEMA DE CATEGORIAS DE TAREFA (pedido do usuario: tirar do app).
+// false = sem abas de filtro, sem cabecalhos de grupo na lista, sem seletor de categoria
+// no composer/editor. Os dados (categoriaId nas tarefas, lista de categorias salva) ficam
+// intactos e sao ignorados -- religar e so trocar pra true.
+window.CATEGORIAS_ATIVAS = false;
 let filtroCategoriaTarefa = null;   // null = "Todos" (sem filtro)
 // pedido do usuario: com "Todos" selecionado, a lista agrupa por
 // categoria (cabecalho .catgrupo, ver render()). Recolher grupo foi
@@ -4987,7 +4992,7 @@ function render(){
   // (todas as tarefas do dia, sem filtro): esconder uma categoria nao
   // pode mexer na vida do monstro nem fingir vitoria sem tarefa real
   // concluida.
-  const pendentesVisiveis = filtroCategoriaTarefa
+  const pendentesVisiveis = (window.CATEGORIAS_ATIVAS && filtroCategoriaTarefa)
     ? pendentes.filter(t => t.categoriaId === filtroCategoriaTarefa)
     : pendentes;
 
@@ -5085,8 +5090,8 @@ function render(){
     return el;
   }
 
-  if (filtroCategoriaTarefa){
-    // uma categoria especifica ja esta selecionada na aba -- lista
+  if (!window.CATEGORIAS_ATIVAS || filtroCategoriaTarefa){
+    // uma categoria especifica ja esta selecionada na aba (ou categorias desligadas) -- lista
     // simples, sem cabecalho (a propria aba ativa ja deixa claro qual
     // categoria e essa)
     pendentesVisiveis.forEach(t => lista.appendChild(montarLinhaTarefa(t)));
@@ -6024,10 +6029,10 @@ function criar(){
     return;
   }
 
-  if (modo === 'hoje') tarefas.push({ texto, tipo:'hoje', data:isoAtual(), feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined, categoriaId: categoriaEscolhida || undefined });
-  else if (modo === 'mensal') tarefas.push({ texto, tipo:'mensal', diaMes:diaMesEscolhido, feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined, categoriaId: categoriaEscolhida || undefined });
-  else if (modo === 'anual') tarefas.push({ texto, tipo:'anual', diaAno:diaAnoEscolhido, mesAno:mesAnoEscolhido, feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined, categoriaId: categoriaEscolhida || undefined });
-  else tarefas.push({ texto, tipo:'repete', dias:[...diasEscolhidos], feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined, categoriaId: categoriaEscolhida || undefined });
+  if (modo === 'hoje') tarefas.push({ texto, tipo:'hoje', data:isoAtual(), feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined, categoriaId: (window.CATEGORIAS_ATIVAS && categoriaEscolhida) || undefined });
+  else if (modo === 'mensal') tarefas.push({ texto, tipo:'mensal', diaMes:diaMesEscolhido, feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined, categoriaId: (window.CATEGORIAS_ATIVAS && categoriaEscolhida) || undefined });
+  else if (modo === 'anual') tarefas.push({ texto, tipo:'anual', diaAno:diaAnoEscolhido, mesAno:mesAnoEscolhido, feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined, categoriaId: (window.CATEGORIAS_ATIVAS && categoriaEscolhida) || undefined });
+  else tarefas.push({ texto, tipo:'repete', dias:[...diasEscolhidos], feitaEm:null, dif:difEscolhida, meta:vezesEscolhida, corBox: corBoxEscolhida || undefined, categoriaId: (window.CATEGORIAS_ATIVAS && categoriaEscolhida) || undefined });
 
   input.value = '';
   input.blur();

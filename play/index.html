@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=143">
+<link rel="stylesheet" href="style.css?v=144">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -982,7 +982,9 @@ catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
           <b data-i18n="cfg.notificacoes">Notificações</b>
           <span id="cfgNotifInfo" data-i18n="cfg.notifDesc">Teste grátis, streak em risco e monstro do dia</span>
         </div>
-        <button class="cfgbtn" id="cfgNotifBtn" type="button">Ativar</button>
+        <button class="swch" id="cfgNotifBtn" type="button" role="switch" aria-checked="false" aria-label="Notificações">
+          <span class="swch-bolinha"></span>
+        </button>
       </div>
     </div>
   </div>
@@ -12445,6 +12447,46 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     return Notification.permission; // 'default' | 'granted' | 'denied'
   };
 
+  // Preferencia local do switch: '0' = usuario desligou (permissao do
+  // navegador continua 'granted', mas o token foi removido da conta).
+  const CHAVE_PUSH_LIGADO = 'questlog.pushLigado.v1';
+  window.notificacaoPushLigada = function(){
+    if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return false;
+    try { return localStorage.getItem(CHAVE_PUSH_LIGADO) !== '0'; } catch(e){ return true; }
+  };
+
+  window.desativarNotificacaoPush = async function(){
+    try { localStorage.setItem(CHAVE_PUSH_LIGADO, '0'); } catch(e){}
+    try {
+      const [modApp, modAuth, modFirestore, modMessaging] = await Promise.all([
+        import("https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js"),
+        import("https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js"),
+        import("https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js"),
+        import("https://www.gstatic.com/firebasejs/10.13.2/firebase-messaging.js")
+      ]);
+      const { getApps, getApp, initializeApp } = modApp;
+      const app = getApps().length ? getApp() : initializeApp(window.firebaseConfig);
+      const auth = modAuth.getAuth(app);
+      const db = modFirestore.getFirestore(app);
+      const usuario = await aguardarUsuario(auth, modAuth.onAuthStateChanged, 4000);
+      const registro = await navigator.serviceWorker.getRegistration();
+      const messaging = modMessaging.getMessaging(app);
+      let token = null;
+      try { token = await modMessaging.getToken(messaging, { vapidKey: VAPID_KEY, serviceWorkerRegistration: registro }); } catch(e){}
+      if (usuario && token){
+        await modFirestore.setDoc(modFirestore.doc(db, 'fcmTokens', usuario.uid), {
+          tokens: modFirestore.arrayRemove(token),
+          atualizadoEm: Date.now(),
+        }, { merge: true });
+      }
+      try { await modMessaging.deleteToken(messaging); } catch(e){}
+      return { ok: true };
+    } catch(e){
+      console.error('QuestLog/FCM: falha ao desativar notificacoes push', e);
+      return { ok: false, erro: e.message };
+    }
+  };
+
   window.ativarNotificacaoPush = async function(){
     if (!window.firebaseConfig || window.firebaseConfig.apiKey === 'COLE_AQUI_SUA_APIKEY'){
       return { ok: false, motivo: 'firebase_nao_configurado' };
@@ -12498,6 +12540,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
         atualizadoEm: Date.now(),
       }, { merge: true });
 
+      try { localStorage.setItem(CHAVE_PUSH_LIGADO, '1'); } catch(e){}
       return { ok: true };
     } catch(e){
       console.error('QuestLog/FCM: falha ao ativar notificacoes push', e);
@@ -17781,33 +17824,27 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
   window.atualizarBotaoNotificacao = function(){
     const status = (typeof window.statusNotificacaoPush === 'function') ? window.statusNotificacaoPush() : 'sem_suporte';
-    const en = (typeof idiomaApp === 'function' && idiomaApp() === 'en');
-    if (status === 'granted'){
-      btn.textContent = en ? 'Enabled' : 'Ativado';
-      btn.disabled = true;
-    } else if (status === 'denied'){
-      btn.textContent = en ? 'Blocked' : 'Bloqueado';
-      btn.disabled = true;
-    } else if (status === 'sem_suporte'){
-      btn.textContent = en ? 'Unavailable' : 'Indisponível';
-      btn.disabled = true;
-    } else {
-      btn.textContent = en ? 'Enable' : 'Ativar';
-      btn.disabled = false;
-    }
+    const ligado = (typeof window.notificacaoPushLigada === 'function') ? window.notificacaoPushLigada() : false;
+    btn.classList.toggle('on', ligado);
+    btn.setAttribute('aria-checked', ligado ? 'true' : 'false');
+    // bloqueado no navegador / sem suporte: nao adianta tentar ligar
+    btn.disabled = (status === 'denied' || status === 'sem_suporte');
+    btn.style.opacity = btn.disabled ? '.45' : '';
   };
 
   btn.onclick = async () => {
-    if (typeof window.ativarNotificacaoPush !== 'function') return;
     const en = (typeof idiomaApp === 'function' && idiomaApp() === 'en');
+    const ligadoAntes = (typeof window.notificacaoPushLigada === 'function') ? window.notificacaoPushLigada() : false;
     btn.disabled = true;
-    btn.textContent = en ? 'Enabling…' : 'Ativando…';
-    const resultado = await window.ativarNotificacaoPush();
+    if (ligadoAntes){
+      const r = typeof window.desativarNotificacaoPush === 'function' ? await window.desativarNotificacaoPush() : { ok:false };
+      window.atualizarBotaoNotificacao();
+      if (!r.ok && typeof window.aviso === 'function') window.aviso(en ? 'Couldn\'t fully turn off notifications' : 'Não deu pra desligar por completo');
+      return;
+    }
+    const resultado = typeof window.ativarNotificacaoPush === 'function' ? await window.ativarNotificacaoPush() : { ok:false, motivo:'erro' };
     window.atualizarBotaoNotificacao();
     if (!resultado.ok && typeof window.aviso === 'function'){
-      // motivo 'permissao_negada'/'denied' nao precisa de toast -- o
-      // proprio botao ja vira "Bloqueado" (estado visivel permanente),
-      // um toast a mais so duplicaria a informacao.
       if (resultado.motivo === 'sem_conta'){
         window.aviso(en ? 'Create an account first to enable notifications' : 'Crie uma conta primeiro pra ativar notificações');
       } else if (resultado.motivo !== 'permissao_negada'){

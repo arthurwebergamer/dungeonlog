@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=134">
+<link rel="stylesheet" href="style.css?v=135">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -329,6 +329,7 @@ catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
         <svg viewBox="0 0 13 13" shape-rendering="crispEdges"><image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAANCAYAAABy6+R8AAABNElEQVR42p2SsUrDUBSGvxtr0angcNup0SzOIop0cXBqcBGkpS59AR10qk+guOoLuCgWQZe2k4NLKXRwzhKlWzMEioOl2hyHkpQmBcG73cP3n//8h6NIPon9VRwwYrCMpcJYKogI0jCj+rwuIg2TwC5wVX4GwNJT7vD6gAV1H/Eq7B7Cezsp8pkRvUEagHxmxOvbpHf5ZgigUgBGs42lhTVrMSHoDdLsboS14TRTvdWnVMyyebqfEOQzI7K5HFvrKzOZRBom9VYfgFIxS2AXMLiD5ioAl7celpZoPAXIRWmZWlUT2AUeT55m1ut6ilpV03V8ts8+p6K4E/YHAUcYzTZdx+fd/cb1FOf1r7+dXG+ytXlOhEJLS5Qp3GrX8Xnp/EQu8RMRgIfjpcgBCOEZVv3n9n4BeByMZhegdHgAAAAASUVORK5CYII=" width="13" height="13" style="image-rendering:pixelated"/></svg>
         <span id="ganhoTxt"></span>
       </span>
+      <span class="vitEstagio" id="vitEstagio"></span>
     </div>
 
     <div class="mobinfo" id="mobinfo">
@@ -371,7 +372,7 @@ catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
          so escondido via CSS (#estagioTopoBar, ver style.css) -- continua
          existindo pra renderEstagioBar() nao precisar de nenhuma mudanca
          (ela so escreve o width nele, que agora nao aparece pra ninguem). -->
-    <div class="xprow">
+    <div class="xprow" id="estagioTopoRow">
       <span class="xplabel"><span data-i18n="jogo.tarefasParaEstagio">Tarefas para Estágio</span> <span id="estagioTopoNum">1</span></span>
       <span class="xpnum" id="estagioTopoLbl">0/10</span>
     </div>
@@ -3251,8 +3252,10 @@ function renderEstagioBar(){
   // misturava QUAL estagio com QUANTO falta). O numero do estagio
   // agora mora so no label (linha de cima), o valor mostra so a fracao,
   // mesmo padrao limpo de "40 / 64" em Vida.
+  const vitEstEl = document.getElementById('vitEstagio'); // texto sob o "DIA VENCIDO": "N tarefas para estagio X"
   if (max){
     numEl.textContent = 'MAX';
+    if (vitEstEl) vitEstEl.textContent = '';
   } else {
     // Contagem numerica (pedido do usuario: mostrar o numero na barra,
     // tipo "7/10") -- relativa ao corte do estagio ATUAL (quantas
@@ -3265,6 +3268,13 @@ function renderEstagioBar(){
     const alvo = LIMIARES_ESTAGIO[estagio - 1];
     const frac = Math.max(0, Math.min(alvo - inicio, total - inicio)) + '/' + (alvo - inicio);
     numEl.textContent = frac;
+    if (vitEstEl){
+      const faltam = Math.max(0, alvo - total);
+      const en = (typeof idiomaApp === 'function') && idiomaApp() === 'en';
+      vitEstEl.textContent = en
+        ? (faltam + (faltam === 1 ? ' task' : ' tasks') + ' to stage ' + (estagio + 1))
+        : (faltam + (faltam === 1 ? ' tarefa' : ' tarefas') + ' para estágio ' + (estagio + 1));
+    }
   }
 }
 window.renderEstagioBar = renderEstagioBar;

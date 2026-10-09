@@ -6074,3 +6074,6 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 .estFlut.on{display:flex}
 .estFlutBar{display:block;width:100%;height:4px;border-radius:3px;background:rgba(255,255,255,.14);overflow:hidden}
 .estFlutBar i{display:block;height:100%;width:0;border-radius:3px;background:var(--accent, #F2A65A);transition:width .4s ease}
+/* barra flutuante no tema branco: --accent e' escuro, sumia sobre o fundo preto */
+:root[data-tema="branco"] .estFlutBar i{background:#F7F6F3}
+:root[data-tema="branco"] .estFlut{border-color:rgba(255,255,255,.28)}

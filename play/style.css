@@ -6068,8 +6068,8 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 /* estagio: a linha "Tarefas para Estagio N" saiu do painel; o progresso fica numa barra flutuante colada acima da nav (que e sticky) */
 #estagioTopoRow, #estagioTopoBar{display:none !important}
 .estFlut{position:absolute;left:50%;bottom:calc(100% + 10px);transform:translateX(-50%);display:none;flex-direction:column;align-items:center;gap:4px;
-  padding:6px 14px 8px;min-width:150px;border-radius:12px;background:rgba(8,8,10,.94);
-  border:1px solid rgba(255,255,255,.14);box-shadow:0 4px 16px rgba(0,0,0,.6);pointer-events:none;z-index:21;
+  padding:6px 14px 8px;min-width:150px;border-radius:12px;background:color-mix(in srgb, var(--accent) 14%, #08080a);
+  border:1px solid color-mix(in srgb, var(--accent) 45%, transparent);box-shadow:0 4px 16px rgba(0,0,0,.6);pointer-events:none;z-index:21;
   font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;color:#e8e8ec}
 .estFlut.on{display:flex}
 .estFlutBar{display:block;width:100%;height:4px;border-radius:3px;background:rgba(255,255,255,.14);overflow:hidden}

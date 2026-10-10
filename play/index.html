@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=146">
+<link rel="stylesheet" href="style.css?v=149">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -6905,11 +6905,17 @@ function renderUltimos7Dias(hist){
   for (let i = 6; i >= 0; i--){
     const iso = isoDe(new Date(new Date(hoje + 'T12:00:00').getTime() - i * 86400000));
     const resultado = porData.get(iso);
-    let y = Y_VAZIO, cor = corAccentComOpacidade(0.18);
-    if (resultado === 'vitoria'){ y = Y_VITORIA; cor = corAccentComOpacidade(1); }
-    else if (resultado === 'fuga'){ y = Y_FUGA; cor = corAccentComOpacidade(0.45); }
     const x = (6 - i) * (LARGURA / 6);
-    pontos.push({ x, y, cor });
+    // HOJE ainda sem resultado (o dia nao terminou): nao e vitoria, fuga
+    // nem dia vazio -- e dia em andamento. Nao desenha ponto, pra linha
+    // nao "despencar" pro fundo como se o dia tivesse sido perdido.
+    const emAndamento = (i === 0 && resultado === undefined);
+    if (!emAndamento){
+      let y = Y_VAZIO, cor = corAccentComOpacidade(0.18);
+      if (resultado === 'vitoria'){ y = Y_VITORIA; cor = corAccentComOpacidade(1); }
+      else if (resultado === 'fuga'){ y = Y_FUGA; cor = corAccentComOpacidade(0.45); }
+      pontos.push({ x, y, cor });
+    }
 
     const dow = new Date(iso + 'T12:00:00').getDay();
     const label = document.createElement('span');
@@ -6918,7 +6924,8 @@ function renderUltimos7Dias(hist){
   }
 
   const dLinha = 'M' + pontos.map(p => p.x + ',' + p.y).join(' L');
-  const dArea = dLinha + ' L' + LARGURA + ',' + ALTURA + ' L0,' + ALTURA + ' Z';
+  const xFim = pontos.length ? pontos[pontos.length - 1].x : LARGURA;
+  const dArea = dLinha + ' L' + xFim + ',' + ALTURA + ' L0,' + ALTURA + ' Z';
   linhaEl.setAttribute('d', dLinha);
   areaEl.setAttribute('d', dArea);
 
@@ -12473,6 +12480,62 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     try { return localStorage.getItem(CHAVE_PUSH_LIGADO) !== '0'; } catch(e){ return true; }
   };
 
+  // Marcador de "este aparelho ja esta registrado na conta X" -- evita um
+  // setDoc a cada abertura do app.
+  const CHAVE_PUSH_UID = 'questlog.pushUid.v1';
+
+  // Chamado ANTES do signOut (precisa estar logado pra a regra do Firestore
+  // deixar escrever): tira o token deste aparelho da conta que esta saindo,
+  // senao o aparelho continuaria recebendo os avisos dela (e duplicaria se
+  // outra conta tambem ativar). NAO mexe na preferencia do switch nem na
+  // permissao -- ao logar de novo (nesta ou em outra conta) o registro
+  // silencioso abaixo coloca o token na conta nova.
+  window.removerTokenPushDaConta = async function(){
+    try {
+      let token = null;
+      try { token = localStorage.getItem(CHAVE_PUSH_TOKEN); } catch(e){}
+      if (!token) return;
+      const [modApp, modAuth, modFirestore] = await carregarModulosFcm();
+      const app = modApp.getApps().length ? modApp.getApp() : modApp.initializeApp(window.firebaseConfig);
+      const usuario = modAuth.getAuth(app).currentUser;
+      if (!usuario) return;
+      await modFirestore.setDoc(modFirestore.doc(modFirestore.getFirestore(app), 'fcmTokens', usuario.uid), {
+        tokens: modFirestore.arrayRemove(token),
+        atualizadoEm: Date.now(),
+      }, { merge: true });
+      try { localStorage.removeItem(CHAVE_PUSH_UID); } catch(e){}
+    } catch(e){ console.error('QuestLog/FCM: falha ao remover token no logout', e); }
+  };
+
+  // Ao logar (qualquer conta) com o switch ligado e a permissao ja
+  // concedida, registra o token do aparelho na conta atual -- sem pop-up.
+  async function registrarSilencioso(usuario){
+    try {
+      if (!window.notificacaoPushLigada || !window.notificacaoPushLigada()) return;
+      if (localStorage.getItem(CHAVE_PUSH_UID) === usuario.uid) return;
+      const [modApp, , modFirestore, modMessaging] = await carregarModulosFcm();
+      const app = modApp.getApps().length ? modApp.getApp() : modApp.initializeApp(window.firebaseConfig);
+      const registro = await navigator.serviceWorker.register('firebase-messaging-sw.js');
+      const token = await modMessaging.getToken(modMessaging.getMessaging(app), { vapidKey: VAPID_KEY, serviceWorkerRegistration: registro });
+      if (!token) return;
+      await modFirestore.setDoc(modFirestore.doc(modFirestore.getFirestore(app), 'fcmTokens', usuario.uid), {
+        tokens: modFirestore.arrayUnion(token),
+        atualizadoEm: Date.now(),
+      }, { merge: true });
+      localStorage.setItem(CHAVE_PUSH_TOKEN, token);
+      localStorage.setItem(CHAVE_PUSH_UID, usuario.uid);
+    } catch(e){ console.error('QuestLog/FCM: registro silencioso falhou', e); }
+  }
+  if (typeof Notification !== 'undefined' && 'serviceWorker' in navigator && window.firebaseConfig && VAPID_KEY){
+    setTimeout(async () => {
+      try {
+        const [modApp, modAuth] = await carregarModulosFcm();
+        const app = modApp.getApps().length ? modApp.getApp() : modApp.initializeApp(window.firebaseConfig);
+        modAuth.onAuthStateChanged(modAuth.getAuth(app), u => { if (u) registrarSilencioso(u); });
+      } catch(e){}
+    }, 3500);
+  }
+
   window.desativarNotificacaoPush = async function(){
     try { localStorage.setItem(CHAVE_PUSH_LIGADO, '0'); } catch(e){}
     try {
@@ -12493,7 +12556,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
           atualizadoEm: Date.now(),
         }, { merge: true });
       }
-      try { await modMessaging.deleteToken(messaging); } catch(e){}
+      try { await modMessaging.deleteToken(messaging); localStorage.removeItem(CHAVE_PUSH_TOKEN); localStorage.removeItem(CHAVE_PUSH_UID); } catch(e){}
       return { ok: true };
     } catch(e){
       console.error('QuestLog/FCM: falha ao desativar notificacoes push', e);
@@ -12549,7 +12612,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
         atualizadoEm: Date.now(),
       }, { merge: true });
 
-      try { localStorage.setItem(CHAVE_PUSH_LIGADO, '1'); localStorage.setItem(CHAVE_PUSH_TOKEN, token); } catch(e){}
+      try { localStorage.setItem(CHAVE_PUSH_LIGADO, '1'); localStorage.setItem(CHAVE_PUSH_TOKEN, token); localStorage.setItem(CHAVE_PUSH_UID, usuario.uid); } catch(e){}
       return { ok: true };
     } catch(e){
       console.error('QuestLog/FCM: falha ao ativar notificacoes push', e);
@@ -17066,6 +17129,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         document.getElementById('boasVindasTrocar').onclick = async function(){
           this.disabled = true;
           try { if (window._questlogUltimoPush) await Promise.race([window._questlogUltimoPush, new Promise(r => setTimeout(r, 3000))]); } catch(e){}
+          try { if (typeof window.removerTokenPushDaConta === 'function') await Promise.race([window.removerTokenPushDaConta(), new Promise(r => setTimeout(r, 3000))]); } catch(e){}
           try { await auth.signOut(); } catch(e){}
           try { localStorage.removeItem('questlog.conta.v1'); localStorage.setItem('questlog.forcarLogin.v1', '1'); } catch(e){}
           location.reload();
@@ -17678,6 +17742,13 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     try {
       if (window._questlogUltimoPush){
         await Promise.race([window._questlogUltimoPush, new Promise(res => setTimeout(res, 4000))]);
+      }
+    } catch(e){}
+
+    // tira o token de push deste aparelho da conta que esta saindo (best-effort, 3s)
+    try {
+      if (typeof window.removerTokenPushDaConta === 'function'){
+        await Promise.race([window.removerTokenPushDaConta(), new Promise(r => setTimeout(r, 3000))]);
       }
     } catch(e){}
 

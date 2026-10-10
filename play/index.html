@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=165">
+<link rel="stylesheet" href="style.css?v=166">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -16034,7 +16034,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // proxima da lista (pop de escala) -- loop dinamico. Tudo por JS/WAAPI;
   // os loops CSS antigos (obHeroLunge/obMobShake/obSlash) ficam
   // desligados por override no fim do style.css.
-  const ESPADAS_OB = [2, 129, 142, 171, 176];   // 1 por raridade (comum..lendario): Aco, Katana, Duas Maos, Ancestral, Dourada -- mostra todos os cortes
+  const ESPADAS_OB = [2, 129, 142, 164, 176];   // 1 por raridade (comum..lendario): Aco, Katana, Duas Maos, Lamina Demoniaca (roxa), Dourada
   let obEspadaIdx = 0, golpeTimers = [];
   function obArmaHTML(id){
     const S = 56, gp = window.ARMA_GRIP && window.ARMA_GRIP[id];

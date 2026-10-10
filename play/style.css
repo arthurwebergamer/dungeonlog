@@ -6084,7 +6084,7 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 #aparenciaOverlay #temaGrid{ width:100%; display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:12px; }
 #aparenciaOverlay #temaGrid{ gap:18px 14px; }
 .temaItem{ display:flex; flex-direction:column; align-items:center; gap:8px; min-width:0; }
-.temaCard{ position:relative; width:100%; aspect-ratio:9/16; border-radius:18px; border:3px solid transparent; padding:9px 8px 0; overflow:hidden;
+.temaCard{ position:relative; width:100%; aspect-ratio:3/4; border-radius:18px; border:3px solid transparent; padding:9px 8px 0; overflow:hidden;
   display:flex; flex-direction:column; gap:6px; cursor:pointer; box-shadow:inset 0 0 0 1px rgba(128,128,128,.3); }
 .temaCard.sel{ border-color:#fff; box-shadow:0 0 0 1px rgba(0,0,0,.4); }
 :root[data-tema="branco"] .temaCard.sel{ border-color:#2E2C29; }
@@ -6094,7 +6094,7 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 .tmTopo b{ height:5px; border-radius:3px; width:22%; }
 .tmTopo b:nth-child(2){ width:30%; }
 .tmTopo b:nth-child(3){ width:14%; }
-.tmArena{ height:22%; border-radius:10px; justify-content:space-around; }
+.tmArena{ height:30%; margin-top:14px; border-radius:10px; justify-content:space-around; }
 .tmArena i{ width:20%; height:62%; border-radius:5px; }
 .tmArena u{ width:8%; height:4px; border-radius:2px; }
 .tmStats{ flex-direction:column; align-items:stretch !important; justify-content:center; gap:7px; border-radius:9px; padding:9px 7px; }
@@ -6113,3 +6113,5 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
   background:#F2C94C; color:#3b2f00; }
 .tmCadeado svg{ width:14px; height:14px; }
 .temaCardNome{ font-size:15px; font-weight:600; text-align:center; font-family:'Outfit',sans-serif; }
+
+.tmVazio{ flex:1; }

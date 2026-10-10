@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=153">
+<link rel="stylesheet" href="style.css?v=154">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -10706,11 +10706,9 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       // miniatura fiel da tela principal: topo (nivel/nome/moedas), arena, vida+xp, titulo+Add, nav
       const sp = 'background:' + t.txt + ';opacity:.5';
       b.innerHTML =
-        '<span class="tmTopo"><b style="background:' + t.acc + '"></b><b style="' + sp + '"></b><b style="background:#F2C94C"></b></span>' +
         '<span class="tmArena" style="background:' + t.panel + '"><i style="background:' + t.acc + '"></i><u style="' + sp + '"></u><i style="background:' + t.txt + ';opacity:.35"></i></span>' +
         '<span class="tmStats" style="background:' + t.panel + '"><b style="background:#F0527A"></b><b style="background:' + t.bg + '"></b></span>' +
-        '<span class="tmTit"><b style="background:' + t.txt + '"></b><i style="background:' + t.acc + '"></i></span>' +
-        '<span class="tmVazio"><b style="' + sp + '"></b><b style="' + sp + '"></b></span>' +
+        '<span class="tmVazio"></span>' +
         '<span class="tmNav"><i style="background:' + t.acc + '"></i><b style="' + sp + '"></b><b style="' + sp + '"></b><b style="' + sp + '"></b><b style="' + sp + '"></b></span>' +
         (travado ? '<span class="tmCadeado"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 9h-1V7a4 4 0 0 0-8 0v2H7a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2zm-7-2a2 2 0 0 1 4 0v2h-4V7z"/></svg></span>' : '');
       b.onclick = () => escolherTema(t.id);

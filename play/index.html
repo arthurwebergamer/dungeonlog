@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=158">
+<link rel="stylesheet" href="style.css?v=159">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -653,7 +653,7 @@ catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
        mudou de aba pra overlay. -->
   <div class="cfgOverlay" id="conquistasOverlay">
     <div class="cfgovhead">
-      <button class="cfgvoltar" id="conquistasVoltarBtn" aria-label="Voltar">
+      <button class="cfgvoltar" id="conquistasVoltarBtn" aria-label="Voltar" data-i18n-aria="acao.voltar">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
       </button>
       <span class="vtitle" data-i18n="perfil.conquistas">Conquistas</span>
@@ -665,7 +665,7 @@ catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 
   <div class="cfgOverlay" id="bestiarioOverlay">
     <div class="cfgovhead">
-      <button class="cfgvoltar" id="bestiarioVoltarBtn" aria-label="Voltar">
+      <button class="cfgvoltar" id="bestiarioVoltarBtn" aria-label="Voltar" data-i18n-aria="acao.voltar">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
       </button>
       <span class="vtitle" data-i18n="perfil.bestiario">Bestiário</span>
@@ -684,7 +684,7 @@ catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
        evita herdar padding/scroll do .view por engano. -->
   <div class="cfgOverlay" id="cfgOverlay">
     <div class="cfgovhead">
-      <button class="cfgvoltar" id="cfgVoltarBtn" aria-label="Voltar">
+      <button class="cfgvoltar" id="cfgVoltarBtn" aria-label="Voltar" data-i18n-aria="acao.voltar">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
       </button>
       <span class="vtitle" data-i18n="cfg.configuracoes">Configurações</span>
@@ -854,7 +854,7 @@ catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
        vir depois no documento pintam por cima dela quando abertas. -->
   <div class="cfgOverlay" id="heroiOverlay">
     <div class="cfgovhead">
-      <button class="cfgvoltar" id="heroiVoltarBtn" aria-label="Voltar">
+      <button class="cfgvoltar" id="heroiVoltarBtn" aria-label="Voltar" data-i18n-aria="acao.voltar">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
       </button>
       <span class="vtitle" data-i18n="cfg.heroi">Herói</span>
@@ -887,7 +887,7 @@ catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
        fluxos pisem um no outro. -->
   <div class="cfgOverlay" id="novoHeroiOverlay">
     <div class="cfgovhead">
-      <button class="cfgvoltar" id="novoHeroiVoltarBtn" aria-label="Voltar">
+      <button class="cfgvoltar" id="novoHeroiVoltarBtn" aria-label="Voltar" data-i18n-aria="acao.voltar">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
       </button>
       <span class="vtitle">Novo herói</span>
@@ -914,7 +914,7 @@ catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 
   <div class="cfgOverlay" id="aparenciaOverlay">
     <div class="cfgovhead">
-      <button class="cfgvoltar" id="aparenciaVoltarBtn" aria-label="Voltar">
+      <button class="cfgvoltar" id="aparenciaVoltarBtn" aria-label="Voltar" data-i18n-aria="acao.voltar">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
       </button>
       <span class="vtitle" data-i18n="cfg.aparencia">Aparência</span>
@@ -932,7 +932,7 @@ catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 
   <div class="cfgOverlay" id="prefsOverlay">
     <div class="cfgovhead">
-      <button class="cfgvoltar" id="prefsVoltarBtn" aria-label="Voltar">
+      <button class="cfgvoltar" id="prefsVoltarBtn" aria-label="Voltar" data-i18n-aria="acao.voltar">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
       </button>
       <span class="vtitle" data-i18n="cfg.preferencias">Preferências</span>
@@ -1000,7 +1000,7 @@ catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
        escondida atrás da de Preferências ainda visível. -->
   <div class="cfgOverlay" id="idiomaOverlay">
     <div class="cfgovhead">
-      <button class="cfgvoltar" id="idiomaVoltarBtn" aria-label="Voltar">
+      <button class="cfgvoltar" id="idiomaVoltarBtn" aria-label="Voltar" data-i18n-aria="acao.voltar">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
       </button>
       <span class="vtitle" data-i18n="cfg.idioma">Idioma</span>
@@ -1039,7 +1039,7 @@ catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
          HTML (getElementById puro, independente de onde mora no DOM). -->
   <div class="cfgOverlay" id="contaOverlay">
     <div class="cfgovhead">
-      <button class="cfgvoltar" id="contaVoltarBtn" aria-label="Voltar">
+      <button class="cfgvoltar" id="contaVoltarBtn" aria-label="Voltar" data-i18n-aria="acao.voltar">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
       </button>
       <span class="vtitle" data-i18n="cfg.gerenciarConta">Gerenciar conta</span>
@@ -1120,7 +1120,7 @@ catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
     <div class="pwFloresta"><img id="pwFlorestaImg" alt=""></div>
 
     <div class="pwTopo">
-      <button class="pwBack" id="paywallVoltarBtn" type="button" aria-label="Voltar">
+      <button class="pwBack" id="paywallVoltarBtn" type="button" aria-label="Voltar" data-i18n-aria="acao.voltar">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
       </button>
       <div class="pwDots">
@@ -15590,7 +15590,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   const htmlTopo = `
     <div class="carrosselTopo">
       <div class="carrosselTopoLado carrosselTopoEsq">
-        <button class="carrosselVoltar" id="carrosselVoltar" aria-label="Voltar">
+        <button class="carrosselVoltar" id="carrosselVoltar" aria-label="Voltar" data-i18n-aria="acao.voltar">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
         </button>
       </div>
@@ -18470,6 +18470,9 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     });
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
       el.placeholder = t(el.dataset.i18nPlaceholder);
+    });
+    document.querySelectorAll('[data-i18n-aria]').forEach(el => {
+      el.setAttribute('aria-label', t(el.dataset.i18nAria));
     });
     atualizarLinksLegais();
   }

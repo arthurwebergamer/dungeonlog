@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=162">
+<link rel="stylesheet" href="style.css?v=167">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -5550,24 +5550,21 @@ window.numeroFlutuanteHeroi = numeroFlutuanteHeroi;
 // nenhuma) e o elemento vai pro body em vez de pra dentro da arena.
 function obNumeroFlutuanteHeroi(heroiEl, xpGanho, moedasGanhas){
   if (!heroiEl) return;
+  // mesmo layout do combate real (numeroFlutuanteHeroi): uma linha
+  // "+moedas · +XP", centralizada na arena (aqui .obPalco), logo acima da
+  // cabeca do heroi. position:fixed porque nao ha .arena -- coordenadas de viewport.
   const heroiRect = heroiEl.getBoundingClientRect();
-  // FIX (print do usuario): a v1 copiava o offset do combate real
-  // (heroiRect.left - 30, texto alinhado a direita crescendo pra
-  // ESQUERDA) -- so que no combate o heroi fica mais centralizado na
-  // arena, com sobra de espaco a esquerda. No onboarding o heroi fica
-  // perto da borda esquerda da tela (obHeroSp, left:6%), entao esse
-  // mesmo offset jogava o texto pra FORA da viewport. Aqui o texto sai
-  // do lado DIREITO do heroi (.pilha.direita, ja existente, cresce pra
-  // direita) em vez do esquerdo.
-  const originX = heroiRect.right + 12;
-  const originY = heroiRect.top + heroiRect.height / 2;
+  const palco = heroiEl.closest('.obPalco');
+  const pr = palco ? palco.getBoundingClientRect() : heroiRect;
+  const originX = pr.left + pr.width / 2;
+  const originY = heroiRect.top - 4;
 
   const el = document.createElement('div');
-  el.className = 'dmg-float pilha direita fixo';
+  el.className = 'dmg-float centro fixo';
   el.style.left = originX + 'px';
   el.style.top = originY + 'px';
   el.innerHTML = '<span class="dmg-moeda">+' + moedasGanhas + ' ' + COIN_SVG + '</span>'
-    + '<span class="dmg-xp">+' + xpGanho + ' XP</span>';
+    + '<span class="dmg-sep">·</span><span class="dmg-xp">+' + xpGanho + ' XP</span>';
   document.body.appendChild(el);
   setTimeout(() => el.remove(), 1100);
 }
@@ -15536,7 +15533,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       return '<div class="carrosselImgWrap"><div class="obPalco">' +
         '<img class="obMobSp" src="' + MONSTROS[s.idx].img + '" alt="">' +
         '<div class="obSlashFx"></div>' +
-        '<img id="obHeroSp" class="obHeroSp" src="' + HEROIS[1].img + '" alt="">' +
+        '<div id="obHeroSp" class="obHeroSp"><div class="hero-sprite obHeroInner" id="obHeroInner"></div></div>' +
       '</div></div>';
     }
     if (s.tipo === 'estagioAnim'){
@@ -16025,18 +16022,91 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     const origemY = mobRect.top + mobRect.height / 2;
     window.voarRecompensa(origemX, origemY, heroEl, COIN_SVG);
     setTimeout(() => window.voarRecompensa(origemX, origemY, heroEl, XP_GEM_SVG), 90);
-    setTimeout(() => {
+    golpeTimers.push(setTimeout(() => {
       if (typeof window.obNumeroFlutuanteHeroi === 'function') window.obNumeroFlutuanteHeroi(heroEl, 12, 4);
-    }, 840);
+    }, 840));
+  }
+
+  // v4.x (pedido do usuario): o heroi do carrossel agora empunha ESPADA de
+  // verdade (mesmo markup .heroArma/.heroMao do combate real, ver
+  // desenharHeroi()), corre ate o monstro como em animarGolpe(), bate, a
+  // recompensa voa ate ele e, depois de cada golpe, a espada TROCA pra
+  // proxima da lista (pop de escala) -- loop dinamico. Tudo por JS/WAAPI;
+  // os loops CSS antigos (obHeroLunge/obMobShake/obSlash) ficam
+  // desligados por override no fim do style.css.
+  const ESPADAS_OB = [2, 129, 142, 164, 176];   // 1 por raridade (comum..lendario): Aco, Katana, Duas Maos, Lamina Demoniaca (roxa), Dourada
+  let obEspadaIdx = 0, golpeTimers = [];
+  function obArmaHTML(id){
+    const S = 56, gp = window.ARMA_GRIP && window.ARMA_GRIP[id];
+    const maoXY = [60, 63.3], kk = S / 32;
+    const aj = (window.ARMA_AJUSTE && window.ARMA_AJUSTE[id]) || [0, 0];
+    const pos = gp ? 'left:' + (maoXY[0] - gp[0]*kk + aj[0]).toFixed(1) + 'px;top:' + (maoXY[1] - gp[1]*kk + aj[1]).toFixed(1) + 'px;transform-origin:' + (gp[0]*kk).toFixed(1) + 'px ' + (gp[1]*kk).toFixed(1) + 'px;' : '';
+    return '<div class="heroArma' + (window.ARMA_ESCURA && window.ARMA_ESCURA.has(id) ? ' escura' : '') + '"' + (pos ? ' style="' + pos + '"' : '') + '><div class="pxi" style="' + estiloArma(ITENS[id][0], S) + '"></div></div>';
+  }
+  function obPintarHeroi(pop){
+    const el = document.getElementById('obHeroInner');
+    if (!el) return;
+    el.innerHTML = '<img class="heroimg" src="' + HEROIS[1].img + '" alt="">' +
+      obArmaHTML(ESPADAS_OB[obEspadaIdx % ESPADAS_OB.length]) +
+      '<img class="heroMao" src="' + HEROIS[1].img + '" alt=""><div class="sombra"></div>';
+    const arma = el.querySelector('.heroArma');
+    if (pop && arma && arma.animate) arma.animate([{opacity:0, filter:'brightness(3)'}, {opacity:1, filter:'brightness(1)'}], {duration:260, easing:'ease-out'});
+  }
+  function golpeOb(){
+    const wrap = document.getElementById('obHeroSp');
+    const inner = document.getElementById('obHeroInner');
+    const mob = document.querySelector('.carrosselSlide.on .obMobSp');
+    const slash = document.querySelector('.carrosselSlide.on .obSlashFx');
+    if (!wrap || !inner || !mob) return;
+    const T = 900;
+    const hr = wrap.getBoundingClientRect(), mr = mob.getBoundingClientRect();
+    const dx = Math.max(0, Math.round(mr.left - hr.right + 14));
+    inner.classList.add('golpeando');
+    wrap.style.zIndex = 5;
+    if (wrap.animate) wrap.animate([
+      {transform:'translateX(0) scale(1)', offset:0},
+      {transform:'translateX(' + (dx*0.55) + 'px) translateY(-6px) scale(1.04)', offset:.22},
+      {transform:'translateX(' + dx + 'px) translateY(0) scale(1.08)', offset:.40},
+      {transform:'translateX(' + dx + 'px) translateY(0) scale(1.08)', offset:.55},
+      {transform:'translateX(0) scale(1)', offset:1}
+    ], {duration:T, easing:'cubic-bezier(.3,.7,.3,1)'});
+    golpeTimers.push(setTimeout(() => {   // impacto
+      if (mob.animate) mob.animate([
+        {transform:'translate(0,0) rotate(0)', filter:'none'},
+        {transform:'translate(-5px,-2px) rotate(-6deg)', filter:'brightness(0) invert(1)', offset:.3},
+        {transform:'translate(4px,1px) rotate(5deg)', filter:'brightness(0) invert(1)', offset:.6},
+        {transform:'translate(0,0) rotate(0)', filter:'none'}
+      ], {duration:320});
+      const palco = mob.closest('.obPalco');
+      if (palco){   // mesmo sprite de corte do combate real (.fx-sprite-slash), cor = raridade da espada, bem maior
+        const pr = palco.getBoundingClientRect(), mr2 = mob.getBoundingClientRect();
+        const fx = document.createElement('div');
+        const rar = (typeof item === 'function' && item(ESPADAS_OB[obEspadaIdx % ESPADAS_OB.length])) ? item(ESPADAS_OB[obEspadaIdx % ESPADAS_OB.length]).rar : 0;
+        fx.className = 'fx-sprite-slash ' + (['comum','incomum','raro','epico','lendario'][rar] || 'comum');
+        fx.style.left = (mr2.left - pr.left + mr2.width / 2) + 'px';
+        fx.style.top = (mr2.top - pr.top + mr2.height / 2) + 'px';
+        fx.style.setProperty('--escala-slash', [2, 2.2, 2.4, 2.6, 2.8][rar] || 2.4);   // raridade maior = corte maior, como no combate real
+        palco.appendChild(fx);
+        setTimeout(() => fx.remove(), 450);
+      }
+      dispararRecompensaGolpe();
+    }, Math.round(T*0.42)));
+    golpeTimers.push(setTimeout(() => { inner.classList.remove('golpeando'); wrap.style.zIndex = ''; }, T + 30));
+    golpeTimers.push(setTimeout(() => {   // troca de espada depois de cada golpe
+      obEspadaIdx++;
+      obPintarHeroi(true);
+    }, T + 350));
   }
   function iniciarCicloGolpe(){
     pararCicloGolpe(); // guarda -- nunca acumula 2 ciclos em paralelo
-    golpeCicloTimeout = setTimeout(() => {
-      dispararRecompensaGolpe();
-      golpeCicloInterval = setInterval(dispararRecompensaGolpe, 3200);
-    }, 190);
+    obPintarHeroi(false);
+    golpeTimers.push(setTimeout(() => {
+      golpeOb();
+      golpeCicloInterval = setInterval(golpeOb, 2400);
+    }, 250));
   }
   function pararCicloGolpe(){
+    golpeTimers.forEach(clearTimeout); golpeTimers = [];
     if (golpeCicloTimeout){ clearTimeout(golpeCicloTimeout); golpeCicloTimeout = null; }
     if (golpeCicloInterval){ clearInterval(golpeCicloInterval); golpeCicloInterval = null; }
   }

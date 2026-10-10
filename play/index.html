@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=163">
+<link rel="stylesheet" href="style.css?v=164">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -5550,24 +5550,21 @@ window.numeroFlutuanteHeroi = numeroFlutuanteHeroi;
 // nenhuma) e o elemento vai pro body em vez de pra dentro da arena.
 function obNumeroFlutuanteHeroi(heroiEl, xpGanho, moedasGanhas){
   if (!heroiEl) return;
+  // mesmo layout do combate real (numeroFlutuanteHeroi): uma linha
+  // "+moedas · +XP", centralizada na arena (aqui .obPalco), logo acima da
+  // cabeca do heroi. position:fixed porque nao ha .arena -- coordenadas de viewport.
   const heroiRect = heroiEl.getBoundingClientRect();
-  // FIX (print do usuario): a v1 copiava o offset do combate real
-  // (heroiRect.left - 30, texto alinhado a direita crescendo pra
-  // ESQUERDA) -- so que no combate o heroi fica mais centralizado na
-  // arena, com sobra de espaco a esquerda. No onboarding o heroi fica
-  // perto da borda esquerda da tela (obHeroSp, left:6%), entao esse
-  // mesmo offset jogava o texto pra FORA da viewport. Aqui o texto sai
-  // do lado DIREITO do heroi (.pilha.direita, ja existente, cresce pra
-  // direita) em vez do esquerdo.
-  const originX = heroiRect.right + 12;
-  const originY = heroiRect.top + heroiRect.height / 2;
+  const palco = heroiEl.closest('.obPalco');
+  const pr = palco ? palco.getBoundingClientRect() : heroiRect;
+  const originX = pr.left + pr.width / 2;
+  const originY = heroiRect.top - 4;
 
   const el = document.createElement('div');
-  el.className = 'dmg-float pilha direita fixo';
+  el.className = 'dmg-float centro fixo';
   el.style.left = originX + 'px';
   el.style.top = originY + 'px';
   el.innerHTML = '<span class="dmg-moeda">+' + moedasGanhas + ' ' + COIN_SVG + '</span>'
-    + '<span class="dmg-xp">+' + xpGanho + ' XP</span>';
+    + '<span class="dmg-sep">·</span><span class="dmg-xp">+' + xpGanho + ' XP</span>';
   document.body.appendChild(el);
   setTimeout(() => el.remove(), 1100);
 }
@@ -16080,9 +16077,18 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         {transform:'translate(4px,1px) rotate(5deg)', filter:'brightness(0) invert(1)', offset:.6},
         {transform:'translate(0,0) rotate(0)', filter:'none'}
       ], {duration:320});
-      if (slash && slash.animate) slash.animate([
-        {opacity:1, backgroundPosition:'0 0'}, {opacity:1, backgroundPosition:'-504px 0'}
-      ], {duration:320, easing:'steps(9)'});
+      const palco = mob.closest('.obPalco');
+      if (palco){   // mesmo sprite de corte do combate real (.fx-sprite-slash), cor = raridade da espada, bem maior
+        const pr = palco.getBoundingClientRect(), mr2 = mob.getBoundingClientRect();
+        const fx = document.createElement('div');
+        const rar = (typeof item === 'function' && item(ESPADAS_OB[obEspadaIdx % ESPADAS_OB.length])) ? item(ESPADAS_OB[obEspadaIdx % ESPADAS_OB.length]).rar : 0;
+        fx.className = 'fx-sprite-slash ' + (['comum','incomum','raro','epico','lendario'][rar] || 'comum');
+        fx.style.left = (mr2.left - pr.left + mr2.width / 2) + 'px';
+        fx.style.top = (mr2.top - pr.top + mr2.height / 2) + 'px';
+        fx.style.setProperty('--escala-slash', 2.6);
+        palco.appendChild(fx);
+        setTimeout(() => fx.remove(), 450);
+      }
       dispararRecompensaGolpe();
     }, Math.round(T*0.42)));
     golpeTimers.push(setTimeout(() => { inner.classList.remove('golpeando'); wrap.style.zIndex = ''; }, T + 30));

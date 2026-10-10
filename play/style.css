@@ -6149,3 +6149,4 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 .obHeroSp{ width:125px; animation:none !important; }
 .obMobSp, .obSlashFx{ animation:none !important; }
 .obHeroInner{ position:absolute; left:0; bottom:0; width:83px; height:83px; transform:scale(1.5); transform-origin:0 100%; }
+.obSlashFx{ display:none !important; }

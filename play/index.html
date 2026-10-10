@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=150">
+<link rel="stylesheet" href="style.css?v=151">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -10508,16 +10508,16 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
      pedido do usuario -- nomes mais diretos, descrevendo a cor em vez
      do tema/vibe). */
   const TEMAS = [
-    {id:'branco',     nome:'Branco',   nome_en:'White',  cor:'#FFFFFF'},
-    {id:'grafite',    nome:'Escuro',   nome_en:'Dark',   cor:'#8B8B93'},
-    {id:'padrao',     nome:'Laranja',  nome_en:'Orange', cor:'#F2A65A'},
-    {id:'pergaminho', nome:'Dourado',  nome_en:'Gold',   cor:'#C9A961'},
+    {id:'branco',     nome:'Branco',   nome_en:'White',  cor:'#FFFFFF', bg:'#E4E2DE', panel:'#D4D1CB', acc:'#2E2C29', txt:'#2E2C29'},
+    {id:'grafite',    nome:'Escuro',   nome_en:'Dark',   cor:'#8B8B93', bg:'#282828', panel:'#3D3D3D', acc:'#FFFFFF', txt:'#FAFAFA'},
+    {id:'padrao',     nome:'Laranja',  nome_en:'Orange', cor:'#F2A65A', bg:'#1A1526', panel:'#251E38', acc:'#F2A65A', txt:'#F5F0E9'},
+    {id:'pergaminho', nome:'Dourado',  nome_en:'Gold',   cor:'#C9A961', bg:'#0F1216', panel:'#151A20', acc:'#C9A961', txt:'#E6E9ED'},
     // PLANO PRO -- item 2 do escopo fechado. `pro:true` e a UNICA
     // diferenca de shape vs os temas gratis acima -- pintarTemaGrid()
     // e escolherTema() leem essa flag pra bloquear quem nao assina.
     // (id 'esmeralda' -- substituiu 'azul', rejeitado pelo usuario)
-    {id:'esmeralda',  nome:'Esmeralda',  nome_en:'Emerald',    cor:'#22C55E', pro:true},
-    {id:'terracota',  nome:'Terracota',  nome_en:'Terracotta', cor:'#C96A4A', pro:true}
+    {id:'esmeralda',  nome:'Esmeralda',  nome_en:'Emerald',    cor:'#22C55E', bg:'#12161A', panel:'#1A2025', acc:'#22C55E', txt:'#EAF1EE', pro:true},
+    {id:'terracota',  nome:'Terracota',  nome_en:'Terracotta', cor:'#C96A4A', bg:'#10161C', panel:'#18212A', acc:'#C96A4A', txt:'#EDEEEF', pro:true}
   ];
   const CHAVE_TEMA = 'questlog.tema.v1';
 
@@ -10692,17 +10692,22 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     // entende o que esta perdendo, igual o "+ Novo herói" bloqueado.
     const bloqueado = typeof assinaturaAtiva === 'function' && !assinaturaAtiva();
     TEMAS.forEach(t => {
-      const b = document.createElement('div');
+      const b = document.createElement('button');
+      b.type = 'button';
       const travado = t.pro && bloqueado;
-      b.className = 'temalinha' + (t.id === atual ? ' sel' : '') + (travado ? ' bloqueado' : '');
+      b.className = 'temaCard' + (t.id === atual ? ' sel' : '') + (travado ? ' bloqueado' : '');
       let langAtual = 'pt';
       try { langAtual = localStorage.getItem('questlog.idioma.v1') || 'pt'; } catch(e){}
       const nomeTema = langAtual === 'en' ? (t.nome_en || t.nome) : t.nome;
+      b.style.background = t.bg;
+      b.style.color = t.txt;
+      b.style.setProperty('--tc-acc', t.acc);
       b.innerHTML =
-        '<span class="temaDot" style="background:' + t.cor + '"></span>' +
-        '<span class="temaNome">' + nomeTema + '</span>' +
+        '<span class="temaCardDot" style="background:' + t.acc + '"></span>' +
+        '<span class="temaCardBarra" style="background:' + t.panel + '"><i style="background:' + t.acc + '"></i></span>' +
+        '<span class="temaCardNome">' + nomeTema + '</span>' +
         (travado ? '<span class="temaSelo">PRO</span>' : '') +
-        '<svg class="temaCheck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+        '<span class="temaCardCheck" style="background:' + t.acc + ';color:' + t.bg + '"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></span>';
       b.onclick = () => escolherTema(t.id);
       g.appendChild(b);
     });

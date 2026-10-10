@@ -6078,14 +6078,20 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 :root[data-tema="branco"] .estFlutBar i{background:#F7F6F3}
 :root[data-tema="branco"] .estFlut{border-color:rgba(255,255,255,.28)}
 
-/* Aparência (celular): a lista de temas ficava estreita e colada na
-   esquerda porque .cfgOverlay .cfgrow.cfgcol usa align-items:flex-start
-   (encolhe o filho ao tamanho do conteúdo). Esticar na largura toda,
-   com linhas maiores pra toque. */
-#aparenciaOverlay #cfgTemaCard{ align-items:stretch; gap:6px; padding:8px 2px; }
+/* Aparência (celular): cartões de tema em grade 2x3 (mockup A). */
+#aparenciaOverlay #cfgTemaCard{ align-items:stretch; gap:10px; padding:8px 2px; }
 #aparenciaOverlay #cfgTemaCard .cfgtxt span{ opacity:.7; font-size:13px; }
-#aparenciaOverlay #temaGrid{ width:100%; gap:0; }
-#aparenciaOverlay .temalinha{ padding:0 4px; min-height:64px; gap:16px; }
-#aparenciaOverlay .temaDot{ width:38px; height:38px; }
-#aparenciaOverlay .temaNome{ font-size:17px; }
-#aparenciaOverlay .temaCheck{ width:24px; height:24px; }
+#aparenciaOverlay #temaGrid{ width:100%; display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:12px; }
+.temaCard{ position:relative; height:140px; border-radius:20px; border:3px solid transparent; padding:0; overflow:hidden;
+  text-align:left; cursor:pointer; font-family:'Outfit',sans-serif; box-shadow:inset 0 0 0 1px rgba(128,128,128,.25); }
+.temaCard.sel{ border-color:var(--tc-acc); }
+.temaCard.bloqueado{ opacity:.7; }
+.temaCardDot{ position:absolute; left:14px; top:14px; width:44px; height:44px; border-radius:50%; box-shadow:0 4px 12px rgba(0,0,0,.35); }
+.temaCardBarra{ position:absolute; left:14px; right:14px; top:72px; height:8px; border-radius:4px; overflow:hidden; }
+.temaCardBarra i{ display:block; height:100%; width:62%; border-radius:4px; }
+.temaCardNome{ position:absolute; left:14px; bottom:14px; font-size:17px; font-weight:600; }
+.temaCard .temaSelo{ position:absolute; right:12px; bottom:14px; }
+.temaCardCheck{ position:absolute; right:12px; top:12px; width:26px; height:26px; border-radius:50%;
+  display:none; align-items:center; justify-content:center; }
+.temaCardCheck svg{ width:16px; height:16px; }
+.temaCard.sel .temaCardCheck{ display:flex; }

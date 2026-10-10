@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=160">
+<link rel="stylesheet" href="style.css?v=162">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -14779,6 +14779,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           <span data-i18n="login.continuarComEmail">Continuar com email</span>
         </button>
         <p class="loginRodape"><span data-i18n="login.jaTemConta">Já tem conta?</span> <button class="loginLink" id="loginEscolhaEntrar" style="padding:0" data-i18n="login.entrar">Entrar</button></p>
+        <p class="loginRodape"><button class="loginLink" id="loginEscolhaConvidado" style="padding:0" data-i18n="login.semConta">Entrar como convidado</button></p>
       </div>
 
       <div class="loginFormWrap" id="loginFormWrap" style="display:none">
@@ -14858,6 +14859,29 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   document.getElementById('loginEscolhaGoogle').onclick = () => {
     const btn = document.getElementById('loginGoogleBtn');
     if (btn) btn.click();
+  };
+  // MODO CONVIDADO (feedback de tester: "o app para num muro de cadastro"):
+  // joga sem conta, tudo em localStorage (chaves sem .uid.). A flag
+  // questlog.convidado.v1 faz o aoLogar() migrar esse progresso pra conta
+  // nova quando a pessoa criar conta depois (Config > Criar conta).
+  document.getElementById('loginEscolhaConvidado').onclick = () => {
+    try { localStorage.setItem('questlog.convidado.v1', '1'); } catch(e){}
+    if (typeof window.definirUidAtivo === 'function') window.definirUidAtivo(null);
+    document.getElementById('passoLogin').classList.remove('on');
+    if (typeof window.esconderLoadingMasmorra === 'function') window.esconderLoadingMasmorra();
+    if (typeof window.confirmarSessaoResolvida === 'function') window.confirmarSessaoResolvida();
+    const temSave = typeof window.carregar === 'function' && window.carregar();
+    if (temSave){
+      // ja tinha progresso local (ex.: Sair/Criar conta e voltou) -- reentra direto
+      try { if (typeof jaComecou !== 'undefined') jaComecou = true; } catch(e){}
+      intro.classList.add('off');
+      intro.classList.remove('loginBg');
+      intro.style.backgroundImage = '';
+      if (typeof window.desenharHeroi === 'function') window.desenharHeroi();
+      if (typeof window.render === 'function') window.render();
+    } else if (typeof window.mostrarSetupPersonagemENome === 'function'){
+      window.mostrarSetupPersonagemENome();
+    }
   };
   // v4.129 (pedido do usuario com video do Habitica): a troca de tela
   // era um display:none/flex INSTANTANEO -- sem transicao nenhuma,
@@ -15092,7 +15116,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       a.href = 'https://dungeonlog.weberlabs.com.br/' + (en ? 'en/' : '') + a.dataset.k;
     }));
     const precisa = id => !dispAceito() || (id === 'loginEntrarBtn' && modoCadastro);   // aparelho ja aceitou: so o 'Criar conta' por email ainda exige o checkbox
-    ['loginEscolhaGoogle','loginEscolhaEmail','loginEntrarBtn','loginGoogleBtn'].forEach(id => {
+    ['loginEscolhaGoogle','loginEscolhaEmail','loginEscolhaConvidado','loginEntrarBtn','loginGoogleBtn'].forEach(id => {
       const el = document.getElementById(id);
       if (!el) return;
       el.addEventListener('click', e => {
@@ -16971,7 +16995,36 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         return;
       }
 
+      // Guarda ANTES de trocar o uid: se veio do modo convidado e a conta e
+      // nova, copia o progresso local (chaves sem .uid.) pro namespace da
+      // conta e limpa as chaves cruas (evita contaminar a proxima conta).
+      let veioDeConvidado = false;
+      try { veioDeConvidado = localStorage.getItem('questlog.convidado.v1') === '1'; } catch(e){}
+
       window.definirUidAtivo(user.uid);
+
+      if (veioDeConvidado){
+        try {
+          if (contaNova){
+            const cruas = [];
+            for (let i = 0; i < localStorage.length; i++){
+              const k = localStorage.key(i);
+              if (!k || k.indexOf('questlog.') !== 0 || k.indexOf('.uid.') !== -1) continue;
+              if (/\.pj\.[^.]+$/.test(k) || k === 'questlog.personagens.v1' || k === 'questlog.personagemAtivo.v1') cruas.push(k);
+            }
+            cruas.forEach(k => {
+              const nk = /\.pj\.[^.]+$/.test(k)
+                ? k.replace(/\.pj\.([^.]+)$/, '.uid.' + user.uid + '.pj.$1')
+                : k + '.uid.' + user.uid;
+              if (localStorage.getItem(nk) === null) localStorage.setItem(nk, localStorage.getItem(k));
+              localStorage.removeItem(k);
+            });
+            // personagem ativo foi relido por definirUidAtivo ANTES da copia -- relê de novo
+            window.definirUidAtivo(user.uid);
+          }
+          localStorage.removeItem('questlog.convidado.v1');
+        } catch(e){ console.error('QuestLog: migracao convidado->conta falhou', e); }
+      }
 
       // BUG REAL ENCONTRADO E CORRIGIDO (testado pelo usuario, nao
       // suposicao): a migracao abaixo rodava pra TODA conta nova que
@@ -17674,6 +17727,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       // sessao nenhuma pra encerrar aqui, so reabre a tela de login com
       // o save local intacto, que aoLogar() ja sabe reaproveitar
       localStorage.setItem('questlog.forcarLogin.v1', '1');
+      localStorage.setItem('questlog.convidado.v1', '1'); // progresso local migra pra conta nova (aoLogar)
     } catch(e){}
     location.reload();
   };
@@ -18429,6 +18483,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'login.emailErrado':       { pt:'Email errado? Corrigir', en:'Wrong email? Fix it' },
     'login.jaTemConta':        { pt:'Já tem conta?', en:'Already have an account?' },
     'login.pular':             { pt:'Pular', en:'Skip' },
+    'login.semConta':          { pt:'Entrar como convidado', en:'Continue as guest' },
     'login.tagline':           { pt:'Suas tarefas viram uma aventura', en:'Your tasks become an adventure' },
     'login.aceitoPre':         { pt:'Li e concordo com os ', en:'I have read and agree to the ' },
     'login.termos':            { pt:'Termos de Uso', en:'Terms of Use' },

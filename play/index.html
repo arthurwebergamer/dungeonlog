@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=164">
+<link rel="stylesheet" href="style.css?v=165">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -16034,7 +16034,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // proxima da lista (pop de escala) -- loop dinamico. Tudo por JS/WAAPI;
   // os loops CSS antigos (obHeroLunge/obMobShake/obSlash) ficam
   // desligados por override no fim do style.css.
-  const ESPADAS_OB = [2, 6, 121, 129, 130, 176];   // Aco, Ferro, Longa, Katana, Elfica, Dourada
+  const ESPADAS_OB = [2, 129, 142, 171, 176];   // 1 por raridade (comum..lendario): Aco, Katana, Duas Maos, Ancestral, Dourada -- mostra todos os cortes
   let obEspadaIdx = 0, golpeTimers = [];
   function obArmaHTML(id){
     const S = 56, gp = window.ARMA_GRIP && window.ARMA_GRIP[id];
@@ -16085,7 +16085,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         fx.className = 'fx-sprite-slash ' + (['comum','incomum','raro','epico','lendario'][rar] || 'comum');
         fx.style.left = (mr2.left - pr.left + mr2.width / 2) + 'px';
         fx.style.top = (mr2.top - pr.top + mr2.height / 2) + 'px';
-        fx.style.setProperty('--escala-slash', 2.6);
+        fx.style.setProperty('--escala-slash', [2, 2.2, 2.4, 2.6, 2.8][rar] || 2.4);   // raridade maior = corte maior, como no combate real
         palco.appendChild(fx);
         setTimeout(() => fx.remove(), 450);
       }

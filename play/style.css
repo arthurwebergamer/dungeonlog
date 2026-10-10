@@ -6082,16 +6082,25 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 #aparenciaOverlay #cfgTemaCard{ align-items:stretch; gap:10px; padding:8px 2px; }
 #aparenciaOverlay #cfgTemaCard .cfgtxt span{ opacity:.7; font-size:13px; }
 #aparenciaOverlay #temaGrid{ width:100%; display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:12px; }
-.temaCard{ position:relative; height:140px; border-radius:20px; border:3px solid transparent; padding:0; overflow:hidden;
-  text-align:left; cursor:pointer; font-family:'Outfit',sans-serif; box-shadow:inset 0 0 0 1px rgba(128,128,128,.25); }
-.temaCard.sel{ border-color:var(--tc-acc); }
-.temaCard.bloqueado{ opacity:.7; }
-.temaCardDot{ position:absolute; left:14px; top:14px; width:44px; height:44px; border-radius:50%; box-shadow:0 4px 12px rgba(0,0,0,.35); }
-.temaCardBarra{ position:absolute; left:14px; right:14px; top:72px; height:8px; border-radius:4px; overflow:hidden; }
-.temaCardBarra i{ display:block; height:100%; width:62%; border-radius:4px; }
-.temaCardNome{ position:absolute; left:14px; bottom:14px; font-size:17px; font-weight:600; }
-.temaCard .temaSelo{ position:absolute; right:12px; bottom:14px; }
-.temaCardCheck{ position:absolute; right:12px; top:12px; width:26px; height:26px; border-radius:50%;
-  display:none; align-items:center; justify-content:center; }
-.temaCardCheck svg{ width:16px; height:16px; }
-.temaCard.sel .temaCardCheck{ display:flex; }
+#aparenciaOverlay #temaGrid{ gap:18px 14px; }
+.temaItem{ display:flex; flex-direction:column; align-items:center; gap:8px; min-width:0; }
+.temaCard{ position:relative; width:100%; aspect-ratio:3/4; border-radius:18px; border:3px solid transparent; padding:10px; overflow:hidden;
+  display:flex; flex-direction:column; gap:7px; cursor:pointer; box-shadow:inset 0 0 0 1px rgba(128,128,128,.3); }
+.temaCard.sel{ border-color:#fff; box-shadow:0 0 0 1px rgba(0,0,0,.4); }
+:root[data-tema="branco"] .temaCard.sel{ border-color:#2E2C29; }
+.temaCard.bloqueado{ opacity:.85; }
+.temaCard > span{ display:flex; align-items:center; border-radius:8px; }
+.tmTopo{ gap:6px; height:12px; }
+.tmTopo i{ width:12px; height:12px; border-radius:50%; flex:none; }
+.tmTopo b{ height:5px; width:45%; border-radius:3px; opacity:.6; }
+.tmPainel{ flex:1; justify-content:space-around; border-radius:10px !important; }
+.tmPainel i{ width:26%; height:55%; border-radius:6px; }
+.tmLinha{ height:22px; gap:6px; padding:0 7px; }
+.tmLinha i{ width:9px; height:9px; border-radius:3px; border:2px solid; opacity:.6; flex:none; }
+.tmLinha b{ height:5px; flex:1; border-radius:3px; opacity:.45; }
+.tmXp{ height:8px; border-radius:4px !important; overflow:hidden; }
+.tmXp i{ display:block; height:100%; width:62%; }
+.tmCadeado{ position:absolute !important; right:8px; top:8px; width:26px; height:26px; border-radius:50% !important; justify-content:center;
+  background:#F2C94C; color:#3b2f00; }
+.tmCadeado svg{ width:14px; height:14px; }
+.temaCardNome{ font-size:15px; font-weight:600; text-align:center; font-family:'Outfit',sans-serif; }

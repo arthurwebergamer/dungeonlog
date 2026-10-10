@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=154">
+<link rel="stylesheet" href="style.css?v=155">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -10692,32 +10692,23 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     // entende o que esta perdendo, igual o "+ Novo herói" bloqueado.
     const bloqueado = typeof assinaturaAtiva === 'function' && !assinaturaAtiva();
     TEMAS.forEach(t => {
-      const item = document.createElement('div');
-      item.className = 'temaItem';
       const b = document.createElement('button');
       b.type = 'button';
       const travado = t.pro && bloqueado;
-      b.className = 'temaCard' + (t.id === atual ? ' sel' : '') + (travado ? ' bloqueado' : '');
+      b.className = 'temaFaixa' + (t.id === atual ? ' sel' : '') + (travado ? ' bloqueado' : '');
       let langAtual = 'pt';
       try { langAtual = localStorage.getItem('questlog.idioma.v1') || 'pt'; } catch(e){}
       const nomeTema = langAtual === 'en' ? (t.nome_en || t.nome) : t.nome;
       b.style.background = t.bg;
+      b.style.color = t.txt;
       b.setAttribute('aria-label', nomeTema);
-      // miniatura fiel da tela principal: topo (nivel/nome/moedas), arena, vida+xp, titulo+Add, nav
-      const sp = 'background:' + t.txt + ';opacity:.5';
       b.innerHTML =
-        '<span class="tmArena" style="background:' + t.panel + '"><i style="background:' + t.acc + '"></i><u style="' + sp + '"></u><i style="background:' + t.txt + ';opacity:.35"></i></span>' +
-        '<span class="tmStats" style="background:' + t.panel + '"><b style="background:#F0527A"></b><b style="background:' + t.bg + '"></b></span>' +
-        '<span class="tmVazio"></span>' +
-        '<span class="tmNav"><i style="background:' + t.acc + '"></i><b style="' + sp + '"></b><b style="' + sp + '"></b><b style="' + sp + '"></b><b style="' + sp + '"></b></span>' +
-        (travado ? '<span class="tmCadeado"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 9h-1V7a4 4 0 0 0-8 0v2H7a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2zm-7-2a2 2 0 0 1 4 0v2h-4V7z"/></svg></span>' : '');
+        '<span class="tfSw"><i style="background:' + t.bg + '"></i><i style="background:' + t.panel + '"></i><i style="background:' + t.acc + '"></i></span>' +
+        '<span class="tfNome">' + nomeTema + '</span>' +
+        (travado ? '<span class="tfCad"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 9h-1V7a4 4 0 0 0-8 0v2H7a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2zm-7-2a2 2 0 0 1 4 0v2h-4V7z"/></svg></span>' : '') +
+        '<span class="tfCheck" style="background:' + t.acc + ';color:' + t.bg + '"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></span>';
       b.onclick = () => escolherTema(t.id);
-      const nm = document.createElement('div');
-      nm.className = 'temaCardNome';
-      nm.textContent = nomeTema;
-      item.appendChild(b);
-      item.appendChild(nm);
-      g.appendChild(item);
+      g.appendChild(b);
     });
   }
 

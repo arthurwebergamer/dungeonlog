@@ -87,3 +87,19 @@
     }, 650);
   });
 })();
+
+/* menu do celular (três linhas) */
+(function () {
+  var btn = document.getElementById('menuBtn'), menu = document.getElementById('menu');
+  if (!btn || !menu) return;
+  function fechar() { menu.hidden = true; btn.setAttribute('aria-expanded', 'false'); }
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    var abrir = menu.hidden;
+    menu.hidden = !abrir; btn.setAttribute('aria-expanded', abrir ? 'true' : 'false');
+  });
+  menu.addEventListener('click', function (e) { if (e.target.closest('a')) fechar(); });
+  document.addEventListener('click', function (e) { if (!menu.hidden && !menu.contains(e.target)) fechar(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') fechar(); });
+  window.addEventListener('resize', function () { if (window.innerWidth > 720) fechar(); });
+})();

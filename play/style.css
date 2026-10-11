@@ -6150,3 +6150,6 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 .obMobSp, .obSlashFx{ animation:none !important; }
 .obHeroInner{ position:absolute; left:0; bottom:0; width:83px; height:83px; transform:scale(1.5); transform-origin:0 100%; }
 .obSlashFx{ display:none !important; }
+
+/* barra de estagio flutuante cobria o fim da lista: reserva espaco no fim pra ultima tarefa rolar pra cima dela */
+.list{padding-bottom:68px}

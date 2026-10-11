@@ -1,180 +1,144 @@
 <!DOCTYPE html>
-<!-- Landing page raiz do domínio dungeonlog.weberlabs.com.br.
-     Substitui a antiga waitlist/ (removida). Fundo = mesma fórmula que a
-     .arena de combate real usa (play/style.css ~linha 1006): tile
-     TEMA_ARENA_TILE_B64 + gradiente vertical com as cores do tema
-     Grafite (--arena-1/2/3) + vinheta radial. Estático, sem animação --
-     a versão com blocos acendendo no hover/toque foi tentada e removida
-     a pedido do usuário (queria algo mais clean).
-
-     Ajustes desta versão:
-     - Removida a grade interativa (JS) por completo.
-     - Ícone do header sem image-rendering:pixelated -- o ícone real
-       (play/icon-192.png) é arte "lisa" (sombreada), não pixel art; o
-       pixelated forçava reamostragem nearest-neighbor ao encolher pra
-       26px e ficava serrilhado/ruim. Sem essa propriedade o navegador
-       reamostra suave, que é o certo pra esse arquivo.
-     - Removido body{overflow:hidden}: no celular ele podia cortar o
-       rodapé (Privacidade/Termos) fora da tela sem permitir rolar até
-       ele. Agora a página rola normalmente se o conteúdo não couber.
-     - Texto do hero encurtado (1 frase em vez de 2).
-     - Título ganhou uma barrinha (underline) fina e curta embaixo,
-       centralizada -- único elemento de "estilo" novo, mantendo clean.
-
-     Ajuste de contraste (4 tentativas):
-     1) painel de vidro atrás de tudo -- "parece um quadradão".
-     2) pastilha escura por linha -- ainda "horrível".
-     3) contorno preto na letra (estilo legenda/HUD) -- usuário rejeitou:
-        quer "estilo Apple", sem esse contorno, "pra ser simples".
-     4ª tentativa (esta): nada NO texto (sem contorno, sem peso extra-
-     bold) -- o contraste vem de escurecer a PRÓPRIA foto de fundo numa
-     faixa ampla e suave atrás do texto (gradiente radial largo, sem
-     borda perceptível), exatamente como a Apple escurece a foto/vídeo
-     de fundo atrás do título nas páginas de produto, em vez de mexer no
-     texto. Tipografia: peso 600 (semibold, não 800), sem text-shadow.
-
-     PT/EN: esta é a versão em português (raiz, "/"). A versão em inglês
-     é uma cópia irmã em /en/ (mesmo HTML, textos traduzidos) -- ver
-     comentário equivalente lá. O seletor de idioma no header linka uma
-     pra outra; não é troca dinâmica via JS, são páginas estáticas
-     separadas (mais simples, sem duplicar conteúdo em atributos
-     data-i18n, e cada idioma fica indexável/linkável na sua própria
-     URL). /privacy e /terms seguem o mesmo padrão (raiz = PT, /en/... =
-     EN), e ambos ganharam esse mesmo header com link de volta pra home
-     (pedido do usuário: "deveria ter um jeito de voltar dos documentos
-     pra essa tela principal"). -->
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dungeonlog</title>
-<meta name="description" content="Dungeonlog — sua lista de tarefas vira uma masmorra.">
+<title>Dungeonlog: app de tarefas com RPG para estudar e criar hábitos</title>
+<meta name="description" content="Todo dia aparece um monstro que só cai se você concluir as tarefas. Ganhe XP, moedas e equipamentos e suba de nível. Plano grátis, em breve no Android.">
+<meta name="theme-color" content="#282828">
+<link rel="canonical" href="https://dungeonlog.weberlabs.com.br/">
+<link rel="alternate" hreflang="pt-BR" href="https://dungeonlog.weberlabs.com.br/">
+<link rel="alternate" hreflang="en" href="https://dungeonlog.weberlabs.com.br/en/">
+<link rel="alternate" hreflang="x-default" href="https://dungeonlog.weberlabs.com.br/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Dungeonlog">
+<meta property="og:title" content="Dungeonlog: app de tarefas com RPG para estudar e criar hábitos">
+<meta property="og:description" content="Todo dia aparece um monstro que só cai se você concluir as tarefas. Ganhe XP, moedas e equipamentos e suba de nível. Plano grátis, em breve no Android.">
+<meta property="og:url" content="https://dungeonlog.weberlabs.com.br/">
+<meta property="og:image" content="https://dungeonlog.weberlabs.com.br/img/og-pt.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Dungeonlog: sua lista de tarefas vira uma masmorra">
+<meta property="og:locale" content="pt_BR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Dungeonlog: app de tarefas com RPG para estudar e criar hábitos">
+<meta name="twitter:description" content="Todo dia aparece um monstro que só cai se você concluir as tarefas. Ganhe XP, moedas e equipamentos e suba de nível. Plano grátis, em breve no Android.">
+<meta name="twitter:image" content="https://dungeonlog.weberlabs.com.br/img/og-pt.jpg">
 <link rel="icon" href="/play/icon-192.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+<link rel="apple-touch-icon" href="/play/icon-192.png">
+<link rel="preload" href="/fonts/outfit-800-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/fonts/fonts2.css">
 <link rel="stylesheet" href="/site.css">
-<style>
-  html,body{ min-height:100%; }
-  body{
-    display:flex; flex-direction:column;
-    min-height:100vh;
-    min-height:100svh; /* iOS: 100vh conta a área embaixo da barra de
-      endereço, que só recolhe depois do load -- isso empurrava o rodapé
-      pra fora da tela visível, exigindo rolar pra ver Contato/Privacidade/
-      Termos. 100svh usa a altura já visível no load. */
-    position:relative;
-    overflow-x:hidden;
-  }
-
-  /* ---------- Fundo: mesmo tratamento da .arena real do app ---------- */
-  .dungeonBg{
-    position:absolute; inset:0; z-index:0; pointer-events:none;
-    background:
-      radial-gradient(ellipse at 50% 45%, transparent 55%, rgba(0,0,0,.4) 100%),
-      url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAKCAYAAADVTVykAAABfElEQVR4nJ2TwU7CQBCGvxKMQeCEXojGlMvWIw/AnfIOwh0egYfwpIneQJ4Bn4L22r10SeCoJ0CDJVkvdNPWgsT/srM738x0Z6fWZDKpPwyHdLpdlFK0222yklIyHY3o9HoHmVMUBAFvr6+49/copXBdl6KUkkW0JgxDGo0GUspfgUIInnefKKWwbTuXOUWO4/ASbZjP56ZWAeD6rILrugcD/1vwUJ5kBwsAH6sVUkqEEMbheR6e5xm7tNXYtp3LJLnkmrUBSludqmXd1mp1nQCuKpVUgN5/YJ5q1SrW3l5EGwBuzsosok1qjfW+XgPwdW6Z82K33wdg9PREr9//c8iklIwfH+kOBoRhePTpYn46HnPXagH8yl2Mjcty+eggxhJCUKtWT2Jjfrq38wa4kNz8dZv4RstofRIb84toc7CrpgPL3WcuoLVO7X3fB20Zn2VZeWHpHEd8pgPZ6QSYzWamqO/7ADSbTUrfmiAIcBzHsNm/ITn9F5ncSd8PSsnXJX9WpAwAAAAASUVORK5CYII=") repeat,
-      linear-gradient(180deg, #454545 0%, #383838 55%, #2C2C2C 100%);
-    background-size:auto, 130px 41px, auto;
-    image-rendering:pixelated;
-  }
-
-  /* ---------- Header ---------- */
-  header.site{
-    position:relative; z-index:1;
-    max-width:none;
-    padding:22px 28px;
-  }
-
-  /* Escurece uma faixa ampla e suave atrás do texto -- sem borda
-     perceptível, então não lê como "caixa". É o mesmo truque que a
-     Apple usa: escurecer a própria imagem de fundo, não desenhar algo
-     sobre o texto. */
-  .dim{
-    position:absolute; inset:0; z-index:-1; pointer-events:none;
-    background:radial-gradient(58% 42% at 50% 50%, rgba(0,0,0,.5) 0%, rgba(0,0,0,.22) 55%, rgba(0,0,0,0) 85%);
-  }
-
-  /* ---------- Hero ---------- */
-  main{
-    position:relative; z-index:1;
-    flex:1;
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    text-align:center;
-    padding:24px 28px 64px;
-  }
-  h1{
-    font-family:'Outfit', sans-serif;
-    font-weight:600;
-    letter-spacing:-.01em;
-    line-height:1.3;
-    font-size:clamp(1.4rem, 4vw, 2.1rem);
-    max-width:480px;
-    color:#fff;
-  }
-  .soon{
-    display:block;
-    margin-top:16px;
-    font-family:'Outfit', sans-serif;
-    font-weight:300;
-    font-size:.8rem;
-    letter-spacing:.01em;
-    color:var(--muted);
-  }
-
-  /* ---------- Footer ---------- */
-  footer.site{
-    position:relative; z-index:1;
-    border-top:none; background:transparent;
-    padding:0 0 28px;
-    flex-shrink:0;
-  }
-  /* colunas lado a lado tambem no mobile: gap/min-width menores em tela estreita */
-  @media (max-width:480px){
-    footer.site .footcols{ gap:28px 32px; }
-    footer.site .footcol{ min-width:0; }
-  }
-
-</style>
+<link rel="stylesheet" href="/home.css?v=19">
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Dungeonlog", "applicationCategory": "LifestyleApplication", "operatingSystem": "Android", "description": "Todo dia aparece um monstro que só cai se você concluir as tarefas. Ganhe XP, moedas e equipamentos e suba de nível. Plano grátis, em breve no Android.", "inLanguage": "pt-BR", "url": "https://dungeonlog.weberlabs.com.br/", "image": "https://dungeonlog.weberlabs.com.br/img/og-pt.jpg", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "BRL"}, "publisher": {"@type": "Organization", "name": "Weberlabs", "url": "https://dungeonlog.weberlabs.com.br/"}}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "O que é o Dungeonlog?", "acceptedAnswer": {"@type": "Answer", "text": "É um app de tarefas com tema de RPG. Você cria a lista do dia, e cada tarefa concluída rende XP, moedas e equipamentos para o seu herói. Todo dia há um monstro que só é derrotado quando todas as tarefas do dia estão concluídas."}}, {"@type": "Question", "name": "Como funciona o monstro do dia?", "acceptedAnswer": {"@type": "Answer", "text": "Cada dia aparece um monstro. Se você conclui todas as tarefas do dia, ele cai e você vence o dia. Se sobrar tarefa, ele foge e o dia não conta. É um jeito de transformar a lista em um desafio com começo, meio e fim."}}, {"@type": "Question", "name": "O Dungeonlog é grátis?", "acceptedAnswer": {"@type": "Answer", "text": "Há um plano gratuito e um plano PRO opcional. O plano gratuito tem limites em alguns recursos, como temas, estatísticas e quantidade de tarefas. O PRO libera tudo e custa R$ 17,90 por mês, R$ 89,90 por ano ou R$ 199,90 uma única vez (vitalício). O plano anual pode ter 7 dias de teste grátis pela Google Play."}}, {"@type": "Question", "name": "Em quais dispositivos funciona?", "acceptedAnswer": {"@type": "Answer", "text": "O app para Android chega em breve na Google Play. Ainda não existe app nativo para iPhone."}}, {"@type": "Question", "name": "Como o Dungeonlog é diferente do Habitica?", "acceptedAnswer": {"@type": "Answer", "text": "O Habitica é um app consolidado e gratuito (com assinatura opcional), com grupos e missões em equipe. O Dungeonlog é mais simples e focado: um monstro por dia que depende de concluir as tarefas do dia, loja diária e visual em pixel art. Se você quer comunidade e missões em grupo, o Habitica pode servir melhor. Se quer algo direto, vale testar o Dungeonlog."}}, {"@type": "Question", "name": "Dá para usar para estudar?", "acceptedAnswer": {"@type": "Answer", "text": "Dá para organizar tarefas de estudo, como exercícios, revisões e leituras. Ele não é uma plataforma de conteúdo nem um cronograma de matérias: é um gerenciador de tarefas com recompensa."}}, {"@type": "Question", "name": "Preciso criar uma conta?", "acceptedAnswer": {"@type": "Answer", "text": "Não precisa. Você pode entrar como convidado e começar na hora, sem cadastro; nesse modo o progresso fica salvo só neste aparelho. Se criar uma conta com Google ou e-mail, o progresso fica guardado e funciona em mais de um aparelho, e o que você fez como convidado é levado para a conta. Você pode excluir sua conta e seus dados quando quiser."}}, {"@type": "Question", "name": "E os meus dados?", "acceptedAnswer": {"@type": "Answer", "text": "Veja a Política de Privacidade e os Termos de Uso abaixo. A página de exclusão de conta explica como apagar os seus dados."}}]}]</script>
 </head>
 <body>
+<a class="skip" href="#main">Ir para o conteúdo</a>
 
-  <div class="dungeonBg" aria-hidden="true"></div>
+<div class="topbar">
+  <a class="brand" href="/"><img src="/play/icon-192.png" width="28" height="28" alt=""><span>Dungeonlog</span></a>
+  <nav aria-label="Menu"><a class="lnk" href="#como-funciona">Como funciona</a><a class="lnk" href="#recursos">Recursos</a><a class="lnk" href="#perguntas">Perguntas</a>
+    <div class="lang"><a href="/" class="active" hreflang="pt-BR">PT</a><span class="sep">·</span><a href="/en/" hreflang="en">EN</a></div>
+    <button class="menu-btn" id="menuBtn" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu"><i></i><i></i><i></i></button>
+  </nav>
+</div>
 
-  <header class="site">
-    <a class="brand" href="/">
-      <img src="/play/icon-192.png" alt="">
-      <span>Dungeonlog</span>
-    </a>
-    <div class="lang">
-      <a href="/" class="active">PT</a>
-      <span class="sep">·</span>
-      <a href="/en/">EN</a>
-    </div>
-  </header>
+<div class="menu" id="menu" aria-hidden="true">
+  <a class="mi" href="#como-funciona">Como funciona</a><a class="mi" href="#recursos">Recursos</a><a class="mi" href="#perguntas">Perguntas</a>
+  <span class="mi off">Blog <em>em breve</em></span>
+  <a class="mi" href="/privacy">Política de Privacidade</a>
+  <a class="mi" href="/terms">Termos de Uso</a>
+  <a class="mi" href="/delete-account">Excluir Conta</a>
+  <a class="mi mhelp" href="mailto:arthurdungeonlog@gmail.com">Precisa de ajuda?</a>
+</div>
 
-  <main>
-    <div class="dim" aria-hidden="true"></div>
-    <h1>Sua lista de tarefas<br>vira uma masmorra.</h1>
-    <span class="soon">Em breve na Google Play</span>
-  </main>
 
-  <footer class="site">
-    <div class="wrap">
-      <div class="footcols">
-        <div class="footcol">
-          <span class="footlabel">Legal</span>
-          <a href="/privacy">Política de Privacidade</a>
-          <a href="/terms">Termos de Uso</a>
-          <a href="/delete-account">Excluir Conta</a>
-        </div>
-        <div class="footcol">
-          <span class="footlabel">Contato</span>
-          <a href="mailto:arthurdungeonlog@gmail.com">E-mail</a>
-        </div>
+<main id="main">
+<section class="hero">
+  <div class="scene" aria-hidden="true" id="scene">
+    <div class="layer l-moon" data-sx="0.12" data-sy="0" data-mx="10"></div>
+    <div class="layer l-mtn" data-sx="0.45" data-sy="0" data-mx="22"></div>
+    <div class="layer l-grave" data-sx="1.15" data-sy="0" data-mx="45"></div>
+  </div>
+  <div class="inner">
+    <div class="col">
+      <h1>Sua lista de tarefas vira uma <em>masmorra.</em></h1>
+      <p class="lead">Todo dia aparece um monstro. Ele só cai se você concluir todas as tarefas do dia. Cada tarefa vale XP, moedas e equipamentos, e a sua sequência de dias fica registrada.</p>
+      <div class="cta">
+        <span class="soon">Em breve na Google Play</span>
       </div>
-      <span class="copy">© 2026 Weberlabs. Todos os direitos reservados.</span>
+      <p class="note">O Dungeonlog ainda não está aberto ao público. O app para Android chega em breve na Google Play.</p>
     </div>
-  </footer>
+  </div>
+</section>
 
+<section class="block" id="como-funciona">
+  <div class="wrapL">
+    <h2>Como funciona</h2>
+    <p class="sub">Três passos, todo dia.</p>
+    <div class="steps"><div class="card"><div class="n">1</div><h3>Anote suas tarefas</h3><p>Coloque o que precisa fazer hoje: estudar para a prova, ir à academia, lavar a louça.</p></div><div class="card"><div class="n">2</div><h3>Derrote o monstro do dia</h3><p>Conclua tudo e o monstro cai. Se sobrar tarefa, ele foge e o dia não conta.</p></div><div class="card"><div class="n">3</div><h3>Ganhe recompensas</h3><p>XP para subir de nível, moedas para a loja, baús de tesouro e equipamentos que aumentam seus ganhos.</p></div></div>
+  </div>
+</section>
+
+<section class="bestiary" aria-labelledby="bst">
+  <div class="wrapL"><h2 id="bst">63 monstros esperando por você</h2><p class="sub">Um deles aparece a cada dia. Quanto mais você vence, mais do bestiário você descobre.</p></div>
+  <div class="strip " aria-hidden="true"><div class="shift" data-sx="0.35"><div class="track "><i style="--i:21"></i><i style="--i:31"></i><i style="--i:20"></i><i style="--i:46"></i><i style="--i:8"></i><i style="--i:47"></i><i style="--i:41"></i><i style="--i:52"></i><i style="--i:26"></i><i style="--i:50"></i><i style="--i:13"></i><i style="--i:17"></i><i style="--i:58"></i><i style="--i:22"></i><i style="--i:53"></i><i style="--i:15"></i><i style="--i:42"></i><i style="--i:27"></i><i style="--i:16"></i><i style="--i:57"></i><i style="--i:18"></i><i style="--i:23"></i><i style="--i:60"></i><i style="--i:14"></i><i style="--i:24"></i><i style="--i:48"></i><i style="--i:43"></i><i style="--i:7"></i><i style="--i:36"></i><i style="--i:45"></i><i style="--i:1"></i><i style="--i:3"></i><i style="--i:4"></i><i style="--i:33"></i><i style="--i:0"></i><i style="--i:10"></i><i style="--i:44"></i><i style="--i:25"></i><i style="--i:38"></i><i style="--i:2"></i><i style="--i:34"></i><i style="--i:5"></i><i style="--i:9"></i><i style="--i:19"></i><i style="--i:56"></i><i style="--i:6"></i><i style="--i:51"></i><i style="--i:39"></i><i style="--i:40"></i><i style="--i:30"></i><i style="--i:61"></i><i style="--i:11"></i><i style="--i:12"></i><i style="--i:37"></i><i style="--i:59"></i><i style="--i:32"></i><i style="--i:62"></i><i style="--i:29"></i><i style="--i:49"></i><i style="--i:54"></i><i style="--i:35"></i><i style="--i:55"></i><i style="--i:28"></i><i style="--i:21"></i><i style="--i:31"></i><i style="--i:20"></i><i style="--i:46"></i><i style="--i:8"></i><i style="--i:47"></i><i style="--i:41"></i><i style="--i:52"></i><i style="--i:26"></i><i style="--i:50"></i><i style="--i:13"></i><i style="--i:17"></i><i style="--i:58"></i><i style="--i:22"></i><i style="--i:53"></i><i style="--i:15"></i><i style="--i:42"></i><i style="--i:27"></i><i style="--i:16"></i><i style="--i:57"></i><i style="--i:18"></i><i style="--i:23"></i><i style="--i:60"></i><i style="--i:14"></i><i style="--i:24"></i><i style="--i:48"></i><i style="--i:43"></i><i style="--i:7"></i><i style="--i:36"></i><i style="--i:45"></i><i style="--i:1"></i><i style="--i:3"></i><i style="--i:4"></i><i style="--i:33"></i><i style="--i:0"></i><i style="--i:10"></i><i style="--i:44"></i><i style="--i:25"></i><i style="--i:38"></i><i style="--i:2"></i><i style="--i:34"></i><i style="--i:5"></i><i style="--i:9"></i><i style="--i:19"></i><i style="--i:56"></i><i style="--i:6"></i><i style="--i:51"></i><i style="--i:39"></i><i style="--i:40"></i><i style="--i:30"></i><i style="--i:61"></i><i style="--i:11"></i><i style="--i:12"></i><i style="--i:37"></i><i style="--i:59"></i><i style="--i:32"></i><i style="--i:62"></i><i style="--i:29"></i><i style="--i:49"></i><i style="--i:54"></i><i style="--i:35"></i><i style="--i:55"></i><i style="--i:28"></i></div></div></div>
+  <div class="strip s2" aria-hidden="true"><div class="shift" data-sx="-0.35"><div class="track rev"><i style="--i:11"></i><i style="--i:28"></i><i style="--i:8"></i><i style="--i:29"></i><i style="--i:9"></i><i style="--i:23"></i><i style="--i:2"></i><i style="--i:32"></i><i style="--i:27"></i><i style="--i:47"></i><i style="--i:39"></i><i style="--i:50"></i><i style="--i:55"></i><i style="--i:10"></i><i style="--i:20"></i><i style="--i:45"></i><i style="--i:35"></i><i style="--i:16"></i><i style="--i:44"></i><i style="--i:56"></i><i style="--i:38"></i><i style="--i:34"></i><i style="--i:40"></i><i style="--i:15"></i><i style="--i:14"></i><i style="--i:51"></i><i style="--i:33"></i><i style="--i:46"></i><i style="--i:22"></i><i style="--i:31"></i><i style="--i:41"></i><i style="--i:7"></i><i style="--i:42"></i><i style="--i:59"></i><i style="--i:37"></i><i style="--i:19"></i><i style="--i:5"></i><i style="--i:21"></i><i style="--i:17"></i><i style="--i:12"></i><i style="--i:60"></i><i style="--i:52"></i><i style="--i:26"></i><i style="--i:57"></i><i style="--i:53"></i><i style="--i:30"></i><i style="--i:3"></i><i style="--i:48"></i><i style="--i:13"></i><i style="--i:0"></i><i style="--i:43"></i><i style="--i:62"></i><i style="--i:61"></i><i style="--i:24"></i><i style="--i:18"></i><i style="--i:54"></i><i style="--i:58"></i><i style="--i:25"></i><i style="--i:6"></i><i style="--i:49"></i><i style="--i:36"></i><i style="--i:4"></i><i style="--i:1"></i><i style="--i:11"></i><i style="--i:28"></i><i style="--i:8"></i><i style="--i:29"></i><i style="--i:9"></i><i style="--i:23"></i><i style="--i:2"></i><i style="--i:32"></i><i style="--i:27"></i><i style="--i:47"></i><i style="--i:39"></i><i style="--i:50"></i><i style="--i:55"></i><i style="--i:10"></i><i style="--i:20"></i><i style="--i:45"></i><i style="--i:35"></i><i style="--i:16"></i><i style="--i:44"></i><i style="--i:56"></i><i style="--i:38"></i><i style="--i:34"></i><i style="--i:40"></i><i style="--i:15"></i><i style="--i:14"></i><i style="--i:51"></i><i style="--i:33"></i><i style="--i:46"></i><i style="--i:22"></i><i style="--i:31"></i><i style="--i:41"></i><i style="--i:7"></i><i style="--i:42"></i><i style="--i:59"></i><i style="--i:37"></i><i style="--i:19"></i><i style="--i:5"></i><i style="--i:21"></i><i style="--i:17"></i><i style="--i:12"></i><i style="--i:60"></i><i style="--i:52"></i><i style="--i:26"></i><i style="--i:57"></i><i style="--i:53"></i><i style="--i:30"></i><i style="--i:3"></i><i style="--i:48"></i><i style="--i:13"></i><i style="--i:0"></i><i style="--i:43"></i><i style="--i:62"></i><i style="--i:61"></i><i style="--i:24"></i><i style="--i:18"></i><i style="--i:54"></i><i style="--i:58"></i><i style="--i:25"></i><i style="--i:6"></i><i style="--i:49"></i><i style="--i:36"></i><i style="--i:4"></i><i style="--i:1"></i></div></div></div>
+</section>
+
+<section class="block alt" aria-labelledby="gal">
+  <div class="wrapL">
+    <h2 id="gal">Veja o app por dentro</h2>
+    <div class="gallery"><figure class="phone" style="--ry:-10deg;--side:1"><div class="view"><div class="frame"><span class="bt b1"></span><span class="bt b2"></span><span class="bt b3"></span><span class="bt b4"></span><div class="screen"><img src="/img/screens/pt-1.webp" width="374" height="776" alt="Tela principal do Dungeonlog: herói enfrentando o monstro do dia, com a lista de tarefas" loading="lazy" decoding="async"><i class="island"></i><span class="st-time">9:41</span><span class="st-sig"></span><span class="st-bat"></span></div></div></div><figcaption>Derrote o monstro diário</figcaption></figure><figure class="phone" style="--ry:10deg;--side:-1"><div class="view"><div class="frame"><span class="bt b1"></span><span class="bt b2"></span><span class="bt b3"></span><span class="bt b4"></span><div class="screen"><img src="/img/screens/pt-2.webp" width="374" height="776" alt="Tela de estatísticas com sequência atual, taxa de conclusão e últimos 7 dias" loading="lazy" decoding="async"><i class="island"></i><span class="st-time">9:41</span><span class="st-sig"></span><span class="st-bat"></span></div></div></div><figcaption>Acompanhe sequências</figcaption></figure><figure class="phone" style="--ry:-10deg;--side:1"><div class="view"><div class="frame"><span class="bt b1"></span><span class="bt b2"></span><span class="bt b3"></span><span class="bt b4"></span><div class="screen"><img src="/img/screens/pt-3.webp" width="374" height="776" alt="Loja do Dungeonlog com oferta do dia e itens para comprar" loading="lazy" decoding="async"><i class="island"></i><span class="st-time">9:41</span><span class="st-sig"></span><span class="st-bat"></span></div></div></div><figcaption>Equipe-se todo dia</figcaption></figure><figure class="phone" style="--ry:10deg;--side:-1"><div class="view"><div class="frame"><span class="bt b1"></span><span class="bt b2"></span><span class="bt b3"></span><span class="bt b4"></span><div class="screen"><img src="/img/screens/pt-4.webp" width="374" height="776" alt="Perfil do herói com os atributos Fortuna, Foco e Vigor, conquistas e bestiário" loading="lazy" decoding="async"><i class="island"></i><span class="st-time">9:41</span><span class="st-sig"></span><span class="st-bat"></span></div></div></div><figcaption>Aumente seu poder</figcaption></figure><figure class="phone" style="--ry:-10deg;--side:1"><div class="view"><div class="frame"><span class="bt b1"></span><span class="bt b2"></span><span class="bt b3"></span><span class="bt b4"></span><div class="screen"><img src="/img/screens/pt-5.webp" width="374" height="776" alt="Inventário com armas, armaduras e consumíveis" loading="lazy" decoding="async"><i class="island"></i><span class="st-time">9:41</span><span class="st-sig"></span><span class="st-bat"></span></div></div></div><figcaption>Monte seu arsenal</figcaption></figure><figure class="phone" style="--ry:10deg;--side:-1"><div class="view"><div class="frame"><span class="bt b1"></span><span class="bt b2"></span><span class="bt b3"></span><span class="bt b4"></span><div class="screen"><img src="/img/screens/pt-6.webp" width="374" height="776" alt="Baú de tesouro com a recompensa de um dia vencido" loading="lazy" decoding="async"><i class="island"></i><span class="st-time">9:41</span><span class="st-sig"></span><span class="st-bat"></span></div></div></div><figcaption>Ganhe baús de tesouro</figcaption></figure></div>
+  </div>
+</section>
+
+<section class="block" id="recursos">
+  <div class="wrapL">
+    <h2>Feito para você não largar no segundo dia</h2>
+    <p class="sub">Poucas telas, regras simples e recompensa na hora.</p>
+    <div class="features"><div class="feat"><h3>Um monstro por dia</h3><p>Um desafio novo toda manhã. O bestiário reúne 63 monstros para descobrir.</p></div><div class="feat"><h3>Loja que renova a cada 24 horas</h3><p>Armas, armaduras e consumíveis, com uma oferta do dia. Os itens dão bônus de XP e de moedas.</p></div><div class="feat"><h3>Atributos e conquistas</h3><p>Invista pontos em Fortuna, Foco e Vigor e desbloqueie conquistas pelo caminho.</p></div><div class="feat"><h3>Sequência e estatísticas</h3><p>Acompanhe sua sequência, a taxa de conclusão e como foi cada mês, para ver o hábito se formando.</p></div></div>
+    <h2 style="margin-top:56px">Para quem é</h2>
+    <div class="who"><div class="card"><h3>Quem estuda</h3><p>Organize matérias, exercícios e revisões e transforme a prova em uma batalha com recompensa.</p></div><div class="card"><h3>Quem procrastina</h3><p>Tarefas pequenas, resultado imediato e um monstro esperando: mais fácil começar.</p></div><div class="card"><h3>Quem curte RPG</h3><p>Herói em pixel art, loja, loot e bestiário. É o seu jogo, só que com a sua rotina.</p></div></div>
+  </div>
+</section>
+
+<section class="block alt" id="perguntas">
+  <div class="wrapL">
+    <h2>Perguntas frequentes</h2>
+    <div class="faq"><details><summary>O que é o Dungeonlog?</summary><div class="ans">É um app de tarefas com tema de RPG. Você cria a lista do dia, e cada tarefa concluída rende XP, moedas e equipamentos para o seu herói. Todo dia há um monstro que só é derrotado quando todas as tarefas do dia estão concluídas.</div></details><details><summary>Como funciona o monstro do dia?</summary><div class="ans">Cada dia aparece um monstro. Se você conclui todas as tarefas do dia, ele cai e você vence o dia. Se sobrar tarefa, ele foge e o dia não conta. É um jeito de transformar a lista em um desafio com começo, meio e fim.</div></details><details><summary>O Dungeonlog é grátis?</summary><div class="ans">Há um plano gratuito e um plano PRO opcional. O plano gratuito tem limites em alguns recursos, como temas, estatísticas e quantidade de tarefas. O PRO libera tudo e custa R$ 17,90 por mês, R$ 89,90 por ano ou R$ 199,90 uma única vez (vitalício). O plano anual pode ter 7 dias de teste grátis pela Google Play.</div></details><details><summary>Em quais dispositivos funciona?</summary><div class="ans">O app para Android chega em breve na Google Play. Ainda não existe app nativo para iPhone.</div></details><details><summary>Como o Dungeonlog é diferente do Habitica?</summary><div class="ans">O Habitica é um app consolidado e gratuito (com assinatura opcional), com grupos e missões em equipe. O Dungeonlog é mais simples e focado: um monstro por dia que depende de concluir as tarefas do dia, loja diária e visual em pixel art. Se você quer comunidade e missões em grupo, o Habitica pode servir melhor. Se quer algo direto, vale testar o Dungeonlog.</div></details><details><summary>Dá para usar para estudar?</summary><div class="ans">Dá para organizar tarefas de estudo, como exercícios, revisões e leituras. Ele não é uma plataforma de conteúdo nem um cronograma de matérias: é um gerenciador de tarefas com recompensa.</div></details><details><summary>Preciso criar uma conta?</summary><div class="ans">Não precisa. Você pode entrar como convidado e começar na hora, sem cadastro; nesse modo o progresso fica salvo só neste aparelho. Se criar uma conta com Google ou e-mail, o progresso fica guardado e funciona em mais de um aparelho, e o que você fez como convidado é levado para a conta. Você pode excluir sua conta e seus dados quando quiser.</div></details><details><summary>E os meus dados?</summary><div class="ans">Veja a Política de Privacidade e os Termos de Uso abaixo. A página de exclusão de conta explica como apagar os seus dados.</div></details></div>
+  </div>
+</section>
+
+<section class="block final">
+  <div class="wrapL">
+    <h2>Pronto para derrotar o primeiro monstro?</h2>
+    <p class="sub" style="margin-left:auto;margin-right:auto">O app chega em breve na Google Play.</p>
+    <div class="cta">
+      <span class="soon">Em breve na Google Play</span>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <div class="footcols">
+      <div class="footcol">
+        <span class="footlabel">Legal</span>
+        <a href="/privacy">Política de Privacidade</a>
+        <a href="/terms">Termos de Uso</a>
+        <a href="/delete-account">Excluir Conta</a>
+      </div>
+      <div class="footcol">
+        <span class="footlabel">Contato</span>
+        <a href="mailto:arthurdungeonlog@gmail.com">E-mail</a>
+      </div>
+    </div>
+    <span class="copy">© 2026 Weberlabs. Todos os direitos reservados.</span>
+    <span class="credit">Cenário em pixel art: <a href="https://opengameart.org/content/gothicvania-cemetery-pack" rel="noopener">ansimuz</a> (CC0)</span>
+  </div>
+</footer>
+<script src="/home.js?v=16" defer></script>
 </body>
 </html>

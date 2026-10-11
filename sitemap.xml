@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url><loc>https://dungeonlog.weberlabs.com.br/</loc><lastmod>2026-10-11</lastmod>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://dungeonlog.weberlabs.com.br/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://dungeonlog.weberlabs.com.br/en/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dungeonlog.weberlabs.com.br/"/>
+  </url>
+  <url><loc>https://dungeonlog.weberlabs.com.br/en/</loc><lastmod>2026-10-11</lastmod>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://dungeonlog.weberlabs.com.br/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://dungeonlog.weberlabs.com.br/en/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://dungeonlog.weberlabs.com.br/"/>
+  </url>
+  <url><loc>https://dungeonlog.weberlabs.com.br/privacy</loc><lastmod>2026-10-11</lastmod>
+  </url>
+  <url><loc>https://dungeonlog.weberlabs.com.br/en/privacy</loc><lastmod>2026-10-11</lastmod>
+  </url>
+  <url><loc>https://dungeonlog.weberlabs.com.br/terms</loc><lastmod>2026-10-11</lastmod>
+  </url>
+  <url><loc>https://dungeonlog.weberlabs.com.br/en/terms</loc><lastmod>2026-10-11</lastmod>
+  </url>
+</urlset>

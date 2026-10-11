@@ -1,135 +1,135 @@
 <!DOCTYPE html>
-<!-- English sibling of the root landing page (/). Same HTML/CSS, content
-     translated -- see the Portuguese version's header comment for the
-     full history of design decisions (background, contrast, etc.), which
-     apply identically here. Kept as a separate static page (not a JS
-     language switch) so each language has its own indexable/linkable
-     URL and there's no data-i18n attribute duplication to maintain. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dungeonlog</title>
-<meta name="description" content="Dungeonlog — your to-do list becomes a dungeon.">
+<title>Dungeonlog: RPG to-do app to study and build habits</title>
+<meta name="description" content="Every day a monster appears and only falls if you finish your tasks. Earn XP, coins and gear and level up. Free plan, on the web and coming soon to Android.">
+<meta name="theme-color" content="#282828">
+<link rel="canonical" href="https://dungeonlog.weberlabs.com.br/en/">
+<link rel="alternate" hreflang="pt-BR" href="https://dungeonlog.weberlabs.com.br/">
+<link rel="alternate" hreflang="en" href="https://dungeonlog.weberlabs.com.br/en/">
+<link rel="alternate" hreflang="x-default" href="https://dungeonlog.weberlabs.com.br/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Dungeonlog">
+<meta property="og:title" content="Dungeonlog: RPG to-do app to study and build habits">
+<meta property="og:description" content="Every day a monster appears and only falls if you finish your tasks. Earn XP, coins and gear and level up. Free plan, on the web and coming soon to Android.">
+<meta property="og:url" content="https://dungeonlog.weberlabs.com.br/en/">
+<meta property="og:image" content="https://dungeonlog.weberlabs.com.br/img/og-en.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Dungeonlog: your to-do list becomes a dungeon">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Dungeonlog: RPG to-do app to study and build habits">
+<meta name="twitter:description" content="Every day a monster appears and only falls if you finish your tasks. Earn XP, coins and gear and level up. Free plan, on the web and coming soon to Android.">
+<meta name="twitter:image" content="https://dungeonlog.weberlabs.com.br/img/og-en.jpg">
 <link rel="icon" href="/play/icon-192.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+<link rel="apple-touch-icon" href="/play/icon-192.png">
+<link rel="preload" href="/fonts/outfit-800-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/fonts/fonts2.css">
 <link rel="stylesheet" href="/site.css">
-<style>
-  html,body{ min-height:100%; }
-  body{
-    display:flex; flex-direction:column;
-    min-height:100vh;
-    min-height:100svh; /* see PT version's header comment for the fix note */
-    position:relative;
-    overflow-x:hidden;
-  }
-
-  /* ---------- Background: same treatment as the real .arena ---------- */
-  .dungeonBg{
-    position:absolute; inset:0; z-index:0; pointer-events:none;
-    background:
-      radial-gradient(ellipse at 50% 45%, transparent 55%, rgba(0,0,0,.4) 100%),
-      url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAKCAYAAADVTVykAAABfElEQVR4nJ2TwU7CQBCGvxKMQeCEXojGlMvWIw/AnfIOwh0egYfwpIneQJ4Bn4L22r10SeCoJ0CDJVkvdNPWgsT/srM738x0Z6fWZDKpPwyHdLpdlFK0222yklIyHY3o9HoHmVMUBAFvr6+49/copXBdl6KUkkW0JgxDGo0GUspfgUIInnefKKWwbTuXOUWO4/ASbZjP56ZWAeD6rILrugcD/1vwUJ5kBwsAH6sVUkqEEMbheR6e5xm7tNXYtp3LJLnkmrUBSludqmXd1mp1nQCuKpVUgN5/YJ5q1SrW3l5EGwBuzsosok1qjfW+XgPwdW6Z82K33wdg9PREr9//c8iklIwfH+kOBoRhePTpYn46HnPXagH8yl2Mjcty+eggxhJCUKtWT2Jjfrq38wa4kNz8dZv4RstofRIb84toc7CrpgPL3WcuoLVO7X3fB20Zn2VZeWHpHEd8pgPZ6QSYzWamqO/7ADSbTUrfmiAIcBzHsNm/ITn9F5ncSd8PSsnXJX9WpAwAAAAASUVORK5CYII=") repeat,
-      linear-gradient(180deg, #454545 0%, #383838 55%, #2C2C2C 100%);
-    background-size:auto, 130px 41px, auto;
-    image-rendering:pixelated;
-  }
-
-  /* ---------- Header ---------- */
-  header.site{
-    position:relative; z-index:1;
-    max-width:none;
-    padding:22px 28px;
-  }
-
-  .dim{
-    position:absolute; inset:0; z-index:-1; pointer-events:none;
-    background:radial-gradient(58% 42% at 50% 50%, rgba(0,0,0,.5) 0%, rgba(0,0,0,.22) 55%, rgba(0,0,0,0) 85%);
-  }
-
-  /* ---------- Hero ---------- */
-  main{
-    position:relative; z-index:1;
-    flex:1;
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    text-align:center;
-    padding:24px 28px 64px;
-  }
-  h1{
-    font-family:'Outfit', sans-serif;
-    font-weight:600;
-    letter-spacing:-.01em;
-    line-height:1.3;
-    font-size:clamp(1.4rem, 4vw, 2.1rem);
-    max-width:480px;
-    color:#fff;
-  }
-  .soon{
-    display:block;
-    margin-top:16px;
-    font-family:'Outfit', sans-serif;
-    font-weight:300;
-    font-size:.8rem;
-    letter-spacing:.01em;
-    color:var(--muted);
-  }
-
-  /* ---------- Footer ---------- */
-  footer.site{
-    position:relative; z-index:1;
-    border-top:none; background:transparent;
-    padding:0 0 28px;
-    flex-shrink:0;
-  }
-  /* colunas lado a lado tambem no mobile: gap/min-width menores em tela estreita */
-  @media (max-width:480px){
-    footer.site .footcols{ gap:28px 32px; }
-    footer.site .footcol{ min-width:0; }
-  }
-
-</style>
+<link rel="stylesheet" href="/home.css?v=14">
+<script type="application/ld+json">[{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Dungeonlog", "applicationCategory": "LifestyleApplication", "operatingSystem": "Web, Android", "description": "Every day a monster appears and only falls if you finish your tasks. Earn XP, coins and gear and level up. Free plan, on the web and coming soon to Android.", "inLanguage": "en", "url": "https://dungeonlog.weberlabs.com.br/en/", "image": "https://dungeonlog.weberlabs.com.br/img/og-en.jpg", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "BRL"}, "publisher": {"@type": "Organization", "name": "Weberlabs", "url": "https://dungeonlog.weberlabs.com.br/"}}, {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is Dungeonlog?", "acceptedAnswer": {"@type": "Answer", "text": "It's a to-do app with an RPG theme. You build the day's list, and every finished task earns XP, coins and gear for your hero. Every day there is a monster that is only defeated when all the day's tasks are done."}}, {"@type": "Question", "name": "How does the daily monster work?", "acceptedAnswer": {"@type": "Answer", "text": "A monster appears each day. If you finish all the day's tasks, it falls and you win the day. If a task is left, it escapes and the day doesn't count. It turns your list into a challenge with a start and an end."}}, {"@type": "Question", "name": "Is Dungeonlog free?", "acceptedAnswer": {"@type": "Answer", "text": "There is a free plan and an optional PRO plan. The free plan has limits on some features, such as themes, stats and number of tasks. PRO unlocks everything and costs R$ 17.90 per month, R$ 89.90 per year or R$ 199.90 once (lifetime), in Brazilian reais; prices may vary by country in the store. The annual plan may include a 7-day free trial through Google Play."}}, {"@type": "Question", "name": "Which devices does it work on?", "acceptedAnswer": {"@type": "Answer", "text": "Today it works on the web, on phones (Android and iPhone) and on computers, in the browser. The Google Play app for Android is coming soon. There is no native iPhone app yet, but on iPhone you can add the site to your home screen."}}, {"@type": "Question", "name": "How is Dungeonlog different from Habitica?", "acceptedAnswer": {"@type": "Answer", "text": "Habitica is an established, free app (with an optional subscription) with parties and group quests. Dungeonlog is simpler and more focused: one monster per day that depends on finishing the day's tasks, a daily shop and pixel-art visuals. If you want community and group quests, Habitica may suit you better. If you want something direct, give Dungeonlog a try."}}, {"@type": "Question", "name": "Can I use it to study?", "acceptedAnswer": {"@type": "Answer", "text": "You can organize study tasks, such as exercises, reviews and readings. It is not a content platform or a subject schedule: it is a task manager with rewards."}}, {"@type": "Question", "name": "Do I need an account?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, you sign in with Google or email to save your progress and use more than one device. You can delete your account and data at any time."}}, {"@type": "Question", "name": "What about my data?", "acceptedAnswer": {"@type": "Answer", "text": "See the Privacy Policy and Terms of Use below. The account deletion page explains how to erase your data."}}]}]</script>
 </head>
 <body>
+<a class="skip" href="#main">Skip to content</a>
 
-  <div class="dungeonBg" aria-hidden="true"></div>
+<div class="topbar">
+  <a class="brand" href="/en/"><img src="/play/icon-192.png" width="28" height="28" alt=""><span>Dungeonlog</span></a>
+  <nav aria-label="Menu"><a class="lnk" href="#how-it-works">How it works</a><a class="lnk" href="#features">Features</a><a class="lnk" href="#faq">FAQ</a>
+    <div class="lang"><a href="/en/" class="active" hreflang="en">EN</a><span class="sep">·</span><a href="/" hreflang="pt-BR">PT</a></div>
+  </nav>
+</div>
 
-  <header class="site">
-    <a class="brand" href="/en/">
-      <img src="/play/icon-192.png" alt="">
-      <span>Dungeonlog</span>
-    </a>
-    <div class="lang">
-      <a href="/">PT</a>
-      <span class="sep">·</span>
-      <a href="/en/" class="active">EN</a>
-    </div>
-  </header>
-
-  <main>
-    <div class="dim" aria-hidden="true"></div>
-    <h1>Your to-do list<br>becomes a dungeon.</h1>
-    <span class="soon">Coming soon to Google Play</span>
-  </main>
-
-  <footer class="site">
-    <div class="wrap">
-      <div class="footcols">
-        <div class="footcol">
-          <span class="footlabel">Legal</span>
-          <a href="/en/privacy">Privacy Policy</a>
-          <a href="/en/terms">Terms of Use</a>
-          <a href="/en/delete-account">Delete Account</a>
-        </div>
-        <div class="footcol">
-          <span class="footlabel">Contact</span>
-          <a href="mailto:arthurdungeonlog@gmail.com">Email</a>
-        </div>
+<main id="main">
+<section class="hero">
+  <div class="scene" aria-hidden="true" id="scene">
+    <div class="layer l-moon" data-sx="0.12" data-sy="0" data-mx="10"></div>
+    <div class="layer l-mtn" data-sx="0.45" data-sy="0" data-mx="22"></div>
+    <div class="layer l-grave" data-sx="1.15" data-sy="0" data-mx="45"></div>
+  </div>
+  <div class="inner">
+    <div class="col">
+      <h1>Your to-do list becomes a <em>dungeon.</em></h1>
+      <p class="lead">A monster appears every day. It only falls if you finish all of the day&#x27;s tasks. Each task earns XP, coins and gear, and your streak of days is tracked.</p>
+      <div class="cta">
+        <a class="btn" href="/play/">Play on the web</a>
+        <span class="soon">Coming soon to Google Play</span>
       </div>
-      <span class="copy">© 2026 Weberlabs. All rights reserved.</span>
+      <p class="note">On iPhone and computer, use it in the browser (on iPhone, add it to the home screen). Sign in with Google or email to save your progress.</p>
     </div>
-  </footer>
+  </div>
+</section>
 
+<section class="block" id="how-it-works">
+  <div class="wrapL">
+    <h2>How it works</h2>
+    <p class="sub">Three steps, every day.</p>
+    <div class="steps"><div class="card"><div class="n">1</div><h3>Write your tasks</h3><p>Add what you need to do today: study for the exam, go to the gym, do the dishes.</p></div><div class="card"><div class="n">2</div><h3>Defeat the daily monster</h3><p>Finish everything and the monster falls. If a task is left, it escapes and the day doesn&#x27;t count.</p></div><div class="card"><div class="n">3</div><h3>Collect rewards</h3><p>XP to level up, coins for the shop, treasure chests and gear that boost your gains.</p></div></div>
+  </div>
+</section>
+
+<section class="bestiary" aria-labelledby="bst">
+  <div class="wrapL"><h2 id="bst">63 monsters are waiting for you</h2><p class="sub">One shows up each day. The more you win, the more of the bestiary you discover.</p></div>
+  <div class="strip " aria-hidden="true"><div class="shift" data-sx="0.35"><div class="track "><i style="--i:21"></i><i style="--i:31"></i><i style="--i:20"></i><i style="--i:46"></i><i style="--i:8"></i><i style="--i:47"></i><i style="--i:41"></i><i style="--i:52"></i><i style="--i:26"></i><i style="--i:50"></i><i style="--i:13"></i><i style="--i:17"></i><i style="--i:58"></i><i style="--i:22"></i><i style="--i:53"></i><i style="--i:15"></i><i style="--i:42"></i><i style="--i:27"></i><i style="--i:16"></i><i style="--i:57"></i><i style="--i:18"></i><i style="--i:23"></i><i style="--i:60"></i><i style="--i:14"></i><i style="--i:24"></i><i style="--i:48"></i><i style="--i:43"></i><i style="--i:7"></i><i style="--i:36"></i><i style="--i:45"></i><i style="--i:1"></i><i style="--i:3"></i><i style="--i:4"></i><i style="--i:33"></i><i style="--i:0"></i><i style="--i:10"></i><i style="--i:44"></i><i style="--i:25"></i><i style="--i:38"></i><i style="--i:2"></i><i style="--i:34"></i><i style="--i:5"></i><i style="--i:9"></i><i style="--i:19"></i><i style="--i:56"></i><i style="--i:6"></i><i style="--i:51"></i><i style="--i:39"></i><i style="--i:40"></i><i style="--i:30"></i><i style="--i:61"></i><i style="--i:11"></i><i style="--i:12"></i><i style="--i:37"></i><i style="--i:59"></i><i style="--i:32"></i><i style="--i:62"></i><i style="--i:29"></i><i style="--i:49"></i><i style="--i:54"></i><i style="--i:35"></i><i style="--i:55"></i><i style="--i:28"></i><i style="--i:21"></i><i style="--i:31"></i><i style="--i:20"></i><i style="--i:46"></i><i style="--i:8"></i><i style="--i:47"></i><i style="--i:41"></i><i style="--i:52"></i><i style="--i:26"></i><i style="--i:50"></i><i style="--i:13"></i><i style="--i:17"></i><i style="--i:58"></i><i style="--i:22"></i><i style="--i:53"></i><i style="--i:15"></i><i style="--i:42"></i><i style="--i:27"></i><i style="--i:16"></i><i style="--i:57"></i><i style="--i:18"></i><i style="--i:23"></i><i style="--i:60"></i><i style="--i:14"></i><i style="--i:24"></i><i style="--i:48"></i><i style="--i:43"></i><i style="--i:7"></i><i style="--i:36"></i><i style="--i:45"></i><i style="--i:1"></i><i style="--i:3"></i><i style="--i:4"></i><i style="--i:33"></i><i style="--i:0"></i><i style="--i:10"></i><i style="--i:44"></i><i style="--i:25"></i><i style="--i:38"></i><i style="--i:2"></i><i style="--i:34"></i><i style="--i:5"></i><i style="--i:9"></i><i style="--i:19"></i><i style="--i:56"></i><i style="--i:6"></i><i style="--i:51"></i><i style="--i:39"></i><i style="--i:40"></i><i style="--i:30"></i><i style="--i:61"></i><i style="--i:11"></i><i style="--i:12"></i><i style="--i:37"></i><i style="--i:59"></i><i style="--i:32"></i><i style="--i:62"></i><i style="--i:29"></i><i style="--i:49"></i><i style="--i:54"></i><i style="--i:35"></i><i style="--i:55"></i><i style="--i:28"></i></div></div></div>
+  <div class="strip s2" aria-hidden="true"><div class="shift" data-sx="-0.35"><div class="track rev"><i style="--i:11"></i><i style="--i:28"></i><i style="--i:8"></i><i style="--i:29"></i><i style="--i:9"></i><i style="--i:23"></i><i style="--i:2"></i><i style="--i:32"></i><i style="--i:27"></i><i style="--i:47"></i><i style="--i:39"></i><i style="--i:50"></i><i style="--i:55"></i><i style="--i:10"></i><i style="--i:20"></i><i style="--i:45"></i><i style="--i:35"></i><i style="--i:16"></i><i style="--i:44"></i><i style="--i:56"></i><i style="--i:38"></i><i style="--i:34"></i><i style="--i:40"></i><i style="--i:15"></i><i style="--i:14"></i><i style="--i:51"></i><i style="--i:33"></i><i style="--i:46"></i><i style="--i:22"></i><i style="--i:31"></i><i style="--i:41"></i><i style="--i:7"></i><i style="--i:42"></i><i style="--i:59"></i><i style="--i:37"></i><i style="--i:19"></i><i style="--i:5"></i><i style="--i:21"></i><i style="--i:17"></i><i style="--i:12"></i><i style="--i:60"></i><i style="--i:52"></i><i style="--i:26"></i><i style="--i:57"></i><i style="--i:53"></i><i style="--i:30"></i><i style="--i:3"></i><i style="--i:48"></i><i style="--i:13"></i><i style="--i:0"></i><i style="--i:43"></i><i style="--i:62"></i><i style="--i:61"></i><i style="--i:24"></i><i style="--i:18"></i><i style="--i:54"></i><i style="--i:58"></i><i style="--i:25"></i><i style="--i:6"></i><i style="--i:49"></i><i style="--i:36"></i><i style="--i:4"></i><i style="--i:1"></i><i style="--i:11"></i><i style="--i:28"></i><i style="--i:8"></i><i style="--i:29"></i><i style="--i:9"></i><i style="--i:23"></i><i style="--i:2"></i><i style="--i:32"></i><i style="--i:27"></i><i style="--i:47"></i><i style="--i:39"></i><i style="--i:50"></i><i style="--i:55"></i><i style="--i:10"></i><i style="--i:20"></i><i style="--i:45"></i><i style="--i:35"></i><i style="--i:16"></i><i style="--i:44"></i><i style="--i:56"></i><i style="--i:38"></i><i style="--i:34"></i><i style="--i:40"></i><i style="--i:15"></i><i style="--i:14"></i><i style="--i:51"></i><i style="--i:33"></i><i style="--i:46"></i><i style="--i:22"></i><i style="--i:31"></i><i style="--i:41"></i><i style="--i:7"></i><i style="--i:42"></i><i style="--i:59"></i><i style="--i:37"></i><i style="--i:19"></i><i style="--i:5"></i><i style="--i:21"></i><i style="--i:17"></i><i style="--i:12"></i><i style="--i:60"></i><i style="--i:52"></i><i style="--i:26"></i><i style="--i:57"></i><i style="--i:53"></i><i style="--i:30"></i><i style="--i:3"></i><i style="--i:48"></i><i style="--i:13"></i><i style="--i:0"></i><i style="--i:43"></i><i style="--i:62"></i><i style="--i:61"></i><i style="--i:24"></i><i style="--i:18"></i><i style="--i:54"></i><i style="--i:58"></i><i style="--i:25"></i><i style="--i:6"></i><i style="--i:49"></i><i style="--i:36"></i><i style="--i:4"></i><i style="--i:1"></i></div></div></div>
+</section>
+
+<section class="block alt" aria-labelledby="gal">
+  <div class="wrapL">
+    <h2 id="gal">See the app inside</h2>
+    <div class="gallery"><figure class="phone" style="--ry:-10deg;--side:1"><div class="view"><div class="frame"><span class="bt b1"></span><span class="bt b2"></span><span class="bt b3"></span><span class="bt b4"></span><div class="screen"><img src="/img/screens/en-1.webp" width="374" height="776" alt="Dungeonlog main screen: a hero fighting the daily monster, with the task list" loading="lazy" decoding="async"><i class="island"></i><span class="st-time">9:41</span><span class="st-sig"></span><span class="st-bat"></span></div></div></div><figcaption>Defeat the daily monster</figcaption></figure><figure class="phone" style="--ry:10deg;--side:-1"><div class="view"><div class="frame"><span class="bt b1"></span><span class="bt b2"></span><span class="bt b3"></span><span class="bt b4"></span><div class="screen"><img src="/img/screens/en-2.webp" width="374" height="776" alt="Stats screen with current streak, completion rate and the last 7 days" loading="lazy" decoding="async"><i class="island"></i><span class="st-time">9:41</span><span class="st-sig"></span><span class="st-bat"></span></div></div></div><figcaption>Track your streaks</figcaption></figure><figure class="phone" style="--ry:-10deg;--side:1"><div class="view"><div class="frame"><span class="bt b1"></span><span class="bt b2"></span><span class="bt b3"></span><span class="bt b4"></span><div class="screen"><img src="/img/screens/en-3.webp" width="374" height="776" alt="Dungeonlog shop with a deal of the day and items to buy" loading="lazy" decoding="async"><i class="island"></i><span class="st-time">9:41</span><span class="st-sig"></span><span class="st-bat"></span></div></div></div><figcaption>Gear up every day</figcaption></figure><figure class="phone" style="--ry:10deg;--side:-1"><div class="view"><div class="frame"><span class="bt b1"></span><span class="bt b2"></span><span class="bt b3"></span><span class="bt b4"></span><div class="screen"><img src="/img/screens/en-4.webp" width="374" height="776" alt="Hero profile with Fortune, Focus and Vigor attributes, achievements and bestiary" loading="lazy" decoding="async"><i class="island"></i><span class="st-time">9:41</span><span class="st-sig"></span><span class="st-bat"></span></div></div></div><figcaption>Boost your power</figcaption></figure><figure class="phone" style="--ry:-10deg;--side:1"><div class="view"><div class="frame"><span class="bt b1"></span><span class="bt b2"></span><span class="bt b3"></span><span class="bt b4"></span><div class="screen"><img src="/img/screens/en-5.webp" width="374" height="776" alt="Inventory with weapons, armor and consumables" loading="lazy" decoding="async"><i class="island"></i><span class="st-time">9:41</span><span class="st-sig"></span><span class="st-bat"></span></div></div></div><figcaption>Build your arsenal</figcaption></figure><figure class="phone" style="--ry:10deg;--side:-1"><div class="view"><div class="frame"><span class="bt b1"></span><span class="bt b2"></span><span class="bt b3"></span><span class="bt b4"></span><div class="screen"><img src="/img/screens/en-6.webp" width="374" height="776" alt="Treasure chest with the reward for a won day" loading="lazy" decoding="async"><i class="island"></i><span class="st-time">9:41</span><span class="st-sig"></span><span class="st-bat"></span></div></div></div><figcaption>Win treasure chests</figcaption></figure></div>
+  </div>
+</section>
+
+<section class="block" id="features">
+  <div class="wrapL">
+    <h2>Built so you don&#x27;t quit on day two</h2>
+    <p class="sub">A few screens, simple rules and instant rewards.</p>
+    <div class="features"><div class="feat"><h3>One monster a day</h3><p>A new challenge every morning. The bestiary collects 63 monsters to discover.</p></div><div class="feat"><h3>A shop that renews every 24 hours</h3><p>Weapons, armor and consumables, with a deal of the day. Items give XP and coin bonuses.</p></div><div class="feat"><h3>Attributes and achievements</h3><p>Spend points on Fortune, Focus and Vigor and unlock achievements along the way.</p></div><div class="feat"><h3>Streak and stats</h3><p>Track your streak, your completion rate and how each month went, and watch the habit form.</p></div></div>
+    <h2 style="margin-top:56px">Who it&#x27;s for</h2>
+    <div class="who"><div class="card"><h3>People who study</h3><p>Organize subjects, exercises and reviews and turn the exam into a battle with a reward.</p></div><div class="card"><h3>People who procrastinate</h3><p>Small tasks, instant results and a monster waiting: it&#x27;s easier to start.</p></div><div class="card"><h3>RPG fans</h3><p>A pixel-art hero, shop, loot and bestiary. Your game, but with your real routine.</p></div></div>
+  </div>
+</section>
+
+<section class="block alt" id="faq">
+  <div class="wrapL">
+    <h2>Frequently asked questions</h2>
+    <div class="faq"><details><summary>What is Dungeonlog?</summary><div class="ans">It&#x27;s a to-do app with an RPG theme. You build the day&#x27;s list, and every finished task earns XP, coins and gear for your hero. Every day there is a monster that is only defeated when all the day&#x27;s tasks are done.</div></details><details><summary>How does the daily monster work?</summary><div class="ans">A monster appears each day. If you finish all the day&#x27;s tasks, it falls and you win the day. If a task is left, it escapes and the day doesn&#x27;t count. It turns your list into a challenge with a start and an end.</div></details><details><summary>Is Dungeonlog free?</summary><div class="ans">There is a free plan and an optional PRO plan. The free plan has limits on some features, such as themes, stats and number of tasks. PRO unlocks everything and costs R$ 17.90 per month, R$ 89.90 per year or R$ 199.90 once (lifetime), in Brazilian reais; prices may vary by country in the store. The annual plan may include a 7-day free trial through Google Play.</div></details><details><summary>Which devices does it work on?</summary><div class="ans">Today it works on the web, on phones (Android and iPhone) and on computers, in the browser. The Google Play app for Android is coming soon. There is no native iPhone app yet, but on iPhone you can add the site to your home screen.</div></details><details><summary>How is Dungeonlog different from Habitica?</summary><div class="ans">Habitica is an established, free app (with an optional subscription) with parties and group quests. Dungeonlog is simpler and more focused: one monster per day that depends on finishing the day&#x27;s tasks, a daily shop and pixel-art visuals. If you want community and group quests, Habitica may suit you better. If you want something direct, give Dungeonlog a try.</div></details><details><summary>Can I use it to study?</summary><div class="ans">You can organize study tasks, such as exercises, reviews and readings. It is not a content platform or a subject schedule: it is a task manager with rewards.</div></details><details><summary>Do I need an account?</summary><div class="ans">Yes, you sign in with Google or email to save your progress and use more than one device. You can delete your account and data at any time.</div></details><details><summary>What about my data?</summary><div class="ans">See the Privacy Policy and Terms of Use below. The account deletion page explains how to erase your data.</div></details></div>
+  </div>
+</section>
+
+<section class="block final">
+  <div class="wrapL">
+    <h2>Ready to defeat your first monster?</h2>
+    <p class="sub" style="margin-left:auto;margin-right:auto">It takes a minute to start.</p>
+    <div class="cta">
+      <a class="btn" href="/play/">Play on the web</a>
+      <span class="soon">Coming soon to Google Play</span>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <div class="footcols">
+      <div class="footcol">
+        <span class="footlabel">Legal</span>
+        <a href="/en/privacy">Privacy Policy</a>
+        <a href="/en/terms">Terms of Use</a>
+        <a href="/en/delete-account">Delete Account</a>
+      </div>
+      <div class="footcol">
+        <span class="footlabel">Contact</span>
+        <a href="mailto:arthurdungeonlog@gmail.com">Email</a>
+      </div>
+    </div>
+    <span class="copy">© 2026 Weberlabs. All rights reserved.</span>
+    <span class="credit">Pixel art scenery: <a href="https://opengameart.org/content/gothicvania-cemetery-pack" rel="noopener">ansimuz</a> (CC0)</span>
+  </div>
+</footer>
+<script src="/home.js?v=12" defer></script>
 </body>
 </html>

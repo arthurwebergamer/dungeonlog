@@ -19397,3 +19397,48 @@ Cobre os PRs #66 a #87 (todos mergeados em `main`). Foco da sessão: **lançar**
 - [ ] Limpar CSS morto de temas (`.temaCard*`, `.temaFaixa*`).
 - [ ] Todas as pendências de lançamento das sessões 03–05/10 continuam abertas (RTDN, `ADMIN_TOKEN`, texto do paywall, Play Console, senha da conta de revisor, limpeza de credenciais, atualizar texto do tutorial para "Terminar dia", `themeColor` do `twa-manifest.json`).
 - Regras de trabalho: dev primeiro; merge na `main` só com "mergeia" explícito; antes de cada merge, `git merge origin/main` no dev (conflitos: manter o lado dev), bump de `style.css?v=` (último: 167) e `grep` pelos marcadores de conflito.
+
+
+## [Auditoria 11/10/2026] Lacunas encontradas no histórico do git e no código
+> Levantamento feito em 11/10 cruzando (1) o histórico do git e (2) um inventário do código (chaves `questlog.*`, coleções do Firestore, rotas e crons do Worker, constantes) contra este roadmap. O que já estava descrito não foi repetido. Limite: os commits de 26/08 a 18/09 são quase todos "Add files via upload" (sem mensagem útil), então essa fase só se confirma pelas seções numeradas 1–96 e pelas sessões datadas; de 19/09 em diante as mensagens são boas e a cobertura é alta.
+
+### 1. Lacunas do histórico (itens que existem no código e não estavam registrados)
+- [x] **"Cara de app" (01/10):** sem zoom, sem pull-to-refresh (`html,body{overscroll-behavior-y:none}`), sem seleção de texto na UI, sem tap highlight azul nativo, e **bloqueio do menu de contexto** (baixar imagem ao segurar) por listener `contextmenu`.
+- [x] **Tema salvo aplicado antes do primeiro paint (03/10):** evita a piscada laranja ao abrir. O CSS de fontes (`fonts.googleapis.com`) não bloqueia mais o primeiro paint (corrige tela preta no boot; log `boot-paint`).
+- [x] **Idioma:** e-mails do Firebase (verificação/recuperar senha) seguem o idioma do app via `auth.languageCode` (`pt`/`en`); detecção aceita `pt` sem região e `pt-BR` em qualquer posição da lista do navegador (01/10).
+- [x] **Logo em texto (01/10):** "dungeon fino + log grosso" (opção 1, minimalista) nas telas de login, verificação e splash; a opção 5 (lilás suave) foi testada antes.
+- [x] **Sync, marcador de alteração pendente (30/09):** `questlog.sujo.v1.uid.<uid>` é ligado a cada `salvar()` e só desligado quando o `setDoc` do último envio termina; enquanto existir, `puxarNuvem()` **não** sobrescreve o save local (causa do bug "criei tarefa, saí, entrei e sumiu"). "Sair" agora espera o envio terminar antes do `signOut`. `aoLogar` liga `jaComecou` (antes nada era salvo após Sair + login com save existente). O offset de dia (debug) deixou de sincronizar com a nuvem e é relido ao trocar de conta.
+- [x] **Debug, histórico de decisões:** menu restrito a contas específicas e depois **revertido** por risco de *cloaking* na revisão da Play; liberação por e-mail verificado; tudo removido em 04/10 (ver seção 03–04/10). Não reintroduzir allowlist por conta em produção.
+- [x] **12 heróis de recolor de cabelo (rosa, azul, roxo, vermelho, menta, branco):** feitos em 02/10 e **removidos em 03/10** ("fora do escopo do lançamento"). Ficam no histórico do git.
+- [x] **Ícones de Halloween (portal de pedra):** adicionados e revertidos em 05/10 (já descrito na sessão 05/10).
+
+### 2. Inventário de chaves de persistência sem registro (localStorage)
+- `questlog.aceiteDisp.v1` — versão dos Termos aceita **neste aparelho** (= `window.ACEITE_VERSAO`, hoje `2026-10-06`). Se coincide, o checkbox some e vira "Ao continuar...". Gravada ao marcar o checkbox, sem servidor.
+- `questlog.billingSync.v1` — timestamp da última revalidação da assinatura no Worker (`billingSincronizar()`, no máx. 1×/6 h; revalida na hora, trava de 5 min, se vence em <1 h).
+- `questlog.categoriasTarefa.v1` e `questlog.onboarding.categoria.v1` — categorias de tarefa e a categoria escolhida no onboarding. **Sistema desligado na UI (`CATEGORIAS_ATIVAS=false`)**, dados preservados.
+- `questlog.contadorGlobalContadoHoje.v1` (por conta) — evita contar 2× o herói no contador global do dia.
+- `questlog.ganhoDia.v1` (por conta) — `{dia, ganho}` gravado **no momento da vitória**, para reabrir o app com o dia vencido sem mostrar "+0" (fallback: recalcula pela fórmula atual).
+- `questlog.pushLigado.v1`, `pushToken.v1`, `pushUid.v1`, `pushPedido.v1` — estado do push: switch ligado, token FCM do aparelho, conta dona do token (para remover ao trocar de conta) e se o pedido nativo de permissão pós-tarefa já foi feito.
+- `questlog.personagens.v1` / `personagemAtivo.v1` (+ sufixo `.uid.<uid>`) — lista de heróis e herói ativo por conta (raw = modo convidado).
+- `questlog.sujo.v1.uid.<uid>` — marcador de alteração local pendente de envio (item 1).
+- `questlog.temaArena.v1` e `temaArenaDicaPendente.v1` (por conta) — tema de arena escolhido e a dica pendente de "novo tema desbloqueado". `temaArena.v1` e `trial.v1` estão em `CHAVES_SECUNDARIAS_CONTA` (sobem na nuvem; `trial.v1` precisa estar lá para o Worker mandar o push de "teste acabando" com o app fechado).
+- `questlog.trial.v1` — legado do teste local de 7 dias (hoje o teste é a oferta `teste-gratis` da Play; `trialAtivo()` sempre `false`).
+- Constantes sem menção no roadmap, para localizar no código: `DIAS_TESTE_GRATIS`, `XP_POR_TAREFA`, `MOEDAS_BASE`, `MULTIPLICADOR_ARMA`, `SUBCATS_EQUIP`, `TEMA_ARENA_DURACAO_SLIDE`, `CORES_PRESET`, `ID_GRIMORIO_LOJA`, `BILLING_SKUS`, `CHAVE_CELEBRACAO_DIA`, `CHAVE_ESTAGIO_CERIMONIA_MOSTRADA`, `CHAVE_TEMAS_DESBLOQUEADOS`.
+
+### 3. Firestore (regras em `firestore.rules`; padrão: negar tudo fora destas coleções)
+- `saves/{uid}` — save principal (campo `data`) + chaves secundárias por conta (`extras`). Só o dono lê/escreve. É de onde o Worker lê `trial`, `hpMonstro` e `hist` para os pushes.
+- `fcmTokens/{uid}` — token(s) FCM. Só o dono lê/escreve; o Worker lê via Admin (ignora a regra).
+- `entitlements/{uid}` — PRO (vitalício manual, assinatura Play com `assinaturaAte`). O dono só **lê**; a escrita do cliente é sempre negada (senão qualquer um se concederia PRO). Concessão manual só pelo Console (campo booleano `proVitalicio`).
+- `contadorGlobal/hoje` — doc único e **público** ("N heróis já venceram hoje"), sem login. A regra só deixa a escrita subir o total em exatamente 1, ou resetar para 1 quando a data muda. Não há Cloud Function no meio (decisão de arquitetura); um cliente malicioso ainda pode chamar a transação várias vezes.
+- Coleção nova exige regra explícita **antes** de ser usada no cliente.
+
+### 4. Worker `dungeonlog-push` (`cf-worker/`)
+- Crons (UTC): `0 13 * * *` (10h BRT), `0 23 * * *` (20h BRT), `0 8 * * *` (5h BRT, revogação de compras reembolsadas). Brasil sem horário de verão, fuso fixo UTC-3.
+- Funções: `checarTesteGratisAcabando`, `checarFimDeDia` (streak em risco e monstro do dia), `revogarComprasAnuladas` (janela de 7 dias).
+- Rotas: `POST /billing/verify` (valida ID token do Firebase, consulta a Play Developer API, `transferir:true` para mover assinatura) e `/admin/revogar-anuladas` (protegida por `ADMIN_TOKEN`, hoje não configurado).
+- Credenciais só como secret (`FIREBASE_SERVICE_ACCOUNT`, e as da Play); `wrangler.toml` não leva `[vars]`/KV/D1, o estado vive no Firestore. Deploy do Worker é do dono (`wrangler deploy`).
+
+### 5. O que esta auditoria NÃO cobriu (continua aberto)
+- [ ] Fase 26/08–18/09: commits sem mensagem; só dá para conferir lendo as seções 1–96 contra o código tela por tela.
+- [ ] Revisar textos do roadmap que ficaram obsoletos (por exemplo "Curto prazo" da seção 4 e as seções de debug) e marcá-los como históricos.
+- [ ] Conferir por tela (Config, Perfil, Loja, Estatísticas, Conquistas, Bestiário) se cada controle visível está descrito.

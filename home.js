@@ -88,18 +88,26 @@
   });
 })();
 
-/* menu do celular (três linhas) */
+/* menu do celular (três linhas): gaveta em tela cheia que desliza da direita */
 (function () {
   var btn = document.getElementById('menuBtn'), menu = document.getElementById('menu');
   if (!btn || !menu) return;
-  function fechar() { menu.hidden = true; btn.setAttribute('aria-expanded', 'false'); }
-  btn.addEventListener('click', function (e) {
-    e.stopPropagation();
-    var abrir = menu.hidden;
-    menu.hidden = !abrir; btn.setAttribute('aria-expanded', abrir ? 'true' : 'false');
+  function definir(abrir) {
+    menu.classList.toggle('open', abrir);
+    menu.setAttribute('aria-hidden', abrir ? 'false' : 'true');
+    btn.setAttribute('aria-expanded', abrir ? 'true' : 'false');
+    document.body.classList.toggle('menu-open', abrir);
+  }
+  btn.addEventListener('click', function () { definir(!menu.classList.contains('open')); });
+  menu.addEventListener('click', function (e) {
+    var a = e.target.closest('a'); if (!a) return;
+    var h = a.getAttribute('href') || '';
+    if (h.charAt(0) === '#' && h.length > 1) {
+      var alvo = document.getElementById(h.slice(1));
+      e.preventDefault(); definir(false);
+      if (alvo) setTimeout(function () { alvo.scrollIntoView({ behavior: 'smooth', block: 'start' }); if (history.replaceState) history.replaceState(null, '', h); }, 40);
+    } else { definir(false); }
   });
-  menu.addEventListener('click', function (e) { if (e.target.closest('a')) fechar(); });
-  document.addEventListener('click', function (e) { if (!menu.hidden && !menu.contains(e.target)) fechar(); });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') fechar(); });
-  window.addEventListener('resize', function () { if (window.innerWidth > 720) fechar(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') definir(false); });
+  window.addEventListener('resize', function () { if (window.innerWidth > 720) definir(false); });
 })();

@@ -19305,9 +19305,95 @@ Cobre os PRs #66 a #87 (todos mergeados em `main`). Foco da sessão: **lançar**
 - **Merge 2 (06/10):** bloco de teste e botão "dia +1" removidos antes do merge; limite grátis segue em 5. Novidades: busca e subcategorias no inventário; sprites corrigidos (clava gigante, espada larga élfica, foices, espelho, arcos); arcos retos na arena e flecha sai do arco; chapéus não aparecem mais no herói; removidos Tsurugi e Martelo de Guerra; Boné de Couro, Gorro e Cornuthaum de volta ao catálogo.
 
 ## [Sessão 06/10] Registro de aceite dos Termos/Privacidade (prova de consentimento)
+> **ATUALIZAÇÃO 07/10 (PR #125): ESTE REGISTRO NO SERVIDOR FOI REMOVIDO.** Saíram o endpoint `/consent/accept` do Worker, as regras de `consents/*` e a chamada no app (commit `79022ab`). O checkbox continua e a marca de aceite é só local, no aparelho. As pastas arquivadas `/terms/2026-10-06/` e `/privacy/2026-10-06/` permanecem. O texto abaixo descreve o que existiu entre 06 e 07/10 e não vale mais; o deploy do Worker/regras com a remoção precisa ter sido feito pelo dono (conferir).
 - **Worker:** `POST /consent/accept` (`tratarConsentimento`): valida o ID token, aceita só versões em `CONSENT_VERSOES_VALIDAS`, grava `consents/{uid}` (estado atual) e `consents/{uid}/aceites/{versões}` (histórico imutável, só cria se não existe) com `aceitoEm` = hora do SERVIDOR; guarda idioma, método, plataforma, país, user-agent e origem.
 - **Regras:** `consents/{uid}` e `aceites/*`: o dono só LÊ; escrita do client sempre negada.
 - **App:** `registrarAceiteSeNecessario(user)` no `aoLogar`, só quando a pessoa marcou o checkbox nesta sessão e a conta não tem o aceite da versão atual. Não bloqueia o login.
 - **Textos arquivados:** `/terms/2026-10-06/`, `/privacy/2026-10-06/` (e `/en/...`). Ao mudar os textos: nova pasta datada + atualizar `TERMOS_VERSAO`/`PRIVACIDADE_VERSAO` (app) e `CONSENT_VERSOES_VALIDAS` (Worker).
 - **Deploy (feito pelo dono):** `firebase deploy --only firestore:rules` e `wrangler deploy` em `cf-worker/`.
 - **Pendente:** tela de aceite bloqueante para sessão restaurada sem aceite registrado / versão nova; decidir se tira o checkbox de quem já tem aceite.
+
+
+## [Sessão 07–11/10/2026] Lote de registro retroativo: arrasto, histórico, categorias, estágio, push, temas, modo convidado, carrossel e biomas premium
+> Entrada escrita em 11/10 para cobrir o que ficou sem registro desde 06/10 (PRs #125–#149 na `main`). Referência: `git log --since=2026-10-07`.
+
+### 1. Aceite de Termos: marca só local (07/10, #125)
+- [x] Removido o registro no servidor (ver nota na seção de 06/10). O checkbox de aceite continua obrigatório nos caminhos de login; o aparelho que já aceitou não vê o checkbox de novo (aceite por continuação).
+
+### 2. Efeito elástico (rubber band) tentado e revertido (07/10, #126–#129)
+- Tentado: efeito elástico no fim/começo de qualquer rolagem, depois só na lista, depois com tela inicial em "página única" (sem barra própria na lista).
+- **Decisão: ficou sem animação.** Revertido na `main` (branch `main-sem-elastico`, #129); o layout de página única também voltou ao estado do PR #125.
+- Aprendizado: o experimento ocupou várias rodadas; antes de reabrir, tratar como decisão fechada ("sem elástico").
+
+### 3. Cor da tarefa (07/10, #130)
+- [x] Cor da tarefa reduzida a algo discreto: checkbox concluído com tom mais apagado. Faixa lateral e fundo translúcido foram tentados e removidos.
+
+### 4. Armas na mão do herói (07/10, #131)
+- [x] Empunhadura alinhada ao ponto da mão medido por sprite; a mão do herói é desenhada **por cima** da arma corpo a corpo (recorte do sprite), com âncora e recorte por herói (masc./fem.) e ajuste fino por arma em `ARMA_AJUSTE`.
+- [x] Armas escuras ganham `brightness` (clareamento) em vez de halo branco; desligado no tema claro (branco); também nos ícones (inventário, slots, loja, baús).
+- Dados por arma: `ARMA_GRIP`, `ARMA_AJUSTE`, `ARMA_ESCURA`.
+
+### 5. Ferramentas de debug só no dev (07/10)
+- [x] Detectadas por **hostname** (`localhost`, `dev`/preview `<hash>.questlog-911.pages.dev`): tarefas ilimitadas, todos os itens do catálogo no inventário (sem subir pra nuvem), botão "dia +1" e console ativo. **Produção inalterada** (o debug removido em 04/10 continua removido na `main`).
+
+### 6. SFX da loja (07/10, #132–#134)
+- [x] Compra (som de mercador), venda (saco de moedas), sem moedas / nível exigido / botão Esgotado (bigorna, som de bloqueio).
+
+### 7. Arrasto de tarefas e histórico (08/10, #135–#138)
+- [x] **Arrasto não duplica mais a tarefa:** se `render()` roda no meio do arrasto, o arrasto é cancelado limpo (#138).
+- Tentado e revertido: `flex:none` no placeholder do arrasto para o vão elástico voltar a abrir (#135 → revertido em #136 a pedido). Hipótese antiga (seção 89, arrasto estranho com poucas tarefas) segue sem confirmação em aparelho.
+- [x] **Histórico:** dias em que o app não foi aberto entram no histórico (fuga / sem tarefa) (#137).
+- [x] Scroll vertical do arrasto começa com 10px (era 18) para reduzir o atraso (#142).
+
+### 8. Composer e categorias (09/10, #139)
+- [x] Ao abrir o criar-tarefa, modo e dias resetam; aviso quando a tarefa criada não é de hoje.
+- [x] **Sistema de categorias de tarefa removido da UI** pela chave `CATEGORIAS_ATIVAS=false`. O código e os dados ficam (reversível ligando a chave); isso substitui o desenho de categorias da sessão 05/10 na prática.
+
+### 9. Barra de estágio flutuante (09/10, #139–#140)
+- [x] Antes: texto "N tarefas para estágio X" sob o Dia Vencido. Agora: **barra flutuante acima da nav**, fundo preto com tinta do `accent` de cada tema, visível no tema branco.
+- Limiares: `LIMIARES_ESTAGIO = [10,30,70]` (estágio 2 Deserto = 10 tarefas, 3 Floresta = 30, 4 Montanhas = 70, acumulado). **Deve ser igual a `desbloqueioGratis.valor` em `TEMAS_ARENA` (assets.js).**
+- Incidente: marcadores de conflito do git foram parar no `index.html` da main (#141, corrigido). Regra: antes de cada commit/merge, `grep` pelos marcadores de conflito (sete sinais de menor/maior).
+
+### 10. Push / notificações (09–10/10, #143–#145)
+- [x] VAPID key pública configurada.
+- [x] Pedido nativo de permissão **após concluir a primeira tarefa** (1×), checando login antes.
+- [x] Config > Preferências: linha **Notificações** vira **switch** (liga/desliga o token na conta), UI otimista, imports do Firebase memoizados e pré-carregados.
+- [x] **Push por conta:** ao sair/trocar de conta o token do aparelho é removido; ao logar registra na conta nova.
+- [x] Gráfico de 7 dias: o dia de hoje em andamento não desenha ponto (não despenca).
+- [ ] **Worker:** trocar `fcm_options` por `fcmOptions` e incluir o nome do monstro na notificação (código pronto/pendente de `wrangler deploy` pelo dono).
+- [ ] Confirmar em produção o push das 20h e o diálogo nativo de permissão no TWA instalado (Android 13+).
+
+### 11. Aparência: temas em lista (10/10, #146)
+- Caminho: cartões 2×3 → cartões retrato com miniatura (estilo Skyllion) → faixas com paleta → **voltou à lista** a pedido ("gosto do design atual, só não ocupa bem o espaço").
+- [x] Final: linhas `.temaLinha2` em largura total (bolinha de cor 36px, nome 17px, divisor, check, selo **PRO** `.temaSelo` nos bloqueados). Branco = bolinha `#FFFFFF`, grafite `#8E8E96`, demais `t.acc`. A largura estreita original vinha de `.cfgOverlay .cfgrow.cfgcol{align-items:flex-start}`.
+- CSS antigo `.temaCard*`/`.temaFaixa*` ficou como código morto (limpar depois).
+
+### 12. i18n do "Voltar" (10/10, #147)
+- [x] `aria-label` dos 11 botões Voltar via `data-i18n-aria="acao.voltar"` (pt Voltar / en Back); `aplicarIdioma()` trata `[data-i18n-aria]`. Pedido do feedback de testador.
+
+### 13. Modo convidado (10/10, #148)
+- [x] Botão "Entrar como convidado" (`login.semConta`; en "Continue as guest") no login. Chaves locais sem `.uid.` (`questlog.convidado.v1` = flag; `questlog.personagens.v1`, `questlog.personagemAtivo.v1`, `.pj.<n>`); `window.mostrarSetupPersonagemENome()` quando não há save.
+- [x] **Migração** em `aoLogar(user)` só quando a conta é nova (`contaNova`): copia as chaves cruas para `.uid.<uid>.…`, apaga as cruas e remove a flag. **Conta que já existe: a nuvem vence, o progresso de convidado não é copiado.**
+- O checkbox de termos também trava o botão de convidado.
+- [ ] Testar a migração convidado → conta nova com **login real** no dev (só testado em navegador headless até a seleção de herói e na lógica de mapeamento das chaves).
+- [ ] Decidir lembrete para convidado criar conta (risco de perder o progresso ao limpar dados/desinstalar) e ligar notificações.
+
+### 14. Carrossel de boas-vindas (10/10, #149)
+- [x] Slide 5 (`tipo:'golpeAnim'`): herói com espada em **loop** golpeia o monstro e **troca de espada a cada golpe**, 5 espadas de raridades 0..4 (`ESPADAS_OB=[2,129,142,164,176]`: Aço, Katana, Duas Mãos, Lâmina Demoníaca, Dourada), mostrando todos os cortes (Lâmina Demoníaca = corte roxo).
+- Corte é o `.fx-sprite-slash` real, escala por raridade (`--escala-slash` 2→2.8); `+moedas/+XP` reais via `window.voarRecompensa` e número de dano numa linha centralizada. Ciclo por JS/WAAPI (`golpeOb()`, 2400 ms, timers em `golpeTimers`, `pararCicloGolpe()`).
+
+### 15. Biomas premium (decisão de produto, 11/10) — NÃO implementado
+- **Ideia:** reinvestir o dinheiro que o app render em **5 novos biomas exclusivos do plano PRO** (fundos de arena feitos sob encomenda).
+- Forma recomendada: bioma **escolhido** pelo assinante na tela de temas (reaproveita selo PRO e `assinaturaAtiva()`), sem mexer na barra de estágios; progressão por tarefas nos biomas premium só se fizer falta depois.
+- Monstros: mapear quais dos 64 Tiny Monsters aparecem em cada bioma.
+- Arte: **protótipo de vulcão por código foi descartado** (destoa dos fundos feitos à mão). Artista candidato: *The Pixel Nook* (itch.io: the-pixel-nook.itch.io; e-mail pixel.nook24@gmail.com; pack "Parallax Backgrounds", 320×180, US$4,99, uso comercial permitido, sem revenda; não há vulcão/lava no catálogo; não informa encomendas). Pedir por escrito uso comercial no app. Sugestão: encomendar 1 fundo de teste e pedir cotação do pacote de 5.
+- Especificação do fundo: 320×180 (PNG, base64 em `TEMAS_ARENA`), mesmo ângulo/faixa de chão dos atuais, uma imagem única por bioma.
+
+### Pendências consolidadas (estado em 11/10/2026)
+- [ ] Worker: `fcmOptions` + nome do monstro (deploy). Verificar push 20h em produção.
+- [ ] Testar migração convidado → conta com login real.
+- [ ] Apagar a branch remota `revert-arrasto` (manual) e as branches antigas de feature já mescladas.
+- [ ] Rebalanceamento da curva de XP: ainda sem decisão.
+- [ ] Limpar CSS morto de temas (`.temaCard*`, `.temaFaixa*`).
+- [ ] Todas as pendências de lançamento das sessões 03–05/10 continuam abertas (RTDN, `ADMIN_TOKEN`, texto do paywall, Play Console, senha da conta de revisor, limpeza de credenciais, atualizar texto do tutorial para "Terminar dia", `themeColor` do `twa-manifest.json`).
+- Regras de trabalho: dev primeiro; merge na `main` só com "mergeia" explícito; antes de cada merge, `git merge origin/main` no dev (conflitos: manter o lado dev), bump de `style.css?v=` (último: 167) e `grep` pelos marcadores de conflito.

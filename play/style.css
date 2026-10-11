@@ -6153,3 +6153,7 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 
 /* barra de estagio flutuante cobria o fim da lista: reserva espaco no fim pra ultima tarefa rolar pra cima dela */
 .list{padding-bottom:68px}
+
+/* aviso em texto quando o aceite dos Termos falta (antes so a borda ficava vermelha e parecia botao quebrado) */
+.loginAceiteMsg{display:none;margin:2px 4px 6px;font-family:'Outfit',sans-serif;font-size:13px;line-height:1.35;color:#F45781;text-align:left;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.loginAceite.erro + .loginAceiteMsg{display:block}

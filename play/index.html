@@ -52,7 +52,7 @@
 try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
-<link rel="stylesheet" href="style.css?v=168">
+<link rel="stylesheet" href="style.css?v=169">
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -14760,7 +14760,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
           <span class="titulo logoDL">dungeon<b>log</b></span>
         </div>
         <p class="loginEscolhaTagline" data-i18n="login.tagline">Suas tarefas viram uma aventura</p>
-        <label class="loginAceite"><input type="checkbox" class="loginAceiteChk"><span><span data-i18n="login.aceitoPre">Li e concordo com os </span><a class="loginTermosLink" data-k="terms" target="_blank" rel="noopener" data-i18n="login.termos">Termos de Uso</a><span data-i18n="login.aceitoE"> e a </span><a class="loginTermosLink" data-k="privacy" target="_blank" rel="noopener" data-i18n="login.privacidade">Política de Privacidade</a></span></label>
+        <label class="loginAceite"><input type="checkbox" class="loginAceiteChk"><span><span data-i18n="login.aceitoPre">Li e concordo com os </span><a class="loginTermosLink" data-k="terms" target="_blank" rel="noopener" data-i18n="login.termos">Termos de Uso</a><span data-i18n="login.aceitoE"> e a </span><a class="loginTermosLink" data-k="privacy" target="_blank" rel="noopener" data-i18n="login.privacidade">Política de Privacidade</a></span></label><p class="loginAceiteMsg" data-i18n="login.aceiteErro">Marque a caixa acima para continuar.</p>
         <p class="loginAceiteNota" data-ctx="escolha"><span data-i18n="login.aceiteImplicito">Ao continuar, você concorda com os </span><a class="loginTermosLink" data-k="terms" target="_blank" rel="noopener" data-i18n="login.termos">Termos de Uso</a><span data-i18n="login.aceitoE"> e a </span><a class="loginTermosLink" data-k="privacy" target="_blank" rel="noopener" data-i18n="login.privacidade">Política de Privacidade</a></p>
         <button class="loginGoogleBtn" id="loginEscolhaGoogle">
           <svg viewBox="0 0 48 48">
@@ -14821,7 +14821,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         </span>
       </div>
       <p class="loginSenhaErro" id="loginSenhaConfirmarErro" style="display:none" data-i18n="login.senhasNaoCoincidem">As senhas não coincidem</p>
-      <div id="loginAceiteForm"><label class="loginAceite"><input type="checkbox" class="loginAceiteChk"><span><span data-i18n="login.aceitoPre">Li e concordo com os </span><a class="loginTermosLink" data-k="terms" target="_blank" rel="noopener" data-i18n="login.termos">Termos de Uso</a><span data-i18n="login.aceitoE"> e a </span><a class="loginTermosLink" data-k="privacy" target="_blank" rel="noopener" data-i18n="login.privacidade">Política de Privacidade</a></span></label></div><p class="loginAceiteNota" data-ctx="form"><span data-i18n="login.aceiteImplicito">Ao continuar, você concorda com os </span><a class="loginTermosLink" data-k="terms" target="_blank" rel="noopener" data-i18n="login.termos">Termos de Uso</a><span data-i18n="login.aceitoE"> e a </span><a class="loginTermosLink" data-k="privacy" target="_blank" rel="noopener" data-i18n="login.privacidade">Política de Privacidade</a></p>
+      <div id="loginAceiteForm"><label class="loginAceite"><input type="checkbox" class="loginAceiteChk"><span><span data-i18n="login.aceitoPre">Li e concordo com os </span><a class="loginTermosLink" data-k="terms" target="_blank" rel="noopener" data-i18n="login.termos">Termos de Uso</a><span data-i18n="login.aceitoE"> e a </span><a class="loginTermosLink" data-k="privacy" target="_blank" rel="noopener" data-i18n="login.privacidade">Política de Privacidade</a></span></label><p class="loginAceiteMsg" data-i18n="login.aceiteErro">Marque a caixa acima para continuar.</p></div><p class="loginAceiteNota" data-ctx="form"><span data-i18n="login.aceiteImplicito">Ao continuar, você concorda com os </span><a class="loginTermosLink" data-k="terms" target="_blank" rel="noopener" data-i18n="login.termos">Termos de Uso</a><span data-i18n="login.aceitoE"> e a </span><a class="loginTermosLink" data-k="privacy" target="_blank" rel="noopener" data-i18n="login.privacidade">Política de Privacidade</a></p>
 
       <div class="loginLinha" id="loginLinhaSenha">
         <span></span>
@@ -15123,6 +15123,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         document.querySelectorAll('.loginAceite').forEach(l => {
           l.classList.remove('erro'); void l.offsetWidth; l.classList.add('erro');
         });
+        try { const v = [...document.querySelectorAll('.loginAceite')].find(l => l.offsetParent); if (v) v.scrollIntoView({block:'center', behavior:'smooth'}); } catch(e){}
       }, true);
     });
     window.pintarAceiteLogin();
@@ -18556,6 +18557,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'login.semConta':          { pt:'Entrar como convidado', en:'Continue as guest' },
     'login.tagline':           { pt:'Suas tarefas viram uma aventura', en:'Your tasks become an adventure' },
     'login.aceitoPre':         { pt:'Li e concordo com os ', en:'I have read and agree to the ' },
+    'login.aceiteErro':        { pt:'Marque a caixa acima para continuar.', en:'Tick the box above to continue.' },
     'login.termos':            { pt:'Termos de Uso', en:'Terms of Use' },
     'login.aceitoE':           { pt:' e a ', en:' and the ' },
     'login.aceiteImplicito':   { pt:'Ao continuar, você concorda com os ', en:'By continuing, you agree to the ' },

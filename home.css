@@ -1,6 +1,6 @@
 
 /* home.css — Dungeonlog: masmorra em pixel art, no grafite do app. Cenário: ansimuz (Luis Zuno), CC0. */
-:root{ --bg:#282828; --panel:#323232; --panel2:#3D3D3D; --line:#4A4A4A; --text:#FAFAFA; --muted:#C2C2C2; --dim:#909090; --gold:#ff63c8; --pink:#ff63c8; --ink:#141414; }
+:root{ --bg:#282828; --panel:#323232; --panel2:#3D3D3D; --line:#4A4A4A; --text:#FAFAFA; --muted:#C2C2C2; --dim:#909090; --gold:#ffffff; --pink:#ffffff; --ink:#141414; }
 html{ scroll-behavior:smooth; }
 @media (prefers-reduced-motion:reduce){ html{ scroll-behavior:auto; } }
 body{ background:var(--bg); color:var(--text); font-family:'Outfit',system-ui,sans-serif; font-size:17px; line-height:1.6; }
@@ -26,7 +26,7 @@ a{ color:var(--text); }
 
 /* ---------- cenário em camadas (parallax horizontal) ---------- */
 .hero{ position:relative; overflow:hidden; isolation:isolate; min-height:100svh; display:flex; align-items:center; padding:120px 24px 130px; background:#17171a; }
-.scene{ position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden; filter:grayscale(.9) brightness(1.55) contrast(1.05); }
+.scene{ position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden; filter:grayscale(1) brightness(1.55) contrast(1.05); }
 .layer{ position:absolute; top:0; bottom:0; left:-6%; right:-6%; will-change:transform; image-rendering:pixelated;
   background-repeat:repeat-x; background-position:center bottom; background-size:auto max(100%, calc(100vw * .5834)); }
 .l-moon{ background-image:url(/img/gothic/moon.png); left:-20%; right:-20%; }
@@ -34,7 +34,7 @@ a{ color:var(--text); }
 .l-grave{ background-image:url(/img/gothic/graveyard.png); left:-1500px; right:-1500px; }
 .hero .inner{ position:relative; z-index:2; width:100%; max-width:1120px; margin:0 auto; }
 .hero .col{ max-width:540px; }
-.hero h1{ font-size:clamp(2.5rem,5.4vw,4.4rem); line-height:1.04; color:#fff; text-shadow:0 2px 14px rgba(0,0,0,.6); }
+.hero h1{ font-size:clamp(2.5rem,5.4vw,4.4rem); line-height:1.04; color:#d4d4d4; text-shadow:0 2px 14px rgba(0,0,0,.6); }
 .hero h1 em{ font-style:normal; color:var(--gold); }
 .hero .lead{ margin-top:22px; font-size:1.2rem; line-height:1.55; color:#f0f0f0; text-shadow:0 1px 4px rgba(0,0,0,.85); }
 .cta{ display:flex; flex-wrap:wrap; gap:14px; margin-top:30px; align-items:center; }
@@ -134,6 +134,6 @@ footer.site .copy{ color:var(--dim); font-size:.9rem; }
   html, body{ cursor:url(/cursors/cursor.png) 1 1, auto; cursor:-webkit-image-set(url(/cursors/cursor.png) 1x, url(/cursors/cursor@2x.png) 2x) 1 1, auto; cursor:image-set(url(/cursors/cursor.png) 1x, url(/cursors/cursor@2x.png) 2x) 1 1, auto; }
   a, button, summary, .btn, [role="button"], label{ cursor:url(/cursors/cursor-hover.png) 1 1, pointer; cursor:-webkit-image-set(url(/cursors/cursor-hover.png) 1x, url(/cursors/cursor-hover@2x.png) 2x) 1 1, pointer; cursor:image-set(url(/cursors/cursor-hover.png) 1x, url(/cursors/cursor-hover@2x.png) 2x) 1 1, pointer; }
 }
-.spark{ position:fixed; width:4px; height:4px; background:#ff63c8; pointer-events:none; z-index:60; animation:spark .45s steps(5) forwards; }
+.spark{ position:fixed; width:4px; height:4px; background:#ffffff; pointer-events:none; z-index:60; animation:spark .45s steps(5) forwards; }
 @keyframes spark{ to{ transform:translate(var(--dx), var(--dy)); opacity:0; } }
 @media (prefers-reduced-motion:reduce){ .track{ animation:none !important; } }

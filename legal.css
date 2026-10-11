@@ -1,10 +1,10 @@
 /* legal.css — páginas legais (privacidade, termos, excluir conta) no visual da home nova */
-:root{ --bg:#282828; --panel:#323232; --line:#4A4A4A; --text:#FAFAFA; --muted:#C2C2C2; --dim:#909090; --pink:#ff63c8; --ink:#141414; }
+:root{ --bg:#282828; --panel:#323232; --line:#4A4A4A; --text:#FAFAFA; --muted:#C2C2C2; --dim:#909090; --pink:#ffffff; --ink:#141414; }
 *{ box-sizing:border-box; margin:0; padding:0; }
 html{ -webkit-text-size-adjust:100%; }
 body{ background:var(--bg); color:var(--text); font-family:'Outfit',system-ui,sans-serif; font-size:17px; line-height:1.6; min-height:100vh; display:flex; flex-direction:column; }
 main{ flex:1; }
-a{ color:var(--pink); text-decoration-color:rgba(255,99,200,.4); text-underline-offset:3px; }
+a{ color:var(--pink); text-decoration-color:rgba(255,255,255,.35); text-underline-offset:3px; }
 a:hover{ text-decoration-color:var(--pink); }
 .wrap{ max-width:760px; margin:0 auto; padding:0 24px; }
 

@@ -1,13 +1,12 @@
 # Dungeonlog
 
-> Dungeonlog é um app de tarefas com tema de RPG. Todo dia aparece um monstro que só é derrotado se você concluir todas as tarefas do dia. Cada tarefa rende XP, moedas e equipamentos. Funciona na web (iPhone, Android e computador); o app para Android na Google Play chega em breve. Há um plano gratuito e um plano PRO opcional (R$ 17,90/mês, R$ 89,90/ano ou R$ 199,90 vitalício, em reais).
+> Dungeonlog é um app de tarefas com tema de RPG. Todo dia aparece um monstro que só é derrotado se você concluir todas as tarefas do dia. Cada tarefa rende XP, moedas e equipamentos. O app para Android na Google Play chega em breve. Há um plano gratuito e um plano PRO opcional (R$ 17,90/mês, R$ 89,90/ano ou R$ 199,90 vitalício, em reais).
 
-Dungeonlog is a to-do app with an RPG theme. Every day a monster appears that is only defeated when you finish all of the day's tasks. Each task earns XP, coins and gear. It works on the web (iPhone, Android and desktop); the Android app on Google Play is coming soon. There is a free plan and an optional PRO plan.
+Dungeonlog is a to-do app with an RPG theme. Every day a monster appears that is only defeated when you finish all of the day's tasks. Each task earns XP, coins and gear. The Android app on Google Play is coming soon. There is a free plan and an optional PRO plan.
 
 ## Páginas
 - [Página inicial (português)](https://dungeonlog.weberlabs.com.br/): o que é, como funciona, perguntas frequentes.
 - [Home page (English)](https://dungeonlog.weberlabs.com.br/en/): what it is, how it works, FAQ.
-- [Jogar na web / Play on the web](https://dungeonlog.weberlabs.com.br/play/)
 - [Política de Privacidade](https://dungeonlog.weberlabs.com.br/privacy)
 - [Termos de Uso](https://dungeonlog.weberlabs.com.br/terms)
 

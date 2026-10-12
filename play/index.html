@@ -53,7 +53,20 @@ try { document.documentElement.setAttribute('data-tema', localStorage.getItem('q
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
 <link rel="preload" href="sheet.png?v=1" as="image">
-<link rel="stylesheet" href="style.css?v=171">
+<!-- TELA DE ABERTURA (feedback de testador: "tela preta ~10s no 1o uso"). No 1o uso o app nao tem tela de loading
+     (aparelho que nunca logou sai antes de agenda-la) e o style.css (grande) bloqueava a 1a pintura. Agora o CSS e' carregado
+     DENTRO do <body>, logo depois da abertura: o que vem antes dele pinta na hora; scripts depois dele esperam o CSS (nada muda pro app). -->
+<style>
+html{background:#282828}
+#bootSplash{position:fixed;inset:0;z-index:2147483000;background:#282828;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:#F4F1EA}
+#bootSplash .bsLogo{font-size:40px;letter-spacing:.5px;font-weight:300}
+#bootSplash .bsLogo b{font-weight:800}
+#bootSplash .bsPts{display:flex;gap:8px}
+#bootSplash .bsPts i{width:9px;height:9px;border-radius:2px;background:#F4F1EA;opacity:.25;animation:bsPulso 1s ease-in-out infinite}
+#bootSplash .bsPts i:nth-child(2){animation-delay:.15s}
+#bootSplash .bsPts i:nth-child(3){animation-delay:.3s}
+@keyframes bsPulso{0%,100%{opacity:.25;transform:translateY(0)}50%{opacity:1;transform:translateY(-4px)}}
+</style>
 
 <script>
 // Console mudo em producao (log/warn/error/etc). Limpa chaves legadas das antigas ferramentas de debug.
@@ -116,6 +129,13 @@ catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </head>
 
 <body>
+<div id="bootSplash"><div class="bsLogo">dungeon<b>log</b></div><div class="bsPts"><i></i><i></i><i></i></div></div>
+<link rel="stylesheet" href="style.css?v=171">
+<script>
+// roda so quando o style.css ja carregou (script depois de CSS pendente espera) -> tira a abertura; teto de seguranca de 15s
+(function(){ function t(){ var e=document.getElementById('bootSplash'); if(e&&e.parentNode) e.parentNode.removeChild(e); }
+  t.done=false; window.__tirarAbertura=t; setTimeout(t,15000); t(); })();
+</script>
 
 <div class="intro" id="intro">
   <div class="card">

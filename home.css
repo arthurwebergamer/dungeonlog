@@ -22,7 +22,7 @@ a{ color:var(--text); }
 .lang a{ color:var(--dim); text-decoration:none; padding:3px 8px; border-radius:3px; }
 .lang a.active{ color:#fff; background:rgba(255,255,255,.12); }
 .lang .sep{ color:var(--dim); }
-.menu-btn{ display:none; width:42px; height:42px; margin-left:6px; padding:0; border:1px solid #4a4a4a; border-radius:12px; background:rgba(20,20,20,.55); cursor:pointer; align-items:center; justify-content:center; flex-direction:column; gap:5px; }
+.menu-btn{ display:none; width:42px; height:42px; margin-left:6px; padding:0; border:1px solid #4a4a4a; border-radius:12px; background:rgba(20,20,20,.55); align-items:center; justify-content:center; flex-direction:column; gap:5px; }
 .menu-btn i{ display:block; width:20px; height:2px; border-radius:2px; background:#fff; transition:transform .2s, opacity .2s; }
 .menu-btn[aria-expanded="true"] i:nth-child(1){ transform:translateY(7px) rotate(45deg); }
 .menu-btn[aria-expanded="true"] i:nth-child(2){ opacity:0; }
@@ -114,7 +114,7 @@ h2{ font-size:clamp(1.9rem,4.2vw,2.8rem); line-height:1.08; color:#fff; }
 /* ---------- FAQ ---------- */
 .faq{ margin-top:30px; max-width:800px; }
 .faq details{ padding:0 20px; margin-bottom:10px; }
-.faq summary{ cursor:pointer; list-style:none; padding:16px 0; font-weight:600; font-size:1.08rem; display:flex; justify-content:space-between; gap:16px; }
+.faq summary{ list-style:none; padding:16px 0; font-weight:600; font-size:1.08rem; display:flex; justify-content:space-between; gap:16px; }
 .faq summary::-webkit-details-marker{ display:none; }
 .faq summary::after{ content:"+"; color:var(--gold); font-family:'Outfit',sans-serif; font-weight:600; font-size:1.5rem; line-height:1; }
 .faq details[open] summary::after{ content:"–"; }
@@ -148,7 +148,7 @@ footer.site .copy{ color:var(--dim); font-size:.9rem; }
 /* ---------- cursor de espada (só com mouse) ---------- */
 @media (hover:hover) and (pointer:fine){
   html, body{ cursor:url(/cursors/cursor.png) 1 1, auto; cursor:-webkit-image-set(url(/cursors/cursor.png) 1x, url(/cursors/cursor@2x.png) 2x) 1 1, auto; cursor:image-set(url(/cursors/cursor.png) 1x, url(/cursors/cursor@2x.png) 2x) 1 1, auto; }
-  a, button, summary, .btn, [role="button"], label{ cursor:url(/cursors/cursor-hover.png) 1 1, pointer; cursor:-webkit-image-set(url(/cursors/cursor-hover.png) 1x, url(/cursors/cursor-hover@2x.png) 2x) 1 1, pointer; cursor:image-set(url(/cursors/cursor-hover.png) 1x, url(/cursors/cursor-hover@2x.png) 2x) 1 1, pointer; }
+  html a, html button, html summary, html .btn, html [role="button"], html label, html .menu .mi{ cursor:url(/cursors/cursor-hover.png) 1 1, pointer; cursor:-webkit-image-set(url(/cursors/cursor-hover.png) 1x, url(/cursors/cursor-hover@2x.png) 2x) 1 1, pointer; cursor:image-set(url(/cursors/cursor-hover.png) 1x, url(/cursors/cursor-hover@2x.png) 2x) 1 1, pointer; }
 }
 .spark{ position:fixed; width:4px; height:4px; background:#ffffff; pointer-events:none; z-index:60; animation:spark .45s steps(5) forwards; }
 @keyframes spark{ to{ transform:translate(var(--dx), var(--dy)); opacity:0; } }

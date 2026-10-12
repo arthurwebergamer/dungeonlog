@@ -19442,3 +19442,11 @@ Cobre os PRs #66 a #87 (todos mergeados em `main`). Foco da sessão: **lançar**
 - [ ] Fase 26/08–18/09: commits sem mensagem; só dá para conferir lendo as seções 1–96 contra o código tela por tela.
 - [ ] Revisar textos do roadmap que ficaram obsoletos (por exemplo "Curto prazo" da seção 4 e as seções de debug) e marcá-los como históricos.
 - [ ] Conferir por tela (Config, Perfil, Loja, Estatísticas, Conquistas, Bestiário) se cada controle visível está descrito.
+
+## [Sessão 12/10/2026] Tela preta no primeiro uso e botões do login (feedback de testador)
+- **Causa provável da tela preta (~10 s no 1º uso):** o `style.css` bloqueia a primeira pintura e levava 379 KB (gzip), dos quais ~230 KB eram **uma única imagem de sprites em base64 dentro do CSS** (`.pxi`, sheet 512×864). Além disso o Service Worker fazia **todo subrecurso correr contra um timeout de 4 s**: em rede lenta o `style.css` estourava e vinha tela preta.
+- [x] Sprite extraído para `play/sheet.png` (232 KB, referenciado por `url("sheet.png?v=1")` no CSS + `<link rel="preload" as="image">`). `style.css` caiu de 729 KB para 420 KB (gzip 379 → 143 KB). Se a imagem mudar, subir o `?v=` no CSS.
+- [x] `firebase-messaging-sw.js`: subrecurso já baixado é servido do cache na hora (match exato, inclui `?v=`) e atualizado em segundo plano; subrecurso sem cache espera a rede sem timeout; só a **navegação** tem limite de espera, agora **12 s** (era 4 s). Offline continua igual (`navigator.onLine === false` responde a tela "Sem conexão" na hora).
+- Testado em navegador headless (1ª e 2ª carga, SW controlando, cache com `style.css?v=…` e `sheet.png?v=1`). **Não testado no aparelho**: confirmar o 1º uso em rede lenta.
+- Ainda pode melhorar: `index.html` tem 1,1 MB (gzip 383 KB) com JS inline e 114 KB de base64 no `<head>`; `assets.js` (209 KB gzip) é script síncrono. Próximo passo se a tela preta persistir: tela de splash inline com CSS assíncrono (cuidado: ~63 leituras de layout rodam no boot e dependem do CSS já aplicado).
+- [x] Botões de entrada do login com sombra e feedback de toque (testador achou que pareciam desativados). Aviso "Marque a caixa acima para continuar." já estava na `main` (#152).

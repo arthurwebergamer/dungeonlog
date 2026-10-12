@@ -85,11 +85,20 @@ self.addEventListener('fetch', (event) => {
     }
     const cache = await caches.open(CACHE_APP);
     const chave = req.mode === 'navigate' ? 'index.html' : req;
+    // subrecurso (css/js/png): se ja foi baixado, serve do cache NA HORA (match exato, inclui ?v=) e atualiza em segundo plano.
+    // Antes todo subrecurso corria contra um timeout de 4s: em rede lenta (1o uso, 3G) o style.css estourava e vinha tela preta.
+    if (req.mode !== 'navigate') {
+      const exato = await cache.match(req);
+      if (exato) {
+        event.waitUntil(fetch(req).then((r) => { if (r && r.ok && r.type === 'basic') return cache.put(req, limpa(r.clone())); }).catch(() => {}));
+        return limpa(exato);
+      }
+    }
     try {
-      const resp = await Promise.race([
-        fetch(req),
-        new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 4000)),
-      ]);
+      // so a NAVEGACAO tem limite de espera (rede "mentirosa"); subrecurso espera a rede o tempo que precisar
+      const resp = req.mode === 'navigate'
+        ? await Promise.race([fetch(req), new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 12000))])
+        : await fetch(req);
       if (resp && resp.ok && resp.type === 'basic') cache.put(chave, limpa(resp.clone()));
       return resp;
     } catch (e) {

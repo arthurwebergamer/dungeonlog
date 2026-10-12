@@ -39,3 +39,9 @@ footer.site a:hover{ color:#fff; text-decoration:underline; }
 footer.site .copy{ color:var(--dim); font-size:.9rem; }
 
 @media (max-width:560px){ body{ font-size:18px; } header.site{ padding:14px 18px; } .wrap{ padding:0 18px; } }
+
+/* cursor de espada (só com mouse), igual ao da home */
+@media (hover:hover) and (pointer:fine){
+  html, body{ cursor:url(/cursors/cursor.png) 1 1, auto; cursor:-webkit-image-set(url(/cursors/cursor.png) 1x, url(/cursors/cursor@2x.png) 2x) 1 1, auto; cursor:image-set(url(/cursors/cursor.png) 1x, url(/cursors/cursor@2x.png) 2x) 1 1, auto; }
+  html a, html button, html summary{ cursor:url(/cursors/cursor-hover.png) 1 1, pointer; cursor:-webkit-image-set(url(/cursors/cursor-hover.png) 1x, url(/cursors/cursor-hover@2x.png) 2x) 1 1, pointer; cursor:image-set(url(/cursors/cursor-hover.png) 1x, url(/cursors/cursor-hover@2x.png) 2x) 1 1, pointer; }
+}

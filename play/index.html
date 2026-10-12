@@ -132,9 +132,16 @@ html{background:#282828}
 <div id="bootSplash"><div class="bsLogo">dungeon<b>log</b></div><div class="bsPts"><i></i><i></i><i></i></div></div>
 <link rel="stylesheet" href="style.css?v=171">
 <script>
-// roda so quando o style.css ja carregou (script depois de CSS pendente espera) -> tira a abertura; teto de seguranca de 15s
-(function(){ function t(){ var e=document.getElementById('bootSplash'); if(e&&e.parentNode) e.parentNode.removeChild(e); }
-  t.done=false; window.__tirarAbertura=t; setTimeout(t,15000); t(); })();
+// A abertura so sai quando a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado; sair antes (assim que o CSS chega)
+// mostrava um flash cinza vazio e depois a tela de login por baixo, antes do carrossel (visto em video de teste). Teto de seguranca: 15s.
+(function(){
+  function tirar(){ var e=document.getElementById('bootSplash'); if(e&&e.parentNode) e.parentNode.removeChild(e); }
+  window.__tirarAbertura = tirar;
+  function depoisDoPrimeiroQuadro(){ requestAnimationFrame(function(){ requestAnimationFrame(tirar); }); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', depoisDoPrimeiroQuadro);
+  else depoisDoPrimeiroQuadro();
+  setTimeout(tirar, 15000);
+})();
 </script>
 
 <div class="intro" id="intro">

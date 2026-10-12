@@ -59,7 +59,7 @@ body.menu-open .topbar{ position:fixed; z-index:50; background:#1f1f1f; }
 .btn:hover{ background:#f0f0f0; transform:translateY(1px); }
 .soon{ display:inline-flex; align-items:center; font-size:1rem; font-weight:600; color:var(--muted); border:2px dashed #6a6a6a; padding:.85rem 1.3rem; border-radius:14px; background:rgba(20,20,20,.6); }
 .hero .note{ margin-top:20px; max-width:480px; color:#c9c9c9; font-size:.95rem; text-shadow:0 1px 3px rgba(0,0,0,.9); }
-.hero::after{ content:""; position:absolute; left:0; right:0; bottom:0; height:90px; z-index:1; pointer-events:none; background:var(--bg); clip-path:polygon(0 100%,100% 100%,100% 0); opacity:0; }
+.hero::after{ content:""; position:absolute; left:0; right:0; bottom:0; height:clamp(160px,26vh,280px); z-index:1; pointer-events:none; background:linear-gradient(180deg, rgba(40,40,40,0) 0%, rgba(40,40,40,.35) 40%, rgba(40,40,40,.78) 75%, #282828 100%); }
 @media (max-width:820px){
   .hero{ align-items:flex-end; padding:300px 20px 80px; }
   .l-moon{ background-position:38% bottom; }

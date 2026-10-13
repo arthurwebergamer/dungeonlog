@@ -1404,11 +1404,11 @@
      morno em vez de branco/preto puros -- mais parecido com o "light
      mode" nativo de iOS/Android (nunca usam #FFF/#000 puros tambem). */
   :root[data-tema="branco"]{
-    --bg:#E4E2DE; --panel:#EDEBE7; --panel-2:#E0DEDA; --line:#C8C5BF;
-    --text:#2E2C29; --muted:#66625C; --dim:#918D85;
-    --accent:#2E2C29; --accent-dim:#D6D3CD; --gold:#5C5650; --blood:#78716A;
-    --panel-3:#D4D1CB; --poco:#F7F6F3; --sel-bg:#D4D1CB; --mobname:#4A453F;
-    --arena-1:#D4D1CB; --arena-2:#DCD9D3; --arena-3:#E6E4DF;
+    --bg:#D2D0CB; --panel:#DBD9D4; --panel-2:#CECCC7; --line:#B6B3AC;
+    --text:#2E2C29; --muted:#5A564F; --dim:#7F7B73;
+    --accent:#2E2C29; --accent-dim:#C4C1BA; --gold:#5C5650; --blood:#78716A;
+    --panel-3:#C2BFB8; --poco:#E9E7E3; --sel-bg:#C2BFB8; --mobname:#4A453F;
+    --arena-1:#C2BFB8; --arena-2:#CAC7C1; --arena-3:#D4D2CC;
     --xp2:#5C5650;
   }
   :root[data-tema="pergaminho"]{
@@ -3453,11 +3453,11 @@
      morno em vez de branco/preto puros -- mais parecido com o "light
      mode" nativo de iOS/Android (nunca usam #FFF/#000 puros tambem). */
   :root[data-tema="branco"]{
-    --bg:#E4E2DE; --panel:#EDEBE7; --panel-2:#E0DEDA; --line:#C8C5BF;
-    --text:#2E2C29; --muted:#66625C; --dim:#918D85;
-    --accent:#2E2C29; --accent-dim:#D6D3CD; --gold:#5C5650; --blood:#78716A;
-    --panel-3:#D4D1CB; --poco:#F7F6F3; --sel-bg:#D4D1CB; --mobname:#4A453F;
-    --arena-1:#D4D1CB; --arena-2:#DCD9D3; --arena-3:#E6E4DF;
+    --bg:#D2D0CB; --panel:#DBD9D4; --panel-2:#CECCC7; --line:#B6B3AC;
+    --text:#2E2C29; --muted:#5A564F; --dim:#7F7B73;
+    --accent:#2E2C29; --accent-dim:#C4C1BA; --gold:#5C5650; --blood:#78716A;
+    --panel-3:#C2BFB8; --poco:#E9E7E3; --sel-bg:#C2BFB8; --mobname:#4A453F;
+    --arena-1:#C2BFB8; --arena-2:#CAC7C1; --arena-3:#D4D2CC;
     --xp2:#5C5650;
   }
   :root[data-tema="pergaminho"]{

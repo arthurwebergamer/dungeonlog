@@ -14984,6 +14984,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         ocupado = false;
         const prox = document.querySelector('#passoHeroi.on, #passo2.on');
         if (prox){ prox.classList.remove('passoIn'); void prox.offsetWidth; prox.classList.add('passoIn'); }
+        // seta de voltar no setup do convidado: se o login abriu direto (semVoltar) ela estava escondida e sumia aqui
+        if (prox){ const sv = document.getElementById('carrosselVoltar'); if (sv) sv.classList.add('visivel'); }
       }, 240);
     };
   })();
@@ -16405,7 +16407,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       if (eN && eN.classList.contains('on')){ eN.classList.remove('on'); if (eH) eH.classList.add('on'); return; }
       window.__setupDireto = false;
       if (eH) eH.classList.remove('on');
-      irParaLogin();
+      irParaLogin(window.__loginSemVoltarAtual);
       return;
     }
     const atualEl = palco.querySelector('.carrosselSlide.on');

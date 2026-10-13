@@ -14863,6 +14863,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         </button>
         <p class="loginRodape"><span data-i18n="login.jaTemConta">Já tem conta?</span> <button class="loginLink" id="loginEscolhaEntrar" style="padding:0" data-i18n="login.entrar">Entrar</button></p>
         <p class="loginRodape"><button class="loginLink" id="loginEscolhaConvidado" style="padding:0" data-i18n="login.semConta">Entrar como convidado</button></p>
+        <p class="loginRodape loginConhecerWrap" id="loginConhecerWrap" style="display:none"><button class="loginLink" id="loginConhecer" style="padding:0;opacity:.75" data-i18n="login.conhecer">Conhecer o app</button></p>
         <p class="loginAceiteNota" data-ctx="escolha"><span data-i18n="login.aceiteCurto">Ao continuar, você aceita os </span><a class="loginTermosLink" data-k="terms" target="_blank" rel="noopener" data-i18n="login.termosCurto">Termos</a><span data-i18n="login.aceitoE"> e a </span><a class="loginTermosLink" data-k="privacy" target="_blank" rel="noopener" data-i18n="login.privCurto">Privacidade</a></p>
       </div>
 
@@ -16350,6 +16351,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // voltarParaEscolhaLogin() conseguem reavaliar a seta sozinhas
     // quando o formulario abre/fecha, sem esperar um irParaLogin() novo.
     window.__loginSemVoltarAtual = semVoltar;
+    { const cw = document.getElementById('loginConhecerWrap'); if (cw) cw.style.display = semVoltar ? '' : 'none'; }   // login direto (Sair/Criar conta): sem seta, entao oferece o carrossel por link
     if (typeof window.__atualizarSetaVoltarLogin === 'function') window.__atualizarSetaVoltarLogin();
     else document.getElementById('carrosselVoltar').classList.toggle('visivel', !semVoltar);
     document.getElementById('carrosselEntrarLink').classList.add('oculto');
@@ -16362,6 +16364,14 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   function voltarDoLoginCarrossel(){
     irPara(ultimoSlideAntesLogin);
   }
+  (function(){
+    const l = document.getElementById('loginConhecer');
+    if (l) l.onclick = () => {
+      window.__loginSemVoltarAtual = false;
+      const cw = document.getElementById('loginConhecerWrap'); if (cw) cw.style.display = 'none';
+      irPara(1);
+    };
+  })();
   document.getElementById('carrosselEntrarLink').onclick = () => irParaLogin(); // sem argumento de proposito -- se fosse so "= irParaLogin", o clique passaria o Event como 1º parametro (semVoltar), escondendo a seta Voltar por engano aqui (esse caso E legitimo, tem slide de origem de verdade)
   window.voltarDoLoginCarrossel = voltarDoLoginCarrossel; // exposto pro
                                     // botao "Agora nao" (bloco de login)
@@ -18687,6 +18697,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'login.termos':            { pt:'Termos de Uso', en:'Terms of Use' },
     'login.aceitoE':           { pt:' e a ', en:' and the ' },
     'login.aceitoImplicitoOnb': { pt:'Ao continuar, você concorda com os ', en:'By continuing, you agree to the ' },
+    'login.conhecer':          { pt:'Conhecer o app', en:'See how it works' },
     'login.aceiteCurto':       { pt:'Ao continuar, você aceita os ', en:'By continuing, you accept the ' },
     'login.termosCurto':       { pt:'Termos', en:'Terms' },
     'login.privCurto':         { pt:'Privacidade', en:'Privacy Policy' },
@@ -19000,8 +19011,11 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
       // 13/10: no login/onboarding com a cena das montanhas a barra de status usa a cor do TOPO da cena
       // (#1E2A41), nao o --bg do tema (cinza #282828 = faixa cinza em cima do azul)
       const cena = document.getElementById('introCenario');
-      const cena_ok = cena && cena.classList.contains('ativo') && cena.classList.contains('modoLogin');
-      const cor = cena_ok ? '#1E2A41' : ((typeof alvo === 'string' && alvo) ? alvo : getComputedStyle(document.documentElement).getPropertyValue('--bg').trim());
+      const introEl = document.getElementById('intro');
+      // 13/10: a cena fica com .ativo/.modoLogin mesmo depois que o #intro sai (.off) -- a barra ficava azul dentro do app
+      const cena_ok = cena && introEl && !introEl.classList.contains('off') && cena.classList.contains('ativo') && cena.classList.contains('modoLogin');
+      const introVisivel = introEl && !introEl.classList.contains('off');
+      const cor = cena_ok ? '#1E2A41' : introVisivel ? '#323232' : ((typeof alvo === 'string' && alvo) ? alvo : getComputedStyle(document.documentElement).getPropertyValue('--bg').trim());
       if (!cor) return;
       let m = document.querySelector('meta[name="theme-color"]');
       if (!m){ m = document.createElement('meta'); m.name = 'theme-color'; document.head.appendChild(m); }
@@ -19013,7 +19027,7 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
   // do <html> a cada quadro, e isso fazia a barra de status trocar de cor ~20x
   // (piscada no celular). escolherTema chama window.__sincCorBarra UMA vez, ja com o alvo.
   window.__sincCorBarra = sincronizarCorBarra;
-  (function(){ const c = document.getElementById('introCenario'); if (c) new MutationObserver(function(){ sincronizarCorBarra(); }).observe(c, { attributes:true, attributeFilter:['class'] }); })();
+  (function(){ ['introCenario','intro'].forEach(function(id){ const c = document.getElementById(id); if (c) new MutationObserver(function(){ sincronizarCorBarra(); }).observe(c, { attributes:true, attributeFilter:['class'] }); }); })();
   new MutationObserver(function(){ if (!window.__temaAnimando) sincronizarCorBarra(); }).observe(document.documentElement, { attributes:true, attributeFilter:['data-tema','class'] });
 
   /* ---- botao voltar ---- */

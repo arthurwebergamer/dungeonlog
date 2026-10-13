@@ -10642,7 +10642,10 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     window.__temaAnimando = true;
     function passo(agora){
       if (minhaAnim !== _temaAnimId) return; // troca mais nova ja assumiu, aborta este loop
-      const t = Math.min(1, (agora - t0) / duracaoMs);
+      // max(0,..): o timestamp do rAF pode ser ANTERIOR ao t0 (performance.now() de quando
+      // o clique rodou); t negativo extrapolava pro lado oposto do alvo = "mergulho" de cor
+      // no 1o quadro (visto no video: 38 -> 12 -> 70 ao ir pro claro; 225 -> 237 -> 147 ao ir pro escuro)
+      const t = Math.max(0, Math.min(1, (agora - t0) / duracaoMs));
       if (!barraTrocada && t >= 0.5){ barraTrocada = true; if (window.__sincCorBarra) window.__sincCorBarra(corAlvo); }
       TEMA_VARS.forEach((v, i) => {
         const a = de[i], b = para[i];

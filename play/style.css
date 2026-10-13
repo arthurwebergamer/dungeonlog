@@ -6176,3 +6176,8 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 /* 13/10: aceite implicito dos termos no ultimo passo do onboarding (escolha do heroi) */
 .onbTermos{margin:10px 0 0;text-align:center;font-family:'Outfit',sans-serif;font-size:12px;line-height:1.4;color:rgba(213,216,222,.7)}
 .onbTermos a{color:#fff;font-weight:600;text-decoration:underline;text-underline-offset:2px}
+
+/* 13/10: "Conhecer o app" no canto superior esquerdo (onde fica a seta quando o login abre direto) */
+.loginConhecerTopo{background:none;border:none;color:rgba(255,255,255,.82);font-family:'Outfit',sans-serif;font-size:14px;font-weight:500;padding:8px 4px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.carrosselTopoEsq{position:relative}
+.loginConhecerTopo{position:absolute;left:0;top:50%;transform:translateY(-50%);white-space:nowrap}

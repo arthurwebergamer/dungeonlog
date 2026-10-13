@@ -14863,6 +14863,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         </button>
         <p class="loginRodape"><span data-i18n="login.jaTemConta">Já tem conta?</span> <button class="loginLink" id="loginEscolhaEntrar" style="padding:0" data-i18n="login.entrar">Entrar</button></p>
         <p class="loginRodape"><button class="loginLink" id="loginEscolhaConvidado" style="padding:0" data-i18n="login.semConta">Entrar como convidado</button></p>
+        <p class="loginRodape loginConhecerWrap" id="loginConhecerWrap" style="display:none"><button class="loginLink" id="loginConhecer" style="padding:0;opacity:.75" data-i18n="login.conhecer">Conhecer o app</button></p>
         <p class="loginAceiteNota" data-ctx="escolha"><span data-i18n="login.aceiteCurto">Ao continuar, você aceita os </span><a class="loginTermosLink" data-k="terms" target="_blank" rel="noopener" data-i18n="login.termosCurto">Termos</a><span data-i18n="login.aceitoE"> e a </span><a class="loginTermosLink" data-k="privacy" target="_blank" rel="noopener" data-i18n="login.privCurto">Privacidade</a></p>
       </div>
 
@@ -16350,6 +16351,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // voltarParaEscolhaLogin() conseguem reavaliar a seta sozinhas
     // quando o formulario abre/fecha, sem esperar um irParaLogin() novo.
     window.__loginSemVoltarAtual = semVoltar;
+    { const cw = document.getElementById('loginConhecerWrap'); if (cw) cw.style.display = semVoltar ? '' : 'none'; }   // login direto (Sair/Criar conta): sem seta, entao oferece o carrossel por link
     if (typeof window.__atualizarSetaVoltarLogin === 'function') window.__atualizarSetaVoltarLogin();
     else document.getElementById('carrosselVoltar').classList.toggle('visivel', !semVoltar);
     document.getElementById('carrosselEntrarLink').classList.add('oculto');
@@ -16362,6 +16364,14 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   function voltarDoLoginCarrossel(){
     irPara(ultimoSlideAntesLogin);
   }
+  (function(){
+    const l = document.getElementById('loginConhecer');
+    if (l) l.onclick = () => {
+      window.__loginSemVoltarAtual = false;
+      const cw = document.getElementById('loginConhecerWrap'); if (cw) cw.style.display = 'none';
+      irPara(1);
+    };
+  })();
   document.getElementById('carrosselEntrarLink').onclick = () => irParaLogin(); // sem argumento de proposito -- se fosse so "= irParaLogin", o clique passaria o Event como 1º parametro (semVoltar), escondendo a seta Voltar por engano aqui (esse caso E legitimo, tem slide de origem de verdade)
   window.voltarDoLoginCarrossel = voltarDoLoginCarrossel; // exposto pro
                                     // botao "Agora nao" (bloco de login)
@@ -18687,6 +18697,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'login.termos':            { pt:'Termos de Uso', en:'Terms of Use' },
     'login.aceitoE':           { pt:' e a ', en:' and the ' },
     'login.aceitoImplicitoOnb': { pt:'Ao continuar, você concorda com os ', en:'By continuing, you agree to the ' },
+    'login.conhecer':          { pt:'Conhecer o app', en:'See how it works' },
     'login.aceiteCurto':       { pt:'Ao continuar, você aceita os ', en:'By continuing, you accept the ' },
     'login.termosCurto':       { pt:'Termos', en:'Terms' },
     'login.privCurto':         { pt:'Privacidade', en:'Privacy Policy' },

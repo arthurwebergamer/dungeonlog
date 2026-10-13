@@ -10628,6 +10628,9 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   // rapida fariam duas animacoes escreverem na mesma variavel ao mesmo
   // tempo, disputando o valor a cada frame).
   let _temaAnimId = 0;
+  // false = troca instantanea (tela e barra de status trocam juntas, sem fade de 220 ms).
+  // Teste pedido em 12/10 por causa da barra do Android nao interpolar; true volta ao fade.
+  const TEMA_ANIMADO = false;
   function _temaAnimarInterpolando(de, para){
     const root = document.documentElement;
     const minhaAnim = ++_temaAnimId;
@@ -10677,7 +10680,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     }
     const root = document.documentElement;
     const reduzido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduzido || id === root.getAttribute('data-tema')){
+    if (!TEMA_ANIMADO || reduzido || id === root.getAttribute('data-tema')){
       root.setAttribute('data-tema', id);
     } else {
       // le as cores ATUAIS (o que esta na tela agora -- se ja tiver uma

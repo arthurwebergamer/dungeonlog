@@ -19011,8 +19011,11 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
       // 13/10: no login/onboarding com a cena das montanhas a barra de status usa a cor do TOPO da cena
       // (#1E2A41), nao o --bg do tema (cinza #282828 = faixa cinza em cima do azul)
       const cena = document.getElementById('introCenario');
-      const cena_ok = cena && cena.classList.contains('ativo') && cena.classList.contains('modoLogin');
-      const cor = cena_ok ? '#1E2A41' : ((typeof alvo === 'string' && alvo) ? alvo : getComputedStyle(document.documentElement).getPropertyValue('--bg').trim());
+      const introEl = document.getElementById('intro');
+      // 13/10: a cena fica com .ativo/.modoLogin mesmo depois que o #intro sai (.off) -- a barra ficava azul dentro do app
+      const cena_ok = cena && introEl && !introEl.classList.contains('off') && cena.classList.contains('ativo') && cena.classList.contains('modoLogin');
+      const introVisivel = introEl && !introEl.classList.contains('off');
+      const cor = cena_ok ? '#1E2A41' : introVisivel ? '#323232' : ((typeof alvo === 'string' && alvo) ? alvo : getComputedStyle(document.documentElement).getPropertyValue('--bg').trim());
       if (!cor) return;
       let m = document.querySelector('meta[name="theme-color"]');
       if (!m){ m = document.createElement('meta'); m.name = 'theme-color'; document.head.appendChild(m); }
@@ -19024,7 +19027,7 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
   // do <html> a cada quadro, e isso fazia a barra de status trocar de cor ~20x
   // (piscada no celular). escolherTema chama window.__sincCorBarra UMA vez, ja com o alvo.
   window.__sincCorBarra = sincronizarCorBarra;
-  (function(){ const c = document.getElementById('introCenario'); if (c) new MutationObserver(function(){ sincronizarCorBarra(); }).observe(c, { attributes:true, attributeFilter:['class'] }); })();
+  (function(){ ['introCenario','intro'].forEach(function(id){ const c = document.getElementById(id); if (c) new MutationObserver(function(){ sincronizarCorBarra(); }).observe(c, { attributes:true, attributeFilter:['class'] }); }); })();
   new MutationObserver(function(){ if (!window.__temaAnimando) sincronizarCorBarra(); }).observe(document.documentElement, { attributes:true, attributeFilter:['data-tema','class'] });
 
   /* ---- botao voltar ---- */

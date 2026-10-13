@@ -6165,3 +6165,4 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 /* 13/10: termos na tela de escolha = letra miuda no rodape (abaixo de "Entrar como convidado") */
 .loginEscolha .loginAceiteNota{margin:2px 0 0;font-size:11.5px;color:rgba(213,216,222,.62);line-height:1.35}
 .loginEscolha .loginAceiteNota a{color:rgba(255,255,255,.8)}
+.loginEscolha .loginAceiteNota{white-space:nowrap;margin-top:-4px}

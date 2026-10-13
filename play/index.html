@@ -6517,6 +6517,7 @@ function selecionarHeroiCarrossel(i, suave){
 })();
 
 function mostrarSetupPersonagemENome(){
+  window.__setupDireto = true;
   const elPersonagem = document.getElementById('passoHeroi');
   const elNome = document.getElementById('passo2');
   if (!elPersonagem || !elNome) return;
@@ -16236,6 +16237,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   let ultimoSlideAntesLogin = 1; // capturado por irParaLogin() antes de desviar
   function irPara(alvo){
     if (emTransicao) return;
+    window.__setupDireto = false;
     const atualEl = palco.querySelector('.carrosselSlide.on');
     const novoEl = slideEl(alvo);
     if (!novoEl) return; // guarda -- alvo invalido nao quebra o carrossel
@@ -16266,6 +16268,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // -- sinaliza visualmente que virou um desvio, nao um passo normal.
   function irParaLogin(semVoltar){
     if (emTransicao) return;
+    window.__setupDireto = false;
     // v4.131: sempre reabre na tela de ESCOLHA (Google/email), nunca
     // direto no formulario -- sem isso, quem saia do login por "Agora
     // nao" com o form de email aberto reabria o login (link "Ja tem
@@ -16375,6 +16378,16 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   });
 
   document.getElementById('carrosselVoltar').onclick = () => {
+    // 13/10: setup direto (convidado / conta nova: Personagem -> Nome, mostrarSetupPersonagemENome). A seta
+    // seguia a ordem do carrossel (heroi=7 -> nome=6) e caia no passo do nome sobre a parede de tijolos.
+    if (window.__setupDireto){
+      const eH = document.getElementById('passoHeroi'), eN = document.getElementById('passo2');
+      if (eN && eN.classList.contains('on')){ eN.classList.remove('on'); if (eH) eH.classList.add('on'); return; }
+      window.__setupDireto = false;
+      if (eH) eH.classList.remove('on');
+      irParaLogin();
+      return;
+    }
     const atualEl = palco.querySelector('.carrosselSlide.on');
     if (!atualEl) return;
     if (atualEl === passoLogin){

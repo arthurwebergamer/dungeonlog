@@ -6161,3 +6161,7 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 /* botoes de entrada do login: sombra e feedback de toque pra nao parecerem desativados (feedback de testador) */
 .loginEscolha .primario,.loginEscolha .loginGoogleBtn{box-shadow:0 3px 14px rgba(0,0,0,.4);transition:transform .12s}
 .loginEscolha .primario:active,.loginEscolha .loginGoogleBtn:active{transform:scale(.97)}
+
+/* 13/10: botao principal do onboarding/login em azul de destaque (branco/cinza = "desabilitado" pra testador) */
+#intro .primario,#passoLogin .primario{background:#3E7BFA !important;color:#fff !important;font-weight:700;box-shadow:0 4px 14px rgba(62,123,250,.45)}
+#passoLogin .primario:hover{background:#3E7BFA !important}

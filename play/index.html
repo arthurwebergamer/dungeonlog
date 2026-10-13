@@ -1838,7 +1838,7 @@ html{background:var(--bsBg,#282828)}
 
     // nome do jogador -- grande, centralizado
     const emIngles = (typeof idiomaApp === 'function') && idiomaApp() === 'en';
-    const nome = (typeof nomeHeroi !== 'undefined' && nomeHeroi) || (emIngles ? 'Adventurer' : 'Aventureiro');
+    const nome = nomeHeroiNorm(typeof nomeHeroi !== 'undefined' ? nomeHeroi : '');
     ctx.fillStyle = corTexto;
     ctx.font = '600 48px Outfit, sans-serif';
     ctx.fillText(nome, W / 2, 175);
@@ -2088,7 +2088,7 @@ function espiarSaveDe(pjId){
     if (!bruto) return null;
     const d = JSON.parse(bruto);
     if (!d || !d.comecou) return null;
-    return { nomeHeroi: d.nomeHeroi || 'Aventureiro', heroi: Number(d.heroi) || 0 };
+    return { nomeHeroi: nomeHeroiNorm(d.nomeHeroi), heroi: Number(d.heroi) || 0 };
   } catch(e){ return null; }
 }
 window.espiarSaveDe = espiarSaveDe;
@@ -2626,6 +2626,10 @@ const NOMES_DIA_EN = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday
 // de item()/aplicarIdiomaDados() -- nao depende de window.t()/modulo
 // I18N (fim do arquivo), que ainda nao existe no primeiro render() do
 // boot (chamado logo no fim deste mesmo script, linha ~1810).
+// nome padrao do heroi segue o idioma do app (antes ficava 'Aventureiro' mesmo em ingles).
+// nomeHeroiNorm: o padrao gravado em qualquer idioma ('Aventureiro'/'Adventurer') vira o do idioma atual.
+function nomePadraoHeroi(){ return (typeof idiomaApp === 'function' && idiomaApp() === 'en') ? 'Adventurer' : 'Aventureiro'; }
+function nomeHeroiNorm(n){ return (!n || n === 'Aventureiro' || n === 'Adventurer') ? nomePadraoHeroi() : n; }
 function idiomaApp(){
   try { return localStorage.getItem('questlog.idioma.v1') || 'pt'; } catch(e){ return 'pt'; }
 }
@@ -2973,7 +2977,7 @@ function mostrarPoofMonstro(){
   setTimeout(removerUmaVez, 700);
 }
 window.mostrarPoofMonstro = mostrarPoofMonstro;
-let nomeHeroi = 'Aventureiro';
+let nomeHeroi = nomePadraoHeroi();
 let ultimoGanho = 0;
 let _vitoriaCelebrada = false; // pedido do usuario (27/08): tela de vitoria "muito simples" -- controla o disparo unico do efeito de celebracao, ver celebrarVitoria()
 
@@ -4936,7 +4940,7 @@ function _carregarBase(){
     xpTotal = Number(d.xpTotal) || 0;
     moedas = Number(d.moedas) || 0;
     derrotadoEm = d.derrotadoEm || null;
-    nomeHeroi = d.nomeHeroi || 'Aventureiro';
+    nomeHeroi = nomeHeroiNorm(d.nomeHeroi);
     heroiEscolhido = Number(d.heroi) || 0;
     if (typeof d.semente === 'number') semente = d.semente;
     inventario = Array.isArray(d.inventario) ? d.inventario : [];
@@ -4974,7 +4978,7 @@ function resetarEstadoParaPadrao(){
   xpTotal = 0;
   moedas = 0;
   derrotadoEm = null;
-  nomeHeroi = 'Aventureiro';
+  nomeHeroi = nomePadraoHeroi();
   heroiEscolhido = 0;
   inventario = [];
   equipado = {arma:null, armadura:null, elmo:null, escudo:null, acess:null};
@@ -5273,7 +5277,7 @@ function render(){
     }
     document.getElementById('fill').style.width = Math.round((p.resto/p.meta)*100) + '%';
   }
-  document.getElementById('nomeTopo').textContent = nomeHeroi || (idiomaApp() === 'en' ? 'Adventurer' : 'Aventureiro');
+  document.getElementById('nomeTopo').textContent = nomeHeroiNorm(nomeHeroi);
 
   if (jaComecou) salvar();
 }
@@ -6296,7 +6300,7 @@ function mostrarPasso(n){
 function pintarEscolha(){
   const palco = document.getElementById('palcoSprite');
   palco.innerHTML = '<img src="' + heroiAtual().img + '" alt="">';
-  document.getElementById('palcoNome').textContent = nomeHeroi || 'Aventureiro';
+  document.getElementById('palcoNome').textContent = nomeHeroiNorm(nomeHeroi);
   document.querySelectorAll('#gradeHerois .opcao').forEach((el, i) => {
     el.classList.toggle('sel', i === heroiEscolhido);
   });
@@ -9874,7 +9878,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     document.getElementById('perfilSub').textContent = (idiomaApp() === 'en' ? 'Level ' : 'Nível ') + romano(p.nivel);
     const _chipN = document.getElementById('perfilNivelChip');
     if (_chipN) _chipN.textContent = (idiomaApp() === 'en' ? 'LEVEL ' : 'NÍVEL ') + romano(p.nivel);
-    document.getElementById('perfilNomeTxt').textContent = (typeof nomeHeroi !== 'undefined' && nomeHeroi) || (idiomaApp() === 'en' ? 'Adventurer' : 'Aventureiro');
+    document.getElementById('perfilNomeTxt').textContent = nomeHeroiNorm(typeof nomeHeroi !== 'undefined' ? nomeHeroi : '');
     document.getElementById('perfilFill').style.width = Math.round((p.resto / p.meta) * 100) + '%';
     document.getElementById('perfilXpNum').textContent = p.resto + ' / ' + p.meta + ' XP';
 
@@ -9934,7 +9938,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 
   function sincronizarConfig(){
     const el = document.getElementById('cfgNomeAtual');
-    if (el) el.textContent = (typeof nomeHeroi !== 'undefined' && nomeHeroi) || 'Aventureiro';
+    if (el) el.textContent = nomeHeroiNorm(typeof nomeHeroi !== 'undefined' ? nomeHeroi : '');
     pintarGradeConfig();
     pintarTemaGrid();
     atualizarResumosConfig();
@@ -9953,7 +9957,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     const emIngles = langAtual === 'en';
 
     const rHeroi = document.getElementById('cfgHeroiResumo');
-    if (rHeroi) rHeroi.textContent = (typeof nomeHeroi !== 'undefined' && nomeHeroi) || (emIngles ? 'Adventurer' : 'Aventureiro');
+    if (rHeroi) rHeroi.textContent = nomeHeroiNorm(typeof nomeHeroi !== 'undefined' ? nomeHeroi : '');
 
     const rTema = document.getElementById('cfgAparenciaResumo');
     if (rTema && typeof TEMAS !== 'undefined'){
@@ -10032,7 +10036,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   function abrirHeroiConfig(){
     pintarGradeConfig();
     const el = document.getElementById('cfgNomeAtual');
-    if (el) el.textContent = (typeof nomeHeroi !== 'undefined' && nomeHeroi) || 'Aventureiro';
+    if (el) el.textContent = nomeHeroiNorm(typeof nomeHeroi !== 'undefined' ? nomeHeroi : '');
     if (heroiOverlay) heroiOverlay.classList.add('on');
   }
   function fecharHeroiConfig(){
@@ -10088,7 +10092,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     lista.forEach(p => {
       const ehAtivo = p.id === ativo;
       const dados = ehAtivo
-        ? { nomeHeroi: (typeof nomeHeroi !== 'undefined' && nomeHeroi) || 'Aventureiro', heroi: typeof heroiEscolhido === 'number' ? heroiEscolhido : 0 }
+        ? { nomeHeroi: nomeHeroiNorm(typeof nomeHeroi !== 'undefined' ? nomeHeroi : ''), heroi: typeof heroiEscolhido === 'number' ? heroiEscolhido : 0 }
         : espiarSaveDe(p.id);
       const heroiImg = (dados && typeof HEROIS !== 'undefined' && HEROIS[dados.heroi]) ? HEROIS[dados.heroi].img : '';
       const nomeMostrado = p.nome || (dados ? dados.nomeHeroi : (en ? 'Adventurer' : 'Aventureiro'));
@@ -10857,14 +10861,14 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   if (!ov || !campo || !bSalv) return;
 
   function abrir(){
-    campo.value = (typeof nomeHeroi !== 'undefined' && nomeHeroi) || 'Aventureiro';
+    campo.value = nomeHeroiNorm(typeof nomeHeroi !== 'undefined' ? nomeHeroi : '');
     ov.classList.add('on');
     setTimeout(() => { campo.focus(); campo.select(); }, 50);
   }
   function fechar(){ ov.classList.remove('on'); }
   function confirmar(){
     const v = campo.value.trim();
-    nomeHeroi = v || 'Aventureiro';           // mesma variavel global do script principal
+    nomeHeroi = v || nomePadraoHeroi();           // mesma variavel global do script principal
     if (typeof render === 'function') render();               // atualiza #nomeTopo e persiste (salvar())
     const cfgEl = document.getElementById('cfgNomeAtual');
     if (cfgEl) cfgEl.textContent = nomeHeroi;                  // atualiza o Config sem esperar reabrir a aba
@@ -12061,7 +12065,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     const img = (typeof heroiAtual === 'function') ? heroiAtual().img : '';
     document.getElementById('dlgHeroImg').src = img;
     document.getElementById('dlgNome').textContent =
-      (typeof nomeHeroi !== 'undefined' && nomeHeroi) || (en ? 'Adventurer' : 'Aventureiro');
+      nomeHeroiNorm(typeof nomeHeroi !== 'undefined' ? nomeHeroi : '');
     document.getElementById('dlgPular').textContent = en ? 'Skip »' : 'Pular »';
     overlay.classList.add('on');
     digitar(linhasAba[0]);

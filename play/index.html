@@ -10633,9 +10633,17 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     const minhaAnim = ++_temaAnimId;
     const duracaoMs = 220;
     const t0 = performance.now();
+    // Barra de status (meta theme-color) nao interpola: troca seca. Trocar no inicio
+    // deixava ela ~220 ms na frente da tela; aqui troca UMA vez, na metade da animacao
+    // (desvio max. ~110 ms pra qualquer lado), ja na cor final.
+    const iBg = TEMA_VARS.indexOf('--bg');
+    const corAlvo = (iBg >= 0 && para[iBg]) ? 'rgb(' + para[iBg].join(',') + ')' : null;
+    let barraTrocada = false;
+    window.__temaAnimando = true;
     function passo(agora){
       if (minhaAnim !== _temaAnimId) return; // troca mais nova ja assumiu, aborta este loop
       const t = Math.min(1, (agora - t0) / duracaoMs);
+      if (!barraTrocada && t >= 0.5){ barraTrocada = true; if (window.__sincCorBarra) window.__sincCorBarra(corAlvo); }
       TEMA_VARS.forEach((v, i) => {
         const a = de[i], b = para[i];
         if (!a || !b) return;
@@ -10647,7 +10655,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       if (t < 1) requestAnimationFrame(passo);
       // anima acabou: remove os overrides inline, volta a herdar limpo
       // do seletor :root[data-tema=...] (mesmo valor final, sem sujeira)
-      else TEMA_VARS.forEach(v => root.style.removeProperty(v));
+      else { TEMA_VARS.forEach(v => root.style.removeProperty(v)); window.__temaAnimando = false; if (window.__sincCorBarra) window.__sincCorBarra(); }
     }
     requestAnimationFrame(passo);
   }
@@ -10690,7 +10698,6 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       root.setAttribute('data-tema', id); // muda a regra que resolve as variaveis...
       const csDepois = getComputedStyle(root);
       const para = TEMA_VARS.map(v => _temaCorParaRgb(csDepois.getPropertyValue(v)));
-      if (window.__sincCorBarra) window.__sincCorBarra(); // barra de status: uma troca so, no alvo
       // ...mas nada foi pintado na tela ainda: um script sincrono nunca
       // e interrompido por um paint no meio. _temaAnimarInterpolando ja
       // comeca escrevendo os valores de "de" via inline style (trava
@@ -18893,9 +18900,9 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
 <script>
 (function(){
   /* ---- cor da barra de status = fundo do tema ---- */
-  function sincronizarCorBarra(){
+  function sincronizarCorBarra(alvo){
     try {
-      const cor = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+      const cor = (typeof alvo === 'string' && alvo) ? alvo : getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
       if (!cor) return;
       let m = document.querySelector('meta[name="theme-color"]');
       if (!m){ m = document.createElement('meta'); m.name = 'theme-color'; document.head.appendChild(m); }
@@ -18907,7 +18914,7 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
   // do <html> a cada quadro, e isso fazia a barra de status trocar de cor ~20x
   // (piscada no celular). escolherTema chama window.__sincCorBarra UMA vez, ja com o alvo.
   window.__sincCorBarra = sincronizarCorBarra;
-  new MutationObserver(sincronizarCorBarra).observe(document.documentElement, { attributes:true, attributeFilter:['data-tema','class'] });
+  new MutationObserver(function(){ if (!window.__temaAnimando) sincronizarCorBarra(); }).observe(document.documentElement, { attributes:true, attributeFilter:['data-tema','class'] });
 
   /* ---- botao voltar ---- */
   if (!window.history || typeof history.pushState !== 'function') return;

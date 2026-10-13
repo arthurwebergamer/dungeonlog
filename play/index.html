@@ -10745,12 +10745,14 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       _temaAnimarInterpolando(de, para);
     }
     try { localStorage.setItem(CHAVE_TEMA, id); } catch(e){}
-    pintarTemaGrid();
+    pintarTemaGrid(id);
   }
-  function pintarTemaGrid(){
+  function pintarTemaGrid(idForcado){
     const g = document.getElementById('temaGrid');
     if (!g) return;
-    const atual = document.documentElement.getAttribute('data-tema') || 'grafite';
+    // idForcado: no modo TEMA_DIP o atributo so troca ~90 ms depois do clique; sem isso o check
+    // era repintado no tema antigo e parecia que o clique nao tinha pego (2o clique necessario)
+    const atual = idForcado || document.documentElement.getAttribute('data-tema') || 'grafite';
     g.innerHTML = '';
     // v4.126 (2a tentativa: o card grande tipo Skyllion nao ficou bom --
     // pedido do usuario pra tentar algo diferente. Virou lista de linhas

@@ -10631,6 +10631,37 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   // false = troca instantanea (tela e barra de status trocam juntas, sem fade de 220 ms).
   // Teste pedido em 12/10 por causa da barra do Android nao interpolar; true volta ao fade.
   const TEMA_ANIMADO = false;
+  // true = "fade por cor neutra": um veu cobre a tela (90 ms), o tema e a barra de status
+  // trocam POR BAIXO dele (instantaneo, sem ninguem ver o descompasso), e o veu some (110 ms).
+  // A barra do Android nao interpola, entao a troca fica escondida em vez de sincronizada.
+  const TEMA_DIP = true;
+  function _temaDip(id){
+    const root = document.documentElement;
+    const atual = root.getAttribute('data-tema');
+    const lerBg = () => _temaCorParaRgb(getComputedStyle(root).getPropertyValue('--bg')) || [40,40,40];
+    const de = lerBg();
+    root.setAttribute('data-tema', id);
+    const para = lerBg();
+    root.setAttribute('data-tema', atual); // so pra medir; nada foi pintado
+    const mid = de.map((v, i) => Math.round((v + para[i]) / 2));
+    let veu = document.getElementById('temaVeu');
+    if (veu) veu.remove();
+    veu = document.createElement('div');
+    veu.id = 'temaVeu';
+    veu.style.cssText = 'position:fixed;inset:0;z-index:2147483000;pointer-events:none;opacity:0;background:rgb(' + mid.join(',') + ')';
+    document.body.appendChild(veu);
+    const remover = () => { if (veu.parentNode) veu.parentNode.removeChild(veu); };
+    if (!veu.animate){ root.setAttribute('data-tema', id); remover(); return; }
+    const entrada = veu.animate([{opacity:0},{opacity:1}], {duration:90, easing:'ease-out', fill:'forwards'});
+    entrada.onfinish = () => {
+      root.setAttribute('data-tema', id); // tela e barra de status, escondidas pelo veu
+      requestAnimationFrame(() => {
+        const saida = veu.animate([{opacity:1},{opacity:0}], {duration:110, easing:'ease-in', fill:'forwards'});
+        saida.onfinish = remover;
+      });
+    };
+    setTimeout(remover, 1200); // seguranca
+  }
   function _temaAnimarInterpolando(de, para){
     const root = document.documentElement;
     const minhaAnim = ++_temaAnimId;
@@ -10680,7 +10711,9 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     }
     const root = document.documentElement;
     const reduzido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (!TEMA_ANIMADO || reduzido || id === root.getAttribute('data-tema')){
+    if (TEMA_DIP && !reduzido && id !== root.getAttribute('data-tema')){
+      _temaDip(id);
+    } else if (!TEMA_ANIMADO || reduzido || id === root.getAttribute('data-tema')){
       root.setAttribute('data-tema', id);
     } else {
       // le as cores ATUAIS (o que esta na tela agora -- se ja tiver uma
@@ -10712,12 +10745,14 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       _temaAnimarInterpolando(de, para);
     }
     try { localStorage.setItem(CHAVE_TEMA, id); } catch(e){}
-    pintarTemaGrid();
+    pintarTemaGrid(id);
   }
-  function pintarTemaGrid(){
+  function pintarTemaGrid(idForcado){
     const g = document.getElementById('temaGrid');
     if (!g) return;
-    const atual = document.documentElement.getAttribute('data-tema') || 'grafite';
+    // idForcado: no modo TEMA_DIP o atributo so troca ~90 ms depois do clique; sem isso o check
+    // era repintado no tema antigo e parecia que o clique nao tinha pego (2o clique necessario)
+    const atual = idForcado || document.documentElement.getAttribute('data-tema') || 'grafite';
     g.innerHTML = '';
     // v4.126 (2a tentativa: o card grande tipo Skyllion nao ficou bom --
     // pedido do usuario pra tentar algo diferente. Virou lista de linhas

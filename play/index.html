@@ -10630,11 +10630,11 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   let _temaAnimId = 0;
   // false = troca instantanea (tela e barra de status trocam juntas, sem fade de 220 ms).
   // Teste pedido em 12/10 por causa da barra do Android nao interpolar; true volta ao fade.
-  const TEMA_ANIMADO = false;
+  const TEMA_ANIMADO = true;
   // true = "fade por cor neutra": um veu cobre a tela (90 ms), o tema e a barra de status
   // trocam POR BAIXO dele (instantaneo, sem ninguem ver o descompasso), e o veu some (110 ms).
   // A barra do Android nao interpola, entao a troca fica escondida em vez de sincronizada.
-  const TEMA_DIP = true;
+  const TEMA_DIP = false;
   function _temaDip(id){
     const root = document.documentElement;
     const atual = root.getAttribute('data-tema');
@@ -10680,7 +10680,12 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       // o clique rodou); t negativo extrapolava pro lado oposto do alvo = "mergulho" de cor
       // no 1o quadro (visto no video: 38 -> 12 -> 70 ao ir pro claro; 225 -> 237 -> 147 ao ir pro escuro)
       const t = Math.max(0, Math.min(1, (agora - t0) / duracaoMs));
-      if (!barraTrocada && t >= 0.5){ barraTrocada = true; if (window.__sincCorBarra) window.__sincCorBarra(corAlvo); }
+      // barra de status acompanha a MESMA cor interpolada, quadro a quadro (o Chrome repassa
+      // a cada quadro; antes piscava por causa do t negativo do 1o quadro, ja corrigido)
+      if (iBg >= 0 && de[iBg] && para[iBg] && window.__sincCorBarra){
+        const q = [0,1,2].map(k => Math.round(de[iBg][k] + (para[iBg][k] - de[iBg][k]) * t));
+        window.__sincCorBarra('rgb(' + q.join(',') + ')');
+      }
       TEMA_VARS.forEach((v, i) => {
         const a = de[i], b = para[i];
         if (!a || !b) return;

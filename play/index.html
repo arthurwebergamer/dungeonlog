@@ -49,7 +49,8 @@
 // tema salvo so era aplicado la embaixo, no script principal. Aplica o
 // data-tema ANTES do style.css pintar a primeira vez (mesma chave e mesmo
 // padrao 'grafite' de temaSalvo()).
-try { document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
+try { var _cb=localStorage.getItem('questlog.corBarra.v1'); if(_cb){var _m=document.querySelector('meta[name="theme-color"]'); if(_m)_m.content=_cb; document.documentElement.style.setProperty('--bsBg',_cb);}
+   document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
 <link rel="preload" href="sheet.png?v=1" as="image">
@@ -57,8 +58,8 @@ catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
      (aparelho que nunca logou sai antes de agenda-la) e o style.css (grande) bloqueava a 1a pintura. Agora o CSS e' carregado
      DENTRO do <body>, logo depois da abertura: o que vem antes dele pinta na hora; scripts depois dele esperam o CSS (nada muda pro app). -->
 <style>
-html{background:#282828}
-#bootSplash{position:fixed;inset:0;z-index:2147483000;background:#282828;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;padding:32px;box-sizing:border-box}
+html{background:var(--bsBg,#282828)}
+#bootSplash{position:fixed;inset:0;z-index:2147483000;background:var(--bsBg,#282828);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;padding:32px;box-sizing:border-box}
 #bootSplash img{width:56px;height:56px;image-rendering:pixelated;animation:bsCorrer .5s ease-in-out infinite}
 @keyframes bsCorrer{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-10px) rotate(4deg)}}
 #bootSplash span{font-family:Silkscreen,ui-monospace,Menlo,Consolas,monospace;font-size:12px;color:#909090;letter-spacing:.02em;max-width:280px}
@@ -10689,6 +10690,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       root.setAttribute('data-tema', id); // muda a regra que resolve as variaveis...
       const csDepois = getComputedStyle(root);
       const para = TEMA_VARS.map(v => _temaCorParaRgb(csDepois.getPropertyValue(v)));
+      if (window.__sincCorBarra) window.__sincCorBarra(); // barra de status: uma troca so, no alvo
       // ...mas nada foi pintado na tela ainda: um script sincrono nunca
       // e interrompido por um paint no meio. _temaAnimarInterpolando ja
       // comeca escrevendo os valores de "de" via inline style (trava
@@ -18897,11 +18899,15 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
       if (!cor) return;
       let m = document.querySelector('meta[name="theme-color"]');
       if (!m){ m = document.createElement('meta'); m.name = 'theme-color'; document.head.appendChild(m); }
-      if (m.content !== cor) m.content = cor;
+      if (m.content !== cor){ m.content = cor; try { localStorage.setItem('questlog.corBarra.v1', cor); } catch(e){} }
     } catch(e){}
   }
   sincronizarCorBarra();
-  new MutationObserver(sincronizarCorBarra).observe(document.documentElement, { attributes:true, attributeFilter:['data-tema','class','style'] });
+  // 'style' fora do filtro: a animacao de troca de tema reescreve o style inline
+  // do <html> a cada quadro, e isso fazia a barra de status trocar de cor ~20x
+  // (piscada no celular). escolherTema chama window.__sincCorBarra UMA vez, ja com o alvo.
+  window.__sincCorBarra = sincronizarCorBarra;
+  new MutationObserver(sincronizarCorBarra).observe(document.documentElement, { attributes:true, attributeFilter:['data-tema','class'] });
 
   /* ---- botao voltar ---- */
   if (!window.history || typeof history.pushState !== 'function') return;

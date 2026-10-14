@@ -45,16 +45,13 @@ body.menu-open .topbar{ position:fixed; z-index:50; background:#1f1f1f; }
 .scene{ position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
 .layer{ position:absolute; top:0; bottom:0; left:-6%; right:-6%; will-change:transform; image-rendering:pixelated;
   background-repeat:repeat-x; background-position:center bottom; background-size:auto max(100%, calc(100vw * .5834)); }
-.layer.pl{ top:-80px; bottom:-80px; left:-1500px; right:-1500px; background-size:auto max(100%, calc(100vw * .5625)); }
-.pl0{ background-image:url(/img/plains/L0.png); }
-.pl1{ background-image:url(/img/plains/L1.png); }
-.pl2{ background-image:url(/img/plains/L2.png); }
-.pl3{ background-image:url(/img/plains/L3.png); }
-.pl4{ background-image:url(/img/plains/L4.png); }
-.pl5{ background-image:url(/img/plains/L5.png); }
-.pl6{ background-image:url(/img/plains/L6.png); }
-.pl7{ background-image:url(/img/plains/L7.png); }
-.pl8{ background-image:url(/img/plains/L8.png); }
+.layer.pn{ top:-80px; bottom:-80px; left:-600px; right:-600px; background-size:auto max(100%, calc(100vw * .5625)); }
+.pn0{ background-image:url(/img/neve/L0.png); }
+.pn1{ background-image:url(/img/neve/L1.png); }
+.pn2{ background-image:url(/img/neve/L2.png); }
+.pn3{ background-image:url(/img/neve/L3.png); }
+.pn4{ background-image:url(/img/neve/L4.png); }
+.pn5{ background-image:url(/img/neve/L5.png); }
 .hero .inner{ position:relative; z-index:2; width:100%; max-width:1120px; margin:0 auto; }
 .hero .col{ max-width:540px; }
 .hero h1{ font-size:clamp(2.5rem,5.4vw,4.4rem); line-height:1.04; color:#fff; text-shadow:0 2px 0 rgba(0,0,0,.55), 0 4px 22px rgba(0,0,0,.7); }

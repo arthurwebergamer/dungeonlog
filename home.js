@@ -8,9 +8,25 @@
   var shifts = [].slice.call(document.querySelectorAll('.shift[data-sx]'));
   var mx = 0, my = 0, ticking = false;
 
+  /* Cada camada só precisa ser larga o bastante para o deslocamento máximo dela (altura do cenário × velocidade
+     + mouse). Camadas gigantes e iguais ocupavam centenas de MB de GPU; o navegador descartava pedaços ao descer
+     a página e, ao subir direto, redesenhava tudo aos poucos (blocos escuros/borrados). */
+  function sizeLayers() {
+    if (!scene) return;
+    var h = scene.offsetHeight || window.innerHeight || 800;
+    for (var i = 0; i < layers.length; i++) {
+      var l = layers[i];
+      var sx = Math.abs(parseFloat(l.getAttribute('data-sx')) || 0);
+      var ax = Math.abs(parseFloat(l.getAttribute('data-mx')) || 0);
+      var m = Math.ceil(h * sx + ax / 2 + 48) + 'px';
+      l.style.left = '-' + m; l.style.right = '-' + m;
+    }
+  }
+
   function update() {
     ticking = false;
     var y = window.pageYOffset || 0;
+    var py = scene ? Math.min(y, scene.offsetHeight) : y;   // o cenário não anda além da própria altura
     var vh = window.innerHeight || 800;
 
     if (layers.length && y < scene.offsetHeight + 300) {
@@ -19,7 +35,7 @@
         var sx = parseFloat(l.getAttribute('data-sx')) || 0;   // deslocamento horizontal por px rolado
         var sy = parseFloat(l.getAttribute('data-sy')) || 0;   // deslocamento vertical por px rolado
         var ax = parseFloat(l.getAttribute('data-mx')) || 0;   // intensidade do mouse
-        l.style.transform = 'translate3d(' + (y * sx + mx * ax).toFixed(1) + 'px,' + (y * sy + my * ax * 0.6).toFixed(1) + 'px,0)';
+        l.style.transform = 'translate3d(' + (py * sx + mx * ax).toFixed(1) + 'px,' + (y * sy + my * ax * 0.6).toFixed(1) + 'px,0)';
       }
     }
     for (var j = 0; j < shifts.length; j++) {      // filas de monstros andam ao rolar (sentidos opostos)
@@ -39,13 +55,14 @@
 
   if (!reduce) {
     window.addEventListener('scroll', req, { passive: true });
-    window.addEventListener('resize', req, { passive: true });
+    window.addEventListener('resize', function () { sizeLayers(); req(); }, { passive: true });
     window.addEventListener('pointermove', function (e) {
       if (e.pointerType !== 'mouse') return;
       mx = (e.clientX / window.innerWidth - 0.5) * -1;
       my = (e.clientY / window.innerHeight - 0.5) * -1;
       req();
     }, { passive: true });
+    sizeLayers();
     update();
 
     /* faíscas douradas ao clicar (só mouse) */

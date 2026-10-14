@@ -16427,8 +16427,16 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       const eH = document.getElementById('passoHeroi'), eN = document.getElementById('passo2');
       if (eN && eN.classList.contains('on')){ eN.classList.remove('on'); if (eH) eH.classList.add('on'); return; }
       window.__setupDireto = false;
-      if (eH) eH.classList.remove('on');
-      irParaLogin(window.__loginSemVoltarAtual);
+      // 14/10: voltar do Personagem pro login com animacao (igual ao Voltar do e-mail): Personagem desliza pra direita
+      // e some; a tela de escolha volta deslizando da esquerda (.loginSlideIn -> sem a classe, com transicao).
+      const semV = window.__loginSemVoltarAtual;
+      if (eH){ eH.style.transition = 'opacity .2s ease, transform .2s ease'; eH.style.opacity = '0'; eH.style.transform = 'translateX(26px)'; }
+      setTimeout(() => {
+        if (eH){ eH.classList.remove('on'); eH.style.transition = ''; eH.style.opacity = ''; eH.style.transform = ''; }
+        irParaLogin(semV);
+        const esc = document.getElementById('loginEscolha');
+        if (esc){ esc.classList.add('loginSlideIn'); void esc.offsetWidth; esc.classList.remove('loginSlideIn'); }
+      }, 200);
       return;
     }
     const atualEl = palco.querySelector('.carrosselSlide.on');

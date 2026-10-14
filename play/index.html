@@ -129,7 +129,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><span id="bootSplashTxt">Conectando com a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Connecting to the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=179">
+<link rel="stylesheet" href="style.css?v=180">
 <script>
 // A abertura so sai quando a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado; sair antes (assim que o CSS chega)
 // mostrava um flash cinza vazio e depois a tela de login por baixo, antes do carrossel (visto em video de teste). Teto de seguranca: 15s.
@@ -15201,6 +15201,9 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   (function(){
     // Versao dos textos aceitos. Mudou? Atualizar aqui e arquivar a copia em /terms/<versao>/ e /privacy/<versao>/ (o checkbox volta pra todo mundo).
     window.ACEITE_VERSAO = '2026-10-06';
+    // 14/10: BETA FECHADA (12 testadores conhecidos): linha de termos do passo do Personagem desligada (o testador Konrad
+    // parava ali por "aceitar os termos em meu nome"). VOLTAR A true ANTES DA PRODUCAO. Termos seguem em Config > Legal.
+    window.TERMOS_NO_ONBOARDING = false;
     const CH_DISP = 'questlog.aceiteDisp.v1';
     // Aparelho ja aceitou ESTA versao (gravado so depois de o Worker confirmar): o checkbox some e vira a nota "Ao continuar...".
     const dispAceito = () => { try { return localStorage.getItem(CH_DISP) === window.ACEITE_VERSAO; } catch(e){ return false; } };
@@ -15238,8 +15241,9 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         try { const v = [...document.querySelectorAll('.loginAceite')].find(l => l.offsetParent); if (v) v.scrollIntoView({block:'center', behavior:'smooth'}); } catch(e){}
       }, true);
     });
+    { const ot = document.querySelector('.onbTermos'); if (ot && !window.TERMOS_NO_ONBOARDING) ot.style.display = 'none'; }
     const irP3 = document.getElementById('irPasso3');   // aceite implicito: a linha dos termos fica visivel nesse passo
-    if (irP3) irP3.addEventListener('click', () => { try { localStorage.setItem(CH_DISP, window.ACEITE_VERSAO); } catch(e){} }, true);
+    if (irP3) irP3.addEventListener('click', () => { if (!window.TERMOS_NO_ONBOARDING) return; try { localStorage.setItem(CH_DISP, window.ACEITE_VERSAO); } catch(e){} }, true);
     window.pintarAceiteLogin();
   })();
 
@@ -16423,8 +16427,16 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       const eH = document.getElementById('passoHeroi'), eN = document.getElementById('passo2');
       if (eN && eN.classList.contains('on')){ eN.classList.remove('on'); if (eH) eH.classList.add('on'); return; }
       window.__setupDireto = false;
-      if (eH) eH.classList.remove('on');
-      irParaLogin(window.__loginSemVoltarAtual);
+      // 14/10: voltar do Personagem pro login com animacao (igual ao Voltar do e-mail): Personagem desliza pra direita
+      // e some; a tela de escolha volta deslizando da esquerda (.loginSlideIn -> sem a classe, com transicao).
+      const semV = window.__loginSemVoltarAtual;
+      if (eH){ eH.style.transition = 'opacity .2s ease, transform .2s ease'; eH.style.opacity = '0'; eH.style.transform = 'translateX(26px)'; }
+      setTimeout(() => {
+        if (eH){ eH.classList.remove('on'); eH.style.transition = ''; eH.style.opacity = ''; eH.style.transform = ''; }
+        irParaLogin(semV);
+        const esc = document.getElementById('loginEscolha');
+        if (esc){ esc.classList.add('loginSlideIn'); void esc.offsetWidth; esc.classList.remove('loginSlideIn'); }
+      }, 200);
       return;
     }
     const atualEl = palco.querySelector('.carrosselSlide.on');
@@ -18749,9 +18761,31 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     document.querySelectorAll('[data-i18n-aria]').forEach(el => {
       el.setAttribute('aria-label', t(el.dataset.i18nAria));
     });
+    traduzirAriaEstatico();
     atualizarLinksLegais();
   }
   window.aplicarIdioma = aplicarIdioma;
+
+  // 14/10 (feedback do testador Konrad): aria-labels estaticos em PT ("Herói anterior", "Próximo herói"...)
+  // ficavam em PT no app em ingles (leitor de tela misturava idiomas). Mapa PT->EN aplicado aos que nao tem
+  // data-i18n-aria, inclusive os criados depois por JS (MutationObserver).
+  const ARIA_EN = { 'Herói anterior':'Previous hero', 'Próximo herói':'Next hero', 'Fechar':'Close', 'Diminuir':'Decrease',
+    'Aumentar':'Increase', 'Investir':'Invest', 'Apagar tarefa':'Delete task', 'Excluir tarefa':'Delete task',
+    'Diminuir mês':'Previous month', 'Aumentar mês':'Next month', 'Diminuir dia':'Previous day', 'Aumentar dia':'Next day',
+    'Ano anterior':'Previous year', 'Próximo ano':'Next year', 'Som':'Sound', 'Notificações':'Notifications',
+    'Feedback tátil':'Haptic feedback', 'Configurações':'Settings', 'Voltar':'Back' };
+  const ARIA_PT = Object.keys(ARIA_EN).reduce((o, k) => { o[ARIA_EN[k]] = k; return o; }, {});
+  function traduzirAriaEstatico(raiz){
+    let en = false; try { en = idiomaApp() === 'en'; } catch(e){}
+    const mapa = en ? ARIA_EN : ARIA_PT;
+    (raiz || document).querySelectorAll('[aria-label]:not([data-i18n-aria])').forEach(el => {
+      const v = el.getAttribute('aria-label');
+      if (mapa[v] && mapa[v] !== v) el.setAttribute('aria-label', mapa[v]);
+    });
+  }
+  { let agendado = false;
+    new MutationObserver(() => { if (agendado) return; agendado = true; requestAnimationFrame(() => { agendado = false; traduzirAriaEstatico(); }); })
+      .observe(document.body, { childList:true, subtree:true }); }
 
   // Links de Config > Legal (Politica de Privacidade / Termos de Uso)
   // apontam pro site estatico real, que tem paginas separadas por

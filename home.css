@@ -16,7 +16,7 @@ a{ color:var(--text); }
 .topbar .brand img{ width:30px; height:30px; border-radius:4px; image-rendering:auto; }
 .topbar .brand span{ font-family:'Outfit',sans-serif; font-weight:800; font-size:1.3rem; line-height:1; color:#fff; }
 .topbar nav{ display:flex; align-items:center; gap:24px; font-size:.98rem; font-weight:600; }
-.topbar nav a{ color:var(--muted); text-decoration:none; text-shadow:0 1px 2px rgba(0,0,0,.7); }
+.topbar nav a{ color:#e4e4e4; text-decoration:none; text-shadow:0 1px 2px rgba(0,0,0,.9), 0 2px 10px rgba(0,0,0,.6); }
 .topbar nav a:hover{ color:#fff; }
 .lang{ display:flex; align-items:center; gap:4px; font-size:.9rem; }
 .lang a{ color:var(--dim); text-decoration:none; padding:3px 8px; border-radius:3px; }
@@ -42,17 +42,24 @@ body.menu-open .topbar{ position:fixed; z-index:50; background:#1f1f1f; }
 
 /* ---------- cenário em camadas (parallax horizontal) ---------- */
 .hero{ position:relative; overflow:hidden; isolation:isolate; min-height:100svh; display:flex; align-items:center; padding:120px 24px 130px; background:#17171a; }
-.scene{ position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden; filter:grayscale(1) brightness(1.55) contrast(1.05); }
+.scene{ position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
 .layer{ position:absolute; top:0; bottom:0; left:-6%; right:-6%; will-change:transform; image-rendering:pixelated;
   background-repeat:repeat-x; background-position:center bottom; background-size:auto max(100%, calc(100vw * .5834)); }
-.l-moon{ background-image:url(/img/gothic/moon.png); left:-20%; right:-20%; }
-.l-mtn{ background-image:url(/img/gothic/mountains.png); left:-1500px; right:-1500px; }
-.l-grave{ background-image:url(/img/gothic/graveyard.png); left:-1500px; right:-1500px; }
+.layer.pl{ top:-80px; bottom:-80px; left:-1500px; right:-1500px; background-size:auto max(100%, calc(100vw * .5625)); }
+.pl0{ background-image:url(/img/plains/L0.png); }
+.pl1{ background-image:url(/img/plains/L1.png); }
+.pl2{ background-image:url(/img/plains/L2.png); }
+.pl3{ background-image:url(/img/plains/L3.png); }
+.pl4{ background-image:url(/img/plains/L4.png); }
+.pl5{ background-image:url(/img/plains/L5.png); }
+.pl6{ background-image:url(/img/plains/L6.png); }
+.pl7{ background-image:url(/img/plains/L7.png); }
+.pl8{ background-image:url(/img/plains/L8.png); }
 .hero .inner{ position:relative; z-index:2; width:100%; max-width:1120px; margin:0 auto; }
 .hero .col{ max-width:540px; }
-.hero h1{ font-size:clamp(2.5rem,5.4vw,4.4rem); line-height:1.04; color:#d4d4d4; text-shadow:0 2px 14px rgba(0,0,0,.6); }
+.hero h1{ font-size:clamp(2.5rem,5.4vw,4.4rem); line-height:1.04; color:#fff; text-shadow:0 2px 0 rgba(0,0,0,.55), 0 4px 22px rgba(0,0,0,.7); }
 .hero h1 em{ font-style:normal; color:var(--gold); }
-.hero .lead{ margin-top:22px; font-size:1.2rem; line-height:1.55; color:#f0f0f0; text-shadow:0 1px 4px rgba(0,0,0,.85); }
+.hero .lead{ margin-top:22px; font-size:1.2rem; line-height:1.55; color:#f0f0f0; text-shadow:0 1px 2px rgba(0,0,0,.95), 0 2px 14px rgba(0,0,0,.8); }
 .cta{ display:flex; flex-wrap:wrap; gap:14px; margin-top:30px; align-items:center; }
 .btn{ display:inline-flex; align-items:center; font-family:'Outfit',sans-serif; font-weight:800; font-size:1.05rem; line-height:1; text-decoration:none; color:#1a1a1a; background:#fff;
   padding:.95rem 1.7rem; border-radius:14px; box-shadow:0 2px 0 #b9b9b9, 0 8px 24px rgba(0,0,0,.35); transition:transform .15s, background .15s; }
@@ -62,7 +69,6 @@ body.menu-open .topbar{ position:fixed; z-index:50; background:#1f1f1f; }
 .hero::after{ content:""; position:absolute; left:0; right:0; bottom:0; height:clamp(160px,26vh,280px); z-index:1; pointer-events:none; background:linear-gradient(180deg, rgba(40,40,40,0) 0%, rgba(40,40,40,.35) 40%, rgba(40,40,40,.78) 75%, #282828 100%); }
 @media (max-width:820px){
   .hero{ align-items:flex-end; padding:300px 20px 80px; }
-  .l-moon{ background-position:38% bottom; }
   .hero h1{ font-size:clamp(2.6rem,12vw,3.6rem); }
   .hero .lead{ font-size:1.15rem; }
 }

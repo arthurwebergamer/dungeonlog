@@ -19488,3 +19488,4 @@ Cobre os PRs #66 a #87 (todos mergeados em `main`). Foco da sessão: **lançar**
 - [14/10] Layout desktop (≥900px): .app vira grid 2 colunas (arena+XP | tarefas), abas Loja/Perfil/Stats em largura total; celular intacto. style.css v=181.
 - [14/10] Desktop: painel até 1500px; selo PRO dos cadeados vira 'Versão completa' fora do Android. style.css v=182.
 - [14/10] Desktop v=183: painel 1180px, coluna esquerda 430px, arena/sprites ampliados (zoom 1.35), sombra.
+- [14/10] Desktop v=184: painel ocupa a tela toda (sem max-width), zoom da arena 1.7 em >=1600px.

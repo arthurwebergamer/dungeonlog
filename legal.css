@@ -37,6 +37,8 @@ footer.site .footlabel{ font-weight:700; font-size:.78rem; letter-spacing:.12em;
 footer.site a{ color:var(--muted); font-size:1rem; text-decoration:none; }
 footer.site a:hover{ color:#fff; text-decoration:underline; }
 footer.site .copy{ color:var(--dim); font-size:.9rem; }
+footer.site .credit{ display:block; margin-top:6px; color:var(--dim); font-size:.85rem; }
+footer.site .credit a{ font-size:inherit; color:var(--muted); text-decoration:underline; }
 
 @media (max-width:560px){ body{ font-size:18px; } header.site{ padding:14px 18px; } .wrap{ padding:0 18px; } }
 

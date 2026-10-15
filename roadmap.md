@@ -19494,3 +19494,4 @@ Cobre os PRs #66 a #87 (todos mergeados em `main`). Foco da sessão: **lançar**
 - [14/10] Desktop v=187: level-up, toast e pílula de estágio ampliados (zoom 1.4), conteúdo das abas zoom 1.2, zoom da arena adaptado à altura.
 - [14/10] Desktop v=188: painel encosta nas bordas (sem margem/raio/sombra).
 - [14/10] Desktop v=189: carrossel/login/onboarding ampliados (zoom 1.3-1.35, card 620px).
+- [14/10] Desktop v=192: abas Inventário/Perfil/Stats/Loja sem zoom, conteúdo centralizado (max 1000px), slots de equipamento menores.

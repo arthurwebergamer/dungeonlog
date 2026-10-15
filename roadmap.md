@@ -19495,3 +19495,4 @@ Cobre os PRs #66 a #87 (todos mergeados em `main`). Foco da sessão: **lançar**
 - [14/10] Desktop v=188: painel encosta nas bordas (sem margem/raio/sombra).
 - [14/10] Desktop v=189: carrossel/login/onboarding ampliados (zoom 1.3-1.35, card 620px).
 - [14/10] Desktop v=192: abas Inventário/Perfil/Stats/Loja sem zoom, conteúdo centralizado (max 1000px), slots de equipamento menores.
+- [14/10] Desktop v=193: zoom do onboarding limitado pela altura (1.1 até 1000px, 1.0 até 820px) — botão cortado em janela de ~870px.

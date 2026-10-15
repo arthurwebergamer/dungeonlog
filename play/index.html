@@ -8239,6 +8239,7 @@ function abrirBauEspecial(){
     // de chave, para de pulsar/chamar atencao -- volta a pulsar sozinho
     // se uma chave ficar disponivel depois (ver atualizarBauArena()).
     if (el) el.classList.add('bau-pausado');
+    window.tocarSom?.('bauTrancado');
     return;
   }
   tirarItem(chaveId, 1);
@@ -14268,6 +14269,14 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       ruidoFaixa(c, { duracao:0.04, ganho:0.7, freq:2500, q:2 });
       tinir(c, [1480, 2290, 3500, 5100], 0,    0.4,  0.7);
       tinir(c, [1480, 2290, 3500],       0.18, 0.16, 0.4);
+    },
+    bauTrancado: c => {                                  // clique no bau trancado sem chave -- cadeado sacudindo: 2 "clanks" secos + tilintar de corrente
+      for (let i = 0; i < 2; i++){
+        tom(c, { freq:150, freqFinal:90, tipo:'square', inicio:i*0.11, duracao:0.05, ganho:0.3 });
+        ruidoFaixa(c, { inicio:i*0.11, duracao:0.04, ganho:0.5, freq:1800, q:2 });
+      }
+      tinir(c, [2400, 3600], 0.05, 0.12, 0.09);
+      tinir(c, [2200, 3300], 0.17, 0.1, 0.09);
     },
     venda: c => {                                        // item vendido -- saco de couro de moedas: chacoalho + tilintares subindo + baque
       ruidoFaixa(c, { inicio:0,    duracao:0.22, ganho:0.5,  freq:900,  q:1.2 });

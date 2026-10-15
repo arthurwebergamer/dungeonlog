@@ -156,3 +156,85 @@
   g.addEventListener('click', function (e) { if (moved) { e.preventDefault(); e.stopPropagation(); moved = false; } }, true);
   g.addEventListener('dragstart', function (e) { e.preventDefault(); });
 })();
+
+/* galeria de celulares: clicar numa tela abre ela ampliada, dentro do site */
+(function () {
+  var g = document.querySelector('.gallery');
+  if (!g) return;
+  var phones = [].slice.call(g.querySelectorAll('.phone'));
+  if (!phones.length) return;
+  var en = /^en/i.test(document.documentElement.lang || '');
+  var T = en ? { close: 'Close', prev: 'Previous screen', next: 'Next screen', open: 'Enlarge: ' }
+             : { close: 'Fechar', prev: 'Tela anterior', next: 'Próxima tela', open: 'Ampliar: ' };
+  var box = null, idx = 0, voltar = null;
+
+  function build() {
+    box = document.createElement('div');
+    box.className = 'lb';
+    box.hidden = true;
+    box.setAttribute('role', 'dialog');
+    box.setAttribute('aria-modal', 'true');
+    box.innerHTML =
+      '<button class="lb-x" type="button" aria-label="' + T.close + '">&times;</button>' +
+      '<button class="lb-nav lb-prev" type="button" aria-label="' + T.prev + '">&#8249;</button>' +
+      '<figure class="lb-fig"><img alt="" draggable="false"><figcaption></figcaption></figure>' +
+      '<button class="lb-nav lb-next" type="button" aria-label="' + T.next + '">&#8250;</button>';
+    document.body.appendChild(box);
+    box.addEventListener('click', function (e) {
+      if (e.target.closest('.lb-prev')) go(-1);
+      else if (e.target.closest('.lb-next')) go(1);
+      else if (!e.target.closest('.lb-fig img')) close();   // botão fechar ou clique no fundo
+    });
+  }
+  function show(i) {
+    idx = (i + phones.length) % phones.length;
+    var p = phones[idx], im = p.querySelector('img'), c = p.querySelector('figcaption');
+    var big = box.querySelector('img');
+    big.src = im.currentSrc || im.src;
+    big.alt = im.alt || '';
+    box.setAttribute('aria-label', c ? c.textContent : '');
+    box.querySelector('figcaption').textContent = (c ? c.textContent + '  ·  ' : '') + (idx + 1) + '/' + phones.length;
+  }
+  function open(i) {
+    if (!box) build();
+    voltar = document.activeElement;
+    show(i);
+    box.hidden = false;
+    document.body.classList.add('lb-open');
+    box.querySelector('.lb-x').focus();
+  }
+  function close() {
+    if (!box || box.hidden) return;
+    box.hidden = true;
+    document.body.classList.remove('lb-open');
+    if (voltar && voltar.focus) voltar.focus();
+  }
+  function go(d) { show(idx + d); }
+
+  phones.forEach(function (p, i) {
+    var c = p.querySelector('figcaption');
+    p.tabIndex = 0;
+    p.setAttribute('role', 'button');
+    p.setAttribute('aria-label', T.open + (c ? c.textContent : ''));
+    p.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(i); }
+    });
+  });
+  // o arrastar com o mouse já cancela o clique quando a galeria foi movida (ver bloco acima)
+  g.addEventListener('click', function (e) {
+    var p = e.target.closest('.phone');
+    if (p) open(phones.indexOf(p));
+  });
+  document.addEventListener('keydown', function (e) {
+    if (!box || box.hidden) return;
+    if (e.key === 'Escape') close();
+    else if (e.key === 'ArrowLeft') go(-1);
+    else if (e.key === 'ArrowRight') go(1);
+    else if (e.key === 'Tab') {                              // mantém o foco dentro da janela
+      var f = [].slice.call(box.querySelectorAll('button'));
+      var i = f.indexOf(document.activeElement);
+      e.preventDefault();
+      f[(i + (e.shiftKey ? -1 : 1) + f.length) % f.length].focus();
+    }
+  });
+})();

@@ -19212,5 +19212,39 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
   window.addEventListener('load',function(){setTimeout(t,300)});
 })();
 </script>
+<script>
+/* TalkBack/leitores de tela: textos de elementos-irmaos blocos/flex colados sem espaco eram lidos juntos
+   ("PredatorDefeat 30 monsters", "Cudgel Common · Weapon18"). Insere um nó de texto " " entre irmaos
+   (nao renderiza em bloco/flex; pares inline x inline ficam como estao). Reaplica quando o DOM muda. */
+(function(){
+  var SEL='.conqcorpo,.conqtrilha,.conqcat,.conqcattxt,.conqcabecalho,.linfo,.lrow,.lacao,.xprow,.planoStat,.progressoTop,.pwPassoTxt,.est-ringtxt,.atop,.atrhead,.anelLeg,.adir,.aneisAtr,.aneisLinha,.obHeadline,.carrosselMeio,.marca,.tarefa,.hprow,.topbar,.dlgStage,.est-chartlabels,.est-mapames,.cfgbtn,.atrpill';
+  function inl(d){return d==='inline'||d==='inline-block';}
+  function fixEl(el){
+    var ch=el.childNodes;
+    for(var i=0;i<ch.length-1;i++){
+      var a=ch[i],b=ch[i+1];
+      if(a.nodeType!==1||b.nodeType!==1) continue;
+      if(!(a.textContent||'').trim()||!(b.textContent||'').trim()) continue;
+      var ca=getComputedStyle(a),cb=getComputedStyle(b);
+      if(ca.display==='none'||cb.display==='none') continue;
+      if(inl(ca.display)&&inl(cb.display)) continue;
+      el.insertBefore(document.createTextNode(' '),b); i++;
+    }
+  }
+  function run(root){
+    try{
+      (root.matches&&root.matches(SEL)?[root]:[]).concat([].slice.call((root.querySelectorAll?root.querySelectorAll(SEL):[]))).forEach(fixEl);
+    }catch(_){}
+  }
+  var t=null,pend=[];
+  new MutationObserver(function(ms){
+    ms.forEach(function(m){m.addedNodes.forEach(function(n){if(n.nodeType===1)pend.push(n);});
+      if(m.target&&m.target.nodeType===1&&m.target.matches&&m.target.matches(SEL))pend.push(m.target);});
+    if(t)return;
+    t=setTimeout(function(){t=null;var l=pend;pend=[];l.forEach(run);},120);
+  }).observe(document.body,{childList:true,subtree:true});
+  run(document.body);
+})();
+</script>
 </body>
 </html>

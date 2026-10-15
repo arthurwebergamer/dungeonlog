@@ -85,15 +85,15 @@ h2{ font-size:clamp(1.9rem,4.2vw,2.8rem); line-height:1.08; color:#fff; }
 .card .n{ font-family:'Outfit',sans-serif; font-weight:800; color:var(--gold); font-size:2.3rem; line-height:1; }
 .card h3{ margin:8px 0 6px; font-size:1.3rem; line-height:1.2; color:#fff; }
 .card p, .feat p{ color:var(--muted); font-size:1rem; }
-.gallery{ margin-top:30px; display:flex; gap:38px; overflow-x:auto; scroll-snap-type:x mandatory; padding:34px 44px 26px; margin-left:-24px; margin-right:-24px; scrollbar-width:thin; scrollbar-color:#666 transparent; }
-.gallery::-webkit-scrollbar{ height:8px; }
-.gallery::-webkit-scrollbar-thumb{ background:#555; border-radius:8px; }
+.gallery{ margin-top:30px; display:flex; gap:38px; overflow-x:auto; scroll-snap-type:x mandatory; padding:34px 44px 26px; margin-left:-24px; margin-right:-24px; scrollbar-width:none; cursor:grab; }
+.gallery::-webkit-scrollbar{ display:none; }
+.gallery.drag{ cursor:grabbing; user-select:none; }
 .phone{ flex:0 0 auto; width:262px; margin:0; scroll-snap-align:center; perspective:1100px; }
 .phone .view{ position:relative; height:524px; -webkit-mask-image:linear-gradient(180deg,#000 70%,transparent 94%); mask-image:linear-gradient(180deg,#000 70%,transparent 94%); overflow:hidden; transform:rotateY(var(--ry,-10deg)) rotateX(3deg); transform-origin:50% 100%; transition:transform .5s ease; }
 .phone:hover .view{ transform:rotateY(0deg) rotateX(0deg); }
 .phone .frame{ position:relative; width:262px; height:1000px; box-sizing:border-box; padding:9px; border-radius:48px 48px 0 0;
   background:linear-gradient(152deg,#62636d 0%,#2c2d34 20%,#16161a 46%,#30313a 78%,#52535d 100%);
-  box-shadow:inset 0 0 0 1.5px #7b7c86, inset 0 0 0 4px #0a0a0d, calc(var(--side,1) * 3px) 0 0 #1c1c21, calc(var(--side,1) * 6px) 0 0 #131317, calc(var(--side,1) * 9px) 0 0 #0a0a0d, calc(var(--side,1) * 18px) 30px 38px rgba(0,0,0,.55); }
+  box-shadow:inset 0 0 0 1.5px #7b7c86, inset 0 0 0 4px #0a0a0d; }
 .phone .bt{ position:absolute; width:4px; background:linear-gradient(90deg,#55565f,#2a2b31); border-radius:2px; }
 .phone .b1{ left:-3px; top:112px; height:30px; }
 .phone .b2{ left:-3px; top:168px; height:56px; }

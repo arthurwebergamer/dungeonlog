@@ -19498,3 +19498,5 @@ Cobre os PRs #66 a #87 (todos mergeados em `main`). Foco da sessão: **lançar**
 - [14/10] Desktop v=193: zoom do onboarding limitado pela altura (1.1 até 1000px, 1.0 até 820px) — botão cortado em janela de ~870px.
 - [14/10] SFX 'bauTrancado' (2 clanks + corrente) ao clicar no bau especial sem chave.
 - [14/10] SFX bauTrancado trocado pela variacao 'grave pesado' (2 clanks graves + corrente).
+- [15/10] Day 7 (Konrad): eyebrow + titulo do onboarding lidos juntos por leitor de tela ('TASKSYour') — adicionado separador .srSep '. ' entre .obFraca e .obForte. style.css v=194.
+- [15/10] A11y TalkBack: script no fim do index.html insere nó de texto ' ' entre elementos irmãos bloco/flex colados (lojas, conquistas, XP, planos etc.) + MutationObserver; auditoria Playwright listou ~260 junções → só contêineres de itens independentes restam.

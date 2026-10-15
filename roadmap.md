@@ -19487,3 +19487,4 @@ Cobre os PRs #66 a #87 (todos mergeados em `main`). Foco da sessão: **lançar**
 - [14/10] Pagamento só no app Android: `abrirPaywall` sai cedo se `billingDisponivel()` for falso (sem Digital Goods = iPhone/Windows/navegador) e mostra só o aviso 'Recurso PRO: disponível na versão completa para Android'. Esses ambientes = teste gratuito. Futuro: Stripe no site (webhook no worker gravando entitlements/{uid}); conferir política da Play sobre PRO comprado fora.
 - [14/10] Layout desktop (≥900px): .app vira grid 2 colunas (arena+XP | tarefas), abas Loja/Perfil/Stats em largura total; celular intacto. style.css v=181.
 - [14/10] Desktop: painel até 1500px; selo PRO dos cadeados vira 'Versão completa' fora do Android. style.css v=182.
+- [14/10] Desktop v=183: painel 1180px, coluna esquerda 430px, arena/sprites ampliados (zoom 1.35), sombra.

@@ -19490,3 +19490,4 @@ Cobre os PRs #66 a #87 (todos mergeados em `main`). Foco da sessão: **lançar**
 - [14/10] Desktop v=183: painel 1180px, coluna esquerda 430px, arena/sprites ampliados (zoom 1.35), sombra.
 - [14/10] Desktop v=184: painel ocupa a tela toda (sem max-width), zoom da arena 1.7 em >=1600px.
 - [14/10] Desktop v=185: arena estica na altura (sprites centralizados, zoom 2.2 em >=1600px), XP colado embaixo, msg vazia centralizada.
+- [14/10] Desktop v=186: sheets (equipar/usar item, edsheet) viram dialogos centrais com zoom 1.3; baupop 1.3; dlgStage 640px; Config/Grimorio/Historico centralizados (880px) c/ fonte maior.

@@ -3368,6 +3368,16 @@ let _pwPlanoSelecionado = 'trial'; // pedido do usuario (tela "planos" simplific
 let _pwAvisoSelecionado = 1; // TESTE GRATIS -- "1 dia antes" vem pre-selecionado (etapa 3, #pwEtapa3)
 
 function abrirPaywall(motivo){
+  // 14/10: pagamento SO no app Android (Play Billing / Digital Goods, que so existe no TWA). iPhone, Windows e navegador
+  // sao a versao de teste gratuita: recurso PRO mostra so um aviso, sem tela de compra (ainda sem Stripe).
+  if (typeof billingDisponivel === 'function' && !billingDisponivel()){
+    const en = (typeof idiomaApp === 'function' && idiomaApp() === 'en');
+    if (typeof window.aviso === 'function' && motivo !== 'primeira'){
+      window.aviso(en ? 'PRO feature: available in the full Android app. Coming to other devices later.'
+                      : 'Recurso PRO: disponível na versão completa para Android. Em breve nos outros aparelhos.');
+    }
+    return;
+  }
   // Fundo = MESMA arte "Floresta" de TEMAS_ARENA (assets.js) usada na
   // Arena de verdade, pintada aqui (nao no <script> logo apos o HTML)
   // porque TEMAS_ARENA so existe mais abaixo no arquivo -- nesse ponto da

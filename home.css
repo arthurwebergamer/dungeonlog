@@ -160,3 +160,28 @@ footer.site .copy{ color:var(--dim); font-size:.9rem; }
 .spark{ position:fixed; width:4px; height:4px; background:#ffffff; pointer-events:none; z-index:60; animation:spark .45s steps(5) forwards; }
 @keyframes spark{ to{ transform:translate(var(--dx), var(--dy)); opacity:0; } }
 @media (prefers-reduced-motion:reduce){ .track{ animation:none !important; } }
+
+/* ---------- galeria: tela ampliada (lightbox) ---------- */
+.phone{ cursor:zoom-in; }
+.gallery.drag .phone{ cursor:grabbing; }
+.phone:focus-visible{ outline:2px solid var(--gold); outline-offset:6px; border-radius:20px; }
+body.lb-open{ overflow:hidden; }
+.lb{ position:fixed; inset:0; z-index:100; display:flex; align-items:center; justify-content:center; padding:24px 72px; background:rgba(10,10,12,.9); }
+.lb[hidden]{ display:none; }
+.lb-fig{ margin:0; text-align:center; }
+.lb-fig img{ display:block; width:auto; height:auto; max-width:min(92vw,560px); max-height:calc(100svh - 120px); border-radius:30px; box-shadow:0 0 0 1px rgba(255,255,255,.1), 0 24px 70px rgba(0,0,0,.65); background:#282828; }
+.lb-fig figcaption{ margin-top:14px; font-family:'Outfit',sans-serif; font-weight:600; font-size:1.05rem; color:#fff; text-shadow:0 1px 3px rgba(0,0,0,.8); }
+.lb-x, .lb-nav{ position:absolute; display:flex; align-items:center; justify-content:center; border:1px solid rgba(255,255,255,.22); background:rgba(40,40,40,.85); color:#fff; border-radius:50%; cursor:pointer; font-family:'Outfit',sans-serif; line-height:1; }
+.lb-x:hover, .lb-nav:hover{ background:#4a4a4a; }
+.lb-x:focus-visible, .lb-nav:focus-visible{ outline:2px solid #fff; outline-offset:3px; }
+.lb-x{ top:18px; right:20px; width:46px; height:46px; font-size:2rem; }
+.lb-nav{ top:50%; width:52px; height:52px; margin-top:-26px; font-size:2.4rem; padding-bottom:4px; }
+.lb-prev{ left:20px; }
+.lb-next{ right:20px; }
+@media (max-width:640px){
+  .lb{ padding:64px 12px 24px; }
+  .lb-nav{ top:auto; bottom:18px; margin-top:0; width:48px; height:48px; }
+  .lb-prev{ left:calc(50% - 64px); }
+  .lb-next{ right:calc(50% - 64px); left:auto; }
+  .lb-fig img{ max-height:calc(100svh - 190px); }
+}

@@ -1,5 +1,0 @@
-Parallax Backgrounds (Snowy Mountains) - Admurin
-https://admurin.itch.io/
-Fonte: https://opengameart.org/content/parallax-backgrounds
-Licenca: CC BY 4.0 - https://creativecommons.org/licenses/by/4.0/
-Uso comercial permitido, com credito ao autor. As camadas L0..L5 sao os arquivos do pacote renomeados.

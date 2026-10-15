@@ -19488,3 +19488,13 @@ Cobre os PRs #66 a #87 (todos mergeados em `main`). Foco da sessão: **lançar**
 - [14/10] Layout desktop (≥900px): .app vira grid 2 colunas (arena+XP | tarefas), abas Loja/Perfil/Stats em largura total; celular intacto. style.css v=181.
 - [14/10] Desktop: painel até 1500px; selo PRO dos cadeados vira 'Versão completa' fora do Android. style.css v=182.
 - [14/10] Desktop v=183: painel 1180px, coluna esquerda 430px, arena/sprites ampliados (zoom 1.35), sombra.
+- [14/10] Desktop v=184: painel ocupa a tela toda (sem max-width), zoom da arena 1.7 em >=1600px.
+- [14/10] Desktop v=185: arena estica na altura (sprites centralizados, zoom 2.2 em >=1600px), XP colado embaixo, msg vazia centralizada.
+- [14/10] Desktop v=186: sheets (equipar/usar item, edsheet) viram dialogos centrais com zoom 1.3; baupop 1.3; dlgStage 640px; Config/Grimorio/Historico centralizados (880px) c/ fonte maior.
+- [14/10] Desktop v=187: level-up, toast e pílula de estágio ampliados (zoom 1.4), conteúdo das abas zoom 1.2, zoom da arena adaptado à altura.
+- [14/10] Desktop v=188: painel encosta nas bordas (sem margem/raio/sombra).
+- [14/10] Desktop v=189: carrossel/login/onboarding ampliados (zoom 1.3-1.35, card 620px).
+- [14/10] Desktop v=192: abas Inventário/Perfil/Stats/Loja sem zoom, conteúdo centralizado (max 1000px), slots de equipamento menores.
+- [14/10] Desktop v=193: zoom do onboarding limitado pela altura (1.1 até 1000px, 1.0 até 820px) — botão cortado em janela de ~870px.
+- [14/10] SFX 'bauTrancado' (2 clanks + corrente) ao clicar no bau especial sem chave.
+- [14/10] SFX bauTrancado trocado pela variacao 'grave pesado' (2 clanks graves + corrente).

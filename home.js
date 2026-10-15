@@ -128,3 +128,31 @@
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') definir(false); });
   window.addEventListener('resize', function () { if (window.innerWidth > 720) definir(false); });
 })();
+
+/* galeria de celulares: arrastar com o mouse (a barra de rolagem fica escondida) */
+(function () {
+  var g = document.querySelector('.gallery');
+  if (!g) return;
+  var down = false, sx = 0, sl = 0, moved = false;
+  g.addEventListener('pointerdown', function (e) {
+    if (e.pointerType !== 'mouse' || e.button !== 0) return;
+    down = true; moved = false; sx = e.clientX; sl = g.scrollLeft;
+    g.style.scrollSnapType = 'none'; g.classList.add('drag');
+    try { g.setPointerCapture(e.pointerId); } catch (x) {}
+  });
+  g.addEventListener('pointermove', function (e) {
+    if (!down) return;
+    var dx = e.clientX - sx;
+    if (Math.abs(dx) > 3) moved = true;
+    g.scrollLeft = sl - dx;
+  });
+  function fim() {
+    if (!down) return;
+    down = false; g.classList.remove('drag');
+    g.style.scrollSnapType = '';           // volta o encaixe no celular mais próximo
+  }
+  g.addEventListener('pointerup', fim);
+  g.addEventListener('pointercancel', fim);
+  g.addEventListener('click', function (e) { if (moved) { e.preventDefault(); e.stopPropagation(); moved = false; } }, true);
+  g.addEventListener('dragstart', function (e) { e.preventDefault(); });
+})();

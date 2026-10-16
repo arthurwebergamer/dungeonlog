@@ -6259,3 +6259,79 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 
 /* a pilula de estagio (.estFlut) flutua sobre o fim da area de tarefas: reserva espaco embaixo pra nao cobrir "Terminar dia" (Redmi Note 8) */
 .tasks::after{content:"";display:block;flex:none;height:52px}
+
+/* ===== Telas de conquista (Nivel / Estagio) -- bottom sheet com molas ===== */
+.cq-tela{--spr2:linear(0,.02,.08 3%,.26 8%,.58 14%,.86 20%,1.02 26%,1.06 32%,1.03 40%,.99 52%,1.002 70%,1);--spr:linear(0,.009,.035 2.1%,.141,.281 6.7%,.723 12.9%,.938 16.7%,1.017,1.077,1.121,1.149 24.3%,1.159,1.163,1.161,1.154 29.9%,1.129 32.8%,1.051 39.6%,1.017 43.1%,.991,.977 51%,.974 53.8%,.975 57.1%,.997 69.8%,1.003 76.9%,1);
+  position:fixed;inset:0;z-index:150;visibility:hidden;pointer-events:none}
+.cq-tela.on{visibility:visible;pointer-events:auto}
+.cq-tela *{animation-play-state:paused}.cq-tela.on *{animation-play-state:running}
+.md-back{position:absolute;inset:0;background:rgba(0,0,0,.55);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);opacity:0;animation:mdFade .35s ease forwards}
+.md-sheet{position:absolute;left:0;right:0;bottom:0;max-width:520px;margin:0 auto;max-height:94%;overflow-y:auto;background:var(--panel-2);border-top:1px solid var(--line);border-radius:26px 26px 0 0;padding:10px 20px calc(24px + env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:center;transform:translateY(105%);animation:mdUp .7s var(--spr2) .05s forwards}
+.cq-tela.estagio-tela-saindo .md-sheet{animation:mdDown .34s cubic-bezier(.5,0,.8,.4) forwards;animation-play-state:running}
+.cq-tela.estagio-tela-saindo .md-back{animation:mdFadeOut .34s ease forwards;animation-play-state:running}
+@keyframes mdUp{to{transform:none}}@keyframes mdDown{from{transform:none}to{transform:translateY(105%)}}
+@keyframes mdFade{to{opacity:1}}@keyframes mdFadeOut{from{opacity:1}to{opacity:0}}
+.md-handle{width:38px;height:4px;border-radius:2px;background:var(--line);margin-bottom:16px;flex:none}
+.md-k{font-family:'Silkscreen',monospace;font-size:10px;letter-spacing:.18em;color:var(--muted);opacity:0;animation:mdIn .4s ease .3s forwards}
+@keyframes mdIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.md-t{font-family:'Outfit',sans-serif;font-size:22px;font-weight:600;color:var(--text);margin:8px 0 0;opacity:0;animation:mdIn .4s ease .45s forwards}
+.md-art{position:relative;width:100%;height:158px;border-radius:18px;overflow:hidden;margin:14px 0;background:#222;flex:none}
+.md-art .l{position:absolute;inset:0;background-size:cover;background-position:center;image-rendering:pixelated}
+.md-art .n{clip-path:circle(0% at 50% 62%);animation:mdIris 1s cubic-bezier(.6,.05,.2,1) .55s forwards}
+.md-art .zoom{position:absolute;inset:0;transform:scale(1.14);animation:mdZoom 1.8s cubic-bezier(.2,.7,.2,1) .4s forwards}
+@keyframes mdIris{to{clip-path:circle(80% at 50% 62%)}}@keyframes mdZoom{to{transform:scale(1)}}
+.md-art .shade{position:absolute;inset:0;background:linear-gradient(transparent 50%,rgba(0,0,0,.6));z-index:2}
+.md-art .tocha-arena{z-index:2}
+.md-hero{position:absolute;left:50%;bottom:14px;width:83px;height:83px;margin-left:-41px;object-fit:contain;image-rendering:pixelated;z-index:2;filter:drop-shadow(0 4px 0 rgba(0,0,0,.35));opacity:0;transform:translateY(28px) scale(.85);animation:mdHero .8s var(--spr2) .55s forwards}
+@keyframes mdHero{to{opacity:1;transform:none}}
+.md-name{position:absolute;left:14px;bottom:10px;z-index:3;overflow:hidden;height:34px}
+.md-name b{display:block;font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:600;font-size:28px;line-height:34px;color:#fff;transform:translateY(110%);animation:mdName .6s cubic-bezier(.2,.9,.2,1) 1.2s forwards}
+@keyframes mdName{to{transform:none}}
+.md-seg{display:flex;gap:6px;width:100%}.md-seg i{flex:1;height:6px;border-radius:3px;background:var(--line);position:relative;overflow:hidden}
+.md-seg i.ok{background:var(--gold)}.md-seg i b{position:absolute;left:0;top:0;width:100%;height:100%;display:block;background:var(--gold);transform:scaleX(0);transform-origin:left;animation:mdFill .8s cubic-bezier(.3,.7,.2,1) .5s forwards}
+@keyframes mdFill{to{transform:none}}
+.md-segl{display:flex;justify-content:space-between;width:100%;font-size:12px;color:var(--dim);margin-top:7px;opacity:0;animation:mdIn .4s ease .6s forwards}
+.md-h{font-family:'Silkscreen',monospace;font-size:10px;letter-spacing:.16em;color:var(--dim);width:100%;margin-top:16px;opacity:0;animation:mdIn .4s ease 1.3s forwards}
+.md-mobs{display:flex;gap:8px;width:100%;margin-top:8px}
+.md-mobs span{flex:1;aspect-ratio:1;max-width:80px;border-radius:14px;background:rgba(255,255,255,.06);display:grid;place-items:center;opacity:0;transform:translateY(14px) scale(.9);animation:mdRow .55s var(--spr2) forwards;animation-delay:calc(1.4s + var(--i)*.07s)}
+.md-mobs img{width:62%;image-rendering:pixelated;filter:brightness(0) opacity(.6)}
+.md-mobs .rev img{animation:mdRev .7s ease 2s forwards}
+@keyframes mdRev{0%{filter:brightness(0) opacity(.6) blur(0)}50%{filter:brightness(.6) blur(3px)}100%{filter:none}}
+.md-all{width:100%;margin-top:12px;font-size:13px;color:var(--dim);line-height:1.4;opacity:0;animation:mdIn .4s ease 2s forwards}
+.md-rows{width:100%;display:flex;flex-direction:column;gap:8px;margin-top:16px}
+.md-row{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.06);border-radius:14px;padding:11px 13px;opacity:0;transform:translateY(16px) scale(.97);animation:mdRow .55s var(--spr2) forwards;animation-delay:calc(1.35s + var(--i)*.08s)}
+@keyframes mdRow{to{opacity:1;transform:none}}
+.md-row .ic{width:28px;height:28px;border-radius:8px;background:var(--line);display:grid;place-items:center;font-family:'Silkscreen',monospace;font-size:10px;color:var(--gold);flex:none}
+.md-row .t{flex:1;font-size:13.5px;color:var(--muted)}
+.md-row .v{font-size:15px;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums;display:flex;gap:7px;align-items:center}
+.md-row .d{font-family:'Silkscreen',monospace;font-size:9px;background:var(--gold);color:#1d1a12;border-radius:5px;padding:3px 6px;transform:scale(0);animation:mdPop .45s var(--spr) forwards;animation-delay:calc(1.9s + var(--i)*.08s)}
+@keyframes mdPop{to{transform:scale(1)}}
+.md-btn{width:100%;margin-top:18px;flex:none;background:#fff;color:#1d1d1d;border:0;border-radius:14px;font-family:'Outfit',sans-serif;font-weight:600;font-size:15px;padding:14px;cursor:pointer;opacity:0;transform:translateY(10px);animation:mdRow .5s var(--spr2) var(--bd,1.9s) forwards}
+@media (prefers-reduced-motion:reduce){.cq-tela *{animation-duration:.01s!important;animation-delay:0s!important}}
+
+/* Level Up: textos so com fade curto (sem deslizar); so numeral e valores se movem */
+@keyframes mdFade2{to{opacity:1}}
+#lvlTela .md-k,#lvlTela .md-t{animation:mdFade2 .25s ease .35s forwards}
+#lvlTela .md-segl{animation:mdFade2 .25s ease .5s forwards}
+#lvlTela .md-row{transform:none;animation:mdFade2 .3s ease forwards;animation-delay:calc(.9s + var(--i)*.06s)}
+#lvlTela .md-row .d{animation-delay:calc(1.3s + var(--i)*.06s)}
+#lvlTela .md-btn{transform:none;animation:mdFade2 .3s ease 1.4s forwards}
+
+/* ===== Popups como bottom sheet (baú, queda, largada) -- mesma linguagem das telas de Nivel/Estagio.
+   Entrada com mola; a saida e o proprio transition revertendo (desce e some). ===== */
+:root{--spr2:linear(0,.02,.08 3%,.26 8%,.58 14%,.86 20%,1.02 26%,1.06 32%,1.03 40%,.99 52%,1.002 70%,1)}
+.baupop,.quedapop,.largpop{
+  left:0 !important; right:0; top:auto !important; bottom:0; margin:0 auto; zoom:1 !important;
+  width:100% !important; max-width:520px; border-radius:26px 26px 0 0 !important; border-bottom:0 !important;
+  padding-top:30px !important; padding-bottom:calc(22px + env(safe-area-inset-bottom)) !important;
+  transform:translateY(105%) !important; opacity:1 !important;
+  transition:transform .34s cubic-bezier(.5,0,.8,.4) !important;
+}
+.baupop.on,.quedapop.on,.largpop.on{
+  transform:none !important; transition:transform .7s var(--spr2) !important;
+}
+.baupop::before,.quedapop::before,.largpop::before{
+  content:""; position:absolute; top:10px; left:50%; width:38px; height:4px; margin-left:-19px;
+  border-radius:2px; background:var(--line);
+}
+.baubg{background:rgba(0,0,0,.55); -webkit-backdrop-filter:blur(5px); backdrop-filter:blur(5px); transition:opacity .3s}

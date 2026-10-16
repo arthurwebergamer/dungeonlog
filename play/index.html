@@ -133,7 +133,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=195">
+<link rel="stylesheet" href="style.css?v=199">
 <script>
 // A abertura so sai quando a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado; sair antes (assim que o CSS chega)
 // mostrava um flash cinza vazio e depois a tela de login por baixo, antes do carrossel (visto em video de teste). Teto de seguranca: 15s.
@@ -11239,41 +11239,82 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 (function(){
   if (typeof progresso !== 'function' || typeof romano !== 'function') return;
 
-  const lvlBG = document.createElement('div');
-  lvlBG.className = 'baubg'; lvlBG.id = 'lvlBG';   // reusa o mesmo fundo escurecido do bau
-  const lvlPop = document.createElement('div');
-  lvlPop.className = 'lvlpop'; lvlPop.id = 'lvlPop';
-  document.body.appendChild(lvlBG);
-  document.body.appendChild(lvlPop);
-
-  let _aoFecharLvl = null;
+  // helpers compartilhados das telas de conquista (Nivel / Estagio)
+  window.cqHelpers = window.cqHelpers || {
+    // background-image atual da Arena (camada de frente) pra reusar de cenario
+    // cenario padrao da masmorra (tijolos + gradiente), igual a Arena
+    bgMasmorra(){
+      return 'background-image:url(\'data:image/png;base64,' + TEMA_ARENA_TILE_B64 + '\'),linear-gradient(180deg,var(--arena-1) 0%,var(--arena-2) 55%,var(--arena-3) 100%);background-size:130px 41px,auto;background-repeat:repeat,no-repeat';
+    },
+    bgArena(){
+      try {
+        const ls = ['arenaBgA','arenaBgB'].map(id => document.getElementById(id)).filter(Boolean);
+        let best = ls[0];
+        ls.forEach(l => { if (parseFloat(getComputedStyle(l).opacity) > parseFloat(getComputedStyle(best).opacity)) best = l; });
+        const cs = best ? getComputedStyle(best) : null;
+        const bi = cs ? cs.backgroundImage : '';
+        if (bi && bi !== 'none'){
+          window.cqHelpers._css = 'background-size:' + cs.backgroundSize + ';background-repeat:' + cs.backgroundRepeat + ';background-position:' + cs.backgroundPosition;
+          return bi.replace(/"/g, "'");
+        }
+      } catch(e){}
+      return 'none';
+    }
+  };
+  const lvlTela = document.createElement('div');
+  lvlTela.id = 'lvlTela'; lvlTela.className = 'cq-tela';
+  document.body.appendChild(lvlTela);
+  let _aoFecharLvl = null, _lvlTok = 0;
   function fecharLvl(){
-    lvlPop.classList.remove('on');
-    lvlBG.classList.remove('on');
-    const cb = _aoFecharLvl; _aoFecharLvl = null;
-    if (cb) cb();
+    lvlTela.classList.add('estagio-tela-saindo');
+    setTimeout(() => {
+      lvlTela.classList.remove('on', 'estagio-tela-saindo');
+      lvlTela.innerHTML = '';
+      const cb = _aoFecharLvl; _aoFecharLvl = null;
+      if (cb) cb();
+    }, 380);
   }
-  lvlBG.onclick = fecharLvl;
 
   function mostrarNivelUp(nivel, aoFechar){
     _aoFecharLvl = aoFechar || null;
-    const vMax = (window.vidaHeroi && typeof window.vidaHeroi.max === 'function')
-      ? window.vidaHeroi.max() : null;
     const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
-
-    lvlPop.innerHTML =
-      '<div class="lvllabel">' + (en ? 'Level reached' : 'Nível alcançado') + '</div>'+
-      '<div class="lvlnum" id="lvlNum">'+romano(nivel)+'</div>'+
-      (vMax !== null ? '<div class="lvlvida">' + (en ? 'Max health now: ' : 'Vida máxima agora: ') + '<b>'+vMax+'</b></div>' : '')+
-      '<button class="lvlok" id="lvlOk">' + (en ? 'Continue' : 'Continuar') + '</button>';
-
+    const cq = window.cqHelpers;
+    const vMax = (window.vidaHeroi && typeof window.vidaHeroi.max === 'function') ? window.vidaHeroi.max() : null;
+    const dV = (typeof ECO !== 'undefined' && ECO && ECO.vidaPorNivel) ? Math.round(ECO.vidaPorNivel) : 0;
+    const heroImg = (typeof heroiAtual === 'function') ? heroiAtual().img : '';
+    const rows = [];
+    if (vMax !== null) rows.push(['HP', en ? 'Max health' : 'Vida máxima', dV > 0 ? '<span class="cnt" data-f="' + (vMax - dV) + '" data-t="' + vMax + '">' + (vMax - dV) + '</span>' : String(vMax), dV > 0 ? '+' + dV : '']);
+    if (nivel > 1) rows.push(['+1', en ? 'Attribute point' : 'Ponto de atributo', '1', 'NEW']);
+    const from = Math.max(1, nivel - 2);
+    let rail = '';
+    for (let k = from; k < from + 5; k++){
+      rail += '<div class="cq-node ' + (k < nivel ? 'ok' : (k === nivel ? 'cur' : '')) + '">' + (k < nivel ? '\u2713' : k) + '</div>';
+      if (k < from + 4) rail += '<div class="cq-line ' + (k < nivel ? 'ok' : '') + '"></div>';
+    }
+    lvlTela.className = 'cq-tela';
+    lvlTela.innerHTML =
+      '<div class="md-back"></div><div class="md-sheet"><div class="md-handle"></div>' +
+      '<div class="md-k">' + (en ? 'LEVEL REACHED' : 'NÍVEL ALCANÇADO') + '</div>' +
+      '<div class="md-t">' + (en ? 'Level ' : 'Nível ') + nivel + '!</div>' +
+      '<div class="md-art"><div class="zoom"><div class="l" style="' + cq.bgMasmorra() + '"></div></div><div class="shade"></div>' +
+        '<div class="tocha-arena tocha-esq"></div><div class="tocha-arena tocha-dir"></div>' +
+        (heroImg ? '<img class="md-hero" src="' + heroImg + '" alt="">' : '') +
+        '<div class="md-name"><b>' + romano(nivel) + '</b></div></div>' +
+      '<div class="md-seg"><i><b></b></i></div><div class="md-segl"><span>' + (en ? 'Level ' : 'Nível ') + (nivel - 1) + '</span><span>' + (en ? 'Level ' : 'Nível ') + nivel + '</span></div>' +
+      (rows.length ? '<div class="md-rows">' + rows.map((r, i) => '<div class="md-row" style="--i:' + i + '"><span class="ic">' + r[0] + '</span><span class="t">' + r[1] + '</span><span class="v">' + r[2] + (r[3] ? '<span class="d">' + r[3] + '</span>' : '') + '</span></div>').join('') + '</div>' : '') +
+      '<button class="md-btn" id="lvlOk">' + (en ? 'Continue' : 'Continuar') + '</button></div>';
+    const tk = ++_lvlTok;
+    setTimeout(() => {
+      if (tk !== _lvlTok) return;
+      lvlTela.querySelectorAll('.cnt').forEach(el => {
+        const f = +el.dataset.f, to = +el.dataset.t, t0 = performance.now();
+        const st = ts => { const p = Math.min(1, (ts - t0) / 650); el.textContent = Math.round(f + (to - f) * (1 - Math.pow(1 - p, 3))); if (p < 1 && tk === _lvlTok) requestAnimationFrame(st); };
+        requestAnimationFrame(st);
+      });
+    }, 1100);
     document.getElementById('lvlOk').onclick = fecharLvl;
-    lvlBG.classList.add('on');
-    requestAnimationFrame(() => {
-      lvlPop.classList.add('on');
-      document.getElementById('lvlNum').classList.add('pulou');
-      spawnParticulas(lvlPop);
-    });
+    if (typeof tocarSom === 'function') tocarSom('levelup');
+    requestAnimationFrame(() => lvlTela.classList.add('on'));
   }
 
   window.mostrarNivelUp = mostrarNivelUp;
@@ -11394,15 +11435,27 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
         + '</div>'
       : '';
 
+    const cq = window.cqHelpers;
+    const prevTema = (typeof TEMAS_ARENA !== 'undefined') ? TEMAS_ARENA[Math.max(0, numEstagioConcluido - 1)] : null;
+    const estiloBg = t => (t && t.arte) ? 'background-image:url(data:image/png;base64,' + t.arte + ')' : cq.bgMasmorra();
+    const lim = (typeof LIMIARES_ESTAGIO !== 'undefined') ? LIMIARES_ESTAGIO : [];
+    const alvo = lim[numEstagioConcluido - 1];
+    let segs = '';
+    for (let k = 1; k <= 4; k++) segs += k < numEstagioConcluido ? '<i class="ok"></i>' : (k === numEstagioConcluido ? '<i><b></b></i>' : '<i></i>');
+    const mobs = (typeof MONSTROS !== 'undefined') ? MONSTROS.filter(m => m.bioma === tema.id).slice(0, 4) : [];
+    estagioTela.className = 'cq-tela'; estagioTela.id = 'estagioTelaCompleta';
     estagioTela.innerHTML =
-      '<div class="estagio-tela-titulo">' + (en ? 'Stage ' + numEstagioConcluido + ' Complete!' : 'Estágio ' + numEstagioConcluido + ' Concluído!') + '</div>' +
-      (heroImg ? '<img class="estagio-tela-hero" src="' + heroImg + '" alt="">' : '') +
-      previewArte +
-      '<div class="estagio-tela-sub"><span class="estagio-tela-sub-flag" aria-hidden="true">&#127937;</span>' +
-        (en ? 'Welcome to ' + tema.nome_en : 'Bem-vindo ao ' + tema.nome) +
-      '</div>' +
-      mensagemTodosBiomas +
-      '<button class="estagio-tela-continuar" id="estagioTelaContinuarBtn">' + (en ? 'Continue' : 'Continuar') + '</button>';
+      '<div class="md-back"></div><div class="md-sheet"><div class="md-handle"></div>' +
+      '<div class="md-k">' + (en ? 'STAGE REACHED' : 'ESTÁGIO ALCANÇADO') + '</div>' +
+      '<div class="md-t">' + (en ? 'Stage ' + numEstagioConcluido + ' Complete!' : 'Estágio ' + numEstagioConcluido + ' Concluído!') + '</div>' +
+      '<div class="md-art"><div class="zoom"><div class="l" style="' + estiloBg(prevTema) + '"></div><div class="l n" style="' + estiloBg(tema) + '"></div></div><div class="shade"></div>' +
+        '<div class="md-name"><b>' + (en ? tema.nome_en : tema.nome) + '</b></div></div>' +
+      '<div class="md-seg">' + segs + '</div>' +
+      '<div class="md-segl"><span>' + (en ? 'Stage ' : 'Estágio ') + numEstagioConcluido + ' / 4</span>' + (alvo ? '<span>' + alvo + ' / ' + alvo + ' ' + (en ? 'tasks' : 'tarefas') + '</span>' : '') + '</div>' +
+      (mobs.length ? '<div class="md-h">' + (en ? 'NEW MONSTERS IN THIS BIOME' : 'NOVOS MONSTROS NESTE BIOMA') + '</div><div class="md-mobs">' +
+        mobs.map((m, k) => '<span style="--i:' + k + '" class="' + (k === 0 ? 'rev' : '') + '"><img src="' + m.img + '" alt=""></span>').join('') + '</div>' : '') +
+      mensagemTodosBiomas.replace('estagio-tela-todos', 'md-all') +
+      '<button class="md-btn" style="--bd:2.1s" id="estagioTelaContinuarBtn">' + (en ? 'Continue' : 'Continuar') + '</button></div>';
 
     document.getElementById('estagioTelaContinuarBtn').onclick = fecharEstagioTelaCompleta;
     // Som -- so aqui, na cerimonia (pedido do usuario, revisado: NAO no

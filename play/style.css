@@ -6308,3 +6308,22 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 @keyframes mdPop{to{transform:scale(1)}}
 .md-btn{width:100%;margin-top:18px;flex:none;background:#fff;color:#1d1d1d;border:0;border-radius:14px;font-family:'Outfit',sans-serif;font-weight:600;font-size:15px;padding:14px;cursor:pointer;opacity:0;transform:translateY(10px);animation:mdRow .5s var(--spr2) var(--bd,1.9s) forwards}
 @media (prefers-reduced-motion:reduce){.cq-tela *{animation-duration:.01s!important;animation-delay:0s!important}}
+
+/* ===== Popups como bottom sheet (baú, queda, largada) -- mesma linguagem das telas de Nivel/Estagio.
+   Entrada com mola; a saida e o proprio transition revertendo (desce e some). ===== */
+:root{--spr2:linear(0,.02,.08 3%,.26 8%,.58 14%,.86 20%,1.02 26%,1.06 32%,1.03 40%,.99 52%,1.002 70%,1)}
+.baupop,.quedapop,.largpop{
+  left:0 !important; right:0; top:auto !important; bottom:0; margin:0 auto; zoom:1 !important;
+  width:100% !important; max-width:520px; border-radius:26px 26px 0 0 !important; border-bottom:0 !important;
+  padding-top:30px !important; padding-bottom:calc(22px + env(safe-area-inset-bottom)) !important;
+  transform:translateY(105%) !important; opacity:1 !important;
+  transition:transform .34s cubic-bezier(.5,0,.8,.4) !important;
+}
+.baupop.on,.quedapop.on,.largpop.on{
+  transform:none !important; transition:transform .7s var(--spr2) !important;
+}
+.baupop::before,.quedapop::before,.largpop::before{
+  content:""; position:absolute; top:10px; left:50%; width:38px; height:4px; margin-left:-19px;
+  border-radius:2px; background:var(--line);
+}
+.baubg{background:rgba(0,0,0,.55); -webkit-backdrop-filter:blur(5px); backdrop-filter:blur(5px); transition:opacity .3s}

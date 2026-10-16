@@ -709,7 +709,7 @@
   /* botao pular (pedido do usuario): fecha a sequencia inteira de falas de
      uma vez, sem precisar clicar fala por fala */
   .dlgPular{position:absolute;top:calc(14px + env(safe-area-inset-top));right:14px;
-            z-index:99;background:rgba(4,3,7,.5);border:1px solid rgba(242,166,90,.4);
+            z-index:99;background:rgba(4,3,7,.5);border:1px solid color-mix(in srgb, var(--accent) 45%, transparent);
             color:var(--accent);font-family:'Outfit',sans-serif;font-size:12px;
             font-weight:600;letter-spacing:.02em;padding:6px 12px;border-radius:20px;
             cursor:pointer;opacity:0;pointer-events:none;transition:opacity .22s}
@@ -6306,7 +6306,7 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 .md-row .v{font-size:15px;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums;display:flex;gap:7px;align-items:center}
 .md-row .d{font-family:'Silkscreen',monospace;font-size:9px;background:var(--gold);color:#1d1a12;border-radius:5px;padding:3px 6px;transform:scale(0);animation:mdPop .45s var(--spr) forwards;animation-delay:calc(1.9s + var(--i)*.08s)}
 @keyframes mdPop{to{transform:scale(1)}}
-.md-btn{width:100%;margin-top:18px;flex:none;background:#fff;color:#1d1d1d;border:0;border-radius:14px;font-family:'Outfit',sans-serif;font-weight:600;font-size:15px;padding:14px;cursor:pointer;opacity:0;transform:translateY(10px);animation:mdRow .5s var(--spr2) var(--bd,1.9s) forwards}
+.md-btn{width:100%;margin-top:18px;flex:none;background:var(--accent);color:var(--bg);border:0;border-radius:14px;font-family:'Outfit',sans-serif;font-weight:600;font-size:15px;padding:14px;cursor:pointer;opacity:0;transform:translateY(10px);animation:mdRow .5s var(--spr2) var(--bd,1.9s) forwards}
 @media (prefers-reduced-motion:reduce){.cq-tela *{animation-duration:.01s!important;animation-delay:0s!important}}
 
 /* Level Up: textos so com fade curto (sem deslizar); so numeral e valores se movem */

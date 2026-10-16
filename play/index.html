@@ -11242,6 +11242,10 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   // helpers compartilhados das telas de conquista (Nivel / Estagio)
   window.cqHelpers = window.cqHelpers || {
     // background-image atual da Arena (camada de frente) pra reusar de cenario
+    // cenario padrao da masmorra (tijolos + gradiente), igual a Arena
+    bgMasmorra(){
+      return 'background-image:url(\'data:image/png;base64,' + TEMA_ARENA_TILE_B64 + '\'),linear-gradient(180deg,var(--arena-1) 0%,var(--arena-2) 55%,var(--arena-3) 100%);background-size:130px 41px,auto;background-repeat:repeat,no-repeat';
+    },
     bgArena(){
       try {
         const ls = ['arenaBgA','arenaBgB'].map(id => document.getElementById(id)).filter(Boolean);
@@ -11298,7 +11302,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       '<div class="cq-rail" style="--rd:1.1s">' + rail + '</div>' +
       (rows.length ? '<div class="cq-h4" style="--hd:2.1s">' + (en ? 'GAINED THIS LEVEL' : 'GANHOS NESTE NÍVEL') + '</div><div class="cq-rows">' +
         rows.map((r, i) => '<div class="cq-row" style="--i:' + i + '"><span class="ic">' + r[0] + '</span><span class="t">' + r[1] + '</span><span class="v">' + r[2] + '</span></div>').join('') + '</div>' : '') +
-      '<button class="cq-btn" id="lvlOk" style="--bd:' + (2.5 + rows.length * .2) + 's">' + (en ? 'Continue' : 'Continuar') + '</button>';
+      '<button class="cq-btn" id="lvlOk" style="--bd:' + (1.9 + rows.length * .2) + 's">' + (en ? 'Continue' : 'Continuar') + '</button>';
     document.getElementById('lvlOk').onclick = fecharLvl;
     if (typeof tocarSom === 'function') tocarSom('levelup');
     requestAnimationFrame(() => lvlTela.classList.add('on'));
@@ -11424,8 +11428,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 
     const cq = window.cqHelpers;
     const prevTema = (typeof TEMAS_ARENA !== 'undefined') ? TEMAS_ARENA[Math.max(0, numEstagioConcluido - 1)] : null;
-    const bgPrev = (prevTema && prevTema.arte) ? 'url(data:image/png;base64,' + prevTema.arte + ')' : cq.bgArena();
-    const bgNovo = tema.arte ? 'url(data:image/png;base64,' + tema.arte + ')' : cq.bgArena();
+    const estiloBg = t => (t && t.arte) ? 'background-image:url(data:image/png;base64,' + t.arte + ')' : cq.bgMasmorra();
     const lim = (typeof LIMIARES_ESTAGIO !== 'undefined') ? LIMIARES_ESTAGIO : [];
     let rail = '';
     for (let k = 1; k <= 4; k++){
@@ -11438,7 +11441,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     estagioTela.innerHTML =
       '<div class="cq-kick">' + (en ? 'STAGE REACHED' : 'ESTÁGIO ALCANÇADO') + '</div>' +
       '<div class="cq-title">' + (en ? 'Stage ' + numEstagioConcluido + ' Complete!' : 'Estágio ' + numEstagioConcluido + ' Concluído!') + '</div>' +
-      '<div class="cq-scene"><div class="art" style="background-image:' + bgPrev + '"></div><div class="art novo" style="background-image:' + bgNovo + '"></div><div class="shade"></div>' +
+      '<div class="cq-scene"><div class="art" style="' + estiloBg(prevTema) + '"></div><div class="art novo" style="' + estiloBg(tema) + '"></div><div class="shade"></div>' +
         '<div class="tocha-arena tocha-esq"></div><div class="tocha-arena tocha-dir"></div>' +
         (heroImg ? '<img class="cq-hero walk" src="' + heroImg + '" alt="">' : '') +
         '<div class="cq-plate"><small>' + (en ? 'BIOME' : 'BIOMA') + '</small><b>' + (en ? tema.nome_en : tema.nome) + '</b></div></div>' +

@@ -6317,21 +6317,21 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 @keyframes cqNIn{0%{transform:translateY(44px)}80%{transform:translateY(-4px)}100%{transform:none}}
 @keyframes cqDrain{to{width:0}}
 .cq-tela.on .cq-kick{animation:cqFade .4s .2s forwards}
-.cq-tela.on .cq-title{animation:cqTitle .5s steps(6) .35s forwards}
-.cq-tela.on .cq-rail{animation:cqFade .4s var(--rd,1.6s) forwards}
-.cq-tela.on .cq-nums{animation:cqFade .4s 1.6s forwards}
-.cq-tela.on .cq-h4{animation:cqFade .4s var(--hd,2.3s) forwards}
-.cq-tela.on .cq-row{animation:cqRow .4s steps(5) forwards;animation-delay:calc(var(--r0,2.2s) + var(--i)*.2s)}
-.cq-tela.on .cq-btn{animation:cqFade .4s var(--bd,3s) forwards}
-.cq-tela.on .cq-plate{animation:cqFade .5s var(--pd,2.1s) forwards}
-.cq-tela.on .cq-mob.rev img{animation:cqReveal .6s steps(5) 3.1s backwards}
-.cq-tela.on .art.novo{animation:cqWipe 1.3s steps(14) .9s forwards}
-.cq-tela.on .cq-hero.walk{left:-90px;animation:cqWalk 1.6s steps(16) .5s forwards}
-.cq-tela.on .cq-hero.hop{left:calc(50% - 41px);animation:cqHop .9s steps(8) .35s both}
+.cq-tela.on .cq-title{animation:cqTitle .5s cubic-bezier(.2,.9,.3,1) .35s forwards}
+.cq-tela.on .cq-rail{animation:cqFade .4s var(--rd,1.1s) forwards}
+.cq-tela.on .cq-nums{animation:cqFade .4s 1.1s forwards}
+.cq-tela.on .cq-h4{animation:cqFade .4s var(--hd,1.5s) forwards}
+.cq-tela.on .cq-row{animation:cqRow .45s cubic-bezier(.2,.9,.3,1) forwards;animation-delay:calc(var(--r0,1.6s) + var(--i)*.2s)}
+.cq-tela.on .cq-btn{animation:cqFade .4s var(--bd,2.4s) forwards}
+.cq-tela.on .cq-plate{animation:cqFade .5s var(--pd,1.6s) forwards}
+.cq-tela.on .cq-mob.rev img{animation:cqReveal .6s steps(5) 2.4s backwards}
+.cq-tela.on .art.novo{animation:cqWipe 1.2s ease-in-out .9s forwards}
+.cq-tela.on .cq-hero.walk{left:-90px;animation:cqWalk 1.5s ease-in-out .5s forwards}
+.cq-tela.on .cq-hero.hop{left:calc(50% - 41px);animation:cqHop .9s cubic-bezier(.3,.7,.4,1) .3s both}
 .cq-tela.on .cq-glow{animation:cqFade .6s .5s forwards}
 .cq-tela.on .cq-ring{animation:cqRing 1.1s ease-out .75s 2}
-.cq-tela.on .cq-num .o{animation:cqNOut .4s steps(5) .9s forwards}
-.cq-tela.on .cq-num .n{animation:cqNIn .45s steps(6) 1.2s forwards}
-.cq-tela.on .cq-xpl,.cq-tela.on .cq-xpb{animation:cqFade .4s 1.7s forwards}
-.cq-tela.on .cq-xpb i{animation:cqDrain .9s steps(10) 2s forwards}
+.cq-tela.on .cq-num .o{animation:cqNOut .35s ease-in .8s forwards}
+.cq-tela.on .cq-num .n{animation:cqNIn .5s cubic-bezier(.2,.9,.3,1.3) 1.1s forwards}
+.cq-tela.on .cq-xpl,.cq-tela.on .cq-xpb{animation:cqFade .4s 1.3s forwards}
+.cq-tela.on .cq-xpb i{animation:cqDrain .9s ease-out 1.5s forwards}
 @media (prefers-reduced-motion:reduce){.cq-tela *{animation-duration:.01s!important;animation-delay:0s!important}}

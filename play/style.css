@@ -6183,7 +6183,13 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 .loginConhecerTopo{position:absolute;left:0;top:50%;transform:translateY(-50%);white-space:nowrap}
 
 /* 14/10: dois testadores (Ori, Day 5 e 6) dizem que o Continuar branco parece "apagado": botao principal do onboarding em azul */
-#intro .primario{background:#D4B872 !important;color:#1b1608 !important;box-shadow:0 6px 20px rgba(212,184,114,.32),0 2px 6px rgba(0,0,0,.35)}
+/* branco volta, mas com cara de botao clicavel (testadores achavam "desabilitado"): degrau 3D embaixo, texto preto forte, brilho que passa devagar */
+#intro .primario{background:linear-gradient(#fff,#ececec) !important;color:#111 !important;font-weight:800;position:relative;overflow:hidden;
+  box-shadow:0 4px 0 #a9a9a9,0 10px 24px rgba(255,255,255,.14) !important;transition:transform .08s,box-shadow .08s}
+#intro .primario:active{transform:translateY(3px);box-shadow:0 1px 0 #a9a9a9,0 4px 12px rgba(255,255,255,.1) !important}
+#intro .primario::before{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.85),transparent);transform:skewX(-20deg);animation:ctaBrilho 3.4s ease-in-out 1.2s infinite;pointer-events:none}
+@keyframes ctaBrilho{0%,55%{left:-60%}100%{left:130%}}
+@media (prefers-reduced-motion:reduce){#intro .primario::before{animation:none;display:none}}
 
 /* ===== Desktop (Windows/Mac/tablet largo): layout 2 colunas =====
    Celular (<900px) fica intacto. Aba Tarefas: heroi/arena/XP a esquerda,

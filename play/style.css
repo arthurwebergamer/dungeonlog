@@ -709,7 +709,7 @@
   /* botao pular (pedido do usuario): fecha a sequencia inteira de falas de
      uma vez, sem precisar clicar fala por fala */
   .dlgPular{position:absolute;top:calc(14px + env(safe-area-inset-top));right:14px;
-            z-index:99;background:rgba(4,3,7,.5);border:1px solid rgba(242,166,90,.4);
+            z-index:99;background:rgba(4,3,7,.5);border:1px solid color-mix(in srgb, var(--accent) 45%, transparent);
             color:var(--accent);font-family:'Outfit',sans-serif;font-size:12px;
             font-weight:600;letter-spacing:.02em;padding:6px 12px;border-radius:20px;
             cursor:pointer;opacity:0;pointer-events:none;transition:opacity .22s}
@@ -6183,7 +6183,13 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 .loginConhecerTopo{position:absolute;left:0;top:50%;transform:translateY(-50%);white-space:nowrap}
 
 /* 14/10: dois testadores (Ori, Day 5 e 6) dizem que o Continuar branco parece "apagado": botao principal do onboarding em azul */
-#intro .primario{background:#3E7BFA !important;color:#fff !important;box-shadow:0 6px 20px rgba(62,123,250,.4),0 2px 6px rgba(0,0,0,.35)}
+/* branco volta, mas com cara de botao clicavel (testadores achavam "desabilitado"): degrau 3D embaixo, texto preto forte, brilho que passa devagar */
+#intro .primario{background:linear-gradient(#fff,#ececec) !important;color:#111 !important;font-weight:800;position:relative;overflow:hidden;
+  box-shadow:0 4px 0 #a9a9a9,0 10px 24px rgba(255,255,255,.14) !important;transition:transform .08s,box-shadow .08s}
+#intro .primario:active{transform:translateY(3px);box-shadow:0 1px 0 #a9a9a9,0 4px 12px rgba(255,255,255,.1) !important}
+#intro .primario::before{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.85),transparent);transform:skewX(-20deg);animation:ctaBrilho 3.4s ease-in-out 1.2s infinite;pointer-events:none}
+@keyframes ctaBrilho{0%,55%{left:-60%}100%{left:130%}}
+@media (prefers-reduced-motion:reduce){#intro .primario::before{animation:none;display:none}}
 
 /* ===== Desktop (Windows/Mac/tablet largo): layout 2 colunas =====
    Celular (<900px) fica intacto. Aba Tarefas: heroi/arena/XP a esquerda,
@@ -6306,7 +6312,7 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 .md-row .v{font-size:15px;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums;display:flex;gap:7px;align-items:center}
 .md-row .d{font-family:'Silkscreen',monospace;font-size:9px;background:var(--gold);color:#1d1a12;border-radius:5px;padding:3px 6px;transform:scale(0);animation:mdPop .45s var(--spr) forwards;animation-delay:calc(1.9s + var(--i)*.08s)}
 @keyframes mdPop{to{transform:scale(1)}}
-.md-btn{width:100%;margin-top:18px;flex:none;background:#fff;color:#1d1d1d;border:0;border-radius:14px;font-family:'Outfit',sans-serif;font-weight:600;font-size:15px;padding:14px;cursor:pointer;opacity:0;transform:translateY(10px);animation:mdRow .5s var(--spr2) var(--bd,1.9s) forwards}
+.md-btn{width:100%;margin-top:18px;flex:none;background:var(--accent);color:var(--bg);border:0;border-radius:14px;font-family:'Outfit',sans-serif;font-weight:600;font-size:15px;padding:14px;cursor:pointer;opacity:0;transform:translateY(10px);animation:mdRow .5s var(--spr2) var(--bd,1.9s) forwards}
 @media (prefers-reduced-motion:reduce){.cq-tela *{animation-duration:.01s!important;animation-delay:0s!important}}
 
 /* Level Up: textos so com fade curto (sem deslizar); so numeral e valores se movem */
@@ -6325,10 +6331,10 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
   width:100% !important; max-width:520px; border-radius:26px 26px 0 0 !important; border-bottom:0 !important;
   padding-top:30px !important; padding-bottom:calc(22px + env(safe-area-inset-bottom)) !important;
   transform:translateY(105%) !important; opacity:1 !important;
-  transition:transform .34s cubic-bezier(.5,0,.8,.4) !important;
+  visibility:hidden; transition:transform .34s cubic-bezier(.5,0,.8,.4), visibility 0s .34s !important;
 }
 .baupop.on,.quedapop.on,.largpop.on{
-  transform:none !important; transition:transform .7s var(--spr2) !important;
+  transform:none !important; visibility:visible; transition:transform .7s var(--spr2), visibility 0s !important;
 }
 .baupop::before,.quedapop::before,.largpop::before{
   content:""; position:absolute; top:10px; left:50%; width:38px; height:4px; margin-left:-19px;

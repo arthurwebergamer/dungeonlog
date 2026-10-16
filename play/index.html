@@ -133,7 +133,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=195">
+<link rel="stylesheet" href="style.css?v=196">
 <script>
 // A abertura so sai quando a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado; sair antes (assim que o CSS chega)
 // mostrava um flash cinza vazio e depois a tela de login por baixo, antes do carrossel (visto em video de teste). Teto de seguranca: 15s.
@@ -322,6 +322,10 @@ html{background:var(--bsBg,#282828)}
     <div class="arena-bg-layer" id="arenaBgB"></div>
     <div class="tocha-arena tocha-esq"></div>
     <div class="tocha-arena tocha-dir"></div>
+    <div class="clima-tint" id="climaTint"></div><div class="clima-glow" id="climaGlow"></div><div class="clima-haze" id="climaHaze"></div>
+    <canvas id="climaFx" width="183" height="94" aria-hidden="true"></canvas>
+    <div class="clima-flash" id="climaFlash"></div>
+    <div class="clima-chip" id="climaChip" role="status"></div>
     <div class="tema-arena-dots" id="temaArenaDots"></div>
     <div class="tema-arena-bloqueio" id="temaArenaBloqueio">
       <img class="tema-arena-cadeado-img" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABUCAYAAAAyLjFTAAASJElEQVR42tVcTWwcV3Kuqvf6j6SGFElRtCnJtqRItGXYUAxT3ktsBOtDAC/k5JCcdi855ZAAyeYaZAPsKddccwjyA+QQBEFyWl8SG8YiNgzLsLWW6YT6WVsiRYmkyJme/nl/Oair/diaIYfDoYw0QJDzw9ev/qu+qn545coVOOyFiPybiqKwi4uLr8zNzf1Jt9uNpJQaAGz1uQMAICJLRNY55xDREZEDAFct5xBRIaJFREtE2jknkyS5eePGjb9dWVnRYRiic87BCC55WMK11uScw8e0oNBam3a7fSZN0z8sigKICIwxgIg1o5xz4JyrXzevJm1KKZibm1tZWFj4x+Xl5TyOY7TWOmstOOcsEdmnzgBEBKUUTE5O2iiK+D1tjIFWq5Vtb29bYwwLCpvE9SMeAEAI4X/XIiIRUa617lhrwRgDWmuIogiEEJDnORDR02MAImJZlu706dO0uLj4R2maXhBCdBFRWmvzKIpev3jxIhljnFIKmRitNZRl+YSErbW7mGOM2XU7YwyGYXim0+n8bH5+fjOKIqGUgpmZGZyamvrvjz/++JdCiKHMQg4jeSIipRQuLCzgxsbGT1ZWVpbiOAYAgDzP4cKFC7C0tAR5nqOU390iTVNot9v7qr4vTeccEhEURXHs/fff/8skSQARIQgC2N7ehjiO/zqO44+01gIRtXPOHhkDEBGMMWAe6zYopYCIuohorLUGEUUlQdRak7UWyrJ8fCMpwTkH1lpAxF2mUNlyzYQGA4CIoCxLQERTliWbiFFKCUTc0FobpZRBRPAZPlIGICIqpdz8/LwcHx//8ebm5rNZloUvvfTSpZMnTwpjDGVZhlprSJIEvv3229rZMaFlWUJRFH2jSJ/IAkQE1lqYnp4WSikQQoBzDq21RES/s7i4uOycC6y1y19//fUX+Pif3agZIIwxkCRJ2Gq1fpqm6aV2uw2zs7MwNTUFeZ7j+vp67ZTu3btXawwTY4x5gil7mYIQAqSUTDCcOXMGpJSgtQbnHMVxDN98881b6+vrb0kpIUmSvyGiPwUAAgA9iE8YiAGV59UAANPT07rT6WBRFMZaa40xsigKLIoCtNY1wWEYgrUWpJRAROCcA2PMLhPg0MhO0Jd+k0lCiF0MtNZCnudgrXXdbteEYSiiKGprrQ0AGOfcQOYgBwl1s7OzND8//wftdvv81NTUmSiKfmN6eloQkWi321CWJSilagfHm+MY/ujRIxBC1MT3UnP/YoZZa+HkyZM1IT5j2K8gIk5MTBARYZIkS0tLS79FRKLb7a58/vnnvxZC7GkO+7EIrbVubGxMENGfd7vd3/z000/hzTffhLm5OcjzHLrdLmRZBmVZQpqmtdqzraZp6jY3N20vwvvlBb5DPHHihGCnaIwBIqo1xxgDY2Nj8Mwzz1AQBLCxsfHDBw8e/LYQgpIk+Ssi+lllDmZoE6gk6owxBhFNkiRWax1kWcZRAIgIhBAghKidlnOObRidc4JNgr06S7Pp9f37lmUJYRhCEARgjKkTJAAArXWtbcwYAHBlWbo4jp1SSo7MCTrnqApxwjmHUspaLbe3t2vbLMsSiAi01tButx0AoBBi9dlnn/3njY0NDIIgcs6RtVZYa0WVIaJnGggAzlprtdZmZmZmYmdn5+rW1lbia4iUEqampnY5SjaHivmIiHYUDGDRUFWc1BJmW83zHJRStcSqmO02NjaU1lpMTU19sb29/WcPHz6sc4H9UmIigjRN4YUXXoA0Tb+4e/fui2EY2op5kCQJzs3NkVIKjh07BhMTExDHMeR5Dg8fPvTXJkQkALD9IoLcQ+rg2Y7J85yKooAgCGqV582y6gsh+DXmeR4GQQBbW1vjW1tbopmq7lULsCYEQRB0Op2ANYYjCZuXn2JzhAEArG6zrrW2rAm++ezJgKrCg+PHj4evvvrqD7vd7jEp5XxRFBcmJyfBGINlWUK73QatNWRZBtZa0FpDmqauyt03L1269Issy2h2dvaXN2/eNMvLyxjH8UDpOvuFra0te+rUqb9vtVqXhBCqMsNCKfXSw4cPf0BEIKWEOI5rzWSBBEGwMD09fZ6Ixo0x32xvb2/29DVNPAARSWttp6amTk5PT//q0aNHM0mSwDvvvAOtVguKooAvv/wSrLVgrYXNzc1a/be2tlRZlmJubu7frbW/WxQFGGNgdXV1qErNGAOnT5+GOI7BWlv7lzNnzry2srLyUafTEdPT0+7y5csopYT19XW4f/8+xHEM29vbRmu945wbM8b8/N69ez8nIgkAek8NYAlZa9Faq6WU9vHbTnC4Y06zKnIObowJqo0nt27dwm63i0IIF4bhUOCFlBJu375N1toquwUqisK2Wi0bhqHje3NEsdZCEARsmqLdbh8PggC01q0DOcFqQXTO0eO1yDHRHII4hBVFwWZjJicnbxRFQePj4zfiOHaV1IYGb5xzEEWR9fblhBBWCCG01rv0mfekta73KaXUQRAIa+1QeUANU/HCURSBMQaKoqg5vrOzY/M8p8nJyV9PTEy8vbq62k7TVOd5DoiHR66a/18xnqrIBACAWmuw1oIQApIkgSiKOBNFYwz6gMzQxRAnL6x2rP6c7+d5nt+5c2dDKaXSNO3rdUd0YQ+m7Nqn/zNsHrCLc1XhUSM6XKKyJkgpTRiGwlqriQgPCkwchgF+BOjDmINrgLWWfUCN5iilQCnVszCpXrvKYR4p4caYkAlkB+ycgyAI6pR8UPyRBtUAn8tN4nvZ6hFfwofZfWn32sewDNi1QHOR/V4f5eWck/6+BrH1YaPALifYzys/bQb4+2bHPOw1kAb4iU8jWfLNQyGifRqmoLUe40yR64+mtnKpXP3thmKAL90BCHsqKlBpmvTaaIdaj/YgHn2i2ePuwQh8Gkyo7k+Htf0DO8Hvy+HtEwUG3cvBTKCXpP33mppRJUbqME3Kg5gAa2cTZO1Hx17o0IFS4X0+f5pqYQbVgOrzwYqhquYU1Z8IVV+/6fmb7S0fS0BEMWBnxvnoz4DSp8qjl77j3SsJ4sS22hM177eLAUopBwCqairsMJFEVNfZxpi6W8Nd3Kow6mqtS0aKB63wBoww/F1b1SIbXAlyo5TxAz9b9dL6jtbaBUFQeqHxOwZw3+/8+fOzSZK8nec5CSFOtNvtVgV04K1btyAIAsiyDDqdTl0EWWuRiEApdfrixYu/XxRFjt9dUGmRq35bRHRSygwRDQBQhTK7qnRGAHBVTuG8H8OgDBGlAPDKzZs3QQjhlFK4sbEBxhjIsgy63S4opaBqomJRFPDiiy9KRJxdX18PJiYm2kVRdBhWxytXriARBUVR2IsXL/6oLMt/Zcn6fT2lVF1zs/R97jNe0Eua/jSIJ3HXq6qrPrcV4YCIzhhjvbhvlVKRMYZY0oxK+y03v60Xx3EmhNhM0zQ6e/bsP6ysrPx0fX2dwjC0smp6lEEQwPj4eNzpdFyFoJBSirje50W5EeGZDRhjIAgCx+hQvzS5krDfA+gZVv0qtF9HyYfBfAyxV9re7XYTIcRChWBNGmOctdZorUGeOnVqioh+LwzD+TiO366wQNFqtXBhYYHnAXbZu9/RkVIyYIkMW/sbaIZMP4Xu975fT/fSKMYIm+uwffsaLISAoiicUsporQUR0fj4+EyWZVGSJClevXr1LSL6T601FEUBY2Nj0O124ZVXXoGrV6/WQEgPKT3hbHpI/AkT2M8x+t9tEthcuxmNfMFsbm5Cu92GJEngxo0b8Nlnn0EURWCtLeI4Xi3LMj537tzfSa11IoRwiGjDMMQsy4idSFEUkGVZDYP1KEqe2PRezc5+2WTzu/0qz+Z6TQHUaWIF1fGPD+I656Isy57PsgyKohiTHLe11iKOYzh58iQURQEzMzO7ONwYXBo4nPXLKvcqqXvdq9/3GZrzzYB7CIwWxXG8q50HADoMQ0FEWgKArcIYnD9/Ht59913IsqxudrDHr1Denp69X6o8TM1wkLygl7lxVIiiCObm5kBKCc8//zwgIsRxDLdv34a7d+9S5etQMnjJIY6lzXU2q2QzudlvrmcEJe/Q/9McyCSius3OdFTaoSUAqCpJoaYU+nnt/28XN06bYRMArASAwmOA4+4qT3kcVCUP0uQYlfQHNakeKbqTvQqRpl2NDMirEqpeRPrNz6OC1XoI00hrbchFRXN6a5QSR0Todrv1wFTzM/Y3SZLAxMTErjR8lGiS7ywRUcujwPN6zQKzB37vvfd6orjsvV9//XV44403wK8qD8OIXploEw+gUQOb/oZ5YCEMw1rK3GRtFkGcRnO5PUr/09cseb73KByQEKIen1NKQZZlu3qKvmSCIABrbd1+y/McgiCoJ8SG3Vu/jLMSjpVV5YX9mh/DJjU8qbm8vAwffvghCCFAa12nqU1GVRUlfPXVV3D79m0oyxIWFxdhaWlpoFpiUPv3fR0RWToq1eKbaa3rqdFe0LpfvTGT0jSFnZ0dyPP8wNPfRwKLD0s81xJM2H6ZIn+f/cZREw8ASM45MeqEpBlO/VmiZgTws012kv60+FEmYESkyVor2Qf06raMghHNam2vMOVjAaO0/WaKX61t5EG5Nqw5NBn7tLvKzfqGt9HXB3BdPcqc4PsgvA8D0K8FyE9aBgEwDmJ3PGHGozWcBvfTiF6NjsNqYy/nW5uAtRb7JQ3DSsl3bFJKmJmZgSRJIE3TOrT1s31Oivz84Ai1Rcvm8MCo1J6zwLNnz8LZs2chDEO4fv06fPDBB0+ENyawLEtYWlqCl19+uc4Eq6fFRuaIfa0SQljpnONRcp61Hwmi4yNMvUJcr7SZM8WJiYmaSft1gA8SBZr3JiJH3KXh376zGPbGzG1/hGY/B+gXRwzGjAqJaj637IVa8wQgMooKrN+DUXut3Q+POOJoYZkBT3XIr2kKfp7gT4AfdVi01lquBL/XmZd+D1MeJRM4PSe/YdlU12Gzwl4tskEnzkaVA/RDgnjtMAxheXnZMANwlBzv5fS4sOml3n47jHsQHAWGZcBeZsT3W19fd/KoVZsPOwCA+jmDJlEMknCHqtPpQJZlEEVRDZ8dhTkEQQC+E8RROhhWs08++QSuXbsGURTVQxT9cAApJVy7dg2uX78O3W4Xrly5Aq+99tq+vcJhizlXDR0TPB5VAW+sZRd6c1DucynLkuWzRJq1QC+nxOcSKKV6dp8PKoS9wiwROQl9JjUOkwtwVseSVUrVgxSDjLNzY3afya8DR5ke93fyKGAxhre11nDu3DlotVp7To71Akmqk2N2QWmjYEJDK1BCn0GlUUQBYwwcP34cTpw4MRAm2PTS/lNpo0qFG/dB6ZyLqi855xyWZbnroIJh/QATwdMmg4Ak/TDFYfFIf4Kk12tEFBK+mxWEbrcL9+/fhzRN4dixYzxT80Qvbz8f0W9krS803eNhp17Fy0EYv7q6Cmma1o/QNQ9r4a3KygxqW2Tn5S922JL0sCFrmEy03W5DlmX1IUt9xv2F9A868p7+rp/JH+TQk6dRuByUmUyD35vk96ozzBAASC4sLMh2u22DIHB37twRm5uboJSC5557DmZnZ2GQ2d9eanwYx9pvrUHmFvxGKwv1/v37sLOzU5uDN1glZavVEjs7OxSGIezs7AAfihLHMVQPHj+B4e23if3i90EZ0gRW9nKi/kwTq/7a2ho8ePCAh76t92yTkI8ePfrfKIr+JwiCCUScN8ZgFEUQBAEkSVJPbDSd0l4E7Gezg2jUQabO/DyCvT3XD6z2fPAaAFAFAzwuuu7du/eLc+fO/SAIAux0On/R6XT+GBHN2tqa4PNBetXp/lNk+3WT9poo6/d99N5sPhW2H2zv742P46hSfySif8my7L0wDFFr/V9Sa+2uX7++aYxxJ06c+NXY2Bg65ySPnvfr6O6l5oOqdzPENddsnjYD3lNiPabPn9A+fpy3cu5WSkkA8E9bW1v/xmYtAQCiKBLGGBNF0QYi3q88p/UqRecNMPNvqooncs6FABAzulS9h95r3A8o4dTU52NjupzPD6tDdb/pr4bpYNWUoUqbZ4QQkoiEc66UlQ3pyo7+I47jT6rxOFNlh9ZngHt81U3ValNjxpgJABCIKJxz0qs060dVeEN82AkTBd+N5/HJlPXhDZXaEgAIYwyFYUiXL18OKwGQ1hqdc3F11A+yjVd/o7W23ksYhrS2tvbR2tqaZgH/HxvVv6Xg4bPkAAAAAElFTkSuQmCC" alt="">
@@ -3155,21 +3159,68 @@ function diasCorridos(){
   return Math.floor(local.getTime() / 86400000);
 }
 
+/* ===== CLIMA DO JOGO (sorteio fixo por dia, tudo no cliente) =====
+   Nao e clima real: sem GPS, sem API. Mesmo dia + mesma semente = mesmo
+   clima e mesmo monstro, o dia inteiro. O clima muda a chance de monstro
+   raro/lendario e o bonus de raridade do loot. Regra central intacta: o
+   monstro do dia so cai com 100% das tarefas. Camada visual: bloco
+   "CLIMA DO JOGO" no fim do arquivo (canvas na .arena). */
+const CLIMAS_JOGO = {
+  sol:        { peso:40, raro:5,  leg:0,   bonus:0  },
+  nublado:    { peso:30, raro:10, leg:0.5, bonus:10 },
+  chuva:      { peso:20, raro:25, leg:2,   bonus:25 },
+  tempestade: { peso:10, raro:42, leg:8,   bonus:50 }
+};
+const ORDEM_CLIMAS = ['sol','nublado','chuva','tempestade'];
+// raridade por monstro (0 comum, 1 raro, 2 lendario) -- proposta v1, ajustavel
+const RAR_MONSTRO = {
+  'Demônio flamejante':1,'Demônio glacial':1,'Demônio venenoso':1,'Espectro sombrio':1,'Espectro pálido':1,'Espectro da lanterna':1,
+  'Golem de pedra':1,'Golem de cristal':1,'Aranha de cristal':1,'Olho sangrento':1,'Alma perdida':1,'Espírito do mau':1,
+  'Baú mímico':1,'Crânio mímico':1,'Moeda mímica':1,'Poção mímica':1,
+  'Esqueleto rei':2,'Demônio':2
+};
+// nome_pt = original (aplicarIdiomaDados troca .nome por EN no idioma ingles)
+function raridadeMonstro(m){ return (m && RAR_MONSTRO[m.nome_pt || m.nome]) || 0; }
+window.raridadeMonstro = raridadeMonstro;
+function _hash01(n, salt){
+  let a = (Math.imul(n | 0, 0x9E3779B1) + Math.imul(((typeof semente === 'number' ? semente : 0) + salt * 7919) | 0, 0x85EBCA6B)) | 0;
+  a ^= a >>> 16; a = Math.imul(a, 0x7feb352d); a ^= a >>> 15; a = Math.imul(a, 0x846ca68b); a ^= a >>> 16;
+  return (a >>> 0) / 4294967296;
+}
+function climaDoDiaN(n){
+  if (window.__climaForcado && CLIMAS_JOGO[window.__climaForcado]) return window.__climaForcado;   // so teste/dev
+  const tot = ORDEM_CLIMAS.reduce((s, c) => s + CLIMAS_JOGO[c].peso, 0);
+  let x = _hash01(n, 1) * tot;
+  for (const c of ORDEM_CLIMAS){ if ((x -= CLIMAS_JOGO[c].peso) < 0) return c; }
+  return 'sol';
+}
+window.climaDoDia = function(){ return climaDoDiaN(diasCorridos()); };
+// bonus de loot do clima de HOJE, somado a "sorte" (0..1) de darLoot/sortearGanhos
+function bonusLootClima(){ return CLIMAS_JOGO[climaDoDiaN(diasCorridos())].bonus / 200; }
+// devolve o INDICE em MONSTROS do monstro do dia n (n = diasCorridos()+deslocamento)
+function monstroPorDia(n){
+  let pool = (typeof poolMonstrosFiltrado === 'function') ? poolMonstrosFiltrado() : [];
+  if (!pool.length) pool = MONSTROS.map((m, i) => i);
+  const c = CLIMAS_JOGO[climaDoDiaN(n)], x = _hash01(n, 2);
+  let r = x < c.leg / 100 ? 2 : x < (c.leg + c.raro) / 100 ? 1 : 0;
+  let cand = pool.filter(i => raridadeMonstro(MONSTROS[i]) === r);
+  while (!cand.length && r > 0){ r--; cand = pool.filter(i => raridadeMonstro(MONSTROS[i]) === r); }
+  if (!cand.length) cand = pool;
+  return r === 0 ? cand[(((n + semente) % cand.length) + cand.length) % cand.length]   // comuns seguem o ciclo de sempre
+                 : cand[Math.floor(_hash01(n, 3) * cand.length)];
+}
+window.monstroPorDia = monstroPorDia;
+window.__climaRaridadeHoje = function(){ return raridadeMonstro(MONSTROS[monstroPorDia(diasCorridos())]); };
+
 function monstroDoDia(){
-  const pool = (typeof poolMonstrosFiltrado === 'function') ? poolMonstrosFiltrado() : MONSTROS.map((m, i) => i);
-  const n = pool.length || MONSTROS.length;
-  const i = pool.length ? pool[(diasCorridos() + semente) % n] : (diasCorridos() + semente) % MONSTROS.length;
-  return MONSTROS[i];
+  return MONSTROS[monstroPorDia(diasCorridos())];
 }
 
-// mesmo ciclo de monstroDoDia(), mas pra uma data especifica (ISO) em vez
+// mesmo sorteio de monstroDoDia(), mas pra uma data especifica (ISO) em vez
 // de "hoje" -- usado pro pop-up de tarefas perdidas mostrar o monstro do
 // DIA QUE VIROU (ultimoDia em verificarVirada()), nao o de hoje.
 function monstroDoDiaEm(iso){
-  const pool = (typeof poolMonstrosFiltrado === 'function') ? poolMonstrosFiltrado() : MONSTROS.map((m, i) => i);
-  const n = pool.length || MONSTROS.length;
-  const idx = ((diasCorridos() + diffDias(iso, isoAtual()) + semente) % n + n) % n;
-  return MONSTROS[pool.length ? pool[idx] : idx];
+  return MONSTROS[monstroPorDia(diasCorridos() + diffDias(iso, isoAtual()))];
 }
 
 function desenharMonstro(){
@@ -3178,6 +3229,9 @@ function desenharMonstro(){
     '<img class="mobimg" src="' + m.img + '" alt="' + m.nome + '">' +
     '<div class="sombra"></div>';
   document.getElementById('mobname').textContent = m.nome;
+  const rar = raridadeMonstro(m), elN = document.getElementById('mobname'), elS = document.getElementById('mobSprite');
+  elN.dataset.r = rar || ''; elS.dataset.rar = rar || '';
+  if (typeof window.climaAtualizar === 'function') window.climaAtualizar();
 }
 
 // ---------- TEMA DE ARENA (TESTE -- catalogo em TEMAS_ARENA, assets.js).
@@ -7644,7 +7698,7 @@ window.lootDoEstagio = lootDoEstagio;
 
 function darLoot(nTarefas){
   const le = lootDoEstagio();
-  const sorte = Math.min(1, nTarefas / 10 + le.bonus);
+  const sorte = Math.min(1, nTarefas / 10 + le.bonus + bonusLootClima());
   const qtd = le.qtd;
   const ganhos = [];
   for (let i=0;i<qtd;i++){
@@ -7666,7 +7720,7 @@ function darLoot(nTarefas){
 // rapido), entao o bau especial usa os dois: bonus + garantia
 function sortearGanhos(nTarefas, bonusSorte, rarMinima){
   const le = lootDoEstagio();
-  const sorte = Math.min(1, nTarefas / 10 + (bonusSorte || 0) + le.bonus);
+  const sorte = Math.min(1, nTarefas / 10 + (bonusSorte || 0) + le.bonus + bonusLootClima());
   const qtd = le.qtd;
   const ids = [];
   for (let i=0;i<qtd;i++) ids.push(sortearItem(sorte));
@@ -13006,14 +13060,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // mas nao e 100% historicamente fiel. Resolver isso exigiria salvar o
     // estagio junto de cada entrada do historico -- fora do escopo desta
     // leva.
-    const pool = (typeof window.poolMonstrosFiltrado === 'function')
-      ? window.poolMonstrosFiltrado()
-      : MONSTROS.map((m, i) => i);
-    const n = pool.length;
-    if (n === 0) return null; // defensivo -- nao deveria acontecer (sempre sobra o pool generico)
-
-    const idx = ((dias + semente) % n + n) % n; // modulo positivo, defensivo
-    return pool[idx]; // indice ORIGINAL em MONSTROS -- quem chama continua indexando MONSTROS normalmente
+    // mesmo sorteio da Arena (clima + raridade) -- ver monstroPorDia()
+    return (typeof window.monstroPorDia === 'function') ? window.monstroPorDia(dias) : null;
   }
   // exposta pra Estatisticas > Historico reaproveitar (pedido do usuario:
   // mostrar o monstro REAL de cada dia "fugiu", em vez de um icone
@@ -14273,6 +14321,10 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       ruidoFaixa(c, { duracao:0.04, ganho:0.7, freq:2500, q:2 });
       tinir(c, [1480, 2290, 3500, 5100], 0,    0.4,  0.7);
       tinir(c, [1480, 2290, 3500],       0.18, 0.16, 0.4);
+    },
+    trovao: c => {                                       // relampago do clima -- estrondo grave com cauda
+      ruidoFaixa(c, { duracao:1.1, ganho:0.5, freq:170, q:0.7 });
+      tom(c, { freq:62, freqFinal:34, tipo:'sine', duracao:0.9, ganho:0.4 });
     },
     bauTrancado: c => {                                  // clique no bau trancado sem chave -- cadeado grosso: 2 "clanks" graves e pesados + tilintar de corrente (variacao 2 aprovada)
       for (let i = 0; i < 2; i++){
@@ -19249,6 +19301,149 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
     t=setTimeout(function(){t=null;var l=pend;pend=[];l.forEach(run);},120);
   }).observe(document.body,{childList:true,subtree:true});
   run(document.body);
+})();
+</script>
+<script>
+/* ===== CLIMA DO JOGO -- camada visual da Arena (canvas em pixel 2x) =====
+   Logica de sorteio (clima/raridade) fica no script principal (climaDoDia,
+   monstroPorDia). Aqui so desenha. Sem imagem nova, sem rede. Pausa com a
+   aba oculta ou a Arena fora de vista; reduz com prefers-reduced-motion;
+   localStorage 'questlog.climaFx'='0' desliga so o canvas (tom/chip ficam). */
+(function(){
+  const cv = document.getElementById('climaFx'); if (!cv) return;
+  const arena = cv.parentElement, g = cv.getContext('2d'), R = Math.random;
+  const reduz = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const ID = (id) => document.getElementById(id);
+  const en = () => (typeof idiomaApp === 'function' && idiomaApp() === 'en');
+  let W = 183, H = 94, P = [], acc = 0, T = 0, cfg = null, chave = '', bolt = null, nextBolt = 90, cloudCv = null, cloudOff = 0, mobXY = [W * .7, H * .35], hazeBase = null;
+  const fxOn = () => { try { return localStorage.getItem('questlog.climaFx') !== '0'; } catch(e){ return true; } };
+
+  const BAY = [[0,8,2,10],[12,4,14,6],[3,11,1,9],[15,7,13,5]];
+  const NUVEM_COR = { padrao:'0,0,0', deserto:'64,38,24', floresta:'6,24,14', montanhas:'34,38,78' };
+  function prepNuvem(){
+    cloudCv = document.createElement('canvas'); cloudCv.width = W * 2; cloudCv.height = Math.round(H * .5);
+    const c = cloudCv.getContext('2d'), cor = NUVEM_COR[biomaAtual()] || NUVEM_COR.padrao, hh = cloudCv.height;
+    const blobs = []; for (let i = 0; i < 6; i++) blobs.push({ x:i * (W / 3) + R() * (W / 5), y:hh * .17 + R() * hh * .35, rx:W * .17 + R() * W * .13, ry:hh * .17 + R() * hh * .15 });
+    for (const b of blobs) for (const ox of [0, -W * 2, W * 2]) for (let y = 0; y < hh; y++) for (let x = 0; x < W * 2; x++) {
+      const dx = (x - (b.x + ox)) / b.rx, dy = (y - b.y) / b.ry, d = dx * dx + dy * dy;
+      if (d < 1) { const dens = Math.pow(1 - d, .7); if (dens * 16 > BAY[y & 3][x & 3]) { c.fillStyle = 'rgba(' + cor + ',' + (.16 + dens * .2).toFixed(2) + ')'; c.fillRect(x, y, 1, 1); } }
+    }
+  }
+  function biomaAtual(){ try { return temaArenaAtual().id; } catch(e){ return 'padrao'; } }
+  function ajustar(){
+    const r = arena.getBoundingClientRect(); if (!r.width) return;
+    W = Math.max(60, Math.round(r.width / 2)); H = Math.max(40, Math.round(r.height / 2));
+    cv.width = W; cv.height = H; prepNuvem(); medirMob();
+  }
+  function medirMob(){
+    const s = ID('mobSprite'); if (!s) return; const a = arena.getBoundingClientRect(), r = s.getBoundingClientRect();
+    if (a.width && r.width) mobXY = [(r.left - a.left + r.width / 2) / 2, (r.top - a.top + r.height * .5) / 2];
+  }
+
+  /* variante por bioma: mesmo clima, partícula diferente */
+  function variante(cl, bi){
+    const v = { nome:['',''], icone:cl, kind:null, rate:0, wind:0, bolt:false, tint:[0,0,0,0], glow:null, haze:null, gust:0, cloud:0, shafts:0, motes:null, leaves:0 };
+    const T0 = { sol:[255,205,130,0], nublado:[96,108,132,.20], chuva:[34,52,92,.34], tempestade:[10,14,42,.50] }[cl];
+    v.tint = T0.slice(); v.nome = { sol:['Ensolarado','Sunny'], nublado:['Nublado','Cloudy'], chuva:['Chuva','Rain'], tempestade:['Tempestade','Storm'] }[cl];
+    if (cl === 'sol') { v.glow = 'rgba(255,196,110,.55)'; v.shafts = bi === 'floresta' ? 1 : bi === 'padrao' ? .7 : .8; v.motes = bi === 'floresta' ? '#e8f08a' : bi === 'montanhas' ? '#ffffff' : bi === 'deserto' ? '#ffe3a0' : '#d9d2c0'; }
+    if (cl === 'nublado') { v.cloud = bi === 'padrao' ? 0 : .55; v.haze = bi === 'padrao' ? [120,110,95,.10] : null; v.wind = .4; v.leaves = bi === 'floresta' ? 1 : 0; if (bi === 'montanhas') { v.kind = 'neve'; v.rate = .35; } }
+    if (cl === 'chuva') { v.cloud = bi === 'padrao' ? 0 : .8; v.wind = .7; v.kind = bi === 'montanhas' ? 'neve' : bi === 'padrao' ? 'goteira' : 'chuva'; v.rate = bi === 'montanhas' ? 1.1 : bi === 'padrao' ? .9 : bi === 'deserto' ? .9 : 2.1; v.leaves = bi === 'floresta' ? 1 : 0;
+      const nm = { montanhas:['Nevando','Snowing'], padrao:['Goteiras','Dripping'], deserto:['Chuva rara','Rare rain'] }[bi]; if (nm) v.nome = nm; if (bi === 'montanhas') v.icone = 'neve'; }
+    if (cl === 'tempestade') { v.cloud = bi === 'padrao' ? 0 : 1; v.wind = 1.6; v.kind = 'chuva'; v.rate = 4.2; v.bolt = true; v.leaves = bi === 'floresta' ? 2 : 0;
+      if (bi === 'padrao') { v.kind = 'goteira'; v.rate = 2.6; }
+      if (bi === 'deserto') { v.kind = 'areia'; v.rate = 5; v.bolt = false; v.nome = ['Tempestade de areia','Sandstorm']; v.icone = 'areia'; v.tint = [110,66,28,.30]; v.haze = [204,142,72,.18]; v.gust = 1; }
+      if (bi === 'montanhas') { v.kind = 'nevasca'; v.rate = 4.8; v.bolt = false; v.nome = ['Nevasca','Blizzard']; v.icone = 'neve'; v.tint = [44,60,98,.30]; v.haze = [226,236,255,.13]; v.gust = 1; } }
+    return v;
+  }
+  const ICON = {
+    sol:['....#....','.#..#..#.','..#####..','..#####..','##.#####.##','..#####..','..#####..','.#..#..#.','....#....'],
+    nublado:['.........','...###...','..#####..','.#######.','#########','#########','.#######.','.........','.........'],
+    chuva:['...###...','..#####..','.#######.','#########','.#######.','.........','.#.#.#.#.','#.#.#.#.#','.........'],
+    tempestade:['...###...','..#####..','.#######.','#########','.#######.','....yy...','...yy....','....y....','...y.....'],
+    neve:['....#....','.#..#..#.','..#.#.#..','...###...','#########','...###...','..#.#.#..','.#..#..#.','....#....'],
+    areia:['.........','#######..','.........','..#######','.........','#######..','.........','..#######','.........']
+  };
+  function icone(k){ let s = '<svg viewBox="0 0 9 9" shape-rendering="crispEdges">'; ICON[k].forEach((r, y) => [...r].forEach((c, x) => { if (c !== '.') s += '<rect x="' + x + '" y="' + y + '" width="1" height="1" fill="' + (c === 'y' ? '#ffd84a' : '#f4f4f4') + '"/>'; })); return s + '</svg>'; }
+
+  function aplicar(){
+    if (typeof climaDoDia !== 'function') return;
+    const cl = climaDoDia(), bi = biomaAtual(), k = cl + '|' + bi + '|' + (typeof idiomaApp === 'function' ? idiomaApp() : '');
+    if (k === chave) return; const mudouClima = chave.split('|').slice(0, 2).join('|') !== k.split('|').slice(0, 2).join('|'); chave = k;
+    cfg = variante(cl, bi); arena.dataset.clima = cl; arena.dataset.climaFx = cfg.gust ? 'gust' : '';
+    if (mudouClima) { P = P.filter(p => p.t === 's'); bolt = null; nextBolt = 40 + R() * 90; prepNuvem(); }
+    const t = cfg.tint; ID('climaTint').style.backgroundColor = 'rgba(' + t[0] + ',' + t[1] + ',' + t[2] + ',' + t[3] + ')';
+    ID('climaGlow').style.background = cfg.glow ? 'radial-gradient(ellipse at 22% 0%,' + cfg.glow + ',rgba(255,196,110,0) 70%)' : 'transparent'; ID('climaGlow').style.opacity = cfg.glow ? 1 : 0;
+    hazeBase = cfg.haze; ID('climaHaze').style.backgroundColor = hazeBase ? 'rgba(' + hazeBase[0] + ',' + hazeBase[1] + ',' + hazeBase[2] + ',' + hazeBase[3] + ')' : 'rgba(0,0,0,0)';
+    ID('climaChip').innerHTML = icone(cfg.icone) + '<span>' + cfg.nome[en() ? 1 : 0] + '</span>';
+    ID('climaChip').setAttribute('aria-label', (en() ? 'Weather: ' : 'Clima: ') + cfg.nome[en() ? 1 : 0]);
+    arena.classList.toggle('clima-off', !fxOn());
+  }
+  window.climaAtualizar = function(){ aplicar(); medirMob(); };
+  window.climaRecalcular = function(){ chave = ''; aplicar(); };
+
+  /* partículas */
+  function nova(k){
+    const w = cfg.wind;
+    if (k === 'chuva') { const l = R() < .45 ? 0 : 1; P.push({ t:'r', x:R() * (W + 50) - 10, y:-6, vx:-(.8 + w * .9) * (l ? 1 : .7), vy:(l ? 5.5 : 4) + R() * 2 + w, ty:H * .5 + R() * H * .46, l }); }
+    else if (k === 'goteira') P.push({ t:'d', x:8 + R() * (W - 16), y:-2, vy:1.2, ty:H * .5 + R() * H * .46 });
+    else if (k === 'neve') P.push({ t:'n', x:R() * (W + 20), y:-3, vy:.35 + R() * .45, vx:-w * .25, ph:R() * 6, big:R() < .3 });
+    else if (k === 'nevasca') P.push({ t:'n', x:W + 6, y:R() * H, vy:.3 + R() * 1.1, vx:-(3.2 + R() * 3), ph:0, big:R() < .25, st:1 });
+    else if (k === 'areia') P.push({ t:'a', x:W + 6, y:H * .25 + R() * H * .75, vy:(R() - .5) * .8, vx:-(4 + R() * 5), big:R() < .2 });
+  }
+  function extras(){
+    const bi = biomaAtual();
+    if (cfg.motes && P.filter(p => p.t === 'm').length < 14 && R() < .12) P.push({ t:'m', x:R() * W, y:R() * H * .9, vx:(R() - .5) * .15, vy:(R() - .5) * .15, ph:R() * 6, c:cfg.motes });
+    if (cfg.leaves && R() < .05 * cfg.leaves) P.push({ t:'f', x:W + 4, y:R() * H * .7, vx:-(1.1 + R() * 1.6) * (.6 + cfg.wind), vy:.3 + R() * .5, ph:R() * 6, c:bi === 'floresta' ? (R() < .5 ? '#6f8a3a' : '#8a6a3a') : '#a08a5a' });
+    const rr = window.__climaRaridadeHoje ? window.__climaRaridadeHoje() : 0;
+    if (rr > 0 && !arena.classList.contains('venceu') && R() < .18 + rr * .12) P.push({ t:'s', x:mobXY[0] + (R() - .5) * 30, y:mobXY[1] - 10 + R() * 22, vy:-(.25 + R() * .3), life:0, max:18 + R() * 14, c:rr === 2 ? '#ffd25a' : '#d2a8ff' });
+  }
+  function dropBolt(){
+    const pts = []; let x = 24 + R() * (W - 48), y = 0; const gy = H * (.6 + R() * .28);
+    while (y < gy) { pts.push([x | 0, y | 0]); x += (R() - .5) * 11; y += 4 + R() * 5; } pts.push([x | 0, gy | 0]);
+    const bi = 2 + ((R() * Math.max(1, pts.length - 3)) | 0), br = []; let bx = pts[Math.min(bi, pts.length - 1)][0], by = pts[Math.min(bi, pts.length - 1)][1];
+    for (let i = 0; i < 4; i++) { br.push([bx | 0, by | 0]); bx += (R() < .5 ? -1 : 1) * (3 + R() * 5); by += 3 + R() * 4; }
+    bolt = { pts, br, f:0 };
+    const fl = ID('climaFlash'); fl.classList.remove('go'); void fl.offsetWidth; fl.classList.add('go');
+    arena.classList.remove('clima-treme'); void arena.offsetWidth; arena.classList.add('clima-treme');
+    setTimeout(() => { window.tocarSom?.('trovao'); }, 250 + R() * 450);
+  }
+  window.climaRelampago = dropBolt;
+  const px = (x, y, w, h, c, a) => { g.globalAlpha = a == null ? 1 : a; g.fillStyle = c; g.fillRect(x | 0, y | 0, w || 1, h || 1); };
+  function frame(dtf){
+    T += dtf; g.clearRect(0, 0, W, H);
+    if (cfg.gust && hazeBase && ((T | 0) % 6 === 0)) { const k = .75 + .5 * Math.abs(Math.sin(T * .018)); ID('climaHaze').style.backgroundColor = 'rgba(' + hazeBase[0] + ',' + hazeBase[1] + ',' + hazeBase[2] + ',' + (hazeBase[3] * k).toFixed(3) + ')'; }
+    if (cfg.cloud && cloudCv) { cloudOff = (cloudOff + .06 * (1 + cfg.wind)) % (W * 2); g.globalAlpha = cfg.cloud * .85; g.drawImage(cloudCv, -cloudOff, 0); g.drawImage(cloudCv, W * 2 - cloudOff, 0); g.globalAlpha = 1; }
+    if (cfg.shafts) { const pulse = .7 + .3 * Math.sin(T * .03), col = biomaAtual() === 'floresta' ? '255,240,160' : '255,236,190';
+      for (let k = 0; k < 3; k++) { const x0 = W * .2 + k * (W * .25) + Math.sin(T * .01 + k) * 3, wd = 14 + k * 3;
+        for (let y = 0; y < H * .85; y++) { g.globalAlpha = Math.max(0, .075 * cfg.shafts * pulse * (1 - y / (H * .95))); g.fillStyle = 'rgb(' + col + ')'; g.fillRect((x0 + y * .55) | 0, y, wd, 1); } } g.globalAlpha = 1; }
+    if (cfg.icone === 'sol' && biomaAtual() === 'montanhas' && R() < .15) px(R() * W, H * .55 + R() * H * .4, 1, 1, '#fff', 1);
+    if ((cfg.kind === 'chuva' || cfg.kind === 'goteira') && R() < .25) px(R() * W, H * .56 + R() * H * .4, 5 + (R() * 6 | 0), 1, '#cfe2ff', .16 + R() * .14);
+    if (cfg.kind) { acc += cfg.rate * dtf * (reduz ? .4 : 1); while (acc >= 1) { acc--; nova(cfg.kind); } }
+    extras();
+    for (let i = P.length - 1; i >= 0; i--) { const p = P[i];
+      if (p.t === 'r') { p.x += p.vx * dtf; p.y += p.vy * dtf; const a = p.l ? .62 : .34; for (let k = 0; k < 3; k++) px(p.x - p.vx * k * .45, p.y - p.vy * k * .45, 1, 1, p.l ? '#cfe2ff' : '#9db6dc', a * (1 - k * .25)); if (p.y >= p.ty) P[i] = { t:'s2', x:p.x, y:p.ty, age:0 }; }
+      else if (p.t === 's2') { p.age += dtf; if (p.age > 4) { P.splice(i, 1); continue; } const a = .55 - p.age * .12; if (p.age < 1.6) px(p.x, p.y - 1, 1, 1, '#e8f1ff', a); else { px(p.x - 2, p.y, 1, 1, '#cfe2ff', a); px(p.x + 2, p.y, 1, 1, '#cfe2ff', a); px(p.x, p.y - 1, 1, 1, '#cfe2ff', a * .8); } }
+      else if (p.t === 'd') { p.vy += .28 * dtf; p.y += p.vy * dtf; px(p.x, p.y, 1, 2, '#b8d0f2', .8); px(p.x, p.y - 2, 1, 1, '#b8d0f2', .35); if (p.y >= p.ty) P[i] = { t:'rip', x:p.x, y:p.ty, age:0 }; }
+      else if (p.t === 'rip') { p.age += dtf * .5; if (p.age > 4) { P.splice(i, 1); continue; } const r = 1 + p.age * 2, a = .6 - p.age * .14; for (let k = -r; k <= r; k++) if (Math.abs(k) >= r - 1) px(p.x + k, p.y + (Math.abs(k) === r ? 0 : 1) - 1, 1, 1, '#cfe2ff', a); }
+      else if (p.t === 'n') { p.y += p.vy * dtf; p.x += (p.vx + (p.st ? 0 : Math.sin(T * .05 + p.ph) * .35)) * dtf; if (p.y > H || p.x < -8) { P.splice(i, 1); continue; } const s = p.big ? 2 : 1; px(p.x, p.y, s, s, '#fff', p.st ? .78 : .9); if (p.st && p.big) px(p.x + 2, p.y, 2, 1, '#fff', .4); }
+      else if (p.t === 'a') { p.x += p.vx * dtf; p.y += p.vy * dtf; if (p.x < -8 || p.y > H) { P.splice(i, 1); continue; } px(p.x, p.y, p.big ? 2 : 1, 1, p.big ? '#d9a96a' : '#c28d4e', .7); if (p.big) px(p.x + 2, p.y, 3, 1, '#d9a96a', .28); }
+      else if (p.t === 'm') { p.x += p.vx + Math.sin(T * .04 + p.ph) * .12; p.y += p.vy; px(p.x, p.y, 1, 1, p.c, .25 + .45 * Math.abs(Math.sin(T * .05 + p.ph))); if (p.x < -4 || p.x > W + 4 || p.y < -4 || p.y > H + 4 || R() < .002) P.splice(i, 1); }
+      else if (p.t === 'f') { p.x += p.vx * dtf; p.y += (p.vy + Math.sin(T * .12 + p.ph) * .7) * dtf; if (p.x < -6 || p.y > H) { P.splice(i, 1); continue; } px(p.x, p.y, 2, 1, p.c, .85); px(p.x + 1, p.y + 1, 1, 1, p.c, .5); }
+      else if (p.t === 's') { p.life += dtf; p.y += p.vy * dtf; if (p.life > p.max) { P.splice(i, 1); continue; } const a = 1 - p.life / p.max; px(p.x, p.y, 1, 1, p.c, a); if (p.life % 6 < 2) px(p.x, p.y - 1, 1, 1, '#fff', a * .6); }
+    }
+    if (cfg.bolt && !reduz) { nextBolt -= dtf; if (nextBolt <= 0) { dropBolt(); nextBolt = 120 + R() * 240; } }
+    if (bolt) { bolt.f += dtf; const f = bolt.f;
+      if (f < 14) { if (f < 4 || (f > 7 && f < 11)) { const draw = (pts, al) => { for (let i = 1; i < pts.length; i++) { const [x0, y0] = pts[i - 1], [x1, y1] = pts[i], n = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0)) || 1; for (let s = 0; s <= n; s++) { const x = x0 + (x1 - x0) * s / n, y = y0 + (y1 - y0) * s / n; px(x - 1, y, 3, 1, '#8fb0ff', .28 * al); px(x, y, 1, 1, '#fff', al); } } }; draw(bolt.pts, 1); draw(bolt.br, .8); } }
+      else bolt = null; }
+    g.globalAlpha = 1;
+  }
+  let last = performance.now(), visivel = true;
+  new IntersectionObserver(e => { visivel = e[0].isIntersecting; }).observe(arena);
+  function loop(now){ requestAnimationFrame(loop);
+    if (document.hidden || !visivel || !cfg || !fxOn()) { last = now; if (cfg && !fxOn()) g.clearRect(0, 0, W, H); return; }
+    const dt = now - last; if (dt < 33) return; last = now; frame(Math.min(2.5, dt / 33)); }
+  new ResizeObserver(() => { ajustar(); }).observe(arena);
+  ajustar(); aplicar(); requestAnimationFrame(loop);
 })();
 </script>
 </body>

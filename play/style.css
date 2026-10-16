@@ -6259,3 +6259,36 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 
 /* a pilula de estagio (.estFlut) flutua sobre o fim da area de tarefas: reserva espaco embaixo pra nao cobrir "Terminar dia" (Redmi Note 8) */
 .tasks::after{content:"";display:block;flex:none;height:52px}
+
+/* ======================================================================
+   CLIMA DO JOGO -- camadas sobre a Arena (ver bloco "CLIMA DO JOGO" no
+   fim do index.html). Tudo pointer-events:none; z-index 2 fica acima de
+   .fight (z1) e abaixo do overlay de tema bloqueado (z3). */
+.clima-tint,.clima-haze,.clima-glow,.clima-flash{position:absolute;inset:0;pointer-events:none;transition:background-color .9s,opacity .9s}
+.clima-tint{z-index:2;mix-blend-mode:multiply}
+.clima-glow{z-index:2;mix-blend-mode:soft-light}
+.clima-haze{z-index:2}
+#climaFx{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;z-index:2;pointer-events:none}
+.clima-flash{z-index:2;background:#e8f0ff;opacity:0;mix-blend-mode:screen}
+.clima-flash.go{animation:climaFlash .55s steps(1) 1}
+@keyframes climaFlash{0%{opacity:.8}12%{opacity:.05}22%{opacity:.6}36%{opacity:.12}60%{opacity:.04}100%{opacity:0}}
+.arena.clima-treme{animation:climaTreme .3s steps(2) 1}
+@keyframes climaTreme{0%{transform:translate(2px,-1px)}25%{transform:translate(-2px,1px)}50%{transform:translate(1px,1px)}75%{transform:translate(-1px,-1px)}100%{transform:none}}
+.clima-chip{position:absolute;z-index:2;left:50%;top:7px;transform:translateX(-50%);display:flex;gap:6px;align-items:center;background:rgba(10,10,10,.5);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:3px 8px 3px 6px;font-family:'Silkscreen',monospace;font-size:8px;letter-spacing:.06em;text-transform:uppercase;color:#f0f0f0;white-space:nowrap;pointer-events:none}
+.clima-chip svg{width:13px;height:13px;image-rendering:pixelated}
+.arena.clima-off #climaFx,.arena.clima-off .clima-flash{display:none}
+/* sprites protegidos da luminosidade do clima (areia/nevasca nao lavam) */
+.arena .fight{transition:filter .8s}
+.arena[data-clima="nublado"] .fight{filter:brightness(.93)}
+.arena[data-clima="chuva"] .fight{filter:brightness(.88)}
+.arena[data-clima="tempestade"] .fight{filter:brightness(.78)}
+.arena[data-clima-fx="gust"] .fight{filter:brightness(.93) contrast(1.12)}
+/* monstro raro/lendario: brilho pulsante + nome colorido */
+.mob-sprite[data-rar="1"]{--rc:#b583ff}.mob-sprite[data-rar="2"]{--rc:#ffc94a}
+.mob-sprite[data-rar="1"] .mobimg,.mob-sprite[data-rar="2"] .mobimg{animation:climaAura 1.8s ease-in-out infinite}
+@keyframes climaAura{0%,100%{filter:drop-shadow(0 0 2px var(--rc))}50%{filter:drop-shadow(0 0 9px var(--rc)) drop-shadow(0 0 3px var(--rc))}}
+#mobname[data-r="1"]{color:#c9a4ff}#mobname[data-r="2"]{color:#ffc94a}
+#mobname[data-r="1"]::after,#mobname[data-r="2"]::after{content:" \2726"}
+@media (prefers-reduced-motion:reduce){.mob-sprite[data-rar="1"] .mobimg,.mob-sprite[data-rar="2"] .mobimg{animation:none;filter:drop-shadow(0 0 5px var(--rc))}}
+/* desktop: o chip acompanha o zoom da arena */
+@media (min-width:900px) and (pointer:fine),(min-width:1100px){.clima-chip{zoom:1.35;top:10px}}

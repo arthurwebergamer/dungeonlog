@@ -6256,3 +6256,6 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 
 /* separador so pra leitores de tela (eyebrow + titulo do onboarding liam juntos: 'TASKSYour tasks') */
 .srSep{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+/* a pilula de estagio (.estFlut) flutua sobre o fim da area de tarefas: reserva espaco embaixo pra nao cobrir "Terminar dia" (Redmi Note 8) */
+.tasks::after{content:"";display:block;flex:none;height:52px}

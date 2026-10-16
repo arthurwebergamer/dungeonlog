@@ -3202,7 +3202,7 @@ function monstroPorDia(n){
   let pool = (typeof poolMonstrosFiltrado === 'function') ? poolMonstrosFiltrado() : [];
   if (!pool.length) pool = MONSTROS.map((m, i) => i);
   const c = CLIMAS_JOGO[climaDoDiaN(n)], x = _hash01(n, 2);
-  let r = x < c.leg / 100 ? 2 : x < (c.leg + c.raro) / 100 ? 1 : 0;
+  let r = (window.__raridadeForcada != null) ? window.__raridadeForcada : (x < c.leg / 100 ? 2 : x < (c.leg + c.raro) / 100 ? 1 : 0);   // __raridadeForcada: so dev
   let cand = pool.filter(i => raridadeMonstro(MONSTROS[i]) === r);
   while (!cand.length && r > 0){ r--; cand = pool.filter(i => raridadeMonstro(MONSTROS[i]) === r); }
   if (!cand.length) cand = pool;
@@ -19251,6 +19251,28 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
       document.body.appendChild(b);
     };
     mk();
+    /* botoes dev do CLIMA: cicla clima / bioma (so visual) / raridade do monstro e dispara relampago */
+    const mkClima = () => {
+      if (document.getElementById('devclima')) return;
+      const box = document.createElement('div'); box.id = 'devclima';
+      box.style.cssText = "position:fixed;bottom:calc(104px + env(safe-area-inset-bottom));left:8px;z-index:50;display:flex;flex-direction:column;gap:4px;align-items:flex-start";
+      const CL = [null, 'sol', 'nublado', 'chuva', 'tempestade'], BI = [null, 'padrao', 'deserto', 'floresta', 'montanhas'], RA = [null, 0, 1, 2], RN = ['comum', 'raro', 'lendario'];
+      const st = { c:0, b:0, r:0 };
+      const aplicar = () => {
+        window.__climaForcado = CL[st.c] || undefined; window.__climaBioma = BI[st.b] || undefined; window.__raridadeForcada = RA[st.r] == null ? undefined : RA[st.r];
+        if (typeof window.climaRecalcular === 'function') window.climaRecalcular();
+        render();
+      };
+      const btn = (txt, fn) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = txt;
+        b.style.cssText = "background:rgba(29,34,43,.9);color:#9aa;border:1px dashed #555;border-radius:6px;padding:4px 8px;font-size:11px";
+        b.onclick = () => fn(b); box.appendChild(b); return b; };
+      const bC = btn('clima: auto', b => { st.c = (st.c + 1) % CL.length; b.textContent = 'clima: ' + (CL[st.c] || 'auto'); aplicar(); });
+      btn('bioma: auto', b => { st.b = (st.b + 1) % BI.length; b.textContent = 'bioma: ' + (BI[st.b] || 'auto'); aplicar(); });
+      btn('monstro: auto', b => { st.r = (st.r + 1) % RA.length; b.textContent = 'monstro: ' + (RA[st.r] == null ? 'auto' : RN[RA[st.r]]); aplicar(); });
+      btn('raio', () => { if (typeof window.climaRelampago === 'function') window.climaRelampago(); });
+      document.body.appendChild(box);
+    };
+    mkClima();
   } catch(e){}
 })();
 </script>
@@ -19329,7 +19351,7 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
       if (d < 1) { const dens = Math.pow(1 - d, .7); if (dens * 16 > BAY[y & 3][x & 3]) { c.fillStyle = 'rgba(' + cor + ',' + (.16 + dens * .2).toFixed(2) + ')'; c.fillRect(x, y, 1, 1); } }
     }
   }
-  function biomaAtual(){ try { return temaArenaAtual().id; } catch(e){ return 'padrao'; } }
+  function biomaAtual(){ if (window.__climaBioma) return window.__climaBioma; try { return temaArenaAtual().id; } catch(e){ return 'padrao'; } }
   function ajustar(){
     const r = arena.getBoundingClientRect(); if (!r.width) return;
     W = Math.max(60, Math.round(r.width / 2)); H = Math.max(40, Math.round(r.height / 2));

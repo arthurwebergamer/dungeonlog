@@ -9264,8 +9264,12 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 
     const novo = texto.value.trim();
     const en = idiomaApp() === 'en';
-    if (!novo){ aviso(en ? 'TITLE CAN\'T BE EMPTY' : 'O TÍTULO NÃO PODE FICAR VAZIO'); return; }
-    if (modo === 'repete' && dias.length === 0){ aviso(en ? 'CHOOSE THE DAYS' : 'ESCOLHA OS DIAS'); return; }
+    // aviso() esta mudo (TOASTS_DESATIVADOS): feedback proprio -- dica + sacudida + som
+    const dicaEd = (() => { let d = document.getElementById('edSaveHint'); if (!d){ d = document.createElement('div'); d.id = 'edSaveHint'; d.className = 'saveHint'; const bs = document.getElementById('edSalvar'); bs.parentNode.insertBefore(d, bs); } return d; })();
+    const falhaEd = (msg, el) => { dicaEd.textContent = msg; dicaEd.classList.add('on'); if (el){ el.classList.remove('sacode'); void el.offsetWidth; el.classList.add('sacode'); } window.tocarSom?.('semMoedas'); };
+    dicaEd.classList.remove('on');
+    if (!novo){ falhaEd(en ? 'Give your task a name' : 'Dê um nome à tarefa', texto); texto.focus(); return; }
+    if (modo === 'repete' && dias.length === 0){ falhaEd(en ? 'Pick at least one day' : 'Escolha pelo menos um dia', document.getElementById('edDias') || null); return; }
 
     t.texto = novo;
     t.dif   = dif;

@@ -6484,3 +6484,25 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 .istats .irow.fVelho{opacity:.5}
 .istats .irow.dim b.neg{color:var(--perigo)}
 .istats .irow.forjaRev{animation:forjaRev .45s ease-out both}
+
+/* cena da forja: item sobre a bigorna, golpes de martelo, fagulhas quadradas (pixel) */
+.cena{position:relative;display:flex;flex-direction:column;align-items:center;padding-top:6px}
+.cena .ibox{width:76px;height:76px;transition:border-color .15s,box-shadow .15s}
+.bigorna{width:104px;height:12px;margin-top:6px;background:var(--line);border-radius:3px 3px 6px 6px;position:relative}
+.bigorna::after{content:'';position:absolute;left:30px;right:30px;bottom:-9px;height:9px;background:var(--line);border-radius:0 0 4px 4px}
+.cena[data-calor="1"] .ibox{border-color:#B8561A;box-shadow:0 0 0 1px #B8561A}
+.cena[data-calor="2"] .ibox{border-color:#E8761F;box-shadow:0 0 0 2px #E8761F}
+.cena[data-calor="3"] .ibox{border-color:#FFB020;box-shadow:0 0 0 3px #FFB020}
+@keyframes forjaGolpe{0%{transform:translate(0,-12px) scale(1.06)}22%{transform:translate(0,3px) scale(.92,1.06)}34%{transform:translate(-3px,0)}46%{transform:translate(3px,0)}58%{transform:translate(-2px,0)}100%{transform:none}}
+.cena.bate{animation:forjaGolpe .36s steps(7,end)}
+.fg{position:absolute;left:50%;top:46px;width:5px;height:5px;background:#FFB020;pointer-events:none;animation:fagulha .6s steps(6,end) forwards}
+@keyframes fagulha{0%{transform:translate(0,0);opacity:1}100%{transform:translate(var(--x),calc(var(--y) + 34px));opacity:0}}
+.fSlots{display:flex;justify-content:center;gap:10px;padding:6px 0 4px}
+.fSlots i{width:18px;height:18px;border:1.5px dashed var(--dim);border-radius:3px;transform:rotate(45deg) scale(.8)}
+.fSlots i.on{border:0;background:#7FE0D6;border-radius:3px}
+@keyframes gemaVoa{0%{transform:rotate(45deg) translate(0,0);opacity:1}100%{transform:rotate(45deg) translate(var(--dx),var(--dy)) scale(.3);opacity:0}}
+.fSlots i.voa{animation:gemaVoa .45s cubic-bezier(.5,0,.8,.4) forwards}
+.fSlotsTx{justify-content:center}
+@keyframes carimbo{0%{transform:scale(2);opacity:0}60%{transform:scale(.94);opacity:1}100%{transform:scale(1)}}
+.istats .irow.forjaRev{animation:carimbo .4s ease-out both}
+@media (prefers-reduced-motion:reduce){.cena.bate,.fSlots i.voa,.istats .irow.forjaRev{animation:none}.fg{display:none}}

@@ -6447,3 +6447,5 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 /* runa do afixo no canto da celula do inventario */
 .cel .rune{position:absolute;right:5px;top:5px;width:8px;height:11px;color:var(--afx-gan);opacity:.95;pointer-events:none}
 .cel .rune.a-est{color:var(--afx-est)}.cel .rune.a-sor{color:var(--afx-sor)}.cel .rune.a-bar{color:var(--afx-bar)}.cel .rune.a-bau{color:var(--afx-bau)}.cel .rune.a-abu{color:var(--afx-abu)}.cel .rune.a-tes{color:var(--afx-tes)}
+
+.cel .rune{width:11px;height:11px;right:5px;top:5px}

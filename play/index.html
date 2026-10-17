@@ -133,7 +133,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=229">
+<link rel="stylesheet" href="style.css?v=230">
 <script>
 // A abertura so sai quando a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado; sair antes (assim que o CSS chega)
 // mostrava um flash cinza vazio e depois a tela de login por baixo, antes do carrossel (visto em video de teste). Teto de seguranca: 15s.
@@ -3069,11 +3069,16 @@ function restaurarVariantes(lista){
   limparVariantes();
   if (Array.isArray(lista)) lista.forEach(v => { if (Array.isArray(v) && ITENS[v[0]] && AFIXOS[v[1]]) variante(v[0], [v[1], v[2]], v[3]); });
 }
-const AFX_RUNA = {
-  gan:'M3 1V13M3 4L8 1M3 7L8 4', est:'M3 1V13M3 2L8 5M3 6L8 9', sor:'M7 1L3 6L7 8L3 13', bar:'M1 2L9 12M9 2L1 12',
-  bau:'M8 2L3 7L8 12', abu:'M5 1L9 5L5 9L1 5ZM2 13L5 9L8 13', tes:'M2 2V12M8 2V12M2 2L8 12M8 2L2 12'
+const AFX_RUNA = {   // icones 10x10: moeda, estrela, trevo, etiqueta, cadeado, bau, gema
+  gan:'<circle cx="5" cy="5" r="4.2"/><path d="M5 2.6v4.8M3.6 4h2.2a.9.9 0 0 1 0 1.8H3.6" fill="none" stroke="#000" stroke-opacity=".45" stroke-width=".9"/>',
+  est:'<path d="M5 .6l1.3 2.9 3.1.3-2.3 2.1.7 3.1L5 7.4 2.2 9l.7-3.1L.6 3.8l3.1-.3z"/>',
+  sor:'<circle cx="3.4" cy="3.4" r="2.1"/><circle cx="6.6" cy="3.4" r="2.1"/><circle cx="3.4" cy="6.4" r="2.1"/><circle cx="6.6" cy="6.4" r="2.1"/><path d="M5 6.5L6.6 9.6" stroke="currentColor" stroke-width="1" fill="none" stroke-linecap="round"/>',
+  bar:'<path d="M1 1h4.4l3.6 3.6a1 1 0 0 1 0 1.4L6 9a1 1 0 0 1-1.4 0L1 5.4z"/><circle cx="3" cy="3" r=".9" fill="#000" fill-opacity=".5"/>',
+  bau:'<rect x="1.6" y="4.6" width="6.8" height="4.8" rx=".9"/><path d="M3.2 4.6V3.3a1.8 1.8 0 0 1 3.6 0v1.3" fill="none" stroke="currentColor" stroke-width="1.1"/>',
+  abu:'<path d="M1 4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v1H1z"/><rect x="1" y="5.4" width="8" height="3.8" rx=".6"/><rect x="4.2" y="4.6" width="1.6" height="1.8" fill="#000" fill-opacity=".45"/>',
+  tes:'<path d="M2.4 1h5.2L9.6 3.8 5 9.4.4 3.8z"/><path d="M.4 3.8h9.2M3.6 1L5 3.8 6.4 1M5 3.8v5.6" fill="none" stroke="#000" stroke-opacity=".35" stroke-width=".6"/>'
 };
-function runaSVG(k){ return '<svg class="rune a-' + k + '" viewBox="0 0 10 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="' + AFX_RUNA[k] + '"/></svg>'; }
+function runaSVG(k){ return '<svg class="rune a-' + k + '" viewBox="0 0 10 10" fill="currentColor">' + AFX_RUNA[k] + '</svg>'; }
 const AFX_SUFIXO = {
   gan:['do Ganancioso','of the Greedy'], est:['do Estudioso','of the Scholar'], sor:['do Sortudo','of the Lucky'], bar:['do Barganhista','of the Haggler'],
   bau:['do Caçador de Baús','of the Chest Hunter'], abu:['da Abundância','of Plenty'], tes:['do Garimpeiro','of the Prospector']

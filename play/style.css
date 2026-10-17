@@ -6543,3 +6543,12 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 .fSlots i.pxi.on{background-image:url("sheet.png?v=1");background-repeat:no-repeat}
 .cena[data-calor] .ibox{box-shadow:none;border-color:transparent}
 .cena .forjaPeca{bottom:72px}
+/* escala inteira (2x dos sprites 32px) em tudo da cena: sem pixel esticado */
+.cena .tocha{top:14px}
+.cena .tocha.t1{left:12px}.cena .tocha.t2{right:12px}
+.cena .ibox{width:64px;height:64px}
+.cena .forjaPeca{width:64px;height:64px;margin-left:-32px;bottom:50px}
+.cena .bigorna{width:88px;height:48px;margin-left:-44px;bottom:8px}
+.cena .martelo{margin-left:34px;bottom:56px}
+.fSlots i.pxi{width:32px;height:32px}
+.fg{top:100px}

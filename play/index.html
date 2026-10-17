@@ -133,7 +133,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=252">
+<link rel="stylesheet" href="style.css?v=253">
 <script>
 // A abertura so sai quando a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado; sair antes (assim que o CSS chega)
 // mostrava um flash cinza vazio e depois a tela de login por baixo, antes do carrossel (visto em video de teste). Teto de seguranca: 15s.
@@ -8122,25 +8122,29 @@ function trocarVariante(idAtual, idNovo){
   darItem(idNovo, 1);
   if (eraEquipado) eqs.forEach(k => { equipado[k] = idNovo; });
 }
-const BIGORNA_PX = [
-  '..oooooooooooooooooooo',
-  '.ohhhhhhhhhhhhhhhhhhho',
-  'ohhbbbbbbbbbbbbbbbbbbo',
-  '.obbbbbbbbbbbbbbbbbsso',
-  '..ooobbbbbbbbbbbbsso..',
-  '.....obbbbbbbbbsso....',
-  '.....obbbbbbbbbsso....',
-  '.....obbbbbbbbbsso....',
-  '....ooobbbbbbbsooo....',
-  '...obbbbbbbbbbbbsso...',
-  '...obbbbbbbbbbbbsso...',
-  '...oooooooooooooooo...'
-];
+/* bigorna em pixel art: gerada em grade 44x24, desenhada a 2px por pixel -- mesma escala 2x dos sprites 32px da sheet */
 function bigornaSVG(){
-  const cor = {o: '#14101F', h: '#9AA0B4', b: '#646A7E', s: '#434859'};
+  const W = 44, H = 24, g = Array.from({length: H}, () => Array(W).fill(''));
+  const fill = (r0, r1, x0, x1) => { for (let r = r0; r <= r1; r++) for (let x = (typeof x0 === 'function' ? x0(r) : x0); x <= (typeof x1 === 'function' ? x1(r) : x1); x++) g[r][x] = 'b'; };
+  fill(2, 7, r => [0, 2, 4, 6, 9, 11][r - 2], r => r < 7 ? 43 : 38);   // mesa + corno
+  fill(8, 15, 14, 29);                                                   // cintura
+  fill(16, 21, 8, 35);                                                   // pe
+  fill(22, 22, 6, 37);                                                   // base
+  const solid = (r, x) => r >= 0 && r < H && x >= 0 && x < W && g[r][x];
+  for (let r = 0; r < H; r++) for (let x = 0; x < W; x++){
+    if (!g[r][x]) continue;
+    if (!solid(r - 1, x) && r < 8) g[r][x] = 'h';                        // brilho no topo
+    else if (!solid(r, x + 1) || !solid(r, x + 2) || (!solid(r, x + 3) && r > 7)) g[r][x] = 'm';
+    if (!solid(r, x + 1) && r > 3) g[r][x] = 's';
+    if (!solid(r + 1, x) && r > 6) g[r][x] = 's';
+  }
+  const base = g.map(l => l.slice()), sd = (r, x) => r >= 0 && r < H && x >= 0 && x < W && base[r][x];
+  for (let r = 0; r < H; r++) for (let x = 0; x < W; x++) if (!base[r][x] && (sd(r - 1, x) || sd(r + 1, x) || sd(r, x - 1) || sd(r, x + 1))) g[r][x] = 'o';
+  g[3][36] = 'o'; g[3][37] = 'o'; g[12][21] = 'm'; g[12][22] = 'm';
+  const cor = {o: '#1B1626', h: '#B4B9C8', b: '#808798', m: '#5E6477', s: '#434859'};
   let r = '';
-  BIGORNA_PX.forEach((ln, y) => { for (let x = 0; x < ln.length; x++){ const k = ln[x]; if (k !== '.') r += '<rect x="' + x + '" y="' + y + '" width="1" height="1" fill="' + cor[k] + '"/>'; } });
-  return '<svg class="bigorna" viewBox="0 0 22 12" shape-rendering="crispEdges" aria-hidden="true">' + r + '</svg>';
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (g[y][x]) r += '<rect x="' + x + '" y="' + y + '" width="1" height="1" fill="' + cor[g[y][x]] + '"/>';
+  return '<svg class="bigorna" viewBox="0 0 ' + W + ' ' + H + '" shape-rendering="crispEdges" aria-hidden="true">' + r + '</svg>';
 }
 function faiscas(cena, n){
   if (!cena) return;
@@ -8188,12 +8192,12 @@ function abrirForja(id, novo){
   } else {
     corpo = '<div class="isep">' + (en ? 'Current enchantment' : 'Encantamento atual') + '</div>' + lin(it.afx) +
       '<div class="isep"></div>' +
-      '<div class="fSlots">' + Array.from({length: custo}, (_, k) => '<i class="pxi ' + (k < tem ? 'on' : '') + '" style="' + estiloSprite(tsp, 30) + '"></i>').join('') + '</div>' +
+      '<div class="fSlots">' + Array.from({length: custo}, (_, k) => '<i class="pxi ' + (k < tem ? 'on' : '') + '" style="' + estiloSprite(tsp, 32) + '"></i>').join('') + '</div>' +
       '<div class="irow dim fSlotsTx"><span>' + (en ? 'Cost' : 'Custo') + ' ' + custo + ' ' + (en ? (custo > 1 ? 'treasures' : 'treasure') : (custo > 1 ? 'tesouros' : 'tesouro')) + '</span><span>·</span><span>' + (en ? 'You have' : 'Você tem') + ' <b class="' + (tem >= custo ? '' : 'neg') + '">' + tem + '</b></span></div>';
     acoes = '<button class="forjaBtn' + (tem >= custo ? '' : ' semTes') + '" data-a="fgo">' + (en ? 'Forge' : 'Forjar') + '</button><button data-a="fvolta">' + (en ? 'Back' : 'Voltar') + '</button>';
   }
   ficha.innerHTML =
-    '<div class="ihead eqh"><div class="cena"><div class="parede"></div><div class="tocha t1 pxi" style="' + estiloSprite(116, 44) + '"></div><div class="tocha t2 pxi" style="' + estiloSprite(116, 44) + '"></div><div class="forjaPeca"><div class="ibox">' + spriteHTML(it.sp, 48) + '</div></div>' + bigornaSVG() + '<div class="martelo pxi" style="' + estiloSprite(121, 64) + '"></div></div><div><div class="iname" style="color:' + COR_RAR[it.rar] + '">' + nomeComAfixo(it, en) + '</div>' +
+    '<div class="ihead eqh"><div class="cena"><div class="parede"></div><div class="tocha t1 pxi" style="' + estiloSprite(116, 64) + '"></div><div class="tocha t2 pxi" style="' + estiloSprite(116, 64) + '"></div><div class="forjaPeca"><div class="ibox">' + spriteHTML(it.sp, 64) + '</div></div>' + bigornaSVG() + '<div class="martelo pxi" style="' + estiloSprite(121, 64) + '"></div></div><div><div class="iname" style="color:' + COR_RAR[it.rar] + '">' + nomeComAfixo(it, en) + '</div>' +
     '<div class="imeta tag" style="color:' + COR_RAR[it.rar] + '">' + (en ? 'Forge' : 'Forja') + ' · ' + RARIDADES[it.rar] + '</div></div></div>' +
     '<div class="ibonus istats">' + corpo + '</div><div class="iacts">' + acoes + '</div>';
   if (novo){ faiscas(ficha.querySelector('.cena'), 12); window.tocarSom?.('chegadaRecompensa'); }

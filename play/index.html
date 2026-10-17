@@ -133,7 +133,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=205">
+<link rel="stylesheet" href="style.css?v=206">
 <script>
 // A abertura so sai quando a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado; sair antes (assim que o CSS chega)
 // mostrava um flash cinza vazio e depois a tela de login por baixo, antes do carrossel (visto em video de teste). Teto de seguranca: 15s.
@@ -3025,8 +3025,74 @@ function _limparCelebracaoDiaMostrada(){
 }
 
 // --- inventario ---
+/* ---------- AFIXOS (variantes de equipamento) ----------
+   Cada combinacao (item base + afixo + valor + rerrolagens) vira uma linha
+   propria no fim de ITENS: [..base.., afx:[tipo,valor], rer, baseId].
+   Assim inventario/equipado/venda continuam trabalhando so com ids.
+   As variantes sao salvas no save ("variantes") e reconstruidas no carregar. */
+const BASE_N = ITENS.length;
+const AFIXOS = {
+  gan: {pt:'Ganancioso', en:'Greedy',    letra:'G', faixa:[[1,2],[1,3],[2,4],[3,6],[5,8]]},
+  est: {pt:'Estudioso',  en:'Scholarly', letra:'E', faixa:[[1,2],[1,3],[2,4],[3,6],[5,8]]},
+  sor: {pt:'Sortudo',    en:'Lucky',     letra:'S', faixa:[[1,1],[1,1],[1,2],[2,3],[2,4]]},
+  bar: {pt:'Barganhista',en:'Haggler',   letra:'B', faixa:[[1,1],[1,2],[2,3],[2,4],[3,5]]}
+};
+const AFX_CHAVES = ['gan','est','sor','bar'];
+const AFX_TETO = {gan:25, est:25, sor:10, bar:10};   // soma dos slots (% de afixo)
+const _varMapa = {};
+function afxRolar(rar, excluir){
+  let ch = AFX_CHAVES.filter(k => k !== excluir);
+  const k = ch[Math.floor(Math.random()*ch.length)];
+  const f = AFIXOS[k].faixa[Math.max(0, Math.min(4, rar))];
+  return [k, f[0] + Math.floor(Math.random()*(f[1]-f[0]+1))];
+}
+function variante(baseId, afx, rer){
+  rer = rer || 0;
+  const key = baseId+'|'+afx[0]+'|'+afx[1]+'|'+rer;
+  if (_varMapa[key] !== undefined) return _varMapa[key];
+  const row = ITENS[baseId].slice();
+  while (row.length < 10) row.push(undefined);
+  row[10] = [afx[0], afx[1]]; row[11] = rer; row[12] = baseId;
+  ITENS.push(row);
+  return (_varMapa[key] = ITENS.length - 1);
+}
+function ehEquipBase(id){ return id >= 0 && id < BASE_N && ITENS[id] && !ITENS[id][8] && ['arma','armadura','elmo','escudo','acess'].includes(ITENS[id][2]); }
+function comAfixo(id){ return ehEquipBase(id) ? variante(id, afxRolar(ITENS[id][3]), 0) : id; }
+function baseDe(id){ const a = ITENS[id]; return (a && a[12] != null) ? a[12] : id; }
+function limparVariantes(){ ITENS.length = BASE_N; Object.keys(_varMapa).forEach(k => delete _varMapa[k]); }
+function exportarVariantes(){ return ITENS.slice(BASE_N).map(r => [r[12], r[10][0], r[10][1], r[11]]); }
+function restaurarVariantes(lista){
+  limparVariantes();
+  if (Array.isArray(lista)) lista.forEach(v => { if (Array.isArray(v) && ITENS[v[0]] && AFIXOS[v[1]]) variante(v[0], [v[1], v[2]], v[3]); });
+}
+function afixoTexto(it, en){
+  if (!it.afx) return '';
+  const A = AFIXOS[it.afx[0]], v = it.afx[1];
+  const nome = en ? A.en : A.pt;
+  const t = {gan: en ? 'Coins +'+v+'%' : 'Moedas +'+v+'%', est: 'XP +'+v+'%',
+             sor: en ? 'Luck +'+v+'% (chests)' : 'Sorte +'+v+'% (baús)', bar: en ? 'Shop -'+v+'%' : 'Loja -'+v+'%'}[it.afx[0]];
+  return nome + ' · ' + t;
+}
+
 let inventario = [];   // [{id:indiceNoCatalogo, q:quantidade}]
 let equipado = {arma:null, armadura:null, elmo:null, escudo:null, acess:null};
+
+function migrarAfixos(){
+  const SL = ['arma','armadura','elmo','escudo','acess'];
+  const novo = [];
+  const mapaEq = {};
+  inventario.forEach(sl => {
+    if (!ehEquipBase(sl.id)){ novo.push(sl); return; }
+    for (let k = 0; k < sl.q; k++){
+      const v = comAfixo(sl.id);
+      if (mapaEq[sl.id] === undefined) mapaEq[sl.id] = v;
+      const e = novo.find(z => z.id === v);
+      if (e) e.q++; else novo.push({id: v, q: 1});
+    }
+  });
+  inventario = novo;
+  SL.forEach(k => { const e = equipado[k]; if (e != null && mapaEq[e] !== undefined) equipado[k] = mapaEq[e]; });
+}
 
 const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
 
@@ -4911,6 +4977,8 @@ function salvar(){
       versao: 3,
       tarefas: tarefas,
       inventario: inventario,
+      variantes: exportarVariantes(),
+      afixos: 1,
       equipado: equipado,
       xpTotal: xpTotal,
       moedas: moedas,
@@ -4933,9 +5001,10 @@ window.EH_DEV = /(^|\.)questlog-911\.pages\.dev$/.test(location.hostname) && loc
 function devLiberarTodosItens(){
   if (!window.EH_DEV) return;
   const idGrim = ITENS.findIndex(a => a[1] === 'Grimório');
-  ITENS.forEach((it, id) => {
+  ITENS.slice(0, BASE_N).forEach((it, id) => {
     if (!it || it[8] || it[2] === 'tesouro' || id === idGrim) return;
-    if (!inventario.some(s => s.id === id)) inventario.push({id, q: (it[2] === 'cons' || it[2] === 'chave') ? 5 : 1});
+    if (['arma','armadura','elmo','escudo','acess'].includes(it[2])) { if (!inventario.some(s => baseDe(s.id) === id)) inventario.push({id: comAfixo(id), q: 1}); }
+    else if (!inventario.some(s => s.id === id)) inventario.push({id, q: (it[2] === 'cons' || it[2] === 'chave') ? 5 : 1});
   });
 }
 window.devLiberarTodosItens = devLiberarTodosItens;
@@ -4958,8 +5027,10 @@ function _carregarBase(){
     nomeHeroi = nomeHeroiNorm(d.nomeHeroi);
     heroiEscolhido = Number(d.heroi) || 0;
     if (typeof d.semente === 'number') semente = d.semente;
+    restaurarVariantes(d.variantes);
     inventario = Array.isArray(d.inventario) ? d.inventario : [];
     if (d.equipado && typeof d.equipado === 'object') equipado = Object.assign(equipado, d.equipado);
+    if (!d.afixos) migrarAfixos();   // contas antigas: cada equipamento ganha um afixo, uma unica vez
     // LIMPEZA: itens removidos do catalogo (marcados morto em assets.js, ex.: Boné de Couro, Gorro, Cornuthaum)
     // saem do inventario e do equipamento de quem ja os tinha.
     const morto = id => !ITENS[id] || !!ITENS[id][8];
@@ -4995,6 +5066,7 @@ function resetarEstadoParaPadrao(){
   derrotadoEm = null;
   nomeHeroi = nomePadraoHeroi();
   heroiEscolhido = 0;
+  limparVariantes();
   inventario = [];
   equipado = {arma:null, armadura:null, elmo:null, escudo:null, acess:null};
 }
@@ -7488,8 +7560,9 @@ function item(id){
   let lang = 'pt';
   try { lang = localStorage.getItem('questlog.idioma.v1') || 'pt'; } catch(e){}
   const usarEn = lang === 'en' && typeof a[9] === 'string';
-  return {id, sp:a[0], nome: usarEn ? a[9] : a[1], tipo:a[2], rar:a[3], val:a[4], m:a[5], x:a[6], h:a[7]||0, morto:!!a[8]};
+  return {id, sp:a[0], nome: usarEn ? a[9] : a[1], tipo:a[2], rar:a[3], val:a[4], m:a[5], x:a[6], h:a[7]||0, morto:!!a[8], afx:a[10]||null, rer:a[11]||0, base:(a[12]!=null?a[12]:id)};
 }
+
 
 function estiloSprite(sp, s){
   const c = sp % SHEET_COLS, r = Math.floor(sp / SHEET_COLS);
@@ -7509,6 +7582,10 @@ function acharSlot(id){ return inventario.findIndex(s => s.id === id); }
 
 function darItem(id, q){
   q = q || 1;
+  if (ehEquipBase(id)){   // equipamento base ganha afixo proprio (1 sorteio por copia)
+    for (let k = 0; k < q; k++) darItem(comAfixo(id), 1);
+    return;
+  }
   const i = acharSlot(id);
   if (i >= 0) inventario[i].q += q;
   else inventario.push({id, q});
@@ -7558,8 +7635,21 @@ function bonusEquip(){
     if (id === null || id === undefined || !ITENS[id]) return;
     const b = bonusItem(item(id)); m += b.m; x += b.x;
   });
+  m += afixoSoma('gan'); x += afixoSoma('est');
   return {m, x};
 }
+// soma dos afixos equipados de um tipo, com teto proprio (AFX_TETO)
+function afixoSoma(k){
+  let t = 0;
+  SLOTS.forEach(s => {
+    const id = equipado[s];
+    if (id === null || id === undefined || !ITENS[id]) return;
+    const a = ITENS[id][10];
+    if (a && a[0] === k) t += a[1];
+  });
+  return Math.min(AFX_TETO[k], t);
+}
+window.afixoSoma = afixoSoma;
 
 // usados pelo script principal
 function multMoedas(){ return 1 + bonusEquip().m / 100; }
@@ -7629,9 +7719,9 @@ function sortearItem(sorte, permitirLendario){
   const total = pesos.reduce((a,b)=>a+b,0);
   let r = Math.random() * total, rar = 0;
   for (let i=0;i<pesos.length;i++){ r -= pesos[i]; if (r <= 0){ rar = i; break; } }
-  let pool = ITENS.map((_,i)=>i).filter(i => ITENS[i][3] === rar && !ITENS[i][8]);
-  if (!pool.length) pool = ITENS.map((_,i)=>i).filter(i => !ITENS[i][8] && (permitirLendario || ITENS[i][3] < 4));
-  return pool[Math.floor(Math.random()*pool.length)];
+  let pool = ITENS.map((_,i)=>i).filter(i => i < BASE_N && ITENS[i][3] === rar && !ITENS[i][8]);
+  if (!pool.length) pool = ITENS.map((_,i)=>i).filter(i => i < BASE_N && !ITENS[i][8] && (permitirLendario || ITENS[i][3] < 4));
+  return comAfixo(pool[Math.floor(Math.random()*pool.length)]);
 }
 
 // quantidade de itens e bonus de sorte do bau conforme o estagio atual
@@ -7674,8 +7764,8 @@ function sortearGanhos(nTarefas, bonusSorte, rarMinima){
     let piorIdx = 0;
     for (let i=1;i<ids.length;i++){ if (ITENS[ids[i]][3] < ITENS[ids[piorIdx]][3]) piorIdx = i; }
     if (ITENS[ids[piorIdx]][3] < rarMinima){
-      const pool = ITENS.map((_,i)=>i).filter(i => ITENS[i][3] >= rarMinima && !ITENS[i][8]);
-      if (pool.length) ids[piorIdx] = pool[Math.floor(Math.random()*pool.length)];
+      const pool = ITENS.map((_,i)=>i).filter(i => i < BASE_N && ITENS[i][3] >= rarMinima && !ITENS[i][8]);
+      if (pool.length) ids[piorIdx] = comAfixo(pool[Math.floor(Math.random()*pool.length)]);
     }
   }
   return ids;
@@ -7814,6 +7904,7 @@ function renderInventario(){
     c.className = 'cel r' + it.rar;
     c.innerHTML = spriteHTML(it.sp, 32)
       + (s.q > 1 ? '<span class="qtd">'+s.q+'</span>' : '')
+      + (it.afx ? '<span class="afx a-' + it.afx[0] + '">' + AFIXOS[it.afx[0]].letra + '</span>' : '')
       + (SLOTS.some(k => equipado[k] === s.id) ? '<span class="eq"></span>' : '');
     c.onclick = () => { fichaOrigemEl = c; abrirFicha(s.id); };
     frag.appendChild(c);
@@ -7864,6 +7955,7 @@ function abrirFicha(id){
   } else if (SLOTS.includes(it.tipo)){
     if (bi.x) bonus += '<span>XP '+(bi.x>0?'+':'')+bi.x+'%</span>';
     if (bi.m) bonus += '<span>' + (en ? 'Coins ' : 'Moedas ') + (bi.m>0?'+':'')+bi.m+'%</span>';
+    if (it.afx) bonus += '<span class="afxTag a-'+it.afx[0]+'">' + afixoTexto(it, en) + '</span>';
   }
   // pedido do usuario: chaves normais agora sao vendaveis -- so o
   // Grimorio (val:0, acao propria "Abrir") continua fora do preco/botao
@@ -7875,6 +7967,7 @@ function abrirFicha(id){
   let acoes = '';
   if (EQUIPAVEL(id)) acoes += '<button class="prim" data-a="eq">'+(estaEquipado ? (en ? 'Unequip' : 'Desequipar') : (en ? 'Equip' : 'Equipar'))+'</button>';
   if (it.tipo === 'cons') acoes += '<button class="prim" data-a="usar">' + (en ? 'Use' : 'Usar') + '</button>';
+  if (it.afx) acoes += '<button data-a="forja">' + (en ? 'Forge' : 'Forjar') + '</button>';
   if (it.tipo === 'chave' && id === ID_GRIMORIO_INV) acoes += '<button class="prim" data-a="abrir">' + (en ? 'Open' : 'Abrir') + '</button>';
   if (!(it.tipo === 'chave' && id === ID_GRIMORIO_INV)) acoes += '<button data-a="vender">' + (en ? 'Sell' : 'Vender') + '</button>';
 
@@ -7892,6 +7985,7 @@ function abrirFicha(id){
       const a = b.dataset.a;
       if (a === 'eq') equipar(id);
       else if (a === 'usar') usarItem(id, fichaOrigemEl || ficha.querySelector('.ibox') || b);
+      else if (a === 'forja') abrirForja(id);
       // pedido do usuario: vender direto da ficha do inventario nao pede
       // confirmacao -- abrir a ficha ja e o passo deliberado, e o botao
       // "Vender" (ibox, estilo escuro) abrindo uma folha com OUTRO botao
@@ -7909,6 +8003,66 @@ function abrirFicha(id){
 
   fichaBG.classList.add('on');
   requestAnimationFrame(() => ficha.classList.add('on'));
+}
+
+/* ---------- forja de afixos (gasta tesouros) ---------- */
+function tesourosDisponiveis(){ return inventario.filter(s => item(s.id).tipo === 'tesouro').reduce((a, s) => a + s.q, 0); }
+function gastarTesouros(n){   // gasta primeiro os de menor valor
+  while (n > 0){
+    const sl = inventario.filter(s => item(s.id).tipo === 'tesouro').sort((a, z) => item(a.id).val - item(z.id).val)[0];
+    if (!sl) return;
+    tirarItem(sl.id, 1); n--;
+  }
+}
+function trocarVariante(idAtual, idNovo){
+  const eqs = SLOTS.filter(k => equipado[k] === idAtual);
+  const q0 = (inventario[acharSlot(idAtual)] || {q: 0}).q;
+  const eraEquipado = eqs.length > 0;
+  // tirarItem desequipa quando a ultima copia sai; guardamos e reequipamos depois
+  tirarItem(idAtual, 1);
+  darItem(idNovo, 1);
+  if (eraEquipado) eqs.forEach(k => { equipado[k] = idNovo; });
+}
+function abrirForja(id, novo){
+  const it = item(id), en = idiomaApp() === 'en';
+  const custo = 3 + it.rer, tem = tesourosDisponiveis();
+  const linha = (rot, afx) => '<div class="forjaLn"><small>' + rot + '</small><b class="afxTag a-' + afx[0] + '">' + afixoTexto({afx}, en) + '</b></div>';
+  let corpo, acoes;
+  if (novo){
+    corpo = linha(en ? 'Current' : 'Atual', it.afx) + linha(en ? 'New' : 'Novo', novo);
+    acoes = '<button class="prim" data-a="fnovo">' + (en ? 'Keep new' : 'Ficar com o novo') + '</button><button data-a="fatual">' + (en ? 'Keep current' : 'Manter atual') + '</button>';
+  } else {
+    corpo = linha(en ? 'Current affix' : 'Afixo atual', it.afx) +
+      '<div class="forjaCusto">' + (en ? 'Cost: ' : 'Custo: ') + '<b>' + custo + '</b> ' + (en ? 'treasures' : 'tesouros') +
+      ' · ' + (en ? 'you have ' : 'você tem ') + '<b style="color:' + (tem >= custo ? 'var(--verde)' : 'var(--perigo)') + '">' + tem + '</b></div>' +
+      '<div class="forjaDica">' + (en ? 'Rerolls the affix only. The cost goes up by 1 each time you forge this item.' : 'Rerrola só o afixo. O custo sobe 1 a cada forja deste item.') + '</div>';
+    acoes = '<button class="prim" data-a="fgo"' + (tem >= custo ? '' : ' disabled') + '>' + (en ? 'Forge' : 'Forjar') + '</button><button data-a="fvolta">' + (en ? 'Back' : 'Voltar') + '</button>';
+  }
+  ficha.innerHTML =
+    '<div class="ihead"><div class="ibox">' + spriteHTML(it.sp, 44) + '</div><div><div class="iname">' + it.nome + '</div>' +
+    '<div class="imeta" style="color:' + COR_RAR[it.rar] + '">' + (en ? 'Forge' : 'Forja') + ' · ' + RARIDADES[it.rar] + '</div></div></div>' +
+    '<div class="ibonus forjaBox">' + corpo + '</div><div class="iacts">' + acoes + '</div>';
+  ficha.querySelectorAll('[data-a]').forEach(b => {
+    b.onclick = () => {
+      const a = b.dataset.a;
+      if (a === 'fvolta') abrirFicha(id);
+      else if (a === 'fgo'){
+        if (tesourosDisponiveis() < custo) return;
+        gastarTesouros(custo);
+        const nv = afxRolar(it.rar);
+        persistir(); renderInventario();
+        abrirForja(id, nv);
+      }
+      else if (a === 'fnovo' || a === 'fatual'){
+        const afx = a === 'fnovo' ? novo : it.afx;
+        const idNovo = variante(it.base, afx, it.rer + 1);
+        trocarVariante(id, idNovo);
+        persistir(); render(); renderInventario();
+        aviso(en ? 'FORGED' : 'FORJADO');
+        abrirFicha(idNovo);
+      }
+    };
+  });
 }
 
 function fecharFicha(){
@@ -8319,7 +8473,7 @@ function precoLoja(id, oferta){
   const margem = ITENS[id][2] === 'cons' ? ECO.lojaMargemConsumivel : ECO.lojaMargem;
   const base = ITENS[id][4] * margem * (oferta ? ECO.lojaDesconto : 1);
   // atributo Foco (Perfil > Atributos): desconto opcional, so se o modulo estiver carregado
-  const descFoco = (typeof window.descontoFoco === 'function') ? window.descontoFoco() : 0;
+  const descFoco = (typeof window.descontoLoja === 'function') ? window.descontoLoja() : ((typeof window.descontoFoco === 'function') ? window.descontoFoco() : 0);
   return Math.max(1, Math.round(base * (1 - descFoco)));
 }
 
@@ -8336,7 +8490,7 @@ function rngLoja(seed){
 
 function montarEstoque(){
   const r = rngLoja(diasCorridos() * 7919 + ((typeof semente === 'number' ? semente : 0) * 104729) + 999);
-  const pool = ITENS.map((_, i) => i).filter(i => LOJA_TIPOS.includes(ITENS[i][2]) && !ITENS[i][8] && i !== ID_GRIMORIO_LOJA);
+  const pool = ITENS.map((_, i) => i).filter(i => i < BASE_N && LOJA_TIPOS.includes(ITENS[i][2]) && !ITENS[i][8] && i !== ID_GRIMORIO_LOJA);
   const vagas = Math.max(1, Math.round(ECO.lojaVagas));
   const nivelAtual = (typeof progresso === 'function') ? progresso().nivel : 1;
   const pesos = pesosLojaPorNivel(nivelAtual);
@@ -11707,6 +11861,9 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   function pontosDisponiveis(){ return pontosGanhos() - pontosGastos(); }
 
   function bonusFortuna(){ return Math.min(FORTUNA_TETO, gasto.fortuna * FORTUNA_POR_PONTO); }
+  // total efetivo = pontos + afixo Sortudo (dividem o mesmo teto)
+  function bonusFortunaTotal(){ return Math.min(FORTUNA_TETO, bonusFortuna() + ((window.afixoSoma ? window.afixoSoma('sor') : 0) / 100)); }
+  function descontoLoja(){ return Math.min(FOCO_TETO, descontoFoco() + ((window.afixoSoma ? window.afixoSoma('bar') : 0) / 100)); }
   function descontoFoco(){ return Math.min(FOCO_TETO, gasto.foco * FOCO_POR_PONTO); }
   function perdaoVigor(){ return Math.min(VIGOR_TETO, gasto.vigor * VIGOR_POR_PONTO); }
 
@@ -11888,7 +12045,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   const _sortearItem = window.sortearItem;
   if (typeof _sortearItem === 'function'){
     window.sortearItem = function(sorte, ...resto){
-      return _sortearItem((sorte || 0) + bonusFortuna(), ...resto);
+      return _sortearItem((sorte || 0) + bonusFortunaTotal(), ...resto);
     };
   }
 
@@ -11901,6 +12058,8 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   // window.descontoFoco() -- e por isso essas duas funcoes sao expostas
   // aqui embaixo, nao so dentro do objeto window.atributosHeroi.
   window.bonusFortuna = bonusFortuna;
+  window.bonusFortunaTotal = bonusFortunaTotal;
+  window.descontoLoja = descontoLoja;
   window.descontoFoco = descontoFoco;
 
   /* ---------- efeito: Vigor no dano de fuga (virada de dia) ----------
@@ -12935,13 +13094,14 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   const _darItemOrig = window.darItem;
   window.darItem = function(id, q){
     _darItemOrig(id, q);
-    if (!vistos.has(id)){ vistos.add(id); salvarVistos(); }
+    const bid = baseDe(id);
+    if (!vistos.has(bid)){ vistos.add(bid); salvarVistos(); }
   };
 
   function renderGrimorio(){
     const grid = document.getElementById('grimGrid');
     grid.innerHTML = '';
-    const idsVivos = ITENS.map((_, id) => id).filter(id => !item(id).morto);
+    const idsVivos = ITENS.map((_, id) => id).filter(id => id < BASE_N && !item(id).morto);
     idsVivos.forEach(id => {
       const it = item(id);
       const desc = vistos.has(id);
@@ -13544,7 +13704,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       itensVistos: vistos.size,
       raridadesObtidas: raridadesObtidasCount(vistos),
       temGrimorio: (typeof ID_GRIMORIO !== 'undefined' && ID_GRIMORIO >= 0) ? vistos.has(ID_GRIMORIO) : false,
-      totalItensCatalogo: (typeof ITENS !== 'undefined') ? ITENS.filter(a => !a[8]).length : 0
+      totalItensCatalogo: (typeof ITENS !== 'undefined') ? ITENS.slice(0, BASE_N).filter(a => !a[8]).length : 0
     };
   }
 

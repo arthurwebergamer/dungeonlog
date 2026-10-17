@@ -133,7 +133,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=259">
+<link rel="stylesheet" href="style.css?v=260">
 <script>
 // A abertura so sai quando a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado; sair antes (assim que o CSS chega)
 // mostrava um flash cinza vazio e depois a tela de login por baixo, antes do carrossel (visto em video de teste). Teto de seguranca: 15s.
@@ -8084,6 +8084,7 @@ function abrirFicha(id){
     '</div>'+
     '<div class="ibonus' + (ehEq ? ' istats' : '') + '">'+bonus+'</div>'+
     '<div class="iacts">'+acoes+'</div>';
+  fichaTransicao('item');
 
   ficha.querySelectorAll('[data-a]').forEach(b => {
     b.onclick = () => {
@@ -8191,6 +8192,18 @@ function forjaAnim(cb){
   setTimeout(cb, 1750);
 }
 const AFX_SP = {gan: 49, est: 77, sor: 42, bar: 86, tes: 1, bau: 16, abu: 118};   // sprites reais da sheet
+/* transicao entre telas da ficha: nova tela entra deslizando+fade (direcao pela ordem das telas); toques na mesma tela nao reanimam */
+const TELAS_FICHA = {item: 0, sel: 1, rol: 2, res: 3};
+function fichaTransicao(chave, alvo){
+  const ant = ficha.dataset.tela;
+  ficha.dataset.tela = chave;
+  if (!ant || ant === chave || matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+  const dir = TELAS_FICHA[chave] >= TELAS_FICHA[ant] ? 'dirF' : 'dirB';
+  ficha.classList.remove('trocando', 'dirF', 'dirB', 'soCorpo');
+  void ficha.offsetWidth;
+  ficha.classList.add('trocando', dir); if (alvo === 'corpo') ficha.classList.add('soCorpo');
+  clearTimeout(ficha._tt); ficha._tt = setTimeout(() => ficha.classList.remove('trocando', 'dirF', 'dirB', 'soCorpo'), 450);
+}
 function forjaLinha(afx, cls, en, tag){
   if (!afx) return '<div class="rolRow ' + cls + '"><div class="rolIc"></div><span class="rolTx dim">' + (en ? 'No enchantment' : 'Sem encantamento') + '</span></div>';
   return '<div class="rolRow ' + cls + '"><div class="rolIc">' + spriteHTML(AFX_SP[afx[0]] || 1, 32) + '</div><span class="rolTx a-' + afx[0] + (afx[1] < 0 ? ' neg' : '') + '">' + afxEfeito(afx, en) + '</span>' + (tag || '') + '</div>';
@@ -8204,18 +8217,21 @@ function forjaRoleta(it, nv, cb){
   fil[N - 3] = nv;
   box.innerHTML = '<div class="isep">' + (en ? 'Rolling enchantment' : 'Sorteando encantamento') + '</div>' +
     '<div class="rolJan"><div class="rolSel"></div><div class="rolTira">' + fil.map(a => forjaLinha(a, 'dim', en)).join('') + '</div></div>';
+  fichaTransicao('rol', 'corpo');
   const tira = box.querySelector('.rolTira'), alvo = -(N - 5) * H;
   const fim = () => {
     tira.children[N - 3].classList.remove('dim');
     box.querySelector('.rolSel').classList.add('trava');
-    window.tocarSom?.('golpe'); if (navigator.vibrate) try { navigator.vibrate(30); } catch (e) {}
+    window.tocarSom?.('roletaFim');
     setTimeout(cb, 500);
   };
   if (reduz){ tira.style.transform = 'translateY(' + alvo + 'px)'; setTimeout(fim, 200); return; }
-  const dur = 2200, t0 = performance.now();
+  let ultima = 0; const dur = 2200, t0 = performance.now();
   const loop = ts => {
     const t = Math.min(1, (ts - t0) / dur);
     tira.style.transform = 'translateY(' + (alvo * (1 - Math.pow(1 - t, 1.8))) + 'px)';
+    const lin = Math.floor(-alvo * (1 - Math.pow(1 - t, 1.8)) / H);
+    if (lin !== ultima){ ultima = lin; if (t < 1) window.tocarSom?.('roletaTick', t); }
     if (t < 1) requestAnimationFrame(loop); else fim();
   };
   requestAnimationFrame(loop);
@@ -8251,6 +8267,7 @@ function abrirForja(id, novo, sel){
     '<div class="ihead eqh forjaH"><div class="ibox">' + spriteHTML(it.sp, 44) + '</div><div><div class="iname" style="color:' + COR_RAR[it.rar] + '">' + nomeComAfixo(it, en) + '</div>' +
     '<div class="imeta tag" style="color:' + COR_RAR[it.rar] + '">' + (en ? 'Forge' : 'Forja') + ' · ' + RARIDADES[it.rar] + '</div></div></div>' +
     '<div class="ibonus istats">' + corpo + '</div><div class="iacts">' + acoes + '</div>';
+  fichaTransicao(novo ? 'res' : 'sel');
   if (novo){ window.tocarSom?.('chegadaRecompensa'); }
   ficha.querySelectorAll('[data-add]').forEach(b => { b.onclick = () => abrirForja(id, undefined, sel.concat([+b.dataset.add])); });
   ficha.querySelectorAll('[data-rm]').forEach(b => { b.onclick = () => abrirForja(id, undefined, sel.filter((_, k) => k !== +b.dataset.rm)); });
@@ -8281,6 +8298,7 @@ function abrirForja(id, novo, sel){
 }
 
 function fecharFicha(){
+  ficha.dataset.tela = '';
   ficha.classList.remove('on');
   fichaBG.classList.remove('on');
 }
@@ -14813,6 +14831,16 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     equipar: [15, 30, 15], desequipar: [20], trocarHeroi: [15, 30, 15], usar: [25], abrirGrimorio: [15],
     soltar: [12], erro: [60, 50, 60]
   };
+  // roleta da forja: tique por linha que passa (tom sobe com o progresso) e um selo final de "travou"
+  SONS.roletaTick = (c, p) => { tom(c, { freq: 520 + (p || 0) * 420, tipo: 'square', duracao: 0.022, ganho: 0.1 }); };
+  SONS.roletaFim = c => {
+    tom(c, { freq: 130, freqFinal: 60, tipo: 'sine', duracao: 0.16, ganho: 0.34 });
+    tom(c, { freq: 523, tipo: 'triangle', duracao: 0.14, ganho: 0.26 });
+    tom(c, { freq: 784, tipo: 'triangle', inicio: 0.09, duracao: 0.16, ganho: 0.26 });
+    tom(c, { freq: 1046, tipo: 'sine', inicio: 0.18, duracao: 0.4, ganho: 0.28 });
+    tom(c, { freq: 1568, tipo: 'sine', inicio: 0.2, duracao: 0.34, ganho: 0.14 });
+  };
+  VIBRACAO.roletaFim = [20, 40, 40];
   function vibrarEvento(nome){
     const padrao = VIBRACAO[nome];
     if (!padrao || feedback !== 'vibrar' || !('vibrate' in navigator)) return;

@@ -6616,3 +6616,11 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 /* pulso da roleta ao travar: suave, sem steps */
 @keyframes rolTrava{0%{transform:scale(1);box-shadow:0 0 0 0 color-mix(in srgb,var(--text) 55%,transparent)}40%{transform:scale(1.035);box-shadow:0 0 0 6px color-mix(in srgb,var(--text) 0%,transparent)}100%{transform:scale(1)}}
 .rolSel.trava{animation:rolTrava .45s ease-out}
+/* transicao entre telas da ficha (item -> escolher tesouros -> roleta -> resultado) */
+@keyframes telaF{from{opacity:0;transform:translateX(26px)}to{opacity:1;transform:none}}
+@keyframes telaB{from{opacity:0;transform:translateX(-26px)}to{opacity:1;transform:none}}
+#ficha.trocando.dirF .ihead,#ficha.trocando.dirF .ibonus,#ficha.trocando.dirF .iacts{animation:telaF .34s cubic-bezier(.2,.8,.2,1) both}
+#ficha.trocando.dirB .ihead,#ficha.trocando.dirB .ibonus,#ficha.trocando.dirB .iacts{animation:telaB .34s cubic-bezier(.2,.8,.2,1) both}
+#ficha.trocando .ibonus{animation-delay:.05s}
+#ficha.trocando .iacts{animation-delay:.1s}
+#ficha.trocando.soCorpo .ihead,#ficha.trocando.soCorpo .iacts{animation:none}

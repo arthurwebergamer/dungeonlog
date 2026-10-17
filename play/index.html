@@ -133,7 +133,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=264">
+<link rel="stylesheet" href="style.css?v=265">
 <script>
 // A abertura so sai quando a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado; sair antes (assim que o CSS chega)
 // mostrava um flash cinza vazio e depois a tela de login por baixo, antes do carrossel (visto em video de teste). Teto de seguranca: 15s.
@@ -12562,58 +12562,39 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   }
 
   /* ===== TOUR NOVO (substitui os dialogos com busto/digitacao): tela escurecida, so o elemento da vez aceso, 1 frase curta ===== */
+  // Cada passo: sel (string, 'a|b' = uniao, ou funcao), espera = passo INTERATIVO
+  // (o usuario toca de verdade no destaque; sem botao Proximo) | ausente = so informa.
+  let tourN0 = 0, tourIdx = -1;
   const TOUR = [
-    {aba: 'tarefas',      sel: '#addbtn',            pre: 'limpa', demo: 'add',      pt: ['Crie uma tarefa', 'Toque em + Adicionar e escreva o que precisa fazer.'], en: ['Create a task', 'Tap + Add and write what you need to do.']},
-    {aba: 'tarefas',      sel: '.tourFake',          pre: 'fake',  demo: 'concluir', leve: true, pt: ['Conclua e o monstro apanha', 'Cada tarefa feita dá XP, moedas e um golpe.'], en: ['Finish it, the monster takes a hit', 'Every task done gives XP, coins and a strike.']},
-    {aba: 'inventario',   sel: '#equipbox',          pre: 'limpa', pt: ['Equipe seus itens', 'Itens bons aumentam seu XP e moedas.'],       en: ['Equip your items', 'Good items boost your XP and coins.']},
-    {aba: 'loja',         sel: '#lojaGrid .lrow',    pre: 'limpa', pt: ['A loja renova todo dia', 'Compre equipamentos com suas moedas.'],  en: ['The shop restocks daily', 'Buy gear with your coins.']},
-    {aba: 'perfil',       sel: '.aneisLinha',        pre: 'limpa', pt: ['Gaste pontos em atributos', 'Cada nível dá pontos pra investir.'], en: ['Spend points on attributes', 'Every level gives points to invest.']},
-    {aba: 'estatisticas', sel: '#estCardPrincipal',  pre: 'limpa', pt: ['Sua sequência de vitórias', 'A tocha cresce a cada dia vencido.'], en: ['Your win streak', 'The torch grows with every won day.']}
+    {aba: 'tarefas', sel: '#addbtn', espera: 'abrir',
+      pt: ['Crie sua 1ª tarefa', 'Toque em + Adicionar.'], en: ['Create your 1st task', 'Tap + Add.']},
+    {aba: 'tarefas', sel: '#input|#save', espera: 'criar',
+      pt: ['Escreva a tarefa', 'Digite algo e toque em Criar tarefa.'], en: ['Write the task', 'Type something and tap Create task.']},
+    {aba: 'tarefas', sel: () => '#list .task[data-idx="' + tourIdx + '"] .box', espera: 'concluir', leve: true, scroll: true,
+      pt: ['Agora conclua', 'Toque na caixinha e veja o monstro apanhar.'], en: ['Now finish it', 'Tap the box and watch the monster take a hit.']},
+    {aba: 'inventario',   sel: '#equipbox',          pt: ['Equipe seus itens', 'Itens bons aumentam seu XP e moedas.'],       en: ['Equip your items', 'Good items boost your XP and coins.']},
+    {aba: 'loja',         sel: '#lojaGrid .lrow',    pt: ['A loja renova todo dia', 'Compre equipamentos com suas moedas.'],  en: ['The shop restocks daily', 'Buy gear with your coins.']},
+    {aba: 'perfil',       sel: '.aneisLinha',        pt: ['Gaste pontos em atributos', 'Cada nível dá pontos pra investir.'], en: ['Spend points on attributes', 'Every level gives points to invest.']},
+    {aba: 'estatisticas', sel: '#estCardPrincipal',  pt: ['Sua sequência de vitórias', 'A tocha cresce a cada dia vencido.'], en: ['Your win streak', 'The torch grows with every won day.']}
   ];
-  let tourTimers = [];
-  function tourLimpaFake(){
-    tourTimers.forEach(clearTimeout); tourTimers = [];
-    document.querySelectorAll('.tourFake').forEach(e => e.remove());
-    const b = document.getElementById('addbtn'); if (b) b.classList.remove('tourToque');
+  let tourEl = null, tourI = 0, tourAtivo = false, tourTok = 0, tourPoll = null;
+  function tourParar(){ if (tourPoll){ clearInterval(tourPoll); tourPoll = null; } }
+  function tourAlvo(st){
+    const sel = typeof st.sel === 'function' ? st.sel() : st.sel;
+    const els = sel.split('|').map(s => document.querySelector(s));
+    if (els.some(e => !e)) return null;
+    const rs = els.map(e => e.getBoundingClientRect());
+    const l = Math.min(...rs.map(r => r.left)), t = Math.min(...rs.map(r => r.top));
+    const r2 = Math.max(...rs.map(r => r.right)), b = Math.max(...rs.map(r => r.bottom));
+    return {el: els[0], left: l, top: t, right: r2, bottom: b, width: r2 - l, height: b - t};
   }
-  function tourFakeCriar(feita){
-    const lista = document.getElementById('list'); if (!lista) return null;
-    let el = lista.querySelector('.tourFake');
-    if (!el){
-      const en = (typeof idiomaApp === 'function' && idiomaApp() === 'en');
-      el = document.createElement('div');
-      el.className = 'task tourFake'; el.dataset.dif = 'medio';
-      el.innerHTML = '<div class="box"></div><div class="tinfo"><span class="label"></span><span class="tmeta"><span class="repeat"></span></span></div>';
-      el.querySelector('.label').textContent = en ? 'Study for 20 minutes' : 'Estudar 20 minutos';
-      el.querySelector('.repeat').textContent = en ? 'today only' : 'só hoje';
-      lista.insertBefore(el, lista.firstChild);
-    }
-    if (feita){ el.classList.add('done'); el.querySelector('.box').innerHTML = (typeof CHECK !== 'undefined' ? CHECK : '✓'); }
-    return el;
-  }
-  function tourDemo(tipo, tok){
-    const agenda = (ms, fn) => tourTimers.push(setTimeout(() => { if (tok === tourTok && tourAtivo) fn(); }, ms));
-    if (tipo === 'add'){
-      const b = document.getElementById('addbtn');
-      agenda(700, () => { if (b) b.classList.add('tourToque'); });
-      agenda(1000, () => { if (b) b.classList.remove('tourToque'); window.tocarSom?.('clique'); const el = tourFakeCriar(false); if (el) el.classList.add('entrou'); });
-    } else if (tipo === 'concluir'){
-      agenda(900, () => {
-        const el = tourFakeCriar(true); if (!el) return;
-        window.tocarSom?.('tarefa');
-        if (typeof animarGolpe === 'function') animarGolpe();
-        const box = el.querySelector('.box');
-        if (typeof flutuanteFixo === 'function') flutuanteFixo(document.getElementById('mobSprite') || box, '<span class="dmg-xp">+10 XP</span>');
-      });
-    }
-  }
-  let tourEl = null, tourI = 0, tourAtivo = false, tourTok = 0;
   function tourMontar(){
     if (tourEl) return;
     tourEl = document.createElement('div');
     tourEl.className = 'tourOverlay';
-    tourEl.innerHTML = '<div class="tourHole"><i></i></div>' +
-      '<div class="tourCard"><div class="tourSeta"></div><div class="tourNum"></div><div class="tourTit"></div><div class="tourSub"></div>' +
+    tourEl.innerHTML = '<i class="tourBloq" data-p="t"></i><i class="tourBloq" data-p="b"></i><i class="tourBloq" data-p="l"></i><i class="tourBloq" data-p="r"></i><i class="tourBloq" data-p="m"></i>' +
+      '<div class="tourHole"><i></i></div>' +
+      '<div class="tourCard"><div class="tourSeta"></div><div class="tourTopo"><span class="tourNum"></span><span class="tourTag"></span></div><div class="tourTit"></div><div class="tourSub"></div>' +
       '<div class="tourBarra"></div><div class="tourBtns"><button type="button" class="tourPular"></button><span style="flex:1"></span><button type="button" class="tourVolta"></button><button type="button" class="tourProx"></button></div></div>';
     document.body.appendChild(tourEl);
     tourEl.querySelector('.tourProx').addEventListener('click', () => tourProximo());
@@ -12623,30 +12604,41 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   }
   function tourPosicionar(anima){
     const st = TOUR[tourI], en = (typeof idiomaApp === 'function' && idiomaApp() === 'en');
-    const alvo = document.querySelector(st.sel);
     const hole = tourEl.querySelector('.tourHole'), card = tourEl.querySelector('.tourCard');
-    if (!alvo) return false;
-    const r = alvo.getBoundingClientRect();
-    if (r.width < 4 || r.height < 4) return false;
+    if (st.scroll){ const e0 = document.querySelector(typeof st.sel === 'function' ? st.sel() : st.sel); if (e0 && e0.scrollIntoView) try { e0.scrollIntoView({block: 'center'}); } catch (_){} }
+    const r = tourAlvo(st);
+    if (!r || r.width < 4 || r.height < 4) return false;
     const pad = 6, W = window.innerWidth, H = window.innerHeight, t = en ? st.en : st.pt;
+    const hl = r.left - pad, ht = r.top - pad, hw = r.width + pad * 2, hh = r.height + pad * 2;
     hole.style.transition = anima ? '' : 'none';
-    hole.style.left = (r.left - pad) + 'px'; hole.style.top = (r.top - pad) + 'px';
-    hole.style.width = (r.width + pad * 2) + 'px'; hole.style.height = (r.height + pad * 2) + 'px';
+    hole.style.left = hl + 'px'; hole.style.top = ht + 'px'; hole.style.width = hw + 'px'; hole.style.height = hh + 'px';
+    // blocos transparentes: so o buraco deixa o toque passar (passo interativo); no passo informativo o miolo tambem bloqueia
+    const B = {t: [0, 0, W, ht], b: [0, ht + hh, W, H - ht - hh], l: [0, ht, hl, hh], r: [hl + hw, ht, W - hl - hw, hh], m: [hl, ht, hw, hh]};
+    tourEl.querySelectorAll('.tourBloq').forEach(q => {
+      const g = B[q.dataset.p];
+      q.style.left = g[0] + 'px'; q.style.top = g[1] + 'px'; q.style.width = Math.max(0, g[2]) + 'px'; q.style.height = Math.max(0, g[3]) + 'px';
+      if (q.dataset.p === 'm') q.style.display = st.espera ? 'none' : 'block';
+    });
+    tourEl.classList.toggle('vez', !!st.espera);
     card.querySelector('.tourNum').textContent = (tourI + 1) + ' / ' + TOUR.length;
+    card.querySelector('.tourTag').textContent = st.espera ? (en ? 'YOUR TURN' : 'SUA VEZ') : '';
     card.querySelector('.tourTit').textContent = t[0];
     card.querySelector('.tourSub').textContent = t[1];
     card.querySelector('.tourBarra').innerHTML = TOUR.map((_, k) => '<i class="' + (k <= tourI ? 'on' : '') + '"></i>').join('');
     card.querySelector('.tourPular').textContent = en ? 'Skip' : 'Pular';
     card.querySelector('.tourVolta').textContent = en ? 'Back' : 'Voltar';
-    card.querySelector('.tourVolta').style.visibility = tourI > 0 ? 'visible' : 'hidden';
+    card.querySelector('.tourVolta').style.display = (st.espera || tourI === 0 || (TOUR[tourI - 1] && TOUR[tourI - 1].espera)) ? 'none' : '';
+    card.querySelector('.tourProx').style.display = st.espera ? 'none' : '';
     card.querySelector('.tourProx').textContent = tourI === TOUR.length - 1 ? (en ? 'Done' : 'Concluir') : (en ? 'Next' : 'Próximo');
     requestAnimationFrame(() => {
       const cw = Math.min(320, W - 28), ch = card.offsetHeight;
       card.style.width = cw + 'px';
-      const abaixo = (r.bottom + pad + 18 + ch) < H - 8;
-      const top = abaixo ? r.bottom + pad + 18 : r.top - pad - 18 - ch;
+      const folgaB = H - (r.bottom + pad), folgaT = r.top - pad;
+      const abaixo = (folgaB >= ch + 26) || (folgaB >= folgaT);
+      let top = abaixo ? r.bottom + pad + 18 : r.top - pad - 18 - ch;
+      top = Math.max(12, Math.min(H - ch - 12, top));
       const left = Math.max(14, Math.min(W - cw - 14, r.left + r.width / 2 - cw / 2));
-      card.style.top = Math.max(12, top) + 'px'; card.style.left = left + 'px';
+      card.style.top = top + 'px'; card.style.left = left + 'px';
       card.classList.toggle('abaixo', abaixo);
       const seta = card.querySelector('.tourSeta');
       seta.style.left = Math.max(22, Math.min(cw - 22, r.left + r.width / 2 - left)) + 'px';
@@ -12654,36 +12646,64 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     });
     return true;
   }
+  function tourEsperar(st, tok){
+    tourParar();
+    if (!st.espera) return;
+    if (st.espera === 'criar') tourN0 = tarefas.length;
+    tourPoll = setInterval(() => {
+      if (tok !== tourTok || !tourAtivo){ tourParar(); return; }
+      if (st.espera === 'abrir'){
+        const cp = document.getElementById('composer');
+        if (cp && cp.classList.contains('on')){ tourParar(); setTimeout(() => { if (tok === tourTok && tourAtivo) tourProximo(); }, 350); }
+      } else if (st.espera === 'criar'){
+        if (tarefas.length > tourN0){
+          tourParar(); tourIdx = tarefas.length - 1;
+          setTimeout(() => { if (tok === tourTok && tourAtivo) tourProximo(); }, 700);
+        } else {
+          const cp = document.getElementById('composer');   // fechou sem criar: volta pro passo anterior
+          if (cp && !cp.classList.contains('on') && !tourFoco()){ tourParar(); tourI = Math.max(0, tourI - 1); tourPasso(-1); }
+        }
+      } else if (st.espera === 'concluir'){
+        const t = tarefas[tourIdx];
+        if (!t || t.feitaEm || t._feitaTour){
+          tourParar();
+          tourEl.classList.add('ok');                  // some o cartao: deixa o golpe aparecer
+          setTimeout(() => { if (tok === tourTok && tourAtivo){ tourEl.classList.remove('ok'); tourProximo(); } }, 1700);
+        }
+      }
+    }, 200);
+  }
+  function tourFoco(){ const a = document.activeElement; return a && a.id === 'input'; }
   function tourPasso(dir){
-    const tok = ++tourTok; tourTimers.forEach(clearTimeout); tourTimers = [];
+    const tok = ++tourTok; tourParar();
     if (tourI < 0 || tourI >= TOUR.length){ tourFim(); return; }
     const st = TOUR[tourI];
     const atual = document.querySelector('.view.on');
     const nomeAtual = atual ? atual.id.replace('view', '').toLowerCase() : '';
     const tentar = (n) => {
       if (tok !== tourTok) return;
-      if (n === 6){ if (st.pre === 'fake') tourFakeCriar(false); else tourLimpaFake(); }
       tourEl.classList.toggle('leve', !!st.leve);
-      if (tourPosicionar(true)){ if (st.demo) tourDemo(st.demo, tok); return; }
+      if (tourPosicionar(true)){ tourEsperar(st, tok); return; }
       if (n > 0) setTimeout(() => tentar(n - 1), 120);
       else { tourI += (dir || 1); tourPasso(dir); }
     };
     const cardEl = tourEl.querySelector('.tourCard'), holeEl = tourEl.querySelector('.tourHole');
     const troca = nomeAtual !== st.aba && typeof window.mostrarAba === 'function';
-    cardEl.style.opacity = '0';                    // 1) texto some
+    cardEl.style.opacity = '0';
     if (troca) holeEl.style.opacity = '0';
     setTimeout(() => {
       if (tok !== tourTok) return;
       if (troca){
-        window.mostrarAba(st.aba);                 // 2) tela troca por baixo do escuro, sem ninguem ver
+        window.mostrarAba(st.aba);
         setTimeout(() => { holeEl.style.opacity = '1'; tentar(6); }, 380);
-      } else tentar(6);                            // 3) destaque desliza e o texto volta junto
+      } else tentar(6);
     }, 200);
   }
   function tourProximo(){ if (!tourAtivo) return; tourI++; tourPasso(1); }
   function tourFim(){
-    tourTok++; tourAtivo = false; tourLimpaFake();
-    if (tourEl) tourEl.classList.remove('on');
+    tourTok++; tourAtivo = false; tourParar();
+    if (tourEl) tourEl.classList.remove('on','ok','leve');
+    const _cp = document.getElementById('composer'); if (_cp) _cp.classList.remove('on');
     ['tarefas', 'inventario', 'loja', 'perfil', 'estatisticas'].forEach(n => { vistas[n] = true; });
     salvarVistas();
     if (typeof window.mostrarAba === 'function') window.mostrarAba('tarefas');

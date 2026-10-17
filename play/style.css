@@ -6388,3 +6388,13 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 .istats .idesc{font:400 12px 'Outfit',sans-serif;color:var(--dim);padding:0 2px 4px}
 .ibonus.istats span{background:none;border:0;padding:0;border-radius:0;box-shadow:none;font-weight:inherit;font-size:inherit;color:inherit}
 .ibonus.istats .isep span{font:600 10px 'Outfit',sans-serif}
+
+/* afixos no inventario: valor colorido + barra na base da celula; chips de filtro */
+:root{--afx-gan:var(--gold);--afx-est:#7fb8ff;--afx-sor:#8fe3a0;--afx-bar:#ffb070;--afx-bau:#e6a8ff;--afx-abu:#ff8f8f;--afx-tes:#7fe0d6}
+.cel{overflow:hidden}
+.cel .afx{left:auto;right:3px;top:3px;bottom:auto;padding:1px 3px;font-size:9px;background:color-mix(in srgb,var(--bg) 75%,transparent)}
+.cel .afx.a-gan{color:var(--afx-gan)}.cel .afx.a-est{color:var(--afx-est)}.cel .afx.a-sor{color:var(--afx-sor)}.cel .afx.a-bar{color:var(--afx-bar)}.cel .afx.a-bau{color:var(--afx-bau)}.cel .afx.a-abu{color:var(--afx-abu)}.cel .afx.a-tes{color:var(--afx-tes)}
+.cel .afbar{position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--afx-gan)}
+.cel .afbar.a-est{background:var(--afx-est)}.cel .afbar.a-sor{background:var(--afx-sor)}.cel .afbar.a-bar{background:var(--afx-bar)}.cel .afbar.a-bau{background:var(--afx-bau)}.cel .afbar.a-abu{background:var(--afx-abu)}.cel .afbar.a-tes{background:var(--afx-tes)}
+#invAfxFiltros button[style*='--afc']{border-color:var(--afc);color:var(--afc)}
+#invAfxFiltros button[style*='--afc'].on{background:var(--afc);color:var(--bg)}

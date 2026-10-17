@@ -133,7 +133,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=211">
+<link rel="stylesheet" href="style.css?v=213">
 <script>
 // A abertura so sai quando a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado; sair antes (assim que o CSS chega)
 // mostrava um flash cinza vazio e depois a tela de login por baixo, antes do carrossel (visto em video de teste). Teto de seguranca: 15s.
@@ -547,6 +547,7 @@ html{background:var(--bsBg,#282828)}
     </div>
 
     <div class="invfiltros invsub" id="invSubFiltros" style="display:none"></div>
+    <div class="invfiltros invsub" id="invAfxFiltros" style="display:none"></div>
 
     <div class="invgrid" id="invGrid"></div>
 
@@ -7795,6 +7796,7 @@ function creditarGanhos(ids){
 let filtroInv = 'tudo';
 let filtroSubEquip = 'todos';   // subcategoria quando filtroInv === 'equip'
 let buscaInv = '';
+let filtroAfx = 'todos';   // filtro por afixo (chips)
 
 // subcategorias de equipamento (armas por tipo + as demais pecas); chips vazios nao aparecem
 const SUBCATS_EQUIP = [
@@ -7897,10 +7899,28 @@ function renderInventario(){
       sub.style.display = 'flex';
     } else { sub.style.display = 'none'; }
   }
+  const afxBox = document.getElementById('invAfxFiltros');
+  if (afxBox){
+    const en = idiomaApp() === 'en';
+    const cont = {};
+    inventario.forEach(sl => { const it = item(sl.id); if (it.afx) cont[it.afx[0]] = (cont[it.afx[0]] || 0) + 1; });
+    if (filtroAfx !== 'todos' && !cont[filtroAfx]) filtroAfx = 'todos';
+    if ((filtroInv === 'equip' || filtroInv === 'tudo') && Object.keys(cont).length){
+      afxBox.innerHTML = '';
+      const mk = (k, rot) => { const bt = document.createElement('button'); bt.textContent = rot; if (filtroAfx === k) bt.className = 'on';
+        if (k !== 'todos') bt.style.setProperty('--afc', 'var(--afx-' + k + ')');
+        bt.onclick = () => { filtroAfx = k; renderInventario(); }; afxBox.appendChild(bt); };
+      mk('todos', en ? 'All enchants' : 'Todos encantamentos');
+      AFX_CHAVES.filter(k => cont[k]).forEach(k => mk(k, en ? AFIXOS[k].en : AFIXOS[k].pt));
+      afxBox.style.display = 'flex';
+    } else { afxBox.style.display = 'none'; }
+  }
   const termoBusca = semAcento(buscaInv).trim();
   const visiveis = inventario.filter(s => {
     const it = item(s.id), t = it.tipo;
-    if (termoBusca && semAcento(it.nome).indexOf(termoBusca) < 0 && semAcento(ITENS[s.id][1]).indexOf(termoBusca) < 0 && semAcento(ITENS[s.id][9]).indexOf(termoBusca) < 0) return false;
+    if (filtroAfx !== 'todos' && !(it.afx && it.afx[0] === filtroAfx)) return false;
+    if (termoBusca && semAcento(it.nome).indexOf(termoBusca) < 0 && semAcento(ITENS[s.id][1]).indexOf(termoBusca) < 0 && semAcento(ITENS[s.id][9]).indexOf(termoBusca) < 0
+        && !(it.afx && (semAcento(AFIXOS[it.afx[0]].pt).indexOf(termoBusca) >= 0 || semAcento(AFIXOS[it.afx[0]].en).indexOf(termoBusca) >= 0))) return false;
     if (filtroInv === 'tudo') return true;
     if (filtroInv === 'equip') return SLOTS.includes(t) && (filtroSubEquip === 'todos' || subcatEquip(ITENS[s.id][1], t) === filtroSubEquip);
     return t === filtroInv;
@@ -7916,7 +7936,7 @@ function renderInventario(){
     c.className = 'cel r' + it.rar;
     c.innerHTML = spriteHTML(it.sp, 32)
       + (s.q > 1 ? '<span class="qtd">'+s.q+'</span>' : '')
-      + (it.afx ? '<span class="afx a-' + it.afx[0] + '">' + AFIXOS[it.afx[0]].letra + '</span>' : '')
+      + (it.afx ? '<span class="afx a-' + it.afx[0] + '">' + (it.afx[0] === 'bar' ? '-' : '+') + it.afx[1] + '</span><i class="afbar a-' + it.afx[0] + '"></i>' : '')
       + (SLOTS.some(k => equipado[k] === s.id) ? '<span class="eq"></span>' : '');
     c.onclick = () => { fichaOrigemEl = c; abrirFicha(s.id); };
     frag.appendChild(c);
@@ -7937,6 +7957,7 @@ document.getElementById('invFiltros').querySelectorAll('button').forEach(b => {
     filtroInv = b.dataset.f;
     filtroSubEquip = 'todos';
     document.getElementById('invFiltros').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+    filtroAfx = 'todos';
     renderInventario();
   };
 });

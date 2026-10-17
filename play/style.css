@@ -6346,3 +6346,116 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 @keyframes tdPulsa{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 55%,transparent)}50%{box-shadow:0 0 0 7px color-mix(in srgb,var(--accent) 0%,transparent)}}
 .terminarDiaBtn:not([hidden]){animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both,tdPulsa 2s ease-in-out .9s infinite}
 @media (prefers-reduced-motion:reduce){.terminarDiaBtn{animation:none !important}}
+
+/* Afixos e forja */
+.cel .afx{position:absolute;left:3px;bottom:2px;font:700 9px/1 'Outfit',sans-serif;padding:2px 3px;border-radius:4px;background:color-mix(in srgb,var(--bg) 70%,transparent);color:var(--gold)}
+.cel .afx.a-est{color:#7fb8ff}.cel .afx.a-sor{color:#8fe3a0}.cel .afx.a-bar{color:#ffb070}
+.afxTag{color:var(--gold)}.afxTag.a-est{color:#7fb8ff}.afxTag.a-sor{color:#8fe3a0}.afxTag.a-bar{color:#ffb070}
+.forjaBox{display:flex;flex-direction:column;gap:10px}
+.forjaLn{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.forjaLn small{color:var(--dim);font-size:12px}
+.forjaCusto{font-size:13px;color:var(--text)}
+.forjaDica{font-size:12px;color:var(--dim)}
+.iacts button[disabled]{opacity:.4;pointer-events:none}
+
+/* Animacao da forja: 3 marteladas no item e o novo afixo entra com mola */
+@keyframes forjaBate{0%{transform:translateY(0) scale(1)}12%{transform:translateY(-7px) scale(1.04)}22%{transform:translateY(2px) scale(.9,1.06)}30%,38%{transform:translateY(0) scale(1)}46%{transform:translateY(-7px) scale(1.04)}56%{transform:translateY(2px) scale(.9,1.06)}64%,72%{transform:translateY(0) scale(1)}80%{transform:translateY(-7px) scale(1.06)}90%{transform:translateY(2px) scale(.88,1.08)}100%{transform:translateY(0) scale(1)}}
+@keyframes forjaTrem{0%,100%{transform:translateX(0)}20%{transform:translateX(-2px)}40%{transform:translateX(2px)}60%{transform:translateX(-1px)}80%{transform:translateX(1px)}}
+.ibox.forjando{animation:forjaBate .85s cubic-bezier(.3,.7,.3,1) both;border-color:var(--accent)}
+@keyframes forjaEntra{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+.forjaLn.forjaRev{animation:forjaEntra .55s var(--spr2,cubic-bezier(.2,.9,.3,1.2)) both}
+@media (prefers-reduced-motion:reduce){.ibox.forjando,.forjaLn.forjaRev{animation:none}}
+
+.cel .afx.a-bau,.afxTag.a-bau{color:#e6a8ff}.cel .afx.a-abu,.afxTag.a-abu{color:#ff8f8f}.cel .afx.a-tes,.afxTag.a-tes{color:#7fe0d6}
+
+/* bau extra (afixo Abundante): empilhado acima do especial */
+.bauArena.bauExtra{ right:auto; left:-64px; bottom:62px; }
+
+/* Ficha de equipamento em estilo RPG: linhas rotulo/valor + secao de encantamento */
+.ibonus.istats{display:block}
+.istats .irow{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:6px 2px;font-family:'Outfit',sans-serif;font-size:14px;color:var(--muted)}
+.istats .irow b{font-weight:600;font-variant-numeric:tabular-nums;color:var(--text)}
+.istats .irow b.pos{color:var(--verde)}
+.istats .irow b.neg{color:var(--perigo)}
+.istats .irow.dim{font-size:12px;color:var(--dim)}
+.istats .irow.dim b{color:var(--dim);font-weight:500}
+.istats .isep{display:flex;align-items:center;gap:8px;margin:6px 0;border-top:1px solid var(--line);padding-top:8px;font:600 10px 'Outfit',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.istats .isep:empty{padding-top:0;margin:4px 0}
+.istats .iafx{font:600 15px 'Outfit',sans-serif;color:var(--gold);padding:2px 2px 0}
+.istats .iafx.a-est{color:#7fb8ff}.istats .iafx.a-sor{color:#8fe3a0}.istats .iafx.a-bar{color:#ffb070}.istats .iafx.a-bau{color:#e6a8ff}.istats .iafx.a-abu{color:#ff8f8f}.istats .iafx.a-tes{color:#7fe0d6}
+.istats .irow b.afv{color:var(--gold)}
+.istats .irow b.afv.a-est{color:#7fb8ff}.istats .irow b.afv.a-sor{color:#8fe3a0}.istats .irow b.afv.a-bar{color:#ffb070}.istats .irow b.afv.a-bau{color:#e6a8ff}.istats .irow b.afv.a-abu{color:#ff8f8f}.istats .irow b.afv.a-tes{color:#7fe0d6}
+.istats .idesc{font:400 12px 'Outfit',sans-serif;color:var(--dim);padding:0 2px 4px}
+.ibonus.istats span{background:none;border:0;padding:0;border-radius:0;box-shadow:none;font-weight:inherit;font-size:inherit;color:inherit}
+.ibonus.istats .isep span{font:600 10px 'Outfit',sans-serif}
+
+/* afixos no inventario: valor colorido + barra na base da celula; chips de filtro */
+:root{--afx-gan:var(--gold);--afx-est:#7fb8ff;--afx-sor:#8fe3a0;--afx-bar:#ffb070;--afx-bau:#e6a8ff;--afx-abu:#ff8f8f;--afx-tes:#7fe0d6}
+.cel{overflow:hidden}
+.cel .afx{left:auto;right:3px;top:3px;bottom:auto;padding:1px 3px;font-size:9px;background:color-mix(in srgb,var(--bg) 75%,transparent)}
+.cel .afx.a-gan{color:var(--afx-gan)}.cel .afx.a-est{color:var(--afx-est)}.cel .afx.a-sor{color:var(--afx-sor)}.cel .afx.a-bar{color:var(--afx-bar)}.cel .afx.a-bau{color:var(--afx-bau)}.cel .afx.a-abu{color:var(--afx-abu)}.cel .afx.a-tes{color:var(--afx-tes)}
+.cel .afbar{position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--afx-gan)}
+.cel .afbar.a-est{background:var(--afx-est)}.cel .afbar.a-sor{background:var(--afx-sor)}.cel .afbar.a-bar{background:var(--afx-bar)}.cel .afbar.a-bau{background:var(--afx-bau)}.cel .afbar.a-abu{background:var(--afx-abu)}.cel .afbar.a-tes{background:var(--afx-tes)}
+#invAfxFiltros button[style*='--afc']{border-color:var(--afc);color:var(--afc)}
+#invAfxFiltros button[style*='--afc'].on{background:var(--afc);color:var(--bg)}
+
+/* Tooltip de item estilo RPG classico: centralizado, linhas "+X% Atributo", encantamento colorido entre ornamentos */
+.istats{text-align:center}
+.istats .irow{justify-content:center;flex-direction:row-reverse;gap:6px;padding:3px 0;font-size:15px;color:var(--text)}
+.istats .irow b,.istats .irow b.pos{color:var(--text);font-weight:600}
+.istats .irow b.neg{color:var(--perigo)}
+.istats .irow.dim{font-size:12px;color:var(--dim);flex-direction:row;gap:5px}
+.istats .irow.dim b{color:var(--dim)}
+.istats .isep.orn{border:0;margin:10px 0 6px;padding:0;height:10px;position:relative}
+.istats .isep.orn::before{content:'';position:absolute;left:8%;right:8%;top:50%;height:1px;background:linear-gradient(90deg,transparent,var(--line) 20%,var(--line) 44%,transparent 44%,transparent 56%,var(--line) 56%,var(--line) 80%,transparent)}
+.istats .isep.orn::after{content:'◆';position:absolute;left:50%;top:50%;transform:translate(-50%,-52%);font-size:8px;color:var(--dim);line-height:1}
+.istats .iafx{text-align:center;font-size:13px;letter-spacing:.06em;text-transform:uppercase;padding:2px 0 4px}
+.istats .irow b.afv{font-weight:700}
+.istats .idesc{text-align:center;font-style:italic;padding:2px 14px 6px}
+.istats .isep:empty:not(.orn){margin:8px 0 4px;border-top:1px solid var(--line)}
+
+/* indicador discreto: uma gema colorida no canto (cor = tipo do afixo) */
+.cel .afgem{position:absolute;right:5px;top:5px;width:7px;height:7px;background:var(--afx-gan);transform:rotate(45deg);border-radius:1px}
+.cel .afgem.a-est{background:var(--afx-est)}.cel .afgem.a-sor{background:var(--afx-sor)}.cel .afgem.a-bar{background:var(--afx-bar)}.cel .afgem.a-bau{background:var(--afx-bau)}.cel .afgem.a-abu{background:var(--afx-abu)}.cel .afgem.a-tes{background:var(--afx-tes)}
+
+/* Forja: limpa, centralizada */
+.forjaBox{display:block}
+.fPar{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fPar.one{grid-template-columns:1fr}
+.fBloco{border:1px solid var(--line);border-radius:12px;padding:12px 8px;text-align:center;background:color-mix(in srgb,var(--bg) 40%,transparent)}
+.fBloco small{display:block;font:600 10px 'Outfit',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
+.fBloco .fVal{font:600 15px 'Outfit',sans-serif;color:var(--afx-gan)}
+.fVal.a-est{color:var(--afx-est)}.fVal.a-sor{color:var(--afx-sor)}.fVal.a-bar{color:var(--afx-bar)}.fVal.a-bau{color:var(--afx-bau)}.fVal.a-abu{color:var(--afx-abu)}.fVal.a-tes{color:var(--afx-tes)}
+.fCusto{text-align:center;margin:12px 0 2px;font:400 14px 'Outfit',sans-serif;color:var(--muted)}
+.fCusto b{color:var(--text)}.fCusto b.ok{color:var(--verde)}.fCusto b.falta{color:var(--perigo)}.fCusto i{font-style:normal;color:var(--dim);margin:0 4px}
+
+/* Tooltip de equipamento estilo Diablo: tudo centralizado, nome do afixo entre aspas sob o nome do item */
+.ihead.eqh{flex-direction:column;align-items:center;text-align:center;gap:8px}
+.ihead.eqh .iname{font-size:20px}
+.iafn{font:600 13px 'Outfit',sans-serif;letter-spacing:.04em;margin-top:3px;color:var(--afx-gan)}
+.iafn.a-est{color:var(--afx-est)}.iafn.a-sor{color:var(--afx-sor)}.iafn.a-bar{color:var(--afx-bar)}.iafn.a-bau{color:var(--afx-bau)}.iafn.a-abu{color:var(--afx-abu)}.iafn.a-tes{color:var(--afx-tes)}
+.istats .irow b.afv{font-weight:600}
+
+/* afixo no loot do bau */
+.baufx{font:600 11px 'Outfit',sans-serif;margin-top:2px;color:var(--afx-gan)}
+.baufx.a-est{color:var(--afx-est)}.baufx.a-sor{color:var(--afx-sor)}.baufx.a-bar{color:var(--afx-bar)}.baufx.a-bau{color:var(--afx-bau)}.baufx.a-abu{color:var(--afx-abu)}.baufx.a-tes{color:var(--afx-tes)}
+
+/* tag de raridade como badge + losango antes das linhas de bonus */
+.imeta.tag{display:inline-block;margin-top:6px;padding:3px 10px;border-radius:999px;font-size:11px;letter-spacing:.08em;background:color-mix(in srgb,currentColor 16%,transparent);border:1px solid color-mix(in srgb,currentColor 35%,transparent)}
+.istats .irow:not(.dim)::before{content:'◆';font-size:7px;color:var(--dim);align-self:center;order:3;margin-left:2px}
+
+/* runa do afixo no canto da celula do inventario */
+.cel .rune{position:absolute;right:5px;top:5px;width:8px;height:11px;color:var(--afx-gan);opacity:.95;pointer-events:none}
+.cel .rune.a-est{color:var(--afx-est)}.cel .rune.a-sor{color:var(--afx-sor)}.cel .rune.a-bar{color:var(--afx-bar)}.cel .rune.a-bau{color:var(--afx-bau)}.cel .rune.a-abu{color:var(--afx-abu)}.cel .rune.a-tes{color:var(--afx-tes)}
+
+.cel .rune{width:11px;height:11px;right:5px;top:5px}
+
+.cel .rune{width:12px;height:12px;right:5px;top:5px;image-rendering:pixelated;filter:drop-shadow(0 0 1px rgba(0,0,0,.9))}
+
+.cel .rune{width:10px;height:14px;right:5px;top:4px}
+
+/* linha de encantamento na ficha (positivo = cor do afixo, ruim = vermelho) */
+.istats .irow.afl{color:var(--afx-gan);font-weight:600}
+.istats .irow.afl.a-est{color:var(--afx-est)}.istats .irow.afl.a-sor{color:var(--afx-sor)}.istats .irow.afl.a-bar{color:var(--afx-bar)}.istats .irow.afl.a-bau{color:var(--afx-bau)}.istats .irow.afl.a-abu{color:var(--afx-abu)}.istats .irow.afl.a-tes{color:var(--afx-tes)}
+.istats .irow.afl.neg,.fBloco .fVal.neg,.baufx.neg{color:var(--perigo)}
+.istats .idesc{padding:4px 14px}

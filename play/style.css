@@ -6655,7 +6655,7 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 .tourTopo{display:flex;align-items:center;justify-content:space-between}
 .tourTag{font:700 10px 'Outfit',sans-serif;letter-spacing:.12em;color:#14101F;background:#fff;border-radius:999px;padding:3px 9px}
 .tourTag:empty{display:none}
-.tourOverlay.ok .tourCard,.tourOverlay.ok .tourHole{opacity:0 !important}
+.tourOverlay.ok .tourCard{opacity:0 !important}
 .tourOverlay:not(.vez) .tourHole i{animation:none;opacity:0}
 
 /* ===== folhas de confirmacao/dialogo no mesmo padrao da ficha do item (fundo roxo escuro, linha roxa, titulo serifado) ===== */

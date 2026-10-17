@@ -6070,7 +6070,35 @@ function atualizarEstadoSave(){
   // Sistema de Estagios: tambem trava durante a transicao de viagem --
   // mesmo motivo do guard em alternar() e do botao "+ Adicionar".
   const emTransicaoEstagio = typeof _arenaBgEmTransicao !== 'undefined' && _arenaBgEmTransicao;
-  btnSave.disabled = semTexto || semDia || diaVencido || emTransicaoEstagio;
+  // sem nome / sem dia: o botao continua com cara de ativo; o clique explica o que falta
+  // (feedback de review: botao cinza sem dica parecia quebrado)
+  btnSave.disabled = diaVencido || emTransicaoEstagio;
+  if (!semTexto && !semDia) mostrarDicaSave('');
+}
+const saveHint = document.createElement('div');
+saveHint.className = 'saveHint';
+if (btnSave) btnSave.parentNode.insertBefore(saveHint, btnSave);
+function mostrarDicaSave(txt){
+  saveHint.textContent = txt;
+  saveHint.classList.toggle('on', !!txt);
+}
+function sacudir(el){
+  if (!el) return;
+  el.classList.remove('sacode'); void el.offsetWidth; el.classList.add('sacode');
+}
+function tentarCriar(){
+  const en = idiomaApp() === 'en';
+  if (input.value.trim().length === 0){
+    mostrarDicaSave(en ? 'Give your task a name' : 'Dê um nome à tarefa');
+    sacudir(input); input.focus(); window.tocarSom?.('semMoedas');
+    return;
+  }
+  if (modo === 'repete' && diasEscolhidos.length === 0){
+    mostrarDicaSave(en ? 'Pick at least one day' : 'Escolha pelo menos um dia');
+    sacudir(daysEl); window.tocarSom?.('semMoedas');
+    return;
+  }
+  criar();
 }
 window.atualizarEstadoSave = atualizarEstadoSave;
 
@@ -6225,7 +6253,7 @@ function criar(){
   atualizarEstadoSave();
 }
 
-btnSave.onclick = criar;
+btnSave.onclick = tentarCriar;
 atualizarEstadoSave(); // estado inicial ao carregar a pagina
 
 /* ---------- seletor de vezes por dia ---------- */
@@ -8104,7 +8132,7 @@ function abrirForja(id, novo){
       '<div class="fCusto">' + (en ? 'Cost' : 'Custo') + ' <b>' + custo + '</b> ' + (en ? (custo > 1 ? 'treasures' : 'treasure') : (custo > 1 ? 'tesouros' : 'tesouro')) +
       ' <i>·</i> ' + (en ? 'You have' : 'Você tem') + ' <b class="' + (tem >= custo ? 'ok' : 'falta') + '">' + tem + '</b></div>' +
       '';
-    acoes = '<button class="prim" data-a="fgo"' + (tem >= custo ? '' : ' disabled') + '>' + (en ? 'Forge' : 'Forjar') + '</button><button data-a="fvolta">' + (en ? 'Back' : 'Voltar') + '</button>';
+    acoes = '<button class="prim' + (tem >= custo ? '' : ' semTes') + '" data-a="fgo">' + (en ? 'Forge' : 'Forjar') + '</button><button data-a="fvolta">' + (en ? 'Back' : 'Voltar') + '</button>';
   }
   ficha.innerHTML =
     '<div class="ihead eqh"><div class="ibox">' + spriteHTML(it.sp, 44) + '</div><div><div class="iname" style="color:' + COR_RAR[it.rar] + '">' + nomeComAfixo(it, en) + '</div>' +
@@ -8115,7 +8143,7 @@ function abrirForja(id, novo){
       const a = b.dataset.a;
       if (a === 'fvolta') abrirFicha(id);
       else if (a === 'fgo'){
-        if (tesourosDisponiveis() < custo) return;
+        if (tesourosDisponiveis() < custo){ window.tocarSom?.('semMoedas'); aviso(en ? 'NOT ENOUGH TREASURES' : 'TESOUROS INSUFICIENTES'); return; }
         gastarTesouros(custo);
         const nv = afxRolar(it.rar, it.afx ? it.afx[0] : null, P_NEG_FORJA);
         persistir(); renderInventario();
@@ -9236,8 +9264,12 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 
     const novo = texto.value.trim();
     const en = idiomaApp() === 'en';
-    if (!novo){ aviso(en ? 'TITLE CAN\'T BE EMPTY' : 'O TÍTULO NÃO PODE FICAR VAZIO'); return; }
-    if (modo === 'repete' && dias.length === 0){ aviso(en ? 'CHOOSE THE DAYS' : 'ESCOLHA OS DIAS'); return; }
+    // aviso() esta mudo (TOASTS_DESATIVADOS): feedback proprio -- dica + sacudida + som
+    const dicaEd = (() => { let d = document.getElementById('edSaveHint'); if (!d){ d = document.createElement('div'); d.id = 'edSaveHint'; d.className = 'saveHint'; const bs = document.getElementById('edSalvar'); bs.parentNode.insertBefore(d, bs); } return d; })();
+    const falhaEd = (msg, el) => { dicaEd.textContent = msg; dicaEd.classList.add('on'); if (el){ el.classList.remove('sacode'); void el.offsetWidth; el.classList.add('sacode'); } window.tocarSom?.('semMoedas'); };
+    dicaEd.classList.remove('on');
+    if (!novo){ falhaEd(en ? 'Give your task a name' : 'Dê um nome à tarefa', texto); texto.focus(); return; }
+    if (modo === 'repete' && dias.length === 0){ falhaEd(en ? 'Pick at least one day' : 'Escolha pelo menos um dia', document.getElementById('edDias') || null); return; }
 
     t.texto = novo;
     t.dif   = dif;

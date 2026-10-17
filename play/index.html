@@ -5047,6 +5047,12 @@ function devLiberarTodosItens(){
     if (['arma','armadura','elmo','escudo','acess'].includes(it[2])) { if (!inventario.some(s => baseDe(s.id) === id)) inventario.push({id: comAfixo(id), q: 1}); }
     else if (!inventario.some(s => s.id === id)) inventario.push({id, q: (it[2] === 'cons' || it[2] === 'chave') ? 5 : 1});
   });
+  // dev: tesouros pra testar a forja -- repoe ate 10 de cada a cada carregar
+  ITENS.slice(0, BASE_N).forEach((it, id) => {
+    if (!it || it[2] !== 'tesouro') return;
+    const sl = inventario.find(s => s.id === id);
+    if (!sl) inventario.push({id, q: 10}); else if (sl.q < 10) sl.q = 10;
+  });
 }
 window.devLiberarTodosItens = devLiberarTodosItens;
 

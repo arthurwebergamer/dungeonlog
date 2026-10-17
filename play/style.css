@@ -6357,3 +6357,11 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 .forjaCusto{font-size:13px;color:var(--text)}
 .forjaDica{font-size:12px;color:var(--dim)}
 .iacts button[disabled]{opacity:.4;pointer-events:none}
+
+/* Animacao da forja: 3 marteladas no item e o novo afixo entra com mola */
+@keyframes forjaBate{0%{transform:translateY(0) scale(1)}12%{transform:translateY(-7px) scale(1.04)}22%{transform:translateY(2px) scale(.9,1.06)}30%,38%{transform:translateY(0) scale(1)}46%{transform:translateY(-7px) scale(1.04)}56%{transform:translateY(2px) scale(.9,1.06)}64%,72%{transform:translateY(0) scale(1)}80%{transform:translateY(-7px) scale(1.06)}90%{transform:translateY(2px) scale(.88,1.08)}100%{transform:translateY(0) scale(1)}}
+@keyframes forjaTrem{0%,100%{transform:translateX(0)}20%{transform:translateX(-2px)}40%{transform:translateX(2px)}60%{transform:translateX(-1px)}80%{transform:translateX(1px)}}
+.ibox.forjando{animation:forjaBate .85s cubic-bezier(.3,.7,.3,1) both;border-color:var(--accent)}
+@keyframes forjaEntra{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+.forjaLn.forjaRev{animation:forjaEntra .55s var(--spr2,cubic-bezier(.2,.9,.3,1.2)) both}
+@media (prefers-reduced-motion:reduce){.ibox.forjando,.forjaLn.forjaRev{animation:none}}

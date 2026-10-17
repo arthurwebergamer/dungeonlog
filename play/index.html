@@ -133,7 +133,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=254">
+<link rel="stylesheet" href="style.css?v=256">
 <script>
 // A abertura so sai quando a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado; sair antes (assim que o CSS chega)
 // mostrava um flash cinza vazio e depois a tela de login por baixo, antes do carrossel (visto em video de teste). Teto de seguranca: 15s.
@@ -8184,31 +8184,52 @@ function forjaAnim(cb){
   }, t));
   setTimeout(cb, 1750);
 }
+const AFX_SP = {gan: 49, est: 77, sor: 42, bar: 86, tes: 1, bau: 16, abu: 118};   // sprites reais da sheet
+function forjaLinha(afx, cls, en, tag){
+  if (!afx) return '<div class="rolRow ' + cls + '"><div class="rolIc"></div><span class="rolTx dim">' + (en ? 'No enchantment' : 'Sem encantamento') + '</span></div>';
+  return '<div class="rolRow ' + cls + '"><div class="rolIc">' + spriteHTML(AFX_SP[afx[0]] || 1, 32) + '</div><span class="rolTx a-' + afx[0] + (afx[1] < 0 ? ' neg' : '') + '">' + afxEfeito(afx, en) + '</span>' + (tag || '') + '</div>';
+}
+/* roleta: 5 linhas, a do meio e a sorteada; desacelera e trava no resultado */
+function forjaRoleta(it, nv, cb){
+  const en = idiomaApp() === 'en', box = ficha.querySelector('.ibonus');
+  if (!box){ setTimeout(cb, 200); return; }
+  const reduz = matchMedia('(prefers-reduced-motion:reduce)').matches;
+  const atrasos = reduz ? [200] : [60, 60, 60, 60, 60, 70, 80, 90, 110, 130, 160, 200, 260, 340];
+  const fil = Array.from({length: atrasos.length + 6}, () => afxRolar(it.rar, null, P_NEG_FORJA));
+  const desenha = (k, final) => {
+    const rows = [0, 1, 2, 3, 4].map(r => (final && r === 2) ? nv : fil[k + r]);
+    box.innerHTML = '<div class="isep">' + (en ? 'Rolling enchantment' : 'Sorteando encantamento') + '</div><div class="rolista">' +
+      rows.map((a, r) => forjaLinha(a, r === 2 ? 'sel' : 'dim', en)).join('') + '</div>';
+  };
+  let k = 0;
+  const passo = () => {
+    if (k < atrasos.length){ desenha(k, false); setTimeout(passo, atrasos[k++]); }
+    else { desenha(0, true); box.querySelector('.rolRow.sel')?.classList.add('trava'); window.tocarSom?.('golpe'); if (navigator.vibrate) try { navigator.vibrate(30); } catch (e) {} setTimeout(cb, 650); }
+  };
+  passo();
+}
 function abrirForja(id, novo){
   const it = item(id), en = idiomaApp() === 'en';
   const custo = 1 + Math.min(it.rer, 2), tem = tesourosDisponiveis();
   const _ts = inventario.filter(s => item(s.id).tipo === 'tesouro').sort((a, z) => item(a.id).val - item(z.id).val)[0];
   const tsp = _ts ? item(_ts.id).sp : 1;
-  const lin = (afx, cls) => afx
-    ? '<div class="irow afl a-' + afx[0] + (afx[1] < 0 ? ' neg' : '') + (cls ? ' ' + cls : '') + '">' + afxEfeito(afx, en) + '</div>'
-    : '<div class="irow dim ' + (cls || '') + '"><b>' + (en ? 'No enchantment' : 'Sem encantamento') + '</b></div>';
   let corpo, acoes;
   if (novo){
-    corpo = '<div class="isep">' + (en ? 'Current' : 'Atual') + '</div>' + lin(it.afx, 'fVelho') +
-      '<div class="isep">' + (en ? 'New' : 'Novo') + ' · ' + afxNome(novo, en) + '</div>' + lin(novo, 'forjaRev');
+    corpo = '<div class="isep">' + (en ? 'Current' : 'Atual') + '</div><div class="rolista">' + forjaLinha(it.afx, 'cur', en) + '</div>' +
+      '<div class="isep">' + (en ? 'New' : 'Novo') + ' · ' + afxNome(novo, en) + '</div><div class="rolista">' + forjaLinha(novo, 'sel trava', en, '<span class="rolTag">' + (en ? 'NEW' : 'NOVO') + '</span>') + '</div>';
     acoes = '<button class="prim" data-a="fnovo">' + (en ? 'Keep new' : 'Ficar com o novo') + '</button><button data-a="fatual">' + (en ? 'Keep current' : 'Manter atual') + '</button>';
   } else {
-    corpo = '<div class="isep">' + (en ? 'Current enchantment' : 'Encantamento atual') + '</div>' + lin(it.afx) +
+    corpo = '<div class="isep">' + (en ? 'Current enchantment' : 'Encantamento atual') + '</div><div class="rolista">' + forjaLinha(it.afx, 'cur', en) + '</div>' +
       '<div class="isep"></div>' +
       '<div class="fSlots">' + Array.from({length: custo}, (_, k) => '<i class="pxi ' + (k < tem ? 'on' : '') + '" style="' + estiloSprite(tsp, 32) + '"></i>').join('') + '</div>' +
       '<div class="irow dim fSlotsTx"><span>' + (en ? 'Cost' : 'Custo') + ' ' + custo + ' ' + (en ? (custo > 1 ? 'treasures' : 'treasure') : (custo > 1 ? 'tesouros' : 'tesouro')) + '</span><span>·</span><span>' + (en ? 'You have' : 'Você tem') + ' <b class="' + (tem >= custo ? '' : 'neg') + '">' + tem + '</b></span></div>';
     acoes = '<button class="forjaBtn' + (tem >= custo ? '' : ' semTes') + '" data-a="fgo">' + (en ? 'Forge' : 'Forjar') + '</button><button data-a="fvolta">' + (en ? 'Back' : 'Voltar') + '</button>';
   }
   ficha.innerHTML =
-    '<div class="ihead eqh">' + cenaForjaHTML(it) + '</div><div><div class="iname" style="color:' + COR_RAR[it.rar] + '">' + nomeComAfixo(it, en) + '</div>' +
+    '<div class="ihead eqh"><div class="ibox">' + spriteHTML(it.sp, 44) + '</div><div><div class="iname" style="color:' + COR_RAR[it.rar] + '">' + nomeComAfixo(it, en) + '</div>' +
     '<div class="imeta tag" style="color:' + COR_RAR[it.rar] + '">' + (en ? 'Forge' : 'Forja') + ' · ' + RARIDADES[it.rar] + '</div></div></div>' +
     '<div class="ibonus istats">' + corpo + '</div><div class="iacts">' + acoes + '</div>';
-  if (novo){ faiscas(ficha.querySelector('.cena'), 12); window.tocarSom?.('chegadaRecompensa'); }
+  if (novo){ window.tocarSom?.('chegadaRecompensa'); }
   ficha.querySelectorAll('[data-a]').forEach(b => {
     b.onclick = () => {
       const a = b.dataset.a;
@@ -8219,7 +8240,8 @@ function abrirForja(id, novo){
         const nv = afxRolar(it.rar, it.afx ? it.afx[0] : null, P_NEG_FORJA);
         persistir(); renderInventario();
         ficha.querySelectorAll('button').forEach(x => x.disabled = true);
-        forjaAnim(() => abrirForja(id, nv));
+        const bg = ficha.querySelector('[data-a=fgo]'); if (bg) bg.textContent = en ? 'Forging…' : 'Forjando…';
+        forjaRoleta(it, nv, () => abrirForja(id, nv));
       }
       else if (a === 'fnovo' || a === 'fatual'){
         const afx = a === 'fnovo' ? novo : it.afx;

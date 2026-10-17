@@ -6645,3 +6645,7 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 .tourVolta{background:transparent;color:#EDE9F7;border:1.5px solid #4A4170 !important}
 .tourProx{background:#fff;color:#14101F}
 @media (prefers-reduced-motion:reduce){.tourHole,.tourCard{transition:none}.tourHole i{animation:none}}
+
+.tourOverlay.leve .tourHole{box-shadow:0 0 0 100vmax rgba(5,4,10,.5)}
+#addbtn.tourToque{transform:scale(.92);filter:brightness(1.3);transition:transform .12s}
+.tourFake{position:relative;z-index:1}

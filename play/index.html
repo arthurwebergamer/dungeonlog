@@ -6079,8 +6079,11 @@ const saveHint = document.createElement('div');
 saveHint.className = 'saveHint';
 if (btnSave) btnSave.parentNode.insertBefore(saveHint, btnSave);
 function mostrarDicaSave(txt){
-  saveHint.textContent = txt;
+  clearTimeout(saveHint._t);
+  if (txt) saveHint.textContent = txt;
   saveHint.classList.toggle('on', !!txt);
+  // fica 5 s e some com fade
+  if (txt) saveHint._t = setTimeout(() => saveHint.classList.remove('on'), 5000);
 }
 function sacudir(el){
   if (!el) return;
@@ -9266,8 +9269,8 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     const en = idiomaApp() === 'en';
     // aviso() esta mudo (TOASTS_DESATIVADOS): feedback proprio -- dica + sacudida + som
     const dicaEd = (() => { let d = document.getElementById('edSaveHint'); if (!d){ d = document.createElement('div'); d.id = 'edSaveHint'; d.className = 'saveHint'; const bs = document.getElementById('edSalvar'); bs.parentNode.insertBefore(d, bs); } return d; })();
-    const falhaEd = (msg, el) => { dicaEd.textContent = msg; dicaEd.classList.add('on'); if (el){ el.classList.remove('sacode'); void el.offsetWidth; el.classList.add('sacode'); } window.tocarSom?.('semMoedas'); };
-    dicaEd.classList.remove('on');
+    const falhaEd = (msg, el) => { clearTimeout(dicaEd._t); dicaEd.textContent = msg; dicaEd.classList.add('on'); dicaEd._t = setTimeout(() => dicaEd.classList.remove('on'), 5000); if (el){ el.classList.remove('sacode'); void el.offsetWidth; el.classList.add('sacode'); } window.tocarSom?.('semMoedas'); };
+    clearTimeout(dicaEd._t); dicaEd.classList.remove('on');
     if (!novo){ falhaEd(en ? 'Give your task a name' : 'Dê um nome à tarefa', texto); texto.focus(); return; }
     if (modo === 'repete' && dias.length === 0){ falhaEd(en ? 'Pick at least one day' : 'Escolha pelo menos um dia', document.getElementById('edDias') || null); return; }
 

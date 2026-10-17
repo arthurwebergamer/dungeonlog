@@ -6470,3 +6470,8 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 @media (prefers-reduced-motion:reduce){.sacode{animation:none}}
 
 .saveHint.on{transition:opacity .2s,height .2s,margin .2s}
+
+/* botoes secundarios (Forjar, Vender, Voltar...) com cara de tocaveis, nao de desabilitados */
+.iacts button:not(.prim){background:color-mix(in srgb,var(--text) 9%,var(--poco));border-color:color-mix(in srgb,var(--text) 38%,transparent);color:var(--text)}
+.iacts button:not(.prim):active{background:color-mix(in srgb,var(--text) 16%,var(--poco))}
+#confirmOk{background:color-mix(in srgb,var(--text) 9%,var(--poco));border-color:color-mix(in srgb,var(--text) 38%,transparent);color:var(--text)}

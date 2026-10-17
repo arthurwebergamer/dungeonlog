@@ -6436,7 +6436,6 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 .iafn.a-est{color:var(--afx-est)}.iafn.a-sor{color:var(--afx-sor)}.iafn.a-bar{color:var(--afx-bar)}.iafn.a-bau{color:var(--afx-bau)}.iafn.a-abu{color:var(--afx-abu)}.iafn.a-tes{color:var(--afx-tes)}
 .istats .irow b.afv{font-weight:600}
 
-/* Celula: borda cheia na cor da raridade (original) + aro interno fino na cor do afixo */
-.cel.afc{--tr:var(--afx-gan)}
-.cel.afc.a-est{--tr:var(--afx-est)}.cel.afc.a-sor{--tr:var(--afx-sor)}.cel.afc.a-bar{--tr:var(--afx-bar)}.cel.afc.a-bau{--tr:var(--afx-bau)}.cel.afc.a-abu{--tr:var(--afx-abu)}.cel.afc.a-tes{--tr:var(--afx-tes)}
-.cel.afc::before{content:'';position:absolute;inset:3px;border:1px solid var(--tr);border-radius:7px;opacity:.75;pointer-events:none}
+/* afixo no loot do bau */
+.baufx{font:600 11px 'Outfit',sans-serif;margin-top:2px;color:var(--afx-gan)}
+.baufx.a-est{color:var(--afx-est)}.baufx.a-sor{color:var(--afx-sor)}.baufx.a-bar{color:var(--afx-bar)}.baufx.a-bau{color:var(--afx-bau)}.baufx.a-abu{color:var(--afx-abu)}.baufx.a-tes{color:var(--afx-tes)}

@@ -6436,29 +6436,7 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 .iafn.a-est{color:var(--afx-est)}.iafn.a-sor{color:var(--afx-sor)}.iafn.a-bar{color:var(--afx-bar)}.iafn.a-bau{color:var(--afx-bau)}.iafn.a-abu{color:var(--afx-abu)}.iafn.a-tes{color:var(--afx-tes)}
 .istats .irow b.afv{font-weight:600}
 
-/* Moldura de celula do inventario: cantoneiras na cor da raridade; a do canto superior direito vira a cor do afixo */
-.cel{border-color:var(--line);box-shadow:none;--rc:#4A4066;--tr:var(--rc)}
-.cel.r1{--rc:var(--verde)}.cel.r2{--rc:#5AA9F2}.cel.r3{--rc:#B57BE8}.cel.r4{--rc:#F2A65A;box-shadow:0 0 12px rgba(242,166,90,.22)}
+/* Celula: borda cheia na cor da raridade (original) + aro interno fino na cor do afixo */
 .cel.afc{--tr:var(--afx-gan)}
 .cel.afc.a-est{--tr:var(--afx-est)}.cel.afc.a-sor{--tr:var(--afx-sor)}.cel.afc.a-bar{--tr:var(--afx-bar)}.cel.afc.a-bau{--tr:var(--afx-bau)}.cel.afc.a-abu{--tr:var(--afx-abu)}.cel.afc.a-tes{--tr:var(--afx-tes)}
-.cel::before{content:'';position:absolute;inset:3px;pointer-events:none;
-  background:
-    linear-gradient(var(--rc),var(--rc)) 0 0/11px 2px no-repeat,
-    linear-gradient(var(--rc),var(--rc)) 0 0/2px 11px no-repeat,
-    linear-gradient(var(--tr),var(--tr)) 100% 0/11px 2px no-repeat,
-    linear-gradient(var(--tr),var(--tr)) 100% 0/2px 11px no-repeat,
-    linear-gradient(var(--rc),var(--rc)) 0 100%/11px 2px no-repeat,
-    linear-gradient(var(--rc),var(--rc)) 0 100%/2px 11px no-repeat,
-    linear-gradient(var(--rc),var(--rc)) 100% 100%/11px 2px no-repeat,
-    linear-gradient(var(--rc),var(--rc)) 100% 100%/2px 11px no-repeat}
-.cel.afc::before{background:
-    linear-gradient(var(--rc),var(--rc)) 0 0/11px 2px no-repeat,
-    linear-gradient(var(--rc),var(--rc)) 0 0/2px 11px no-repeat,
-    linear-gradient(var(--tr),var(--tr)) 100% 0/15px 3px no-repeat,
-    linear-gradient(var(--tr),var(--tr)) 100% 0/3px 15px no-repeat,
-    linear-gradient(var(--rc),var(--rc)) 0 100%/11px 2px no-repeat,
-    linear-gradient(var(--rc),var(--rc)) 0 100%/2px 11px no-repeat,
-    linear-gradient(var(--rc),var(--rc)) 100% 100%/11px 2px no-repeat,
-    linear-gradient(var(--rc),var(--rc)) 100% 100%/2px 11px no-repeat}
-.cel .eq{left:8px;top:8px}
-.cel .qtd{right:8px;bottom:6px}
+.cel.afc::before{content:'';position:absolute;inset:3px;border:1px solid var(--tr);border-radius:7px;opacity:.75;pointer-events:none}

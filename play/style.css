@@ -6706,3 +6706,5 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 /* durante o tour: sem blur de fundo nas folhas (backdrop-filter em tela cheia e o que mais pesa na animacao) */
 body.tourAberto .edov,body.tourAberto .baubg,body.tourAberto .sheetbg{backdrop-filter:none !important;-webkit-backdrop-filter:none !important}
 body.tourAberto .edsheet{will-change:transform}
+
+.tourHole{transition:none !important}

@@ -133,7 +133,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=277">
+<link rel="stylesheet" href="style.css?v=278">
 <script>
 // A abertura so sai quando a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado; sair antes (assim que o CSS chega)
 // mostrava um flash cinza vazio e depois a tela de login por baixo, antes do carrossel (visto em video de teste). Teto de seguranca: 15s.
@@ -12588,7 +12588,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     const rs = els.map(e => e.getBoundingClientRect());
     const l = Math.min(...rs.map(r => r.left)), t = Math.min(...rs.map(r => r.top));
     const r2 = Math.max(...rs.map(r => r.right)), b = Math.max(...rs.map(r => r.bottom));
-    return {el: els[0], left: l, top: t, right: r2, bottom: b, width: r2 - l, height: b - t};
+    return {el: els[0], rects: rs, left: l, top: t, right: r2, bottom: b, width: r2 - l, height: b - t};
   }
   let tourDigT = null;
   // texto inteiro reservado desde o inicio (parte nao digitada fica transparente): a caixa nao muda de altura enquanto digita
@@ -12633,9 +12633,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     if (!r || r.width < 4 || r.height < 4) return false;
     const pad = 6, W = window.innerWidth, H = window.innerHeight, t = en ? st.en : st.pt;
     const hl = r.left - pad, ht = r.top - pad, hw = r.width + pad * 2, hh = r.height + pad * 2;
-    const _d = Math.abs((parseFloat(hole.style.left) || 0) - hl) + Math.abs((parseFloat(hole.style.top) || 0) - ht) + Math.abs((parseFloat(hole.style.width) || 0) - hw) + Math.abs((parseFloat(hole.style.height) || 0) - hh);
-    hole.style.transition = (anima && _d < 260) ? '' : 'none';   // salto grande (ex.: botao -> formulario): troca na hora, sem repintar a tela inteira a cada frame
-    if (anima){ hole.classList.remove('chega'); void hole.offsetWidth; hole.classList.add('chega'); }
+    hole.style.transition = 'none';   // o quadrado nunca anima largura/altura (ficava esticando); entra com um 'pop' curto
     hole.style.left = hl + 'px'; hole.style.top = ht + 'px'; hole.style.width = hw + 'px'; hole.style.height = hh + 'px';
     // blocos transparentes: so o buraco deixa o toque passar (passo interativo); no passo informativo o miolo tambem bloqueia
     const B = {t: [0, 0, W, ht], b: [0, ht + hh, W, H - ht - hh], l: [0, ht, hl, hh], r: [hl + hw, ht, W - hl - hw, hh], m: [hl, ht, hw, hh]};
@@ -12645,6 +12643,10 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       if (q.dataset.p === 'm') q.style.display = st.espera ? 'none' : 'block';
     });
     tourEl.classList.toggle('vez', !!st.espera);
+    if (anima){
+      hole.classList.remove('chega'); void hole.offsetWidth; hole.classList.add('chega');
+      if (hole.animate) hole.animate([{transform: 'scale(1.1)', opacity: .35}, {transform: 'scale(1)', opacity: 1}], {duration: 240, easing: 'cubic-bezier(.2,.9,.3,1)'});
+    }
     card.querySelector('.tourNum').textContent = (tourI + 1) + ' / ' + TOUR.length;
     card.querySelector('.tourTag').textContent = st.espera ? (en ? 'YOUR TURN' : 'SUA VEZ') : '';
     const _img = card.querySelector('.tourFace img'), _h = (typeof heroiAtual === 'function') ? heroiAtual() : null;
@@ -12662,22 +12664,21 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       card.style.width = cw + 'px';
       const ch = card.offsetHeight;
       let nl, nt, bot = 'auto';
-      if (largo){
-        // desktop: tenta abaixo, acima, direita, esquerda; usa o primeiro lugar que cabe sem cobrir o destaque
-        const M = 14, cx = Math.max(M, Math.min(W - cw - M, r.left + r.width / 2 - cw / 2)), cy = Math.max(M, Math.min(H - ch - M, r.top + r.height / 2 - ch / 2));
-        const hx0 = r.left - pad - 8, hx1 = r.right + pad + 8, hy0 = r.top - pad - 8, hy1 = r.bottom + pad + 8;
-        const cand = [[cx, r.bottom + pad + 20], [cx, r.top - pad - 20 - ch], [r.right + pad + 20, cy], [r.left - pad - 20 - cw, cy]];
-        const cabe = ([x, y]) => x >= M && y >= M && x + cw <= W - M && y + ch <= H - M && (x + cw < hx0 || x > hx1 || y + ch < hy0 || y > hy1);
-        const esc = cand.find(cabe) || [cx, Math.max(M, Math.min(H - ch - M, r.bottom + pad + 20))];
-        nl = esc[0]; nt = esc[1];
-        card.classList.remove('noTopo');
-      } else {
-        const noFundo = (r.bottom + pad) > (H - ch - 28);
-        card.classList.toggle('noTopo', noFundo);
-        nl = Math.round((W - cw) / 2);
-        nt = noFundo ? 'calc(12px + env(safe-area-inset-top, 0px))' : 'auto';
-        bot = noFundo ? 'auto' : 'calc(14px + env(safe-area-inset-bottom, 0px))';
+      const M = 12, liv = (x, y) => r.rects.every(q => (x + cw < q.left - 10 || x > q.right + 10 || y + ch < q.top - 10 || y > q.bottom + 10));   // nao cobre nenhum alvo
+      const dentro = (x, y) => x >= M && y >= M && x + cw <= W - M && y + ch <= H - M;
+      const cx = Math.max(M, Math.min(W - cw - M, r.left + r.width / 2 - cw / 2)), cy = Math.max(M, Math.min(H - ch - M, r.top + r.height / 2 - ch / 2));
+      const topoSeg = 'calc(12px + env(safe-area-inset-top, 0px))', baseSeg = 'calc(14px + env(safe-area-inset-bottom, 0px))';
+      let cand;
+      if (largo) cand = [[r.right + pad + 20, cy], [r.left - pad - 20 - cw, cy], [cx, r.bottom + pad + 20], [cx, r.top - pad - 20 - ch]];
+      else cand = [[cx, H - ch - 14], [cx, M]];
+      let esc = cand.find(([x, y]) => dentro(x, y) && liv(x, y));
+      if (!esc){   // nada cabe fora do destaque: procura um vao entre os alvos (ex.: entre o campo e o botao Criar do formulario)
+        for (let y = M; y + ch <= H - M && !esc; y += 12) if (liv(cx, y)) esc = [cx, y];
       }
+      if (!esc) esc = cand[0];
+      nl = Math.round(esc[0]); nt = Math.round(esc[1]);
+      if (!largo){ nl = Math.round((W - cw) / 2); if (nt >= H - ch - 20){ nt = 'auto'; bot = baseSeg; } else if (nt <= M + 1){ nt = topoSeg; } }
+      card.classList.toggle('noTopo', !largo && nt !== 'auto');
       const aplica = () => { card.style.left = nl + 'px'; card.style.top = (typeof nt === 'number') ? nt + 'px' : nt; card.style.bottom = bot; };
       const ox = parseFloat(card.style.left), oy = parseFloat(card.style.top);
       const salto = largo && !isNaN(ox) && !isNaN(oy) && (Math.abs(ox - nl) + Math.abs(oy - nt) > 150) && !card.classList.contains('tcOculto');

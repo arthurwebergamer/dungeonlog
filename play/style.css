@@ -6475,3 +6475,8 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 .iacts button:not(.prim),#confirmOk{background:color-mix(in srgb,var(--accent) 16%,var(--poco));border:1.5px solid color-mix(in srgb,var(--accent) 65%,transparent);color:var(--accent)}
 .iacts button:not(.prim):active,#confirmOk:active{background:color-mix(in srgb,var(--accent) 28%,var(--poco))}
 .iacts button.semTes{opacity:.45}
+
+/* Forjar: dourado com brilho pulsante -> chama atencao (dá pra forjar) */
+@keyframes forjaBrilho{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--gold) 55%,transparent)}50%{box-shadow:0 0 10px 2px color-mix(in srgb,var(--gold) 45%,transparent)}}
+.iacts button.forjaBtn{background:color-mix(in srgb,var(--gold) 18%,var(--poco));border:1.5px solid var(--gold);color:var(--gold);animation:forjaBrilho 2s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.iacts button.forjaBtn{animation:none}}

@@ -7955,7 +7955,7 @@ function abrirFicha(id){
   } else if (SLOTS.includes(it.tipo)){
     if (bi.x) bonus += '<span>XP '+(bi.x>0?'+':'')+bi.x+'%</span>';
     if (bi.m) bonus += '<span>' + (en ? 'Coins ' : 'Moedas ') + (bi.m>0?'+':'')+bi.m+'%</span>';
-    if (it.afx) bonus += '<span class="afxTag a-'+it.afx[0]+'">' + afixoTexto(it, en) + '</span>';
+    if (it.afx) bonus += '<span class="afxTag a-'+it.afx[0]+'">' + afixoTexto(it, en) + '</span><span class="forjaDica">' + ({gan: en ? 'Bonus coins on every task.' : 'Mais moedas em toda tarefa.', est: en ? 'Bonus XP on every task.' : 'Mais XP em toda tarefa.', sor: en ? 'Better rarity in chest loot.' : 'Raridade melhor no loot dos baús.', bar: en ? 'Cheaper items in the shop.' : 'Itens mais baratos na loja.'}[it.afx[0]]) + '</span>';
   }
   // pedido do usuario: chaves normais agora sao vendaveis -- so o
   // Grimorio (val:0, acao propria "Abrir") continua fora do preco/botao
@@ -8025,7 +8025,7 @@ function trocarVariante(idAtual, idNovo){
 }
 function abrirForja(id, novo){
   const it = item(id), en = idiomaApp() === 'en';
-  const custo = 3 + it.rer, tem = tesourosDisponiveis();
+  const custo = 1 + Math.min(it.rer, 2), tem = tesourosDisponiveis();
   const linha = (rot, afx) => '<div class="forjaLn"><small>' + rot + '</small><b class="afxTag a-' + afx[0] + '">' + afixoTexto({afx}, en) + '</b></div>';
   let corpo, acoes;
   if (novo){
@@ -8035,7 +8035,8 @@ function abrirForja(id, novo){
     corpo = linha(en ? 'Current affix' : 'Afixo atual', it.afx) +
       '<div class="forjaCusto">' + (en ? 'Cost: ' : 'Custo: ') + '<b>' + custo + '</b> ' + (en ? 'treasures' : 'tesouros') +
       ' · ' + (en ? 'you have ' : 'você tem ') + '<b style="color:' + (tem >= custo ? 'var(--verde)' : 'var(--perigo)') + '">' + tem + '</b></div>' +
-      '<div class="forjaDica">' + (en ? 'Rerolls the affix only. The cost goes up by 1 each time you forge this item.' : 'Rerrola só o afixo. O custo sobe 1 a cada forja deste item.') + '</div>';
+      '<div class="forjaDica">' + (en ? 'Spend treasures to roll a new bonus for this item. You see the result and choose: keep the new one or the current one. Cost: 1, then 2, then 3 per forge (max).' : 'Gaste tesouros para sortear um novo bônus neste item. Você vê o resultado e escolhe: ficar com o novo ou manter o atual. Custo: 1, depois 2, depois 3 por forja (máximo).') + '</div>' +
+      '<div class="forjaDica">' + (en ? 'Possible: ' : 'Pode sair: ') + AFX_CHAVES.map(k => { const f = AFIXOS[k].faixa[it.rar]; return (en ? AFIXOS[k].en : AFIXOS[k].pt) + ' ' + f[0] + (f[1] > f[0] ? '–' + f[1] : '') + '%'; }).join(' · ') + '</div>';
     acoes = '<button class="prim" data-a="fgo"' + (tem >= custo ? '' : ' disabled') + '>' + (en ? 'Forge' : 'Forjar') + '</button><button data-a="fvolta">' + (en ? 'Back' : 'Voltar') + '</button>';
   }
   ficha.innerHTML =

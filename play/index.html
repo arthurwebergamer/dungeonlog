@@ -133,7 +133,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=233">
+<link rel="stylesheet" href="style.css?v=234">
 <script>
 // A abertura so sai quando a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado; sair antes (assim que o CSS chega)
 // mostrava um flash cinza vazio e depois a tela de login por baixo, antes do carrossel (visto em video de teste). Teto de seguranca: 15s.
@@ -3044,11 +3044,33 @@ const AFIXOS = {
 const AFX_CHAVES = ['gan','est','sor','bar','bau','abu','tes'];
 const AFX_TETO = {gan:25, est:25, sor:10, bar:10, bau:10, abu:15, tes:20};   // soma dos slots (% de afixo)
 const _varMapa = {};
-function afxRolar(rar, excluir){
-  let ch = AFX_CHAVES.filter(k => k !== excluir);
+// encantamentos RUINS (maldicoes): mesmo tipo, valor negativo. Podem vir no loot (20%) e na forja (30%).
+const AFX_NEG = {
+  gan: {pt:'Perdulário', en:'Spendthrift',    faixa:[[1,1],[1,2],[1,3],[2,4],[3,5]]},
+  est: {pt:'Distraído',  en:'Absent-minded',  faixa:[[1,1],[1,2],[1,3],[2,4],[3,5]]},
+  sor: {pt:'Azarado',    en:'Unlucky',        faixa:[[1,1],[1,1],[1,2],[1,3],[2,3]]},
+  bar: {pt:'Esbanjador', en:'Wasteful',       faixa:[[1,1],[1,1],[1,2],[2,3],[2,4]]}
+};
+const AFX_NEG_CHAVES = ['gan','est','sor','bar'];
+const P_NEG_LOOT = 0.20, P_NEG_FORJA = 0.30;
+function afxRolar(rar, excluir, pNeg){
+  const r = Math.max(0, Math.min(4, rar));
+  const neg = pNeg && Math.random() < pNeg;
+  const ch = (neg ? AFX_NEG_CHAVES : AFX_CHAVES).filter(k => k !== excluir);
   const k = ch[Math.floor(Math.random()*ch.length)];
-  const f = AFIXOS[k].faixa[Math.max(0, Math.min(4, rar))];
-  return [k, f[0] + Math.floor(Math.random()*(f[1]-f[0]+1))];
+  const f = (neg ? AFX_NEG[k] : AFIXOS[k]).faixa[r];
+  const v = f[0] + Math.floor(Math.random()*(f[1]-f[0]+1));
+  return [k, neg ? -v : v];
+}
+function afxNome(afx, en){ const A = afx[1] < 0 ? AFX_NEG[afx[0]] : AFIXOS[afx[0]]; return en ? A.en : A.pt; }
+function afxEfeito(afx, en){
+  const k = afx[0], v = Math.abs(afx[1]);
+  if (afx[1] < 0) return {gan: en ? '-'+v+'% coins earned' : '-'+v+'% moedas ganhas', est: en ? '-'+v+'% XP earned' : '-'+v+'% XP ganho',
+    sor: en ? '-'+v+'% chest luck' : '-'+v+'% sorte nos baús', bar: en ? '+'+v+'% shop prices' : '+'+v+'% preço na loja'}[k];
+  return {gan: en ? '+'+v+'% coins earned' : '+'+v+'% moedas ganhas', est: en ? '+'+v+'% XP earned' : '+'+v+'% XP ganho',
+    sor: en ? '+'+v+'% chest luck' : '+'+v+'% sorte nos baús', bar: en ? v+'% shop discount' : v+'% de desconto na loja',
+    bau: en ? '+'+v+'% locked chest chance' : '+'+v+'% chance de baú trancado', abu: en ? '+'+v+'% extra chest chance' : '+'+v+'% chance de baú extra',
+    tes: en ? '+'+v+'% treasure chance' : '+'+v+'% chance de tesouro'}[k];
 }
 function variante(baseId, afx, rer){
   rer = rer || 0;
@@ -3061,7 +3083,7 @@ function variante(baseId, afx, rer){
   return (_varMapa[key] = ITENS.length - 1);
 }
 function ehEquipBase(id){ return id >= 0 && id < BASE_N && ITENS[id] && !ITENS[id][8] && ['arma','armadura','elmo','escudo','acess'].includes(ITENS[id][2]); }
-function comAfixo(id){ return ehEquipBase(id) ? variante(id, afxRolar(ITENS[id][3]), 0) : id; }
+function comAfixo(id){ return ehEquipBase(id) ? variante(id, afxRolar(ITENS[id][3], null, P_NEG_LOOT), 0) : id; }
 function baseDe(id){ const a = ITENS[id]; return (a && a[12] != null) ? a[12] : id; }
 function limparVariantes(){ ITENS.length = BASE_N; Object.keys(_varMapa).forEach(k => delete _varMapa[k]); }
 function exportarVariantes(){ return ITENS.slice(BASE_N).map(r => [r[12], r[10][0], r[10][1], r[11]]); }
@@ -3088,16 +3110,9 @@ const AFX_SUFIXO = {
   gan:['do Ganancioso','of the Greedy'], est:['do Estudioso','of the Scholar'], sor:['do Sortudo','of the Lucky'], bar:['do Barganhista','of the Haggler'],
   bau:['do Caçador de Baús','of the Chest Hunter'], abu:['da Abundância','of Plenty'], tes:['do Garimpeiro','of the Prospector']
 };
-function nomeComAfixo(it, en){ return it.afx ? it.nome + ' ' + AFX_SUFIXO[it.afx[0]][en ? 1 : 0] : it.nome; }
-function afixoTexto(it, en){
-  if (!it.afx) return '';
-  const A = AFIXOS[it.afx[0]], v = it.afx[1];
-  const nome = en ? A.en : A.pt;
-  const t = {gan: en ? 'Coins +'+v+'%' : 'Moedas +'+v+'%', est: 'XP +'+v+'%',
-             sor: en ? 'Luck +'+v+'% (chests)' : 'Sorte +'+v+'% (baús)', bar: en ? 'Shop -'+v+'%' : 'Loja -'+v+'%',
-             bau: en ? 'Locked chest +'+v+'%' : 'Baú trancado +'+v+'%', abu: en ? 'Extra chest '+v+'%' : 'Baú extra '+v+'%', tes: en ? 'Treasure +'+v+'%' : 'Tesouro +'+v+'%'}[it.afx[0]];
-  return nome + ' · ' + t;
-}
+const AFX_SUFIXO_NEG = {gan:['do Perdulário','of the Spendthrift'], est:['do Distraído','of the Absent-minded'], sor:['do Azarado','of the Unlucky'], bar:['do Esbanjador','of the Wasteful']};
+function nomeComAfixo(it, en){ return it.afx ? it.nome + ' ' + (it.afx[1] < 0 ? AFX_SUFIXO_NEG : AFX_SUFIXO)[it.afx[0]][en ? 1 : 0] : it.nome; }
+function afixoTexto(it, en){ return it.afx ? afxNome(it.afx, en) + ' · ' + afxEfeito(it.afx, en) : ''; }
 
 let inventario = [];   // [{id:indiceNoCatalogo, q:quantidade}]
 let equipado = {arma:null, armadura:null, elmo:null, escudo:null, acess:null};
@@ -7672,7 +7687,7 @@ function afixoSoma(k){
     const a = ITENS[id][10];
     if (a && a[0] === k) t += a[1];
   });
-  return Math.min(AFX_TETO[k], t);
+  return Math.max(-AFX_TETO[k], Math.min(AFX_TETO[k], t));
 }
 window.afixoSoma = afixoSoma;
 
@@ -7939,7 +7954,7 @@ function renderInventario(){
     const it = item(s.id), t = it.tipo;
     if (filtroAfx !== 'todos' && !(it.afx && it.afx[0] === filtroAfx)) return false;
     if (termoBusca && semAcento(it.nome).indexOf(termoBusca) < 0 && semAcento(ITENS[s.id][1]).indexOf(termoBusca) < 0 && semAcento(ITENS[s.id][9]).indexOf(termoBusca) < 0
-        && !(it.afx && (semAcento(AFIXOS[it.afx[0]].pt).indexOf(termoBusca) >= 0 || semAcento(AFIXOS[it.afx[0]].en).indexOf(termoBusca) >= 0))) return false;
+        && !(it.afx && (semAcento(afxNome(it.afx, false)).indexOf(termoBusca) >= 0 || semAcento(afxNome(it.afx, true)).indexOf(termoBusca) >= 0))) return false;
     if (filtroInv === 'tudo') return true;
     if (filtroInv === 'equip') return SLOTS.includes(t) && (filtroSubEquip === 'todos' || subcatEquip(ITENS[s.id][1], t) === filtroSubEquip);
     return t === filtroInv;
@@ -7999,34 +8014,22 @@ function abrirFicha(id){
   const en = idiomaApp() === 'en';
 
   const bi = bonusItem(it);
+  const row = (rot, val, cls) => '<div class="irow"><span>' + rot + '</span><b class="' + (cls || (String(val).charAt(0) === '-' ? 'neg' : 'pos')) + '">' + val + '</b></div>';
   let bonus = '';
   if (it.tipo === 'cons'){
-    if (bi.x) bonus += '<span>' + (en ? 'Grants ' + bi.x + ' XP' : 'Concede '+bi.x+' XP') + '</span>';
-    if (bi.m) bonus += '<span>' + (en ? 'Grants ' + bi.m + ' coins' : 'Concede '+bi.m+' moedas') + '</span>';
+    if (bi.x) bonus += row('XP', '+' + bi.x);
+    if (bi.m) bonus += row(en ? 'Coins' : 'Moedas', '+' + bi.m);
+    if (it.h) bonus += row('HP', '+' + it.h);
   } else if (SLOTS.includes(it.tipo)){
-    // estilo ficha de RPG: atributos base em linhas rotulo/valor + secao de encantamento
-    const row = (rot, val, cls) => '<div class="irow"><span>' + rot + '</span><b class="' + (cls || (String(val).charAt(0) === '-' ? 'neg' : 'pos')) + '">' + val + '</b></div>';
     if (bi.x) bonus += row('XP', (bi.x>0?'+':'')+bi.x+'%');
     if (bi.m) bonus += row(en ? 'Coins' : 'Moedas', (bi.m>0?'+':'')+bi.m+'%');
-    if (it.afx){
-      const A = AFIXOS[it.afx[0]];
-      const unid = {gan: en ? 'Coins' : 'Moedas', est: 'XP', sor: en ? 'Chest luck' : 'Sorte nos baús', bar: en ? 'Shop price' : 'Preço na loja',
-                    bau: en ? 'Locked chest' : 'Baú trancado', abu: en ? 'Extra chest' : 'Baú extra', tes: en ? 'Treasure chance' : 'Chance de tesouro'}[it.afx[0]];
-      const sinal = it.afx[0] === 'bar' ? '-' : '+';
-      bonus += row(unid, sinal + it.afx[1] + '%', 'afv a-' + it.afx[0]) +
-        '';
-    }
-    bonus += '<div class="isep"></div>';
+    if (it.afx) bonus += '<div class="irow afl a-' + it.afx[0] + (it.afx[1] < 0 ? ' neg' : '') + '">' + afxEfeito(it.afx, en) + '</div>';
   }
-  // pedido do usuario: chaves normais agora sao vendaveis -- so o
-  // Grimorio (val:0, acao propria "Abrir") continua fora do preco/botao
-  // de venda. Antes "it.tipo !== 'chave'" excluia TODA chave junto.
-  const ehEq = SLOTS.includes(it.tipo);
-  if (!(it.tipo === 'chave' && id === ID_GRIMORIO_INV)) bonus += ehEq
-    ? '<div class="irow dim"><span>' + (en ? 'Sells for' : 'Vende por') + '</span><b>' + precoVenda(it) + ' ' + (en ? 'coins' : 'moedas') + '</b></div>'
-    : '<span>' + (en ? 'Sells for ' + precoVenda(it) + ' coins' : 'Vende por '+precoVenda(it)+' moedas') + '</span>';
-  if (it.tipo === 'chave' && id !== ID_GRIMORIO_INV) bonus += '<span>' + (en ? 'Used automatically to unlock a locked chest in the Arena' : 'Usada automaticamente pra destrancar um baú trancado na Arena') + '</span>';
-  if (q > 1) bonus += ehEq ? '<div class="irow dim"><span>' + (en ? 'Quantity' : 'Quantidade') + '</span><b>' + q + '</b></div>' : '<span>' + (en ? 'Quantity: ' + q : 'Quantidade: '+q) + '</span>';
+  bonus += '<div class="isep"></div>';
+  const ehEq = true;   // todos os tipos usam o estilo tooltip
+  if (it.tipo === 'chave' && id !== ID_GRIMORIO_INV) bonus += '<div class="idesc">' + (en ? 'Used automatically to unlock a locked chest in the Arena' : 'Usada automaticamente pra destrancar um baú trancado na Arena') + '</div>';
+  if (!(it.tipo === 'chave' && id === ID_GRIMORIO_INV)) bonus += '<div class="irow dim"><span>' + (en ? 'Sells for' : 'Vende por') + '</span><b>' + precoVenda(it) + ' ' + (en ? 'coins' : 'moedas') + '</b></div>';
+  if (q > 1) bonus += '<div class="irow dim"><span>' + (en ? 'Quantity' : 'Quantidade') + '</span><b>' + q + '</b></div>';
 
   let acoes = '';
   if (EQUIPAVEL(id)) acoes += '<button class="prim" data-a="eq">'+(estaEquipado ? (en ? 'Unequip' : 'Desequipar') : (en ? 'Equip' : 'Equipar'))+'</button>';
@@ -8090,7 +8093,7 @@ function trocarVariante(idAtual, idNovo){
 function abrirForja(id, novo){
   const it = item(id), en = idiomaApp() === 'en';
   const custo = 1 + Math.min(it.rer, 2), tem = tesourosDisponiveis();
-  const bloco = (rot, afx) => '<div class="fBloco"><small>' + rot + '</small><div class="iafx a-' + afx[0] + '"><b>✦ ' + (en ? AFIXOS[afx[0]].en : AFIXOS[afx[0]].pt) + ' ✦</b></div><div class="fVal a-' + afx[0] + '">' + afixoTexto({afx}, en).split(' · ')[1] + '</div></div>';
+  const bloco = (rot, afx) => '<div class="fBloco"><small>' + rot + '</small><div class="iafx a-' + afx[0] + '"><b>✦ ' + afxNome(afx, en) + ' ✦</b></div><div class="fVal a-' + afx[0] + (afx[1] < 0 ? ' neg' : '') + '">' + afxEfeito(afx, en) + '</div></div>';
   let corpo, acoes;
   if (novo){
     corpo = '<div class="fPar">' + bloco(en ? 'Current' : 'Atual', it.afx) + bloco(en ? 'New' : 'Novo', novo).replace('fBloco', 'fBloco forjaRev') + '</div>';
@@ -8113,7 +8116,7 @@ function abrirForja(id, novo){
       else if (a === 'fgo'){
         if (tesourosDisponiveis() < custo) return;
         gastarTesouros(custo);
-        const nv = afxRolar(it.rar, it.afx[0]);
+        const nv = afxRolar(it.rar, it.afx[0], P_NEG_FORJA);
         persistir(); renderInventario();
         ficha.querySelectorAll('button').forEach(x => x.disabled = true);
         const bx = ficha.querySelector('.ibox'); if (bx) bx.classList.add('forjando');
@@ -11474,7 +11477,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
           '<div class="bautxt">'+
             '<div class="baunome">'+it.nome+'</div>'+
             '<div class="bauraridade" style="color:'+COR_RAR[it.rar]+'">'+RARIDADES[it.rar]+'</div>'+
-            (it.afx ? '<div class="baufx a-'+it.afx[0]+'">'+afixoTexto(it, en)+'</div>' : '')+
+            (it.afx ? '<div class="baufx a-'+it.afx[0]+(it.afx[1] < 0 ? ' neg' : '')+'">'+afixoTexto(it, en)+'</div>' : '')+
           '</div>';
         alvo.appendChild(card);
       });
@@ -11958,8 +11961,8 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 
   function bonusFortuna(){ return Math.min(FORTUNA_TETO, gasto.fortuna * FORTUNA_POR_PONTO); }
   // total efetivo = pontos + afixo Sortudo (dividem o mesmo teto)
-  function bonusFortunaTotal(){ return Math.min(FORTUNA_TETO, bonusFortuna() + ((window.afixoSoma ? window.afixoSoma('sor') : 0) / 100)); }
-  function descontoLoja(){ return Math.min(FOCO_TETO, descontoFoco() + ((window.afixoSoma ? window.afixoSoma('bar') : 0) / 100)); }
+  function bonusFortunaTotal(){ return Math.max(0, Math.min(FORTUNA_TETO, bonusFortuna() + ((window.afixoSoma ? window.afixoSoma('sor') : 0) / 100))); }
+  function descontoLoja(){ return Math.max(-0.10, Math.min(FOCO_TETO, descontoFoco() + ((window.afixoSoma ? window.afixoSoma('bar') : 0) / 100))); }
   function descontoFoco(){ return Math.min(FOCO_TETO, gasto.foco * FOCO_POR_PONTO); }
   function perdaoVigor(){ return Math.min(VIGOR_TETO, gasto.vigor * VIGOR_POR_PONTO); }
 

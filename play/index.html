@@ -8104,7 +8104,7 @@ function abrirForja(id, novo){
       '<div class="fCusto">' + (en ? 'Cost' : 'Custo') + ' <b>' + custo + '</b> ' + (en ? (custo > 1 ? 'treasures' : 'treasure') : (custo > 1 ? 'tesouros' : 'tesouro')) +
       ' <i>·</i> ' + (en ? 'You have' : 'Você tem') + ' <b class="' + (tem >= custo ? 'ok' : 'falta') + '">' + tem + '</b></div>' +
       '';
-    acoes = '<button class="prim" data-a="fgo"' + (tem >= custo ? '' : ' disabled') + '>' + (en ? 'Forge' : 'Forjar') + '</button><button data-a="fvolta">' + (en ? 'Back' : 'Voltar') + '</button>';
+    acoes = '<button class="prim' + (tem >= custo ? '' : ' semTes') + '" data-a="fgo">' + (en ? 'Forge' : 'Forjar') + '</button><button data-a="fvolta">' + (en ? 'Back' : 'Voltar') + '</button>';
   }
   ficha.innerHTML =
     '<div class="ihead eqh"><div class="ibox">' + spriteHTML(it.sp, 44) + '</div><div><div class="iname" style="color:' + COR_RAR[it.rar] + '">' + nomeComAfixo(it, en) + '</div>' +
@@ -8115,7 +8115,7 @@ function abrirForja(id, novo){
       const a = b.dataset.a;
       if (a === 'fvolta') abrirFicha(id);
       else if (a === 'fgo'){
-        if (tesourosDisponiveis() < custo) return;
+        if (tesourosDisponiveis() < custo){ window.tocarSom?.('semMoedas'); aviso(en ? 'NOT ENOUGH TREASURES' : 'TESOUROS INSUFICIENTES'); return; }
         gastarTesouros(custo);
         const nv = afxRolar(it.rar, it.afx ? it.afx[0] : null, P_NEG_FORJA);
         persistir(); renderInventario();

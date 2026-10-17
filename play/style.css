@@ -6677,7 +6677,7 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 #confirmTitulo.verbo{font:700 11px 'Outfit',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:4px}
 
 /* ===== tour v3: destaque escuro + caixa do heroi fixa embaixo ===== */
-.tourCard{left:12px !important;right:12px;width:auto !important;max-width:520px;margin:0 auto;box-sizing:border-box;display:grid;grid-template-columns:64px 1fr;gap:10px 12px;background:#251E38;border:1.5px solid #3B3257;border-radius:20px;padding:14px;box-shadow:0 -10px 40px rgba(0,0,0,.5);color:#EDE9F7}
+.tourCard{box-sizing:border-box;display:grid;grid-template-columns:64px 1fr;gap:10px 12px;background:#251E38;border:1.5px solid #3B3257;border-radius:20px;padding:14px;box-shadow:0 -10px 40px rgba(0,0,0,.5);color:#EDE9F7}
 .tourCard.noTopo{box-shadow:0 10px 40px rgba(0,0,0,.5)}
 .tourFace{width:64px;height:64px;border-radius:14px;background:#1B1629;border:1px solid #3B3257;display:grid;place-items:center;overflow:hidden}
 .tourFace img{width:60px;height:60px;image-rendering:pixelated;object-fit:contain}
@@ -6690,3 +6690,9 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 .tourRod .tourPular{background:none;color:#8C84A6;padding:10px 4px}
 .tourRod .tourVolta{background:transparent;color:#EDE9F7;border:1.5px solid #4A4170}
 .tourRod .tourProx{background:#fff;color:#14101F}
+
+.tourFalta{color:transparent}
+.tourOverlay.on{animation:tourEntra .35s ease-out}
+@keyframes tourEntra{from{opacity:0}to{opacity:1}}
+.tourCard{transition:opacity .25s ease,transform .38s cubic-bezier(.2,.9,.25,1.15),left .3s cubic-bezier(.3,.8,.3,1),top .3s cubic-bezier(.3,.8,.3,1)}
+.tourCard.oculto{transition:opacity .14s ease,transform .16s ease-in}

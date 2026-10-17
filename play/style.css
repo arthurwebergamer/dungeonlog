@@ -6506,3 +6506,40 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 @keyframes carimbo{0%{transform:scale(2);opacity:0}60%{transform:scale(.94);opacity:1}100%{transform:scale(1)}}
 .istats .irow.forjaRev{animation:carimbo .4s ease-out both}
 @media (prefers-reduced-motion:reduce){.cena.bate,.fSlots i.voa,.istats .irow.forjaRev{animation:none}.fg{display:none}}
+
+/* ===== forja em pixel art: parede de tijolo, tochas e martelo da propria sheet, bigorna desenhada em pixels ===== */
+.cena{position:relative;width:100%;height:178px;padding:0;display:block;border-radius:14px;overflow:hidden;border:2px solid #14101F;image-rendering:pixelated}
+.cena .parede{position:absolute;inset:0;background:#2B2342 url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='24' shape-rendering='crispEdges'><rect width='48' height='24' fill='%232B2342'/><rect y='11' width='48' height='2' fill='%231B1629'/><rect y='23' width='48' height='2' fill='%231B1629'/><rect x='23' width='2' height='12' fill='%231B1629'/><rect x='47' y='12' width='2' height='12' fill='%231B1629'/><rect x='2' y='2' width='10' height='2' fill='%2335294F'/><rect x='26' y='14' width='10' height='2' fill='%2335294F'/></svg>");background-size:48px 24px;image-rendering:pixelated}
+.cena .tocha{position:absolute;top:10px}
+.cena .tocha.t1{left:10px}
+.cena .tocha.t2{right:10px;transform:scaleX(-1)}
+@keyframes tochaPisca{0%,100%{filter:none}50%{filter:brightness(1.35)}}
+.cena .tocha{animation:tochaPisca .5s steps(2,end) infinite}
+.cena.bate .tocha{animation-duration:.18s}
+.cena .forjaPeca{position:absolute;left:50%;bottom:46px;margin-left:-24px;width:48px;height:48px}
+.cena .ibox{width:48px;height:48px;background:none;border:0;border-radius:0;box-shadow:none;display:block;padding:0;transition:none}
+.cena[data-calor="1"] .forjaPeca{filter:drop-shadow(2px 0 0 #B8561A) drop-shadow(-2px 0 0 #B8561A) drop-shadow(0 2px 0 #B8561A) drop-shadow(0 -2px 0 #B8561A)}
+.cena[data-calor="2"] .forjaPeca{filter:drop-shadow(2px 0 0 #E8761F) drop-shadow(-2px 0 0 #E8761F) drop-shadow(0 2px 0 #E8761F) drop-shadow(0 -2px 0 #E8761F)}
+.cena[data-calor="3"] .forjaPeca{filter:drop-shadow(2px 0 0 #FFB020) drop-shadow(-2px 0 0 #FFB020) drop-shadow(0 2px 0 #FFB020) drop-shadow(0 -2px 0 #FFB020)}
+.cena .bigorna{position:absolute;left:50%;bottom:8px;width:132px;height:72px;margin-left:-66px;margin-top:0;background:none;border-radius:0}
+.cena .bigorna::after{display:none}
+.cena .martelo{position:absolute;left:50%;bottom:62px;margin-left:6px;transform-origin:50% 94%;transform:rotate(38deg)}
+@keyframes marteloBate{0%{transform:rotate(38deg)}40%{transform:rotate(38deg)}60%{transform:rotate(-52deg)}72%{transform:rotate(-52deg)}100%{transform:rotate(38deg)}}
+.cena.bate .martelo{animation:marteloBate .38s steps(8,end)}
+@keyframes pecaAmassa{0%,50%{transform:none}60%{transform:scale(1.12,.84)}75%{transform:scale(.96,1.04)}100%{transform:none}}
+.cena.bate .forjaPeca{animation:pecaAmassa .38s steps(5,end);transform-origin:50% 100%}
+.cena.bate{animation:none}
+.fg{top:104px}
+.fSlots i.pxi{width:30px;height:30px;border:0;background-color:transparent;transform:none;border-radius:0}
+.fSlots i.pxi:not(.on){opacity:.25;filter:grayscale(1)}
+@keyframes gemaVoa{0%{transform:translate(0,0);opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(.4);opacity:0}}
+.fSlots i.voa{animation:gemaVoa .45s steps(7,end) forwards}
+@media (prefers-reduced-motion:reduce){.cena .tocha,.cena.bate .martelo,.cena.bate .forjaPeca{animation:none}}
+
+.cena .forjaPeca{bottom:76px}
+.cena .martelo{margin-left:30px;bottom:80px;transform:rotate(30deg)}
+@keyframes marteloBate{0%,35%{transform:rotate(30deg)}55%,70%{transform:rotate(-72deg)}100%{transform:rotate(30deg)}}
+.fg{top:96px}
+.fSlots i.pxi.on{background-image:url("sheet.png?v=1");background-repeat:no-repeat}
+.cena[data-calor] .ibox{box-shadow:none;border-color:transparent}
+.cena .forjaPeca{bottom:72px}

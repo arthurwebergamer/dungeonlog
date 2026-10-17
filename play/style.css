@@ -6461,3 +6461,10 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 .istats .idesc{padding:4px 14px}
 
 .iacts button.semTes{opacity:.4}
+
+/* dica do botao Criar tarefa */
+.saveHint{min-height:0;height:0;overflow:hidden;opacity:0;text-align:center;font:500 12px 'Outfit',sans-serif;color:var(--perigo);transition:opacity .2s,height .2s,margin .2s}
+.saveHint.on{height:18px;opacity:1;margin:4px 0}
+@keyframes sacode{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+.sacode{animation:sacode .35s ease}
+@media (prefers-reduced-motion:reduce){.sacode{animation:none}}

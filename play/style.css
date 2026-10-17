@@ -6665,3 +6665,7 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 #confirmCancelar{background:var(--poco) !important;border:1px solid #3B3257 !important;color:var(--text) !important;font-size:14px}
 #confirmOk{background:var(--accent);border:1px solid var(--accent);color:var(--bg);font-size:14px}
 #confirmOk:active{background:var(--accent);filter:brightness(.9)}
+
+/* tour: transicoes curtas (menos repaint do escurecimento em tela cheia) */
+.tourHole{transition:opacity .12s ease,left .2s cubic-bezier(.3,.8,.3,1),top .2s cubic-bezier(.3,.8,.3,1),width .2s cubic-bezier(.3,.8,.3,1),height .2s cubic-bezier(.3,.8,.3,1)}
+.tourCard{transition:opacity .15s ease;will-change:opacity}

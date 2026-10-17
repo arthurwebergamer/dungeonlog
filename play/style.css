@@ -6552,3 +6552,21 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 .cena .martelo{margin-left:34px;bottom:56px}
 .fSlots i.pxi{width:32px;height:32px}
 .fg{top:100px}
+
+/* ===== forja: banner igual ao da tela de Nivel (arte real do jogo) ===== */
+.cena{position:relative;width:100%;height:158px;margin:0;border-radius:18px;overflow:hidden;border:0;background:#222;display:block}
+.cena .l{position:absolute;inset:0;image-rendering:pixelated}
+.cena .tocha-arena{z-index:2}
+.cena .cfHeroi{position:absolute;left:16%;bottom:20px;width:83px;height:83px;z-index:2}
+.cena .cfHeroi img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated;display:block}
+.cena .cfPeca{position:absolute;right:18%;bottom:24px;width:64px;height:64px;z-index:2}
+.cena .forjaPeca{position:relative;left:auto;bottom:auto;margin:0;width:64px;height:64px;transform-origin:50% 100%}
+.cena .sombra{position:absolute;left:50%;bottom:-6px;width:72%;height:9px;margin-left:-36%;border-radius:50%;background:rgba(0,0,0,.38)}
+.cena .cfHeroi .sombra{bottom:-4px}
+@keyframes cfLunge{0%{transform:none}38%{transform:translateX(52px) rotate(6deg)}100%{transform:none}}
+@keyframes cfTrema{0%,34%{transform:none}44%{transform:translateX(7px) scale(1.1,.88)}58%{transform:translateX(-4px)}100%{transform:none}}
+.cena.bate .cfHeroi{animation:cfLunge .34s cubic-bezier(.2,.8,.3,1)}
+.cena.bate .forjaPeca{animation:cfTrema .34s steps(6,end)}
+.cena.bate .martelo,.cena.bate .tocha{animation:none}
+.cena .fg{left:auto;right:calc(18% + 30px);top:84px}
+@media (prefers-reduced-motion:reduce){.cena.bate .cfHeroi,.cena.bate .forjaPeca{animation:none}}

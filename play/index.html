@@ -3074,22 +3074,23 @@ function afxEfeito(afx, en){
 }
 function variante(baseId, afx, rer){
   rer = rer || 0;
-  const key = baseId+'|'+afx[0]+'|'+afx[1]+'|'+rer;
+  const key = baseId+'|'+(afx ? afx[0]+'|'+afx[1] : 'sem')+'|'+rer;
   if (_varMapa[key] !== undefined) return _varMapa[key];
   const row = ITENS[baseId].slice();
   while (row.length < 10) row.push(undefined);
-  row[10] = [afx[0], afx[1]]; row[11] = rer; row[12] = baseId;
+  row[10] = afx ? [afx[0], afx[1]] : null; row[11] = rer; row[12] = baseId;
   ITENS.push(row);
   return (_varMapa[key] = ITENS.length - 1);
 }
 function ehEquipBase(id){ return id >= 0 && id < BASE_N && ITENS[id] && !ITENS[id][8] && ['arma','armadura','elmo','escudo','acess'].includes(ITENS[id][2]); }
-function comAfixo(id){ return ehEquipBase(id) ? variante(id, afxRolar(ITENS[id][3], null, P_NEG_LOOT), 0) : id; }
+const P_SEM_AFX = 0.30;   // chance de o equipamento vir sem nenhum encantamento
+function comAfixo(id){ return ehEquipBase(id) ? variante(id, Math.random() < P_SEM_AFX ? null : afxRolar(ITENS[id][3], null, P_NEG_LOOT), 0) : id; }
 function baseDe(id){ const a = ITENS[id]; return (a && a[12] != null) ? a[12] : id; }
 function limparVariantes(){ ITENS.length = BASE_N; Object.keys(_varMapa).forEach(k => delete _varMapa[k]); }
-function exportarVariantes(){ return ITENS.slice(BASE_N).map(r => [r[12], r[10][0], r[10][1], r[11]]); }
+function exportarVariantes(){ return ITENS.slice(BASE_N).map(r => r[10] ? [r[12], r[10][0], r[10][1], r[11]] : [r[12], null, 0, r[11]]); }
 function restaurarVariantes(lista){
   limparVariantes();
-  if (Array.isArray(lista)) lista.forEach(v => { if (Array.isArray(v) && ITENS[v[0]] && AFIXOS[v[1]]) variante(v[0], [v[1], v[2]], v[3]); });
+  if (Array.isArray(lista)) lista.forEach(v => { if (Array.isArray(v) && ITENS[v[0]] && (v[1] === null || AFIXOS[v[1]])) variante(v[0], v[1] === null ? null : [v[1], v[2]], v[3]); });
 }
 // letras iniciais em fonte pixel 5x7 por afixo ('#' = pixel aceso)
 const AFX_PIXEL = {
@@ -8034,7 +8035,7 @@ function abrirFicha(id){
   let acoes = '';
   if (EQUIPAVEL(id)) acoes += '<button class="prim" data-a="eq">'+(estaEquipado ? (en ? 'Unequip' : 'Desequipar') : (en ? 'Equip' : 'Equipar'))+'</button>';
   if (it.tipo === 'cons') acoes += '<button class="prim" data-a="usar">' + (en ? 'Use' : 'Usar') + '</button>';
-  if (it.afx) acoes += '<button data-a="forja">' + (en ? 'Forge' : 'Forjar') + '</button>';
+  if (SLOTS.includes(it.tipo)) acoes += '<button data-a="forja">' + (en ? 'Forge' : 'Forjar') + '</button>';
   if (it.tipo === 'chave' && id === ID_GRIMORIO_INV) acoes += '<button class="prim" data-a="abrir">' + (en ? 'Open' : 'Abrir') + '</button>';
   if (!(it.tipo === 'chave' && id === ID_GRIMORIO_INV)) acoes += '<button data-a="vender">' + (en ? 'Sell' : 'Vender') + '</button>';
 
@@ -8093,7 +8094,7 @@ function trocarVariante(idAtual, idNovo){
 function abrirForja(id, novo){
   const it = item(id), en = idiomaApp() === 'en';
   const custo = 1 + Math.min(it.rer, 2), tem = tesourosDisponiveis();
-  const bloco = (rot, afx) => '<div class="fBloco"><small>' + rot + '</small><div class="iafx a-' + afx[0] + '"><b>✦ ' + afxNome(afx, en) + ' ✦</b></div><div class="fVal a-' + afx[0] + (afx[1] < 0 ? ' neg' : '') + '">' + afxEfeito(afx, en) + '</div></div>';
+  const bloco = (rot, afx) => !afx ? '<div class="fBloco"><small>' + rot + '</small><div class="fVal" style="color:var(--dim)">' + (en ? 'No enchantment' : 'Sem encantamento') + '</div></div>' : '<div class="fBloco"><small>' + rot + '</small><div class="iafx a-' + afx[0] + '"><b>✦ ' + afxNome(afx, en) + ' ✦</b></div><div class="fVal a-' + afx[0] + (afx[1] < 0 ? ' neg' : '') + '">' + afxEfeito(afx, en) + '</div></div>';
   let corpo, acoes;
   if (novo){
     corpo = '<div class="fPar">' + bloco(en ? 'Current' : 'Atual', it.afx) + bloco(en ? 'New' : 'Novo', novo).replace('fBloco', 'fBloco forjaRev') + '</div>';
@@ -8116,7 +8117,7 @@ function abrirForja(id, novo){
       else if (a === 'fgo'){
         if (tesourosDisponiveis() < custo) return;
         gastarTesouros(custo);
-        const nv = afxRolar(it.rar, it.afx[0], P_NEG_FORJA);
+        const nv = afxRolar(it.rar, it.afx ? it.afx[0] : null, P_NEG_FORJA);
         persistir(); renderInventario();
         ficha.querySelectorAll('button').forEach(x => x.disabled = true);
         const bx = ficha.querySelector('.ibox'); if (bx) bx.classList.add('forjando');

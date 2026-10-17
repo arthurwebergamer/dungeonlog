@@ -6413,3 +6413,7 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 .istats .irow b.afv{font-weight:700}
 .istats .idesc{text-align:center;font-style:italic;padding:2px 14px 6px}
 .istats .isep:empty:not(.orn){margin:8px 0 4px;border-top:1px solid var(--line)}
+
+/* indicador discreto: uma gema colorida no canto (cor = tipo do afixo) */
+.cel .afgem{position:absolute;right:5px;top:5px;width:7px;height:7px;background:var(--afx-gan);transform:rotate(45deg);border-radius:1px}
+.cel .afgem.a-est{background:var(--afx-est)}.cel .afgem.a-sor{background:var(--afx-sor)}.cel .afgem.a-bar{background:var(--afx-bar)}.cel .afgem.a-bau{background:var(--afx-bau)}.cel .afgem.a-abu{background:var(--afx-abu)}.cel .afgem.a-tes{background:var(--afx-tes)}

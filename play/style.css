@@ -6435,3 +6435,7 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 .iafn{font:600 13px 'Outfit',sans-serif;letter-spacing:.04em;margin-top:3px;color:var(--afx-gan)}
 .iafn.a-est{color:var(--afx-est)}.iafn.a-sor{color:var(--afx-sor)}.iafn.a-bar{color:var(--afx-bar)}.iafn.a-bau{color:var(--afx-bau)}.iafn.a-abu{color:var(--afx-abu)}.iafn.a-tes{color:var(--afx-tes)}
 .istats .irow b.afv{font-weight:600}
+
+/* afixo no inventario sem formas extras: brilho suave da cor do afixo no fundo da celula */
+.cel.afc{--c:var(--afx-gan);background-image:radial-gradient(ellipse 75% 60% at 50% 100%,color-mix(in srgb,var(--c) 42%,transparent),transparent 75%)}
+.cel.afc.a-est{--c:var(--afx-est)}.cel.afc.a-sor{--c:var(--afx-sor)}.cel.afc.a-bar{--c:var(--afx-bar)}.cel.afc.a-bau{--c:var(--afx-bau)}.cel.afc.a-abu{--c:var(--afx-abu)}.cel.afc.a-tes{--c:var(--afx-tes)}

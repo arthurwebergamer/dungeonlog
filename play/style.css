@@ -6367,3 +6367,6 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 @media (prefers-reduced-motion:reduce){.ibox.forjando,.forjaLn.forjaRev{animation:none}}
 
 .cel .afx.a-bau,.afxTag.a-bau{color:#e6a8ff}.cel .afx.a-abu,.afxTag.a-abu{color:#ff8f8f}.cel .afx.a-tes,.afxTag.a-tes{color:#7fe0d6}
+
+/* bau extra (afixo Abundante): empilhado acima do especial */
+.bauArena.bauExtra{ right:auto; left:-64px; bottom:62px; }

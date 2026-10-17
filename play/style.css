@@ -6428,3 +6428,10 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 .fVal.a-est{color:var(--afx-est)}.fVal.a-sor{color:var(--afx-sor)}.fVal.a-bar{color:var(--afx-bar)}.fVal.a-bau{color:var(--afx-bau)}.fVal.a-abu{color:var(--afx-abu)}.fVal.a-tes{color:var(--afx-tes)}
 .fCusto{text-align:center;margin:12px 0 2px;font:400 14px 'Outfit',sans-serif;color:var(--muted)}
 .fCusto b{color:var(--text)}.fCusto b.ok{color:var(--verde)}.fCusto b.falta{color:var(--perigo)}.fCusto i{font-style:normal;color:var(--dim);margin:0 4px}
+
+/* Tooltip de equipamento estilo Diablo: tudo centralizado, nome do afixo entre aspas sob o nome do item */
+.ihead.eqh{flex-direction:column;align-items:center;text-align:center;gap:8px}
+.ihead.eqh .iname{font-size:20px}
+.iafn{font:600 13px 'Outfit',sans-serif;letter-spacing:.04em;margin-top:3px;color:var(--afx-gan)}
+.iafn.a-est{color:var(--afx-est)}.iafn.a-sor{color:var(--afx-sor)}.iafn.a-bar{color:var(--afx-bar)}.iafn.a-bau{color:var(--afx-bau)}.iafn.a-abu{color:var(--afx-abu)}.iafn.a-tes{color:var(--afx-tes)}
+.istats .irow b.afv{font-weight:600}

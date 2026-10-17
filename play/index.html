@@ -133,7 +133,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=274">
+<link rel="stylesheet" href="style.css?v=276">
 <script>
 // A abertura so sai quando a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado; sair antes (assim que o CSS chega)
 // mostrava um flash cinza vazio e depois a tela de login por baixo, antes do carrossel (visto em video de teste). Teto de seguranca: 15s.
@@ -12616,7 +12616,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     tourEl.className = 'tourOverlay';
     tourEl.innerHTML = '<i class="tourBloq" data-p="t"></i><i class="tourBloq" data-p="b"></i><i class="tourBloq" data-p="l"></i><i class="tourBloq" data-p="r"></i><i class="tourBloq" data-p="m"></i>' +
       '<div class="tourHole"><i></i></div>' +
-      '<div class="tourCard oculto"><div class="tourFace"><img alt=""></div><div class="tourTx"><div class="tourNome"><span class="tourNomeT"></span><span class="tourTag"></span><span class="tourNum"></span></div><div class="tourSub"></div></div>' +
+      '<div class="tourCard tcOculto"><div class="tourFace"><img alt=""></div><div class="tourTx"><div class="tourNome"><span class="tourNomeT"></span><span class="tourTag"></span><span class="tourNum"></span></div><div class="tourSub"></div></div>' +
       '<div class="tourRod"><div class="tourBarra"></div><button type="button" class="tourPular"></button><button type="button" class="tourVolta"></button><button type="button" class="tourProx"></button></div></div>';
     document.body.appendChild(tourEl);
     tourEl.querySelector('.tourProx').addEventListener('click', () => tourProximo());
@@ -12661,21 +12661,34 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       const largo = W > 700, cw = largo ? 440 : Math.min(520, W - 24);
       card.style.width = cw + 'px';
       const ch = card.offsetHeight;
+      let nl, nt, bot = 'auto';
       if (largo){
-        // desktop: perto do alvo (abaixo se couber, senao acima), centrado nele
-        const abaixo = (H - (r.bottom + pad)) >= ch + 36;
-        const top = abaixo ? r.bottom + pad + 20 : Math.max(12, r.top - pad - 20 - ch);
-        card.style.top = top + 'px'; card.style.bottom = 'auto';
-        card.style.left = Math.max(14, Math.min(W - cw - 14, r.left + r.width / 2 - cw / 2)) + 'px';
+        // desktop: tenta abaixo, acima, direita, esquerda; usa o primeiro lugar que cabe sem cobrir o destaque
+        const M = 14, cx = Math.max(M, Math.min(W - cw - M, r.left + r.width / 2 - cw / 2)), cy = Math.max(M, Math.min(H - ch - M, r.top + r.height / 2 - ch / 2));
+        const hx0 = r.left - pad - 8, hx1 = r.right + pad + 8, hy0 = r.top - pad - 8, hy1 = r.bottom + pad + 8;
+        const cand = [[cx, r.bottom + pad + 20], [cx, r.top - pad - 20 - ch], [r.right + pad + 20, cy], [r.left - pad - 20 - cw, cy]];
+        const cabe = ([x, y]) => x >= M && y >= M && x + cw <= W - M && y + ch <= H - M && (x + cw < hx0 || x > hx1 || y + ch < hy0 || y > hy1);
+        const esc = cand.find(cabe) || [cx, Math.max(M, Math.min(H - ch - M, r.bottom + pad + 20))];
+        nl = esc[0]; nt = esc[1];
         card.classList.remove('noTopo');
       } else {
         const noFundo = (r.bottom + pad) > (H - ch - 28);
         card.classList.toggle('noTopo', noFundo);
-        card.style.left = Math.round((W - cw) / 2) + 'px';
-        card.style.top = noFundo ? 'calc(12px + env(safe-area-inset-top, 0px))' : 'auto';
-        card.style.bottom = noFundo ? 'auto' : 'calc(14px + env(safe-area-inset-bottom, 0px))';
+        nl = Math.round((W - cw) / 2);
+        nt = noFundo ? 'calc(12px + env(safe-area-inset-top, 0px))' : 'auto';
+        bot = noFundo ? 'auto' : 'calc(14px + env(safe-area-inset-bottom, 0px))';
       }
-    card.classList.remove('oculto');
+      const aplica = () => { card.style.left = nl + 'px'; card.style.top = (typeof nt === 'number') ? nt + 'px' : nt; card.style.bottom = bot; };
+      const ox = parseFloat(card.style.left), oy = parseFloat(card.style.top);
+      const salto = largo && !isNaN(ox) && !isNaN(oy) && (Math.abs(ox - nl) + Math.abs(oy - nt) > 150) && !card.classList.contains('tcOculto');
+      if (salto){
+        // salto grande: some, muda de lugar escondido e reaparece (em vez de cruzar a tela voando)
+        card.classList.add('tcOculto');
+        setTimeout(() => { if (!tourAtivo) return; card.style.transition = 'none'; aplica(); void card.offsetWidth; card.style.transition = ''; card.classList.remove('tcOculto'); }, 170);
+        return;
+      }
+      aplica();
+    card.classList.remove('tcOculto');
     });
     return true;
   }
@@ -12707,6 +12720,20 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     }, 100);
   }
   function tourFoco(){ const a = document.activeElement; return a && a.id === 'input'; }
+  // true quando nenhuma transicao finita da tela (folha subindo, aba, linha entrando) esta rodando; limite de 900ms
+  let _assentarDesde = 0;
+  function tourAssentou(tok){
+    if (!_assentarDesde || _assentarDesde.tok !== tok) _assentarDesde = {tok, t: performance.now()};
+    if (performance.now() - _assentarDesde.t > 900) return true;
+    try {
+      return !document.getAnimations().some(a => {
+        const e = a.effect, tg = e && e.target;
+        if (a.playState !== 'running' || !tg || !tg.closest || tg.closest('.tourOverlay')) return false;
+        if (e.getComputedTiming().iterations === Infinity) return false;
+        return !!tg.closest('.edov,.view,.task');
+      });
+    } catch (_) { return true; }
+  }
   function tourPasso(dir){
     const tok = ++tourTok; tourParar();
     if (tourI < 0) tourI = 0;
@@ -12717,6 +12744,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     const tentar = (n) => {
       if (tok !== tourTok) return;
       tourEl.classList.toggle('leve', !!st.leve);
+      if (n === 6 && !tourAssentou(tok)){ setTimeout(() => tentar(6), 60); return; }   // folha/aba ainda animando: mede so quando assentar
       if (tourPosicionar(true)){ tourEsperar(st, tok); setTimeout(() => { if (tok === tourTok && tourAtivo) tourPosicionar(true); }, 420); return; }
       if (n > 0) setTimeout(() => tentar(n - 1), 60);
       else {

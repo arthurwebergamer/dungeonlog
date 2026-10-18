@@ -6758,3 +6758,9 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 /* sem barra de rolagem visivel em nenhuma tela (a rolagem continua funcionando) */
 *{scrollbar-width:none !important;-ms-overflow-style:none !important}
 *::-webkit-scrollbar{display:none !important;width:0 !important;height:0 !important}
+
+/* switches cinza (estilo Skillion): ligado = trilho cinza + bolinha clara; desligado = trilho escuro + bolinha cinza */
+.swch{background:rgba(128,128,132,.28) !important}
+.swch.on{background:#8b8b90 !important}
+.swch .swch-bolinha{background:#9a9aa0;box-shadow:none}
+.swch.on .swch-bolinha{background:#f2f2f4}

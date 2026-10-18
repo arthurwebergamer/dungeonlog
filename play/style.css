@@ -6726,3 +6726,7 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 .tourOverlay.saindo .tourVeu{opacity:.86;transition:opacity .14s ease}
 .tourOverlay.saindo.leve .tourVeu{opacity:.5}
 .tourOverlay.cortina .tourVeu{opacity:1}
+
+/* v2: na saida o buraco colapsa (largura/altura 0): o escurecimento (box-shadow) cobre a tela toda IGUAL, sem quadrado claro sobrando */
+.tourVeu{display:none !important}
+.tourOverlay.saindo .tourHole{width:0 !important;height:0 !important;border-width:0 !important}

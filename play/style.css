@@ -6764,3 +6764,14 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 .swch.on{background:#8b8b90 !important}
 .swch .swch-bolinha{background:#9a9aa0;box-shadow:none}
 .swch.on .swch-bolinha{background:#f2f2f4}
+
+/* Config compacto em cartoes (estilo Skillion): grupos arredondados, icone solto sem bolha, linhas mais baixas */
+.cfgOverlay .cfgcard{background:var(--panel-2);border-radius:18px;margin:0 0 6px;overflow:hidden}
+.cfgOverlay .cfgcard .cfgrow{padding:11px 16px;min-height:50px;gap:14px;border-bottom:none;position:relative}
+.cfgOverlay .cfgcard .cfgrow + .cfgrow::before,.cfgOverlay .cfgcard .cfgacordeaoPainel + .cfgrow::before{content:"";position:absolute;top:0;left:54px;right:0;border-top:1px solid var(--line)}
+.cfgOverlay .cfgcard .cfgicone{flex:0 0 24px;width:24px;height:24px;background:none;border-radius:0;color:var(--dim)}
+.cfgOverlay .cfgcard .cfgicone svg{width:22px;height:22px}
+.cfgOverlay .cfgcard .cfgtxt b{font-size:15px;font-weight:500}
+.cfgOverlay .cfgcard .cfgtxt span{font-size:12px}
+.cfgOverlay .edsec{margin:18px 6px 8px;font-size:12px;letter-spacing:.12em;text-transform:uppercase}
+.cfgOverlay .cfgcard .cfgrow:not(.cfglink):not(.cfgacordeao){padding-left:16px}

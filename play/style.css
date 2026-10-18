@@ -6756,5 +6756,5 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 #idiomaGrid.temagrid{align-self:stretch;width:100%}
 
 /* sem barra de rolagem visivel em nenhuma tela (a rolagem continua funcionando) */
-*{scrollbar-width:none;-ms-overflow-style:none}
-*::-webkit-scrollbar{display:none;width:0;height:0}
+*{scrollbar-width:none !important;-ms-overflow-style:none !important}
+*::-webkit-scrollbar{display:none !important;width:0 !important;height:0 !important}

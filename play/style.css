@@ -6718,3 +6718,5 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 .tourOverlay.saindo .tourHole{border-color:transparent}
 .tourOverlay.saindo .tourHole i{opacity:0 !important;animation:none !important}
 .tourHole{transition:border-color .16s ease,box-shadow .35s ease !important}
+
+.tourOverlay.cortina .tourHole{box-shadow:0 0 0 100vmax rgb(5,4,10) !important;transition:border-color .16s ease,box-shadow .14s ease !important}

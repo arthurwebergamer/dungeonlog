@@ -6708,3 +6708,8 @@ body.tourAberto .edov,body.tourAberto .baubg,body.tourAberto .sheetbg{backdrop-f
 body.tourAberto .edsheet{will-change:transform}
 
 .tourHole{transition:none !important}
+
+/* durante o tour a folha NAO desliza (so aparece com fade): assim a posicao final ja esta valendo quando o destaque e o dialogo chegam, sem fase escura */
+body.tourAberto .edov .edsheet{transform:none !important;transition:opacity .22s ease !important}
+body.tourAberto .edov:not(.on) .edsheet{opacity:0}
+body.tourAberto .edov.on .edsheet{opacity:1}

@@ -6733,3 +6733,19 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 
 .tourOverlay.fim{opacity:0;transition:opacity .36s ease}
 
+
+/* afixo Tesoureiro (tex): mesmas regras do Garimpeiro, cor propria */
+:root{--afx-tex:#b8e65c}
+.cel .afx.a-tex,.afxTag.a-tex{color:#b8e65c}
+.istats .iafx.a-tex{color:#b8e65c}
+.istats .irow b.afv.a-tex{color:#b8e65c}
+.cel .afx.a-tex{color:var(--afx-tex)}
+.cel .afbar.a-tex{background:var(--afx-tex)}
+.cel .afgem.a-tex{background:var(--afx-tex)}
+.fVal.a-tex{color:var(--afx-tex)}
+.iafn.a-tex{color:var(--afx-tex)}
+.baufx.a-tex{color:var(--afx-tex)}
+.cel .rune.a-tex{color:var(--afx-tex)}
+.istats .irow.afl.a-tex{color:var(--afx-tex)}
+.rolTx.a-tex{color:var(--afx-tex)}
+.ibonus.istats .rolTx.a-tex{color:var(--afx-tex)}

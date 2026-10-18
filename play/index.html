@@ -133,7 +133,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=291">
+<link rel="stylesheet" href="style.css?v=292">
 <script>
 // A abertura so sai quando a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado; sair antes (assim que o CSS chega)
 // mostrava um flash cinza vazio e depois a tela de login por baixo, antes do carrossel (visto em video de teste). Teto de seguranca: 15s.
@@ -3047,10 +3047,11 @@ const AFIXOS = {
   bar: {pt:'Barganhista',en:'Haggler',   letra:'B', faixa:[[1,1],[1,2],[2,3],[2,4],[3,5]]},
   bau: {pt:'Caçador de Baús', en:'Chest Hunter', letra:'C', faixa:[[1,1],[1,2],[2,3],[3,4],[4,5]]},
   abu: {pt:'Abundante',  en:'Bountiful', letra:'A', faixa:[[1,2],[2,3],[3,4],[4,6],[6,8]]},
-  tes: {pt:'Garimpeiro', en:'Prospector',letra:'P', faixa:[[2,3],[3,5],[4,6],[6,8],[8,12]]}
+  tes: {pt:'Garimpeiro', en:'Prospector',letra:'P', faixa:[[2,3],[3,5],[4,6],[6,8],[8,12]]},
+  tex: {pt:'Tesoureiro', en:'Treasurer', letra:'T', faixa:[[1,2],[2,3],[3,4],[4,6],[6,9]]}   // chance de 1 tesouro EXTRA no bau
 };
-const AFX_CHAVES = ['gan','est','sor','bar','bau','abu','tes'];
-const AFX_TETO = {gan:25, est:25, sor:10, bar:10, bau:10, abu:15, tes:20};   // soma dos slots (% de afixo)
+const AFX_CHAVES = ['gan','est','sor','bar','bau','abu','tes','tex'];
+const AFX_TETO = {gan:25, est:25, sor:10, bar:10, bau:10, abu:15, tes:20, tex:15};   // soma dos slots (% de afixo)
 const _varMapa = {};
 // encantamentos RUINS (maldicoes): mesmo tipo, valor negativo. Podem vir no loot (20%) e na forja (30%).
 const AFX_NEG = {
@@ -3078,7 +3079,8 @@ function afxEfeito(afx, en){
   return {gan: en ? '+'+v+'% coins earned' : '+'+v+'% moedas ganhas', est: en ? '+'+v+'% XP earned' : '+'+v+'% XP ganho',
     sor: en ? '+'+v+'% chest luck' : '+'+v+'% sorte nos baús', bar: en ? v+'% shop discount' : v+'% de desconto na loja',
     bau: en ? '+'+v+'% locked chest chance' : '+'+v+'% chance de baú trancado', abu: en ? '+'+v+'% extra chest chance' : '+'+v+'% chance de baú extra',
-    tes: en ? '+'+v+'% treasure chance' : '+'+v+'% chance de tesouro'}[k];
+    tes: en ? '+'+v+'% treasure chance' : '+'+v+'% chance de tesouro',
+    tex: en ? '+'+v+'% extra treasure chance' : '+'+v+'% chance de tesouro extra'}[k];
 }
 function variante(baseId, afx, rer){
   rer = rer || 0;
@@ -3108,7 +3110,8 @@ const AFX_PIXEL = {
   bar:['####.','#...#','#...#','####.','#...#','#...#','####.'],   // B
   bau:['.###.','#...#','#....','#....','#....','#...#','.###.'],   // C
   abu:['.###.','#...#','#...#','#####','#...#','#...#','#...#'],   // A
-  tes:['####.','#...#','#...#','####.','#....','#....','#....']    // P
+  tes:['####.','#...#','#...#','####.','#....','#....','#....'],   // P
+  tex:['#####','..#..','..#..','..#..','..#..','..#..','..#..']    // T
 };
 function runaSVG(k){
   let r = '';
@@ -3117,7 +3120,7 @@ function runaSVG(k){
 }
 const AFX_SUFIXO = {
   gan:['do Ganancioso','of the Greedy'], est:['do Estudioso','of the Scholar'], sor:['do Sortudo','of the Lucky'], bar:['do Barganhista','of the Haggler'],
-  bau:['do Caçador de Baús','of the Chest Hunter'], abu:['da Abundância','of Plenty'], tes:['do Garimpeiro','of the Prospector']
+  bau:['do Caçador de Baús','of the Chest Hunter'], abu:['da Abundância','of Plenty'], tes:['do Garimpeiro','of the Prospector'], tex:['do Tesoureiro','of the Treasurer']
 };
 const AFX_SUFIXO_NEG = {gan:['da Pobreza','of Poverty'], est:['da Ignorância','of Ignorance'], sor:['do Azar','of Bad Luck'], bar:['do Desperdício','of Waste']};
 function nomeComAfixo(it, en){ return it.afx ? it.nome + ' ' + (it.afx[1] < 0 ? AFX_SUFIXO_NEG : AFX_SUFIXO)[it.afx[0]][en ? 1 : 0] : it.nome; }
@@ -7818,6 +7821,17 @@ function sortearItem(sorte, permitirLendario){
   return comAfixo(pick);
 }
 
+// Tesoureiro: chance de 1 tesouro EXTRA no bau (alem dos itens normais); raridade segue a sorte
+function tesouroExtra(sorte){
+  if (!(Math.random() * 100 < afixoSoma('tex'))) return null;
+  const pesos = PESO_RAR.map((p,i) => i < 4 ? p * (1 + sorte * i * 0.9) : 0);
+  let r = Math.random() * pesos.reduce((a,b)=>a+b,0), rar = 0;
+  for (let i=0;i<pesos.length;i++){ r -= pesos[i]; if (r <= 0){ rar = i; break; } }
+  let tp = ITENS.map((_,i)=>i).filter(i => i < BASE_N && ITENS[i][2] === 'tesouro' && !ITENS[i][8] && ITENS[i][3] === rar);
+  if (!tp.length) tp = ITENS.map((_,i)=>i).filter(i => i < BASE_N && ITENS[i][2] === 'tesouro' && !ITENS[i][8] && ITENS[i][3] < 4);
+  return tp.length ? tp[Math.floor(Math.random()*tp.length)] : null;
+}
+
 // quantidade de itens e bonus de sorte do bau conforme o estagio atual
 function lootDoEstagio(){
   const e = Math.min(4, Math.max(1, (typeof window.estagioAtual === 'function') ? window.estagioAtual() : 1));
@@ -7836,6 +7850,8 @@ function darLoot(nTarefas){
     darItem(id, 1);
     ganhos.push(item(id));
   }
+  const _tx = tesouroExtra(sorte);
+  if (_tx !== null){ darItem(_tx, 1); ganhos.push(item(_tx)); }
   persistir();
   if (abaAtual === 'inventario') renderInventario();
   return ganhos;
@@ -7854,6 +7870,8 @@ function sortearGanhos(nTarefas, bonusSorte, rarMinima){
   const qtd = le.qtd;
   const ids = [];
   for (let i=0;i<qtd;i++) ids.push(sortearItem(sorte));
+  const _tx = tesouroExtra(sorte);
+  if (_tx !== null) ids.push(_tx);
   if (rarMinima != null){
     let piorIdx = 0;
     for (let i=1;i<ids.length;i++){ if (ITENS[ids[i]][3] < ITENS[ids[piorIdx]][3]) piorIdx = i; }
@@ -8200,7 +8218,7 @@ function forjaAnim(cb){
   }, t));
   setTimeout(cb, 1750);
 }
-const AFX_SP = {gan: 49, est: 77, sor: 42, bar: 86, tes: 1, bau: 16, abu: 118};   // sprites reais da sheet
+const AFX_SP = {gan: 49, est: 77, sor: 42, bar: 86, tes: 1, tex: 1, bau: 16, abu: 118};   // sprites reais da sheet
 /* transicao entre telas da ficha: nova tela entra deslizando+fade (direcao pela ordem das telas); toques na mesma tela nao reanimam */
 const TELAS_FICHA = {item: 0, sel: 1, rol: 2, res: 3};
 function fichaTransicao(chave, alvo){

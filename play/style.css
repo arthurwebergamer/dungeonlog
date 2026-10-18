@@ -6749,3 +6749,8 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 .istats .irow.afl.a-tex{color:var(--afx-tex)}
 .rolTx.a-tex{color:var(--afx-tex)}
 .ibonus.istats .rolTx.a-tex{color:var(--afx-tex)}
+
+/* lista de idiomas: uma opcao embaixo da outra, sem bandeira */
+#idiomaGrid.temagrid{flex-direction:column;flex-wrap:nowrap;gap:2px}
+#idiomaGrid .temalinha{width:100%;box-sizing:border-box}
+#idiomaGrid.temagrid{align-self:stretch;width:100%}

@@ -6799,3 +6799,18 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 #novoHeroiOverlay .cfgcard .campo{width:100%;margin:0}
 
 #cfgHeroiResumo,#cfgAparenciaResumo,#cfgPrefsResumo{display:none !important}
+
+/* Tela unica Herois: linhas de personagem no padrao dos cartoes do Config */
+#heroisOverlay .cfgHeroisLista{width:100%}
+#heroisOverlay .pjItem{padding:10px 16px;min-height:60px;border-radius:0;gap:14px;position:relative;background:none}
+#heroisOverlay .pjItem.ativo{background:none}
+#heroisOverlay .pjItem + .pjItem::before{content:"";position:absolute;top:0;left:70px;right:0;border-top:1px solid var(--line)}
+#heroisOverlay .pjItem .pjAvatar{flex:0 0 40px;width:40px;height:40px;border-radius:12px;background:var(--panel-3)}
+#heroisOverlay .pjItem .pjAvatar img{width:34px;height:34px}
+#heroisOverlay .pjItem .pjTxt b{font-size:15px;font-weight:500}
+#heroisOverlay .pjItem .pjTxt span{font-size:12px}
+#heroisOverlay .pjCheck{width:22px;height:22px;flex:none;color:var(--text)}
+#heroisOverlay .pjEdit{flex:none;width:32px;height:32px;display:grid;place-items:center;color:var(--dim);border-radius:50%;cursor:pointer}
+#heroisOverlay .pjEdit svg{width:18px;height:18px}
+#heroisOverlay .pjEdit:active{background:rgba(255,255,255,.08)}
+#heroisOverlay .pjNovoBtn{margin:12px 0 0;padding:13px;border-radius:14px;font-size:14px;font-weight:500}

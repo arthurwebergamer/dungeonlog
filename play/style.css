@@ -6797,3 +6797,5 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 #gradeHeroisConfig .opcao,#gradeNovoHeroi .opcao{padding:8px 2px;border-radius:12px}
 #gradeHeroisConfig .opcao img,#gradeNovoHeroi .opcao img{width:52px;height:52px}
 #novoHeroiOverlay .cfgcard .campo{width:100%;margin:0}
+
+#cfgHeroiResumo,#cfgAparenciaResumo,#cfgPrefsResumo{display:none !important}

@@ -133,7 +133,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=279">
+<link rel="stylesheet" href="style.css?v=281">
 <script>
 // A abertura so sai quando a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado; sair antes (assim que o CSS chega)
 // mostrava um flash cinza vazio e depois a tela de login por baixo, antes do carrossel (visto em video de teste). Teto de seguranca: 15s.
@@ -12580,6 +12580,8 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     {aba: 'estatisticas', sel: '#estCardPrincipal',  pt: ['Sua sequência de vitórias', 'Essa é sua sequência de vitórias. A tocha cresce a cada dia vencido.'], en: ['Your win streak', 'This is your win streak. The torch grows with every won day.']}
   ];
   let tourEl = null, tourI = 0, tourAtivo = false, tourTok = 0, tourPoll = null;
+  // SAIDA coordenada: anel do destaque e cartao somem JUNTOS (o escurecimento fica); ENTRADA: voltam juntos no lugar novo
+  function tourSair(){ if (!tourEl) return; tourEl.classList.add('saindo'); tourEl.querySelector('.tourCard').classList.add('tcOculto'); }
   function tourParar(){ if (tourPoll){ clearInterval(tourPoll); tourPoll = null; } }
   function tourAlvo(st){
     const sel = typeof st.sel === 'function' ? st.sel() : st.sel;
@@ -12613,7 +12615,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   function tourMontar(){
     if (tourEl) return;
     tourEl = document.createElement('div');
-    tourEl.className = 'tourOverlay';
+    tourEl.className = 'tourOverlay saindo';
     tourEl.innerHTML = '<i class="tourBloq" data-p="t"></i><i class="tourBloq" data-p="b"></i><i class="tourBloq" data-p="l"></i><i class="tourBloq" data-p="r"></i><i class="tourBloq" data-p="m"></i>' +
       '<div class="tourHole"><i></i></div>' +
       '<div class="tourCard tcOculto"><div class="tourFace"><img alt=""></div><div class="tourTx"><div class="tourNome"><span class="tourNomeT"></span><span class="tourTag"></span><span class="tourNum"></span></div><div class="tourSub"></div></div>' +
@@ -12679,7 +12681,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       nl = Math.round(esc[0]); nt = Math.round(esc[1]);
       if (!largo){ nl = Math.round((W - cw) / 2); if (nt >= H - ch - 20){ nt = 'auto'; bot = baseSeg; } else if (nt <= M + 1){ nt = topoSeg; } }
       card.classList.toggle('noTopo', !largo && nt !== 'auto');
-      const aplica = () => { card.style.left = nl + 'px'; card.style.top = (typeof nt === 'number') ? nt + 'px' : nt; card.style.bottom = bot; };
+      const aplica = () => { card.style.transition = card.classList.contains('tcOculto') ? 'none' : ''; card.style.left = nl + 'px'; card.style.top = (typeof nt === 'number') ? nt + 'px' : nt; card.style.bottom = bot; void card.offsetWidth; card.style.transition = ''; };
       const ox = parseFloat(card.style.left), oy = parseFloat(card.style.top);
       const salto = largo && !isNaN(ox) && !isNaN(oy) && (Math.abs(ox - nl) + Math.abs(oy - nt) > 150) && !card.classList.contains('tcOculto');
       if (salto){
@@ -12689,7 +12691,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
         return;
       }
       aplica();
-    card.classList.remove('tcOculto');
+    card.classList.remove('tcOculto'); tourEl.classList.remove('saindo');
     });
     return true;
   }
@@ -12711,8 +12713,8 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
         if (cp && cp.classList.contains('on')){ tourParar(); setTimeout(() => { if (tok === tourTok && tourAtivo) tourProximo(); }, 420); }   // espera a folha terminar de subir
       } else if (st.espera === 'criar'){
         if (tarefas.length > tourN0){
-          tourParar(); tourIdx = tarefas.length - 1;
-          setTimeout(() => { if (tok === tourTok && tourAtivo) tourProximo(); }, 300);
+          tourParar(); tourIdx = tarefas.length - 1; tourSair();
+          setTimeout(() => { if (tok === tourTok && tourAtivo) tourProximo(); }, 60);
         } else {
           const cp = document.getElementById('composer');   // fechou sem criar: volta pro passo anterior
           if (cp && !cp.classList.contains('on') && !tourFoco()){ tourParar(); tourI = Math.max(0, tourI - 1); tourPasso(-1); }
@@ -12720,9 +12722,8 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       } else if (st.espera === 'concluir'){
         const t = tarefas[tourIdx];
         if (!t || t.feitaEm || t._feitaTour){
-          tourParar();
-          tourEl.classList.add('ok');                  // some o cartao: deixa o golpe aparecer
-          setTimeout(() => { if (tok === tourTok && tourAtivo){ tourEl.classList.remove('ok'); tourProximo(); } }, 1300);
+          tourParar(); tourSair();                      // anel e cartao somem na hora; o golpe e o XP aparecem sem nada em cima
+          setTimeout(() => { if (tok === tourTok && tourAtivo) tourProximo(); }, 1300);
         }
       }
     }, 100);
@@ -12762,15 +12763,16 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
         tourI = prox; tourPasso(d);
       }
     };
-    const cardEl = tourEl.querySelector('.tourCard');
     const troca = nomeAtual !== st.aba && typeof window.mostrarAba === 'function';
-    if (troca){
-      // o destaque (que tambem e o escurecimento) NUNCA some: se sumisse, a aba nova piscava clara.
-      // troca a aba na hora, por baixo do escuro, enquanto o cartao sai
-      cardEl.classList.add('tcOculto');
-      window.mostrarAba(st.aba);
-      requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(() => tentar(6), 60)));
-    } else tentar(6);
+    const jaSaiu = tourEl.classList.contains('saindo');
+    tourSair();                                       // 1) anel + cartao saem juntos (o escurecimento nunca some)
+    setTimeout(() => {
+      if (tok !== tourTok) return;
+      if (troca){                                     // 2) aba troca por baixo do escuro
+        window.mostrarAba(st.aba);
+        requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(() => tentar(6), 60)));
+      } else tentar(6);                               // 3) anel + cartao entram juntos no lugar novo
+    }, jaSaiu ? 0 : 150);
   }
   function tourProximo(){ if (!tourAtivo) return; tourI++; tourPasso(1); }
   function tourFim(){

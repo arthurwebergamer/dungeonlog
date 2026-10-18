@@ -6713,3 +6713,8 @@ body.tourAberto .edsheet{will-change:transform}
 body.tourAberto .edov .edsheet{transform:none !important;transition:opacity .22s ease !important}
 body.tourAberto .edov:not(.on) .edsheet{opacity:0}
 body.tourAberto .edov.on .edsheet{opacity:1}
+
+.tourHole{transition:border-color .16s ease !important}
+.tourOverlay.saindo .tourHole{border-color:transparent}
+.tourOverlay.saindo .tourHole i{opacity:0 !important;animation:none !important}
+.tourHole{transition:border-color .16s ease,box-shadow .35s ease !important}

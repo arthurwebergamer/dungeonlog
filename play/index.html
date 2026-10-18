@@ -133,7 +133,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=235">
+<link rel="stylesheet" href="style.css?v=287">
 <script>
 // A abertura so sai quando a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado; sair antes (assim que o CSS chega)
 // mostrava um flash cinza vazio e depois a tela de login por baixo, antes do carrossel (visto em video de teste). Teto de seguranca: 15s.
@@ -837,6 +837,14 @@ html{background:var(--bsBg,#282828)}
            caso o JS falhe por algum motivo. Abre em nova aba
            (target=_blank) pra nao tirar o usuario do app. -->
       <div class="edsec" data-i18n="cfg.legal">Legal</div>
+
+      <div class="cfgrow cfglink" id="cfgRever">
+        <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></span>
+        <div class="cfgtxt">
+          <b data-i18n="cfg.reverTutorial">Rever tutorial</b>
+        </div>
+        <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
 
       <a class="cfgrow cfglink" id="cfgLinkPrivacidade" href="https://dungeonlog.weberlabs.com.br/privacy" target="_blank" rel="noopener">
         <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
@@ -4564,6 +4572,7 @@ function precarregarTemasArena(){
 // antes (entao ainda vai aparecer quando agendarDialogoTela('tarefas')
 // rodar, alguns ms depois do #intro sumir).
 function tutorialTarefasPendente(){
+  if (document.querySelector('.tourOverlay.on')) return true;
   const overlay = document.querySelector('.dlgOverlay');
   if (overlay) return overlay.classList.contains('on');
   try {
@@ -5046,6 +5055,12 @@ function devLiberarTodosItens(){
     if (!it || it[8] || it[2] === 'tesouro' || id === idGrim) return;
     if (['arma','armadura','elmo','escudo','acess'].includes(it[2])) { if (!inventario.some(s => baseDe(s.id) === id)) inventario.push({id: comAfixo(id), q: 1}); }
     else if (!inventario.some(s => s.id === id)) inventario.push({id, q: (it[2] === 'cons' || it[2] === 'chave') ? 5 : 1});
+  });
+  // dev: tesouros pra testar a forja -- repoe ate 10 de cada a cada carregar
+  ITENS.slice(0, BASE_N).forEach((it, id) => {
+    if (!it || it[2] !== 'tesouro') return;
+    const sl = inventario.find(s => s.id === id);
+    if (!sl) inventario.push({id, q: 10}); else if (sl.q < 10) sl.q = 10;
   });
 }
 window.devLiberarTodosItens = devLiberarTodosItens;
@@ -8066,9 +8081,9 @@ function abrirFicha(id){
   let acoes = '';
   if (EQUIPAVEL(id)) acoes += '<button class="prim" data-a="eq">'+(estaEquipado ? (en ? 'Unequip' : 'Desequipar') : (en ? 'Equip' : 'Equipar'))+'</button>';
   if (it.tipo === 'cons') acoes += '<button class="prim" data-a="usar">' + (en ? 'Use' : 'Usar') + '</button>';
-  if (SLOTS.includes(it.tipo)) acoes += '<button data-a="forja">' + (en ? 'Forge' : 'Forjar') + '</button>';
+  if (SLOTS.includes(it.tipo)) acoes += '<button class="forjaBtn" data-a="forja">' + (en ? 'Forge' : 'Forjar') + '</button>';
   if (it.tipo === 'chave' && id === ID_GRIMORIO_INV) acoes += '<button class="prim" data-a="abrir">' + (en ? 'Open' : 'Abrir') + '</button>';
-  if (!(it.tipo === 'chave' && id === ID_GRIMORIO_INV)) acoes += '<button data-a="vender">' + (en ? 'Sell' : 'Vender') + '</button>';
+  if (!(it.tipo === 'chave' && id === ID_GRIMORIO_INV)) acoes += '<button class="prim" data-a="vender">' + (en ? 'Sell' : 'Vender') + '</button>';
 
   ficha.innerHTML =
     '<div class="ihead'+(ehEq ? ' eqh' : '')+'">'+
@@ -8078,6 +8093,7 @@ function abrirFicha(id){
     '</div>'+
     '<div class="ibonus' + (ehEq ? ' istats' : '') + '">'+bonus+'</div>'+
     '<div class="iacts">'+acoes+'</div>';
+  fichaTransicao('item');
 
   ficha.querySelectorAll('[data-a]').forEach(b => {
     b.onclick = () => {
@@ -8122,37 +8138,161 @@ function trocarVariante(idAtual, idNovo){
   darItem(idNovo, 1);
   if (eraEquipado) eqs.forEach(k => { equipado[k] = idNovo; });
 }
-function abrirForja(id, novo){
+/* bigorna em pixel art: gerada em grade 44x24, desenhada a 2px por pixel -- mesma escala 2x dos sprites 32px da sheet */
+function bigornaSVG(){
+  const W = 44, H = 24, g = Array.from({length: H}, () => Array(W).fill(''));
+  const fill = (r0, r1, x0, x1) => { for (let r = r0; r <= r1; r++) for (let x = (typeof x0 === 'function' ? x0(r) : x0); x <= (typeof x1 === 'function' ? x1(r) : x1); x++) g[r][x] = 'b'; };
+  fill(2, 7, r => [0, 2, 4, 6, 9, 11][r - 2], r => r < 7 ? 43 : 38);   // mesa + corno
+  fill(8, 15, 14, 29);                                                   // cintura
+  fill(16, 21, 8, 35);                                                   // pe
+  fill(22, 22, 6, 37);                                                   // base
+  const solid = (r, x) => r >= 0 && r < H && x >= 0 && x < W && g[r][x];
+  for (let r = 0; r < H; r++) for (let x = 0; x < W; x++){
+    if (!g[r][x]) continue;
+    if (!solid(r - 1, x) && r < 8) g[r][x] = 'h';                        // brilho no topo
+    else if (!solid(r, x + 1) || !solid(r, x + 2) || (!solid(r, x + 3) && r > 7)) g[r][x] = 'm';
+    if (!solid(r, x + 1) && r > 3) g[r][x] = 's';
+    if (!solid(r + 1, x) && r > 6) g[r][x] = 's';
+  }
+  const base = g.map(l => l.slice()), sd = (r, x) => r >= 0 && r < H && x >= 0 && x < W && base[r][x];
+  for (let r = 0; r < H; r++) for (let x = 0; x < W; x++) if (!base[r][x] && (sd(r - 1, x) || sd(r + 1, x) || sd(r, x - 1) || sd(r, x + 1))) g[r][x] = 'o';
+  g[3][36] = 'o'; g[3][37] = 'o'; g[12][21] = 'm'; g[12][22] = 'm';
+  const cor = {o: '#1B1626', h: '#B4B9C8', b: '#808798', m: '#5E6477', s: '#434859'};
+  let r = '';
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (g[y][x]) r += '<rect x="' + x + '" y="' + y + '" width="1" height="1" fill="' + cor[g[y][x]] + '"/>';
+  return '<svg class="bigorna" viewBox="0 0 ' + W + ' ' + H + '" shape-rendering="crispEdges" aria-hidden="true">' + r + '</svg>';
+}
+/* cenario da forja: mesmo banner da tela de Nivel (masmorra + tochas + heroi do jogador), peca no lugar do monstro */
+function cenaForjaHTML(it){
+  const cq = window.cqHelpers, bg = cq && cq.bgMasmorra ? cq.bgMasmorra() : '';
+  const h = typeof heroiAtual === 'function' ? heroiAtual().img : '';
+  return '<div class="cena"><div class="l" style="' + bg + '"></div><div class="tocha-arena tocha-esq"></div><div class="tocha-arena tocha-dir"></div>' +
+    '<div class="cfHeroi">' + (h ? '<img src="' + h + '" alt="">' : '') + '<div class="sombra"></div></div>' +
+    '<div class="cfPeca"><div class="forjaPeca"><div class="ibox">' + spriteHTML(it.sp, 64) + '</div></div><div class="sombra"></div></div></div>';
+}
+function faiscas(cena, n){
+  if (!cena) return;
+  for (let k = 0; k < n; k++){
+    const f = document.createElement('span'); f.className = 'fg';
+    const ang = Math.random() * Math.PI * 2, d = 40 + Math.random() * 60;
+    f.style.setProperty('--x', Math.round(Math.cos(ang) * d) + 'px');
+    f.style.setProperty('--y', Math.round(Math.sin(ang) * d - 18) + 'px');
+    if (k % 3 === 0) f.style.background = '#fff';
+    cena.appendChild(f); setTimeout(() => f.remove(), 650);
+  }
+}
+function forjaAnim(cb){
+  const cena = ficha.querySelector('.cena'), bx = ficha.querySelector('.ibox');
+  if (!cena || !bx || matchMedia('(prefers-reduced-motion:reduce)').matches){ setTimeout(cb, 300); return; }
+  const c = bx.getBoundingClientRect();
+  ficha.querySelectorAll('.fSlots i.on').forEach(g => {
+    const r = g.getBoundingClientRect();
+    g.style.setProperty('--dx', (c.left + c.width / 2 - r.left - r.width / 2) + 'px');
+    g.style.setProperty('--dy', (c.top + c.height / 2 - r.top - r.height / 2) + 'px');
+    g.classList.add('voa');
+  });
+  [500, 880, 1260].forEach((t, k) => setTimeout(() => {
+    cena.dataset.calor = k + 1;
+    cena.classList.remove('bate'); void cena.offsetWidth; cena.classList.add('bate');
+    faiscas(cena, k === 2 ? 16 : 8);
+    window.tocarSom?.('golpe');
+    if (navigator.vibrate) try { navigator.vibrate(k === 2 ? 40 : 15); } catch (e) {}
+  }, t));
+  setTimeout(cb, 1750);
+}
+const AFX_SP = {gan: 49, est: 77, sor: 42, bar: 86, tes: 1, bau: 16, abu: 118};   // sprites reais da sheet
+/* transicao entre telas da ficha: nova tela entra deslizando+fade (direcao pela ordem das telas); toques na mesma tela nao reanimam */
+const TELAS_FICHA = {item: 0, sel: 1, rol: 2, res: 3};
+function fichaTransicao(chave, alvo){
+  const ant = ficha.dataset.tela;
+  ficha.dataset.tela = chave;
+  if (!ant || ant === chave || matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+  const dir = TELAS_FICHA[chave] >= TELAS_FICHA[ant] ? 'dirF' : 'dirB';
+  ficha.classList.remove('trocando', 'dirF', 'dirB', 'soCorpo');
+  void ficha.offsetWidth;
+  ficha.classList.add('trocando', dir); if (alvo === 'corpo') ficha.classList.add('soCorpo');
+  clearTimeout(ficha._tt); ficha._tt = setTimeout(() => ficha.classList.remove('trocando', 'dirF', 'dirB', 'soCorpo'), 450);
+}
+function forjaLinha(afx, cls, en, tag){
+  if (!afx) return '<div class="rolRow ' + cls + '"><div class="rolIc"></div><span class="rolTx dim">' + (en ? 'No enchantment' : 'Sem encantamento') + '</span></div>';
+  return '<div class="rolRow ' + cls + '"><div class="rolIc">' + spriteHTML(AFX_SP[afx[0]] || 1, 32) + '</div><span class="rolTx a-' + afx[0] + (afx[1] < 0 ? ' neg' : '') + '">' + afxEfeito(afx, en) + '</span>' + (tag || '') + '</div>';
+}
+/* roleta: tira vertical que desliza suave e desacelera ate o sorteado ficar na linha do meio */
+function forjaRoleta(it, nv, cb){
+  const en = idiomaApp() === 'en', box = ficha.querySelector('.ibonus');
+  if (!box){ setTimeout(cb, 200); return; }
+  const reduz = matchMedia('(prefers-reduced-motion:reduce)').matches;
+  const N = 28, H = 60, fil = Array.from({length: N}, () => afxRolar(it.rar, null, P_NEG_FORJA));
+  fil[N - 3] = nv;
+  box.innerHTML = '<div class="isep">' + (en ? 'Rolling enchantment' : 'Sorteando encantamento') + '</div>' +
+    '<div class="rolJan"><div class="rolSel"></div><div class="rolTira">' + fil.map(a => forjaLinha(a, 'dim', en)).join('') + '</div></div>';
+  fichaTransicao('rol', 'corpo');
+  const tira = box.querySelector('.rolTira'), alvo = -(N - 5) * H;
+  const fim = () => {
+    tira.children[N - 3].classList.remove('dim');
+    box.querySelector('.rolSel').classList.add('trava');
+    window.tocarSom?.('roletaFim');
+    setTimeout(cb, 500);
+  };
+  if (reduz){ tira.style.transform = 'translateY(' + alvo + 'px)'; setTimeout(fim, 200); return; }
+  let ultima = 0; const dur = 2200, t0 = performance.now();
+  const loop = ts => {
+    const t = Math.min(1, (ts - t0) / dur);
+    tira.style.transform = 'translateY(' + (alvo * (1 - Math.pow(1 - t, 1.8))) + 'px)';
+    const lin = Math.floor(-alvo * (1 - Math.pow(1 - t, 1.8)) / H);
+    if (lin !== ultima){ ultima = lin; if (t < 1) window.tocarSom?.('roletaTick', t); }
+    if (t < 1) requestAnimationFrame(loop); else fim();
+  };
+  requestAnimationFrame(loop);
+}
+/* tesouro mais raro = menos chance de maldição (0 -> 30%, raridade 4 -> ~6%) */
+function pNegForja(sel){
+  if (!sel || !sel.length) return P_NEG_FORJA;
+  const m = sel.reduce((a, id) => a + item(id).rar, 0) / sel.length;
+  return P_NEG_FORJA * (1 - 0.2 * m);
+}
+function abrirForja(id, novo, sel){
   const it = item(id), en = idiomaApp() === 'en';
   const custo = 1 + Math.min(it.rer, 2), tem = tesourosDisponiveis();
-  const bloco = (rot, afx) => !afx ? '<div class="fBloco"><small>' + rot + '</small><div class="fVal" style="color:var(--dim)">' + (en ? 'No enchantment' : 'Sem encantamento') + '</div></div>' : '<div class="fBloco"><small>' + rot + '</small><div class="iafx a-' + afx[0] + '"><b>✦ ' + afxNome(afx, en) + ' ✦</b></div><div class="fVal a-' + afx[0] + (afx[1] < 0 ? ' neg' : '') + '">' + afxEfeito(afx, en) + '</div></div>';
+  sel = sel || [];
   let corpo, acoes;
   if (novo){
-    corpo = '<div class="fPar">' + bloco(en ? 'Current' : 'Atual', it.afx) + bloco(en ? 'New' : 'Novo', novo).replace('fBloco', 'fBloco forjaRev') + '</div>';
+    corpo = '<div class="isep">' + (en ? 'Current' : 'Atual') + '</div><div class="rolista">' + forjaLinha(it.afx, 'cur', en) + '</div>' +
+      '<div class="isep">' + (en ? 'New' : 'Novo') + ' · ' + afxNome(novo, en) + '</div><div class="rolista">' + forjaLinha(novo, 'sel trava', en, '<span class="rolTag">' + (en ? 'NEW' : 'NOVO') + '</span>') + '</div>';
     acoes = '<button class="prim" data-a="fnovo">' + (en ? 'Keep new' : 'Ficar com o novo') + '</button><button data-a="fatual">' + (en ? 'Keep current' : 'Manter atual') + '</button>';
   } else {
-    corpo = '<div class="fPar one">' + bloco(en ? 'Current' : 'Atual', it.afx) + '</div>' +
-      '<div class="fCusto">' + (en ? 'Cost' : 'Custo') + ' <b>' + custo + '</b> ' + (en ? (custo > 1 ? 'treasures' : 'treasure') : (custo > 1 ? 'tesouros' : 'tesouro')) +
-      ' <i>·</i> ' + (en ? 'You have' : 'Você tem') + ' <b class="' + (tem >= custo ? 'ok' : 'falta') + '">' + tem + '</b></div>' +
-      '';
-    acoes = '<button class="prim' + (tem >= custo ? '' : ' semTes') + '" data-a="fgo">' + (en ? 'Forge' : 'Forjar') + '</button><button data-a="fvolta">' + (en ? 'Back' : 'Voltar') + '</button>';
+    corpo = '<div class="isep">' + (en ? 'Current enchantment' : 'Encantamento atual') + '</div><div class="rolista">' + forjaLinha(it.afx, 'cur', en) + '</div>' +
+      '<div class="isep"></div>' +
+      '<div class="isep">' + (en ? 'Offer ' + custo + (custo > 1 ? ' treasures' : ' treasure') : 'Ofereça ' + custo + (custo > 1 ? ' tesouros' : ' tesouro')) + '</div>' +
+      '<div class="fSlots">' + Array.from({length: custo}, (_, k) => k < sel.length ? '<i class="on" data-rm="' + k + '"><div class="pxi" style="' + estiloSprite(item(sel[k]).sp, 32) + '"></div></i>' : '<i></i>').join('') + '</div>' +
+      '<div class="rolDica">' + (sel.length === custo ? (en ? 'Curse chance: ' : 'Chance de maldição: ') + Math.round(pNegForja(sel) * 100) + '%' : (en ? 'Tap treasures below to choose' : 'Toque nos tesouros abaixo pra escolher')) + '</div>' +
+      '<div class="tesGrade">' + inventario.filter(s => item(s.id).tipo === 'tesouro').sort((a, z) => item(z.id).rar - item(a.id).rar || item(z.id).val - item(a.id).val).map(s => {
+        const usados = sel.filter(x => x === s.id).length;
+        return '<button class="tesCel" data-add="' + s.id + '"' + (usados >= s.q || sel.length >= custo ? ' disabled' : '') + ' style="--rc:' + COR_RAR[item(s.id).rar] + '"><div class="pxi" style="' + estiloSprite(item(s.id).sp, 32) + '"></div><b>' + (s.q - usados) + '</b></button>';
+      }).join('') + '</div>';
+    acoes = '<button class="prim' + (sel.length === custo ? '' : ' semTes') + '" data-a="fgo">' + (en ? 'Forge' : 'Forjar') + '</button><button data-a="fvolta">' + (en ? 'Back' : 'Voltar') + '</button>';
   }
   ficha.innerHTML =
-    '<div class="ihead eqh"><div class="ibox">' + spriteHTML(it.sp, 44) + '</div><div><div class="iname" style="color:' + COR_RAR[it.rar] + '">' + nomeComAfixo(it, en) + '</div>' +
+    '<div class="ihead eqh forjaH"><div class="ibox">' + spriteHTML(it.sp, 44) + '</div><div><div class="iname" style="color:' + COR_RAR[it.rar] + '">' + nomeComAfixo(it, en) + '</div>' +
     '<div class="imeta tag" style="color:' + COR_RAR[it.rar] + '">' + (en ? 'Forge' : 'Forja') + ' · ' + RARIDADES[it.rar] + '</div></div></div>' +
-    '<div class="ibonus istats forjaBox">' + corpo + '</div><div class="iacts">' + acoes + '</div>';
+    '<div class="ibonus istats">' + corpo + '</div><div class="iacts">' + acoes + '</div>';
+  fichaTransicao(novo ? 'res' : 'sel');
+  if (novo){ window.tocarSom?.('chegadaRecompensa'); }
+  ficha.querySelectorAll('[data-add]').forEach(b => { b.onclick = () => abrirForja(id, undefined, sel.concat([+b.dataset.add])); });
+  ficha.querySelectorAll('[data-rm]').forEach(b => { b.onclick = () => abrirForja(id, undefined, sel.filter((_, k) => k !== +b.dataset.rm)); });
   ficha.querySelectorAll('[data-a]').forEach(b => {
     b.onclick = () => {
       const a = b.dataset.a;
       if (a === 'fvolta') abrirFicha(id);
       else if (a === 'fgo'){
-        if (tesourosDisponiveis() < custo){ window.tocarSom?.('semMoedas'); aviso(en ? 'NOT ENOUGH TREASURES' : 'TESOUROS INSUFICIENTES'); return; }
-        gastarTesouros(custo);
-        const nv = afxRolar(it.rar, it.afx ? it.afx[0] : null, P_NEG_FORJA);
+        if (sel.length < custo){ window.tocarSom?.('semMoedas'); aviso(en ? 'CHOOSE THE TREASURES' : 'ESCOLHA OS TESOUROS'); return; }
+        const pn = pNegForja(sel);
+        sel.forEach(tid => tirarItem(tid, 1));
+        const nv = afxRolar(it.rar, it.afx ? it.afx[0] : null, pn);
         persistir(); renderInventario();
         ficha.querySelectorAll('button').forEach(x => x.disabled = true);
-        const bx = ficha.querySelector('.ibox'); if (bx) bx.classList.add('forjando');
-        setTimeout(() => abrirForja(id, nv), 850);
+        const bg = ficha.querySelector('[data-a=fgo]'); if (bg) bg.textContent = en ? 'Forging…' : 'Forjando…';
+        forjaRoleta(it, nv, () => abrirForja(id, nv));
       }
       else if (a === 'fnovo' || a === 'fatual'){
         const afx = a === 'fnovo' ? novo : it.afx;
@@ -8167,6 +8307,7 @@ function abrirForja(id, novo){
 }
 
 function fecharFicha(){
+  ficha.dataset.tela = '';
   ficha.classList.remove('on');
   fichaBG.classList.remove('on');
 }
@@ -8850,7 +8991,8 @@ function montarCompra(grid){
         en ? 'Buy ' + it.nome + '?' : 'Comprar ' + it.nome + '?',
         en ? 'Costs ' + preco + ' coins.' : 'Custa ' + preco + ' moedas.',
         en ? 'Buy' : 'Comprar',
-        () => comprar(i)
+        () => comprar(i),
+        s.id
       );
     };
   });
@@ -8918,7 +9060,8 @@ function montarVenda(grid){
           const icone = b.closest('.lrow')?.querySelector('.lbox');
           venderItem(id, icone || b);
           renderLoja();
-        }
+        },
+        id
       );
     };
   });
@@ -10335,6 +10478,8 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   if (btnCfgAbrir) btnCfgAbrir.onclick = abrirConfig;
   window.abrirConfig = abrirConfig;
   window.fecharConfig = fecharConfig;
+  const btnRever = document.getElementById('cfgRever');
+  if (btnRever) btnRever.onclick = () => { fecharConfig(); setTimeout(() => { if (typeof window.revisarTutorial === 'function') window.revisarTutorial(); }, 350); };
 
   /* ---------- Config: sub-tela Herói (item 39) ---------- */
   const heroiOverlay = document.getElementById('heroiOverlay');
@@ -12217,7 +12362,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
    ======================================================================= */
 (function(){
   const CHAVE_TELAS = 'questlog.tutorialTelas.v2';
-  const ATRASO_MS = 550;   // deixa a troca de aba assentar antes de falar
+  const ATRASO_MS = 120;   // deixa a troca de aba assentar antes de falar
 
   const DIALOGOS = {
     tarefas: [
@@ -12418,7 +12563,265 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     })();
   }
 
+  /* ===== TOUR NOVO (substitui os dialogos com busto/digitacao): tela escurecida, so o elemento da vez aceso, 1 frase curta ===== */
+  // Cada passo: sel (string, 'a|b' = uniao, ou funcao), espera = passo INTERATIVO
+  // (o usuario toca de verdade no destaque; sem botao Proximo) | ausente = so informa.
+  let tourN0 = 0, tourIdx = -1;
+  const TOUR = [
+    {aba: 'tarefas', sel: '#addbtn', espera: 'abrir',
+      pt: ['Crie sua 1ª tarefa', 'Toque em + Adicionar pra criar sua primeira tarefa.'], en: ['Create your 1st task', 'Tap + Add to create your first task.']},
+    {aba: 'tarefas', sel: '#input|#save', espera: 'criar',
+      pt: ['Escreva a tarefa', 'Escreva a tarefa e toque em Criar tarefa.'], en: ['Write the task', 'Write the task and tap Create task.']},
+    {aba: 'tarefas', sel: () => '#list .task[data-idx="' + tourIdx + '"] .box', espera: 'concluir', leve: true, scroll: true,
+      pt: ['Agora conclua', 'Agora toque na caixinha e veja o monstro apanhar.'], en: ['Now finish it', 'Now tap the box and watch the monster take a hit.']},
+    {aba: 'inventario',   sel: '#equipbox',          pt: ['Equipe seus itens', 'Aqui ficam seus itens. Itens bons dão mais XP e moedas.'],       en: ['Equip your items', 'Your items live here. Good ones boost your XP and coins.']},
+    {aba: 'loja',         sel: '#lojaGrid .lrow',    pt: ['A loja renova todo dia', 'A loja renova todo dia. Compre equipamentos com suas moedas.'],  en: ['The shop restocks daily', 'The shop restocks daily. Buy gear with your coins.']},
+    {aba: 'perfil',       sel: '.aneisLinha',        pt: ['Gaste pontos em atributos', 'Gaste seus pontos em atributos. Cada nível dá mais pontos.'], en: ['Spend points on attributes', 'Spend your points on attributes. Every level gives more.']},
+    {aba: 'estatisticas', sel: '#estCardPrincipal',  pt: ['Sua sequência de vitórias', 'Essa é sua sequência de vitórias. A tocha cresce a cada dia vencido.'], en: ['Your win streak', 'This is your win streak. The torch grows with every won day.']}
+  ];
+  let tourEl = null, tourI = 0, tourAtivo = false, tourTok = 0, tourPoll = null;
+  // SAIDA coordenada: anel do destaque e cartao somem JUNTOS (o escurecimento fica); ENTRADA: voltam juntos no lugar novo
+  function tourSair(){ if (!tourEl) return; tourEl.classList.add('saindo'); tourEl.querySelector('.tourCard').classList.add('tcOculto'); }
+  function tourParar(){ if (tourPoll){ clearInterval(tourPoll); tourPoll = null; } }
+  function tourAlvo(st){
+    const sel = typeof st.sel === 'function' ? st.sel() : st.sel;
+    const els = sel.split('|').map(s => document.querySelector(s));
+    if (els.some(e => !e)) return null;
+    const rs = els.map(e => e.getBoundingClientRect());
+    const l = Math.min(...rs.map(r => r.left)), t = Math.min(...rs.map(r => r.top));
+    const r2 = Math.max(...rs.map(r => r.right)), b = Math.max(...rs.map(r => r.bottom));
+    return {el: els[0], rects: rs, left: l, top: t, right: r2, bottom: b, width: r2 - l, height: b - t};
+  }
+  let tourDigT = null, tourPrimeira = false;
+  // texto inteiro reservado desde o inicio (parte nao digitada fica transparente): a caixa nao muda de altura enquanto digita
+  function tourDigitar(el, txt){
+    if (el.dataset.t === txt) return;          // re-medicoes nao reiniciam nem cortam a digitacao
+    clearInterval(tourDigT);
+    el.dataset.t = txt;
+    const face = tourEl.querySelector('.tourFace'), tx = tourEl.querySelector('.tourTx');
+    if (tx && tx.animate) tx.animate([{opacity: 0, transform: 'translateY(8px)'}, {opacity: 1, transform: 'none'}], {duration: 260, easing: 'cubic-bezier(.2,.9,.3,1)'});
+    const pinta = n => { el.innerHTML = '<span></span><span class="tourFalta"></span>'; el.firstChild.textContent = txt.slice(0, n); el.lastChild.textContent = txt.slice(n); };
+    let i = 0; pinta(0);
+    if (face) face.classList.add('fala');
+    tourDigT = setInterval(() => {
+      i += 2; pinta(Math.min(i, txt.length));
+      // haptico igual ao dialogo antigo: 20ms a cada 4 letras, respeitando o mudo da topbar
+      if (i % 4 === 0 && txt[i - 1] && txt[i - 1] !== ' ' && 'vibrate' in navigator && (typeof window.sfxAtivo !== 'function' || window.sfxAtivo())){
+        try { navigator.vibrate(20); } catch (e) {}
+      }
+      if (i >= txt.length){ clearInterval(tourDigT); if (face) face.classList.remove('fala'); }
+    }, 38);
+  }
+  function tourMontar(){
+    if (tourEl) return;
+    tourEl = document.createElement('div');
+    tourEl.className = 'tourOverlay saindo';
+    tourEl.innerHTML = '<i class="tourBloq" data-p="t"></i><i class="tourBloq" data-p="b"></i><i class="tourBloq" data-p="l"></i><i class="tourBloq" data-p="r"></i><i class="tourBloq" data-p="m"></i>' +
+      '<div class="tourHole"><i></i></div><i class="tourVeu"></i>' +
+      '<div class="tourCard tcOculto"><div class="tourFace"><img alt=""></div><div class="tourTx"><div class="tourNome"><span class="tourNomeT"></span><span class="tourTag"></span><span class="tourNum"></span></div><div class="tourSub"></div></div>' +
+      '<div class="tourRod"><div class="tourBarra"></div><button type="button" class="tourPular"></button><button type="button" class="tourVolta"></button><button type="button" class="tourProx"></button></div></div>';
+    document.body.appendChild(tourEl);
+    tourEl.querySelector('.tourProx').addEventListener('click', () => tourProximo());
+    tourEl.querySelector('.tourVolta').addEventListener('click', () => { if (tourAtivo && tourI > 0){ tourI--; tourPasso(-1); } });
+    tourEl.querySelector('.tourPular').addEventListener('click', () => tourFim());
+    let _rt = null;
+    window.addEventListener('resize', () => { clearTimeout(_rt); _rt = setTimeout(() => { if (tourAtivo) tourPosicionar(false); }, 120); });   // teclado abrindo dispara varios resize: um so por vez
+  }
+  function tourPosicionar(anima){
+    const st = TOUR[tourI], en = (typeof idiomaApp === 'function' && idiomaApp() === 'en');
+    const hole = tourEl.querySelector('.tourHole'), card = tourEl.querySelector('.tourCard');
+    if (st.scroll){ const e0 = document.querySelector(typeof st.sel === 'function' ? st.sel() : st.sel); if (e0 && e0.scrollIntoView) try { e0.scrollIntoView({block: 'center'}); } catch (_){} }
+    const r = tourAlvo(st);
+    if (!r || r.width < 4 || r.height < 4) return false;
+    const pad = 6, W = window.innerWidth, H = window.innerHeight, t = en ? st.en : st.pt;
+    const hl = r.left - pad, ht = r.top - pad, hw = r.width + pad * 2, hh = r.height + pad * 2;
+    hole.style.transition = 'none';   // o quadrado nunca anima largura/altura (ficava esticando); entra com um 'pop' curto
+    hole.style.left = hl + 'px'; hole.style.top = ht + 'px'; hole.style.width = hw + 'px'; hole.style.height = hh + 'px';
+    // blocos transparentes: so o buraco deixa o toque passar (passo interativo); no passo informativo o miolo tambem bloqueia
+    const B = {t: [0, 0, W, ht], b: [0, ht + hh, W, H - ht - hh], l: [0, ht, hl, hh], r: [hl + hw, ht, W - hl - hw, hh], m: [hl, ht, hw, hh]};
+    tourEl.querySelectorAll('.tourBloq').forEach(q => {
+      const g = B[q.dataset.p];
+      q.style.left = g[0] + 'px'; q.style.top = g[1] + 'px'; q.style.width = Math.max(0, g[2]) + 'px'; q.style.height = Math.max(0, g[3]) + 'px';
+      if (q.dataset.p === 'm') q.style.display = st.espera ? 'none' : 'block';
+    });
+    tourEl.classList.toggle('vez', !!st.espera);
+    if (anima){
+      hole.classList.remove('chega'); void hole.offsetWidth; hole.classList.add('chega');
+      if (hole.animate) hole.animate([{transform: 'scale(1.06)'}, {transform: 'scale(1)'}], {duration: 240, easing: 'cubic-bezier(.2,.9,.3,1)'});   // so escala: opacidade aqui derretia o escurecimento (box-shadow) e a tela piscava clara
+    }
+    card.querySelector('.tourNum').textContent = (tourI + 1) + ' / ' + TOUR.length;
+    card.querySelector('.tourTag').textContent = st.espera ? (en ? 'YOUR TURN' : 'SUA VEZ') : '';
+    const _img = card.querySelector('.tourFace img'), _h = (typeof heroiAtual === 'function') ? heroiAtual() : null;
+    if (_h && _img.getAttribute('src') !== _h.img) _img.src = _h.img;
+    card.querySelector('.tourNomeT').textContent = (typeof nomeHeroiNorm === 'function' && typeof nomeHeroi !== 'undefined' && nomeHeroi) ? nomeHeroiNorm(nomeHeroi) : (en ? 'Hero' : 'Herói');
+    tourDigitar(card.querySelector('.tourSub'), t[1]);
+    card.querySelector('.tourBarra').innerHTML = TOUR.map((_, k) => '<i class="' + (k <= tourI ? 'on' : '') + '"></i>').join('');
+    card.querySelector('.tourPular').textContent = en ? 'Skip' : 'Pular';
+    card.querySelector('.tourVolta').textContent = en ? 'Back' : 'Voltar';
+    card.querySelector('.tourVolta').style.display = (st.espera || tourI === 0 || (TOUR[tourI - 1] && TOUR[tourI - 1].espera)) ? 'none' : '';
+    card.querySelector('.tourProx').style.display = st.espera ? 'none' : '';
+    card.querySelector('.tourProx').textContent = tourI === TOUR.length - 1 ? (en ? 'Done' : 'Concluir') : (en ? 'Next' : 'Próximo');
+    requestAnimationFrame(() => {
+      const largo = W > 700, cw = largo ? 440 : Math.min(520, W - 24);
+      card.style.width = cw + 'px';
+      const ch = card.offsetHeight;
+      let nl, nt, bot = 'auto';
+      const M = 12, liv = (x, y) => r.rects.every(q => (x + cw < q.left - 10 || x > q.right + 10 || y + ch < q.top - 10 || y > q.bottom + 10));   // nao cobre nenhum alvo
+      const dentro = (x, y) => x >= M && y >= M && x + cw <= W - M && y + ch <= H - M;
+      const cx = Math.max(M, Math.min(W - cw - M, r.left + r.width / 2 - cw / 2)), cy = Math.max(M, Math.min(H - ch - M, r.top + r.height / 2 - ch / 2));
+      const topoSeg = 'calc(12px + env(safe-area-inset-top, 0px))', baseSeg = 'calc(14px + env(safe-area-inset-bottom, 0px))';
+      let cand;
+      if (largo) cand = [[r.right + pad + 20, cy], [r.left - pad - 20 - cw, cy], [cx, r.bottom + pad + 20], [cx, r.top - pad - 20 - ch]];
+      else cand = [[cx, H - ch - 14], [cx, M]];
+      let esc = cand.find(([x, y]) => dentro(x, y) && liv(x, y));
+      if (!esc){   // nada cabe fora do destaque: procura um vao entre os alvos (ex.: entre o campo e o botao Criar do formulario)
+        for (let y = M; y + ch <= H - M && !esc; y += 12) if (liv(cx, y)) esc = [cx, y];
+      }
+      if (!esc) esc = cand[0];
+      nl = Math.round(esc[0]); nt = Math.round(esc[1]);
+      if (!largo){ nl = Math.round((W - cw) / 2); if (nt >= H - ch - 20){ nt = 'auto'; bot = baseSeg; } else if (nt <= M + 1){ nt = topoSeg; } }
+      card.classList.toggle('noTopo', !largo && nt !== 'auto');
+      const aplica = () => { card.style.transition = card.classList.contains('tcOculto') ? 'none' : ''; card.style.left = nl + 'px'; card.style.top = (typeof nt === 'number') ? nt + 'px' : nt; card.style.bottom = bot; void card.offsetWidth; card.style.transition = ''; };
+      const ox = parseFloat(card.style.left), oy = parseFloat(card.style.top);
+      const salto = largo && !isNaN(ox) && !isNaN(oy) && (Math.abs(ox - nl) + Math.abs(oy - nt) > 150) && !card.classList.contains('tcOculto');
+      if (salto){
+        // salto grande: some, muda de lugar escondido e reaparece (em vez de cruzar a tela voando)
+        card.classList.add('tcOculto');
+        setTimeout(() => { if (!tourAtivo) return; card.style.transition = 'none'; aplica(); void card.offsetWidth; card.style.transition = ''; card.classList.remove('tcOculto'); }, 170);
+        return;
+      }
+      aplica();
+    card.classList.remove('tcOculto'); tourEl.classList.remove('saindo', 'cortina');
+    });
+    return true;
+  }
+  function tourEsperar(st, tok){
+    tourParar();
+    if (!st.espera) return;
+    if (st.espera === 'criar') tourN0 = tarefas.length;
+    if (st.espera === 'abrir'){
+      const ab = document.getElementById('addbtn');
+      if (ab){
+        const h = () => { ab.removeEventListener('click', h); if (tok === tourTok && tourAtivo){ tourParar(); tourProximo(); } };   // roda depois do handler do app, no mesmo clique
+        ab.addEventListener('click', h);
+      }
+    }
+    tourPoll = setInterval(() => {
+      if (tok !== tourTok || !tourAtivo){ tourParar(); return; }
+      if (st.espera === 'abrir'){
+        const cp = document.getElementById('composer');
+        if (cp && cp.classList.contains('on')){ tourParar(); setTimeout(() => { if (tok === tourTok && tourAtivo) tourProximo(); }, 420); }   // espera a folha terminar de subir
+      } else if (st.espera === 'criar'){
+        if (tarefas.length > tourN0){
+          tourParar(); tourIdx = tarefas.length - 1; tourSair();
+          setTimeout(() => { if (tok === tourTok && tourAtivo) tourProximo(); }, 60);
+        } else {
+          const cp = document.getElementById('composer');   // fechou sem criar: volta pro passo anterior
+          if (cp && !cp.classList.contains('on') && !tourFoco()){ tourParar(); tourI = Math.max(0, tourI - 1); tourPasso(-1); }
+        }
+      } else if (st.espera === 'concluir'){
+        const t = tarefas[tourIdx];
+        if (!t || t.feitaEm || t._feitaTour){
+          tourParar(); tourSair();                      // anel e cartao somem na hora; o golpe e o XP aparecem sem nada em cima
+          setTimeout(() => { if (tok === tourTok && tourAtivo) tourProximo(); }, 1300);
+        }
+      }
+    }, 100);
+  }
+  function tourFoco(){ const a = document.activeElement; return a && a.id === 'input'; }
+  // true quando nenhuma transicao finita da tela (folha subindo, aba, linha entrando) esta rodando; limite de 900ms
+  let _assentarDesde = 0;
+  function tourAssentou(tok){
+    if (!_assentarDesde || _assentarDesde.tok !== tok) _assentarDesde = {tok, t: performance.now()};
+    if (performance.now() - _assentarDesde.t > 900) return true;
+    try {
+      return !document.getAnimations().some(a => {
+        const e = a.effect, tg = e && e.target;
+        if (a.playState !== 'running' || !tg || !tg.closest || tg.closest('.tourOverlay')) return false;
+        if (['opacity', 'visibility', 'color', 'background-color', 'filter', 'backdrop-filter', 'border-color'].includes(a.transitionProperty)) return false;   // fade nao muda posicao: nao precisa esperar
+        if (e.getComputedTiming().iterations === Infinity) return false;
+        return !!tg.closest('.edov,.view,.task');
+      });
+    } catch (_) { return true; }
+  }
+  function tourPasso(dir){
+    const tok = ++tourTok; tourParar();
+    if (tourI < 0) tourI = 0;
+    if (tourI >= TOUR.length){ tourFim(); return; }
+    const st = TOUR[tourI];
+    const atual = document.querySelector('.view.on');
+    const nomeAtual = atual ? atual.id.replace('view', '').toLowerCase() : '';
+    const tentar = (n) => {
+      if (tok !== tourTok) return;
+      tourEl.classList.toggle('leve', !!st.leve);
+      if (n === 6 && !tourAssentou(tok)){ setTimeout(() => tentar(6), 60); return; }   // folha/aba ainda animando: mede so quando assentar
+      if (tourPosicionar(true)){ tourEsperar(st, tok); setTimeout(() => { if (tok === tourTok && tourAtivo) tourPosicionar(false); }, 420); return; }
+      if (n > 0) setTimeout(() => tentar(n - 1), 60);
+      else {
+        let prox = tourI + (dir || 1), d = dir || 1;
+        if (d < 0 && (prox < 0 || TOUR[prox].espera)){ d = 1; prox = tourI + 1; }   // voltar nunca sai nem cai num passo interativo
+        tourI = prox; tourPasso(d);
+      }
+    };
+    const troca = nomeAtual !== st.aba && typeof window.mostrarAba === 'function';
+    const jaSaiu = tourEl.classList.contains('saindo');
+    if (tourPrimeira){                                // 1a entrada: sem passar pelo preto total; o overlay ja nasce com o anel no lugar e so faz fade-in
+      tourPrimeira = false;
+      tourEl.classList.remove('saindo', 'cortina');
+      requestAnimationFrame(() => tentar(6));
+      return;
+    }
+    tourSair();                                       // 1) anel + cartao saem juntos (o escurecimento nunca some)
+    if (troca) tourEl.classList.add('cortina');       //    troca de aba: tela escurece quase total (corte limpo), depois clareia ja na aba nova
+    setTimeout(() => {
+      if (tok !== tourTok) return;
+      if (troca){                                     // 2) aba troca no escuro total
+        window.mostrarAba(st.aba);
+        requestAnimationFrame(() => tentar(6));
+      } else tentar(6);                               // 3) anel + cartao entram juntos no lugar novo
+    }, troca ? 90 : (jaSaiu ? 0 : 70));
+  }
+  function tourProximo(){ if (!tourAtivo) return; tourI++; tourPasso(1); }
+  function tourFim(){
+    tourTok++; tourAtivo = false; tourParar(); clearInterval(tourDigT);
+    document.body.classList.remove('tourAberto');
+    ['tarefas', 'inventario', 'loja', 'perfil', 'estatisticas'].forEach(n => { vistas[n] = true; });
+    salvarVistas();
+    const _cp = document.getElementById('composer'); if (_cp) _cp.classList.remove('on');
+    const ov = tourEl;
+    const volta = () => { if (typeof window.mostrarAba === 'function') window.mostrarAba('tarefas'); };
+    if (!ov || !ov.classList.contains('on')){ volta(); return; }
+    // fim sem piscar: escurece total, volta pra aba Tarefas por baixo do escuro e so entao o escuro desaparece (fade)
+    tourSair(); ov.classList.add('cortina');
+    setTimeout(() => {
+      volta();
+      requestAnimationFrame(() => {
+        ov.classList.add('fim');
+        setTimeout(() => { ov.classList.remove('on', 'ok', 'leve', 'saindo', 'cortina', 'fim'); }, 380);
+      });
+    }, 110);
+  }
+  function iniciarTour(){
+    if (tourAtivo) return;
+    tourMontar(); tourAtivo = true; tourI = 0; document.body.classList.add('tourAberto');
+    tourEl.classList.add('saindo'); tourPrimeira = true;
+    // entra quando o app terminou de pintar/ficou ocioso (evita competir com a abertura do app e travar o 1o fade)
+    const go = () => { if (!tourAtivo) return; tourEl.classList.add('on'); tourPasso(1); };
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      if ('requestIdleCallback' in window) requestIdleCallback(go, {timeout: 500}); else setTimeout(go, 60);
+    }));
+  }
+  window.revisarTutorial = function(){
+    ['tarefas', 'inventario', 'loja', 'perfil', 'estatisticas'].forEach(n => { delete vistas[n]; });
+    if (typeof window.mostrarAba === 'function') window.mostrarAba('tarefas');
+    iniciarTour();
+  };
   function mostrarDialogoTela(nome){
+    if (nome === 'tarefas'){ iniciarTour(); return; }
+    vistas[nome] = true; salvarVistas();     // outras abas: sem dialogo, o tour ja cobriu
+  }
+
+  function mostrarDialogoTelaAntigo(nome){
     const en = (typeof idiomaApp === 'function' && idiomaApp() === 'en');
     const fonte = en ? DIALOGOS_EN : DIALOGOS;
     const linhas = fonte[nome];
@@ -13081,6 +13484,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   <div class="edsheet" id="confirmSheet">
     <div class="edpuxador"></div>
     <div class="edtitulo" id="confirmTitulo">Confirmar?</div>
+    <div id="confirmItem"></div>
     <p id="confirmDesc" style="font-family:'Outfit',sans-serif;font-size:13px;color:var(--dim);line-height:1.5;margin:0 0 16px"></p>
     <div class="edacoes">
       <button class="edsalvar" id="confirmCancelar" type="button" style="background:var(--panel-2);color:var(--text)">Cancelar</button>
@@ -13114,8 +13518,19 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   // window.pedirConfirmacao(titulo, desc, textoBotaoOk, aoConfirmar) --
   // generico, usado por comprar() e venderItem() (ver pontos de chamada
   // em montarLoja()/montarVenda()/abrirFicha()).
-  window.pedirConfirmacao = function(titulo, desc, textoOk, aoConfirmar){
-    elTitulo.textContent = titulo;
+  window.pedirConfirmacao = function(titulo, desc, textoOk, aoConfirmar, itemId){
+    const elItem = document.getElementById('confirmItem');
+    if (elItem){
+      if (itemId != null && typeof item === 'function' && item(itemId)){
+        const it = item(itemId), en = (typeof idiomaApp === 'function' && idiomaApp() === 'en');
+        elItem.innerHTML = '<div class="ihead eqh"><div class="ibox" style="border-color:' + COR_RAR[it.rar] + '">' + spriteHTML(it.sp, 44) + '</div>' +
+          '<div><div class="iname" style="color:' + COR_RAR[it.rar] + '">' + nomeComAfixo(it, en) + '</div>' +
+          '<div class="imeta tag" style="color:' + COR_RAR[it.rar] + '">' + RARIDADES[it.rar] + ' · ' + NOME_TIPO[it.tipo] + '</div></div></div>';
+        elItem.style.display = '';
+        elTitulo.textContent = textoOk;       // com o item na tela, o titulo vira so o verbo
+        elTitulo.classList.add('verbo');
+      } else { elItem.innerHTML = ''; elItem.style.display = 'none'; elTitulo.textContent = titulo; elTitulo.classList.remove('verbo'); }
+    } else elTitulo.textContent = titulo;
     elDesc.textContent = desc;
     bOk.textContent = textoOk;
     _callback = aoConfirmar;
@@ -14699,6 +15114,16 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     equipar: [15, 30, 15], desequipar: [20], trocarHeroi: [15, 30, 15], usar: [25], abrirGrimorio: [15],
     soltar: [12], erro: [60, 50, 60]
   };
+  // roleta da forja: tique por linha que passa (tom sobe com o progresso) e um selo final de "travou"
+  SONS.roletaTick = (c, p) => { tom(c, { freq: 520 + (p || 0) * 420, tipo: 'square', duracao: 0.022, ganho: 0.1 }); };
+  SONS.roletaFim = c => {
+    tom(c, { freq: 130, freqFinal: 60, tipo: 'sine', duracao: 0.16, ganho: 0.34 });
+    tom(c, { freq: 523, tipo: 'triangle', duracao: 0.14, ganho: 0.26 });
+    tom(c, { freq: 784, tipo: 'triangle', inicio: 0.09, duracao: 0.16, ganho: 0.26 });
+    tom(c, { freq: 1046, tipo: 'sine', inicio: 0.18, duracao: 0.4, ganho: 0.28 });
+    tom(c, { freq: 1568, tipo: 'sine', inicio: 0.2, duracao: 0.34, ganho: 0.14 });
+  };
+  VIBRACAO.roletaFim = [20, 40, 40];
   function vibrarEvento(nome){
     const padrao = VIBRACAO[nome];
     if (!padrao || feedback !== 'vibrar' || !('vibrate' in navigator)) return;
@@ -19018,6 +19443,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'cfg.aparencia':       { pt:'Aparência', en:'Appearance' },
     'cfg.preferencias':    { pt:'Preferências', en:'Preferences' },
     'cfg.legal':           { pt:'Legal', en:'Legal' },
+    'cfg.reverTutorial':   { pt:'Rever tutorial', en:'Replay tutorial' },
     'cfg.privacidade':     { pt:'Política de Privacidade', en:'Privacy Policy' },
     'cfg.termosDeUso':     { pt:'Termos de Uso', en:'Terms of Use' },
     'pro.legalTermos':      { pt:'Termos e Condições', en:'Terms & Conditions' },

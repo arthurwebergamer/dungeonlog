@@ -6470,3 +6470,265 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 @media (prefers-reduced-motion:reduce){.sacode{animation:none}}
 
 .saveHint.on{transition:opacity .2s,height .2s,margin .2s}
+
+/* botoes secundarios (Forjar, Vender, Voltar...): preenchidos com tinta do tema + borda e texto na cor de destaque -> claramente tocaveis */
+.iacts button:not(.prim),#confirmOk{background:color-mix(in srgb,var(--accent) 16%,var(--poco));border:1.5px solid color-mix(in srgb,var(--accent) 65%,transparent);color:var(--accent)}
+.iacts button:not(.prim):active,#confirmOk:active{background:color-mix(in srgb,var(--accent) 28%,var(--poco))}
+.iacts button.semTes{opacity:.45}
+
+/* Forjar: roxo solido fixo (igual em todos os temas), sem gradiente nem brilho */
+
+/* tela de forja: mesmo layout da ficha (linhas centralizadas), sem caixas */
+.istats .irow.fVelho{opacity:.5}
+.istats .irow.dim b.neg{color:var(--perigo)}
+.istats .irow.forjaRev{animation:forjaRev .45s ease-out both}
+
+/* cena da forja: item sobre a bigorna, golpes de martelo, fagulhas quadradas (pixel) */
+.cena{position:relative;display:flex;flex-direction:column;align-items:center;padding-top:6px}
+.cena .ibox{width:76px;height:76px;transition:border-color .15s,box-shadow .15s}
+.bigorna{width:104px;height:12px;margin-top:6px;background:var(--line);border-radius:3px 3px 6px 6px;position:relative}
+.bigorna::after{content:'';position:absolute;left:30px;right:30px;bottom:-9px;height:9px;background:var(--line);border-radius:0 0 4px 4px}
+.cena[data-calor="1"] .ibox{border-color:#B8561A;box-shadow:0 0 0 1px #B8561A}
+.cena[data-calor="2"] .ibox{border-color:#E8761F;box-shadow:0 0 0 2px #E8761F}
+.cena[data-calor="3"] .ibox{border-color:#FFB020;box-shadow:0 0 0 3px #FFB020}
+@keyframes forjaGolpe{0%{transform:translate(0,-12px) scale(1.06)}22%{transform:translate(0,3px) scale(.92,1.06)}34%{transform:translate(-3px,0)}46%{transform:translate(3px,0)}58%{transform:translate(-2px,0)}100%{transform:none}}
+.cena.bate{animation:forjaGolpe .36s steps(7,end)}
+.fg{position:absolute;left:50%;top:46px;width:5px;height:5px;background:#FFB020;pointer-events:none;animation:fagulha .6s steps(6,end) forwards}
+@keyframes fagulha{0%{transform:translate(0,0);opacity:1}100%{transform:translate(var(--x),calc(var(--y) + 34px));opacity:0}}
+.fSlots{display:flex;justify-content:center;gap:10px;padding:6px 0 4px}
+.fSlots i{width:18px;height:18px;border:1.5px dashed var(--dim);border-radius:3px;transform:rotate(45deg) scale(.8)}
+.fSlots i.on{border:0;background:#7FE0D6;border-radius:3px}
+@keyframes gemaVoa{0%{transform:rotate(45deg) translate(0,0);opacity:1}100%{transform:rotate(45deg) translate(var(--dx),var(--dy)) scale(.3);opacity:0}}
+.fSlots i.voa{animation:gemaVoa .45s cubic-bezier(.5,0,.8,.4) forwards}
+.fSlotsTx{justify-content:center}
+@keyframes carimbo{0%{transform:scale(2);opacity:0}60%{transform:scale(.94);opacity:1}100%{transform:scale(1)}}
+.istats .irow.forjaRev{animation:carimbo .4s ease-out both}
+@media (prefers-reduced-motion:reduce){.cena.bate,.fSlots i.voa,.istats .irow.forjaRev{animation:none}.fg{display:none}}
+
+/* ===== forja em pixel art: parede de tijolo, tochas e martelo da propria sheet, bigorna desenhada em pixels ===== */
+.cena{position:relative;width:100%;height:178px;padding:0;display:block;border-radius:14px;overflow:hidden;border:2px solid #14101F;image-rendering:pixelated}
+.cena .parede{position:absolute;inset:0;background:#2B2342 url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='24' shape-rendering='crispEdges'><rect width='48' height='24' fill='%232B2342'/><rect y='11' width='48' height='2' fill='%231B1629'/><rect y='23' width='48' height='2' fill='%231B1629'/><rect x='23' width='2' height='12' fill='%231B1629'/><rect x='47' y='12' width='2' height='12' fill='%231B1629'/><rect x='2' y='2' width='10' height='2' fill='%2335294F'/><rect x='26' y='14' width='10' height='2' fill='%2335294F'/></svg>");background-size:48px 24px;image-rendering:pixelated}
+.cena .tocha{position:absolute;top:10px}
+.cena .tocha.t1{left:10px}
+.cena .tocha.t2{right:10px;transform:scaleX(-1)}
+@keyframes tochaPisca{0%,100%{filter:none}50%{filter:brightness(1.35)}}
+.cena .tocha{animation:tochaPisca .5s steps(2,end) infinite}
+.cena.bate .tocha{animation-duration:.18s}
+.cena .forjaPeca{position:absolute;left:50%;bottom:46px;margin-left:-24px;width:48px;height:48px}
+.cena .ibox{width:48px;height:48px;background:none;border:0;border-radius:0;box-shadow:none;display:block;padding:0;transition:none}
+.cena[data-calor="1"] .forjaPeca{filter:drop-shadow(2px 0 0 #B8561A) drop-shadow(-2px 0 0 #B8561A) drop-shadow(0 2px 0 #B8561A) drop-shadow(0 -2px 0 #B8561A)}
+.cena[data-calor="2"] .forjaPeca{filter:drop-shadow(2px 0 0 #E8761F) drop-shadow(-2px 0 0 #E8761F) drop-shadow(0 2px 0 #E8761F) drop-shadow(0 -2px 0 #E8761F)}
+.cena[data-calor="3"] .forjaPeca{filter:drop-shadow(2px 0 0 #FFB020) drop-shadow(-2px 0 0 #FFB020) drop-shadow(0 2px 0 #FFB020) drop-shadow(0 -2px 0 #FFB020)}
+.cena .bigorna{position:absolute;left:50%;bottom:8px;width:132px;height:72px;margin-left:-66px;margin-top:0;background:none;border-radius:0}
+.cena .bigorna::after{display:none}
+.cena .martelo{position:absolute;left:50%;bottom:62px;margin-left:6px;transform-origin:50% 94%;transform:rotate(38deg)}
+@keyframes marteloBate{0%{transform:rotate(38deg)}40%{transform:rotate(38deg)}60%{transform:rotate(-52deg)}72%{transform:rotate(-52deg)}100%{transform:rotate(38deg)}}
+.cena.bate .martelo{animation:marteloBate .38s steps(8,end)}
+@keyframes pecaAmassa{0%,50%{transform:none}60%{transform:scale(1.12,.84)}75%{transform:scale(.96,1.04)}100%{transform:none}}
+.cena.bate .forjaPeca{animation:pecaAmassa .38s steps(5,end);transform-origin:50% 100%}
+.cena.bate{animation:none}
+.fg{top:104px}
+.fSlots i.pxi{width:30px;height:30px;border:0;background-color:transparent;transform:none;border-radius:0}
+.fSlots i.pxi:not(.on){opacity:.25;filter:grayscale(1)}
+@keyframes gemaVoa{0%{transform:translate(0,0);opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(.4);opacity:0}}
+.fSlots i.voa{animation:gemaVoa .45s steps(7,end) forwards}
+@media (prefers-reduced-motion:reduce){.cena .tocha,.cena.bate .martelo,.cena.bate .forjaPeca{animation:none}}
+
+.cena .forjaPeca{bottom:76px}
+.cena .martelo{margin-left:30px;bottom:80px;transform:rotate(30deg)}
+@keyframes marteloBate{0%,35%{transform:rotate(30deg)}55%,70%{transform:rotate(-72deg)}100%{transform:rotate(30deg)}}
+.fg{top:96px}
+.fSlots i.pxi.on{background-image:url("sheet.png?v=1");background-repeat:no-repeat}
+.cena[data-calor] .ibox{box-shadow:none;border-color:transparent}
+.cena .forjaPeca{bottom:72px}
+/* escala inteira (2x dos sprites 32px) em tudo da cena: sem pixel esticado */
+.cena .tocha{top:14px}
+.cena .tocha.t1{left:12px}.cena .tocha.t2{right:12px}
+.cena .ibox{width:64px;height:64px}
+.cena .forjaPeca{width:64px;height:64px;margin-left:-32px;bottom:50px}
+.cena .bigorna{width:88px;height:48px;margin-left:-44px;bottom:8px}
+.cena .martelo{margin-left:34px;bottom:56px}
+.fSlots i.pxi{width:32px;height:32px}
+.fg{top:100px}
+
+/* ===== forja: banner igual ao da tela de Nivel (arte real do jogo) ===== */
+.cena{position:relative;width:100%;height:158px;margin:0;border-radius:18px;overflow:hidden;border:0;background:#222;display:block}
+.cena .l{position:absolute;inset:0;image-rendering:pixelated}
+.cena .tocha-arena{z-index:2}
+.cena .cfHeroi{position:absolute;left:16%;bottom:20px;width:83px;height:83px;z-index:2}
+.cena .cfHeroi img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated;display:block}
+.cena .cfPeca{position:absolute;right:18%;bottom:24px;width:64px;height:64px;z-index:2}
+.cena .forjaPeca{position:relative;left:auto;bottom:auto;margin:0;width:64px;height:64px;transform-origin:50% 100%}
+.cena .sombra{position:absolute;left:50%;bottom:-6px;width:72%;height:9px;margin-left:-36%;border-radius:50%;background:rgba(0,0,0,.38)}
+.cena .cfHeroi .sombra{bottom:-4px}
+@keyframes cfLunge{0%{transform:none}38%{transform:translateX(52px) rotate(6deg)}100%{transform:none}}
+@keyframes cfTrema{0%,34%{transform:none}44%{transform:translateX(7px) scale(1.1,.88)}58%{transform:translateX(-4px)}100%{transform:none}}
+.cena.bate .cfHeroi{animation:cfLunge .34s cubic-bezier(.2,.8,.3,1)}
+.cena.bate .forjaPeca{animation:cfTrema .34s steps(6,end)}
+.cena.bate .martelo,.cena.bate .tocha{animation:none}
+.cena .fg{left:auto;right:calc(18% + 30px);top:84px}
+@media (prefers-reduced-motion:reduce){.cena.bate .cfHeroi,.cena.bate .forjaPeca{animation:none}}
+
+/* ===== forja B: roleta de encantamentos com sprites reais ===== */
+.rolista{display:flex;flex-direction:column;gap:8px}
+.rolRow{display:flex;align-items:center;gap:12px;padding:8px 10px;border-radius:14px;border:2px solid var(--line);background:var(--poco);text-align:left}
+.rolRow.dim{opacity:.5;border-color:transparent}
+.rolRow.cur{opacity:.7}
+.rolRow.sel{border-color:var(--text)}
+.rolRow.sel.trava{animation:rolTrava .35s steps(4,end)}
+@keyframes rolTrava{0%{transform:scale(1.06)}100%{transform:none}}
+.rolIc{width:44px;height:44px;flex:none;border-radius:12px;background:var(--bg);border:1.5px solid var(--line);display:flex;align-items:center;justify-content:center}
+.rolTx{flex:1;font:600 15px 'Outfit',sans-serif;color:var(--afx-gan)}
+.rolTx.dim{color:var(--dim);font-weight:500}
+.rolTx.a-est{color:var(--afx-est)}.rolTx.a-sor{color:var(--afx-sor)}.rolTx.a-bar{color:var(--afx-bar)}.rolTx.a-bau{color:var(--afx-bau)}.rolTx.a-abu{color:var(--afx-abu)}.rolTx.a-tes{color:var(--afx-tes)}.rolTx.neg{color:var(--perigo)}
+.rolTag{font:700 9px 'Outfit',sans-serif;letter-spacing:.1em;background:var(--text);color:var(--bg);padding:3px 6px;border-radius:5px}
+@media (prefers-reduced-motion:reduce){.rolRow.sel.trava{animation:none}}
+.ibonus.istats .rolTx{color:var(--afx-gan);font:600 15px 'Outfit',sans-serif}
+.ibonus.istats .rolTx.dim{color:var(--dim);font-weight:500}
+.ibonus.istats .rolTx.a-est{color:var(--afx-est)}.ibonus.istats .rolTx.a-sor{color:var(--afx-sor)}.ibonus.istats .rolTx.a-bar{color:var(--afx-bar)}.ibonus.istats .rolTx.a-bau{color:var(--afx-bau)}.ibonus.istats .rolTx.a-abu{color:var(--afx-abu)}.ibonus.istats .rolTx.a-tes{color:var(--afx-tes)}.ibonus.istats .rolTx.neg{color:var(--perigo)}
+.ibonus.istats .rolTag{font:700 9px 'Outfit',sans-serif;letter-spacing:.1em;background:var(--text);color:var(--bg);padding:3px 6px;border-radius:5px}
+/* roleta em tira + escolha de tesouros */
+.rolJan{position:relative;height:292px;overflow:hidden;border-radius:14px}
+.rolTira{display:flex;flex-direction:column;gap:0;will-change:transform}
+.rolTira .rolRow{height:52px;box-sizing:border-box;padding:4px 8px;margin-bottom:8px;flex:none}
+.rolSel{position:absolute;left:0;right:0;top:120px;height:52px;box-sizing:border-box;border:2px solid var(--text);border-radius:14px;z-index:2;pointer-events:none}
+.rolSel.trava{animation:rolTrava .35s steps(4,end)}
+.rolDica{text-align:center;font:500 12px 'Outfit',sans-serif;color:var(--dim);padding:2px 0 6px}
+.tesGrade{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;max-height:150px;overflow-y:auto;padding:2px}
+.tesCel{position:relative;aspect-ratio:1;border-radius:12px;border:2px solid var(--rc,var(--line));background:var(--poco);display:flex;align-items:center;justify-content:center;padding:0;color:var(--text)}
+.tesCel:disabled{opacity:.3}
+.tesCel b{position:absolute;right:3px;bottom:1px;font:700 10px 'Outfit',sans-serif;color:var(--text)}
+.fSlots i{cursor:pointer}
+.fSlots i:not(.on){width:36px;height:36px;border:2px dashed var(--dim);border-radius:10px;transform:none;box-sizing:border-box}
+@media (prefers-reduced-motion:reduce){.rolSel.trava{animation:none}}
+.fSlots i:not(.on){width:44px;height:44px}
+.fSlots i.on{width:44px;height:44px;border:2px solid var(--line);border-radius:10px;background:var(--poco);display:flex;align-items:center;justify-content:center;box-sizing:border-box;transform:none}
+.tesGrade{grid-template-columns:repeat(auto-fill,56px);justify-content:center;gap:8px;max-height:176px}
+.tesCel{width:56px;height:56px;aspect-ratio:auto}
+/* slot vazio: celula solida de inventario com sprite fantasma (sem pontilhado) */
+.fSlots i:not(.on){border:2px solid var(--line);background:var(--poco);border-radius:10px;display:flex;align-items:center;justify-content:center;box-sizing:border-box}
+.fSlots i.vazio .pxi{opacity:.2;filter:grayscale(1)}
+/* tela de forja compacta: cabecalho horizontal, grade usa so o espaco que sobra */
+.ihead.eqh.forjaH{flex-direction:row;text-align:left;align-items:center;gap:14px}
+.ihead.eqh.forjaH .imeta.tag{align-self:flex-start;margin-top:6px}
+.tesGrade{max-height:clamp(96px,calc(100dvh - 560px),176px)}
+#ficha.on{max-height:calc(100dvh - 12px);overflow-y:auto}
+/* pulso da roleta ao travar: suave, sem steps */
+@keyframes rolTrava{0%{transform:scale(1);box-shadow:0 0 0 0 color-mix(in srgb,var(--text) 55%,transparent)}40%{transform:scale(1.035);box-shadow:0 0 0 6px color-mix(in srgb,var(--text) 0%,transparent)}100%{transform:scale(1)}}
+.rolSel.trava{animation:rolTrava .45s ease-out}
+/* transicao entre telas da ficha (item -> escolher tesouros -> roleta -> resultado) */
+@keyframes telaF{from{opacity:0;transform:translateX(26px)}to{opacity:1;transform:none}}
+@keyframes telaB{from{opacity:0;transform:translateX(-26px)}to{opacity:1;transform:none}}
+#ficha.trocando.dirF .ihead,#ficha.trocando.dirF .ibonus,#ficha.trocando.dirF .iacts{animation:telaF .34s cubic-bezier(.2,.8,.2,1) both}
+#ficha.trocando.dirB .ihead,#ficha.trocando.dirB .ibonus,#ficha.trocando.dirB .iacts{animation:telaB .34s cubic-bezier(.2,.8,.2,1) both}
+#ficha.trocando .ibonus{animation-delay:.05s}
+#ficha.trocando .iacts{animation-delay:.1s}
+#ficha.trocando.soCorpo .ihead,#ficha.trocando.soCorpo .iacts{animation:none}
+/* ===== tour de primeira vez: spotlight com cartao e botoes explicitos ===== */
+.tourOverlay{position:fixed;inset:0;z-index:99990;display:none;pointer-events:none;font-family:'Outfit',sans-serif}
+.tourOverlay.on{display:block}
+.tourHole{position:fixed;border-radius:16px;border:2px solid #fff;box-shadow:0 0 0 100vmax rgba(5,4,10,.86);transition:opacity .2s ease,left .4s cubic-bezier(.2,.8,.2,1),top .4s cubic-bezier(.2,.8,.2,1),width .4s cubic-bezier(.2,.8,.2,1),height .4s cubic-bezier(.2,.8,.2,1);pointer-events:none}
+.tourHole i{position:absolute;inset:-2px;border-radius:16px;border:2px solid rgba(255,255,255,.7);animation:tourPulso 1.6s ease-out infinite}
+@keyframes tourPulso{0%{transform:scale(1);opacity:.9}100%{transform:scale(1.12,1.25);opacity:0}}
+.tourCard{position:fixed;box-sizing:border-box;background:#1B1629;color:#EDE9F7;border:1px solid #3B3257;border-radius:20px;padding:16px 16px 14px;box-shadow:0 18px 50px rgba(0,0,0,.55);transition:opacity .2s ease}
+.tourSeta{position:absolute;width:14px;height:14px;background:#1B1629;border-left:1px solid #3B3257;border-top:1px solid #3B3257;transform:translateX(-50%) rotate(45deg);top:-8px}
+.tourCard:not(.abaixo) .tourSeta{top:auto;bottom:-8px;transform:translateX(-50%) rotate(225deg)}
+.tourNum{font:700 11px 'Outfit',sans-serif;letter-spacing:.14em;color:#8C84A6}
+.tourTit{font:700 19px 'Outfit',sans-serif;margin-top:4px}
+.tourSub{font:400 14px/1.35 'Outfit',sans-serif;color:#B9B2D0;margin-top:3px}
+.tourBarra{display:flex;gap:4px;margin:14px 0 12px}
+.tourBarra i{flex:1;height:4px;border-radius:2px;background:#3B3257}
+.tourBarra i.on{background:#fff}
+.tourBtns{display:flex;align-items:center;gap:8px}
+.tourBtns button{font:700 14px 'Outfit',sans-serif;border-radius:12px;padding:11px 16px;border:0}
+.tourPular{background:none;color:#8C84A6;padding-left:2px !important}
+.tourVolta{background:transparent;color:#EDE9F7;border:1.5px solid #4A4170 !important}
+.tourProx{background:#fff;color:#14101F}
+@media (prefers-reduced-motion:reduce){.tourHole,.tourCard{transition:none}.tourHole i{animation:none}}
+
+.tourOverlay.leve .tourHole{box-shadow:0 0 0 100vmax rgba(5,4,10,.5)}
+#addbtn.tourToque{transform:scale(.92);filter:brightness(1.3);transition:transform .12s}
+.tourFake{position:relative;z-index:1}
+
+.tourBloq{position:fixed;display:block;pointer-events:auto;background:transparent}
+.tourCard{pointer-events:auto}
+.tourTopo{display:flex;align-items:center;justify-content:space-between}
+.tourTag{font:700 10px 'Outfit',sans-serif;letter-spacing:.12em;color:#14101F;background:#fff;border-radius:999px;padding:3px 9px}
+.tourTag:empty{display:none}
+.tourOverlay.ok .tourCard{opacity:0 !important}
+.tourOverlay:not(.vez) .tourHole i{animation:none;opacity:0}
+
+/* ===== folhas de confirmacao/dialogo no mesmo padrao da ficha do item (fundo roxo escuro, linha roxa, titulo serifado) ===== */
+#confirmSheet,#excluirContaOverlay .edsheet,#nomeOverlay .edsheet,#estPeriodoOverlay .edsheet,#estMontanhaOverlay .edsheet{background:#251E38;border-top:1px solid #3B3257}
+#confirmSheet .edtitulo,#excluirContaOverlay .edtitulo,#nomeOverlay .edtitulo{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:600;font-size:22px;letter-spacing:0;text-transform:none;color:var(--text);line-height:1.15}
+#confirmSheet .edpuxador,#excluirContaOverlay .edpuxador,#nomeOverlay .edpuxador{background:#3B3257}
+#confirmCancelar{background:var(--poco) !important;border:1px solid #3B3257 !important;color:var(--text) !important;font-size:14px}
+#confirmOk{background:var(--accent);border:1px solid var(--accent);color:var(--bg);font-size:14px}
+#confirmOk:active{background:var(--accent);filter:brightness(.9)}
+
+/* tour: transicoes curtas (menos repaint do escurecimento em tela cheia) */
+.tourHole{transition:opacity .12s ease,left .2s cubic-bezier(.3,.8,.3,1),top .2s cubic-bezier(.3,.8,.3,1),width .2s cubic-bezier(.3,.8,.3,1),height .2s cubic-bezier(.3,.8,.3,1)}
+.tourCard{transition:opacity .15s ease;will-change:opacity}
+
+/* cartao do tour: entrada/saida limpas (sobe + escala + fade) */
+.tourCard{transition:opacity .22s ease,transform .3s cubic-bezier(.2,.9,.3,1);transform:none}
+.tourCard.tcOculto{opacity:0;transform:translateY(14px) scale(.96);transition:opacity .14s ease,transform .16s ease-in}
+#confirmItem{margin:0 0 12px}
+#confirmTitulo.verbo{font:700 11px 'Outfit',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:4px}
+
+/* ===== tour v3: destaque escuro + caixa do heroi fixa embaixo ===== */
+.tourCard{box-sizing:border-box;display:grid;grid-template-columns:64px 1fr;gap:10px 12px;background:#251E38;border:1.5px solid #3B3257;border-radius:20px;padding:14px;box-shadow:0 -10px 40px rgba(0,0,0,.5);color:#EDE9F7}
+.tourCard.noTopo{box-shadow:0 10px 40px rgba(0,0,0,.5)}
+.tourFace{width:64px;height:64px;border-radius:14px;background:#1B1629;border:1px solid #3B3257;display:grid;place-items:center;overflow:hidden}
+.tourFace img{width:60px;height:60px;image-rendering:pixelated;object-fit:contain}
+.tourNome{display:flex;align-items:center;gap:8px;font:italic 600 19px 'Cormorant Garamond',serif}
+.tourNum{margin-left:auto;font:700 11px 'Outfit',sans-serif;letter-spacing:.12em;color:#8C84A6;font-style:normal}
+.tourSub{font:400 15px/1.35 'Outfit',sans-serif;color:#EDE9F7;margin-top:3px;min-height:40px}
+.tourRod{grid-column:1/3;display:flex;align-items:center;gap:10px}
+.tourRod .tourBarra{flex:1;margin:0}
+.tourRod button{font:700 14px 'Outfit',sans-serif;border-radius:12px;padding:10px 16px;border:0}
+.tourRod .tourPular{background:none;color:#8C84A6;padding:10px 4px}
+.tourRod .tourVolta{background:transparent;color:#EDE9F7;border:1.5px solid #4A4170}
+.tourRod .tourProx{background:#fff;color:#14101F}
+
+.tourFalta{color:transparent}
+.tourOverlay.on{animation:tourEntra .35s ease-out}
+@keyframes tourEntra{from{opacity:0}to{opacity:1}}
+.tourCard{transition:opacity .25s ease,transform .38s cubic-bezier(.2,.9,.25,1.15),left .3s cubic-bezier(.3,.8,.3,1),top .3s cubic-bezier(.3,.8,.3,1)}
+.tourCard.tcOculto{transition:opacity .14s ease,transform .16s ease-in}
+
+.tourFace.fala img{animation:tourFala .26s ease-in-out infinite alternate}
+@keyframes tourFala{from{transform:translateY(0)}to{transform:translateY(-3px)}}
+.tourHole.chega i{animation:tourOnda .75s cubic-bezier(.2,.7,.3,1) 1 !important;opacity:1}
+@keyframes tourOnda{0%{transform:scale(1);opacity:.9}100%{transform:scale(1.16,1.35);opacity:0}}
+.tourBarra i{transition:background .35s ease}
+
+/* durante o tour: sem blur de fundo nas folhas (backdrop-filter em tela cheia e o que mais pesa na animacao) */
+body.tourAberto .edov,body.tourAberto .baubg,body.tourAberto .sheetbg{backdrop-filter:none !important;-webkit-backdrop-filter:none !important}
+body.tourAberto .edsheet{will-change:transform}
+
+.tourHole{transition:none !important}
+
+/* durante o tour a folha NAO desliza (so aparece com fade): assim a posicao final ja esta valendo quando o destaque e o dialogo chegam, sem fase escura */
+body.tourAberto .edov .edsheet{transform:none !important;transition:opacity .22s ease !important}
+body.tourAberto .edov:not(.on) .edsheet{opacity:0}
+body.tourAberto .edov.on .edsheet{opacity:1}
+
+.tourHole{transition:border-color .16s ease !important}
+.tourOverlay.saindo .tourHole{border-color:transparent}
+.tourOverlay.saindo .tourHole i{opacity:0 !important;animation:none !important}
+.tourHole{transition:border-color .16s ease,box-shadow .35s ease !important}
+
+.tourOverlay.cortina .tourHole{box-shadow:0 0 0 100vmax rgb(5,4,10) !important;transition:border-color .16s ease,box-shadow .09s ease !important}
+
+/* veu: durante a troca de passo cobre ate o buraco do destaque (o elemento aceso nao pode ficar solto na tela sem anel/cartao) */
+.tourVeu{position:fixed;inset:0;background:rgb(5,4,10);opacity:0;pointer-events:none;transition:opacity .32s ease}
+.tourOverlay.saindo .tourVeu{opacity:.86;transition:opacity .14s ease}
+.tourOverlay.saindo.leve .tourVeu{opacity:.5}
+.tourOverlay.cortina .tourVeu{opacity:1}
+
+/* v2: na saida o buraco colapsa (largura/altura 0): o escurecimento (box-shadow) cobre a tela toda IGUAL, sem quadrado claro sobrando */
+.tourVeu{display:none !important}
+.tourOverlay.saindo .tourHole{width:0 !important;height:0 !important;border-width:0 !important}
+
+.tourOverlay.fim{opacity:0;transition:opacity .36s ease}

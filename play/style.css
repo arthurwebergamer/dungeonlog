@@ -6814,3 +6814,9 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 #heroisOverlay .pjEdit svg{width:18px;height:18px}
 #heroisOverlay .pjEdit:active{background:rgba(255,255,255,.08)}
 #heroisOverlay .pjNovoBtn{margin:12px 0 0;padding:13px;border-radius:14px;font-size:14px;font-weight:500}
+
+/* Config: Sair / Excluir conta ancorados no fim da tela, botoes um pouco menores */
+#cfgOverlay .cfgovcorpo{display:flex;flex-direction:column}
+#cfgOverlay .cfgovcorpo>*{flex-shrink:0}
+#cfgOverlay .zonarisco{margin-top:auto;padding:28px 0 calc(12px + env(safe-area-inset-bottom));gap:8px}
+#cfgOverlay .zonarisco .cfgbtnfull{padding:12px;font-size:14px}

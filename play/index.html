@@ -11706,7 +11706,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       lvlTela.innerHTML = '';
       const cb = _aoFecharLvl; _aoFecharLvl = null;
       if (cb) cb();
-    }, 240);
+    }, 380);
   }
 
   function mostrarNivelUp(nivel, aoFechar){
@@ -11781,7 +11781,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       estagioTela.classList.remove('on', 'estagio-tela-saindo');
       const cb = _aoFecharEstagioTela; _aoFecharEstagioTela = null;
       if (cb) cb();
-    }, 240); // bate com a duracao do transition em .estagio-tela-saindo
+    }, 380); // bate com a duracao do transition em .estagio-tela-saindo
   }
   window.fecharEstagioTelaCompleta = fecharEstagioTelaCompleta; // exposta pra rede de seguranca em viajarParaTemaEstagio()
 

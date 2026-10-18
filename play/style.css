@@ -6272,9 +6272,9 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
 .cq-tela.on{visibility:visible;pointer-events:auto}
 .cq-tela *{animation-play-state:paused}.cq-tela.on *{animation-play-state:running}
 .md-back{position:absolute;inset:0;background:rgba(0,0,0,.55);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);opacity:0;animation:mdFade .35s ease forwards}
-.md-sheet{position:absolute;left:0;right:0;bottom:0;max-width:520px;margin:0 auto;max-height:94%;overflow-y:auto;background:var(--panel-2);border-top:1px solid var(--line);border-radius:26px 26px 0 0;padding:10px 20px calc(24px + env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:center;transform:translateY(105%);animation:mdUp .7s var(--spr2) .05s forwards}
-.cq-tela.estagio-tela-saindo .md-sheet{animation:mdDown .34s cubic-bezier(.5,0,.8,.4) forwards;animation-play-state:running}
-.cq-tela.estagio-tela-saindo .md-back{animation:mdFadeOut .34s ease forwards;animation-play-state:running}
+.md-sheet{position:absolute;left:0;right:0;bottom:0;max-width:520px;margin:0 auto;max-height:94%;overflow-y:auto;background:var(--panel-2);border-top:1px solid var(--line);border-radius:26px 26px 0 0;padding:10px 20px calc(24px + env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:center;transform:translateY(105%);animation:mdUp .22s ease forwards}
+.cq-tela.estagio-tela-saindo .md-sheet{animation:mdDown .22s ease forwards;animation-play-state:running}
+.cq-tela.estagio-tela-saindo .md-back{animation:mdFadeOut .22s ease forwards;animation-play-state:running}
 @keyframes mdUp{to{transform:none}}@keyframes mdDown{from{transform:none}to{transform:translateY(105%)}}
 @keyframes mdFade{to{opacity:1}}@keyframes mdFadeOut{from{opacity:1}to{opacity:0}}
 .md-handle{width:38px;height:4px;border-radius:2px;background:var(--line);margin-bottom:16px;flex:none}
@@ -6331,16 +6331,16 @@ animation:tdEntra .45s cubic-bezier(.2,1.3,.4,1) both}
   width:100% !important; max-width:520px; border-radius:26px 26px 0 0 !important; border-bottom:0 !important;
   padding-top:30px !important; padding-bottom:calc(22px + env(safe-area-inset-bottom)) !important;
   transform:translateY(105%) !important; opacity:1 !important;
-  visibility:hidden; transition:transform .34s cubic-bezier(.5,0,.8,.4), visibility 0s .34s !important;
+  visibility:hidden; transition:transform .22s ease, visibility 0s .22s !important;
 }
 .baupop.on,.quedapop.on,.largpop.on{
-  transform:none !important; visibility:visible; transition:transform .7s var(--spr2), visibility 0s !important;
+  transform:none !important; visibility:visible; transition:transform .22s ease, visibility 0s !important;
 }
 .baupop::before,.quedapop::before,.largpop::before{
   content:""; position:absolute; top:10px; left:50%; width:38px; height:4px; margin-left:-19px;
   border-radius:2px; background:var(--line);
 }
-.baubg{background:rgba(0,0,0,.55); -webkit-backdrop-filter:blur(5px); backdrop-filter:blur(5px); transition:opacity .3s}
+.baubg{background:rgba(0,0,0,.55); -webkit-backdrop-filter:blur(5px); backdrop-filter:blur(5px); transition:opacity .22s ease}
 
 /* ultima tarefa feita: sobra so o golpe final -- o botao Terminar dia pulsa */
 @keyframes tdPulsa{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 55%,transparent)}50%{box-shadow:0 0 0 7px color-mix(in srgb,var(--accent) 0%,transparent)}}
@@ -6733,21 +6733,3 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 
 .tourOverlay.fim{opacity:0;transition:opacity .36s ease}
 
-
-/* ===== Popups/sheets: mesma animacao do baú e do nível (entrada com mola, saída acelerando) ===== */
-:root{--spr2:linear(0,.02,.08 3%,.26 8%,.58 14%,.86 20%,1.02 26%,1.06 32%,1.03 40%,.99 52%,1.002 70%,1)}
-.sheetbg{display:block !important;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .3s ease,visibility 0s .3s}
-.sheetbg.on{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .3s ease,visibility 0s}
-.isheet,.edsheet{transition:transform .34s cubic-bezier(.5,0,.8,.4) !important;box-shadow:0 80px 0 0 #251E38}
-.edsheet{box-shadow:0 80px 0 0 var(--panel-2)}
-.isheet.on,.edov.on .edsheet{transition:transform .7s var(--spr2) !important}
-@media (min-width:900px) and (pointer:fine), (min-width:1100px){
-  /* desktop: mesmas folhas de baixo do celular (igual ao bau/nivel), nada de dialogo centralizado */
-  .isheet{left:0 !important;right:0 !important;top:auto !important;bottom:0 !important;width:100% !important;max-width:520px !important;margin:0 auto !important;zoom:1 !important;
-    border-radius:26px 26px 0 0 !important;opacity:1 !important;transform:translateY(105%) !important;box-shadow:0 80px 0 0 #251E38}
-  .isheet.on{transform:none !important;opacity:1 !important}
-  .edov{align-items:flex-end !important}
-  .edsheet{max-width:520px !important;zoom:1 !important;border-radius:26px 26px 0 0 !important;opacity:1 !important;transform:translateY(105%) !important;box-shadow:0 80px 0 0 var(--panel-2)}
-  .edov.on .edsheet{transform:none !important;opacity:1 !important}
-}
-body.tourAberto .edov .edsheet{transform:none !important;transition:opacity .22s ease !important}

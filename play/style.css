@@ -6790,6 +6790,3 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 #cfgTemaCard .tl2Nome{font-size:15px;font-weight:500}
 #cfgTemaCard .tl2Check{width:24px;height:24px}
 #cfgTemaCard .tl2Check svg{width:20px;height:20px}
-
-/* abrir/fechar Config e sub-telas: sem animacao (aparece direto) */
-.cfgOverlay,.cfgOverlay.on{transition:none !important;transform:none !important}

@@ -6790,3 +6790,10 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 #cfgTemaCard .tl2Nome{font-size:15px;font-weight:500}
 #cfgTemaCard .tl2Check{width:24px;height:24px}
 #cfgTemaCard .tl2Check svg{width:20px;height:20px}
+
+/* Herois: mesmo padrao de cartoes do Config */
+.cfgcardGrade{padding:10px}
+.cfgcardGrade .grade{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:0}
+#gradeHeroisConfig .opcao,#gradeNovoHeroi .opcao{padding:8px 2px;border-radius:12px}
+#gradeHeroisConfig .opcao img,#gradeNovoHeroi .opcao img{width:52px;height:52px}
+#novoHeroiOverlay .cfgcard .campo{width:100%;margin:0}

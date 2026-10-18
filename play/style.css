@@ -6719,7 +6719,7 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 .tourOverlay.saindo .tourHole i{opacity:0 !important;animation:none !important}
 .tourHole{transition:border-color .16s ease,box-shadow .35s ease !important}
 
-.tourOverlay.cortina .tourHole{box-shadow:0 0 0 100vmax rgb(5,4,10) !important;transition:border-color .16s ease,box-shadow .14s ease !important}
+.tourOverlay.cortina .tourHole{box-shadow:0 0 0 100vmax rgb(5,4,10) !important;transition:border-color .16s ease,box-shadow .09s ease !important}
 
 /* veu: durante a troca de passo cobre ate o buraco do destaque (o elemento aceso nao pode ficar solto na tela sem anel/cartao) */
 .tourVeu{position:fixed;inset:0;background:rgb(5,4,10);opacity:0;pointer-events:none;transition:opacity .32s ease}

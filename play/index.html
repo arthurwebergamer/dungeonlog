@@ -133,7 +133,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=317">
+<link rel="stylesheet" href="style.css?v=318">
 <script>
 // A abertura so sai quando a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado; sair antes (assim que o CSS chega)
 // mostrava um flash cinza vazio e depois a tela de login por baixo, antes do carrossel (visto em video de teste). Teto de seguranca: 15s.
@@ -927,6 +927,25 @@ html{background:var(--bsBg,#282828)}
       <div class="edsec" data-i18n="cfg.spriteDoHeroi">Sprite do herói</div>
       <div class="cfgcard cfgcardGrade">
         <div class="grade" id="gradeHeroisConfig"></div>
+      </div>
+
+      <div class="zonarisco">
+        <button class="cfgbtnfull perigo oculto" id="cfgExcluirHeroiBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          <span id="cfgExcluirHeroiTxt">Excluir herói</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="edov" id="excluirHeroiOverlay">
+    <div class="edsheet">
+      <div class="edpuxador"></div>
+      <div class="edtitulo" id="excluirHeroiTitulo">Excluir herói?</div>
+      <p style="font-family:'Outfit',sans-serif;font-size:13px;color:var(--dim);line-height:1.5;margin:0 0 16px" id="excluirHeroiDesc"></p>
+      <div class="edacoes">
+        <button class="edsalvar" id="excluirHeroiCancelar" type="button" style="background:var(--panel-2);color:var(--text)">Cancelar</button>
+        <button class="edperigo" id="excluirHeroiConfirmar" type="button">Excluir herói</button>
       </div>
     </div>
   </div>
@@ -2259,6 +2278,28 @@ function criarPersonagem(nome, heroiIdx){
   return { ok: true, id: id };
 }
 window.criarPersonagem = criarPersonagem;
+
+// Exclui um personagem: apaga o save e todas as chaves '.pj.<id>' do escopo atual (convidado ou uid) e tira da lista.
+// Precisa sobrar pelo menos 1. Quem chama troca antes pra outro personagem se o excluido for o ativo.
+function excluirPersonagem(id){
+  const lista = listarPersonagens();
+  if (lista.length < 2 || !lista.some(p => p.id === id) || id === _personagemAtivo) return { ok: false };
+  const sufixo = '.pj.' + id;
+  const uidTag = _uidAtivo ? ('.uid.' + _uidAtivo + '.') : null;
+  const apagar = [];
+  try {
+    for (let i = 0; i < localStorage.length; i++){
+      const k = localStorage.key(i);
+      if (!k || !k.endsWith(sufixo)) continue;
+      if (uidTag ? !k.includes(uidTag) : k.includes('.uid.')) continue;
+      apagar.push(k);
+    }
+    apagar.forEach(k => localStorage.removeItem(k));
+  } catch(e){}
+  salvarListaPersonagens(lista.filter(p => p.id !== id));
+  return { ok: true, removidas: apagar.length };
+}
+window.excluirPersonagem = excluirPersonagem;
 
 
 /* =======================================================================
@@ -10541,6 +10582,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     pintarGradeConfig();
     const el = document.getElementById('cfgNomeAtual');
     if (el) el.textContent = nomeHeroiNorm(typeof nomeHeroi !== 'undefined' ? nomeHeroi : '');
+    if (typeof window.atualizarBotaoExcluirHeroi === 'function') window.atualizarBotaoExcluirHeroi();
     if (heroiOverlay) heroiOverlay.classList.add('on');
   }
   function fecharHeroiConfig(){
@@ -10684,6 +10726,46 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     }, 220); // mesma duracao de .pjCortina no style.css -- se mudar la, mudar aqui tambem
   }
   window.trocarPersonagemComTransicao = trocarPersonagemComTransicao;
+
+  /* ---------- excluir heroi (tela Editar heroi) ---------- */
+  (function(){
+    const btn = document.getElementById('cfgExcluirHeroiBtn');
+    const ov = document.getElementById('excluirHeroiOverlay');
+    if (!btn || !ov) return;
+    const ehEn = () => (localStorage.getItem('questlog.idioma.v1') || 'pt') === 'en';
+    function atualizarBotao(){
+      const podeExcluir = listarPersonagens().length >= 2;
+      btn.classList.toggle('oculto', !podeExcluir);
+      document.getElementById('cfgExcluirHeroiTxt').textContent = ehEn() ? 'Delete hero' : 'Excluir herói';
+    }
+    window.atualizarBotaoExcluirHeroi = atualizarBotao;
+    btn.onclick = () => {
+      const en = ehEn();
+      const nome = nomeHeroiNorm(typeof nomeHeroi !== 'undefined' ? nomeHeroi : '');
+      document.getElementById('excluirHeroiTitulo').textContent = en ? 'Delete hero?' : 'Excluir herói?';
+      document.getElementById('excluirHeroiDesc').textContent = en
+        ? ('"' + nome + '" and all of this hero\'s progress will be lost for good. This can\'t be undone.')
+        : ('"' + nome + '" e todo o progresso desse herói serão perdidos em definitivo. Não tem volta.');
+      document.getElementById('excluirHeroiCancelar').textContent = en ? 'Cancel' : 'Cancelar';
+      document.getElementById('excluirHeroiConfirmar').textContent = en ? 'Delete hero' : 'Excluir herói';
+      ov.classList.add('on');
+    };
+    document.getElementById('excluirHeroiCancelar').onclick = () => ov.classList.remove('on');
+    ov.addEventListener('click', e => { if (e.target === ov) ov.classList.remove('on'); });
+    document.getElementById('excluirHeroiConfirmar').onclick = () => {
+      const idExcluir = personagemAtivoId();
+      const outro = listarPersonagens().find(p => p.id !== idExcluir);
+      ov.classList.remove('on');
+      if (!outro) return;
+      // troca pro outro heroi (com a cortina) e so depois apaga o save do que saiu
+      trocarPersonagemComTransicao(outro.id, () => {
+        excluirPersonagem(idExcluir);
+        if (typeof window.fecharHeroiConfig === 'function') window.fecharHeroiConfig();
+        if (typeof window.pintarAcordeaoHerois === 'function') window.pintarAcordeaoHerois();
+        atualizarNomeTopoPersonagem();
+      });
+    };
+  })();
 
   /* ---------- criar personagem novo ---------- */
   const novoHeroiOverlay = document.getElementById('novoHeroiOverlay');

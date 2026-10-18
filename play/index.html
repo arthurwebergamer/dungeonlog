@@ -133,7 +133,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=296">
+<link rel="stylesheet" href="style.css?v=310">
 <script>
 // A abertura so sai quando a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado; sair antes (assim que o CSS chega)
 // mostrava um flash cinza vazio e depois a tela de login por baixo, antes do carrossel (visto em video de teste). Teto de seguranca: 15s.
@@ -724,6 +724,70 @@ html{background:var(--bsBg,#282828)}
     </div>
     <div class="cfgovcorpo">
       <div class="edsec" data-i18n="cfg.conta">Conta</div>
+      <div class="cfgcard">
+      <div class="cfgrow cfglink" id="cfgAbrirConta">
+        <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="8" r="4.5"/></svg></span>
+        <div class="cfgtxt">
+          <b data-i18n="cfg.conta">Conta</b>
+          <span id="cfgContaInfo">Jogando sem conta</span>
+        </div>
+        <button class="cfgbtn" id="cfgEntrarBtn" data-i18n="cfg.criarConta">Criar conta</button>
+        <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+      </div>
+      </div>
+
+      <div class="edsec" data-i18n="cfg.app">App</div>
+      <div class="cfgcard">
+      <div class="cfgrow cfglink" id="cfgAbrirHerois">
+        <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+        <div class="cfgtxt">
+          <b data-i18n="cfg.herois">Heróis</b>
+        </div>
+        <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+      </div>
+      <div class="cfgrow cfglink" id="cfgAbrirAparencia">
+        <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a9 9 0 1 1 0-18c4.97 0 9 3.5 9 7.5 0 2-1.5 3-3 3h-2a2 2 0 0 0-1.5 3.2c.3.4.5.9.5 1.3 0 1.6-1.3 3-3 3z"/><circle cx="7.5" cy="10.5" r="1.2" fill="currentColor"/><circle cx="12" cy="7.5" r="1.2" fill="currentColor"/><circle cx="16.5" cy="10.5" r="1.2" fill="currentColor"/></svg></span>
+        <div class="cfgtxt">
+          <b data-i18n="cfg.aparencia">Aparência</b>
+        </div>
+        <span class="cfgval" id="cfgAparenciaResumo">Grafite</span>
+        <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+      </div>
+      <div class="cfgrow cfglink" id="cfgAbrirPrefs">
+        <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h14M22 18h0"/><circle cx="14" cy="6" r="2"/><circle cx="7" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></span>
+        <div class="cfgtxt">
+          <b data-i18n="cfg.preferencias">Preferências</b>
+        </div>
+        <span class="cfgval" id="cfgPrefsResumo">Vibrar</span>
+        <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+      </div>
+      <div class="cfgrow cfglink" id="cfgRever">
+        <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></span>
+        <div class="cfgtxt">
+          <b data-i18n="cfg.reverTutorial">Rever tutorial</b>
+        </div>
+        <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      </div>
+
+      <div class="edsec" data-i18n="cfg.legal">Legal</div>
+      <div class="cfgcard">
+      <a class="cfgrow cfglink" id="cfgLinkPrivacidade" href="https://dungeonlog.weberlabs.com.br/privacy" target="_blank" rel="noopener">
+        <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+        <div class="cfgtxt">
+          <b data-i18n="cfg.privacidade">Política de Privacidade</b>
+        </div>
+        <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14L21 3"/></svg>
+      </a>
+      <a class="cfgrow cfglink" id="cfgLinkTermos" href="https://dungeonlog.weberlabs.com.br/terms" target="_blank" rel="noopener">
+        <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg></span>
+        <div class="cfgtxt">
+          <b data-i18n="cfg.termosDeUso">Termos de Uso</b>
+        </div>
+        <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14L21 3"/></svg>
+      </a>
+      </div>
+
 
       <!-- v4.9x (pedido do usuario): a linha "Conta" virou link pra uma
            sub-tela propria (#contaOverlay, "Gerenciar conta" -- padrao
@@ -740,31 +804,13 @@ html{background:var(--bsBg,#282828)}
            #prefsOverlay mais abaixo. Zero mudanca na logica dos dois
            botoes (getElementById puro, independente de onde moram no
            DOM). -->
-      <div class="cfgrow cfglink" id="cfgAbrirConta">
-        <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="8" r="4.5"/></svg></span>
-        <div class="cfgtxt">
-          <b data-i18n="cfg.conta">Conta</b>
-          <span id="cfgContaInfo">Jogando sem conta</span>
-        </div>
-        <button class="cfgbtn" id="cfgEntrarBtn" data-i18n="cfg.criarConta">Criar conta</button>
-        <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
-      </div>
 
-      <div class="edsec" data-i18n="cfg.app">App</div>
 
       <!-- item 39 do roadmap: tela principal enxuta (texto + valor atual +
            seta), conteudo pesado (grade de sprites / grid de temas / linha
            de feedback) migrou pras 3 sub-telas logo abaixo no arquivo.
            Zero logica nova aqui -- so resumo textual, atualizado por
            atualizarResumosConfig() no bloco JS "PERFIL — SUB-ABAS". -->
-      <div class="cfgrow cfglink" id="cfgAbrirHeroi">
-        <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 3.5l6 6L9 21H3v-6z"/></svg></span>
-        <div class="cfgtxt">
-          <b data-i18n="cfg.heroi">Herói</b>
-        </div>
-        <span class="cfgval" id="cfgHeroiResumo">Aventureiro</span>
-        <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
-      </div>
 
       <!-- v4.23x (pedido do usuario): linha "Heróis" em ACORDEÃO -- clicar
            NAO abre sub-tela nova (diferente do padrao .cfglink usado nas
@@ -776,45 +822,9 @@ html{background:var(--bsBg,#282828)}
            .pjSelo, ja existentes) -- so o container e o gatilho que sao
            novos. Ver bloco JS "PLANO PRO -- acordeao de herois em Config"
            mais abaixo. -->
-      <div class="cfgrow cfgacordeao" id="cfgHeroisRow">
-        <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
-        <div class="cfgtxt">
-          <b data-i18n="cfg.herois">Heróis</b>
-        </div>
-        <svg class="cfgseta cfgacordeaoSeta" id="cfgHeroisSeta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
-      </div>
-      <div class="cfgacordeaoPainel" id="cfgHeroisPainel">
-        <div class="cfgHeroisLista" id="cfgHeroisLista"></div>
-        <button class="pjNovoBtn" id="cfgNovoHeroiBtn" type="button">
-          <span>+ Novo herói</span>
-        </button>
-      </div>
 
-      <div class="cfgrow cfglink" id="cfgAbrirAparencia">
-        <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a9 9 0 1 1 0-18c4.97 0 9 3.5 9 7.5 0 2-1.5 3-3 3h-2a2 2 0 0 0-1.5 3.2c.3.4.5.9.5 1.3 0 1.6-1.3 3-3 3z"/><circle cx="7.5" cy="10.5" r="1.2" fill="currentColor"/><circle cx="12" cy="7.5" r="1.2" fill="currentColor"/><circle cx="16.5" cy="10.5" r="1.2" fill="currentColor"/></svg></span>
-        <div class="cfgtxt">
-          <b data-i18n="cfg.aparencia">Aparência</b>
-        </div>
-        <span class="cfgval" id="cfgAparenciaResumo">Grafite</span>
-        <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
-      </div>
 
-      <div class="cfgrow cfglink" id="cfgAbrirPrefs">
-        <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h14M22 18h0"/><circle cx="14" cy="6" r="2"/><circle cx="7" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></span>
-        <div class="cfgtxt">
-          <b data-i18n="cfg.preferencias">Preferências</b>
-        </div>
-        <span class="cfgval" id="cfgPrefsResumo">Vibrar</span>
-        <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
-      </div>
 
-      <div class="cfgrow cfglink" id="cfgRever">
-        <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></span>
-        <div class="cfgtxt">
-          <b data-i18n="cfg.reverTutorial">Rever tutorial</b>
-        </div>
-        <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
-      </div>
 
       <!-- Linha "Notificações" removida daqui (pedido do usuario, v4.9x) --
            era texto+botao (Ativar/Ativado/Bloqueado, refletindo
@@ -844,23 +854,8 @@ html{background:var(--bsBg,#282828)}
            aqui no HTML fica so um href placeholder (pt) de fallback
            caso o JS falhe por algum motivo. Abre em nova aba
            (target=_blank) pra nao tirar o usuario do app. -->
-      <div class="edsec" data-i18n="cfg.legal">Legal</div>
 
-      <a class="cfgrow cfglink" id="cfgLinkPrivacidade" href="https://dungeonlog.weberlabs.com.br/privacy" target="_blank" rel="noopener">
-        <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
-        <div class="cfgtxt">
-          <b data-i18n="cfg.privacidade">Política de Privacidade</b>
-        </div>
-        <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14L21 3"/></svg>
-      </a>
 
-      <a class="cfgrow cfglink" id="cfgLinkTermos" href="https://dungeonlog.weberlabs.com.br/terms" target="_blank" rel="noopener">
-        <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg></span>
-        <div class="cfgtxt">
-          <b data-i18n="cfg.termosDeUso">Termos de Uso</b>
-        </div>
-        <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14L21 3"/></svg>
-      </a>
 
       <!-- Zona de risco (Sair/Excluir conta): de volta ao fim da tela principal de Config (pedido do usuario). Mesmos ids/JS. -->
       <div class="zonarisco">
@@ -893,27 +888,44 @@ html{background:var(--bsBg,#282828)}
        atualizarBotaoFeedback) precisou mudar. Ficam depois de cfgOverlay
        no DOM de proposito: mesmo z-index (69) da .cfgOverlay, mas por
        vir depois no documento pintam por cima dela quando abertas. -->
+  <div class="cfgOverlay" id="heroisOverlay">
+    <div class="cfgovhead">
+      <button class="cfgvoltar" id="heroisVoltarBtn" aria-label="Voltar" data-i18n-aria="acao.voltar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      </button>
+      <span class="vtitle" data-i18n="cfg.herois">Heróis</span>
+    </div>
+    <div class="cfgovcorpo">
+      <div class="edsec" data-i18n="cfg.personagens">Personagens</div>
+      <div class="cfgcard">
+        <div class="cfgHeroisLista" id="cfgHeroisLista"></div>
+      </div>
+      <button class="pjNovoBtn" id="cfgNovoHeroiBtn" type="button">
+        <span>+ Novo herói</span>
+      </button>
+    </div>
+  </div>
+
   <div class="cfgOverlay" id="heroiOverlay">
     <div class="cfgovhead">
       <button class="cfgvoltar" id="heroiVoltarBtn" aria-label="Voltar" data-i18n-aria="acao.voltar">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
       </button>
-      <span class="vtitle" data-i18n="cfg.heroi">Herói</span>
+      <span class="vtitle" data-i18n="cfg.editarHeroi">Editar herói</span>
     </div>
     <div class="cfgovcorpo">
-      <div class="cfgrow" id="cfgRenomear">
-        <div class="cfgtxt">
-          <b data-i18n="cfg.nomeDoHeroi">Nome do herói</b>
-          <span id="cfgNomeAtual">Aventureiro</span>
+      <div class="cfgcard">
+        <div class="cfgrow" id="cfgRenomear">
+          <div class="cfgtxt">
+            <b data-i18n="cfg.nomeDoHeroi">Nome do herói</b>
+            <span id="cfgNomeAtual">Aventureiro</span>
+          </div>
+          <button class="cfgbtn" data-i18n="cfg.renomear">Renomear</button>
         </div>
-        <button class="cfgbtn" data-i18n="cfg.renomear">Renomear</button>
       </div>
 
-      <div class="cfgrow cfgcol">
-        <div class="cfgtxt">
-          <b data-i18n="cfg.spriteDoHeroi">Sprite do herói</b>
-          <span data-i18n="cfg.escolhaQuemEnfrenta">Escolha quem enfrenta os monstros</span>
-        </div>
+      <div class="edsec" data-i18n="cfg.spriteDoHeroi">Sprite do herói</div>
+      <div class="cfgcard cfgcardGrade">
         <div class="grade" id="gradeHeroisConfig"></div>
       </div>
     </div>
@@ -934,18 +946,17 @@ html{background:var(--bsBg,#282828)}
       <span class="vtitle">Novo herói</span>
     </div>
     <div class="cfgovcorpo">
-      <div class="cfgrow cfgcol">
-        <div class="campo">
-          <label data-i18n="cfg.nomeDoHeroi">Nome do herói</label>
-          <input id="novoHeroiNome" placeholder="Aventureiro" data-i18n-placeholder="onb.placeholderNome" maxlength="18" autocomplete="off">
+      <div class="edsec" data-i18n="cfg.nomeDoHeroi">Nome do herói</div>
+      <div class="cfgcard">
+        <div class="cfgrow cfgcol">
+          <div class="campo">
+            <input id="novoHeroiNome" placeholder="Aventureiro" data-i18n-placeholder="onb.placeholderNome" maxlength="18" autocomplete="off">
+          </div>
         </div>
       </div>
 
-      <div class="cfgrow cfgcol">
-        <div class="cfgtxt">
-          <b data-i18n="cfg.spriteDoHeroi">Sprite do herói</b>
-          <span data-i18n="cfg.escolhaQuemEnfrenta">Escolha quem enfrenta os monstros</span>
-        </div>
+      <div class="edsec" data-i18n="cfg.spriteDoHeroi">Sprite do herói</div>
+      <div class="cfgcard cfgcardGrade">
         <div class="grade" id="gradeNovoHeroi"></div>
       </div>
 
@@ -979,54 +990,65 @@ html{background:var(--bsBg,#282828)}
       <span class="vtitle" data-i18n="cfg.preferencias">Preferências</span>
     </div>
     <div class="cfgovcorpo">
+      <div class="edsec" data-i18n="cfg.geral">Geral</div>
+      <div class="cfgcard">
+      <div class="cfgrow cfglink" id="cfgAbrirIdioma">
+        <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.7-3.8-9s1.3-6.4 3.8-9z"/></svg></span>
+        <div class="cfgtxt">
+          <b data-i18n="cfg.idioma">Idioma</b>
+        </div>
+        <span class="cfgval" id="cfgIdiomaResumo">Português</span>
+        <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+      </div>
+      </div>
+
+      <div class="edsec" data-i18n="cfg.experiencia">Experiência</div>
+      <div class="cfgcard">
+      <div class="cfgrow" id="cfgRowFeedback">
+        <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="3" width="8" height="18" rx="2"/><path d="M4 8v8M20 8v8"/></svg></span>
+        <div class="cfgtxt">
+          <b data-i18n="cfg.feedbackDeClique">Feedback tátil</b>
+        </div>
+        <button class="swch" id="cfgFeedbackBtn" type="button" role="switch" aria-checked="true" aria-label="Feedback tátil">
+          <span class="swch-bolinha"></span>
+        </button>
+      </div>
+      <div class="cfgrow" id="cfgRowSom">
+        <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9zM16 9a4 4 0 010 6"/></svg></span>
+        <div class="cfgtxt">
+          <b data-i18n="cfg.som">Som</b>
+        </div>
+        <button class="swch" id="cfgSomBtn" type="button" role="switch" aria-checked="true" aria-label="Som">
+          <span class="swch-bolinha"></span>
+        </button>
+      </div>
+      </div>
+
+      <div class="edsec" data-i18n="cfg.avisos">Avisos</div>
+      <div class="cfgcard">
+      <div class="cfgrow" id="cfgRowNotif">
+        <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 17V11a6 6 0 0112 0v6l2 2H4zM10 21h4"/></svg></span>
+        <div class="cfgtxt">
+          <b data-i18n="cfg.notificacoes">Notificações</b>
+        </div>
+        <button class="swch" id="cfgNotifBtn" type="button" role="switch" aria-checked="false" aria-label="Notificações">
+          <span class="swch-bolinha"></span>
+        </button>
+      </div>
+      </div>
       <!-- item 47 do roadmap (ajuste, pedido do usuário): "Idioma" saiu
            da tela principal de Config (não precisava de destaque de
            box própria) e passou a morar aqui dentro de Preferências,
            como mais uma linha -- mesmo padrão .cfgrow.cfglink usado
            pra Herói/Aparência, abrindo o mesmo idiomaOverlay de antes
            (nenhuma mudança de JS necessária, só de posição no HTML). -->
-      <div class="cfgrow cfglink" id="cfgAbrirIdioma">
-        <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.7-3.8-9s1.3-6.4 3.8-9z"/></svg></span>
-        <div class="cfgtxt">
-          <b data-i18n="cfg.idioma">Idioma</b>
-        </div>
-        <span class="cfgval" id="cfgIdiomaResumo">🇧🇷 Português</span>
-        <svg class="cfgseta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
-      </div>
 
-      <div class="cfgrow" id="cfgRowFeedback">
-        <div class="cfgtxt">
-          <b data-i18n="cfg.feedbackDeClique">Feedback tátil</b>
-          <span data-i18n="cfg.feedbackDeCliqueDesc">Vibração ao tocar em botões e nos eventos do jogo</span>
-        </div>
-        <button class="swch" id="cfgFeedbackBtn" type="button" role="switch" aria-checked="true" aria-label="Feedback tátil">
-          <span class="swch-bolinha"></span>
-        </button>
-      </div>
 
       <!-- v4.20x (pedido do usuario): o botao de mudo saiu da topbar e
            virou esta linha aqui -- mesmo padrao .cfgrow/.swch da linha
            de cima (#cfgRowFeedback), so troca a API de dados (ver script
            antes de </body>, wiring identico ao de Feedback). -->
-      <div class="cfgrow" id="cfgRowSom">
-        <div class="cfgtxt">
-          <b data-i18n="cfg.som">Som</b>
-          <span data-i18n="cfg.somDesc">Efeitos sonoros do jogo</span>
-        </div>
-        <button class="swch" id="cfgSomBtn" type="button" role="switch" aria-checked="true" aria-label="Som">
-          <span class="swch-bolinha"></span>
-        </button>
-      </div>
 
-      <div class="cfgrow" id="cfgRowNotif">
-        <div class="cfgtxt">
-          <b data-i18n="cfg.notificacoes">Notificações</b>
-          <span id="cfgNotifInfo" data-i18n="cfg.notifDesc">Teste grátis, streak em risco e monstro do dia</span>
-        </div>
-        <button class="swch" id="cfgNotifBtn" type="button" role="switch" aria-checked="false" aria-label="Notificações">
-          <span class="swch-bolinha"></span>
-        </button>
-      </div>
     </div>
   </div>
 
@@ -10444,7 +10466,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 
     const rIdioma = document.getElementById('cfgIdiomaResumo');
     if (rIdioma){
-      rIdioma.textContent = emIngles ? '🇺🇸 English' : '🇧🇷 Português';
+      rIdioma.textContent = emIngles ? 'English' : 'Português';
     }
 
     const rPref = document.getElementById('cfgPrefsResumo');
@@ -10494,7 +10516,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     // vez que Config abriu -- repinta sempre.
     if (typeof window.atualizarBotaoNotificacao === 'function') window.atualizarBotaoNotificacao();
     if (cfgOverlay) cfgOverlay.classList.add('on');
-    animarStaggerCfgRows();
+    // (sem animacao em cascata das linhas ao abrir -- pedido do usuario)
   }
   function fecharConfig(){
     if (cfgOverlay) cfgOverlay.classList.remove('on');
@@ -10519,6 +10541,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   function fecharHeroiConfig(){
     if (heroiOverlay) heroiOverlay.classList.remove('on');
     atualizarResumosConfig(); // nome/sprite pode ter mudado dentro da sub-tela
+    if (typeof window.pintarAcordeaoHerois === 'function') window.pintarAcordeaoHerois();
   }
   const btnAbrirHeroi = document.getElementById('cfgAbrirHeroi');
   if (btnAbrirHeroi) btnAbrirHeroi.onclick = abrirHeroiConfig;
@@ -10560,7 +10583,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   // (cfgHeroisLista/cfgNovoHeroiBtn, ver bloco mais abaixo). onSelecionar
   // e a funcao chamada ao clicar num herói NAO-ativo -- cada chamador
   // passa a sua (fecha o dropdown vs repinta o acordeao no lugar).
-  function pintarListaHerois(containerEl, btnNovoEl, onSelecionar){
+  function pintarListaHerois(containerEl, btnNovoEl, onSelecionar, onEditar){
     if (!containerEl) return 0;
     const ativo = personagemAtivoId();
     const lista = listarPersonagens();
@@ -10581,6 +10604,10 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
         '<span class="pjTxt"><b>' + nomeMostrado + '</b>' +
         (ehAtivo ? ('<span>' + (en ? 'active now' : 'ativo agora') + '</span>') : '') + '</span>';
       if (!ehAtivo) btn.onclick = () => onSelecionar(p.id);
+      if (onEditar){
+        btn.insertAdjacentHTML('beforeend', (ehAtivo ? '<svg class="pjCheck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>' : '') + '<span class="pjEdit" role="button" aria-label="' + (en ? 'Edit' : 'Editar') + '"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg></span>');
+        btn.querySelector('.pjEdit').onclick = (e) => { e.stopPropagation(); onEditar(p.id, ehAtivo); };
+      }
       containerEl.appendChild(btn);
     });
 
@@ -10734,28 +10761,23 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   const cfgNovoHeroiBtn = document.getElementById('cfgNovoHeroiBtn');
 
   function pintarAcordeaoHerois(){
-    // repinta so DEPOIS que trocarPersonagemComTransicao confirma que a
-    // troca de verdade ja aconteceu por baixo (aoTrocar, 220ms depois do
-    // clique) -- repintar antes disso mostrava o personagem ANTIGO ainda
-    // marcado "ativo agora", precisando de um 2o clique pra atualizar.
+    // repinta so DEPOIS que trocarPersonagemComTransicao confirma que a troca de verdade ja aconteceu (aoTrocar)
     pintarListaHerois(cfgHeroisLista, cfgNovoHeroiBtn, (id) => {
       trocarPersonagemComTransicao(id, pintarAcordeaoHerois);
+    }, (id, ehAtivo) => {
+      // lapis: edita o heroi ATIVO (nome/sprite) -- se for outro, troca primeiro
+      if (ehAtivo) window.abrirHeroiConfig();
+      else trocarPersonagemComTransicao(id, () => { pintarAcordeaoHerois(); window.abrirHeroiConfig(); });
     });
   }
   window.pintarAcordeaoHerois = pintarAcordeaoHerois;
 
-  if (cfgHeroisRow) cfgHeroisRow.onclick = () => {
-    const abrindo = !(cfgHeroisPainel && cfgHeroisPainel.classList.contains('on'));
-    if (cfgHeroisPainel) cfgHeroisPainel.classList.toggle('on', abrindo);
-    if (cfgHeroisSeta) cfgHeroisSeta.classList.toggle('aberto', abrindo);
-    // v4.24x (pedido do usuario): tira a divisoria (border-bottom) da
-    // propria linha "Heróis" enquanto ela esta ABERTA -- com o painel
-    // logo em seguida, aquela linha ficava parecendo "fim da lista"
-    // bem no meio do conteudo que continua. Fechada, a linha volta
-    // normal (mesma divisoria que toda linha de Config ja tem).
-    cfgHeroisRow.classList.toggle('aberto', abrindo);
-    if (abrindo) pintarAcordeaoHerois();
-  };
+  // tela unica "Herois": lista de personagens (trocar / editar / novo)
+  const heroisOverlay = document.getElementById('heroisOverlay');
+  const btnAbrirHerois = document.getElementById('cfgAbrirHerois');
+  if (btnAbrirHerois) btnAbrirHerois.onclick = () => { pintarAcordeaoHerois(); if (heroisOverlay) heroisOverlay.classList.add('on'); };
+  const btnHeroisVoltar = document.getElementById('heroisVoltarBtn');
+  if (btnHeroisVoltar) btnHeroisVoltar.onclick = () => { if (heroisOverlay) heroisOverlay.classList.remove('on'); };
   if (cfgNovoHeroiBtn) cfgNovoHeroiBtn.onclick = abrirNovoHeroiSeCouber;
 
   atualizarNomeTopoPersonagem(); // primeira pintura, no boot
@@ -11296,7 +11318,6 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       const b = document.createElement('div');
       b.className = 'temalinha' + (id.id === atual ? ' sel' : '');
       b.innerHTML =
-        '<span class="idiomaBandeira">' + id.bandeira + '</span>' +
         '<span class="temaNome">' + id.nome + '</span>' +
         '<svg class="temaCheck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
       b.onclick = () => escolherIdiomaCfg(id.id);
@@ -19470,6 +19491,11 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'cfg.aparencia':       { pt:'Aparência', en:'Appearance' },
     'cfg.preferencias':    { pt:'Preferências', en:'Preferences' },
     'cfg.legal':           { pt:'Legal', en:'Legal' },
+    'cfg.geral':           { pt:'Geral', en:'General' },
+    'cfg.personagens':     { pt:'Personagens', en:'Characters' },
+    'cfg.editarHeroi':     { pt:'Editar herói', en:'Edit hero' },
+    'cfg.experiencia':     { pt:'Experiência', en:'Experience' },
+    'cfg.avisos':          { pt:'Avisos', en:'Alerts' },
     'cfg.reverTutorial':   { pt:'Rever tutorial', en:'Replay tutorial' },
     'cfg.privacidade':     { pt:'Política de Privacidade', en:'Privacy Policy' },
     'cfg.termosDeUso':     { pt:'Termos de Uso', en:'Terms of Use' },

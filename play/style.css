@@ -6749,3 +6749,68 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 .istats .irow.afl.a-tex{color:var(--afx-tex)}
 .rolTx.a-tex{color:var(--afx-tex)}
 .ibonus.istats .rolTx.a-tex{color:var(--afx-tex)}
+
+/* lista de idiomas: uma opcao embaixo da outra, sem bandeira */
+#idiomaGrid.temagrid{flex-direction:column;flex-wrap:nowrap;gap:2px}
+#idiomaGrid .temalinha{width:100%;box-sizing:border-box}
+#idiomaGrid.temagrid{align-self:stretch;width:100%}
+
+/* sem barra de rolagem visivel em nenhuma tela (a rolagem continua funcionando) */
+*{scrollbar-width:none !important;-ms-overflow-style:none !important}
+*::-webkit-scrollbar{display:none !important;width:0 !important;height:0 !important}
+
+/* switches cinza (estilo Skillion): ligado = trilho cinza + bolinha clara; desligado = trilho escuro + bolinha cinza */
+.swch{background:rgba(128,128,132,.28) !important}
+.swch.on{background:#8b8b90 !important}
+.swch .swch-bolinha{background:#9a9aa0;box-shadow:none}
+.swch.on .swch-bolinha{background:#f2f2f4}
+
+/* Config compacto em cartoes (estilo Skillion): grupos arredondados, icone solto sem bolha, linhas mais baixas */
+.cfgOverlay .cfgcard{background:var(--panel-2);border-radius:18px;margin:0 0 6px;overflow:hidden}
+.cfgOverlay .cfgcard .cfgrow{padding:11px 16px;min-height:50px;gap:14px;border-bottom:none;position:relative}
+.cfgOverlay .cfgcard .cfgrow + .cfgrow::before,.cfgOverlay .cfgcard .cfgacordeaoPainel + .cfgrow::before{content:"";position:absolute;top:0;left:54px;right:0;border-top:1px solid var(--line)}
+.cfgOverlay .cfgcard .cfgicone{flex:0 0 24px;width:24px;height:24px;background:none;border-radius:0;color:var(--dim)}
+.cfgOverlay .cfgcard .cfgicone svg{width:22px;height:22px}
+.cfgOverlay .cfgcard .cfgtxt b{font-size:15px;font-weight:500}
+.cfgOverlay .cfgcard .cfgtxt span{font-size:12px}
+.cfgOverlay .edsec{margin:18px 6px 8px;font-size:12px;letter-spacing:.12em;text-transform:uppercase}
+.cfgOverlay .cfgcard .cfgrow:not(.cfglink):not(.cfgacordeao){padding-left:16px}
+
+/* Aparencia e Idioma: mesmo tamanho/cartao compacto da tela principal de Config */
+#cfgTemaCard,#cfgIdiomaCard{background:var(--panel-2) !important;border-radius:18px !important;padding:0 !important;margin:0 0 6px !important;overflow:hidden;border:none !important}
+#cfgTemaCard>.cfgtxt,#cfgIdiomaCard>.cfgtxt{display:none}
+#temaGrid.temagrid,#idiomaGrid.temagrid{gap:0;margin-top:0;width:100%;align-self:stretch}
+#cfgTemaCard .temalinha,#cfgIdiomaCard .temalinha{padding:11px 16px;min-height:50px;border-bottom:none;position:relative;box-sizing:border-box}
+#cfgTemaCard .temalinha + .temalinha::before,#cfgIdiomaCard .temalinha + .temalinha::before{content:"";position:absolute;top:0;left:16px;right:0;border-top:1px solid var(--line)}
+#cfgTemaCard .temaNome,#cfgIdiomaCard .temaNome{font-size:15px;font-weight:500}
+#cfgTemaCard .temaDot{width:24px;height:24px}
+#cfgTemaCard .temaLinha2{min-height:50px;padding:11px 16px;border-bottom:none;position:relative;box-sizing:border-box;gap:14px}
+#cfgTemaCard .temaLinha2 + .temaLinha2::before{content:"";position:absolute;top:0;left:16px;right:0;border-top:1px solid var(--line)}
+#cfgTemaCard .tl2Dot{width:26px;height:26px;border-width:2px}
+#cfgTemaCard .tl2Nome{font-size:15px;font-weight:500}
+#cfgTemaCard .tl2Check{width:24px;height:24px}
+#cfgTemaCard .tl2Check svg{width:20px;height:20px}
+
+/* Herois: mesmo padrao de cartoes do Config */
+.cfgcardGrade{padding:10px}
+.cfgcardGrade .grade{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:0}
+#gradeHeroisConfig .opcao,#gradeNovoHeroi .opcao{padding:8px 2px;border-radius:12px}
+#gradeHeroisConfig .opcao img,#gradeNovoHeroi .opcao img{width:52px;height:52px}
+#novoHeroiOverlay .cfgcard .campo{width:100%;margin:0}
+
+#cfgHeroiResumo,#cfgAparenciaResumo,#cfgPrefsResumo{display:none !important}
+
+/* Tela unica Herois: linhas de personagem no padrao dos cartoes do Config */
+#heroisOverlay .cfgHeroisLista{width:100%}
+#heroisOverlay .pjItem{padding:10px 16px;min-height:60px;border-radius:0;gap:14px;position:relative;background:none}
+#heroisOverlay .pjItem.ativo{background:none}
+#heroisOverlay .pjItem + .pjItem::before{content:"";position:absolute;top:0;left:70px;right:0;border-top:1px solid var(--line)}
+#heroisOverlay .pjItem .pjAvatar{flex:0 0 40px;width:40px;height:40px;border-radius:12px;background:var(--panel-3)}
+#heroisOverlay .pjItem .pjAvatar img{width:34px;height:34px}
+#heroisOverlay .pjItem .pjTxt b{font-size:15px;font-weight:500}
+#heroisOverlay .pjItem .pjTxt span{font-size:12px}
+#heroisOverlay .pjCheck{width:22px;height:22px;flex:none;color:var(--text)}
+#heroisOverlay .pjEdit{flex:none;width:32px;height:32px;display:grid;place-items:center;color:var(--dim);border-radius:50%;cursor:pointer}
+#heroisOverlay .pjEdit svg{width:18px;height:18px}
+#heroisOverlay .pjEdit:active{background:rgba(255,255,255,.08)}
+#heroisOverlay .pjNovoBtn{margin:12px 0 0;padding:13px;border-radius:14px;font-size:14px;font-weight:500}

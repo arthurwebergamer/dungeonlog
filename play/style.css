@@ -6775,3 +6775,18 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 .cfgOverlay .cfgcard .cfgtxt span{font-size:12px}
 .cfgOverlay .edsec{margin:18px 6px 8px;font-size:12px;letter-spacing:.12em;text-transform:uppercase}
 .cfgOverlay .cfgcard .cfgrow:not(.cfglink):not(.cfgacordeao){padding-left:16px}
+
+/* Aparencia e Idioma: mesmo tamanho/cartao compacto da tela principal de Config */
+#cfgTemaCard,#cfgIdiomaCard{background:var(--panel-2) !important;border-radius:18px !important;padding:0 !important;margin:0 0 6px !important;overflow:hidden;border:none !important}
+#cfgTemaCard>.cfgtxt,#cfgIdiomaCard>.cfgtxt{display:none}
+#temaGrid.temagrid,#idiomaGrid.temagrid{gap:0;margin-top:0;width:100%;align-self:stretch}
+#cfgTemaCard .temalinha,#cfgIdiomaCard .temalinha{padding:11px 16px;min-height:50px;border-bottom:none;position:relative;box-sizing:border-box}
+#cfgTemaCard .temalinha + .temalinha::before,#cfgIdiomaCard .temalinha + .temalinha::before{content:"";position:absolute;top:0;left:16px;right:0;border-top:1px solid var(--line)}
+#cfgTemaCard .temaNome,#cfgIdiomaCard .temaNome{font-size:15px;font-weight:500}
+#cfgTemaCard .temaDot{width:24px;height:24px}
+#cfgTemaCard .temaLinha2{min-height:50px;padding:11px 16px;border-bottom:none;position:relative;box-sizing:border-box;gap:14px}
+#cfgTemaCard .temaLinha2 + .temaLinha2::before{content:"";position:absolute;top:0;left:16px;right:0;border-top:1px solid var(--line)}
+#cfgTemaCard .tl2Dot{width:26px;height:26px;border-width:2px}
+#cfgTemaCard .tl2Nome{font-size:15px;font-weight:500}
+#cfgTemaCard .tl2Check{width:24px;height:24px}
+#cfgTemaCard .tl2Check svg{width:20px;height:20px}

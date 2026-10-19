@@ -6820,3 +6820,9 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 #cfgOverlay .cfgovcorpo>*{flex-shrink:0}
 #cfgOverlay .zonarisco{margin-top:auto;padding:28px 0 calc(12px + env(safe-area-inset-bottom));gap:8px}
 #cfgOverlay .zonarisco .cfgbtnfull{padding:12px;font-size:14px}
+
+/* onboarding: botao primario com cor FIXA (nao depende de tema/modo claro-escuro nem de regra antiga em cache) -- sempre legivel e com cara de clicavel */
+#intro .carrosselSlide:not([data-slide="login"]) button.primario,
+.carrosselSlide:not([data-slide="login"]) button.primario{
+  background:#FAFAFA !important; color:#1E1E1E !important; opacity:1 !important; border:none !important;
+}

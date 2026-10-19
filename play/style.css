@@ -445,6 +445,8 @@
   .est-anomeslbl{width:24px;flex:none;font-family:'Outfit',sans-serif;font-size:9.5px;color:var(--dim)}
   .est-anodias{display:flex;gap:3px;flex:1;min-width:0;flex-wrap:wrap}
   .est-anodia{display:block;width:9px;height:9px;border-radius:3px;background:var(--panel-3)}
+  .est-anodia.est-anodia-vitoria{background:#3A2E1A}
+  .est-anodia.est-anodia-fuga{background:#242428}
   .est-histchevron{width:14px;height:14px;margin-left:auto;flex:none;color:var(--dim)}
   .est-histsufixo{color:var(--dim);font-weight:400}
 

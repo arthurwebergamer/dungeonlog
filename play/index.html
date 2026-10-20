@@ -3647,9 +3647,23 @@ function abrirPaywall(motivo){
   // sao a versao de teste gratuita: recurso PRO mostra so um aviso, sem tela de compra (ainda sem Stripe).
   if (typeof billingDisponivel === 'function' && !billingDisponivel()){
     const en = (typeof idiomaApp === 'function' && idiomaApp() === 'en');
-    if (typeof window.aviso === 'function' && motivo !== 'primeira'){
-      window.aviso(en ? 'PRO feature: available in the full Android app. Coming to other devices later.'
-                      : 'Recurso PRO: disponível na versão completa para Android. Em breve nos outros aparelhos.');
+    if (motivo !== 'primeira'){
+      // caixa de aviso (o toast de 1,8 s passava despercebido e o botao parecia quebrado)
+      let ov = document.getElementById('proIndispOverlay');
+      if (!ov){
+        ov = document.createElement('div'); ov.id = 'proIndispOverlay';
+        ov.style.cssText = 'position:fixed;inset:0;z-index:9600;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,.62)';
+        ov.innerHTML = '<div style="max-width:320px;width:100%;background:#2b2b2b;color:#fafafa;border-radius:18px;padding:22px 20px 18px;text-align:center;font-family:Outfit,sans-serif;box-shadow:0 12px 40px rgba(0,0,0,.6)"><div id="proIndispTit" style="font-size:18px;font-weight:700;margin-bottom:8px"></div><div id="proIndispTxt" style="font-size:14px;line-height:1.45;color:#d8d8d8;margin-bottom:16px"></div><button id="proIndispOk" style="width:100%;padding:13px;border:none;border-radius:12px;background:#fafafa;color:#1c1c1c;font-weight:700;font-size:15px;font-family:inherit;cursor:pointer"></button></div>';
+        document.body.appendChild(ov);
+        const fechar = () => { ov.style.display = 'none'; };
+        ov.addEventListener('click', e => { if (e.target === ov || e.target.id === 'proIndispOk') fechar(); });
+      }
+      document.getElementById('proIndispTit').textContent = en ? 'Pro plan' : 'Plano Pro';
+      document.getElementById('proIndispTxt').textContent = en
+        ? 'For now, Pro features can only be purchased on the Android app. Support for other devices is coming later.'
+        : 'Por enquanto, os recursos do Plano Pro só estão disponíveis para compra no app Android. Em breve nos outros aparelhos.';
+      document.getElementById('proIndispOk').textContent = en ? 'Got it' : 'Entendi';
+      ov.style.display = 'flex';
     }
     return;
   }

@@ -2133,12 +2133,26 @@ function corrigirTemaPorPlano(){
   // plano expirou (ou nunca teve): cenario Pro salvo volta pro Padrao
   try {
     if (typeof TEMAS_ARENA === 'undefined' || temaArenaDesbloqueado(temaArenaAtual())) return;
+    try { localStorage.setItem(window.chaveConta('questlog.temaPreRebaixo.v1'), temaArenaAtual().id); } catch(e){}   // lembra o cenario Pro pra devolver se voltar ao Pro
     definirTemaArenaSalvo(TEMAS_ARENA[0].id);
     if (typeof renderTemaArena === 'function') renderTemaArena();
     else if (typeof _renderTemaArenaV1 === 'function') _renderTemaArenaV1();
   } catch(e){}
 }
 function corrigirHeroiPorPlano(){
+  // voltou pro Pro: devolve o cenario que a pessoa tinha antes de acabar o plano (se ainda liberado pelo estagio)
+  try {
+    const k = window.chaveConta('questlog.temaPreRebaixo.v1'), pre = localStorage.getItem(k);
+    if (pre && assinaturaAtiva()){
+      const t = TEMAS_ARENA.find(x => x.id === pre);
+      localStorage.removeItem(k);
+      if (t && temaArenaDesbloqueado(t)){
+        definirTemaArenaSalvo(t.id);
+        if (typeof renderTemaArena === 'function') renderTemaArena();
+        else if (typeof _renderTemaArenaV1 === 'function') _renderTemaArenaV1();
+      }
+    }
+  } catch(e){}
   corrigirTemaPorPlano();
   try {
     if (typeof heroiEscolhido !== 'number' || heroiLiberado(heroiEscolhido)) return;

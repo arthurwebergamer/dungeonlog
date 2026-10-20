@@ -2371,15 +2371,15 @@
   .pwEtapa.pwStepIn{ animation:pwStepIn .26s var(--expo); }
   .pwEtapa.pwStepInVolta{ animation:pwStepInVolta .26s var(--expo); }
 
-  .pwPlano{ transition:transform .15s var(--expo), border-color .15s, background .15s; }
-  .pwPlano:active{ transform:scale(.98); }
+  .pwPlano{ transition:none; }
+  .pwPlano:active{ transform:none; }  /* sem animacao ao tocar numa opcao (pedido do usuario) */
 
   /* pulso ao selecionar -- SO transform+transition, nunca `animation`,
      pra nunca mais colidir com a entrada (ver nota acima). JS (perto de
      selecionarPlano(), index.html) adiciona .pwPulse e remove logo
      depois; a transicao ja declarada em .pwPlano cuida da subida e
      descida sozinha. */
-  .pwPlano.pwPulse{ transform:scale(1.035); }
+  .pwPlano.pwPulse{ transform:none; }
 
   .pwCTA{ transition:transform .12s var(--expo), filter .15s; }
   .pwCTA:active{ transform:scale(.97); }

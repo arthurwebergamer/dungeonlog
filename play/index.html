@@ -2145,8 +2145,9 @@ function corrigirHeroiPorPlano(){
     const k = window.chaveConta('questlog.temaPreRebaixo.v1'), pre = localStorage.getItem(k);
     if (pre && assinaturaAtiva()){
       const t = TEMAS_ARENA.find(x => x.id === pre);
-      localStorage.removeItem(k);
+      if (!t) localStorage.removeItem(k);
       if (t && temaArenaDesbloqueado(t)){
+        localStorage.removeItem(k);
         definirTemaArenaSalvo(t.id);
         if (typeof renderTemaArena === 'function') renderTemaArena();
         else if (typeof _renderTemaArenaV1 === 'function') _renderTemaArenaV1();

@@ -2153,6 +2153,9 @@ window.corrigirHeroiPorPlano = corrigirHeroiPorPlano;
 function planoSimuladoDev(){ try { if (!window.EH_DEV) return null; const m = /[?&]plano=(gratis|pro)\b/.exec(location.search); return m ? m[1] : null; } catch(e){ return null; } }
 window.planoSimuladoDev = planoSimuladoDev;
 // grade de heroi: marca os bloqueados (cadeado do bau trancado, ver CSS .heroiBloq)
+// ordem de exibicao: liberados primeiro, bloqueados (Pro) por ultimo; mantem a ordem original dentro de cada grupo
+function ordemHerois(){ const t = HEROIS.map((_, i) => i); return t.filter(i => heroiLiberado(i)).concat(t.filter(i => !heroiLiberado(i))); }
+window.ordemHerois = ordemHerois;
 function marcarHeroiBloq(el, i){ if (el && !heroiLiberado(i)) el.classList.add('heroiBloq'); }
 
 function limitePersonagens(){
@@ -6741,7 +6744,7 @@ function pintarEscolha(){
 function montarGrade(){
   const g = document.getElementById('gradeHerois');
   g.innerHTML = '';
-  HEROIS.forEach((hh, i) => {
+  ordemHerois().forEach(i => { const hh = HEROIS[i];
     const b = document.createElement('div');
     b.className = 'opcao' + (i === heroiEscolhido ? ' sel' : '');
     b.innerHTML = '<img src="' + hh.img + '" alt="' + hh.nome + '">';
@@ -6863,7 +6866,7 @@ function montarCarrosselHerois(){
   const track = document.getElementById('gradeHerois');
   if (!track || typeof HEROIS === 'undefined') return;
   track.innerHTML = '';
-  HEROIS.forEach((hh, i) => {
+  ordemHerois().forEach(i => { const hh = HEROIS[i];
     const card = document.createElement('div');
     // ".opcao" mantida de proposito -- e a classe que o bloco de
     // feedback haptico (secao "SFX/VIBRACAO", delegacao em #gradeHerois
@@ -6890,15 +6893,15 @@ function atualizarNomeCarrosselHerois(){
 
 function rolarAteHeroi(i, suave){
   const track = document.getElementById('gradeHerois');
-  const card = track && track.children[i];
+  const card = track && track.children[ordemHerois().indexOf(i)];
   if (!card) return;
   card.scrollIntoView({ behavior: suave ? 'smooth' : 'auto', inline: 'center', block: 'nearest' });
 }
 
 function selecionarHeroiCarrossel(i, suave){
   heroiEscolhido = i;
-  document.querySelectorAll('#gradeHerois .heroiCard').forEach((el, idx) => {
-    el.classList.toggle('sel', idx === i);
+  document.querySelectorAll('#gradeHerois .heroiCard').forEach(el => {
+    el.classList.toggle('sel', +el.dataset.idx === i);
   });
   atualizarNomeCarrosselHerois();
   rolarAteHeroi(i, suave);
@@ -6921,7 +6924,8 @@ function selecionarHeroiCarrossel(i, suave){
       const rect = track.getBoundingClientRect();
       const centro = rect.left + rect.width / 2;
       let melhorIdx = heroiEscolhido, melhorDist = Infinity, distAtual = Infinity;
-      Array.from(track.children).forEach((el, idx) => {
+      Array.from(track.children).forEach(el => {
+        const idx = +el.dataset.idx;
         const r = el.getBoundingClientRect();
         const dist = Math.abs((r.left + r.width / 2) - centro);
         if (idx === heroiEscolhido) distAtual = dist;
@@ -6942,7 +6946,7 @@ function selecionarHeroiCarrossel(i, suave){
       const MARGEM_HISTERESE = 10; // px
       if (melhorIdx !== heroiEscolhido && melhorDist < distAtual - MARGEM_HISTERESE){
         heroiEscolhido = melhorIdx;
-        Array.from(track.children).forEach((el, idx) => el.classList.toggle('sel', idx === melhorIdx));
+        Array.from(track.children).forEach(el => el.classList.toggle('sel', +el.dataset.idx === melhorIdx));
         atualizarNomeCarrosselHerois();
       }
     });
@@ -6989,10 +6993,10 @@ function mostrarSetupPersonagemENome(){
   // carrossel novo, mesma convencao wrap-not-rewrite usada no resto do
   // arquivo (ultima atribuicao no load vence).
   document.getElementById('heroiAnterior').onclick = () => {
-    selecionarHeroiCarrossel(Math.max(0, heroiEscolhido - 1), true);
+    { const o = ordemHerois(), k = o.indexOf(heroiEscolhido); selecionarHeroiCarrossel(o[Math.max(0, k - 1)], true); }
   };
   document.getElementById('heroiProximo').onclick = () => {
-    selecionarHeroiCarrossel(Math.min(HEROIS.length - 1, heroiEscolhido + 1), true);
+    { const o = ordemHerois(), k = o.indexOf(heroiEscolhido); selecionarHeroiCarrossel(o[Math.min(o.length - 1, k + 1)], true); }
   };
 
   // Personagem e o 1o passo do fluxo novo -- sem seta de voltar, mesma
@@ -10961,7 +10965,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     const g = document.getElementById('gradeNovoHeroi');
     if (!g || typeof HEROIS === 'undefined') return;
     g.innerHTML = '';
-    HEROIS.forEach((hh, i) => {
+    ordemHerois().forEach(i => { const hh = HEROIS[i];
       const b = document.createElement('div');
       b.className = 'opcao' + (i === _novoHeroiSelecao ? ' sel' : '');
       b.innerHTML = '<img src="' + hh.img + '" alt="' + hh.nome + '">';
@@ -11283,7 +11287,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     const g = document.getElementById('gradeHeroisConfig');
     if (!g || typeof HEROIS === 'undefined') return;
     g.innerHTML = '';
-    HEROIS.forEach((hh, i) => {
+    ordemHerois().forEach(i => { const hh = HEROIS[i];
       const b = document.createElement('div');
       b.className = 'opcao' + (i === heroiEscolhido ? ' sel' : '');
       b.innerHTML = '<img src="' + hh.img + '" alt="' + hh.nome + '">';

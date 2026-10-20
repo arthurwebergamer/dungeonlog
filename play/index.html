@@ -135,15 +135,21 @@ html{background:var(--bsBg,#282828)}
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
 <link rel="stylesheet" href="style.css?v=322">
 <script>
-// A abertura so sai quando a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado; sair antes (assim que o CSS chega)
-// mostrava um flash cinza vazio e depois a tela de login por baixo, antes do carrossel (visto em video de teste). Teto de seguranca: 15s.
+// A abertura so sai quando (1) a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado (sair antes mostrava um flash
+// cinza vazio e depois a tela de login por baixo, visto em video de teste) E (2) quem ja tinha sessao neste aparelho teve login confirmado e o
+// plano (Pro/gratis) lido -- antes o app aparecia e so depois o plano chegava (cadeados piscando). Convidado/1o acesso nao espera nada.
+// A flag window.__aguardandoAbertura e ligada pelo bloco "sessao anterior" (uidAtivo) e desligada por window.liberarAbertura().
+// Teto de seguranca: 10s.
 (function(){
+  var quadro=false;
   function tirar(){ var e=document.getElementById('bootSplash'); if(!e||!e.parentNode||e.__saindo) return; e.__saindo=1; e.classList.add('bsSai'); setTimeout(function(){ if(e.parentNode) e.parentNode.removeChild(e); },300); }
+  function tentar(){ if(quadro && !window.__aguardandoAbertura) tirar(); }
   window.__tirarAbertura = tirar;
-  function depoisDoPrimeiroQuadro(){ requestAnimationFrame(function(){ requestAnimationFrame(tirar); }); }
+  window.liberarAbertura = function(){ window.__aguardandoAbertura=false; tentar(); };
+  function depoisDoPrimeiroQuadro(){ requestAnimationFrame(function(){ requestAnimationFrame(function(){ quadro=true; tentar(); }); }); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', depoisDoPrimeiroQuadro);
   else depoisDoPrimeiroQuadro();
-  setTimeout(tirar, 15000);
+  setTimeout(tirar, 10000);
 })();
 </script>
 
@@ -7602,6 +7608,8 @@ if (carregar()){
   let jaResolvido = false;
   const uidConhecido = (function(){ try { return localStorage.getItem('questlog.uidAtivo.v1'); } catch(e){ return null; } })();
   if (!uidConhecido) return; // nunca logou neste aparelho -- guest de verdade, sem corrida nenhuma pra evitar
+  window.__aguardandoAbertura = true; // segura a abertura (bootSplash) ate login+plano resolverem -- ver window.liberarAbertura()
+  setTimeout(function(){ if (window.liberarAbertura) window.liberarAbertura(); }, 6000);
 
   // v4.127 (item 81 do roadmap): trava de clique nasce JUNTO e sincrona,
   // igual sempre foi -- zero mudanca na corrida que isso resolve. O
@@ -15895,6 +15903,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     document.getElementById('passoLogin').classList.remove('on');
     if (typeof window.esconderLoadingMasmorra === 'function') window.esconderLoadingMasmorra();
     if (typeof window.confirmarSessaoResolvida === 'function') window.confirmarSessaoResolvida();
+    if (typeof window.liberarAbertura === 'function') window.liberarAbertura();
     const temSave = typeof window.carregar === 'function' && window.carregar();
     if (temSave){
       // ja tinha progresso local (ex.: Sair/Criar conta e voltou) -- reentra direto
@@ -18138,6 +18147,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
     async function aoLogar(user){
       if (typeof window.confirmarSessaoResolvida === 'function') window.confirmarSessaoResolvida();
+      if (typeof window.liberarAbertura === 'function') window.liberarAbertura();
       const contaNova = !!(user.metadata &&
         user.metadata.creationTime === user.metadata.lastSignInTime);
 
@@ -18445,6 +18455,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       const precisaVerificar = !user.emailVerified && contaNovaOBastante;
 
       if (precisaVerificar){
+        if (typeof window.liberarAbertura === 'function') window.liberarAbertura();
         // bloqueia so a PARTIR DAQUI -- o app ja pode ter desenhado um
         // frame antes deste await assincrono resolver (limite conhecido:
         // onAuthStateChanged e sempre assincrono, nao da pra gatear o
@@ -18471,13 +18482,14 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // um login completo. Isto le SO entitlements/{uid} e revalida a compra;
     // nao toca no save local (mantem a decisao de nao puxar a nuvem aqui).
     async function puxarPlanoSilencioso(uid){
-      try { await puxarEntitlement(uid); } catch(e){}
+      try { await Promise.race([puxarEntitlement(uid), new Promise(r => setTimeout(r, 4000))]); } catch(e){}
+      if (typeof window.liberarAbertura === 'function') window.liberarAbertura();
       if (typeof window.billingSincronizar === 'function') window.billingSincronizar();
       if (typeof window.billingAtualizarTelas === 'function') window.billingAtualizarTelas();
     }
 
     onAuthStateChanged(auth, user => {
-        if (!user) return;
+        if (!user){ if (typeof window.liberarAbertura === 'function') window.liberarAbertura(); return; } // sem sessao valida: nada mais a esperar
         const passoLoginOn = !!(passoLogin && passoLogin.classList.contains('on'));
         if (passoLoginOn) {
           aoLogar(user).catch(e => console.error('QuestLog/Firebase: aoLogar() falhou', e));

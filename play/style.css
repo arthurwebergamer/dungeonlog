@@ -6881,3 +6881,11 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 /* tela "Plano Pro ativado / Teste gratis ativado" (billingMostrarCompraOk) */
 .compraOkPalco{ flex:none; display:flex; justify-content:center; margin-bottom:6px; }
 .compraOkPalco img{ width:112px; height:112px; image-rendering:pixelated; filter:drop-shadow(0 6px 10px rgba(0,0,0,.55)); }
+
+/* linha do tempo na tela de planos */
+.pwTL{ margin:0 0 12px; padding:0 12px; }
+.pwTL .pwNRow{ padding:7px 0; gap:12px; }
+.pwTL .pwNIc{ width:34px; height:34px; border-radius:10px; }
+.pwTL .pwNIc svg{ width:19px; height:19px; }
+.pwTL .pwNTxt b{ font-size:14px; }
+.pwTL .pwNTxt span{ font-size:12px; }

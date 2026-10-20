@@ -133,7 +133,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=335">
+<link rel="stylesheet" href="style.css?v=336">
 <script>
 // A abertura so sai quando (1) a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado (sair antes mostrava um flash
 // cinza vazio e depois a tela de login por baixo, visto em video de teste) E (2) quem ja tinha sessao neste aparelho teve login confirmado e o
@@ -1340,6 +1340,8 @@ html{background:var(--bsBg,#282828)}
       <div class="pwConteudo pwPConteudo">
         <span class="pwEyebrow" data-i18n="pro.titulo">Plano Pro</span>
         <h2 class="pwHeadline pwHeadlineMenor" data-i18n="pro.escolhaPlano">Escolha como quer assinar</h2>
+
+        <div class="pwNLista pwTL" id="pwLinhaTempo"><div class="pwNRow"><div class="pwNIc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 7-2.6"/></svg></div><div class="pwNTxt"><b id="pwTLt0"></b><span id="pwTLs0"></span></div></div><div class="pwNRow"><div class="pwNIc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21h4"/></svg></div><div class="pwNTxt"><b id="pwTLt1"></b><span id="pwTLs1"></span></div></div><div class="pwNRow"><div class="pwNIc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 2.7 5.6 6.1.8-4.5 4.2 1.1 6-5.4-3-5.4 3 1.1-6L3.2 9.4l6.1-.8z"/></svg></div><div class="pwNTxt"><b id="pwTLt2"></b><span id="pwTLs2"></span></div></div></div>
 
         <div class="pwPlanos">
           <!-- teste gratis, agora um card na MESMA lista dos pagos (nao
@@ -3678,6 +3680,7 @@ function abrirPaywall(motivo){
     const hs = [['pwNHeroiE',1],['pwNHeroiC',5],['pwNHeroiD',7]];
     hs.forEach(([id,n]) => { const im = document.getElementById(id); if (im && !im.src && typeof HEROIS !== 'undefined' && HEROIS[n]) im.src = HEROIS[n].img; });
   } catch(e){}
+  if (typeof window.pintarLinhaTempoPaywall === 'function') window.pintarLinhaTempoPaywall(_pwPlanoSelecionado);
   const overlay = document.getElementById('paywallOverlay');
   if (!overlay) return;
   // Sem pitch/lembrete locais: o teste gratis e' do Play, entao vai direto
@@ -3808,12 +3811,32 @@ window.aplicarCtaPlano = aplicarCtaPlano;
   if (avisoPorId[1]) avisoPorId[1].onclick = () => selecionarAviso(1);
   if (avisoPorId[0]) avisoPorId[0].onclick = () => selecionarAviso(0);
 
+
+  // LINHA DO TEMPO (tela de planos): alterna conforme o plano marcado --
+  // teste gratis (hoje / lembrete / cobranca) x pago direto (sem surpresas).
+  function pintarLinhaTempo(id){
+    const en = (typeof idiomaApp === 'function') && idiomaApp() === 'en';
+    const d = new Date(Date.now() + 7*86400000);
+    const loc = String(navigator.language||'pt-BR').split('@')[0];
+    let ds = ''; try { ds = d.toLocaleDateString(loc, { day:'numeric', month:'short', year:'numeric' }); } catch(e){ ds = d.toLocaleDateString(); }
+    const T = id === 'trial'
+      ? (en ? [['Today','Unlock everything now and start your adventure'],['In 5 days','Reminder: we warn you your trial is ending'],['In 7 days','Billing starts on ' + ds + '. Cancel before if you like']]
+            : [['Hoje','Acesse tudo na hora e comece sua aventura'],['Em 5 dias','Lembrete: avisamos que seu teste está acabando'],['Em 7 dias','Início da cobrança em ' + ds + '. Cancele antes quando quiser']])
+      : (en ? [['Today','Unlock everything now and start your adventure'],['Nothing to remember','No deadlines or cancellation reminders'],['Whenever you want','Cancel in two taps. No lock-in']]
+            : [['Hoje','Desbloqueie tudo na hora e comece sua aventura'],['Nada para lembrar','Sem prazos nem lembretes de cancelamento'],['Quando quiser','Cancele em dois toques. Sem fidelidade']]);
+    if (id === 'vitalicio' && !en) T[2] = ['Para sempre','Pagamento único, sem renovação'];
+    if (id === 'vitalicio' && en) T[2] = ['Forever','One-time payment, no renewal'];
+    T.forEach((r, i) => { const t = document.getElementById('pwTLt'+i), u = document.getElementById('pwTLs'+i); if (t) t.textContent = r[0]; if (u) u.textContent = r[1]; });
+  }
+  window.pintarLinhaTempoPaywall = pintarLinhaTempo;
+
   // selecao de plano -- troca qual card fica marcado (.sel), guarda em
   // _pwPlanoSelecionado e atualiza o texto/acao do CTA unico
   // (aplicarCtaPlano()). 'trial' e' so mais um id nessa lista agora.
   function selecionarPlano(id){
     if (id === _pwPlanoSelecionado) return;
     _pwPlanoSelecionado = id;
+    pintarLinhaTempo(id);
     Object.keys(planosPorId).forEach(k => {
       if (planosPorId[k]) planosPorId[k].classList.toggle('sel', k === id);
     });
@@ -3836,6 +3859,7 @@ window.aplicarCtaPlano = aplicarCtaPlano;
   if (planoVitalicio) planoVitalicio.onclick = () => selecionarPlano('vitalicio');
 
   aplicarCtaPlano(_pwPlanoSelecionado); // sincroniza o CTA com o default ('trial') logo no boot
+  pintarLinhaTempo(_pwPlanoSelecionado);
 })();
 
 // ---------------------------------------------------------------------

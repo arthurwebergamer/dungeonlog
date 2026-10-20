@@ -3969,8 +3969,8 @@ async function billingChecarAssinaturasPlay(){
 }
 
 // DEV (?paywall=1 em localhost / *.questlog-911.pages.dev): simula o app Android pra poder ver o paywall no navegador; compra e' so um aviso.
-function paywallSimuladoDev(){ try { return !!window.EH_DEV && /[?&]paywall=1\b/.test(location.search); } catch(e){ return false; } }
-window.addEventListener('load', function(){ setTimeout(function(){ try { if (planoSimuladoDev()){ window.__entitlementLido = true; corrigirHeroiPorPlano(); } if (paywallSimuladoDev()) abrirPaywall('primeira'); } catch(e){} }, 900); });   // EH_DEV so existe depois do load
+function paywallSimuladoDev(){ try { return !!window.EH_DEV && /[?&](paywall|novo)=1\b/.test(location.search); } catch(e){ return false; } }
+window.addEventListener('load', function(){ setTimeout(function(){ try { if (planoSimuladoDev()){ window.__entitlementLido = true; corrigirHeroiPorPlano(); } if (paywallSimuladoDev() && /[?&]paywall=1\b/.test(location.search)) abrirPaywall('primeira'); } catch(e){} }, 900); });   // EH_DEV so existe depois do load
 function billingDisponivel(){
   if (paywallSimuladoDev()) return true;
   return typeof window.getDigitalGoodsService === 'function' && typeof window.PaymentRequest === 'function';
@@ -14244,7 +14244,20 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   }
   window.ofertarTrialPrimeiraVitoria = ofertarTrialPrimeiraVitoria;
 
-  window.totalTarefasConcluidas = function(){ return total; };
+  // DEV: ?novo=1 simula conta recem-criada (contagem de tarefas concluidas comeca em 0, zera flags de oferta); ?novo=0 desfaz
+  window.totalTarefasConcluidas = function(){
+    try {
+      if (window.EH_DEV){
+        if (/[?&]novo=0\b/.test(location.search)){ localStorage.removeItem('dev.offsetTarefas'); }
+        else if (/[?&]novo=1\b/.test(location.search)){
+          let off = localStorage.getItem('dev.offsetTarefas');
+          if (off === null){ localStorage.setItem('dev.offsetTarefas', String(total)); localStorage.removeItem('questlog.ofertaEstagio.v1'); off = String(total); }
+          return Math.max(0, total - Number(off));
+        }
+      }
+    } catch(e){}
+    return total;
+  };
 
   // chamado por puxarNuvem() apos restaurar CHAVE_CONCLUIDAS vinda da
   // nuvem -- mesmo motivo do vidaHeroi.recarregar() (ver bloco VIDA DO

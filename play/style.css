@@ -6889,3 +6889,7 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 .pwTL .pwNIc svg{ width:19px; height:19px; }
 .pwTL .pwNTxt b{ font-size:14px; }
 .pwTL .pwNTxt span{ font-size:12px; }
+
+.pwPlano .pwZero{ display:none; }
+.pwPlano.comTrial .pwZero{ display:flex; flex-direction:column; align-items:flex-end; }
+.pwPlano.comTrial .pwPlanoPreco:not(.pwZero){ display:none; }

@@ -133,7 +133,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=336">
+<link rel="stylesheet" href="style.css?v=338">
 <script>
 // A abertura so sai quando (1) a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado (sair antes mostrava um flash
 // cinza vazio e depois a tela de login por baixo, visto em video de teste) E (2) quem ja tinha sessao neste aparelho teve login confirmado e o
@@ -1346,7 +1346,7 @@ html{background:var(--bsBg,#282828)}
         <div class="pwPlanos">
           <!-- teste gratis, agora um card na MESMA lista dos pagos (nao
                um botao a parte) -- some (JS) pra quem ja usou o teste. -->
-          <div class="pwPlano sel" data-plano="trial" id="pwPlanoTrial">
+          <div class="pwPlano" data-plano="trial" id="pwPlanoTrial" style="display:none">
             <div class="pwPlanoRow">
               <div class="pwPlanoInfo">
                 <span class="pwPlanoNome" data-i18n="pro.planoTrial">7 dias grátis</span>
@@ -1356,13 +1356,14 @@ html{background:var(--bsBg,#282828)}
               <span class="pwRadio"></span>
             </div>
           </div>
-          <div class="pwPlano" data-plano="mensal" id="pwPlanoMensal">
+          <div class="pwPlano sel" data-plano="mensal" id="pwPlanoMensal">
             <div class="pwPlanoRow">
               <div class="pwPlanoInfo">
                 <span class="pwPlanoNome" data-i18n="pro.planoMensal">Mensal</span>
-                <span class="pwPlanoSub" data-i18n="pro.planoMensalSub">Cobrado todo mês</span>
+                <span class="pwPlanoSub" id="pwMensalSub" data-i18n="pro.planoMensalSub">Cobrado todo mês</span>
               </div>
               <span class="pwPlanoPreco"><span data-i18n="pro.precoMensal">R$17,90</span><span class="pwPlanoUnidade" data-i18n="pro.porMes">/mês</span></span>
+              <span class="pwPlanoPreco pwZero"><span>R$0,00</span><span class="pwPlanoUnidade" id="pwZeroUn">no 1º mês</span></span>
               <span class="pwRadio"></span>
             </div>
           </div>
@@ -3680,6 +3681,7 @@ function abrirPaywall(motivo){
     const hs = [['pwNHeroiE',1],['pwNHeroiC',5],['pwNHeroiD',7]];
     hs.forEach(([id,n]) => { const im = document.getElementById(id); if (im && !im.src && typeof HEROIS !== 'undefined' && HEROIS[n]) im.src = HEROIS[n].img; });
   } catch(e){}
+  if (typeof window.pintarMensalTrialPaywall === 'function') window.pintarMensalTrialPaywall();
   if (typeof window.pintarLinhaTempoPaywall === 'function') window.pintarLinhaTempoPaywall(_pwPlanoSelecionado);
   const overlay = document.getElementById('paywallOverlay');
   if (!overlay) return;
@@ -3812,6 +3814,24 @@ window.aplicarCtaPlano = aplicarCtaPlano;
   if (avisoPorId[0]) avisoPorId[0].onclick = () => selecionarAviso(0);
 
 
+
+  // Teste gratis agora mora no card MENSAL (sem card "R$0,00" separado):
+  // quando elegivel, o Mensal mostra "R$0,00 no 1o mes" e vira o id 'trial'.
+  function pintarMensalTrial(){
+    const card = document.getElementById('pwPlanoMensal'); if (!card) return;
+    const en = (typeof idiomaApp === 'function') && idiomaApp() === 'en';
+    card.classList.toggle('comTrial', !!_billingTrialOk);
+    const sub = document.getElementById('pwMensalSub'), un = document.getElementById('pwZeroUn');
+    const pr = card.querySelector('.pwPlanoPreco:not(.pwZero) > span:first-child');
+    if (un) un.textContent = en ? 'first month' : 'no 1º mês';
+    if (sub){
+      if (_billingTrialOk){ sub.removeAttribute('data-i18n'); sub.textContent = (en ? '7 days free, then ' : '7 dias grátis, depois ') + (pr ? pr.textContent : '') + (en ? '/mo' : '/mês'); }
+      else { sub.textContent = en ? 'Billed every month' : 'Cobrado todo mês'; }
+    }
+    const tr = document.getElementById('pwPlanoTrial'); if (tr) tr.style.display = 'none';
+  }
+  window.pintarMensalTrialPaywall = pintarMensalTrial;
+
   // LINHA DO TEMPO (tela de planos): alterna conforme o plano marcado --
   // teste gratis (hoje / lembrete / cobranca) x pago direto (sem surpresas).
   function pintarLinhaTempo(id){
@@ -3838,7 +3858,7 @@ window.aplicarCtaPlano = aplicarCtaPlano;
     _pwPlanoSelecionado = id;
     pintarLinhaTempo(id);
     Object.keys(planosPorId).forEach(k => {
-      if (planosPorId[k]) planosPorId[k].classList.toggle('sel', k === id);
+      if (planosPorId[k]) planosPorId[k].classList.toggle('sel', k === id || (k === 'mensal' && id === 'trial'));
     });
     aplicarCtaPlano(id);
     // pulso rapido no card recem-marcado -- feedback tatil de que o clique
@@ -3854,7 +3874,7 @@ window.aplicarCtaPlano = aplicarCtaPlano;
   }
   window.selecionarPlanoPaywall = selecionarPlano; // exposto pra abrirPaywall() forcar 'anual' se o trial ja foi usado
   if (planoTrial) planoTrial.onclick = () => selecionarPlano('trial');
-  if (planoMensal) planoMensal.onclick = () => selecionarPlano('mensal');
+  if (planoMensal) planoMensal.onclick = () => selecionarPlano(_billingTrialOk ? 'trial' : 'mensal');
   if (planoAnual) planoAnual.onclick = () => selecionarPlano('anual');
   if (planoVitalicio) planoVitalicio.onclick = () => selecionarPlano('vitalicio');
 
@@ -3997,12 +4017,12 @@ async function billingPintarPrecos(){
   try {  } catch(e){}
   // O Chrome/TWA nao manda freeTrialPeriod: o teste gratis chega como
   // introductoryPrice de valor 0 (visto no log real). Aceita os dois.
-  const _temTesteGratis = !!(a && (a.freeTrialPeriod || (a.introductoryPrice && Number(a.introductoryPrice.value) === 0)));
+  const _tt = x => !!(x && (x.freeTrialPeriod || (x.introductoryPrice && Number(x.introductoryPrice.value) === 0)));
+  window._trialSku = _tt(m) ? BILLING_SKUS.mensal : BILLING_SKUS.anual;
+  const _temTesteGratis = _tt(m) || !!(a && (a.freeTrialPeriod || (a.introductoryPrice && Number(a.introductoryPrice.value) === 0)));
   _billingTrialOk = _temTesteGratis && !billingJaUsouTeste() && !(typeof assinaturaAtiva === 'function' && assinaturaAtiva());
-  const cardT = document.getElementById('pwPlanoTrial');
-  if (cardT) cardT.style.display = _billingTrialOk ? '' : 'none';
-  if (_billingTrialOk && _pwPlanoSelecionado === 'anual' && typeof window.selecionarPlanoPaywall === 'function') window.selecionarPlanoPaywall('trial');
-  if (!_billingTrialOk && _pwPlanoSelecionado === 'trial' && typeof window.selecionarPlanoPaywall === 'function') window.selecionarPlanoPaywall('anual');
+  if (_billingTrialOk && _pwPlanoSelecionado === 'mensal' && typeof window.selecionarPlanoPaywall === 'function') window.selecionarPlanoPaywall('trial');
+  if (!_billingTrialOk && _pwPlanoSelecionado === 'trial' && typeof window.selecionarPlanoPaywall === 'function') window.selecionarPlanoPaywall('mensal');
   if (m && m.price){
     por(document.querySelector('#pwPlanoMensal .pwPlanoPreco > span:first-child'), billingFormatarPreco(m.price.value, m.price.currency));
   }
@@ -4019,6 +4039,7 @@ async function billingPintarPrecos(){
       else badge.style.display = 'none';
     }
   }
+  if (typeof window.pintarMensalTrialPaywall === 'function') window.pintarMensalTrialPaywall();
   const cardV = document.getElementById('pwPlanoVitalicio');
   if (cardV){
     if (v && v.price){
@@ -4158,10 +4179,10 @@ async function iniciarCompraAssinatura(){
   if (paywallSimuladoDev()){
     window.__devAssinou = true;   // dev: simula a compra -- libera o Pro ate recarregar
     const eTeste = _pwPlanoSelecionado === 'trial';
-    billingMostrarCompraOk(eTeste ? BILLING_SKUS.anual : (BILLING_SKUS[_pwPlanoSelecionado] || BILLING_SKUS.anual), false, { trial: eTeste, ate: Date.now() + DIAS_TESTE_GRATIS * 86400000 });
+    billingMostrarCompraOk(eTeste ? (window._trialSku || BILLING_SKUS.mensal) : (BILLING_SKUS[_pwPlanoSelecionado] || BILLING_SKUS.anual), false, { trial: eTeste, ate: Date.now() + DIAS_TESTE_GRATIS * 86400000 });
     return;
   }
-  const sku = BILLING_SKUS[_pwPlanoSelecionado] || BILLING_SKUS.anual;
+  const sku = _pwPlanoSelecionado === 'trial' ? (window._trialSku || BILLING_SKUS.anual) : (BILLING_SKUS[_pwPlanoSelecionado] || BILLING_SKUS.anual);
   if (!BILLING_VERIFY_URL){
     billingMsg(_billingTexto('pro.pagamentoIndisponivel', 'Pagamento ainda não disponível', 'Payments coming soon'));
     return;

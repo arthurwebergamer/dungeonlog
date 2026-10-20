@@ -3511,6 +3511,43 @@ function renderEstagioBar(){
   // agora mora so no label (linha de cima), o valor mostra so a fracao,
   // mesmo padrao limpo de "40 / 64" em Vida.
   const flutEl = document.getElementById('estFlut'), flutTxt = document.getElementById('estFlutTxt'), flutFill = document.getElementById('estFlutFill'); // barra flutuante acima da nav
+  // PLANO GRATIS: so existe o estagio 1 (cenario Padrao). Barra 0/10; ao
+  // chegar em 10/10 oferece o Pro (1x por conta) e depois vira botao Pro.
+  const gratis = !assinaturaAtiva();
+  const totalG = (typeof window.totalTarefasConcluidas === 'function') ? window.totalTarefasConcluidas() : 0;
+  const en0 = (typeof idiomaApp === 'function') && idiomaApp() === 'en';
+  if (flutEl && !flutEl._proClick){ flutEl._proClick = 1; flutEl.addEventListener('click', function(){ if (flutEl.dataset.pro) abrirPaywall('estagio'); }); }
+  const rowEl = document.getElementById('estagioTopoRow');
+  if (rowEl && !rowEl._proClick){ rowEl._proClick = 1; rowEl.addEventListener('click', function(){ if (rowEl.dataset.pro) abrirPaywall('estagio'); }); }
+  if (gratis){
+    const cheio = totalG >= LIMIARES_ESTAGIO[0];
+    const f = Math.min(totalG, LIMIARES_ESTAGIO[0]);
+    if (estagioNumEl) estagioNumEl.textContent = 2;
+    fillEl.style.width = Math.round(f / LIMIARES_ESTAGIO[0] * 100) + '%';
+    numEl.textContent = cheio ? 'Pro' : (f + '/' + LIMIARES_ESTAGIO[0]);
+    if (flutEl){
+      flutEl.style.visibility = '';
+      flutTxt.textContent = (en0 ? 'Stage ' : 'Estágio ') + '2 · ' + (cheio ? (en0 ? 'Unlock with Pro' : 'Liberar com o Pro') : (f + '/' + LIMIARES_ESTAGIO[0]));
+      flutFill.style.width = Math.round(f / LIMIARES_ESTAGIO[0] * 100) + '%';
+      if (cheio) flutEl.dataset.pro = '1'; else delete flutEl.dataset.pro;
+    }
+    if (rowEl){ if (cheio) rowEl.dataset.pro = '1'; else delete rowEl.dataset.pro; rowEl.style.cursor = cheio ? 'pointer' : ''; }
+    if (cheio){
+      let visto = false; try { visto = localStorage.getItem('questlog.ofertaEstagio.v1') === '1'; } catch(e){}
+      if (!visto && !window._ofertaEstagioAgendada){
+        window._ofertaEstagioAgendada = true;
+        const tenta = function(){
+          if (window._vitoriaSequenciaEmAndamento || document.getElementById('paywallOverlay')?.classList.contains('on')){ setTimeout(tenta, 1500); return; }
+          try { localStorage.setItem('questlog.ofertaEstagio.v1', '1'); } catch(e){}
+          abrirPaywall('estagio');
+        };
+        setTimeout(tenta, 1200);
+      }
+    }
+    return;
+  }
+  if (flutEl){ delete flutEl.dataset.pro; }
+  if (rowEl){ delete rowEl.dataset.pro; rowEl.style.cursor = ''; }
   if (max){
     numEl.textContent = 'MAX';
     if (flutEl) flutEl.style.visibility = 'hidden';
@@ -3607,7 +3644,7 @@ function abrirPaywall(motivo){
     const floresta = TEMAS_ARENA.find(t => t.id === 'floresta');
     if (floresta) fundo.src = 'data:image/png;base64,' + floresta.arte;
   }
-  if (motivo !== 'primeira' && typeof window.aviso === 'function'){   // oferta pos-1a-tarefa nao e "recurso premium": sem toast
+  if (motivo !== 'primeira' && motivo !== 'estagio' && typeof window.aviso === 'function'){   // oferta pos-1a-tarefa nao e "recurso premium": sem toast
     window.aviso((typeof idiomaApp === 'function' && idiomaApp() === 'en') ? 'You found a premium feature!' : 'Você descobriu um recurso premium!');
   }
   // TESTE GRATIS -- o card "7 dias gratis" (tela de planos) e a linha do
@@ -3646,7 +3683,7 @@ function abrirPaywall(motivo){
   // Sem pitch/lembrete locais: o teste gratis e' do Play, entao vai direto
   // pra lista de planos (passo 3) e sem seta de voltar.
   // oferta pos-1a-tarefa ('primeira'): abre na tela do TESTE GRATIS (pitch, passo 1); os demais gatilhos seguem direto pros planos
-  irParaEtapaPaywall(motivo === 'primeira' ? 1 : 3, false);
+  irParaEtapaPaywall((motivo === 'primeira' || motivo === 'estagio') ? 1 : 3, false);
   const back = document.getElementById('paywallVoltarBtn');
   if (back) back.classList.remove('on');
   // atraso bem curto so pra o toast nao nascer e morrer debaixo do paywall

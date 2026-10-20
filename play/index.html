@@ -133,7 +133,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=338">
+<link rel="stylesheet" href="style.css?v=340">
 <script>
 // A abertura so sai quando (1) a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado (sair antes mostrava um flash
 // cinza vazio e depois a tela de login por baixo, visto em video de teste) E (2) quem ja tinha sessao neste aparelho teve login confirmado e o
@@ -1373,7 +1373,7 @@ html{background:var(--bsBg,#282828)}
             <div class="pwPlanoRow">
               <div class="pwPlanoInfo">
                 <span class="pwPlanoNome" data-i18n="pro.planoAnual">Anual</span>
-                <span class="pwPlanoSub" data-i18n="pro.planoAnualSub">Cobrado R$89,90/ano</span>
+                <span class="pwPlanoSub" data-i18n="pro.planoAnualSub" style="display:none">Cobrado R$89,90/ano</span>
               </div>
               <span class="pwPlanoPreco"><span data-i18n="pro.precoAnual">R$7,49</span><span class="pwPlanoUnidade" data-i18n="pro.porMes">/mês</span></span>
               <span class="pwRadio"></span>
@@ -3844,6 +3844,7 @@ window.aplicarCtaPlano = aplicarCtaPlano;
             : [['Hoje','Acesse tudo na hora e comece sua aventura'],['Em 5 dias','Lembrete: avisamos que seu teste está acabando'],['Em 7 dias','Início da cobrança em ' + ds + '. Cancele antes quando quiser']])
       : (en ? [['Today','Unlock everything now and start your adventure'],['Nothing to remember','No deadlines or cancellation reminders'],['Whenever you want','Cancel in two taps. No lock-in']]
             : [['Hoje','Desbloqueie tudo na hora e comece sua aventura'],['Nada para lembrar','Sem prazos nem lembretes de cancelamento'],['Quando quiser','Cancele em dois toques. Sem fidelidade']]);
+    if (id === 'anual'){ const pa = window._precoAnualTxt || 'R$89,90'; T[0] = en ? ['Today','Billed ' + pa + '/year. Unlock everything now'] : ['Hoje','Cobrado ' + pa + ' por ano. Desbloqueie tudo na hora']; }
     if (id === 'vitalicio' && !en) T[2] = ['Para sempre','Pagamento único, sem renovação'];
     if (id === 'vitalicio' && en) T[2] = ['Forever','One-time payment, no renewal'];
     T.forEach((r, i) => { const t = document.getElementById('pwTLt'+i), u = document.getElementById('pwTLs'+i); if (t) t.textContent = r[0]; if (u) u.textContent = r[1]; });
@@ -4030,7 +4031,8 @@ async function billingPintarPrecos(){
     const anual = billingFormatarPreco(a.price.value, a.price.currency);
     const porMes = billingFormatarPreco(Number(a.price.value) / 12, a.price.currency);
     por(document.querySelector('#pwPlanoAnual .pwPlanoPreco > span:first-child'), porMes);
-    por(document.querySelector('#pwPlanoAnual .pwPlanoSub'), en ? ('Billed ' + anual + '/year') : ('Cobrado ' + anual + '/ano'));
+    window._precoAnualTxt = anual;
+    { const sa = document.querySelector('#pwPlanoAnual .pwPlanoSub'); if (sa) sa.style.display = 'none'; }
     por(document.querySelector('#pwPlanoTrial .pwPlanoSub'), en ? ('Then ' + anual + '/year') : ('Depois, ' + anual + '/ano'));
     const badge = document.querySelector('#pwPlanoAnual .pwBadge');
     if (badge && m && m.price){

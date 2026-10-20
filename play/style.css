@@ -6893,3 +6893,20 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 .pwPlano .pwZero{ display:none; }
 .pwPlano.comTrial .pwZero{ display:flex; flex-direction:column; align-items:flex-end; }
 .pwPlano.comTrial .pwPlanoPreco:not(.pwZero){ display:none; }
+
+/* linha do tempo no estilo Skillion: sem cartao, icones vazados verdes, conector vertical. Cores fixas (nao seguem o tema do app) */
+.pwTL{ margin-top:10px !important; background:none !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; padding:0 4px; margin:0 0 14px; border-radius:0; gap:0; }
+.pwTL .pwNRow{ position:relative; align-items:flex-start; border-bottom:none; padding:0 0 14px; gap:14px; }
+.pwTL .pwNRow:last-child{ padding-bottom:0; }
+.pwTL .pwNIc{ width:40px; height:40px; border-radius:12px; background:rgba(0,0,0,.22); border:2px solid #A6E08B; color:#A6E08B; box-sizing:border-box; }
+.pwTL .pwNIc svg{ width:20px; height:20px; }
+.pwTL .pwNRow:not(:last-child)::after{ content:''; position:absolute; left:19px; top:42px; bottom:2px; width:2px; background:#A6E08B; border-radius:2px; }
+.pwTL .pwNTxt{ padding-top:0; }
+.pwTL .pwNTxt b{ font-size:16px; line-height:1.2; text-shadow:0 1px 3px rgba(0,0,0,.6); }
+.pwTL .pwNTxt span{ font-size:13px; color:#E6E6EE; text-shadow:0 1px 3px rgba(0,0,0,.7); }
+/* botao Pro na barra de estagio (plano gratis, 10/10) */
+.estFlut[data-pro]{ cursor:pointer; padding:7px 14px; border-radius:999px; background:#A6E08B; border:1px solid rgba(0,0,0,.25); box-shadow:0 2px 10px rgba(0,0,0,.35); }
+.estFlut[data-pro] .estFlutTxt{ color:#1C1C1C !important; font-weight:700; }
+.estFlut[data-pro] .estFlutBar{ display:none; }
+
+.paywallOverlay{ --pw-accent:#FAFAFA; --pw-panel:#323232; --pw-panel2:#3D3D3D; --pw-line:#5C5C5C; --pw-muted:#D8D8D8; color:#FAFAFA; }

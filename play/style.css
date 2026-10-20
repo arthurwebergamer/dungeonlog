@@ -6871,3 +6871,9 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 .pwLMicro{ margin:0 0 14px; }
 #pwEtapa2{ position:relative; }
 #pwEtapa2 .pwPConteudo{ position:relative; z-index:1; }
+
+/* heroi Pro bloqueado nas grades de escolha -- mesmo cadeado do bau trancado */
+.opcao.heroiBloq, .heroiCard.heroiBloq{ position:relative; }
+.opcao.heroiBloq img{ opacity:.5; }
+.opcao.heroiBloq::after{ content:''; position:absolute; right:4px; bottom:4px; width:18px; height:21px; pointer-events:none;
+  background:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 12 14%22 shape-rendering=%22crispEdges%22%3E%3Crect x=%223%22 y=%220%22 width=%226%22 height=%221%22 fill=%22%232a2118%22/%3E%3Crect x=%222%22 y=%221%22 width=%222%22 height=%226%22 fill=%22%232a2118%22/%3E%3Crect x=%228%22 y=%221%22 width=%222%22 height=%226%22 fill=%22%232a2118%22/%3E%3Crect x=%224%22 y=%221%22 width=%224%22 height=%221%22 fill=%22%23d5d9e0%22/%3E%3Crect x=%223%22 y=%222%22 width=%221%22 height=%225%22 fill=%22%23b8bcc4%22/%3E%3Crect x=%228%22 y=%222%22 width=%221%22 height=%225%22 fill=%22%238b909a%22/%3E%3Crect x=%220%22 y=%227%22 width=%2212%22 height=%227%22 fill=%22%232a2118%22/%3E%3Crect x=%221%22 y=%228%22 width=%2210%22 height=%225%22 fill=%22%23e8a92a%22/%3E%3Crect x=%221%22 y=%228%22 width=%2210%22 height=%221%22 fill=%22%23ffe27a%22/%3E%3Crect x=%221%22 y=%2212%22 width=%2210%22 height=%221%22 fill=%22%23b9831f%22/%3E%3Crect x=%225%22 y=%229%22 width=%222%22 height=%222%22 fill=%22%232a2118%22/%3E%3Crect x=%225.5%22 y=%2211%22 width=%221%22 height=%221%22 fill=%22%232a2118%22/%3E%3C/svg%3E") center/contain no-repeat; image-rendering:pixelated; filter:drop-shadow(0 1px 1px rgba(0,0,0,.6)); }

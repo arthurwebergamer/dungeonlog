@@ -133,7 +133,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=333">
+<link rel="stylesheet" href="style.css?v=334">
 <script>
 // A abertura so sai quando (1) a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado (sair antes mostrava um flash
 // cinza vazio e depois a tela de login por baixo, visto em video de teste) E (2) quem ja tinha sessao neste aparelho teve login confirmado e o
@@ -2120,6 +2120,28 @@ function salvarListaPersonagens(lista){
   try { localStorage.setItem(chavePersonagens(), JSON.stringify(lista)); } catch(e){}
 }
 
+// PLANO GRATIS x PRO -- HEROIS: gratis Cinza(0), Musgo(2), Ruiva(4), Morena(6); Pro Loiro(1), Castanho(3), Loira(5), Prata(7).
+// Ao expirar o plano, o heroi Pro em uso vira o gratis do mesmo genero (i-1: 1->0, 3->2, 5->4, 7->6).
+const HEROIS_PRO = [1, 3, 5, 7];
+function heroiEhPro(i){ return HEROIS_PRO.indexOf(Number(i)) >= 0; }
+function heroiLiberado(i){ return !heroiEhPro(i) || (typeof assinaturaAtiva === 'function' && assinaturaAtiva()); }
+function heroiGratisEquivalente(i){ return heroiEhPro(i) ? Number(i) - 1 : Number(i); }
+function corrigirHeroiPorPlano(){
+  try {
+    if (typeof heroiEscolhido !== 'number' || heroiLiberado(heroiEscolhido)) return;
+    heroiEscolhido = heroiGratisEquivalente(heroiEscolhido);
+    if (typeof desenharHeroi === 'function') desenharHeroi();
+    if (typeof salvar === 'function') salvar();
+    if (typeof render === 'function') render();
+  } catch(e){}
+}
+window.corrigirHeroiPorPlano = corrigirHeroiPorPlano;
+// DEV (?plano=gratis|pro em localhost / *.questlog-911.pages.dev): simula o plano pra testar os limites.
+function planoSimuladoDev(){ try { if (!window.EH_DEV) return null; const m = /[?&]plano=(gratis|pro)\b/.exec(location.search); return m ? m[1] : null; } catch(e){ return null; } }
+window.planoSimuladoDev = planoSimuladoDev;
+// grade de heroi: marca os bloqueados (cadeado do bau trancado, ver CSS .heroiBloq)
+function marcarHeroiBloq(el, i){ if (el && !heroiLiberado(i)) el.classList.add('heroiBloq'); }
+
 function limitePersonagens(){
   return (typeof assinaturaAtiva === 'function' && assinaturaAtiva()) ? 4 : 1;
 }
@@ -3510,6 +3532,7 @@ window.renderEstagioBar = renderEstagioBar;
 // Nenhum caminho do app concede PRO localmente.
 
 function assinaturaAtiva(){
+  { const pd = (typeof planoSimuladoDev === 'function') ? planoSimuladoDev() : null; if (pd) return pd === 'pro'; }   // dev: ?plano=gratis|pro
   // PRO VITALICIO MANUAL, versao local (localStorage, ver bloco logo
   // acima) OU versao servidor (Firestore entitlements/{uid}, sincroniza
   // entre aparelhos -- ver puxarEntitlement() no bloco AUTH/Firebase,
@@ -3545,7 +3568,7 @@ window.assinaturaAtiva = assinaturaAtiva;
 // preco) e decidir onde a Cloud Function vai rodar. Ate la, o botao
 // "Assinar" so avisa que ainda nao esta disponivel.
 // ---------------------------------------------------------------------
-let LIMITE_TAREFAS_GRATIS = 5; // pedido do usuario -- plano gratis para em 5 tarefas ativas
+let LIMITE_TAREFAS_GRATIS = 6; // plano gratis (decisao 20/10): 6 tarefas ativas
 
 let _pwEtapaAtual = 1;
 let _pwPlanoSelecionado = 'trial'; // pedido do usuario (tela "planos" simplificada) -- teste gratis vem pre-selecionado, junto na mesma lista dos planos pagos
@@ -3605,7 +3628,7 @@ function abrirPaywall(motivo){
     }
   } catch(e){}
   try {
-    const hs = [['pwNHeroiE',2],['pwNHeroiC',4],['pwNHeroiD',6]];
+    const hs = [['pwNHeroiE',1],['pwNHeroiC',5],['pwNHeroiD',7]];
     hs.forEach(([id,n]) => { const im = document.getElementById(id); if (im && !im.src && typeof HEROIS !== 'undefined' && HEROIS[n]) im.src = HEROIS[n].img; });
   } catch(e){}
   const overlay = document.getElementById('paywallOverlay');
@@ -3855,7 +3878,7 @@ async function billingChecarAssinaturasPlay(){
 
 // DEV (?paywall=1 em localhost / *.questlog-911.pages.dev): simula o app Android pra poder ver o paywall no navegador; compra e' so um aviso.
 function paywallSimuladoDev(){ try { return !!window.EH_DEV && /[?&]paywall=1\b/.test(location.search); } catch(e){ return false; } }
-window.addEventListener('load', function(){ setTimeout(function(){ try { if (paywallSimuladoDev()) abrirPaywall('primeira'); } catch(e){} }, 900); });   // EH_DEV so existe depois do load
+window.addEventListener('load', function(){ setTimeout(function(){ try { if (planoSimuladoDev()){ window.__entitlementLido = true; corrigirHeroiPorPlano(); } if (paywallSimuladoDev()) abrirPaywall('primeira'); } catch(e){} }, 900); });   // EH_DEV so existe depois do load
 function billingDisponivel(){
   if (paywallSimuladoDev()) return true;
   return typeof window.getDigitalGoodsService === 'function' && typeof window.PaymentRequest === 'function';
@@ -5205,6 +5228,7 @@ function _carregarBase(){
     const morto = id => !ITENS[id] || !!ITENS[id][8];
     inventario = inventario.filter(sl => sl && !morto(sl.id));
     ['arma','armadura','elmo','escudo','acess'].forEach(sl => { if (equipado[sl] != null && morto(equipado[sl])) equipado[sl] = null; });
+    try { if (!localStorage.getItem('questlog.uidAtivo.v1') && typeof corrigirHeroiPorPlano === 'function') { const h0 = heroiEscolhido; if (!heroiLiberado(h0)) heroiEscolhido = heroiGratisEquivalente(h0); } } catch(e){}   // sem conta: plano e' local (teste gratis), da pra decidir ja
     return true;
   } catch(e){
     console.warn('dado salvo invalido, comecando do zero', e);
@@ -6600,7 +6624,8 @@ function montarGrade(){
     const b = document.createElement('div');
     b.className = 'opcao' + (i === heroiEscolhido ? ' sel' : '');
     b.innerHTML = '<img src="' + hh.img + '" alt="' + hh.nome + '">';
-    b.onclick = () => { heroiEscolhido = i; pintarEscolha(); };
+    marcarHeroiBloq(b, i);
+    b.onclick = () => { if (!heroiLiberado(i)){ abrirPaywall('herois'); return; } heroiEscolhido = i; pintarEscolha(); };
     g.appendChild(b);
   });
   pintarEscolha();
@@ -6725,6 +6750,7 @@ function montarCarrosselHerois(){
     // que recebeu o clique. Sem ela o toque para de vibrar, silenciosamente.
     card.className = 'heroiCard opcao' + (i === heroiEscolhido ? ' sel' : '');
     card.dataset.idx = i;
+    marcarHeroiBloq(card, i);
     card.innerHTML = '<img src="' + hh.img + '" alt="' + hh.nome + '">';
     card.onclick = () => selecionarHeroiCarrossel(i, true);
     track.appendChild(card);
@@ -6855,6 +6881,7 @@ function mostrarSetupPersonagemENome(){
   if (btnVoltarPersonagem) btnVoltarPersonagem.style.visibility = 'hidden';
 
   document.getElementById('irPasso3').onclick = () => {
+    if (!heroiLiberado(heroiEscolhido)){ abrirPaywall('herois'); return; }   // heroi Pro: so com plano
     if (typeof desenharHeroi === 'function') desenharHeroi();
     // avatar da placa de nome -- mostra o heroi que acabou de ser
     // escolhido, pra a etapa de Nome nao parecer desconectada da
@@ -10817,7 +10844,8 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       const b = document.createElement('div');
       b.className = 'opcao' + (i === _novoHeroiSelecao ? ' sel' : '');
       b.innerHTML = '<img src="' + hh.img + '" alt="' + hh.nome + '">';
-      b.onclick = () => { _novoHeroiSelecao = i; pintarGradeNovoHeroi(); };
+      marcarHeroiBloq(b, i);
+      b.onclick = () => { if (!heroiLiberado(i)){ abrirPaywall('herois'); return; } _novoHeroiSelecao = i; pintarGradeNovoHeroi(); };
       g.appendChild(b);
     });
   }
@@ -11138,7 +11166,9 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       const b = document.createElement('div');
       b.className = 'opcao' + (i === heroiEscolhido ? ' sel' : '');
       b.innerHTML = '<img src="' + hh.img + '" alt="' + hh.nome + '">';
+      marcarHeroiBloq(b, i);
       b.onclick = () => {
+        if (!heroiLiberado(i)){ abrirPaywall('herois'); return; }
         heroiEscolhido = i;
         pintarGradeConfig();
         if (typeof desenharHeroi === 'function') desenharHeroi();
@@ -17874,6 +17904,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         _proVitalicioServidor = snap.exists() && snap.data().proVitalicio === true;
         _assinaturaServidorAte = snap.exists() ? (Number(snap.data().assinaturaAte) || 0) : 0;
         _assinaturaProduto = snap.exists() ? String(snap.data().assinaturaProduto || '') : '';
+        window.__entitlementLido = true;   // so corrige heroi Pro depois de ler o plano de verdade (offline nao rebaixa)
       } catch(e){
         // se falhar (offline, doc nao existe, regra etc.) mantem false --
         // nunca libera PRO por erro, so por doc existente de verdade.
@@ -17887,6 +17918,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       // que o valor de verdade chegou -- window.atualizarResumoAssinatura
       // e' null-safe sozinha (checa `if (!resumoAssinatura) return;`).
       if (typeof window.atualizarResumoAssinatura === 'function') window.atualizarResumoAssinatura();
+      if (window.__entitlementLido && typeof window.corrigirHeroiPorPlano === 'function') window.corrigirHeroiPorPlano();
     }
 
     // Usados pelo bloco GOOGLE PLAY BILLING (script principal): ID token
@@ -19456,9 +19488,9 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'pro.titulo':      { pt:'Plano Pro', en:'Pro Plan' },
     'pro.headline':    { pt:'Queremos que você experimente o Plano Pro de graça', en:'We want you to try the Pro plan for free' },
     'pro.headlineNovo':{ pt:'Continue sua jornada com o Pro', en:'Continue your journey with Pro' },
-    'pro.b1t': { pt:'Todos os 8 heróis', en:'All 8 heroes' }, 'pro.b1s': { pt:'E mais de um herói por conta', en:'And more than one hero per account' },
-    'pro.b2t': { pt:'3 cenários novos', en:'3 new scenes' }, 'pro.b2s': { pt:'Deserto, Floresta e Montanhas', en:'Desert, Jungle and Mountains' },
-    'pro.b3t': { pt:'Tarefas sem limite', en:'Unlimited tasks' }, 'pro.b3s': { pt:'Sem o limite diário do plano grátis', en:'No daily limit of the free plan' },
+    'pro.b1t': { pt:'Todos os 8 heróis', en:'All 8 heroes' }, 'pro.b1s': { pt:'Loiro, Castanho, Loira e Prata, e vários heróis por conta', en:'Blond, Chestnut, Blonde and Silver, plus several heroes per account' },
+    'pro.b2t': { pt:'3 cenários na hora', en:'3 scenes, instantly' }, 'pro.b2s': { pt:'Deserto, Floresta e Montanhas, sem esperar o estágio', en:'Desert, Jungle and Mountains, no waiting for the stage' },
+    'pro.b3t': { pt:'Tarefas sem limite', en:'Unlimited tasks' }, 'pro.b3s': { pt:'No grátis são 6 tarefas ativas', en:'Free plan has 6 active tasks' },
     'pro.b4t': { pt:'Estatísticas e temas', en:'Stats and themes' }, 'pro.b4s': { pt:'Histórico completo, Esmeralda e Terracota', en:'Full history, Emerald and Terracotta' },
     'pro.dias': { pt:'DIAS', en:'DAYS' },
     'pro.ofertaT': { pt:'Teste grátis do Pro', en:'Free Pro trial' }, 'pro.ofertaS': { pt:'Estamos te oferecendo 7 dias grátis para testar o plano Pro.', en:'We are offering you 7 days free to try the Pro plan.' },

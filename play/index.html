@@ -4089,7 +4089,27 @@ async function billingVerificar(sku, purchaseToken, transferir){
   return dados;
 }
 
+// Repinta TUDO que depende do plano quando ele muda (compra, restauracao, expiracao) -- sem precisar sair e entrar na tela.
+let _planoUIUltimo = null;
+function atualizarTelasPorPlano(forcar){
+  let ativo = false;
+  try { ativo = !!assinaturaAtiva(); } catch(e){}
+  if (!forcar && _planoUIUltimo === ativo) return;
+  const primeira = _planoUIUltimo === null;
+  _planoUIUltimo = ativo;
+  if (primeira && !forcar) return;   // 1a leitura = estado inicial, nada mudou
+  try { if (window.__entitlementLido || planoSimuladoDev()) corrigirHeroiPorPlano(); } catch(e){}
+  try { document.dispatchEvent(new Event('questlog:plano')); } catch(e){}
+  try { if (typeof renderTemaArena === 'function') renderTemaArena(); } catch(e){}
+  try { if (typeof atualizarBloqueioArena === 'function') atualizarBloqueioArena(); } catch(e){}
+  try { if (typeof renderEstatisticas === 'function') renderEstatisticas(); } catch(e){}
+  try { if (typeof renderEstagioBar === 'function') renderEstagioBar(); } catch(e){}
+  try { if (typeof window.atualizarResumoAssinatura === 'function') window.atualizarResumoAssinatura(); } catch(e){}
+  try { if (typeof render === 'function') render(); } catch(e){}
+}
+window.atualizarTelasPorPlano = atualizarTelasPorPlano;
 function billingAtualizarTelas(){
+  try { atualizarTelasPorPlano(true); } catch(e){}
   if (typeof window.atualizarResumoAssinatura === 'function') window.atualizarResumoAssinatura();
   if (typeof render === 'function') { try { render(); } catch(e){} }
 }
@@ -4198,6 +4218,7 @@ async function iniciarCompraAssinatura(){
   if (_billingOcupado) return;
   if (paywallSimuladoDev()){
     window.__devAssinou = true;   // dev: simula a compra -- libera o Pro ate recarregar
+    try { atualizarTelasPorPlano(true); } catch(e){}
     const eTeste = _pwPlanoSelecionado === 'trial';
     billingMostrarCompraOk(eTeste ? (window._trialSku || BILLING_SKUS.mensal) : (BILLING_SKUS[_pwPlanoSelecionado] || BILLING_SKUS.anual), false, { trial: eTeste, ate: Date.now() + DIAS_TESTE_GRATIS * 86400000 });
     return;
@@ -10878,6 +10899,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   function pintarDropdownPersonagens(){
     pintarListaHerois(pjLista, pjNovoBtn, trocarPersonagemComTransicao);
   }
+  document.addEventListener('questlog:plano', function(){ try { pintarDropdownPersonagens(); } catch(e){} });
   window.pintarDropdownPersonagens = pintarDropdownPersonagens;
 
   function abrirDropdownPersonagens(){
@@ -10990,6 +11012,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       g.appendChild(b);
     });
   }
+  document.addEventListener('questlog:plano', function(){ try { if (document.getElementById('gradeNovoHeroi') && document.getElementById('gradeNovoHeroi').children.length) pintarGradeNovoHeroi(); } catch(e){} });
   function abrirNovoHeroiOverlay(){
     _novoHeroiSelecao = 0;
     pintarGradeNovoHeroi();
@@ -11318,6 +11341,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       g.appendChild(b);
     });
   }
+  document.addEventListener('questlog:plano', function(){ try { if (document.getElementById('gradeHeroisConfig')) pintarGradeConfig(); } catch(e){} });
 
   /* ---------- temas ---------- */
   /* v4.158 (pedido do usuario): Verde (id "floresta") recebeu paleta
@@ -11584,6 +11608,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       g.appendChild(b);
     });
   }
+  document.addEventListener('questlog:plano', function(){ try { pintarTemaGrid(); } catch(e){} });
 
   /* ---------- idioma (item 47 do roadmap, pedido do usuario) ---------
      Mesmo padrao visual de pintarTemaGrid() acima (lista .temalinha,
@@ -18075,6 +18100,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       if (window.__entitlementLido && typeof window.corrigirHeroiPorPlano === 'function') window.corrigirHeroiPorPlano();
       if (window.__entitlementLido && typeof window.verificarAvisoTesteGratis === 'function') window.verificarAvisoTesteGratis();
       if (typeof window.atualizarResumoAssinatura === 'function') window.atualizarResumoAssinatura();
+      if (typeof window.atualizarTelasPorPlano === 'function') window.atualizarTelasPorPlano();
     }
 
     // Usados pelo bloco GOOGLE PLAY BILLING (script principal): ID token

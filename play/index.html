@@ -2126,7 +2126,17 @@ const HEROIS_PRO = [1, 3, 5, 7];
 function heroiEhPro(i){ return HEROIS_PRO.indexOf(Number(i)) >= 0; }
 function heroiLiberado(i){ return !heroiEhPro(i) || (typeof assinaturaAtiva === 'function' && assinaturaAtiva()); }
 function heroiGratisEquivalente(i){ return heroiEhPro(i) ? Number(i) - 1 : Number(i); }
+function corrigirTemaPorPlano(){
+  // plano expirou (ou nunca teve): cenario Pro salvo volta pro Padrao
+  try {
+    if (typeof TEMAS_ARENA === 'undefined' || temaArenaDesbloqueado(temaArenaAtual())) return;
+    definirTemaArenaSalvo(TEMAS_ARENA[0].id);
+    if (typeof renderTemaArena === 'function') renderTemaArena();
+    else if (typeof _renderTemaArenaV1 === 'function') _renderTemaArenaV1();
+  } catch(e){}
+}
 function corrigirHeroiPorPlano(){
+  corrigirTemaPorPlano();
   try {
     if (typeof heroiEscolhido !== 'number' || heroiLiberado(heroiEscolhido)) return;
     heroiEscolhido = heroiGratisEquivalente(heroiEscolhido);
@@ -4023,7 +4033,7 @@ function billingMostrarCompraOk(sku, restaurada, dados){
   const linha = (d, k, t, sb) => '<div class="pwNRow">' + ic(d) + '<div class="pwNTxt"><b>' + T('pro.' + k + 't', t[0], t[1]) + '</b><span>' + T('pro.' + k + 's', sb[0], sb[1]) + '</span></div></div>';
   const lista =
     linha('<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>', 'b1', ['Todos os 8 heróis', 'All 8 heroes'], ['Loiro, Castanho, Loira e Prata, e vários heróis por conta', 'Blond, Chestnut, Blonde and Silver, plus several heroes per account']) +
-    linha('<path d="M3 20l6-10 4 6 3-4 5 8z"/><circle cx="17" cy="6" r="2"/>', 'b2', ['3 cenários na hora', '3 scenes, instantly'], ['Deserto, Floresta e Montanhas, sem esperar o estágio', 'Desert, Jungle and Mountains, no waiting for the stage']) +
+    linha('<path d="M3 20l6-10 4 6 3-4 5 8z"/><circle cx="17" cy="6" r="2"/>', 'b2', ['3 cenários novos', '3 new scenes'], ['Deserto, Floresta e Montanhas', 'Desert, Jungle and Mountains']) +
     linha('<path d="M20 6 9 17l-5-5"/>', 'b3', ['Tarefas sem limite', 'Unlimited tasks'], ['No grátis são 6 tarefas ativas', 'Free plan has 6 active tasks']) +
     linha('<path d="M3 3v18h18M8 17V10M13 17V6M18 17v-4"/>', 'b4', ['Estatísticas e temas', 'Stats and themes'], ['Histórico completo, Esmeralda e Terracota', 'Full history, Emerald and Terracotta']);
   const heroiImg = (typeof heroiAtual === 'function' && heroiAtual()) ? heroiAtual().img : '';
@@ -4387,6 +4397,9 @@ function definirEstagioCerimoniaMostradaAte(n){
 function temaArenaDesbloqueado(t){
   if (t.gratuito) return true;
   if (assinaturaAtiva()) return true;
+  // PLANO GRATIS x PRO (decisao 20/10): no plano gratis so o cenario Padrao (gratuito:true) fica liberado. O Estagio NAO libera mais
+  // Deserto/Floresta/Montanhas pra quem nao tem Pro -- o codigo de desbloqueio por estagio logo abaixo so vale (via assinaturaAtiva) com Pro.
+  return false;
   // BUG CORRIGIDO (cadeado aparecia no tema mesmo com o Estagio ja
   // alcancado -- print do usuario): antes, temas do tipo 'tarefasTotais'
   // so eram considerados desbloqueados via temasDesbloqueadosSalvos(),
@@ -4600,7 +4613,7 @@ function renderTemaArena(){
     // Sem tema salvo nenhum: assenta direto no tema do estagio atual (sem cerimonia, o jogador ja passou por ele).
     try {
       // so quando a cerimonia JA foi mostrada (flag >= estagio): quem acabou de subir de estagio continua vendo a cerimonia normal
-      if (estagioReal > 1 && estagioCerimoniaMostradaAte() >= estagioReal && localStorage.getItem(window.chaveConta(CHAVE_TEMA_ARENA)) === null && TEMAS_ARENA[estagioReal - 1]){
+      if (estagioReal > 1 && estagioCerimoniaMostradaAte() >= estagioReal && localStorage.getItem(window.chaveConta(CHAVE_TEMA_ARENA)) === null && TEMAS_ARENA[estagioReal - 1] && temaArenaDesbloqueado(TEMAS_ARENA[estagioReal - 1])){
         definirTemaArenaSalvo(TEMAS_ARENA[estagioReal - 1].id);
       }
     } catch(e){}
@@ -4669,8 +4682,8 @@ function atualizarBloqueioArena(temaForcado){
       // que a ordem da lista foi definida pra bater com a trilha.
       const numEstagio = TEMAS_ARENA.findIndex(x => x.id === tema.id) + 1;
       texto.textContent = emIngles
-        ? 'Reach Stage ' + numEstagio + ' to unlock ' + tema.nome_en
-        : 'Chegue no Estágio ' + numEstagio + ' pra desbloquear ' + tema.nome;
+        ? tema.nome_en + ' is a Pro scene'
+        : tema.nome + ' é um cenário do Plano Pro';
     }
   }
 }
@@ -4916,6 +4929,11 @@ function viajarParaTemaEstagio(){
   }
   const temaAlvo = TEMAS_ARENA[estagioAtual() - 1];
   if (!temaAlvo){
+    return;
+  }
+  if (!temaArenaDesbloqueado(temaAlvo)){
+    // plano gratis: o cenario do estagio e' Pro -- sem viagem nem cerimonia; marca o estagio como visto pra nao tentar de novo
+    definirEstagioCerimoniaMostradaAte(estagioAtual());
     return;
   }
   if (temaArenaSalvo() === temaAlvo.id){
@@ -5247,7 +5265,7 @@ function _carregarBase(){
     const morto = id => !ITENS[id] || !!ITENS[id][8];
     inventario = inventario.filter(sl => sl && !morto(sl.id));
     ['arma','armadura','elmo','escudo','acess'].forEach(sl => { if (equipado[sl] != null && morto(equipado[sl])) equipado[sl] = null; });
-    try { if (!localStorage.getItem('questlog.uidAtivo.v1') && typeof corrigirHeroiPorPlano === 'function') { const h0 = heroiEscolhido; if (!heroiLiberado(h0)) heroiEscolhido = heroiGratisEquivalente(h0); } } catch(e){}   // sem conta: plano e' local (teste gratis), da pra decidir ja
+    try { if (!localStorage.getItem('questlog.uidAtivo.v1') && typeof corrigirHeroiPorPlano === 'function') { const h0 = heroiEscolhido; if (!heroiLiberado(h0)) heroiEscolhido = heroiGratisEquivalente(h0); if (typeof temaArenaAtual === 'function' && typeof TEMAS_ARENA !== 'undefined' && !temaArenaDesbloqueado(temaArenaAtual())) definirTemaArenaSalvo(TEMAS_ARENA[0].id); } } catch(e){}   // sem conta: plano e' local (teste gratis), da pra decidir ja
     return true;
   } catch(e){
     console.warn('dado salvo invalido, comecando do zero', e);
@@ -19514,7 +19532,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'pro.headline':    { pt:'Queremos que você experimente o Plano Pro de graça', en:'We want you to try the Pro plan for free' },
     'pro.headlineNovo':{ pt:'Continue sua jornada com o Pro', en:'Continue your journey with Pro' },
     'pro.b1t': { pt:'Todos os 8 heróis', en:'All 8 heroes' }, 'pro.b1s': { pt:'Loiro, Castanho, Loira e Prata, e vários heróis por conta', en:'Blond, Chestnut, Blonde and Silver, plus several heroes per account' },
-    'pro.b2t': { pt:'3 cenários na hora', en:'3 scenes, instantly' }, 'pro.b2s': { pt:'Deserto, Floresta e Montanhas, sem esperar o estágio', en:'Desert, Jungle and Mountains, no waiting for the stage' },
+    'pro.b2t': { pt:'3 cenários novos', en:'3 new scenes' }, 'pro.b2s': { pt:'Deserto, Floresta e Montanhas', en:'Desert, Jungle and Mountains' },
     'pro.b3t': { pt:'Tarefas sem limite', en:'Unlimited tasks' }, 'pro.b3s': { pt:'No grátis são 6 tarefas ativas', en:'Free plan has 6 active tasks' },
     'pro.b4t': { pt:'Estatísticas e temas', en:'Stats and themes' }, 'pro.b4s': { pt:'Histórico completo, Esmeralda e Terracota', en:'Full history, Emerald and Terracotta' },
     'pro.dias': { pt:'DIAS', en:'DAYS' },

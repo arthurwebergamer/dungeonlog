@@ -6541,7 +6541,8 @@ function criar(){
   // e travava a criacao mesmo com 1 unica tarefa aparecendo na tela.
   // Fix: conta so o que "existe" de verdade pro jogador hoje (mesmo
   // filtro ehDeHoje() que decide o que aparece na lista de tarefas).
-  const tarefasAtivas = tarefas.filter(ehDeHoje).length;
+  // conta tambem repetidas/mensais/anuais que nao caem hoje (antes escapavam do limite e davam 11+); so "hoje" de outros dias fica de fora
+  const tarefasAtivas = tarefas.filter(t => t.tipo === 'hoje' ? ehDeHoje(t) : true).length;
   if (typeof assinaturaAtiva === 'function' && !assinaturaAtiva() && tarefasAtivas >= LIMITE_TAREFAS_GRATIS){
     composer.classList.remove('on');
     if (typeof window.abrirPaywall === 'function') window.abrirPaywall('tarefas');
@@ -20354,7 +20355,7 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
 (function(){
   try {
     if (!window.EH_DEV) return;
-    LIMITE_TAREFAS_GRATIS = Infinity;
+    if (!/[?&]plano=gratis\b/.test(location.search)) LIMITE_TAREFAS_GRATIS = Infinity;   // ?plano=gratis testa o limite de verdade
     if (equipado.arma == null) equipado.arma = 2;      // Espada de Aco
     if (equipado.escudo == null) equipado.escudo = 36; // Escudo Redondo
     if (equipado.elmo == null) equipado.elmo = 215;    // Chapeu de Mago

@@ -133,7 +133,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=322">
+<link rel="stylesheet" href="style.css?v=324">
 <script>
 // A abertura so sai quando (1) a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado (sair antes mostrava um flash
 // cinza vazio e depois a tela de login por baixo, visto em video de teste) E (2) quem ja tinha sessao neste aparelho teve login confirmado e o
@@ -1233,32 +1233,22 @@ html{background:var(--bsBg,#282828)}
          abrirPaywall() pula esta tela e a de lembrete, abrindo direto em
          "planos" (nao ha teste pra oferecer). -->
     <div class="pwEtapa" id="pwEtapa1">
-      <div class="pwConteudo">
-        <span class="pwEyebrow" data-i18n="pro.titulo">Plano Pro</span>
-        <h2 class="pwHeadline" data-i18n="pro.headline">Queremos que você experimente o Plano Pro de graça</h2>
-        <p class="pwSub" data-i18n="pro.sub">7 dias grátis, sem compromisso. Cancele quando quiser.</p>
-
-        <div class="pwTrilha">
-          <div class="pwTrilhaLinha"></div>
-          <div class="pwPasso on">
-            <div class="pwPassoNo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
-            <div class="pwPassoTxt"><b data-i18n="pro.passo1Titulo">Suas tarefas</b><span data-i18n="pro.passo1Sub">Já disponível</span></div>
-          </div>
-          <div class="pwPasso">
-            <div class="pwPassoNo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div>
-            <div class="pwPassoTxt"><b data-i18n="pro.beneficio2Titulo">Temas &amp; heróis</b><span data-i18n="pro.beneficio2">6 temas, 4 heróis</span></div>
-          </div>
-          <div class="pwPasso">
-            <div class="pwPassoNo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div>
-            <div class="pwPassoTxt"><b data-i18n="pro.beneficio1Titulo">Sem limite diário</b><span data-i18n="pro.beneficio1">Tarefas ilimitadas</span></div>
-          </div>
-          <div class="pwPasso">
-            <div class="pwPassoNo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18M8 17V10M13 17V6M18 17v-4"/></svg></div>
-            <div class="pwPassoTxt"><b data-i18n="pro.beneficio3Titulo">Estatísticas</b><span data-i18n="pro.beneficio3">Histórico completo</span></div>
-          </div>
+      <div class="pwConteudo pwNConteudo">
+        <!-- paywall novo (mockup "Paywall do Pro"): vitrine de herois no topo (pintada por abrirPaywall()), titulo, 4 beneficios, bloco da oferta -->
+        <div class="pwNPalco"><img id="pwNHeroiE" alt=""><img id="pwNHeroiC" alt=""><img id="pwNHeroiD" alt=""></div>
+        <h2 class="pwHeadline pwNHeadline" data-i18n="pro.headlineNovo">Continue sua jornada com o Pro</h2>
+        <div class="pwNLista">
+          <div class="pwNRow"><div class="pwNIc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div><div class="pwNTxt"><b data-i18n="pro.b1t">Todos os 8 heróis</b><span data-i18n="pro.b1s">E mais de um herói por conta</span></div></div>
+          <div class="pwNRow"><div class="pwNIc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20l6-10 4 6 3-4 5 8z"/><circle cx="17" cy="6" r="2"/></svg></div><div class="pwNTxt"><b data-i18n="pro.b2t">3 cenários novos</b><span data-i18n="pro.b2s">Deserto, Floresta e Montanhas</span></div></div>
+          <div class="pwNRow"><div class="pwNIc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div><div class="pwNTxt"><b data-i18n="pro.b3t">Tarefas sem limite</b><span data-i18n="pro.b3s">Sem o limite diário do plano grátis</span></div></div>
+          <div class="pwNRow"><div class="pwNIc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18M8 17V10M13 17V6M18 17v-4"/></svg></div><div class="pwNTxt"><b data-i18n="pro.b4t">Estatísticas e temas</b><span data-i18n="pro.b4s">Histórico completo, Esmeralda e Terracota</span></div></div>
         </div>
 
         <div class="pwSpacer"></div>
+        <div class="pwNOferta">
+          <div class="pwNDias"><b>7</b><span data-i18n="pro.dias">DIAS</span></div>
+          <div class="pwNOfertaTxt"><b data-i18n="pro.ofertaT">Teste grátis do Pro</b><span data-i18n="pro.ofertaS">Estamos te oferecendo 7 dias grátis para testar o plano Pro.</span></div>
+        </div>
         <button class="pwCTA" id="paywallContinuarBtn" type="button" data-i18n="pro.testarGratis">Testar grátis por 7 dias</button>
         <button class="pwSecundario" id="paywallAgoraNaoBtn1" type="button" data-i18n="pro.agoraNao">Agora não</button>
 
@@ -3593,11 +3583,16 @@ function abrirPaywall(motivo){
   // PRO da sessao inteira. Se o trial ja foi usado e a selecao atual
   // ainda estava em 'trial' (default), forca pra 'anual' -- senao o CTA
   // ficaria tentando iniciar um teste que nao existe mais.
+  if (paywallSimuladoDev()) _billingTrialOk = true;   // dev: mostra o card de teste gratis
   const cardTrialVisibilidade = document.getElementById('pwPlanoTrial');
   if (cardTrialVisibilidade) cardTrialVisibilidade.style.display = _billingTrialOk ? '' : 'none';
   if (!_billingTrialOk && _pwPlanoSelecionado === 'trial' && typeof window.selecionarPlanoPaywall === 'function'){
     window.selecionarPlanoPaywall('anual');
   }
+  try {
+    const hs = [['pwNHeroiE',2],['pwNHeroiC',4],['pwNHeroiD',6]];
+    hs.forEach(([id,n]) => { const im = document.getElementById(id); if (im && !im.src && typeof HEROIS !== 'undefined' && HEROIS[n]) im.src = HEROIS[n].img; });
+  } catch(e){}
   const overlay = document.getElementById('paywallOverlay');
   if (!overlay) return;
   // Sem pitch/lembrete locais: o teste gratis e' do Play, entao vai direto
@@ -3843,7 +3838,11 @@ async function billingChecarAssinaturasPlay(){
   } catch(e){}
 }
 
+// DEV (?paywall=1 em localhost / *.questlog-911.pages.dev): simula o app Android pra poder ver o paywall no navegador; compra e' so um aviso.
+function paywallSimuladoDev(){ try { return !!window.EH_DEV && /[?&]paywall=1\b/.test(location.search); } catch(e){ return false; } }
+window.addEventListener('load', function(){ setTimeout(function(){ try { if (paywallSimuladoDev()) abrirPaywall('primeira'); } catch(e){} }, 900); });   // EH_DEV so existe depois do load
 function billingDisponivel(){
+  if (paywallSimuladoDev()) return true;
   return typeof window.getDigitalGoodsService === 'function' && typeof window.PaymentRequest === 'function';
 }
 
@@ -4056,6 +4055,7 @@ async function billingRestaurarSku(sku){
 
 async function iniciarCompraAssinatura(){
   if (_billingOcupado) return;
+  if (paywallSimuladoDev()){ billingMsg('[DEV] compra simulada: plano ' + _pwPlanoSelecionado); return; }
   const sku = BILLING_SKUS[_pwPlanoSelecionado] || BILLING_SKUS.anual;
   if (!BILLING_VERIFY_URL){
     billingMsg(_billingTexto('pro.pagamentoIndisponivel', 'Pagamento ainda não disponível', 'Payments coming soon'));
@@ -19440,6 +19440,13 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // PLANO PRO -- paywall (ver #paywallOverlay no HTML + abrirPaywall() no script)
     'pro.titulo':      { pt:'Plano Pro', en:'Pro Plan' },
     'pro.headline':    { pt:'Queremos que você experimente o Plano Pro de graça', en:'We want you to try the Pro plan for free' },
+    'pro.headlineNovo':{ pt:'Continue sua jornada com o Pro', en:'Continue your journey with Pro' },
+    'pro.b1t': { pt:'Todos os 8 heróis', en:'All 8 heroes' }, 'pro.b1s': { pt:'E mais de um herói por conta', en:'And more than one hero per account' },
+    'pro.b2t': { pt:'3 cenários novos', en:'3 new scenes' }, 'pro.b2s': { pt:'Deserto, Floresta e Montanhas', en:'Desert, Jungle and Mountains' },
+    'pro.b3t': { pt:'Tarefas sem limite', en:'Unlimited tasks' }, 'pro.b3s': { pt:'Sem o limite diário do plano grátis', en:'No daily limit of the free plan' },
+    'pro.b4t': { pt:'Estatísticas e temas', en:'Stats and themes' }, 'pro.b4s': { pt:'Histórico completo, Esmeralda e Terracota', en:'Full history, Emerald and Terracotta' },
+    'pro.dias': { pt:'DIAS', en:'DAYS' },
+    'pro.ofertaT': { pt:'Teste grátis do Pro', en:'Free Pro trial' }, 'pro.ofertaS': { pt:'Estamos te oferecendo 7 dias grátis para testar o plano Pro.', en:'We are offering you 7 days free to try the Pro plan.' },
     'pro.sub':         { pt:'7 dias grátis, sem compromisso. Cancele quando quiser.', en:'7 days free, no commitment. Cancel anytime.' },
     'pro.passo1Titulo':{ pt:'Suas tarefas', en:'Your tasks' },
     'pro.passo1Sub':   { pt:'Já disponível', en:'Already unlocked' },

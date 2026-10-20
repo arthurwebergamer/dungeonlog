@@ -5020,7 +5020,8 @@ function viajarParaTemaEstagio(){
   }
   if (!temaArenaDesbloqueado(temaAlvo)){
     // plano gratis: o cenario do estagio e' Pro -- sem viagem nem cerimonia; marca o estagio como visto pra nao tentar de novo
-    definirEstagioCerimoniaMostradaAte(estagioAtual());
+    // so marca depois de LER o plano de verdade (senao um Pro ainda carregando perderia a cerimonia); sem leitura (offline/conta local) so sai
+    if (window.__entitlementLido || !localStorage.getItem('questlog.uidAtivo.v1')) definirEstagioCerimoniaMostradaAte(estagioAtual());
     return;
   }
   if (temaArenaSalvo() === temaAlvo.id){

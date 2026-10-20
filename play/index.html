@@ -133,7 +133,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=334">
+<link rel="stylesheet" href="style.css?v=335">
 <script>
 // A abertura so sai quando (1) a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado (sair antes mostrava um flash
 // cinza vazio e depois a tela de login por baixo, visto em video de teste) E (2) quem ja tinha sessao neste aparelho teve login confirmado e o
@@ -3532,7 +3532,7 @@ window.renderEstagioBar = renderEstagioBar;
 // Nenhum caminho do app concede PRO localmente.
 
 function assinaturaAtiva(){
-  { const pd = (typeof planoSimuladoDev === 'function') ? planoSimuladoDev() : null; if (pd) return pd === 'pro'; }   // dev: ?plano=gratis|pro
+  { const pd = (typeof planoSimuladoDev === 'function') ? planoSimuladoDev() : null; if (pd) return pd === 'pro'; if (window.__devAssinou || (typeof trialSimuladoDev === 'function' && trialSimuladoDev() !== null)) return true; }   // dev: ?plano=gratis|pro, ?trial=N
   // PRO VITALICIO MANUAL, versao local (localStorage, ver bloco logo
   // acima) OU versao servidor (Firestore entitlements/{uid}, sincroniza
   // entre aparelhos -- ver puxarEntitlement() no bloco AUTH/Firebase,
@@ -3993,11 +3993,13 @@ function billingMostrarCompraOk(sku, restaurada, dados){
     : (sku === BILLING_SKUS.mensal ? T('pro.planoMensal', 'Mensal', 'Monthly') : T('pro.planoAnual', 'Anual', 'Annual'));
   // TESTE GRATIS do Play: o Worker devolve trial:true quando a compra esta na oferta
   const emTeste = !!(dados && dados.trial && !restaurada && !ehVit);
+  if (emTeste && typeof registrarTrialPlay === 'function') registrarTrialPlay(dados.ate);   // guarda a data de fim pro aviso e pro "X dias restantes"
   let subTeste = '';
   if (emTeste){
     const ate = new Date(Number(dados.ate) || Date.now());
     const curto = (Number(dados.ate) - Date.now()) < 24 * 3600 * 1000;
-    const quando = curto ? ate.toLocaleString(navigator.language || 'pt-BR', { dateStyle: 'short', timeStyle: 'short' }) : ate.toLocaleDateString(navigator.language || 'pt-BR');
+    const loc = String(navigator.language || 'pt-BR').split('@')[0];
+    const quando = curto ? ate.toLocaleString(loc, { dateStyle: 'short', timeStyle: 'short' }) : ate.toLocaleDateString(loc);
     const det = _billingDetalhes && _billingDetalhes[sku];
     const preco = (det && det.price) ? billingFormatarPreco(det.price.value, det.price.currency) : '';
     subTeste = T('pro.okSubTeste', 'Seu teste grátis vai até ', 'Your free trial runs until ') + quando + '. ' +
@@ -4017,29 +4019,29 @@ function billingMostrarCompraOk(sku, restaurada, dados){
     star: '<path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',
     stats: '<path d="M3 3v18h18M8 17V10M13 17V6M18 17v-4"/>'
   };
-  const itens = [
-    [ico.star, T('pro.beneficio2Titulo', 'Temas & heróis', 'Themes & heroes'), T('pro.beneficio2', '6 temas, 4 heróis', '6 themes, 4 heroes')],
-    [ico.inf,  T('pro.beneficio1Titulo', 'Sem limite diário', 'No daily limit'), T('pro.beneficio1', 'Tarefas ilimitadas', 'Unlimited tasks')],
-    [ico.stats,T('pro.beneficio3Titulo', 'Estatísticas', 'Statistics'), T('pro.beneficio3', 'Histórico completo', 'Full history')]
-  ];
+  const ic = (d) => '<div class="pwNIc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + d + '</svg></div>';
+  const linha = (d, k, t, sb) => '<div class="pwNRow">' + ic(d) + '<div class="pwNTxt"><b>' + T('pro.' + k + 't', t[0], t[1]) + '</b><span>' + T('pro.' + k + 's', sb[0], sb[1]) + '</span></div></div>';
+  const lista =
+    linha('<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>', 'b1', ['Todos os 8 heróis', 'All 8 heroes'], ['Loiro, Castanho, Loira e Prata, e vários heróis por conta', 'Blond, Chestnut, Blonde and Silver, plus several heroes per account']) +
+    linha('<path d="M3 20l6-10 4 6 3-4 5 8z"/><circle cx="17" cy="6" r="2"/>', 'b2', ['3 cenários na hora', '3 scenes, instantly'], ['Deserto, Floresta e Montanhas, sem esperar o estágio', 'Desert, Jungle and Mountains, no waiting for the stage']) +
+    linha('<path d="M20 6 9 17l-5-5"/>', 'b3', ['Tarefas sem limite', 'Unlimited tasks'], ['No grátis são 6 tarefas ativas', 'Free plan has 6 active tasks']) +
+    linha('<path d="M3 3v18h18M8 17V10M13 17V6M18 17v-4"/>', 'b4', ['Estatísticas e temas', 'Stats and themes'], ['Histórico completo, Esmeralda e Terracota', 'Full history, Emerald and Terracotta']);
+  const heroiImg = (typeof heroiAtual === 'function' && heroiAtual()) ? heroiAtual().img : '';
   let ov = document.getElementById('compraOkOverlay');
   if (ov) ov.remove();
   ov = document.createElement('div');
   ov.className = 'paywallOverlay';
   ov.id = 'compraOkOverlay';
   ov.style.zIndex = '9600';
-  const svg = (d, w) => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="' + (w || 2) + '" stroke-linecap="round" stroke-linejoin="round">' + d + '</svg>';
   ov.innerHTML =
-    '<div class="pwFloresta"><img id="compraOkFlorestaImg" alt=""></div>' +
-    '<div class="pwEtapa on"><div class="pwConteudo" style="padding-top:72px">' +
+    '<div class="pwLTela"><img id="compraOkFundo" alt=""></div>' +
+    '<div class="pwEtapa on"><div class="pwConteudo pwNConteudo" style="padding-top:56px;position:relative;z-index:1">' +
+      '<div class="compraOkPalco"><img src="' + heroiImg + '" alt=""></div>' +
       '<span class="pwEyebrow">' + T('pro.titulo', 'Plano Pro', 'Pro plan') + ' · ' + (emTeste ? T('pro.testeGratisEyebrow', 'Teste grátis', 'Free trial') : nomePlano) + '</span>' +
-      '<h2 class="pwHeadline">' + (restaurada ? T('pro.okRestaurada', 'Compra restaurada!', 'Purchase restored!') : emTeste ? T('pro.testeOk', 'Teste grátis ativado!', 'Free trial activated!') : T('pro.compraOk', 'Plano Pro ativado!', 'Pro plan activated!')) + '</h2>' +
-      '<p class="pwSub">' + sub + '</p>' +
-      '<div class="pwTrilha" style="flex:none;gap:18px"><div class="pwTrilhaLinha"></div>' +
-        itens.map(it => '<div class="pwPasso on"><div class="pwPassoNo">' + svg(it[0], 2) + '</div>' +
-          '<div class="pwPassoTxt"><b>' + it[1] + '</b><span>' + it[2] + '</span></div></div>').join('') +
-      '</div>' +
-      '<div class="pwSpacer compraOkMobs"></div>' +
+      '<h2 class="pwHeadline pwNHeadline" style="text-align:center">' + (restaurada ? T('pro.okRestaurada', 'Compra restaurada!', 'Purchase restored!') : emTeste ? T('pro.testeOk', 'Teste grátis ativado!', 'Free trial activated!') : T('pro.compraOk', 'Plano Pro ativado!', 'Pro plan activated!')) + '</h2>' +
+      '<p class="pwSub" style="max-width:none;margin-bottom:14px">' + sub + '</p>' +
+      '<div class="pwNLista">' + lista + '</div>' +
+      '<div class="pwSpacer"></div>' +
       '<button class="pwCTA" type="button">' + T('pro.okComecar', 'Começar', 'Get started') + '</button>' +
     '</div></div>';
   ov.querySelector('.pwCTA').onclick = () => {
@@ -4047,21 +4049,10 @@ function billingMostrarCompraOk(sku, restaurada, dados){
     setTimeout(() => ov.remove(), 450);
     if (typeof fecharPaywall === 'function') fecharPaywall();
   };
-  const fundo = ov.querySelector('#compraOkFlorestaImg');
+  const fundo = ov.querySelector('#compraOkFundo');
   if (fundo && typeof TEMAS_ARENA !== 'undefined'){
-    const floresta = TEMAS_ARENA.find(t => t.id === 'floresta');
-    if (floresta) fundo.src = 'data:image/png;base64,' + floresta.arte;
-  }
-  // 2 monstros da floresta (mesma arte da Arena), tamanho medio, no espaco livre
-  const palco = ov.querySelector('.compraOkMobs');
-  if (palco && typeof MONSTROS !== 'undefined'){
-    const pool = MONSTROS.filter(m => m && m.img && m.bioma === 'floresta');
-    for (let k = 0; k < 2 && pool.length; k++){
-      const m = pool.splice(Math.floor(Math.random() * pool.length), 1)[0];
-      const im = document.createElement('img');
-      im.src = m.img; im.alt = ''; im.className = 'compraOkMob' + (k ? ' b' : '');
-      palco.appendChild(im);
-    }
+    const mt = TEMAS_ARENA.find(t => t.id === 'montanhas');
+    if (mt) fundo.src = 'data:image/png;base64,' + mt.arte;
   }
   document.body.appendChild(ov);
   requestAnimationFrame(() => requestAnimationFrame(() => ov.classList.add('on')));
@@ -4093,7 +4084,12 @@ async function billingRestaurarSku(sku){
 
 async function iniciarCompraAssinatura(){
   if (_billingOcupado) return;
-  if (paywallSimuladoDev()){ billingMsg('[DEV] compra simulada: plano ' + _pwPlanoSelecionado); return; }
+  if (paywallSimuladoDev()){
+    window.__devAssinou = true;   // dev: simula a compra -- libera o Pro ate recarregar
+    const eTeste = _pwPlanoSelecionado === 'trial';
+    billingMostrarCompraOk(eTeste ? BILLING_SKUS.anual : (BILLING_SKUS[_pwPlanoSelecionado] || BILLING_SKUS.anual), false, { trial: eTeste, ate: Date.now() + DIAS_TESTE_GRATIS * 86400000 });
+    return;
+  }
   const sku = BILLING_SKUS[_pwPlanoSelecionado] || BILLING_SKUS.anual;
   if (!BILLING_VERIFY_URL){
     billingMsg(_billingTexto('pro.pagamentoIndisponivel', 'Pagamento ainda não disponível', 'Payments coming soon'));
@@ -4285,6 +4281,28 @@ function diasRestantesTrial(){
   return Math.max(0, Math.ceil((t.fim - Date.now()) / 86400000));
 }
 
+// TESTE GRATIS DO PLAY -- registro LOCAL (por conta/aparelho) feito na ativacao (billingMostrarCompraOk). O servidor so guarda a data de fim
+// (assinaturaAte), nao que e' teste; por isso "X dias restantes" e o aviso so existem no aparelho que ativou o teste.
+const CHAVE_TRIAL_PLAY = 'questlog.trialPlay.v1';
+function trialSimuladoDev(){ try { if (!window.EH_DEV) return null; const m = /[?&]trial=(\d+)\b/.exec(location.search); return m ? Number(m[1]) : null; } catch(e){ return null; } }
+function trialPlaySalvo(){
+  const n = trialSimuladoDev();
+  if (n !== null) return { ate: Date.now() + n * 86400000 - 60000, avisoDias: 1, avisoMostradoDia: null, dev: true };
+  try { return JSON.parse(localStorage.getItem(window.chaveConta(CHAVE_TRIAL_PLAY)) || 'null'); } catch(e){ return null; }
+}
+function registrarTrialPlay(ate){
+  try { localStorage.setItem(window.chaveConta(CHAVE_TRIAL_PLAY), JSON.stringify({ ate: Number(ate) || 0, avisoDias: _pwAvisoSelecionado, avisoMostradoDia: null })); } catch(e){}
+}
+// dias de calendario ate o fim do teste (0 = termina hoje); null = nao esta em teste agora
+function trialPlayDiasRestantes(){
+  const t = trialPlaySalvo();
+  if (!t || !t.ate || t.ate <= Date.now()) return null;
+  if (typeof assinaturaAtiva !== 'function' || !assinaturaAtiva()) return null;
+  const ini = d => { const x = new Date(d); x.setHours(0,0,0,0); return x.getTime(); };
+  return Math.max(0, Math.round((ini(t.ate) - ini(Date.now())) / 86400000));
+}
+window.trialPlayDiasRestantes = trialPlayDiasRestantes;
+
 // avisoDias: 3, 1 ou 0 (0 = so no ultimo dia) -- escolhido na etapa 3
 // do paywall (#pwEtapa3).
 function iniciarTesteGratis(avisoDias){
@@ -4307,20 +4325,21 @@ window.iniciarTesteGratis = iniciarTesteGratis;
 // Nao reabre o paywall sozinha (seria intrusivo toda vez que o app
 // abre); quem quiser assinar clica em qualquer gatilho PRO normal.
 function verificarAvisoTesteGratis(){
-  const t = trialSalvo();
-  if (!t || !trialAtivo()) return;
-  const restantes = diasRestantesTrial();
-  if (restantes > t.avisoDias) return;
+  const t = trialPlaySalvo();
+  const restantes = trialPlayDiasRestantes();
+  if (!t || restantes === null) return;
+  const alvo = (typeof t.avisoDias === 'number') ? t.avisoDias : 1;
+  if (restantes > alvo) return;
   const hoje = new Date().toISOString().slice(0, 10);
   if (t.avisoMostradoDia === hoje) return;
-  t.avisoMostradoDia = hoje;
-  salvarTrial(t);
+  if (!t.dev){ t.avisoMostradoDia = hoje; try { localStorage.setItem(window.chaveConta(CHAVE_TRIAL_PLAY), JSON.stringify(t)); } catch(e){} }
   if (typeof window.aviso !== 'function') return;
   const en = (typeof idiomaApp === 'function' && idiomaApp() === 'en');
   const msg = restantes <= 0
     ? (en ? 'Your free trial ends today' : 'Seu teste grátis acaba hoje')
-    : (en ? ('Your free trial ends in ' + restantes + (restantes === 1 ? ' day' : ' days'))
-           : ('Seu teste grátis acaba em ' + restantes + (restantes === 1 ? ' dia' : ' dias')));
+    : restantes === 1
+    ? (en ? 'Your free trial ends tomorrow' : 'Seu teste grátis acaba amanhã')
+    : (en ? ('Your free trial ends in ' + restantes + ' days') : ('Seu teste grátis acaba em ' + restantes + ' dias'));
   window.aviso(msg);
 }
 window.verificarAvisoTesteGratis = verificarAvisoTesteGratis;
@@ -17919,6 +17938,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       // e' null-safe sozinha (checa `if (!resumoAssinatura) return;`).
       if (typeof window.atualizarResumoAssinatura === 'function') window.atualizarResumoAssinatura();
       if (window.__entitlementLido && typeof window.corrigirHeroiPorPlano === 'function') window.corrigirHeroiPorPlano();
+      if (window.__entitlementLido && typeof window.verificarAvisoTesteGratis === 'function') window.verificarAvisoTesteGratis();
+      if (typeof window.atualizarResumoAssinatura === 'function') window.atualizarResumoAssinatura();
     }
 
     // Usados pelo bloco GOOGLE PLAY BILLING (script principal): ID token
@@ -18978,6 +18999,10 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     const emTrial = (typeof trialAtivo === 'function' && trialAtivo());
     if (vitalicio){
       resumoAssinatura.textContent = emIngles ? 'PRO active (lifetime)' : 'PRO ativo (vitalício)';
+    } else if (typeof window.trialPlayDiasRestantes === 'function' && window.trialPlayDiasRestantes() !== null){
+      const d = window.trialPlayDiasRestantes();
+      resumoAssinatura.textContent = d <= 0 ? (emIngles ? 'Free trial · ends today' : 'Teste grátis · termina hoje')
+        : (emIngles ? ('Free trial · ' + d + (d === 1 ? ' day left' : ' days left')) : ('Teste grátis · ' + d + (d === 1 ? ' dia restante' : ' dias restantes')));
     } else if (emTrial){
       resumoAssinatura.textContent = emIngles ? 'Free trial active' : 'Teste grátis ativo';
     } else if (typeof assinaturaAtiva === 'function' && assinaturaAtiva()){

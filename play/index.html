@@ -2061,6 +2061,7 @@ window.chaveConta = chaveConta;
 const CHAVES_SECUNDARIAS_CONTA = [
   'questlog.atrib.v1',
   'questlog.bauDia.v1',
+  'questlog.bauSemEspecial.v1', // contador da garantia do bau trancado: sem isso zerava ao limpar dados/relogar e a garantia nunca chegava
   'questlog.celebracaoDiaMostrada.v1',
   'questlog.conquistasDesbloqueadasV2.v1',
   'questlog.conquistasResgatadas.v1',
@@ -8599,6 +8600,7 @@ function gerarEstadoBauDia(dia, nTarefas){
   const semEspecial = _lerPityBau();
   const sorteado = (semEspecial >= PITY_BAU_ESPECIAL) || (Math.random() < chanceBauTrancado(media));
   _gravarPityBau(sorteado ? 0 : semEspecial + 1);
+  try { salvar(); } catch(e){}   // dispara o envio pra nuvem (o contador vai junto, em extras)
   if (sorteado){
     const tier = tierBauNecessario(media);
     // loot do especial e melhor de proposito: bonus de sorte + garantia de
@@ -20136,6 +20138,19 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
         if (escapou && mob) { mob.classList.add('fugiu'); setTimeout(av, 560); } else av();
       };
       document.body.appendChild(b);
+      const bb = document.createElement('button');
+      bb.id = 'devbau'; bb.textContent = 'ba\u00fa?';
+      bb.style.cssText = b.style.cssText.replace('left:8px','left:112px');
+      bb.onclick = () => {
+        let box = document.getElementById('devbaubox');
+        if (box){ box.remove(); return; }
+        box = document.createElement('div'); box.id = 'devbaubox';
+        box.style.cssText = 'position:fixed;left:8px;right:8px;bottom:calc(110px + env(safe-area-inset-bottom));z-index:60;background:#111;color:#cfe;border:1px solid #555;border-radius:8px;padding:10px;font:12px/1.5 monospace';
+        const m = (typeof mediaDifHoje === 'function') ? mediaDifHoje() : null;
+        box.textContent = 'garantia: ' + _lerPityBau() + '/' + PITY_BAU_ESPECIAL + ' | chance hoje: ' + (m == null ? '0 (sem tarefas)' : Math.round(chanceBauTrancado(m) * 100) + '%') + ' | media dif: ' + (m == null ? '-' : m.toFixed(2)) + ' | fortuna: ' + ((typeof window.bonusFortuna === 'function') ? window.bonusFortuna().toFixed(3) : '-');
+        document.body.appendChild(box);
+      };
+      document.body.appendChild(bb);
     };
     mk();
   } catch(e){}

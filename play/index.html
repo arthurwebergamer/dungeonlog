@@ -2061,6 +2061,7 @@ window.chaveConta = chaveConta;
 const CHAVES_SECUNDARIAS_CONTA = [
   'questlog.atrib.v1',
   'questlog.bauDia.v1',
+  'questlog.bauLog.v1', // diagnostico do sorteio do bau trancado (ultimas 15 geracoes)
   'questlog.bauSemEspecial.v1', // contador da garantia do bau trancado: sem isso zerava ao limpar dados/relogar e a garantia nunca chegava
   'questlog.celebracaoDiaMostrada.v1',
   'questlog.conquistasDesbloqueadasV2.v1',
@@ -8599,6 +8600,13 @@ function gerarEstadoBauDia(dia, nTarefas){
   let especial = null;
   const semEspecial = _lerPityBau();
   const sorteado = (semEspecial >= PITY_BAU_ESPECIAL) || (Math.random() < chanceBauTrancado(media));
+  // diagnostico (sincroniza na nuvem): ultimas 15 geracoes de bau -- mostra se o contador/sorteio se comportam como esperado em producao
+  try {
+    const kLog = window.chaveConta('questlog.bauLog.v1');
+    let lg = []; try { lg = JSON.parse(localStorage.getItem(kLog)) || []; } catch(e){}
+    lg.push({ dia: dia, em: new Date().toISOString().slice(0, 16), pity: semEspecial, media: media, chance: Math.round(chanceBauTrancado(media) * 100), sorteado: !!sorteado });
+    localStorage.setItem(kLog, JSON.stringify(lg.slice(-15)));
+  } catch(e){}
   _gravarPityBau(sorteado ? 0 : semEspecial + 1);
   try { salvar(); } catch(e){}   // dispara o envio pra nuvem (o contador vai junto, em extras)
   if (sorteado){

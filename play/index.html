@@ -4088,7 +4088,7 @@ function billingMostrarCompraOk(sku, restaurada, dados){
   const lista =
     linha('<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>', 'b1', ['Vários heróis', 'Several heroes'], ['Até 4 heróis por conta', 'Up to 4 heroes per account']) +
     linha('<path d="M3 20l6-10 4 6 3-4 5 8z"/><circle cx="17" cy="6" r="2"/>', 'b2', ['Temas exclusivos', 'Exclusive themes'], ['Esmeralda e Terracota', 'Emerald and Terracotta']) +
-    linha('<path d="M20 6 9 17l-5-5"/>', 'b3', ['Tarefas sem limite', 'Unlimited tasks'], ['No grátis são 5 tarefas ativas', 'Free plan has 5 active tasks']) +
+    linha('<path d="M20 6 9 17l-5-5"/>', 'b3ok', ['Tarefas sem limite', 'Unlimited tasks'], ['Sem limite de tarefas ativas', 'No limit on active tasks']) +
     linha('<path d="M3 3v18h18M8 17V10M13 17V6M18 17v-4"/>', 'b4', ['Estatísticas completas', 'Full statistics'], ['Histórico completo e todos os gráficos', 'Full history and all charts']);
   const heroiImg = (typeof heroiAtual === 'function' && heroiAtual()) ? heroiAtual().img : '';
   let ov = document.getElementById('compraOkOverlay');

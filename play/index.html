@@ -16162,8 +16162,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // Versao dos textos aceitos. Mudou? Atualizar aqui e arquivar a copia em /terms/<versao>/ e /privacy/<versao>/ (o checkbox volta pra todo mundo).
     window.ACEITE_VERSAO = '2026-10-06';
     // 14/10: BETA FECHADA (12 testadores conhecidos): linha de termos do passo do Personagem desligada (o testador Konrad
-    // parava ali por "aceitar os termos em meu nome"). VOLTAR A true ANTES DA PRODUCAO. Termos seguem em Config > Legal.
-    window.TERMOS_NO_ONBOARDING = false;
+    // parava ali por "aceitar os termos em meu nome"). (voltou a true para a producao, 21/10). Termos seguem em Config > Legal.
+    window.TERMOS_NO_ONBOARDING = true;   // producao: termos voltam ao passo do Personagem
     const CH_DISP = 'questlog.aceiteDisp.v1';
     // Aparelho ja aceitou ESTA versao (gravado so depois de o Worker confirmar): o checkbox some e vira a nota "Ao continuar...".
     const dispAceito = () => { try { return localStorage.getItem(CH_DISP) === window.ACEITE_VERSAO; } catch(e){ return false; } };

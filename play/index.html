@@ -133,7 +133,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=322">
+<link rel="stylesheet" href="style.css?v=342">
 <script>
 // A abertura so sai quando (1) a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado (sair antes mostrava um flash
 // cinza vazio e depois a tela de login por baixo, visto em video de teste) E (2) quem ja tinha sessao neste aparelho teve login confirmado e o
@@ -1233,32 +1233,20 @@ html{background:var(--bsBg,#282828)}
          abrirPaywall() pula esta tela e a de lembrete, abrindo direto em
          "planos" (nao ha teste pra oferecer). -->
     <div class="pwEtapa" id="pwEtapa1">
-      <div class="pwConteudo">
-        <span class="pwEyebrow" data-i18n="pro.titulo">Plano Pro</span>
-        <h2 class="pwHeadline" data-i18n="pro.headline">Queremos que você experimente o Plano Pro de graça</h2>
-        <p class="pwSub" data-i18n="pro.sub">7 dias grátis, sem compromisso. Cancele quando quiser.</p>
-
-        <div class="pwTrilha">
-          <div class="pwTrilhaLinha"></div>
-          <div class="pwPasso on">
-            <div class="pwPassoNo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
-            <div class="pwPassoTxt"><b data-i18n="pro.passo1Titulo">Suas tarefas</b><span data-i18n="pro.passo1Sub">Já disponível</span></div>
-          </div>
-          <div class="pwPasso">
-            <div class="pwPassoNo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div>
-            <div class="pwPassoTxt"><b data-i18n="pro.beneficio2Titulo">Temas &amp; heróis</b><span data-i18n="pro.beneficio2">6 temas, 4 heróis</span></div>
-          </div>
-          <div class="pwPasso">
-            <div class="pwPassoNo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div>
-            <div class="pwPassoTxt"><b data-i18n="pro.beneficio1Titulo">Sem limite diário</b><span data-i18n="pro.beneficio1">Tarefas ilimitadas</span></div>
-          </div>
-          <div class="pwPasso">
-            <div class="pwPassoNo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18M8 17V10M13 17V6M18 17v-4"/></svg></div>
-            <div class="pwPassoTxt"><b data-i18n="pro.beneficio3Titulo">Estatísticas</b><span data-i18n="pro.beneficio3">Histórico completo</span></div>
-          </div>
+      <div class="pwConteudo pwNConteudo">
+        <!-- paywall novo (mockup "Paywall do Pro"): vitrine de herois no topo (pintada por abrirPaywall()), titulo, 4 beneficios, bloco da oferta -->
+        <div class="pwNCena"><img id="pwNFundoImg" alt=""></div>
+        <div class="pwNPalco"><img id="pwNHeroiE" alt=""><img id="pwNHeroiC" alt=""><img id="pwNHeroiD" alt=""></div>
+        <h2 class="pwHeadline pwNHeadline" data-i18n="pro.headlineNovo">Continue sua jornada com o Pro</h2>
+        <div class="pwNLista">
+          <div class="pwNRow"><div class="pwNIc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div><div class="pwNTxt"><b data-i18n="pro.b1t">Vários heróis</b><span data-i18n="pro.b1s">E mais de um herói por conta</span></div></div>
+          <div class="pwNRow"><div class="pwNIc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20l6-10 4 6 3-4 5 8z"/><circle cx="17" cy="6" r="2"/></svg></div><div class="pwNTxt"><b data-i18n="pro.b2t">Temas exclusivos</b><span data-i18n="pro.b2s">Esmeralda e Terracota</span></div></div>
+          <div class="pwNRow"><div class="pwNIc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div><div class="pwNTxt"><b data-i18n="pro.b3t">Tarefas sem limite</b><span data-i18n="pro.b3s">Sem o limite diário do plano grátis</span></div></div>
+          <div class="pwNRow"><div class="pwNIc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18M8 17V10M13 17V6M18 17v-4"/></svg></div><div class="pwNTxt"><b data-i18n="pro.b4t">Estatísticas completas</b><span data-i18n="pro.b4s">Histórico completo e todos os gráficos</span></div></div>
         </div>
 
         <div class="pwSpacer"></div>
+        <p class="pwNOfertaLinha" data-i18n="pro.ofertaS">Estamos te oferecendo 7 dias grátis para testar o plano Pro.</p>
         <button class="pwCTA" id="paywallContinuarBtn" type="button" data-i18n="pro.testarGratis">Testar grátis por 7 dias</button>
         <button class="pwSecundario" id="paywallAgoraNaoBtn1" type="button" data-i18n="pro.agoraNao">Agora não</button>
 
@@ -1284,10 +1272,12 @@ html{background:var(--bsBg,#282828)}
          selecionarAviso() perto de iniciarCompraAssinatura() no script
          principal. -->
     <div class="pwEtapa" id="pwEtapa3">
-      <div class="pwConteudo">
-        <span class="pwEyebrow" data-i18n="pro.titulo">Plano Pro</span>
-        <h2 class="pwHeadline pwHeadlineMenor" data-i18n="pro.avisoHeadline">Quando avisamos que o teste tá acabando?</h2>
-        <p class="pwSub" data-i18n="pro.avisoSub">Um aviso dentro do app, pra você decidir se quer assinar antes do teste acabar.</p>
+      <div class="pwLTela"><img id="pwLFundo" alt=""></div>
+      <div class="pwConteudo pwLConteudo">
+        <!-- tela de lembrete (referencia: tela de lembretes do Skillion): titulo no topo, ilustracao (heroi atual + sino pixel), pergunta, opcoes -->
+        <h2 class="pwHeadline pwLHeadline" data-i18n="pro.avisoHeadlineNovo">Avisamos você antes do teste acabar!</h2>
+        <div class="pwLPalco"><img id="pwLHeroi" alt=""><img class="pwLSino" alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAMAAABg3Am1AAAAAXNSR0IArs4c6QAAAe9QTFRFAAAAOQQuZwxSnhRg0CRw9jN0qiuR/GeM/7PEAAAAOQQFZgsgmRM/rCRnzSFB9TxA/3d6/6aLGBgYKioqOjo6QUFBSUlJVlZWbW1tmZmZXl5egoKCmpqaubm5z8/P5+fn////dS0msCIQ4lYh84Io/J41/8dmOBQPVCIadTEm/9on//Fk//epLwoDTxsKk0Ya5XkZ8KwlCiYYE0AjG1gtHns1KbA7R9ZSevN5I2dRHA9ACClJDjxbDFJ4FXyqG57TF77cKPDigf/vMxl+SCK2OEr5VXH/g6P/FRsmMDs+TVZZYWtvj5ydtL2+7fHzTC0IXEMIelwKlH4YzLVI7tp6//m34C5ANwQ5VBoaILkwK9kuT/Y+7a818849//o0axOZQDTUpxzK1zz1/GJm3ZI5Hpwvaoj/TwtmjBi0s8z/cC8Ss2QmmHtWs5Nj1phC07Nz8NWG/++htf/wICslOCohSTkrOEk+dVxDTWVUcY14pbmn1+LYN3vT+fnfazDE72n//6X6/+b+PyYlUjQwg1NLvot53KmR9cqu/+jT//nz1lAW/8/B7bdZ88x5+dySf39/OA8UsEMkyj5R8PDwJhYVVR4AejcSlkMWxm8r4ptM/+LD3to9/+ewl/9zzf+f//rdmzUd/YunHGoxcCSs1dnaVbE0aQAAAKV0Uk5TAP//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////Cv2L1AAAAJxJREFUSInN02EOwyAIhuEeZTeCD+T+V1miKTNVF38M2fu3PE0j9bpmAWDm6aN5wQCAmZVSdk0wwB3f5QIApUtVReSbCQZt2mpb5ggws1fNzd8CIkoBzLw61lww/nxZAICIqOo4LSIAniYY+E2QLnS1d31MPGDm9vW+Zq31/jBohojGOd/0cw/xoEWLJqOnQH/Ky3uTAfyUd6d/DN5uVYFXZJp+vAAAAABJRU5ErkJggg=="></div>
+        <p class="pwSub pwLSub" data-i18n="pro.avisoSubNovo">Quando fica melhor para você?</p>
 
         <div class="pwPlanos">
           <div class="pwPlano" data-aviso="3" id="pwAviso3">
@@ -1317,7 +1307,8 @@ html{background:var(--bsBg,#282828)}
         </div>
 
         <div class="pwSpacer"></div>
-        <button class="pwCTA" id="paywallComecarTesteBtn" type="button" data-i18n="pro.continuar">Continuar</button>
+        <p class="pwNOfertaLinha pwLMicro" data-i18n="pro.microcopy2">Nada a pagar hoje, cancele quando quiser</p>
+        <button class="pwCTA" id="paywallComecarTesteBtn" type="button" data-i18n="pro.salvarLembrete">Salvar lembrete</button>
         <button class="pwSecundario" id="paywallAgoraNaoBtn3" type="button" data-i18n="pro.agoraNao">Agora não</button>
 
         <div class="pwLegal pwLegalEtapa">
@@ -1345,14 +1336,17 @@ html{background:var(--bsBg,#282828)}
          do usuario: "o conteúdo é pra ocupar TODA a tela") -- ver
          #pwEtapa2 .pwPlanos/.pwPlano em style.css. -->
     <div class="pwEtapa" id="pwEtapa2">
-      <div class="pwConteudo">
+      <div class="pwLTela"><img id="pwPFundo" alt=""></div>
+      <div class="pwConteudo pwPConteudo">
         <span class="pwEyebrow" data-i18n="pro.titulo">Plano Pro</span>
         <h2 class="pwHeadline pwHeadlineMenor" data-i18n="pro.escolhaPlano">Escolha como quer assinar</h2>
+
+        <div class="pwNLista pwTL" id="pwLinhaTempo"><div class="pwNRow"><div class="pwNIc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 7-2.6"/></svg></div><div class="pwNTxt"><b id="pwTLt0"></b><span id="pwTLs0"></span></div></div><div class="pwNRow"><div class="pwNIc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21h4"/></svg></div><div class="pwNTxt"><b id="pwTLt1"></b><span id="pwTLs1"></span></div></div><div class="pwNRow"><div class="pwNIc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 2.7 5.6 6.1.8-4.5 4.2 1.1 6-5.4-3-5.4 3 1.1-6L3.2 9.4l6.1-.8z"/></svg></div><div class="pwNTxt"><b id="pwTLt2"></b><span id="pwTLs2"></span></div></div></div>
 
         <div class="pwPlanos">
           <!-- teste gratis, agora um card na MESMA lista dos pagos (nao
                um botao a parte) -- some (JS) pra quem ja usou o teste. -->
-          <div class="pwPlano sel" data-plano="trial" id="pwPlanoTrial">
+          <div class="pwPlano" data-plano="trial" id="pwPlanoTrial" style="display:none">
             <div class="pwPlanoRow">
               <div class="pwPlanoInfo">
                 <span class="pwPlanoNome" data-i18n="pro.planoTrial">7 dias grátis</span>
@@ -1362,13 +1356,14 @@ html{background:var(--bsBg,#282828)}
               <span class="pwRadio"></span>
             </div>
           </div>
-          <div class="pwPlano" data-plano="mensal" id="pwPlanoMensal">
+          <div class="pwPlano sel" data-plano="mensal" id="pwPlanoMensal">
             <div class="pwPlanoRow">
               <div class="pwPlanoInfo">
                 <span class="pwPlanoNome" data-i18n="pro.planoMensal">Mensal</span>
-                <span class="pwPlanoSub" data-i18n="pro.planoMensalSub">Cobrado todo mês</span>
+                <span class="pwPlanoSub" id="pwMensalSub" data-i18n="pro.planoMensalSub">Cobrado todo mês</span>
               </div>
               <span class="pwPlanoPreco"><span data-i18n="pro.precoMensal">R$17,90</span><span class="pwPlanoUnidade" data-i18n="pro.porMes">/mês</span></span>
+              <span class="pwPlanoPreco pwZero"><span>R$0,00</span><span class="pwPlanoUnidade" id="pwZeroUn">no 1º mês</span></span>
               <span class="pwRadio"></span>
             </div>
           </div>
@@ -1378,7 +1373,7 @@ html{background:var(--bsBg,#282828)}
             <div class="pwPlanoRow">
               <div class="pwPlanoInfo">
                 <span class="pwPlanoNome" data-i18n="pro.planoAnual">Anual</span>
-                <span class="pwPlanoSub" data-i18n="pro.planoAnualSub">Cobrado R$89,90/ano</span>
+                <span class="pwPlanoSub" data-i18n="pro.planoAnualSub" style="display:none">Cobrado R$89,90/ano</span>
               </div>
               <span class="pwPlanoPreco"><span data-i18n="pro.precoAnual">R$7,49</span><span class="pwPlanoUnidade" data-i18n="pro.porMes">/mês</span></span>
               <span class="pwRadio"></span>
@@ -3520,6 +3515,7 @@ window.renderEstagioBar = renderEstagioBar;
 // Nenhum caminho do app concede PRO localmente.
 
 function assinaturaAtiva(){
+  { const pd = (typeof planoSimuladoDev === 'function') ? planoSimuladoDev() : null; if (pd) return pd === 'pro'; if (window.__devAssinou || (typeof trialSimuladoDev === 'function' && trialSimuladoDev() !== null)) return true; }   // dev: ?plano=gratis|pro, ?trial=N
   // PRO VITALICIO MANUAL, versao local (localStorage, ver bloco logo
   // acima) OU versao servidor (Firestore entitlements/{uid}, sincroniza
   // entre aparelhos -- ver puxarEntitlement() no bloco AUTH/Firebase,
@@ -3566,9 +3562,23 @@ function abrirPaywall(motivo){
   // sao a versao de teste gratuita: recurso PRO mostra so um aviso, sem tela de compra (ainda sem Stripe).
   if (typeof billingDisponivel === 'function' && !billingDisponivel()){
     const en = (typeof idiomaApp === 'function' && idiomaApp() === 'en');
-    if (typeof window.aviso === 'function' && motivo !== 'primeira'){
-      window.aviso(en ? 'PRO feature: available in the full Android app. Coming to other devices later.'
-                      : 'Recurso PRO: disponível na versão completa para Android. Em breve nos outros aparelhos.');
+    if (motivo !== 'primeira'){
+      // caixa de aviso (o toast de 1,8 s passava despercebido e o botao parecia quebrado)
+      let ov = document.getElementById('proIndispOverlay');
+      if (!ov){
+        ov = document.createElement('div'); ov.id = 'proIndispOverlay';
+        ov.style.cssText = 'position:fixed;inset:0;z-index:9600;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,.62)';
+        ov.innerHTML = '<div style="max-width:320px;width:100%;background:#2b2b2b;color:#fafafa;border-radius:18px;padding:22px 20px 18px;text-align:center;font-family:Outfit,sans-serif;box-shadow:0 12px 40px rgba(0,0,0,.6)"><div id="proIndispTit" style="font-size:18px;font-weight:700;margin-bottom:8px"></div><div id="proIndispTxt" style="font-size:14px;line-height:1.45;color:#d8d8d8;margin-bottom:16px"></div><button id="proIndispOk" style="width:100%;padding:13px;border:none;border-radius:12px;background:#fafafa;color:#1c1c1c;font-weight:700;font-size:15px;font-family:inherit;cursor:pointer"></button></div>';
+        document.body.appendChild(ov);
+        const fechar = () => { ov.style.display = 'none'; };
+        ov.addEventListener('click', e => { if (e.target === ov || e.target.id === 'proIndispOk') fechar(); });
+      }
+      document.getElementById('proIndispTit').textContent = en ? 'Pro plan' : 'Plano Pro';
+      document.getElementById('proIndispTxt').textContent = en
+        ? 'For now, Pro features can only be purchased on the Android app. Support for other devices is coming later.'
+        : 'Por enquanto, os recursos do Plano Pro só estão disponíveis para compra no app Android. Em breve nos outros aparelhos.';
+      document.getElementById('proIndispOk').textContent = en ? 'Got it' : 'Entendi';
+      ov.style.display = 'flex';
     }
     return;
   }
@@ -3584,7 +3594,7 @@ function abrirPaywall(motivo){
     const floresta = TEMAS_ARENA.find(t => t.id === 'floresta');
     if (floresta) fundo.src = 'data:image/png;base64,' + floresta.arte;
   }
-  if (motivo !== 'primeira' && typeof window.aviso === 'function'){   // oferta pos-1a-tarefa nao e "recurso premium": sem toast
+  if (motivo !== 'primeira' && motivo !== 'estagio' && typeof window.aviso === 'function'){   // oferta pos-1a-tarefa nao e "recurso premium": sem toast
     window.aviso((typeof idiomaApp === 'function' && idiomaApp() === 'en') ? 'You found a premium feature!' : 'Você descobriu um recurso premium!');
   }
   // TESTE GRATIS -- o card "7 dias gratis" (tela de planos) e a linha do
@@ -3595,17 +3605,37 @@ function abrirPaywall(motivo){
   // PRO da sessao inteira. Se o trial ja foi usado e a selecao atual
   // ainda estava em 'trial' (default), forca pra 'anual' -- senao o CTA
   // ficaria tentando iniciar um teste que nao existe mais.
+  if (paywallSimuladoDev()) _billingTrialOk = true;   // dev: mostra o card de teste gratis
   const cardTrialVisibilidade = document.getElementById('pwPlanoTrial');
   if (cardTrialVisibilidade) cardTrialVisibilidade.style.display = _billingTrialOk ? '' : 'none';
   if (!_billingTrialOk && _pwPlanoSelecionado === 'trial' && typeof window.selecionarPlanoPaywall === 'function'){
     window.selecionarPlanoPaywall('anual');
   }
+  try {
+    const pf = document.getElementById('pwPFundo');
+    if (pf && !pf.src && typeof TEMAS_ARENA !== 'undefined'){ const dt = TEMAS_ARENA.find(t => t.id === 'deserto'); if (dt) pf.src = 'data:image/png;base64,' + dt.arte; }
+    const lf = document.getElementById('pwLFundo');
+    if (lf && !lf.src && typeof TEMAS_ARENA !== 'undefined'){ const mt2 = TEMAS_ARENA.find(t => t.id === 'floresta'); if (mt2) lf.src = 'data:image/png;base64,' + mt2.arte; }
+    const hl = document.getElementById('pwLHeroi');
+    if (hl && typeof heroiAtual === 'function'){ const h = heroiAtual(); if (h && h.img) hl.src = h.img; }
+    const fm = document.getElementById('pwNFundoImg');
+    if (fm && !fm.src && typeof TEMAS_ARENA !== 'undefined'){
+      const mt = TEMAS_ARENA.find(t => t.id === 'montanhas');
+      if (mt) fm.src = 'data:image/png;base64,' + mt.arte;
+    }
+  } catch(e){}
+  try {
+    const hs = [['pwNHeroiE',1],['pwNHeroiC',5],['pwNHeroiD',7]];
+    hs.forEach(([id,n]) => { const im = document.getElementById(id); if (im && !im.src && typeof HEROIS !== 'undefined' && HEROIS[n]) im.src = HEROIS[n].img; });
+  } catch(e){}
+  if (typeof window.pintarMensalTrialPaywall === 'function') window.pintarMensalTrialPaywall();
+  if (typeof window.pintarLinhaTempoPaywall === 'function') window.pintarLinhaTempoPaywall(_pwPlanoSelecionado);
   const overlay = document.getElementById('paywallOverlay');
   if (!overlay) return;
   // Sem pitch/lembrete locais: o teste gratis e' do Play, entao vai direto
   // pra lista de planos (passo 3) e sem seta de voltar.
   // oferta pos-1a-tarefa ('primeira'): abre na tela do TESTE GRATIS (pitch, passo 1); os demais gatilhos seguem direto pros planos
-  irParaEtapaPaywall(motivo === 'primeira' ? 1 : 3, false);
+  irParaEtapaPaywall((motivo === 'primeira' || motivo === 'estagio') ? 1 : 3, false);
   const back = document.getElementById('paywallVoltarBtn');
   if (back) back.classList.remove('on');
   // atraso bem curto so pra o toast nao nascer e morrer debaixo do paywall
@@ -3730,14 +3760,53 @@ window.aplicarCtaPlano = aplicarCtaPlano;
   if (avisoPorId[1]) avisoPorId[1].onclick = () => selecionarAviso(1);
   if (avisoPorId[0]) avisoPorId[0].onclick = () => selecionarAviso(0);
 
+
+
+  // Teste gratis agora mora no card MENSAL (sem card "R$0,00" separado):
+  // quando elegivel, o Mensal mostra "R$0,00 no 1o mes" e vira o id 'trial'.
+  function pintarMensalTrial(){
+    const card = document.getElementById('pwPlanoMensal'); if (!card) return;
+    const en = (typeof idiomaApp === 'function') && idiomaApp() === 'en';
+    card.classList.toggle('comTrial', !!_billingTrialOk);
+    const sub = document.getElementById('pwMensalSub'), un = document.getElementById('pwZeroUn');
+    const pr = card.querySelector('.pwPlanoPreco:not(.pwZero) > span:first-child');
+    if (un) un.textContent = en ? 'first month' : 'no 1º mês';
+    if (sub){
+      if (_billingTrialOk){ sub.removeAttribute('data-i18n'); sub.textContent = (en ? '7 days free, then ' : '7 dias grátis, depois ') + (pr ? pr.textContent : '') + (en ? '/mo' : '/mês'); }
+      else { sub.textContent = en ? 'Billed every month' : 'Cobrado todo mês'; }
+    }
+    const tr = document.getElementById('pwPlanoTrial'); if (tr) tr.style.display = 'none';
+  }
+  window.pintarMensalTrialPaywall = pintarMensalTrial;
+
+  // LINHA DO TEMPO (tela de planos): alterna conforme o plano marcado --
+  // teste gratis (hoje / lembrete / cobranca) x pago direto (sem surpresas).
+  function pintarLinhaTempo(id){
+    const en = (typeof idiomaApp === 'function') && idiomaApp() === 'en';
+    const d = new Date(Date.now() + 7*86400000);
+    const loc = String(navigator.language||'pt-BR').split('@')[0];
+    let ds = ''; try { ds = d.toLocaleDateString(loc, { day:'numeric', month:'short', year:'numeric' }); } catch(e){ ds = d.toLocaleDateString(); }
+    const T = id === 'trial'
+      ? (en ? [['Today','Unlock everything now and start your adventure'],['In 5 days','Reminder: we warn you your trial is ending'],['In 7 days','Billing starts on ' + ds + '. Cancel before if you like']]
+            : [['Hoje','Acesse tudo na hora e comece sua aventura'],['Em 5 dias','Lembrete: avisamos que seu teste está acabando'],['Em 7 dias','Início da cobrança em ' + ds + '. Cancele antes quando quiser']])
+      : (en ? [['Today','Unlock everything now and start your adventure'],['Nothing to remember','No deadlines or cancellation reminders'],['Whenever you want','Cancel in two taps. No lock-in']]
+            : [['Hoje','Desbloqueie tudo na hora e comece sua aventura'],['Nada para lembrar','Sem prazos nem lembretes de cancelamento'],['Quando quiser','Cancele em dois toques. Sem fidelidade']]);
+    if (id === 'anual'){ const pa = window._precoAnualTxt || 'R$89,90'; T[0] = en ? ['Today','Billed ' + pa + '/year. Unlock everything now'] : ['Hoje','Cobrado ' + pa + ' por ano. Desbloqueie tudo na hora']; }
+    if (id === 'vitalicio' && !en) T[2] = ['Para sempre','Pagamento único, sem renovação'];
+    if (id === 'vitalicio' && en) T[2] = ['Forever','One-time payment, no renewal'];
+    T.forEach((r, i) => { const t = document.getElementById('pwTLt'+i), u = document.getElementById('pwTLs'+i); if (t) t.textContent = r[0]; if (u) u.textContent = r[1]; });
+  }
+  window.pintarLinhaTempoPaywall = pintarLinhaTempo;
+
   // selecao de plano -- troca qual card fica marcado (.sel), guarda em
   // _pwPlanoSelecionado e atualiza o texto/acao do CTA unico
   // (aplicarCtaPlano()). 'trial' e' so mais um id nessa lista agora.
   function selecionarPlano(id){
     if (id === _pwPlanoSelecionado) return;
     _pwPlanoSelecionado = id;
+    pintarLinhaTempo(id);
     Object.keys(planosPorId).forEach(k => {
-      if (planosPorId[k]) planosPorId[k].classList.toggle('sel', k === id);
+      if (planosPorId[k]) planosPorId[k].classList.toggle('sel', k === id || (k === 'mensal' && id === 'trial'));
     });
     aplicarCtaPlano(id);
     // pulso rapido no card recem-marcado -- feedback tatil de que o clique
@@ -3753,11 +3822,12 @@ window.aplicarCtaPlano = aplicarCtaPlano;
   }
   window.selecionarPlanoPaywall = selecionarPlano; // exposto pra abrirPaywall() forcar 'anual' se o trial ja foi usado
   if (planoTrial) planoTrial.onclick = () => selecionarPlano('trial');
-  if (planoMensal) planoMensal.onclick = () => selecionarPlano('mensal');
+  if (planoMensal) planoMensal.onclick = () => selecionarPlano(_billingTrialOk ? 'trial' : 'mensal');
   if (planoAnual) planoAnual.onclick = () => selecionarPlano('anual');
   if (planoVitalicio) planoVitalicio.onclick = () => selecionarPlano('vitalicio');
 
   aplicarCtaPlano(_pwPlanoSelecionado); // sincroniza o CTA com o default ('trial') logo no boot
+  pintarLinhaTempo(_pwPlanoSelecionado);
 })();
 
 // ---------------------------------------------------------------------
@@ -3845,7 +3915,14 @@ async function billingChecarAssinaturasPlay(){
   } catch(e){}
 }
 
+// DEV (?paywall=1 em localhost / *.questlog-911.pages.dev): simula o app Android pra poder ver o paywall no navegador; compra e' so um aviso.
+// DEV (?plano=gratis|pro em localhost / *.questlog-911.pages.dev): simula o plano pra testar.
+function planoSimuladoDev(){ try { if (!window.EH_DEV) return null; const m = /[?&]plano=(gratis|pro)\b/.exec(location.search); return m ? m[1] : null; } catch(e){ return null; } }
+window.planoSimuladoDev = planoSimuladoDev;
+function paywallSimuladoDev(){ try { return !!window.EH_DEV && /[?&](paywall|novo)=1\b/.test(location.search); } catch(e){ return false; } }
+window.addEventListener('load', function(){ setTimeout(function(){ try { if (planoSimuladoDev()){ window.__entitlementLido = true; corrigirHeroiPorPlano(); } if (paywallSimuladoDev() && /[?&]paywall=1\b/.test(location.search)) abrirPaywall('primeira'); } catch(e){} }, 900); });   // EH_DEV so existe depois do load
 function billingDisponivel(){
+  if (paywallSimuladoDev()) return true;
   return typeof window.getDigitalGoodsService === 'function' && typeof window.PaymentRequest === 'function';
 }
 
@@ -3891,12 +3968,12 @@ async function billingPintarPrecos(){
   try {  } catch(e){}
   // O Chrome/TWA nao manda freeTrialPeriod: o teste gratis chega como
   // introductoryPrice de valor 0 (visto no log real). Aceita os dois.
-  const _temTesteGratis = !!(a && (a.freeTrialPeriod || (a.introductoryPrice && Number(a.introductoryPrice.value) === 0)));
+  const _tt = x => !!(x && (x.freeTrialPeriod || (x.introductoryPrice && Number(x.introductoryPrice.value) === 0)));
+  window._trialSku = _tt(m) ? BILLING_SKUS.mensal : BILLING_SKUS.anual;
+  const _temTesteGratis = _tt(m) || !!(a && (a.freeTrialPeriod || (a.introductoryPrice && Number(a.introductoryPrice.value) === 0)));
   _billingTrialOk = _temTesteGratis && !billingJaUsouTeste() && !(typeof assinaturaAtiva === 'function' && assinaturaAtiva());
-  const cardT = document.getElementById('pwPlanoTrial');
-  if (cardT) cardT.style.display = _billingTrialOk ? '' : 'none';
-  if (_billingTrialOk && _pwPlanoSelecionado === 'anual' && typeof window.selecionarPlanoPaywall === 'function') window.selecionarPlanoPaywall('trial');
-  if (!_billingTrialOk && _pwPlanoSelecionado === 'trial' && typeof window.selecionarPlanoPaywall === 'function') window.selecionarPlanoPaywall('anual');
+  if (_billingTrialOk && _pwPlanoSelecionado === 'mensal' && typeof window.selecionarPlanoPaywall === 'function') window.selecionarPlanoPaywall('trial');
+  if (!_billingTrialOk && _pwPlanoSelecionado === 'trial' && typeof window.selecionarPlanoPaywall === 'function') window.selecionarPlanoPaywall('mensal');
   if (m && m.price){
     por(document.querySelector('#pwPlanoMensal .pwPlanoPreco > span:first-child'), billingFormatarPreco(m.price.value, m.price.currency));
   }
@@ -3904,7 +3981,8 @@ async function billingPintarPrecos(){
     const anual = billingFormatarPreco(a.price.value, a.price.currency);
     const porMes = billingFormatarPreco(Number(a.price.value) / 12, a.price.currency);
     por(document.querySelector('#pwPlanoAnual .pwPlanoPreco > span:first-child'), porMes);
-    por(document.querySelector('#pwPlanoAnual .pwPlanoSub'), en ? ('Billed ' + anual + '/year') : ('Cobrado ' + anual + '/ano'));
+    window._precoAnualTxt = anual;
+    { const sa = document.querySelector('#pwPlanoAnual .pwPlanoSub'); if (sa) sa.style.display = 'none'; }
     por(document.querySelector('#pwPlanoTrial .pwPlanoSub'), en ? ('Then ' + anual + '/year') : ('Depois, ' + anual + '/ano'));
     const badge = document.querySelector('#pwPlanoAnual .pwBadge');
     if (badge && m && m.price){
@@ -3913,6 +3991,7 @@ async function billingPintarPrecos(){
       else badge.style.display = 'none';
     }
   }
+  if (typeof window.pintarMensalTrialPaywall === 'function') window.pintarMensalTrialPaywall();
   const cardV = document.getElementById('pwPlanoVitalicio');
   if (cardV){
     if (v && v.price){
@@ -3942,7 +4021,27 @@ async function billingVerificar(sku, purchaseToken, transferir){
   return dados;
 }
 
+// Repinta TUDO que depende do plano quando ele muda (compra, restauracao, expiracao) -- sem precisar sair e entrar na tela.
+let _planoUIUltimo = null;
+function atualizarTelasPorPlano(forcar){
+  let ativo = false;
+  try { ativo = !!assinaturaAtiva(); } catch(e){}
+  if (!forcar && _planoUIUltimo === ativo) return;
+  const primeira = _planoUIUltimo === null;
+  _planoUIUltimo = ativo;
+  if (primeira && !forcar) return;   // 1a leitura = estado inicial, nada mudou
+  try { if (window.__entitlementLido || planoSimuladoDev()) corrigirHeroiPorPlano(); } catch(e){}
+  try { document.dispatchEvent(new Event('questlog:plano')); } catch(e){}
+  try { if (typeof renderTemaArena === 'function') renderTemaArena(); } catch(e){}
+  try { if (typeof atualizarBloqueioArena === 'function') atualizarBloqueioArena(); } catch(e){}
+  try { if (typeof renderEstatisticas === 'function') renderEstatisticas(); } catch(e){}
+  try { if (typeof renderEstagioBar === 'function') renderEstagioBar(); } catch(e){}
+  try { if (typeof window.atualizarResumoAssinatura === 'function') window.atualizarResumoAssinatura(); } catch(e){}
+  try { if (typeof render === 'function') render(); } catch(e){}
+}
+window.atualizarTelasPorPlano = atualizarTelasPorPlano;
 function billingAtualizarTelas(){
+  try { atualizarTelasPorPlano(true); } catch(e){}
   if (typeof window.atualizarResumoAssinatura === 'function') window.atualizarResumoAssinatura();
   if (typeof render === 'function') { try { render(); } catch(e){} }
 }
@@ -3958,11 +4057,13 @@ function billingMostrarCompraOk(sku, restaurada, dados){
     : (sku === BILLING_SKUS.mensal ? T('pro.planoMensal', 'Mensal', 'Monthly') : T('pro.planoAnual', 'Anual', 'Annual'));
   // TESTE GRATIS do Play: o Worker devolve trial:true quando a compra esta na oferta
   const emTeste = !!(dados && dados.trial && !restaurada && !ehVit);
+  if (emTeste && typeof registrarTrialPlay === 'function') registrarTrialPlay(dados.ate);   // guarda a data de fim pro aviso e pro "X dias restantes"
   let subTeste = '';
   if (emTeste){
     const ate = new Date(Number(dados.ate) || Date.now());
     const curto = (Number(dados.ate) - Date.now()) < 24 * 3600 * 1000;
-    const quando = curto ? ate.toLocaleString(navigator.language || 'pt-BR', { dateStyle: 'short', timeStyle: 'short' }) : ate.toLocaleDateString(navigator.language || 'pt-BR');
+    const loc = String(navigator.language || 'pt-BR').split('@')[0];
+    const quando = curto ? ate.toLocaleString(loc, { dateStyle: 'short', timeStyle: 'short' }) : ate.toLocaleDateString(loc);
     const det = _billingDetalhes && _billingDetalhes[sku];
     const preco = (det && det.price) ? billingFormatarPreco(det.price.value, det.price.currency) : '';
     subTeste = T('pro.okSubTeste', 'Seu teste grátis vai até ', 'Your free trial runs until ') + quando + '. ' +
@@ -3982,29 +4083,29 @@ function billingMostrarCompraOk(sku, restaurada, dados){
     star: '<path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',
     stats: '<path d="M3 3v18h18M8 17V10M13 17V6M18 17v-4"/>'
   };
-  const itens = [
-    [ico.star, T('pro.beneficio2Titulo', 'Temas & heróis', 'Themes & heroes'), T('pro.beneficio2', '6 temas, 4 heróis', '6 themes, 4 heroes')],
-    [ico.inf,  T('pro.beneficio1Titulo', 'Sem limite diário', 'No daily limit'), T('pro.beneficio1', 'Tarefas ilimitadas', 'Unlimited tasks')],
-    [ico.stats,T('pro.beneficio3Titulo', 'Estatísticas', 'Statistics'), T('pro.beneficio3', 'Histórico completo', 'Full history')]
-  ];
+  const ic = (d) => '<div class="pwNIc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + d + '</svg></div>';
+  const linha = (d, k, t, sb) => '<div class="pwNRow">' + ic(d) + '<div class="pwNTxt"><b>' + T('pro.' + k + 't', t[0], t[1]) + '</b><span>' + T('pro.' + k + 's', sb[0], sb[1]) + '</span></div></div>';
+  const lista =
+    linha('<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>', 'b1', ['Vários heróis', 'Several heroes'], ['Até 4 heróis por conta', 'Up to 4 heroes per account']) +
+    linha('<path d="M3 20l6-10 4 6 3-4 5 8z"/><circle cx="17" cy="6" r="2"/>', 'b2', ['Temas exclusivos', 'Exclusive themes'], ['Esmeralda e Terracota', 'Emerald and Terracotta']) +
+    linha('<path d="M20 6 9 17l-5-5"/>', 'b3', ['Tarefas sem limite', 'Unlimited tasks'], ['No grátis são 5 tarefas ativas', 'Free plan has 5 active tasks']) +
+    linha('<path d="M3 3v18h18M8 17V10M13 17V6M18 17v-4"/>', 'b4', ['Estatísticas completas', 'Full statistics'], ['Histórico completo e todos os gráficos', 'Full history and all charts']);
+  const heroiImg = (typeof heroiAtual === 'function' && heroiAtual()) ? heroiAtual().img : '';
   let ov = document.getElementById('compraOkOverlay');
   if (ov) ov.remove();
   ov = document.createElement('div');
   ov.className = 'paywallOverlay';
   ov.id = 'compraOkOverlay';
   ov.style.zIndex = '9600';
-  const svg = (d, w) => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="' + (w || 2) + '" stroke-linecap="round" stroke-linejoin="round">' + d + '</svg>';
   ov.innerHTML =
-    '<div class="pwFloresta"><img id="compraOkFlorestaImg" alt=""></div>' +
-    '<div class="pwEtapa on"><div class="pwConteudo" style="padding-top:72px">' +
+    '<div class="pwLTela"><img id="compraOkFundo" alt=""></div>' +
+    '<div class="pwEtapa on"><div class="pwConteudo pwNConteudo" style="padding-top:56px;position:relative;z-index:1">' +
+      '<div class="compraOkPalco"><img src="' + heroiImg + '" alt=""></div>' +
       '<span class="pwEyebrow">' + T('pro.titulo', 'Plano Pro', 'Pro plan') + ' · ' + (emTeste ? T('pro.testeGratisEyebrow', 'Teste grátis', 'Free trial') : nomePlano) + '</span>' +
-      '<h2 class="pwHeadline">' + (restaurada ? T('pro.okRestaurada', 'Compra restaurada!', 'Purchase restored!') : emTeste ? T('pro.testeOk', 'Teste grátis ativado!', 'Free trial activated!') : T('pro.compraOk', 'Plano Pro ativado!', 'Pro plan activated!')) + '</h2>' +
-      '<p class="pwSub">' + sub + '</p>' +
-      '<div class="pwTrilha" style="flex:none;gap:18px"><div class="pwTrilhaLinha"></div>' +
-        itens.map(it => '<div class="pwPasso on"><div class="pwPassoNo">' + svg(it[0], 2) + '</div>' +
-          '<div class="pwPassoTxt"><b>' + it[1] + '</b><span>' + it[2] + '</span></div></div>').join('') +
-      '</div>' +
-      '<div class="pwSpacer compraOkMobs"></div>' +
+      '<h2 class="pwHeadline pwNHeadline" style="text-align:center">' + (restaurada ? T('pro.okRestaurada', 'Compra restaurada!', 'Purchase restored!') : emTeste ? T('pro.testeOk', 'Teste grátis ativado!', 'Free trial activated!') : T('pro.compraOk', 'Plano Pro ativado!', 'Pro plan activated!')) + '</h2>' +
+      '<p class="pwSub" style="max-width:none;margin-bottom:14px">' + sub + '</p>' +
+      '<div class="pwNLista">' + lista + '</div>' +
+      '<div class="pwSpacer"></div>' +
       '<button class="pwCTA" type="button">' + T('pro.okComecar', 'Começar', 'Get started') + '</button>' +
     '</div></div>';
   ov.querySelector('.pwCTA').onclick = () => {
@@ -4012,21 +4113,10 @@ function billingMostrarCompraOk(sku, restaurada, dados){
     setTimeout(() => ov.remove(), 450);
     if (typeof fecharPaywall === 'function') fecharPaywall();
   };
-  const fundo = ov.querySelector('#compraOkFlorestaImg');
+  const fundo = ov.querySelector('#compraOkFundo');
   if (fundo && typeof TEMAS_ARENA !== 'undefined'){
-    const floresta = TEMAS_ARENA.find(t => t.id === 'floresta');
-    if (floresta) fundo.src = 'data:image/png;base64,' + floresta.arte;
-  }
-  // 2 monstros da floresta (mesma arte da Arena), tamanho medio, no espaco livre
-  const palco = ov.querySelector('.compraOkMobs');
-  if (palco && typeof MONSTROS !== 'undefined'){
-    const pool = MONSTROS.filter(m => m && m.img && m.bioma === 'floresta');
-    for (let k = 0; k < 2 && pool.length; k++){
-      const m = pool.splice(Math.floor(Math.random() * pool.length), 1)[0];
-      const im = document.createElement('img');
-      im.src = m.img; im.alt = ''; im.className = 'compraOkMob' + (k ? ' b' : '');
-      palco.appendChild(im);
-    }
+    const mt = TEMAS_ARENA.find(t => t.id === 'montanhas');
+    if (mt) fundo.src = 'data:image/png;base64,' + mt.arte;
   }
   document.body.appendChild(ov);
   requestAnimationFrame(() => requestAnimationFrame(() => ov.classList.add('on')));
@@ -4058,7 +4148,14 @@ async function billingRestaurarSku(sku){
 
 async function iniciarCompraAssinatura(){
   if (_billingOcupado) return;
-  const sku = BILLING_SKUS[_pwPlanoSelecionado] || BILLING_SKUS.anual;
+  if (paywallSimuladoDev()){
+    window.__devAssinou = true;   // dev: simula a compra -- libera o Pro ate recarregar
+    try { atualizarTelasPorPlano(true); } catch(e){}
+    const eTeste = _pwPlanoSelecionado === 'trial';
+    billingMostrarCompraOk(eTeste ? (window._trialSku || BILLING_SKUS.mensal) : (BILLING_SKUS[_pwPlanoSelecionado] || BILLING_SKUS.anual), false, { trial: eTeste, ate: Date.now() + DIAS_TESTE_GRATIS * 86400000 });
+    return;
+  }
+  const sku = _pwPlanoSelecionado === 'trial' ? (window._trialSku || BILLING_SKUS.anual) : (BILLING_SKUS[_pwPlanoSelecionado] || BILLING_SKUS.anual);
   if (!BILLING_VERIFY_URL){
     billingMsg(_billingTexto('pro.pagamentoIndisponivel', 'Pagamento ainda não disponível', 'Payments coming soon'));
     return;
@@ -4249,6 +4346,28 @@ function diasRestantesTrial(){
   return Math.max(0, Math.ceil((t.fim - Date.now()) / 86400000));
 }
 
+// TESTE GRATIS DO PLAY -- registro LOCAL (por conta/aparelho) feito na ativacao (billingMostrarCompraOk). O servidor so guarda a data de fim
+// (assinaturaAte), nao que e' teste; por isso "X dias restantes" e o aviso so existem no aparelho que ativou o teste.
+const CHAVE_TRIAL_PLAY = 'questlog.trialPlay.v1';
+function trialSimuladoDev(){ try { if (!window.EH_DEV) return null; const m = /[?&]trial=(\d+)\b/.exec(location.search); return m ? Number(m[1]) : null; } catch(e){ return null; } }
+function trialPlaySalvo(){
+  const n = trialSimuladoDev();
+  if (n !== null) return { ate: Date.now() + n * 86400000 - 60000, avisoDias: 1, avisoMostradoDia: null, dev: true };
+  try { return JSON.parse(localStorage.getItem(window.chaveConta(CHAVE_TRIAL_PLAY)) || 'null'); } catch(e){ return null; }
+}
+function registrarTrialPlay(ate){
+  try { localStorage.setItem(window.chaveConta(CHAVE_TRIAL_PLAY), JSON.stringify({ ate: Number(ate) || 0, avisoDias: _pwAvisoSelecionado, avisoMostradoDia: null })); } catch(e){}
+}
+// dias de calendario ate o fim do teste (0 = termina hoje); null = nao esta em teste agora
+function trialPlayDiasRestantes(){
+  const t = trialPlaySalvo();
+  if (!t || !t.ate || t.ate <= Date.now()) return null;
+  if (typeof assinaturaAtiva !== 'function' || !assinaturaAtiva()) return null;
+  const ini = d => { const x = new Date(d); x.setHours(0,0,0,0); return x.getTime(); };
+  return Math.max(0, Math.round((ini(t.ate) - ini(Date.now())) / 86400000));
+}
+window.trialPlayDiasRestantes = trialPlayDiasRestantes;
+
 // avisoDias: 3, 1 ou 0 (0 = so no ultimo dia) -- escolhido na etapa 3
 // do paywall (#pwEtapa3).
 function iniciarTesteGratis(avisoDias){
@@ -4271,20 +4390,21 @@ window.iniciarTesteGratis = iniciarTesteGratis;
 // Nao reabre o paywall sozinha (seria intrusivo toda vez que o app
 // abre); quem quiser assinar clica em qualquer gatilho PRO normal.
 function verificarAvisoTesteGratis(){
-  const t = trialSalvo();
-  if (!t || !trialAtivo()) return;
-  const restantes = diasRestantesTrial();
-  if (restantes > t.avisoDias) return;
+  const t = trialPlaySalvo();
+  const restantes = trialPlayDiasRestantes();
+  if (!t || restantes === null) return;
+  const alvo = (typeof t.avisoDias === 'number') ? t.avisoDias : 1;
+  if (restantes > alvo) return;
   const hoje = new Date().toISOString().slice(0, 10);
   if (t.avisoMostradoDia === hoje) return;
-  t.avisoMostradoDia = hoje;
-  salvarTrial(t);
+  if (!t.dev){ t.avisoMostradoDia = hoje; try { localStorage.setItem(window.chaveConta(CHAVE_TRIAL_PLAY), JSON.stringify(t)); } catch(e){} }
   if (typeof window.aviso !== 'function') return;
   const en = (typeof idiomaApp === 'function' && idiomaApp() === 'en');
   const msg = restantes <= 0
     ? (en ? 'Your free trial ends today' : 'Seu teste grátis acaba hoje')
-    : (en ? ('Your free trial ends in ' + restantes + (restantes === 1 ? ' day' : ' days'))
-           : ('Seu teste grátis acaba em ' + restantes + (restantes === 1 ? ' dia' : ' dias')));
+    : restantes === 1
+    ? (en ? 'Your free trial ends tomorrow' : 'Seu teste grátis acaba amanhã')
+    : (en ? ('Your free trial ends in ' + restantes + ' days') : ('Seu teste grátis acaba em ' + restantes + ' dias'));
   window.aviso(msg);
 }
 window.verificarAvisoTesteGratis = verificarAvisoTesteGratis;
@@ -17869,6 +17989,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         _proVitalicioServidor = snap.exists() && snap.data().proVitalicio === true;
         _assinaturaServidorAte = snap.exists() ? (Number(snap.data().assinaturaAte) || 0) : 0;
         _assinaturaProduto = snap.exists() ? String(snap.data().assinaturaProduto || '') : '';
+        window.__entitlementLido = true;   // so corrige heroi Pro depois de ler o plano de verdade (offline nao rebaixa)
       } catch(e){
         // se falhar (offline, doc nao existe, regra etc.) mantem false --
         // nunca libera PRO por erro, so por doc existente de verdade.
@@ -17882,6 +18003,10 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       // que o valor de verdade chegou -- window.atualizarResumoAssinatura
       // e' null-safe sozinha (checa `if (!resumoAssinatura) return;`).
       if (typeof window.atualizarResumoAssinatura === 'function') window.atualizarResumoAssinatura();
+      if (window.__entitlementLido && typeof window.corrigirHeroiPorPlano === 'function') window.corrigirHeroiPorPlano();
+      if (window.__entitlementLido && typeof window.verificarAvisoTesteGratis === 'function') window.verificarAvisoTesteGratis();
+      if (typeof window.atualizarResumoAssinatura === 'function') window.atualizarResumoAssinatura();
+      if (typeof window.atualizarTelasPorPlano === 'function') window.atualizarTelasPorPlano();
     }
 
     // Usados pelo bloco GOOGLE PLAY BILLING (script principal): ID token
@@ -18941,6 +19066,10 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     const emTrial = (typeof trialAtivo === 'function' && trialAtivo());
     if (vitalicio){
       resumoAssinatura.textContent = emIngles ? 'PRO active (lifetime)' : 'PRO ativo (vitalício)';
+    } else if (typeof window.trialPlayDiasRestantes === 'function' && window.trialPlayDiasRestantes() !== null){
+      const d = window.trialPlayDiasRestantes();
+      resumoAssinatura.textContent = d <= 0 ? (emIngles ? 'Free trial · ends today' : 'Teste grátis · termina hoje')
+        : (emIngles ? ('Free trial · ' + d + (d === 1 ? ' day left' : ' days left')) : ('Teste grátis · ' + d + (d === 1 ? ' dia restante' : ' dias restantes')));
     } else if (emTrial){
       resumoAssinatura.textContent = emIngles ? 'Free trial active' : 'Teste grátis ativo';
     } else if (typeof assinaturaAtiva === 'function' && assinaturaAtiva()){
@@ -19450,6 +19579,17 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // PLANO PRO -- paywall (ver #paywallOverlay no HTML + abrirPaywall() no script)
     'pro.titulo':      { pt:'Plano Pro', en:'Pro Plan' },
     'pro.headline':    { pt:'Queremos que você experimente o Plano Pro de graça', en:'We want you to try the Pro plan for free' },
+    'pro.headlineNovo':{ pt:'Continue sua jornada com o Pro', en:'Continue your journey with Pro' },
+    'pro.b1t': { pt:'Vários heróis', en:'Several heroes' }, 'pro.b1s': { pt:'Até 4 heróis por conta', en:'Up to 4 heroes per account' },
+    'pro.b2t': { pt:'Temas exclusivos', en:'Exclusive themes' }, 'pro.b2s': { pt:'Esmeralda e Terracota', en:'Emerald and Terracotta' },
+    'pro.b3t': { pt:'Tarefas sem limite', en:'Unlimited tasks' }, 'pro.b3s': { pt:'No grátis são 5 tarefas ativas', en:'Free plan has 5 active tasks' },
+    'pro.b4t': { pt:'Estatísticas completas', en:'Full statistics' }, 'pro.b4s': { pt:'Histórico completo e todos os gráficos', en:'Full history and all charts' },
+    'pro.dias': { pt:'DIAS', en:'DAYS' },
+    'pro.ofertaT': { pt:'Teste grátis do Pro', en:'Free Pro trial' }, 'pro.ofertaS': { pt:'Estamos te oferecendo 7 dias grátis para testar o plano Pro.', en:'We are offering you 7 days free to try the Pro plan.' },
+    'pro.avisoHeadlineNovo': { pt:'Avisamos você antes do teste acabar!', en:'We will remind you before the trial ends!' },
+    'pro.avisoSubNovo': { pt:'Quando fica melhor para você?', en:'When works best for you?' },
+    'pro.salvarLembrete': { pt:'Salvar lembrete', en:'Save reminder' },
+    'pro.microcopy2': { pt:'Nada a pagar hoje, cancele quando quiser', en:'Nothing to pay today, cancel anytime' },
     'pro.sub':         { pt:'7 dias grátis, sem compromisso. Cancele quando quiser.', en:'7 days free, no commitment. Cancel anytime.' },
     'pro.passo1Titulo':{ pt:'Suas tarefas', en:'Your tasks' },
     'pro.passo1Sub':   { pt:'Já disponível', en:'Already unlocked' },

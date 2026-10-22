@@ -3784,7 +3784,7 @@ window.aplicarCtaPlano = aplicarCtaPlano;
   function pintarLinhaTempo(id){
     const en = (typeof idiomaApp === 'function') && idiomaApp() === 'en';
     const d = new Date(Date.now() + 7*86400000);
-    const loc = String(navigator.language||'pt-BR').split('@')[0];
+    const loc = en ? (/^en/i.test(navigator.language || '') ? String(navigator.language).split('@')[0] : 'en-US') : 'pt-BR';   // data no idioma do app (nao do aparelho)
     let ds = ''; try { ds = d.toLocaleDateString(loc, { day:'numeric', month:'short', year:'numeric' }); } catch(e){ ds = d.toLocaleDateString(); }
     const T = id === 'trial'
       ? (en ? [['Today','Unlock everything now and start your adventure'],['In 5 days','Reminder: we warn you your trial is ending'],['In 7 days','Billing starts on ' + ds + '. Cancel before if you like']]
@@ -3975,8 +3975,12 @@ async function billingPintarPrecos(){
   if (_billingTrialOk && _pwPlanoSelecionado === 'mensal' && typeof window.selecionarPlanoPaywall === 'function') window.selecionarPlanoPaywall('trial');
   if (!_billingTrialOk && _pwPlanoSelecionado === 'trial' && typeof window.selecionarPlanoPaywall === 'function') window.selecionarPlanoPaywall('mensal');
   if (m && m.price){
-    por(document.querySelector('#pwPlanoMensal .pwPlanoPreco > span:first-child'), billingFormatarPreco(m.price.value, m.price.currency));
+    por(document.querySelector('#pwPlanoMensal .pwPlanoPreco:not(.pwZero) > span:first-child'), billingFormatarPreco(m.price.value, m.price.currency));
+    por(document.querySelector('#pwPlanoMensal .pwZero > span:first-child'), billingFormatarPreco(0, m.price.currency));   // "R$0,00" fixo no HTML -> moeda local
   }
+  // produto sem preco na regiao da pessoa: esconde o card em vez de deixar o valor em reais do HTML
+  { const cm = document.getElementById('pwPlanoMensal'); if (cm) cm.style.display = (m && m.price) ? '' : 'none';
+    const ca = document.getElementById('pwPlanoAnual'); if (ca) ca.style.display = (a && a.price) ? '' : 'none'; }
   if (a && a.price){
     const anual = billingFormatarPreco(a.price.value, a.price.currency);
     const porMes = billingFormatarPreco(Number(a.price.value) / 12, a.price.currency);

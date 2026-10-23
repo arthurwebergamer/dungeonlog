@@ -13078,6 +13078,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     ['tarefas', 'inventario', 'loja', 'perfil', 'estatisticas'].forEach(n => { vistas[n] = true; });
     salvarVistas();
     const _cp = document.getElementById('composer'); if (_cp) _cp.classList.remove('on');
+    setTimeout(() => { if (typeof window.pedirPushUmaVez === 'function') window.pedirPushUmaVez(); }, 1200);   // permissao de notificacao so depois do tutorial
     const ov = tourEl;
     const volta = () => { if (typeof window.mostrarAba === 'function') window.mostrarAba('tarefas'); };
     if (!ov || !ov.classList.contains('on')){ volta(); return; }
@@ -19327,27 +19328,29 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // ativarNotificacaoPush() devolve sem_conta sem pedir permissao -- a flag
   // so e marcada quando o pedido de fato aconteceu (ou ja estava decidido).
   const CHAVE_PUSH_PEDIDO = 'questlog.pushPedido.v1';
+  // pedido de permissao: NAO durante o tutorial (corpo com .tourAberto) -- o tour chama de novo ao terminar
+  window.pedirPushUmaVez = function(){
+    try {
+      if (document.body.classList.contains('tourAberto')) return;
+      if (typeof window.ativarNotificacaoPush !== 'function' || typeof window.statusNotificacaoPush !== 'function') return;
+      if (localStorage.getItem(CHAVE_PUSH_PEDIDO)) return;
+      const st = window.statusNotificacaoPush();
+      if (st !== 'default'){ localStorage.setItem(CHAVE_PUSH_PEDIDO, '1'); return; }
+      setTimeout(async () => {
+        if (document.body.classList.contains('tourAberto')) return;
+        const res = await window.ativarNotificacaoPush();
+        if (res && res.motivo !== 'sem_conta' && res.motivo !== 'firebase_nao_configurado' && res.motivo !== 'vapid_nao_configurada'){
+          try { localStorage.setItem(CHAVE_PUSH_PEDIDO, '1'); } catch(e){}
+        }
+        window.atualizarBotaoNotificacao();
+      }, 700);
+    } catch(e){}
+  };
   const _alternarPush = window.alternar;
   if (typeof _alternarPush === 'function'){
     window.alternar = function(){
       const r = _alternarPush.apply(this, arguments);
-      try {
-        if (r !== false && typeof window.ativarNotificacaoPush === 'function'
-            && typeof window.statusNotificacaoPush === 'function'
-            && !localStorage.getItem(CHAVE_PUSH_PEDIDO)){
-          const st = window.statusNotificacaoPush();
-          if (st !== 'default'){ localStorage.setItem(CHAVE_PUSH_PEDIDO, '1'); }
-          else {
-            setTimeout(async () => {
-              const res = await window.ativarNotificacaoPush();
-              if (res && res.motivo !== 'sem_conta' && res.motivo !== 'firebase_nao_configurado' && res.motivo !== 'vapid_nao_configurada'){
-                try { localStorage.setItem(CHAVE_PUSH_PEDIDO, '1'); } catch(e){}
-              }
-              window.atualizarBotaoNotificacao();
-            }, 700);
-          }
-        }
-      } catch(e){}
+      if (r !== false) window.pedirPushUmaVez();
       return r;
     };
   }

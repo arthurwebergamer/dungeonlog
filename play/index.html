@@ -3992,7 +3992,8 @@ async function billingPintarPrecos(){
   }
   // produto sem preco na regiao da pessoa: esconde o card em vez de deixar o valor em reais do HTML
   { const cm = document.getElementById('pwPlanoMensal'); if (cm) cm.style.display = (m && m.price) ? '' : 'none';
-    const ca = document.getElementById('pwPlanoAnual'); if (ca) ca.style.display = (a && a.price) ? '' : 'none'; }
+    const ca = document.getElementById('pwPlanoAnual'); if (ca) ca.style.display = (a && a.price) ? '' : 'none';
+    const cv = document.getElementById('pwPlanoVitalicio'); if (cv) cv.style.display = (v && v.price) ? '' : 'none'; }
   if (a && a.price){
     const anual = billingFormatarPreco(a.price.value, a.price.currency);
     const porMes = billingFormatarPreco(Number(a.price.value) / 12, a.price.currency);

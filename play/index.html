@@ -3557,6 +3557,18 @@ let _pwEtapaAtual = 1;
 let _pwPlanoSelecionado = 'trial'; // pedido do usuario (tela "planos" simplificada) -- teste gratis vem pre-selecionado, junto na mesma lista dos planos pagos
 let _pwAvisoSelecionado = 1; // TESTE GRATIS -- "1 dia antes" vem pre-selecionado (etapa 3, #pwEtapa3)
 
+// Slide 1 do paywall muda conforme o teste gratis: disponivel -> pitch -> lembrete -> planos; sem teste -> pitch normal -> planos.
+// Roda ao abrir E de novo quando o Play responde (billingPintarPrecos e' assincrono: ao abrir, _billingTrialOk ainda pode estar falso).
+window.pwAtualizarModoTrial = function(){
+  try {
+    const eOferta = document.querySelector('#pwEtapa1 .pwNOfertaLinha'), eCta = document.getElementById('paywallContinuarBtn');
+    if (eOferta) eOferta.style.display = _billingTrialOk ? '' : 'none';
+    if (eCta){
+      eCta.setAttribute('data-i18n', _billingTrialOk ? 'pro.testarGratis' : 'pro.verPlanos');
+      eCta.textContent = _billingTexto(_billingTrialOk ? 'pro.testarGratis' : 'pro.verPlanos', _billingTrialOk ? 'Testar grátis por 7 dias' : 'Ver planos', _billingTrialOk ? 'Try free for 7 days' : 'See plans');
+    }
+  } catch(e){}
+};
 function abrirPaywall(motivo){
   // 14/10: pagamento SO no app Android (Play Billing / Digital Goods, que so existe no TWA). iPhone, Windows e navegador
   // sao a versao de teste gratuita: recurso PRO mostra so um aviso, sem tela de compra (ainda sem Stripe).
@@ -3633,15 +3645,7 @@ function abrirPaywall(motivo){
   const overlay = document.getElementById('paywallOverlay');
   if (!overlay) return;
   // TODO gatilho (recurso Pro, estagio, 1o dia, conta) comeca no pitch (passo 1) e segue por lembrete (2) e planos (3)
-  // Teste gratis disponivel: pitch -> lembrete -> planos. Sem teste (ja usou / Play nao oferece): pitch "normal" -> planos
-  try {
-    const eOferta = document.querySelector('#pwEtapa1 .pwNOfertaLinha'), eCta = document.getElementById('paywallContinuarBtn');
-    if (eOferta) eOferta.style.display = _billingTrialOk ? '' : 'none';
-    if (eCta){
-      eCta.setAttribute('data-i18n', _billingTrialOk ? 'pro.testarGratis' : 'pro.verPlanos');
-      eCta.textContent = _billingTexto(_billingTrialOk ? 'pro.testarGratis' : 'pro.verPlanos', _billingTrialOk ? 'Testar grátis por 7 dias' : 'Ver planos', _billingTrialOk ? 'Try free for 7 days' : 'See plans');
-    }
-  } catch(e){}
+  window.pwAtualizarModoTrial();
   irParaEtapaPaywall(1, false);
   const back = document.getElementById('paywallVoltarBtn');
   if (back) back.classList.remove('on');
@@ -3979,6 +3983,7 @@ async function billingPintarPrecos(){
   window._trialSku = _tt(m) ? BILLING_SKUS.mensal : BILLING_SKUS.anual;
   const _temTesteGratis = _tt(m) || !!(a && (a.freeTrialPeriod || (a.introductoryPrice && Number(a.introductoryPrice.value) === 0)));
   _billingTrialOk = _temTesteGratis && !billingJaUsouTeste() && !(typeof assinaturaAtiva === 'function' && assinaturaAtiva());
+  if (typeof window.pwAtualizarModoTrial === 'function') window.pwAtualizarModoTrial();
   if (_billingTrialOk && _pwPlanoSelecionado === 'mensal' && typeof window.selecionarPlanoPaywall === 'function') window.selecionarPlanoPaywall('trial');
   if (!_billingTrialOk && _pwPlanoSelecionado === 'trial' && typeof window.selecionarPlanoPaywall === 'function') window.selecionarPlanoPaywall('mensal');
   if (m && m.price){

@@ -3632,10 +3632,8 @@ function abrirPaywall(motivo){
   if (typeof window.pintarLinhaTempoPaywall === 'function') window.pintarLinhaTempoPaywall(_pwPlanoSelecionado);
   const overlay = document.getElementById('paywallOverlay');
   if (!overlay) return;
-  // Sem pitch/lembrete locais: o teste gratis e' do Play, entao vai direto
-  // pra lista de planos (passo 3) e sem seta de voltar.
-  // oferta pos-1a-tarefa ('primeira'): abre na tela do TESTE GRATIS (pitch, passo 1); os demais gatilhos seguem direto pros planos
-  irParaEtapaPaywall((motivo === 'primeira' || motivo === 'estagio') ? 1 : 3, false);
+  // TODO gatilho (recurso Pro, estagio, 1o dia, conta) comeca no pitch (passo 1) e segue por lembrete (2) e planos (3)
+  irParaEtapaPaywall(1, false);
   const back = document.getElementById('paywallVoltarBtn');
   if (back) back.classList.remove('on');
   // atraso bem curto so pra o toast nao nascer e morrer debaixo do paywall

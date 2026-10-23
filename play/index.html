@@ -3633,6 +3633,15 @@ function abrirPaywall(motivo){
   const overlay = document.getElementById('paywallOverlay');
   if (!overlay) return;
   // TODO gatilho (recurso Pro, estagio, 1o dia, conta) comeca no pitch (passo 1) e segue por lembrete (2) e planos (3)
+  // Teste gratis disponivel: pitch -> lembrete -> planos. Sem teste (ja usou / Play nao oferece): pitch "normal" -> planos
+  try {
+    const eOferta = document.querySelector('#pwEtapa1 .pwNOfertaLinha'), eCta = document.getElementById('paywallContinuarBtn');
+    if (eOferta) eOferta.style.display = _billingTrialOk ? '' : 'none';
+    if (eCta){
+      eCta.setAttribute('data-i18n', _billingTrialOk ? 'pro.testarGratis' : 'pro.verPlanos');
+      eCta.textContent = _billingTexto(_billingTrialOk ? 'pro.testarGratis' : 'pro.verPlanos', _billingTrialOk ? 'Testar grátis por 7 dias' : 'Ver planos', _billingTrialOk ? 'Try free for 7 days' : 'See plans');
+    }
+  } catch(e){}
   irParaEtapaPaywall(1, false);
   const back = document.getElementById('paywallVoltarBtn');
   if (back) back.classList.remove('on');
@@ -3733,8 +3742,8 @@ window.aplicarCtaPlano = aplicarCtaPlano;
   };
 
   if (btnFechar) btnFechar.onclick = fecharPaywall;
-  if (btnVoltar) btnVoltar.onclick = () => irParaEtapaPaywall(_pwEtapaAtual === 3 ? 2 : 1);
-  if (btnContinuar) btnContinuar.onclick = () => irParaEtapaPaywall(2);
+  if (btnVoltar) btnVoltar.onclick = () => irParaEtapaPaywall(_pwEtapaAtual === 3 ? (_billingTrialOk ? 2 : 1) : 1);
+  if (btnContinuar) btnContinuar.onclick = () => irParaEtapaPaywall(_billingTrialOk ? 2 : 3);
   if (btnAgoraNao1) btnAgoraNao1.onclick = fecharPaywall;
   if (btnAgoraNao2) btnAgoraNao2.onclick = fecharPaywall;
   if (btnAgoraNao3) btnAgoraNao3.onclick = fecharPaywall;
@@ -19605,6 +19614,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'pro.beneficio3Titulo': { pt:'Estatísticas', en:'Statistics' },
     'pro.beneficio3':  { pt:'Histórico completo', en:'Full history' },
     'pro.continuar':   { pt:'Continuar', en:'Continue' },
+    'pro.verPlanos':   { pt:'Ver planos', en:'See plans' },
     'pro.escolhaPlano':{ pt:'Escolha como quer assinar', en:'Choose how you want to subscribe' },
     'pro.maisPopular': { pt:'Mais popular', en:'Most popular' },
     'pro.planoTrial':     { pt:'7 dias grátis', en:'7 days free' },

@@ -10329,19 +10329,17 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     if (dano > 0){
       const total = Math.max(1, Math.round(dano));
       setTimeout(() => {
+        // "Tarefas perdidas" entra na fila ANTES de ferir(): se o golpe for fatal, ferir() enfileira "Voce caiu" 420ms depois,
+        // e a pessoa ve primeiro o que escapou e depois a queda (antes so aparecia "Voce caiu", sem dizer o que tinha fugido)
+        if (typeof window.enfileirarPopup === 'function' && typeof window.mostrarTarefasPerdidas === 'function'){
+          window.enfileirarPopup(prox => window.mostrarTarefasPerdidas(largadas, total, diaVirada, prox));
+        }
         const morreu = ferir(total);
-        // caso fatal: exclusivo do pop-up "Você caiu" (ja enfileirado dentro
-        // de ferir()). Caso nao-fatal: pop-up "Tarefas perdidas" com a lista
-        // de tarefas, no lugar do toast generico antigo (que hoje esta mudo).
-        if (!morreu){
-          if (typeof window.enfileirarPopup === 'function' && typeof window.mostrarTarefasPerdidas === 'function'){
-            window.enfileirarPopup(prox => window.mostrarTarefasPerdidas(largadas, total, diaVirada, prox));
-          } else if (typeof aviso === 'function'){
-            const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
-            aviso(en
-              ? ('−' + total + ' HEALTH FOR ' + largadas.length + (largadas.length === 1 ? ' SKIPPED TASK' : ' SKIPPED TASKS'))
-              : ('−' + total + ' DE VIDA POR ' + largadas.length + (largadas.length === 1 ? ' TAREFA LARGADA' : ' TAREFAS LARGADAS')), false, true);
-          }
+        if (!(typeof window.enfileirarPopup === 'function' && typeof window.mostrarTarefasPerdidas === 'function') && !morreu && typeof aviso === 'function'){
+          const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
+          aviso(en
+            ? ('−' + total + ' HEALTH FOR ' + largadas.length + (largadas.length === 1 ? ' SKIPPED TASK' : ' SKIPPED TASKS'))
+            : ('−' + total + ' DE VIDA POR ' + largadas.length + (largadas.length === 1 ? ' TAREFA LARGADA' : ' TAREFAS LARGADAS')), false, true);
         }
       }, 700);
     }

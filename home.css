@@ -41,19 +41,25 @@ body.menu-open .topbar{ position:fixed; z-index:50; background:#1f1f1f; }
 @media (min-width:721px){ .menu{ display:none !important; } body.menu-open{ overflow:auto; } }
 
 /* ---------- cenário em camadas (parallax horizontal) ---------- */
-.hero{ position:relative; overflow:hidden; isolation:isolate; min-height:100svh; display:flex; align-items:center; padding:120px 24px 130px; background:#17171a; }
+.hero{ position:relative; overflow:hidden; isolation:isolate; min-height:100svh; display:flex; align-items:center; padding:120px 24px 130px; background:#04100f; }
 .scene{ position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
 .layer{ position:absolute; top:0; bottom:0; left:-6%; right:-6%; will-change:transform; image-rendering:pixelated;
   background-repeat:repeat-x; background-position:center bottom; background-size:auto max(100%, calc(100vw * .5834)); }
 .layer.pc{ top:-80px; bottom:-80px; left:-600px; right:-600px; background-size:auto max(100%, calc(100vw * .5625)); }
-.pc0{ background-image:url(/img/cave/L0.png); }
-.pc1{ background-image:url(/img/cave/L1.png); }
-.pc2{ background-image:url(/img/cave/L2.png); }
-.pc3{ background-image:url(/img/cave/L3.png); }
-.pc4{ background-image:url(/img/cave/L4.png); }
-.pc5{ background-image:url(/img/cave/L5.png); }
-.pc6{ background-image:url(/img/cave/L6.png); }
-.pc7{ background-image:url(/img/cave/L7.png); }
+.tv0{ background-image:url(/img/vila/L0.png); }
+.tv1{ background-image:url(/img/vila/L1.png); }
+.tv2{ background-image:url(/img/vila/L2.png); }
+.tv3{ background-image:url(/img/vila/L3.png); }
+.tv4{ background-image:url(/img/vila/L4.png); }
+.tv5{ background-image:url(/img/vila/L5.png); }
+.tv6{ background-image:url(/img/vila/L6.png); }
+.layer.pc.tv0{ background-size:auto calc(max(100%, 56.25vw) * 224 / 224); }
+.layer.pc.tv1{ background-size:auto calc(max(100%, 56.25vw) * 224 / 224); }
+.layer.pc.tv2{ background-size:auto calc(max(100%, 56.25vw) * 224 / 224); }
+.layer.pc.tv3{ background-size:auto calc(max(100%, 56.25vw) * 224 / 224); }
+.layer.pc.tv4{ background-size:auto calc(max(100%, 56.25vw) * 80 / 224); }
+.layer.pc.tv5{ background-size:auto calc(max(100%, 56.25vw) * 96 / 224); }
+.layer.pc.tv6{ background-size:auto calc(max(100%, 56.25vw) * 99 / 224); }
 .hero .inner{ position:relative; z-index:2; width:100%; max-width:1120px; margin:0 auto; }
 .hero .col{ max-width:540px; }
 .hero h1{ font-size:clamp(2.5rem,5.4vw,4.4rem); line-height:1.04; color:#fff; text-shadow:0 2px 0 rgba(0,0,0,.55), 0 4px 22px rgba(0,0,0,.7); }
@@ -64,11 +70,11 @@ body.menu-open .topbar{ position:fixed; z-index:50; background:#1f1f1f; }
   padding:.95rem 1.7rem; border-radius:14px; box-shadow:0 2px 0 #b9b9b9, 0 8px 24px rgba(0,0,0,.35); transition:transform .15s, background .15s; }
 .btn:hover{ background:#f0f0f0; transform:translateY(1px); }
 /* botoes grandes do topo/final: mesmo desenho (selo da Play e "Jogar na web"), animacao no estilo pixel: sobe no hover, afunda no clique */
-.gp, .btn-web{ display:inline-flex; align-items:center; border-radius:12px; text-decoration:none; cursor:pointer; box-shadow:6px 6px 0 rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.28); transition:transform .15s, box-shadow .15s; }
-.gp:hover, .gp:focus-visible, .btn-web:hover, .btn-web:focus-visible{ transform:translate(-2px,-2px); box-shadow:8px 8px 0 rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.6); }
-.gp:active, .btn-web:active{ transform:translate(0,0); box-shadow:3px 3px 0 rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.28); }
+.gp, .btn-web{ display:inline-flex; align-items:center; border-radius:6px; text-decoration:none; cursor:pointer; box-shadow:6px 6px 0 rgba(0,0,0,.55); transition:transform .15s, box-shadow .15s; }
+.gp:hover, .gp:focus-visible, .btn-web:hover, .btn-web:focus-visible{ transform:translate(-2px,-2px); box-shadow:8px 8px 0 rgba(0,0,0,.6); }
+.gp:active, .btn-web:active{ transform:translate(0,0); box-shadow:3px 3px 0 rgba(0,0,0,.55); }
 .gp:focus-visible, .btn-web:focus-visible{ outline:3px solid #fff; outline-offset:4px; }
-.gp img{ height:60px; width:auto; display:block; border-radius:12px; }
+.gp img{ height:60px; width:auto; display:block; }
 .btn-web{ gap:.75rem; height:60px; padding:0 1.5rem 0 1.15rem; background:#000; color:#fff; font-family:'Outfit',sans-serif; }
 .btn-web .bw{ display:flex; flex-direction:column; justify-content:center; line-height:1; }
 .btn-web small{ font-size:.62rem; font-weight:600; letter-spacing:.07em; text-transform:uppercase; margin-bottom:.22rem; }
@@ -77,8 +83,8 @@ body.menu-open .topbar{ position:fixed; z-index:50; background:#1f1f1f; }
 .soon{ display:inline-flex; align-items:center; font-size:1rem; font-weight:600; color:var(--muted); border:2px dashed #6a6a6a; padding:.85rem 1.3rem; border-radius:14px; background:rgba(20,20,20,.6); }
 .hero .note{ margin-top:20px; max-width:480px; color:#c9c9c9; font-size:.95rem; text-shadow:0 1px 3px rgba(0,0,0,.9); }
 .hero::after{ content:""; position:absolute; left:0; right:0; bottom:0; height:clamp(220px,40vh,400px); z-index:1; pointer-events:none;
-  /* névoa na cor da caverna que se dissolve no fundo do site (sem passar pelo preto) */
-  background:linear-gradient(180deg, rgba(74,72,92,0) 0%, rgba(74,72,92,.28) 26%, rgba(56,55,68,.6) 54%, rgba(43,43,49,.88) 80%, #282828 100%); }
+  /* névoa na cor da vila que se dissolve no fundo do site (sem passar pelo preto) */
+  background:linear-gradient(180deg, rgba(8,24,24,0) 0%, rgba(8,24,24,.34) 26%, rgba(16,30,30,.66) 54%, rgba(30,34,34,.9) 80%, #282828 100%); }
 @media (max-width:820px){
   .hero{ align-items:flex-end; padding:300px 20px 80px; }
   .hero h1{ font-size:clamp(2.6rem,12vw,3.6rem); }

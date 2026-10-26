@@ -63,6 +63,17 @@ body.menu-open .topbar{ position:fixed; z-index:50; background:#1f1f1f; }
 .btn{ display:inline-flex; align-items:center; font-family:'Outfit',sans-serif; font-weight:800; font-size:1.05rem; line-height:1; text-decoration:none; color:#1a1a1a; background:#fff;
   padding:.95rem 1.7rem; border-radius:14px; box-shadow:0 2px 0 #b9b9b9, 0 8px 24px rgba(0,0,0,.35); transition:transform .15s, background .15s; }
 .btn:hover{ background:#f0f0f0; transform:translateY(1px); }
+/* botoes grandes do topo/final: mesmo desenho (selo da Play e "Jogar na web"), animacao no estilo pixel: sobe no hover, afunda no clique */
+.gp, .btn-web{ display:inline-flex; align-items:center; border-radius:12px; text-decoration:none; cursor:pointer; box-shadow:6px 6px 0 rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.28); transition:transform .15s, box-shadow .15s; }
+.gp:hover, .gp:focus-visible, .btn-web:hover, .btn-web:focus-visible{ transform:translate(-2px,-2px); box-shadow:8px 8px 0 rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.6); }
+.gp:active, .btn-web:active{ transform:translate(0,0); box-shadow:3px 3px 0 rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.28); }
+.gp:focus-visible, .btn-web:focus-visible{ outline:3px solid #fff; outline-offset:4px; }
+.gp img{ height:60px; width:auto; display:block; border-radius:12px; }
+.btn-web{ gap:.75rem; height:60px; padding:0 1.5rem 0 1.15rem; background:#000; color:#fff; font-family:'Outfit',sans-serif; }
+.btn-web .bw{ display:flex; flex-direction:column; justify-content:center; line-height:1; }
+.btn-web small{ font-size:.62rem; font-weight:600; letter-spacing:.07em; text-transform:uppercase; margin-bottom:.22rem; }
+.btn-web b{ font-size:1.4rem; font-weight:800; letter-spacing:-.01em; }
+@media (prefers-reduced-motion:reduce){ .gp, .btn-web{ transition:none; } }
 .soon{ display:inline-flex; align-items:center; font-size:1rem; font-weight:600; color:var(--muted); border:2px dashed #6a6a6a; padding:.85rem 1.3rem; border-radius:14px; background:rgba(20,20,20,.6); }
 .hero .note{ margin-top:20px; max-width:480px; color:#c9c9c9; font-size:.95rem; text-shadow:0 1px 3px rgba(0,0,0,.9); }
 .hero::after{ content:""; position:absolute; left:0; right:0; bottom:0; height:clamp(220px,40vh,400px); z-index:1; pointer-events:none;

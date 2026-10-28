@@ -20250,6 +20250,60 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
 </script>
 
 <script>
+// ATUALIZACAO AO VOLTAR PRO APP (TWA): voltar pelo historico de apps NAO recarrega a pagina,
+// entao o jogador ficava com o codigo carregado dias antes (pop-ups/notificacoes antigos).
+// Se ficou >30 min em segundo plano E o servidor tem versao nova (ETag/Last-Modified do HEAD
+// mudou desde o carregamento), recarrega -- mas so com a tela parada (sem popup/tutorial/paywall/
+// campo em foco), salvando antes. Sem validador no HEAD = nao faz nada (nunca recarrega "no escuro").
+(function(){
+  const MIN_FORA = 30 * 60 * 1000, RETENTA = 30 * 1000, MAX_TENTATIVAS = 6;
+  let saiuEm = 0, versaoCarregada = null, timer = null, tentativas = 0;
+  const tag = r => r && (r.headers.get('etag') || r.headers.get('last-modified')) || null;
+  const url = () => location.pathname;
+  function ler(){ return fetch(url(), { method:'HEAD', cache:'no-store' }).then(tag).catch(() => null); }
+  window.addEventListener('load', () => setTimeout(() => { ler().then(v => { if (v) versaoCarregada = v; }); }, 3000));
+
+  function telaParada(){
+    try {
+      if (document.body.classList.contains('tourAberto')) return false;
+      const a = document.activeElement;
+      if (a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)) return false;
+      const H = window.innerHeight, W = window.innerWidth;
+      const els = document.querySelectorAll('.on, [class*="overlay"], [id*="paywall" i], [id*="pw" i]');
+      for (const e of els){
+        const cs = getComputedStyle(e);
+        if (cs.position !== 'fixed' || cs.display === 'none' || cs.visibility === 'hidden' || +cs.opacity < 0.05) continue;
+        const r = e.getBoundingClientRect();
+        if (r.width >= W * 0.8 && r.height >= H * 0.5) return false;
+      }
+      return true;
+    } catch(e){ return false; }
+  }
+  function recarregar(){
+    try {
+      const k = 'questlog.autoReload.v1', ult = +(sessionStorage.getItem(k) || 0);
+      if (Date.now() - ult < 120000) return;                       // trava anti-loop
+      sessionStorage.setItem(k, String(Date.now()));
+    } catch(e){}
+    try { if (typeof window.salvar === 'function') window.salvar(); } catch(e){}
+    location.reload();
+  }
+  async function checar(){
+    clearTimeout(timer);
+    if (document.hidden || !versaoCarregada) return;
+    const agora = await ler();
+    if (!agora || agora === versaoCarregada) return;               // sem versao nova
+    if (telaParada()) return recarregar();
+    if (++tentativas <= MAX_TENTATIVAS) timer = setTimeout(checar, RETENTA);
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden){ saiuEm = Date.now(); return; }
+    if (saiuEm && Date.now() - saiuEm > MIN_FORA){ saiuEm = 0; tentativas = 0; checar(); }
+  });
+  window.__atualizarAoVoltar = { checar, telaParada };            // gancho de teste
+})();
+</script>
+<script>
 // Service Worker registrado ja no carregamento (nao so ao ligar notificacoes):
 // e' ele que guarda o app pra abrir SEM internet (senao o TWA mostra a tela
 // padrao de "sem conexao" do Chrome). Mesmo arquivo/escopo do push (FCM).

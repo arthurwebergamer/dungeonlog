@@ -20256,12 +20256,12 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
 <div class="edov" id="apagarRecOverlay" style="z-index:90">
   <div class="edsheet">
     <div class="edpuxador"></div>
+    <button id="apagarRecX" type="button" aria-label="Fechar" style="position:absolute;top:12px;right:12px;width:34px;height:34px;border:none;background:transparent;color:var(--dim);font-size:24px;line-height:1;cursor:pointer;display:grid;place-items:center">&#215;</button>
     <div class="edtitulo" id="apagarRecTitulo">Apagar tarefa</div>
     <p id="apagarRecTexto" style="margin:0 0 14px;font-size:14px;line-height:1.45;color:var(--dim)"></p>
     <div style="display:flex;flex-direction:column;gap:9px">
       <button class="edsalvar" id="apagarRecHoje" type="button"></button>
       <button class="edsalvar" id="apagarRecTodos" type="button" style="background:var(--panel);color:var(--perigo);border:1px solid rgba(244,87,129,.35)"></button>
-      <button class="edsalvar" id="apagarRecCancelar" type="button" style="background:transparent;color:var(--dim)"></button>
     </div>
   </div>
 </div>
@@ -20298,7 +20298,7 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
   }
   document.getElementById('apagarRecHoje').onclick = () => concluir(true);
   document.getElementById('apagarRecTodos').onclick = () => concluir(false);
-  document.getElementById('apagarRecCancelar').onclick = fechar;
+  document.getElementById('apagarRecX').onclick = fechar;
   ov.onclick = e => { if (e.target === ov) fechar(); };
   document.addEventListener('keydown', e => { if (ov.classList.contains('on') && e.key === 'Escape') fechar(); });
 
@@ -20317,7 +20317,7 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
       : ('Essa tarefa se repete (' + quando + '). Apagar só hoje ou em todos os dias?');
     document.getElementById('apagarRecHoje').textContent = en() ? 'Only today' : 'Só hoje';
     document.getElementById('apagarRecTodos').textContent = en() ? 'Today and all other days' : 'Hoje e nos outros dias';
-    document.getElementById('apagarRecCancelar').textContent = en() ? 'Cancel' : 'Cancelar';
+    document.getElementById('apagarRecX').setAttribute('aria-label', en() ? 'Close' : 'Fechar');
     ov.classList.add('on');
   };
 })();

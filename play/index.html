@@ -3238,6 +3238,7 @@ function anualOcorreNoDia(t, iso){
   return d.getDate() === alvo;
 }
 function ocorreNoDia(t, iso){
+  if (Array.isArray(t.pulaEm) && t.pulaEm.includes(iso)) return false;   // "apagar so hoje": tarefa recorrente pulada nesse dia
   if (t.tipo === 'hoje') return t.data === iso;
   if (t.tipo === 'mensal') return diaMesOcorreNoDia(t, iso);
   if (t.tipo === 'anual') return anualOcorreNoDia(t, iso);
@@ -5516,7 +5517,7 @@ function render(){
       if (dragArmado || e.target.closest('.del') || e.target.closest('.box')) return;
       if (typeof abrirEditor === 'function') abrirEditor(i);
     };
-    el.querySelector('.del').onclick = e => { e.stopPropagation(); window.tocarSom?.('desequipar'); tarefas.splice(i,1); verificarVitoriaAoExcluir(); render(); };
+    el.querySelector('.del').onclick = e => { e.stopPropagation(); window.apagarTarefaPerguntando(t, () => { window.tocarSom?.('desequipar'); render(); }); };
     return el;
   }
 
@@ -9729,12 +9730,15 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 
   document.getElementById('edExcluir').onclick = () => {
     if (idx < 0) return;
-    tarefas.splice(idx, 1);
-    if (typeof verificarVitoriaAoExcluir === 'function') verificarVitoriaAoExcluir();
-    fechar();
-    render();
-    window.tocarSom?.('desequipar'); // SFX: reusa o thud curto/surdo ja catalogado, combina com "remover algo" -- mesma familia de excecao de closure do edSalvar acima (item 21 do roadmap)
-    aviso(idiomaApp() === 'en' ? 'TASK DELETED' : 'TAREFA EXCLUÍDA');
+    const tAlvo = tarefas[idx];
+    if (!tAlvo) return;
+    // tarefa recorrente que cai hoje: pergunta "so hoje" ou "todos os dias" (window.apagarTarefaPerguntando, bloco logo antes do SW)
+    window.apagarTarefaPerguntando(tAlvo, (soHoje) => {
+      fechar();
+      render();
+      window.tocarSom?.('desequipar'); // SFX: reusa o thud curto/surdo ja catalogado, combina com "remover algo" -- mesma familia de excecao de closure do edSalvar acima (item 21 do roadmap)
+      aviso(idiomaApp() === 'en' ? (soHoje ? 'SKIPPED TODAY' : 'TASK DELETED') : (soHoje ? 'PULADA POR HOJE' : 'TAREFA EXCLUÍDA'));
+    });
   };
 
   // chamada pelo render() ao tocar no corpo da linha
@@ -20249,6 +20253,75 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
 })();
 </script>
 
+<div class="edov" id="apagarRecOverlay" style="z-index:90">
+  <div class="edsheet">
+    <div class="edpuxador"></div>
+    <button id="apagarRecX" type="button" aria-label="Fechar" style="position:absolute;top:12px;right:12px;width:34px;height:34px;border:none;background:transparent;color:var(--dim);font-size:24px;line-height:1;cursor:pointer;display:grid;place-items:center">&#215;</button>
+    <div class="edtitulo" id="apagarRecTitulo">Apagar tarefa</div>
+    <p id="apagarRecTexto" style="margin:0 0 14px;font-size:14px;line-height:1.45;color:var(--dim)"></p>
+    <div style="display:flex;flex-direction:column;gap:9px">
+      <button class="edsalvar" id="apagarRecHoje" type="button"></button>
+      <button class="edsalvar" id="apagarRecTodos" type="button" style="background:var(--panel);color:var(--perigo);border:1px solid rgba(244,87,129,.35)"></button>
+    </div>
+  </div>
+</div>
+<script>
+// APAGAR TAREFA RECORRENTE: pergunta "so hoje" (pula so esse dia: t.pulaEm += hoje, a tarefa
+// continua nos outros dias) ou "todos os dias" (apaga de vez). Tarefa que nao se repete
+// (tipo 'hoje') ou que nao cai hoje apaga direto, sem pergunta. aoApagar(soHoje) roda DEPOIS
+// de a tarefa ja ter sido alterada/removida do array.
+(function(){
+  const ov = document.getElementById('apagarRecOverlay');
+  if (!ov) return;
+  const en = () => (typeof idiomaApp === 'function' && idiomaApp() === 'en');
+  let atual = null, cb = null;
+
+  function apagarTudo(t){
+    const i = tarefas.indexOf(t);
+    if (i >= 0) tarefas.splice(i, 1);
+    if (typeof verificarVitoriaAoExcluir === 'function') verificarVitoriaAoExcluir();
+  }
+  function pularHoje(t){
+    const hoje = isoAtual();
+    if (!Array.isArray(t.pulaEm)) t.pulaEm = [];
+    if (!t.pulaEm.includes(hoje)) t.pulaEm.push(hoje);
+    if (typeof verificarVitoriaAoExcluir === 'function') verificarVitoriaAoExcluir();
+    if (typeof window.salvar === 'function') window.salvar();
+  }
+  function fechar(){ ov.classList.remove('on'); atual = null; cb = null; }
+  function concluir(soHoje){
+    const t = atual, fn = cb;
+    if (!t) return;
+    fechar();
+    if (soHoje) pularHoje(t); else apagarTudo(t);
+    if (typeof fn === 'function') fn(soHoje);
+  }
+  document.getElementById('apagarRecHoje').onclick = () => concluir(true);
+  document.getElementById('apagarRecTodos').onclick = () => concluir(false);
+  document.getElementById('apagarRecX').onclick = fechar;
+  ov.onclick = e => { if (e.target === ov) fechar(); };
+  document.addEventListener('keydown', e => { if (ov.classList.contains('on') && e.key === 'Escape') fechar(); });
+
+  window.apagarTarefaPerguntando = function(t, aoApagar){
+    const recorrente = t && t.tipo !== 'hoje';
+    if (!recorrente || !ocorreNoDia(t, isoAtual())){
+      apagarTudo(t);
+      if (typeof aoApagar === 'function') aoApagar(false);
+      return;
+    }
+    atual = t; cb = aoApagar;
+    const quando = (typeof rotulo === 'function') ? rotulo(t) : '';
+    document.getElementById('apagarRecTitulo').textContent = en() ? 'Delete task' : 'Apagar tarefa';
+    document.getElementById('apagarRecTexto').textContent = en()
+      ? ('This task repeats (' + quando + '). Delete it only for today, or from all days?')
+      : ('Essa tarefa se repete (' + quando + '). Apagar só hoje ou em todos os dias?');
+    document.getElementById('apagarRecHoje').textContent = en() ? 'Only today' : 'Só hoje';
+    document.getElementById('apagarRecTodos').textContent = en() ? 'Today and all other days' : 'Hoje e nos outros dias';
+    document.getElementById('apagarRecX').setAttribute('aria-label', en() ? 'Close' : 'Fechar');
+    ov.classList.add('on');
+  };
+})();
+</script>
 <script>
 // ATUALIZACAO AO VOLTAR PRO APP (TWA): voltar pelo historico de apps NAO recarrega a pagina,
 // entao o jogador ficava com o codigo carregado dias antes (pop-ups/notificacoes antigos).

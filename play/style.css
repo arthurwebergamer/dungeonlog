@@ -6950,3 +6950,20 @@ body.tourAberto .edov.on .edsheet{opacity:1}
   .resdiabarra{height:8px;border-radius:4px;background:var(--panel);overflow:hidden}
   .resdiafill{height:100%;width:0;border-radius:4px;background:linear-gradient(90deg,#F2A65A,#F2C94C);transition:width .7s cubic-bezier(.22,1,.36,1)}
   .resdiaok{width:100%;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;padding:11px;border-radius:11px;border:none;background:var(--accent);color:var(--bg);cursor:pointer}
+
+/* estagio saiu da home: agora vive no resumo do dia */
+.estFlut{display:none !important}
+.resdiaest{margin-bottom:10px}
+/* dano RPG em cima do monstro */
+.dano-rpg{position:absolute;pointer-events:none;z-index:30;transform:translate(-50%,-50%);
+  font-family:'Silkscreen',monospace;font-size:22px;font-weight:700;color:#ff5a4d;
+  text-shadow:0 2px 0 #3a0a08,0 0 8px rgba(255,90,77,.6);animation:danoRpg .95s cubic-bezier(.2,.8,.3,1) forwards}
+@keyframes danoRpg{
+  0%{transform:translate(-50%,-30%) scale(.4);opacity:0}
+  15%{transform:translate(-50%,-70%) scale(1.5);opacity:1}
+  30%{transform:translate(-50%,-90%) scale(1);opacity:1}
+  70%{transform:translate(-50%,-130%) scale(1);opacity:1}
+  100%{transform:translate(-50%,-170%) scale(.9);opacity:0}
+}
+.coins.pulso{animation:coinsPulso .3s ease-out}
+@keyframes coinsPulso{0%{transform:scale(1)}40%{transform:scale(1.25)}100%{transform:scale(1)}}

@@ -6984,7 +6984,7 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 .mob-sprite.escapando .mobimg{opacity:1 !important;filter:none !important;animation:none !important;transform:none !important}
 .mob-sprite.escapando .sombra{opacity:1 !important;width:auto !important}
 
-/* ===== Efeito CRT (Pro): preferencia, vale sobre qualquer tema ===== */
+/* ===== Efeito CRT: ligado por padrao, preferencia, vale sobre qualquer tema ===== */
 :root[data-crt="1"] body{text-shadow:1.2px 0 rgba(255,40,40,.32),-1.2px 0 rgba(40,160,255,.32),0 0 3px rgba(255,255,255,.1)}
 /* cores mais vivas, como tubo de verdade */
 :root[data-crt="1"]::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:2147482999;

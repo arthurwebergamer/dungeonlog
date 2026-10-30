@@ -6986,8 +6986,6 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 
 /* ===== Efeito CRT (Pro): preferencia, vale sobre qualquer tema ===== */
 :root[data-crt="1"] body{text-shadow:1.2px 0 rgba(255,40,40,.32),-1.2px 0 rgba(40,160,255,.32),0 0 3px rgba(255,255,255,.1)}
-/* aberracao cromatica nos sprites (no wrapper, pra nao sobrescrever filtros internos) */
-:root[data-crt="1"] .hero-sprite,:root[data-crt="1"] .mob-sprite{filter:drop-shadow(1px 0 0 rgba(255,40,40,.35)) drop-shadow(-1px 0 0 rgba(40,160,255,.35))}
 /* cores mais vivas, como tubo de verdade */
 :root[data-crt="1"]::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:2147482999;
   -webkit-backdrop-filter:saturate(1.15) contrast(1.04);backdrop-filter:saturate(1.15) contrast(1.04)}

@@ -133,7 +133,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=355">
+<link rel="stylesheet" href="style.css?v=356">
 <script>
 // A abertura so sai quando (1) a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado (sair antes mostrava um flash
 // cinza vazio e depois a tela de login por baixo, visto em video de teste) E (2) quem ja tinha sessao neste aparelho teve login confirmado e o
@@ -5890,6 +5890,39 @@ const COIN_SVG = '<svg viewBox="0 0 13 13" shape-rendering="crispEdges"><image h
 // de XP ja usada no resto do app (--verde, ver dmg-xp em style.css)
 const XP_GEM_SVG = '<svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="7" y="1" width="2" height="1" fill="#63C99A"/><rect x="5" y="2" width="6" height="1" fill="#63C99A"/><rect x="3" y="3" width="10" height="2" fill="#7EDBB0"/><rect x="1" y="5" width="14" height="3" fill="#63C99A"/><rect x="3" y="8" width="10" height="2" fill="#4EA97E"/><rect x="5" y="10" width="6" height="1" fill="#4EA97E"/><rect x="7" y="11" width="2" height="1" fill="#4EA97E"/></svg>';
 
+// icones pixel-art (mesmo padrao crispEdges de COIN_SVG/XP_GEM_SVG) pras telas de nivel / dia vencido / monstro escapou.
+// rows: grade de caracteres ('.' = vazio); pal: char -> cor. Ganha contorno escuro de 1px automaticamente.
+function pxSvg(rows, pal){
+  const w = rows[0].length, h = rows.length, W = w + 2, H = h + 2;
+  const g = []; for (let y = 0; y < H; y++){ g.push(new Array(W).fill('.')); }
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) g[y + 1][x + 1] = rows[y][x] || '.';
+  const o = g.map(r => r.slice());
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++){
+    if (g[y][x] !== '.') continue;
+    if ((y > 0 && g[y-1][x] !== '.') || (y < H-1 && g[y+1][x] !== '.') || (x > 0 && g[y][x-1] !== '.') || (x < W-1 && g[y][x+1] !== '.')) o[y][x] = 'k';
+  }
+  let r = '';
+  for (let y = 0; y < H; y++){
+    let x = 0;
+    while (x < W){
+      const c = o[y][x];
+      if (c === '.'){ x++; continue; }
+      let x2 = x; while (x2 + 1 < W && o[y][x2 + 1] === c) x2++;
+      r += '<rect x="' + x + '" y="' + y + '" width="' + (x2 - x + 1) + '" height="1" fill="' + (c === 'k' ? '#241418' : pal[c]) + '"/>';
+      x = x2 + 1;
+    }
+  }
+  return '<svg viewBox="0 0 ' + W + ' ' + H + '" shape-rendering="crispEdges">' + r + '</svg>';
+}
+const PX_ICO = {
+  heart: pxSvg(['.aa.aa.','abbabba','bbbbbbb','.bbbbbd','..bbbd.','...d...'], {a:'#ffa0a8', b:'#e8456b', d:'#a02848'}),
+  ponto: pxSvg(['...a...','...a...','.aabaa.','aabbbaa','.aabaa.','...a...','...a...'], {a:'#ffd23f', b:'#fff6c8'}),
+  pergaminho: pxSvg(['.aaaaa.','abbbbba','.bcbcb.','.bbbbb.','.bcbcb.','.bbbbb.','.aaaaa.'], {a:'#b08a4a', b:'#eadcb0', c:'#7a5a2a'}),
+  chama: pxSvg(['...a...','..aa...','.aaba..','.abbba.','aabcbba','abbcbba','.abbba.','..aaa..'], {a:'#ff7a3d', b:'#ffc83d', c:'#fff3b0'}),
+  bandeira: pxSvg(['cbbbb..','cbbbbb.','cbbbb..','c......','c......','c......'], {b:'#e8456b', c:'#cfcfd6'}),
+  caveira: pxSvg(['.aaaaa.','aaaaaaa','akaaaka','aaaaaaa','.aakaa.','.a.a.a.'], {a:'#e8e4d8', k:'#241418'})
+};
+
 // item 3 do redesign de feedback de combate: em vez de um numero
 // estatico, um icone nasce no ponto de origem (onde o monstro morreu)
 // e VOA de verdade ate o elemento de destino real na tela (contador de
@@ -10285,13 +10318,15 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   // que se quer proteger e uma rajada, nao o dia seguinte de verdade.
   let quedaNaFila = false;
 
-  function ferir(n){
+  function ferir(n, quieto){
     if (n <= 0) return false;
     vida -= n;
+    if (!quieto){
     tremer();
     flashHeroi();
     try { window.arpgNumero(String(n), { alvo: 'heroSprite', cls: 'dano', cor: '#ff5a4d', dur: 800, alt: 60 }); window.arpgVinheta(); } catch(e){}
-    window.tocarSom?.('danoHeroi'); // SFX: ferir() vive em IIFE, sem gancho externo possivel -- editado direto (ver roadmap.md, secao SFX)
+    window.tocarSom?.('danoHeroi');
+    } // SFX: ferir() vive em IIFE, sem gancho externo possivel -- editado direto (ver roadmap.md, secao SFX)
 
     if (vida <= 0){
       vida = vidaMax();
@@ -10422,10 +10457,17 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       setTimeout(() => {
         // "Tarefas perdidas" entra na fila ANTES de ferir(): se o golpe for fatal, ferir() enfileira "Voce caiu" 420ms depois,
         // e a pessoa ve primeiro o que escapou e depois a queda (antes so aparecia "Voce caiu", sem dizer o que tinha fugido)
-        if (typeof window.enfileirarPopup === 'function' && typeof window.mostrarTarefasPerdidas === 'function'){
-          window.enfileirarPopup(prox => window.mostrarTarefasPerdidas(largadas, total, diaVirada, prox));
+        const temTela = typeof window.enfileirarPopup === 'function' && typeof window.mostrarTarefasPerdidas === 'function';
+        if (temTela){
+          // golpes da tela "monstro escapou": 1 por tarefa largada, somando exatamente o dano total
+          const raws = largadas.map(t => ECO.danoPorTarefa * (typeof multDif === 'function' ? multDif(difDe(t)) : 1));
+          const somaRaw = raws.reduce((a, b) => a + b, 0) || 1;
+          let acum = 0, antes = 0;
+          const golpes = raws.map(r => { acum += r; const c = Math.round(total * acum / somaRaw); const g = c - antes; antes = c; return g; });
+          const info = { vidaAntes: vida, vidaMax: vidaMax(), golpes: golpes };
+          window.enfileirarPopup(prox => window.mostrarTarefasPerdidas(largadas, total, diaVirada, prox, info));
         }
-        const morreu = ferir(total);
+        const morreu = ferir(total, temTela);
         if (!(typeof window.enfileirarPopup === 'function' && typeof window.mostrarTarefasPerdidas === 'function') && !morreu && typeof aviso === 'function'){
           const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
           aviso(en
@@ -12109,8 +12151,8 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     const dV = (typeof ECO !== 'undefined' && ECO && ECO.vidaPorNivel) ? Math.round(ECO.vidaPorNivel) : 0;
     const heroImg = (typeof heroiAtual === 'function') ? heroiAtual().img : '';
     const rows = [];
-    if (vMax !== null) rows.push(['HP', en ? 'Max health' : 'Vida máxima', dV > 0 ? '<span class="cnt" data-f="' + (vMax - dV) + '" data-t="' + vMax + '">' + (vMax - dV) + '</span>' : String(vMax), dV > 0 ? '+' + dV : '']);
-    if (nivel > 1) rows.push(['+1', en ? 'Attribute point' : 'Ponto de atributo', '1', 'NEW']);
+    if (vMax !== null) rows.push([PX_ICO.heart, en ? 'Max health' : 'Vida máxima', dV > 0 ? '<span class="cnt" data-f="' + (vMax - dV) + '" data-t="' + vMax + '">' + (vMax - dV) + '</span>' : String(vMax), dV > 0 ? '+' + dV : '']);
+    if (nivel > 1) rows.push([PX_ICO.ponto, en ? 'Attribute point' : 'Ponto de atributo', '1', 'NEW']);
     const from = Math.max(1, nivel - 2);
     let rail = '';
     for (let k = from; k < from + 5; k++){
@@ -12408,12 +12450,12 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     const heroImg = (typeof heroiAtual === 'function') ? heroiAtual().img : '';
     const cq = window.cqHelpers;
     const rows = [
-      ['\u2713', en ? 'Tasks done' : 'Tarefas concluídas', String(d.nTarefas)],
-      ['XP', en ? 'Experience' : 'Experiência', '+' + xpDia],
-      ['$', en ? 'Coins' : 'Moedas', '+' + d.ganho],
-      ['>', en ? 'Streak' : 'Sequência', streak + (streak === 1 ? (en ? ' day' : ' dia') : (en ? ' days' : ' dias'))]
+      [PX_ICO.pergaminho, en ? 'Tasks done' : 'Tarefas concluídas', String(d.nTarefas)],
+      [XP_GEM_SVG, en ? 'Experience' : 'Experiência', '+' + xpDia],
+      [COIN_SVG, en ? 'Coins' : 'Moedas', '+' + d.ganho],
+      [PX_ICO.chama, en ? 'Streak' : 'Sequência', streak + (streak === 1 ? (en ? ' day' : ' dia') : (en ? ' days' : ' dias'))]
     ];
-    if (est) rows.push(['E', est.l, est.v]);
+    if (est) rows.push([PX_ICO.bandeira, est.l, est.v]);
     tela.className = 'cq-tela';
     tela.innerHTML =
       '<div class="md-back"></div><div class="md-sheet"><div class="md-handle"></div>' +
@@ -12496,6 +12538,116 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   }
 
   window.mostrarTarefasPerdidas = mostrarTarefasPerdidas;
+})();
+</script>
+
+<script>
+(function(){
+  // TELA "MONSTRO ESCAPOU": ao abrir o app com tarefas largadas no dia anterior, o monstro espanca o heroi
+  // uma vez por tarefa perdida (golpes rapidos), com a vida caindo e o nome de cada tarefa; depois vem o resumo.
+  // Substitui window.mostrarTarefasPerdidas (mesma assinatura + 5o parametro "info" vindo de verificarVirada).
+  const tela = document.createElement('div'); tela.id = 'escapouTela'; tela.className = 'cq-tela';
+  document.body.appendChild(tela);
+  let aoFecharCb = null, tok = 0;
+  function fechar(){
+    tela.classList.add('estagio-tela-saindo');
+    setTimeout(() => {
+      tela.classList.remove('on', 'estagio-tela-saindo'); tela.innerHTML = '';
+      const cb = aoFecharCb; aoFecharCb = null;
+      if (cb) cb();
+    }, 240);
+  }
+  const esc = t => String(t == null ? '' : t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+  window.mostrarTarefasPerdidas = function(largadas, total, diaVirada, aoFechar, info){
+    if (!largadas || !largadas.length){ if (aoFechar) aoFechar(); return; }
+    aoFecharCb = aoFechar || null;
+    const meuTok = ++tok;
+    const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
+    const N = largadas.length;
+    const vMax = (info && info.vidaMax) || (window.vidaHeroi ? window.vidaHeroi.max() : 40);
+    const vAntes = (info && info.vidaAntes != null) ? info.vidaAntes : Math.min(vMax, (window.vidaHeroi ? window.vidaHeroi.get() : vMax) + total);
+    let golpes = info && info.golpes;
+    if (!golpes || golpes.length !== N){ golpes = []; let ac = 0; for (let i = 0; i < N; i++){ const c = Math.round(total * (i + 1) / N); golpes.push(c - ac); ac = c; } }
+    const m = (typeof monstroDoDiaEm === 'function' && diaVirada) ? monstroDoDiaEm(diaVirada) : (typeof monstroDoDia === 'function' ? monstroDoDia() : null);
+    const heroImg = (typeof heroiAtual === 'function') ? heroiAtual().img : '';
+    const cq = window.cqHelpers;
+    const nomeM = m ? ((en && m.nome_en) || m.nome) : '';
+    const vFim = Math.max(0, vAntes - total);
+
+    tela.className = 'cq-tela';
+    tela.innerHTML =
+      '<div class="md-back"></div><div class="md-sheet"><div class="md-handle"></div>' +
+      '<div class="md-k">' + (en ? 'SKIPPED TASKS' : 'TAREFAS PERDIDAS') + '</div>' +
+      '<div class="md-t">' + (nomeM ? (en ? nomeM + ' got away' : nomeM + ' escapou') : (en ? 'It got away' : 'Ele escapou')) + '</div>' +
+      '<div class="md-art"><div class="zoom"><div class="l" style="' + (cq ? cq.bgMasmorra() : '') + '"></div></div><div class="shade"></div>' +
+        '<div class="tocha-arena tocha-esq"></div><div class="tocha-arena tocha-dir"></div>' +
+        (heroImg ? '<img class="md-hero rd-hero" id="escHero" src="' + heroImg + '" alt="">' : '') +
+        (m ? '<img class="md-hero rd-mob" id="escMob" style="filter:drop-shadow(0 4px 0 rgba(0,0,0,.35))" src="' + m.img + '" alt="">' : '') +
+        '<div class="esc-hp"><i id="escHpFill" style="width:' + Math.round(vAntes / vMax * 100) + '%"></i></div>' +
+        '<div class="esc-cnt" id="escCnt">0 / ' + N + '</div></div>' +
+      '<div class="esc-nome" id="escNome">&nbsp;</div>' +
+      '<div class="md-rows" id="escRows"></div>' +
+      '<button class="md-btn esc-ok" id="escOk" style="animation:none;opacity:0;pointer-events:none;transform:none">' + (en ? 'Continue' : 'Continuar') + '</button></div>';
+    document.getElementById('escOk').onclick = fechar;
+    if (typeof tocarSom === 'function') tocarSom('fuga');
+    requestAnimationFrame(() => tela.classList.add('on'));
+
+    const art = tela.querySelector('.md-art'), heroEl = document.getElementById('escHero'), mobEl = document.getElementById('escMob');
+    const fill = document.getElementById('escHpFill'), cnt = document.getElementById('escCnt'), nomeEl = document.getElementById('escNome');
+
+    (async () => {
+      await sleep(1300);
+      if (meuTok !== tok) return;
+      const gap = Math.max(90, Math.min(340, Math.round(1800 / N)));
+      let vida = vAntes;
+      for (let i = 0; i < N; i++){
+        if (meuTok !== tok || !tela.classList.contains('on')) return;
+        const g = golpes[i] || 0;
+        nomeEl.textContent = largadas[i].texto || '';
+        cnt.textContent = (i + 1) + ' / ' + N;
+        // investida do monstro
+        if (mobEl && heroEl && mobEl.animate){
+          const dx = Math.max(20, mobEl.getBoundingClientRect().left - heroEl.getBoundingClientRect().right + 10);
+          const d = Math.max(110, Math.min(300, gap * 0.95));
+          mobEl.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(' + (-dx) + 'px)', offset: .4 }, { transform: 'translateX(' + (-dx) + 'px)', offset: .55 }, { transform: 'translateX(0)' }], { duration: d, easing: 'ease-out', composite: 'add' });
+          setTimeout(() => {
+            if (meuTok !== tok) return;
+            heroEl.animate([{ filter: 'brightness(3)' }, { filter: 'none' }], { duration: 160 });
+            heroEl.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-7px)' }, { transform: 'translateX(4px)' }, { transform: 'translateX(0)' }], { duration: 200, composite: 'add' });
+          }, d * 0.4);
+        }
+        setTimeout(() => {
+          if (meuTok !== tok) return;
+          vida = Math.max(0, vida - g);
+          fill.style.width = Math.round(vida / vMax * 100) + '%';
+          if (typeof tocarSom === 'function') tocarSom('danoHeroi');
+          if (g > 0 && heroEl){
+            const ar = art.getBoundingClientRect(), hr = heroEl.getBoundingClientRect();
+            const n = document.createElement('div'); n.className = 'esc-num'; n.textContent = g;
+            n.style.left = (hr.left - ar.left + hr.width / 2 + (Math.random() * 24 - 12)) + 'px';
+            n.style.top = (hr.top - ar.top + 4) + 'px';
+            art.appendChild(n);
+            n.animate([{ transform: 'translate(-50%,0) scale(.6)', opacity: 0 }, { transform: 'translate(-50%,-22px) scale(1.2)', opacity: 1, offset: .25 }, { transform: 'translate(-50%,-40px) scale(1)', opacity: 0 }], { duration: 650 }).onfinish = () => n.remove();
+          }
+        }, Math.round(Math.max(110, Math.min(300, gap * 0.95)) * 0.4));
+        await sleep(gap);
+      }
+      await sleep(350);
+      if (meuTok !== tok) return;
+      nomeEl.innerHTML = '&nbsp;';
+      const rows = [
+        [PX_ICO.pergaminho, en ? 'Tasks skipped' : 'Tarefas perdidas', String(N)],
+        [PX_ICO.heart, en ? 'Health lost' : 'Vida perdida', '−' + total],
+        [PX_ICO.heart, en ? 'Health left' : 'Vida restante', vFim + ' / ' + vMax]
+      ];
+      document.getElementById('escRows').innerHTML = rows.map((r, i) =>
+        '<div class="md-row" style="--i:' + i + '"><span class="ic">' + r[0] + '</span><span class="t">' + r[1] + '</span><span class="v">' + r[2] + '</span></div>').join('');
+      const ok = document.getElementById('escOk');
+      ok.style.pointerEvents = 'auto'; ok.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, delay: 250, fill: 'forwards' });
+    })();
+  };
 })();
 </script>
 

@@ -133,7 +133,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=355">
+<link rel="stylesheet" href="style.css?v=362">
 <script>
 // A abertura so sai quando (1) a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado (sair antes mostrava um flash
 // cinza vazio e depois a tela de login por baixo, visto em video de teste) E (2) quem ja tinha sessao neste aparelho teve login confirmado e o
@@ -3381,7 +3381,7 @@ function monstroDoDiaEm(iso){
 }
 
 function desenharMonstro(){
-  const m = monstroDoDia();
+  const m = (window._monstroEscapando && typeof monstroDoDiaEm === 'function') ? monstroDoDiaEm(window._monstroEscapando) : monstroDoDia();
   document.getElementById('mobSprite').innerHTML =
     '<img class="mobimg" src="' + m.img + '" alt="' + m.nome + '">' +
     '<div class="sombra"></div>';
@@ -5889,6 +5889,39 @@ const COIN_SVG = '<svg viewBox="0 0 13 13" shape-rendering="crispEdges"><image h
 // diamante verde -- mesmo padrao crispEdges do COIN_SVG, cor da paleta
 // de XP ja usada no resto do app (--verde, ver dmg-xp em style.css)
 const XP_GEM_SVG = '<svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect x="7" y="1" width="2" height="1" fill="#63C99A"/><rect x="5" y="2" width="6" height="1" fill="#63C99A"/><rect x="3" y="3" width="10" height="2" fill="#7EDBB0"/><rect x="1" y="5" width="14" height="3" fill="#63C99A"/><rect x="3" y="8" width="10" height="2" fill="#4EA97E"/><rect x="5" y="10" width="6" height="1" fill="#4EA97E"/><rect x="7" y="11" width="2" height="1" fill="#4EA97E"/></svg>';
+
+// icones pixel-art (mesmo padrao crispEdges de COIN_SVG/XP_GEM_SVG) pras telas de nivel / dia vencido / monstro escapou.
+// rows: grade de caracteres ('.' = vazio); pal: char -> cor. Ganha contorno escuro de 1px automaticamente.
+function pxSvg(rows, pal){
+  const w = rows[0].length, h = rows.length, W = w + 2, H = h + 2;
+  const g = []; for (let y = 0; y < H; y++){ g.push(new Array(W).fill('.')); }
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) g[y + 1][x + 1] = rows[y][x] || '.';
+  const o = g.map(r => r.slice());
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++){
+    if (g[y][x] !== '.') continue;
+    if ((y > 0 && g[y-1][x] !== '.') || (y < H-1 && g[y+1][x] !== '.') || (x > 0 && g[y][x-1] !== '.') || (x < W-1 && g[y][x+1] !== '.')) o[y][x] = 'k';
+  }
+  let r = '';
+  for (let y = 0; y < H; y++){
+    let x = 0;
+    while (x < W){
+      const c = o[y][x];
+      if (c === '.'){ x++; continue; }
+      let x2 = x; while (x2 + 1 < W && o[y][x2 + 1] === c) x2++;
+      r += '<rect x="' + x + '" y="' + y + '" width="' + (x2 - x + 1) + '" height="1" fill="' + (c === 'k' ? '#241418' : pal[c]) + '"/>';
+      x = x2 + 1;
+    }
+  }
+  return '<svg viewBox="0 0 ' + W + ' ' + H + '" shape-rendering="crispEdges">' + r + '</svg>';
+}
+const PX_ICO = {
+  heart: pxSvg(['.aa.aa.','abbabba','bbbbbbb','.bbbbbd','..bbbd.','...d...'], {a:'#ffa0a8', b:'#e8456b', d:'#a02848'}),
+  ponto: pxSvg(['...a...','...a...','.aabaa.','aabbbaa','.aabaa.','...a...','...a...'], {a:'#ffd23f', b:'#fff6c8'}),
+  pergaminho: pxSvg(['.aaaaa.','abbbbba','.bcbcb.','.bbbbb.','.bcbcb.','.bbbbb.','.aaaaa.'], {a:'#b08a4a', b:'#eadcb0', c:'#7a5a2a'}),
+  chama: pxSvg(['...a...','..aa...','.aaba..','.abbba.','aabcbba','abbcbba','.abbba.','..aaa..'], {a:'#ff7a3d', b:'#ffc83d', c:'#fff3b0'}),
+  bandeira: pxSvg(['cbbbb..','cbbbbb.','cbbbb..','c......','c......','c......'], {b:'#e8456b', c:'#cfcfd6'}),
+  caveira: pxSvg(['.aaaaa.','aaaaaaa','akaaaka','aaaaaaa','.aakaa.','.a.a.a.'], {a:'#e8e4d8', k:'#241418'})
+};
 
 // item 3 do redesign de feedback de combate: em vez de um numero
 // estatico, um icone nasce no ponto de origem (onde o monstro morreu)
@@ -10285,13 +10318,15 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   // que se quer proteger e uma rajada, nao o dia seguinte de verdade.
   let quedaNaFila = false;
 
-  function ferir(n){
+  function ferir(n, quieto){
     if (n <= 0) return false;
     vida -= n;
+    if (!quieto){
     tremer();
     flashHeroi();
     try { window.arpgNumero(String(n), { alvo: 'heroSprite', cls: 'dano', cor: '#ff5a4d', dur: 800, alt: 60 }); window.arpgVinheta(); } catch(e){}
-    window.tocarSom?.('danoHeroi'); // SFX: ferir() vive em IIFE, sem gancho externo possivel -- editado direto (ver roadmap.md, secao SFX)
+    window.tocarSom?.('danoHeroi');
+    } // SFX: ferir() vive em IIFE, sem gancho externo possivel -- editado direto (ver roadmap.md, secao SFX)
 
     if (vida <= 0){
       vida = vidaMax();
@@ -10419,13 +10454,39 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 
     if (dano > 0){
       const total = Math.max(1, Math.round(dano));
+      // o monstro do dia perdido continua na arena ate a animacao de golpes acabar (so entao entra o de hoje)
+      if (largadas.length && typeof window.escapadaNaArena === 'function'){
+        window._monstroEscapando = diaVirada;
+        window._fimEscapada = () => {
+          window._monstroEscapando = null;
+          const mo = document.getElementById('mobSprite'); if (mo) mo.classList.remove('escapando');
+          try { desenharMonstro(); } catch(e){}
+        };
+        const mo0 = document.getElementById('mobSprite'); if (mo0) mo0.classList.add('escapando');   // ativo, nunca esmaecido
+        try { desenharMonstro(); } catch(e){}
+        setTimeout(() => { if (window._monstroEscapando) window._fimEscapada(); }, 25000);   // seguranca
+      }
       setTimeout(() => {
         // "Tarefas perdidas" entra na fila ANTES de ferir(): se o golpe for fatal, ferir() enfileira "Voce caiu" 420ms depois,
         // e a pessoa ve primeiro o que escapou e depois a queda (antes so aparecia "Voce caiu", sem dizer o que tinha fugido)
-        if (typeof window.enfileirarPopup === 'function' && typeof window.mostrarTarefasPerdidas === 'function'){
-          window.enfileirarPopup(prox => window.mostrarTarefasPerdidas(largadas, total, diaVirada, prox));
+        const temTela = typeof window.enfileirarPopup === 'function' && typeof window.mostrarTarefasPerdidas === 'function' && typeof window.escapadaNaArena === 'function';
+        let info = null;
+        if (temTela){
+          // golpes da animacao: 1 por tarefa largada, somando exatamente o dano total
+          const raws = largadas.map(t => ECO.danoPorTarefa * (typeof multDif === 'function' ? multDif(difDe(t)) : 1));
+          const somaRaw = raws.reduce((a, b) => a + b, 0) || 1;
+          let acum = 0, antes = 0;
+          const golpes = raws.map(r => { acum += r; const c = Math.round(total * acum / somaRaw); const g = c - antes; antes = c; return g; });
+          info = { vidaAntes: vida, vidaMax: vidaMax(), golpes: golpes };
         }
-        const morreu = ferir(total);
+        // o dano e aplicado (e salvo) na hora; a animacao so REENCENA a perda na arena
+        const morreu = ferir(total, temTela);
+        if (temTela){
+          // ordem na fila: animacao na arena -> (se caiu) tela "Voce caiu", que o ferir() ja enfileirou; senao -> resumo "Tarefas perdidas"
+          window.enfileirarPopup(prox => window.escapadaNaArena(largadas, diaVirada, info, morreu, () => {
+            if (morreu) prox(); else window.mostrarTarefasPerdidas(largadas, total, diaVirada, prox, info);
+          }));
+        }
         if (!(typeof window.enfileirarPopup === 'function' && typeof window.mostrarTarefasPerdidas === 'function') && !morreu && typeof aviso === 'function'){
           const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
           aviso(en
@@ -10472,6 +10533,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     get:() => vida,
     set:v => { vida = v; gravar(); pintar(); },
     max:vidaMax,
+    repintar: () => pintar(),
     checarVirada: verificarVirada,      // usado pelo watchdog de dia
     // chamado por puxarNuvem() (bloco AUTH/Firebase) apos restaurar
     // CHAVE_VIDA vinda da nuvem -- sem isto, o boot desta IIFE ja tinha
@@ -12109,8 +12171,8 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     const dV = (typeof ECO !== 'undefined' && ECO && ECO.vidaPorNivel) ? Math.round(ECO.vidaPorNivel) : 0;
     const heroImg = (typeof heroiAtual === 'function') ? heroiAtual().img : '';
     const rows = [];
-    if (vMax !== null) rows.push(['HP', en ? 'Max health' : 'Vida máxima', dV > 0 ? '<span class="cnt" data-f="' + (vMax - dV) + '" data-t="' + vMax + '">' + (vMax - dV) + '</span>' : String(vMax), dV > 0 ? '+' + dV : '']);
-    if (nivel > 1) rows.push(['+1', en ? 'Attribute point' : 'Ponto de atributo', '1', 'NEW']);
+    if (vMax !== null) rows.push([PX_ICO.heart, en ? 'Max health' : 'Vida máxima', dV > 0 ? '<span class="cnt" data-f="' + (vMax - dV) + '" data-t="' + vMax + '">' + (vMax - dV) + '</span>' : String(vMax), dV > 0 ? '+' + dV : '']);
+    if (nivel > 1) rows.push([PX_ICO.ponto, en ? 'Attribute point' : 'Ponto de atributo', '1', 'NEW']);
     const from = Math.max(1, nivel - 2);
     let rail = '';
     for (let k = from; k < from + 5; k++){
@@ -12319,37 +12381,43 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 <script>
 (function(){
   if (typeof heroiAtual !== 'function') return;
-
-  const quedaBG = document.createElement('div');
-  quedaBG.className = 'baubg'; quedaBG.id = 'quedaBG';   // reusa o mesmo fundo escurecido
-  const quedaPop = document.createElement('div');
-  quedaPop.className = 'quedapop'; quedaPop.id = 'quedaPop';
-  document.body.appendChild(quedaBG);
-  document.body.appendChild(quedaPop);
-
+  // "VOCE CAIU": bottom sheet no padrao das telas de nivel/dia vencido. A animacao do heroi apanhando e sumindo
+  // acontece ANTES, na propria arena (escapadaNaArena); aqui so o resultado.
+  const tela = document.createElement('div'); tela.id = 'quedaTela'; tela.className = 'cq-tela';
+  document.body.appendChild(tela);
   let _aoFecharQueda = null;
   function fecharQueda(){
-    quedaPop.classList.remove('on');
-    quedaBG.classList.remove('on');
-    const cb = _aoFecharQueda; _aoFecharQueda = null;
-    if (cb) cb();
+    tela.classList.add('estagio-tela-saindo');
+    setTimeout(() => {
+      tela.classList.remove('on', 'estagio-tela-saindo'); tela.innerHTML = '';
+      if (typeof window._restaurarHeroiQueda === 'function') window._restaurarHeroiQueda();
+      const cb = _aoFecharQueda; _aoFecharQueda = null;
+      if (cb) cb();
+    }, 240);
   }
-  quedaBG.onclick = fecharQueda;
 
   function mostrarQueda(perdidas, aoFechar){
     _aoFecharQueda = aoFechar || null;
     const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
-
-    quedaPop.innerHTML =
-      '<div class="quedalabel">' + (en ? 'Defeat' : 'Derrota') + '</div>'+
-      '<div class="quedaicone"><img src="'+heroiAtual().img+'" alt="' + (en ? 'fallen hero' : 'herói caído') + '"></div>'+
-      '<div class="quedatitulo">' + (en ? 'You fell.' : 'Você caiu.') + '</div>'+
-      '<div class="quedaperda">' + (en ? ('Lost <b>'+perdidas+' coins</b> in the fall — health restored.') : ('Perdeu <b>'+perdidas+' moedas</b> na queda — vida restaurada.')) + '</div>'+
-      '<button class="quedaok" id="quedaOk">' + (en ? 'Get up' : 'Levantar') + '</button>';
-
+    const cq = window.cqHelpers;
+    const vMax = (window.vidaHeroi && typeof window.vidaHeroi.max === 'function') ? window.vidaHeroi.max() : null;
+    const rows = [
+      [COIN_SVG, en ? 'Coins lost' : 'Moedas perdidas', '−' + perdidas]
+    ];
+    if (vMax !== null) rows.push([PX_ICO.heart, en ? 'Health restored' : 'Vida restaurada', vMax + ' / ' + vMax]);
+    if (window.vidaHeroi && window.vidaHeroi.repintar) window.vidaHeroi.repintar();   // a vida volta cheia na hora
+    tela.className = 'cq-tela';
+    tela.innerHTML =
+      '<div class="md-back"></div><div class="md-sheet"><div class="md-handle"></div>' +
+      '<div class="md-k">' + (en ? 'DEFEAT' : 'DERROTA') + '</div>' +
+      '<div class="md-t">' + (en ? 'You fell' : 'Você caiu') + '</div>' +
+      '<div class="md-art"><div class="zoom"><div class="l" style="' + (cq ? cq.bgMasmorra() : '') + '"></div></div><div class="shade"></div>' +
+        '<div class="tocha-arena tocha-esq"></div><div class="tocha-arena tocha-dir"></div>' +
+        '<img class="md-hero" style="filter:grayscale(1) brightness(.7);rotate:-90deg;bottom:4px" src="' + heroiAtual().img + '" alt="' + (en ? 'fallen hero' : 'herói caído') + '"></div>' +
+      '<div class="md-rows">' + rows.map((r, i) => '<div class="md-row" style="--i:' + i + '"><span class="ic">' + r[0] + '</span><span class="t">' + r[1] + '</span><span class="v">' + r[2] + '</span></div>').join('') + '</div>' +
+      '<button class="md-btn" style="--bd:1.2s" id="quedaOk">' + (en ? 'Get up' : 'Levantar') + '</button></div>';
     document.getElementById('quedaOk').onclick = fecharQueda;
-    quedaBG.classList.add('on');
-    requestAnimationFrame(() => quedaPop.classList.add('on'));
+    requestAnimationFrame(() => tela.classList.add('on'));
   }
 
   window.mostrarQueda = mostrarQueda;
@@ -12408,12 +12476,12 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     const heroImg = (typeof heroiAtual === 'function') ? heroiAtual().img : '';
     const cq = window.cqHelpers;
     const rows = [
-      ['\u2713', en ? 'Tasks done' : 'Tarefas concluídas', String(d.nTarefas)],
-      ['XP', en ? 'Experience' : 'Experiência', '+' + xpDia],
-      ['$', en ? 'Coins' : 'Moedas', '+' + d.ganho],
-      ['>', en ? 'Streak' : 'Sequência', streak + (streak === 1 ? (en ? ' day' : ' dia') : (en ? ' days' : ' dias'))]
+      [PX_ICO.pergaminho, en ? 'Tasks done' : 'Tarefas concluídas', String(d.nTarefas)],
+      [XP_GEM_SVG, en ? 'Experience' : 'Experiência', '+' + xpDia],
+      [COIN_SVG, en ? 'Coins' : 'Moedas', '+' + d.ganho],
+      [PX_ICO.chama, en ? 'Streak' : 'Sequência', streak + (streak === 1 ? (en ? ' day' : ' dia') : (en ? ' days' : ' dias'))]
     ];
-    if (est) rows.push(['E', est.l, est.v]);
+    if (est) rows.push([PX_ICO.bandeira, est.l, est.v]);
     tela.className = 'cq-tela';
     tela.innerHTML =
       '<div class="md-back"></div><div class="md-sheet"><div class="md-handle"></div>' +
@@ -12496,6 +12564,118 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   }
 
   window.mostrarTarefasPerdidas = mostrarTarefasPerdidas;
+})();
+</script>
+
+<script>
+(function(){
+  // "MONSTRO ESCAPOU": (1) escapadaNaArena() reencena na PROPRIA arena o monstro do dia perdido espancando o heroi,
+  // uma vez por tarefa largada, com a barra de vida descendo; se o dano e fatal, o heroi some no ultimo golpe.
+  // (2) mostrarTarefasPerdidas() e o resumo que abre DEPOIS (so quando o heroi sobreviveu).
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const $ = id => document.getElementById(id);
+
+  window.escapadaNaArena = async function(largadas, diaVirada, info, fatal, cb){
+    const fim = () => { if (typeof cb === 'function') cb(); };
+    const arena = document.querySelector('.arena'), hero = $('heroSprite'), mob = $('mobSprite'), fill = $('hpfill'), num = $('hpnum');
+    if (!arena || !hero || !mob || !fill || !num || !info || !largadas || !largadas.length || arena.getBoundingClientRect().width === 0 || document.hidden){ if (window._fimEscapada) window._fimEscapada(); fim(); return; }
+    const N = largadas.length, vMax = info.vidaMax;
+    const pintaBarra = v => {
+      const pct = vMax > 0 ? v / vMax * 100 : 0;
+      fill.style.width = pct + '%'; num.textContent = v + ' / ' + vMax;
+      fill.classList.toggle('baixa', pct <= 25); num.classList.toggle('baixa', pct <= 25);
+    };
+    let v = info.vidaAntes; pintaBarra(v);
+    if (typeof tocarSom === 'function') tocarSom('fuga');
+    await sleep(500);
+    const gap = Math.max(150, Math.min(650, Math.round(5200 / N)));   // golpes um pouco mais lentos
+    const dur = Math.max(130, Math.min(480, gap * 0.9));
+    for (let i = 0; i < N; i++){
+      const g = info.golpes[i] || 0;
+      const dx = Math.max(20, mob.getBoundingClientRect().left - hero.getBoundingClientRect().right + 12);
+      if (mob.animate) mob.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(' + (-dx) + 'px)', offset: .4 }, { transform: 'translateX(' + (-dx) + 'px)', offset: .55 }, { transform: 'translateX(0)' }], { duration: dur, easing: 'ease-out', composite: 'add' });
+      setTimeout(() => {
+        v = Math.max(0, v - g); pintaBarra(v);
+        if (typeof tocarSom === 'function') tocarSom('danoHeroi');
+        hero.classList.remove('ferido'); void hero.offsetWidth; hero.classList.add('ferido'); setTimeout(() => hero.classList.remove('ferido'), 200);
+        if (hero.animate) hero.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-6px)' }, { transform: 'translateX(4px)' }, { transform: 'translateX(0)' }], { duration: 200, composite: 'add' });
+        const w = document.querySelector('.xpwrap'); if (w){ w.classList.remove('hpdano'); void w.offsetWidth; w.classList.add('hpdano'); }
+        if (g > 0 && typeof window.arpgNumero === 'function') window.arpgNumero(String(g), { alvo: 'heroSprite', cls: 'dano', cor: '#ff5a4d', dur: 650, alt: 46 });
+      }, dur * 0.4);
+      await sleep(gap);
+    }
+    await sleep(250);
+    if (fatal){
+      pintaBarra(0);
+      // o heroi tomba no chao (de lado) e fica la; so levanta quando a tela "Voce caiu" fechar
+      hero.style.transformOrigin = '50% 92%';
+      if (hero.animate) await hero.animate([{ rotate: '0deg' }, { rotate: '-14deg', offset: .25 }, { rotate: '-90deg' }], { duration: 750, easing: 'cubic-bezier(.5,0,.9,.6)', fill: 'forwards' }).finished.catch(() => {});
+      hero.style.rotate = '-90deg';
+      hero.getAnimations().forEach(a => a.cancel());
+      window._restaurarHeroiQueda = () => {
+        window._restaurarHeroiQueda = null;
+        if (window.vidaHeroi && window.vidaHeroi.repintar) window.vidaHeroi.repintar();   // vida cheia na hora
+        const fim2 = () => { hero.style.rotate = ''; hero.style.transformOrigin = ''; };
+        if (hero.animate){
+          const an = hero.animate([{ rotate: '-90deg' }, { rotate: '6deg', offset: .7 }, { rotate: '0deg' }], { duration: 850, easing: 'ease-out' });
+          an.onfinish = fim2; an.oncancel = fim2;
+          setTimeout(fim2, 1000);
+        } else fim2();
+        hero.style.rotate = '-90deg';
+      };
+      await sleep(350);
+    } else await sleep(350);
+    if (window._fimEscapada) window._fimEscapada();   // transicao pro monstro de hoje, ja atras do pop-up
+    if (!fatal && window.vidaHeroi && window.vidaHeroi.repintar) window.vidaHeroi.repintar();
+    fim();
+  };
+
+  // resumo "Tarefas perdidas" (bottom sheet, mesma familia da tela de level-up)
+  const tela = document.createElement('div'); tela.id = 'escapouTela'; tela.className = 'cq-tela';
+  document.body.appendChild(tela);
+  let aoFecharCb = null;
+  function fechar(){
+    tela.classList.add('estagio-tela-saindo');
+    setTimeout(() => {
+      tela.classList.remove('on', 'estagio-tela-saindo'); tela.innerHTML = '';
+      const cb = aoFecharCb; aoFecharCb = null;
+      if (cb) cb();
+    }, 240);
+  }
+  const esc = t => String(t == null ? '' : t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+  window.mostrarTarefasPerdidas = function(largadas, total, diaVirada, aoFechar, info){
+    if (!largadas || !largadas.length){ if (aoFechar) aoFechar(); return; }
+    aoFecharCb = aoFechar || null;
+    const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
+    const N = largadas.length;
+    const vMax = (info && info.vidaMax) || (window.vidaHeroi ? window.vidaHeroi.max() : 40);
+    const vFim = window.vidaHeroi ? window.vidaHeroi.get() : Math.max(0, vMax - total);
+    const m = (typeof monstroDoDiaEm === 'function' && diaVirada) ? monstroDoDiaEm(diaVirada) : (typeof monstroDoDia === 'function' ? monstroDoDia() : null);
+    const heroImg = (typeof heroiAtual === 'function') ? heroiAtual().img : '';
+    const cq = window.cqHelpers;
+    const nomeM = m ? ((en && m.nome_en) || m.nome) : '';
+    const rows = [
+      [PX_ICO.pergaminho, en ? 'Tasks skipped' : 'Tarefas perdidas', String(N)],
+      [PX_ICO.heart, en ? 'Health lost' : 'Vida perdida', '−' + total],
+      [PX_ICO.heart, en ? 'Health left' : 'Vida restante', vFim + ' / ' + vMax]
+    ];
+    const nomes = largadas.slice(0, 5).map(t => esc(t.texto)).join(' · ') + (N > 5 ? ' · +' + (N - 5) : '');
+    tela.className = 'cq-tela';
+    tela.innerHTML =
+      '<div class="md-back"></div><div class="md-sheet"><div class="md-handle"></div>' +
+      '<div class="md-k">' + (en ? 'SKIPPED TASKS' : 'TAREFAS PERDIDAS') + '</div>' +
+      '<div class="md-t">' + (nomeM ? (en ? nomeM + ' got away' : nomeM + ' escapou') : (en ? 'It got away' : 'Ele escapou')) + '</div>' +
+      '<div class="md-art"><div class="zoom"><div class="l" style="' + (cq ? cq.bgMasmorra() : '') + '"></div></div><div class="shade"></div>' +
+        '<div class="tocha-arena tocha-esq"></div><div class="tocha-arena tocha-dir"></div>' +
+        (heroImg ? '<img class="md-hero rd-hero" src="' + heroImg + '" alt="">' : '') +
+        (m ? '<img class="md-hero rd-mob" style="filter:drop-shadow(0 4px 0 rgba(0,0,0,.35));transform:scaleX(-1)" src="' + m.img + '" alt="">' : '') + '</div>' +
+      '<div class="esc-nome">' + nomes + '</div>' +
+      '<div class="md-rows">' + rows.map((r, i) => '<div class="md-row" style="--i:' + i + '"><span class="ic">' + r[0] + '</span><span class="t">' + r[1] + '</span><span class="v">' + r[2] + '</span></div>').join('') + '</div>' +
+      '<button class="md-btn" style="--bd:1.3s" id="escOk">' + (en ? 'Continue' : 'Continuar') + '</button></div>';
+    document.getElementById('escOk').onclick = fechar;
+    requestAnimationFrame(() => tela.classList.add('on'));
+  };
 })();
 </script>
 
@@ -20596,13 +20776,14 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
           render();
           if (escapou) aviso(nome.toUpperCase() + ' FUGIU', false, true);
           else aviso('AVANCOU PARA ' + nomeDiaLocal(diaDaSemana()).toUpperCase());
+          if (typeof window.checarDia === 'function') window.checarDia();   // dispara a virada na hora (senao so no watchdog de 30s)
         };
         if (escapou && mob) { mob.classList.add('fugiu'); setTimeout(av, 560); } else av();
       };
       document.body.appendChild(b);
       const bb = document.createElement('button');
       bb.id = 'devbau'; bb.textContent = 'ba\u00fa?';
-      bb.style.cssText = b.style.cssText.replace('left:8px','left:112px');
+      bb.style.cssText = b.style.cssText.replace(/left:\s*8px/,'left:112px');
       bb.onclick = () => {
         let box = document.getElementById('devbaubox');
         if (box){ box.remove(); return; }

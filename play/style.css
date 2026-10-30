@@ -6974,3 +6974,12 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 /* nome do heroi saiu do topo: aparece em outras telas */
 .nomeBadgeTopo{display:none !important}
 .topbar .coins{grid-column:3}
+
+/* tela "monstro escapou" / "voce caiu" (sheets) */
+#escapouTela .md-row,#quedaTela .md-row{transform:none}
+.esc-nome{width:100%;text-align:center;font-size:12.5px;color:var(--muted);margin:-2px 0 2px;line-height:1.4}
+.md-row .ic svg{width:18px;height:18px;display:block}
+
+/* monstro do dia perdido durante a escapada: sempre ativo (sem esmaecer por espreita/dead/fugiu) */
+.mob-sprite.escapando .mobimg{opacity:1 !important;filter:none !important;animation:none !important;transform:none !important}
+.mob-sprite.escapando .sombra{opacity:1 !important;width:auto !important}

@@ -6985,13 +6985,13 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 .mob-sprite.escapando .sombra{opacity:1 !important;width:auto !important}
 
 /* ===== Efeito CRT (Pro): preferencia, vale sobre qualquer tema ===== */
-:root[data-crt="1"] body{text-shadow:1.5px 0 rgba(255,50,50,.5),-1.5px 0 rgba(50,170,255,.5),0 0 3px rgba(255,255,255,.18)}
+:root[data-crt="1"] body{text-shadow:1px 0 rgba(255,50,50,.32),-1px 0 rgba(50,170,255,.32),0 0 3px rgba(255,255,255,.12)}
 /* referencia: scanlines bem marcadas + mascara RGB + vinheta leve */
 :root[data-crt="1"]::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:2147483000;
   background:
-    repeating-linear-gradient(0deg,rgba(0,0,0,.42) 0 1px,rgba(0,0,0,0) 1px 3px),
-    repeating-linear-gradient(90deg,rgba(255,0,0,.10) 0 1px,rgba(0,255,0,.07) 1px 2px,rgba(0,80,255,.10) 2px 3px);
-  box-shadow:inset 0 0 90px 6px rgba(0,0,0,.5);
+    repeating-linear-gradient(0deg,rgba(0,0,0,.26) 0 1px,rgba(0,0,0,0) 1px 3px),
+    repeating-linear-gradient(90deg,rgba(255,0,0,.06) 0 1px,rgba(0,255,0,.04) 1px 2px,rgba(0,80,255,.06) 2px 3px);
+  box-shadow:inset 0 0 90px 4px rgba(0,0,0,.35);
   animation:crtFlicker 4s steps(1,end) infinite}
 @keyframes crtFlicker{0%{opacity:1}7%{opacity:.9}8%{opacity:1}43%{opacity:1}44%{opacity:.93}46%{opacity:1}81%{opacity:.91}82%{opacity:1}100%{opacity:1}}
 @media (prefers-reduced-motion:reduce){:root[data-crt="1"]::after{animation:none}}

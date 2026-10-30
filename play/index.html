@@ -133,7 +133,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=344">
+<link rel="stylesheet" href="style.css?v=345">
 <script>
 // A abertura so sai quando (1) a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado (sair antes mostrava um flash
 // cinza vazio e depois a tela de login por baixo, visto em video de teste) E (2) quem ja tinha sessao neste aparelho teve login confirmado e o
@@ -2862,6 +2862,12 @@ function dispararVitoriaDoDia(doDia, nivelAntes, xpGanho, moedasGanhas){
     const mobEl = document.getElementById('mobSprite');
     if (mobEl) mobEl.style.opacity = '';
     setTimeout(()=>aviso((idiomaApp() === 'en' ? 'MONSTER DEFEATED  +' : 'MONSTRO DERROTADO  +')+ganho+(idiomaApp() === 'en' ? ' COINS' : ' MOEDAS'), true), 350);
+    // resumo do dia (tela de vitoria detalhada): entra na fila ANTES do level-up (650ms < 700ms)
+    setTimeout(() => {
+      if (typeof window.enfileirarPopup === 'function' && typeof window.mostrarResumoDia === 'function'){
+        window.enfileirarPopup(prox => window.mostrarResumoDia({ ganho: ganho, nTarefas: doDia.length }, prox));
+      }
+    }, 650);
     const nivelDepois = progresso().nivel;
     if (nivelDepois > nivelAntes){
       setTimeout(() => {
@@ -12285,6 +12291,70 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 
 <script>
 (function(){
+  // RESUMO DO DIA (vitoria): tela detalhada que abre quando o dia e vencido -- monstro derrotado, tarefas,
+  // XP do dia, moedas da vitoria, sequencia e progresso do nivel. Mesma familia visual do pop-up de nivel/
+  // tarefas perdidas (fundo .baubg + cartao central), na fila de pop-ups (enfileirarPopup).
+  // XP do dia = xpTotal agora - xpTotal no 1o toque de tarefa do dia (snapshot em localStorage, por conta).
+  const CH = 'questlog.resumoDia.v1';
+  function lerSnap(){ try { return JSON.parse(localStorage.getItem(window.chaveConta(CH)) || 'null'); } catch(e){ return null; } }
+  function snap(){
+    try {
+      const d = isoAtual(), s = lerSnap();
+      if (!s || s.dia !== d) localStorage.setItem(window.chaveConta(CH), JSON.stringify({ dia: d, xp0: xpTotal }));
+    } catch(e){}
+  }
+  const _alt = window.alternar;
+  if (typeof _alt === 'function') window.alternar = function(){ snap(); return _alt.apply(this, arguments); };
+
+  const bg = document.createElement('div'); bg.className = 'baubg'; bg.id = 'resDiaBG';
+  const pop = document.createElement('div'); pop.className = 'resDiaPop'; pop.id = 'resDiaPop';
+  document.body.appendChild(bg); document.body.appendChild(pop);
+  let aoFecharCb = null;
+  function fechar(){
+    pop.classList.remove('on'); bg.classList.remove('on');
+    const cb = aoFecharCb; aoFecharCb = null;
+    if (cb) cb();
+  }
+  bg.onclick = fechar;
+
+  window.mostrarResumoDia = function(d, aoFechar){
+    aoFecharCb = aoFechar || null;
+    const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
+    const m = (typeof monstroDoDia === 'function') ? monstroDoDia() : null;
+    const snp = lerSnap();
+    const xpDia = (snp && snp.dia === isoAtual() && typeof xpTotal === 'number') ? Math.max(0, xpTotal - snp.xp0) : 0;
+    let streak = 0;
+    try { streak = estStreakAtual(estHistComHojeAoVivo(isoAtual())); } catch(e){}
+    const pr = progresso();
+    const pct = Math.max(0, Math.min(100, Math.round(pr.resto / pr.meta * 100)));
+    const nomeM = m ? ((en && m.nome_en) || m.nome) : '';
+    const linhas = [
+      [en ? 'Tasks' : 'Tarefas', String(d.nTarefas)],
+      ['XP', '+' + xpDia],
+      [en ? 'Coins' : 'Moedas', '+' + d.ganho],
+      [en ? 'Streak' : 'Sequência', streak + (streak === 1 ? (en ? ' day' : ' dia') : (en ? ' days' : ' dias'))]
+    ];
+    pop.innerHTML =
+      '<div class="resdialabel">' + (en ? 'Day won' : 'Dia vencido') + '</div>' +
+      (m ? '<div class="resdiaicone"><img src="' + m.img + '" alt=""></div>' : '') +
+      '<div class="resdiatitulo">' + (en ? 'Monster defeated' : 'Monstro derrotado') + (nomeM ? '<span>' + nomeM + '</span>' : '') + '</div>' +
+      '<div class="resdiagrade">' + linhas.map((l, i) =>
+        '<div class="resdiacel" style="animation-delay:' + (120 + i * 90) + 'ms"><span class="resdiaval">' + l[1] + '</span><span class="resdialbl">' + l[0] + '</span></div>').join('') + '</div>' +
+      '<div class="resdianivel"><div class="resdianivelrow"><span>' + (en ? 'Level ' : 'Nível ') + romano(pr.nivel) + '</span><span>' + pr.resto + ' / ' + pr.meta + '</span></div>' +
+      '<div class="resdiabarra"><div class="resdiafill" id="resDiaFill"></div></div></div>' +
+      '<button class="resdiaok" id="resDiaOk">' + (en ? 'Continue' : 'Continuar') + '</button>';
+    document.getElementById('resDiaOk').onclick = fechar;
+    bg.classList.add('on');
+    requestAnimationFrame(() => {
+      pop.classList.add('on');
+      setTimeout(() => { const f = document.getElementById('resDiaFill'); if (f) f.style.width = pct + '%'; }, 350);
+    });
+  };
+})();
+</script>
+
+<script>
+(function(){
   // Pop-up "Tarefas perdidas" -- caso NAO-FATAL de verificarVirada() (ferir()
   // retornou false). Mesma familia visual do bau: reusa .baubg (fundo
   // escurecido) e fecha com toque nele, igual ao bau -- ver mostrarBauLoot().
@@ -14223,7 +14293,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   function ofertarTrialPrimeiraVitoria(){
     const CHAVE = 'questlog.ofertaTrialPrimeira.v1';
     try { if (localStorage.getItem(window.chaveConta(CHAVE))) return; } catch(e){}
-    const ocupado = () => [...document.querySelectorAll('.dlgOverlay.on, #paywallOverlay.on, [class*="verlay"].on, .levelup.on, .nivelUp.on')]
+    const ocupado = () => [...document.querySelectorAll('.dlgOverlay.on, #paywallOverlay.on, [class*="verlay"].on, .levelup.on, .nivelUp.on, .resDiaPop.on')]
       .some(e => { const c = getComputedStyle(e); return c.display !== 'none' && c.visibility !== 'hidden' && Number(c.opacity) > 0; });
     let tentativas = 0;
     const tentar = () => {

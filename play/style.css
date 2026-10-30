@@ -6927,3 +6927,26 @@ body.tourAberto .edov.on .edsheet{opacity:1}
   .mobBarra.baixa .mobBarraFill{background:linear-gradient(180deg,#F2A65A,#D9822B)}
   .mobBarra.golpe{animation:mobBarraGolpe .3s ease-out}
   @keyframes mobBarraGolpe{0%{transform:translateX(-50%) scale(1.12);filter:brightness(1.6)}100%{transform:translateX(-50%) scale(1);filter:none}}
+
+/* ===== Resumo do dia (tela de vitoria) ===== */
+.resDiaPop{position:fixed;left:50%;top:50%;z-index:96;
+  transform:translate(-50%,-50%) scale(.9);opacity:0;pointer-events:none;
+  transition:transform .25s cubic-bezier(.2,.9,.3,1.2), opacity .22s;
+  background:var(--panel-2);border:1px solid var(--verde,#A6E08B);border-radius:18px;
+  padding:24px 20px 18px;width:min(320px, calc(100% - 48px));text-align:center;
+  box-shadow:0 0 28px -8px var(--verde,#A6E08B)}
+  .resDiaPop.on{transform:translate(-50%,-50%) scale(1);opacity:1;pointer-events:auto}
+  .resdialabel{font-family:'Silkscreen',monospace;font-size:11px;color:var(--verde,#A6E08B);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}
+  .resdiaicone{width:64px;height:64px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center}
+  .resdiaicone img{width:64px;height:64px;image-rendering:pixelated}
+  .resdiatitulo{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:21px;font-weight:600;color:var(--text);line-height:1.2;margin-bottom:16px;display:flex;flex-direction:column;gap:2px}
+  .resdiatitulo span{font-family:'Outfit',sans-serif;font-style:normal;font-size:12px;font-weight:500;color:var(--dim)}
+  .resdiagrade{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+  .resdiacel{display:flex;flex-direction:column;align-items:center;gap:2px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 6px;opacity:0;transform:translateY(6px);animation:largitemIn .32s ease forwards}
+  .resdiaval{font-family:'Outfit',sans-serif;font-size:18px;font-weight:700;color:var(--text)}
+  .resdialbl{font-family:'Outfit',sans-serif;font-size:11px;font-weight:500;color:var(--dim);letter-spacing:.04em}
+  .resdianivel{margin-bottom:16px}
+  .resdianivelrow{display:flex;justify-content:space-between;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px}
+  .resdiabarra{height:8px;border-radius:4px;background:var(--panel);overflow:hidden}
+  .resdiafill{height:100%;width:0;border-radius:4px;background:linear-gradient(90deg,#F2A65A,#F2C94C);transition:width .7s cubic-bezier(.22,1,.36,1)}
+  .resdiaok{width:100%;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;padding:11px;border-radius:11px;border:none;background:var(--accent);color:var(--bg);cursor:pointer}

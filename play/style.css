@@ -6975,11 +6975,7 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 .nomeBadgeTopo{display:none !important}
 .topbar .coins{grid-column:3}
 
-/* tela "monstro escapou" */
-#escapouTela .md-row{animation-delay:calc(var(--i)*.08s) !important;transform:none}
-.esc-hp{position:absolute;left:34%;bottom:108px;width:66px;margin-left:-33px;height:7px;background:#111;border:1px solid #000;border-radius:4px;overflow:hidden;z-index:3}
-.esc-hp i{display:block;height:100%;background:#e8456b;transition:width .12s linear}
-.esc-cnt{position:absolute;right:10px;top:8px;z-index:3;font-family:'Silkscreen',monospace;font-size:11px;color:#fff;background:#000a;border-radius:6px;padding:3px 7px}
-.esc-nome{width:100%;text-align:center;font-size:13px;color:var(--muted);margin-top:-4px;margin-bottom:2px;min-height:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.esc-num{position:absolute;z-index:4;pointer-events:none;font-family:'Silkscreen',monospace;font-weight:700;font-size:17px;color:#ff5a4d;text-shadow:2px 2px 0 #000,-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000}
+/* tela "monstro escapou" / "voce caiu" (sheets) */
+#escapouTela .md-row,#quedaTela .md-row{transform:none}
+.esc-nome{width:100%;text-align:center;font-size:12.5px;color:var(--muted);margin:-2px 0 2px;line-height:1.4}
 .md-row .ic svg{width:18px;height:18px;display:block}

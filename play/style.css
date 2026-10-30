@@ -6910,3 +6910,20 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 .estFlut[data-pro] .estFlutBar{ display:none; }
 
 .paywallOverlay{ --pw-accent:#FAFAFA; --pw-panel:#323232; --pw-panel2:#3D3D3D; --pw-line:#5C5C5C; --pw-muted:#D8D8D8; color:#FAFAFA; }
+
+/* ===== Arena: sprites assentados no chao + barra de vida do monstro (30/10) ===== */
+/* pedido do usuario: sprites "voando" sobre o chao dos biomas -- descem ~34px (o conjunto .fight) e o
+   nome + "2 / 2" de baixo saem (#mobinfo fica no DOM, so escondido, pra nao quebrar quem atualiza ele).
+   min-height mantem a altura da arena (188px) -- a arte de fundo nao se desloca. */
+  .arena{padding-top:56px !important;min-height:188px;box-sizing:border-box}
+  .mobinfo{display:none !important}
+  .fighter.mob{position:relative}
+  .mobBarra{position:absolute;left:50%;top:-6px;transform:translateX(-50%);width:62px;height:8px;
+    background:rgba(8,6,12,.78);border:1px solid rgba(0,0,0,.85);border-radius:3px;padding:1px;box-sizing:border-box;
+    box-shadow:0 1px 3px rgba(0,0,0,.5);transition:opacity .3s;z-index:3;pointer-events:none}
+  .mobBarra.off{opacity:0}
+  .mobBarraFill{height:100%;width:100%;border-radius:1px;background:linear-gradient(180deg,#E8556E,#B8283F);
+    transition:width .45s cubic-bezier(.22,1,.36,1)}
+  .mobBarra.baixa .mobBarraFill{background:linear-gradient(180deg,#F2A65A,#D9822B)}
+  .mobBarra.golpe{animation:mobBarraGolpe .3s ease-out}
+  @keyframes mobBarraGolpe{0%{transform:translateX(-50%) scale(1.12);filter:brightness(1.6)}100%{transform:translateX(-50%) scale(1);filter:none}}

@@ -133,7 +133,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=346">
+<link rel="stylesheet" href="style.css?v=347">
 <script>
 // A abertura so sai quando (1) a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado (sair antes mostrava um flash
 // cinza vazio e depois a tela de login por baixo, visto em video de teste) E (2) quem ja tinha sessao neste aparelho teve login confirmado e o
@@ -2861,7 +2861,7 @@ function dispararVitoriaDoDia(doDia, nivelAntes, xpGanho, moedasGanhas){
     // "ressuscitava" visualmente no meio da recompensa ainda voando).
     const mobEl = document.getElementById('mobSprite');
     if (mobEl) mobEl.style.opacity = '';
-    // aviso "MONSTRO DERROTADO +N MOEDAS" removido: o resumo do dia mostra isso
+    setTimeout(()=>aviso((idiomaApp() === 'en' ? 'MONSTER DEFEATED  +' : 'MONSTRO DERROTADO  +')+ganho+(idiomaApp() === 'en' ? ' COINS' : ' MOEDAS'), true), 350);
     // resumo do dia (tela de vitoria detalhada): entra na fila ANTES do level-up (650ms < 700ms)
     setTimeout(() => {
       if (typeof window.enfileirarPopup === 'function' && typeof window.mostrarResumoDia === 'function'){
@@ -2910,7 +2910,7 @@ function dispararVitoriaDoDia(doDia, nivelAntes, xpGanho, moedasGanhas){
         // tempo antes do bau entrar, sem voltar ao problema antigo de
         // parecer tudo simultaneo.
         setTimeout(mostrarBauEContadores, 600);
-      }, 'final');
+      });
     }, 420);
   } else {
     setTimeout(mostrarBauEContadores, 420);
@@ -5835,43 +5835,42 @@ window.voarRecompensa = voarRecompensa;
 // heroi (ver numeroFlutuanteHeroi, logo abaixo de numeroFlutuante) --
 // so ENTAO e que os contadores reais (coinnum/xpnum, no topo/embaixo)
 // atualizam de verdade, via a contagem suave que render() ja faz.
-function voarRecompensaFinal(xpGanho, moedasGanhas, aoTerminar, modo){
-  // modo: 'final' (golpe final: moedas voam do monstro ate o contador do topo),
-  // 'parcial' (toque parcial de meta>1: so o golpe, sem numero),
-  // omitido = golpe normal (numero de dano "-1" em cima do monstro).
-  const mob = document.getElementById('mobSprite');
+function voarRecompensaFinal(xpGanho, moedasGanhas, aoTerminar){
   const arena = document.querySelector('.arena');
-  const fim = () => { if (typeof aoTerminar === 'function') aoTerminar(); };
-  if (!mob || !arena){ fim(); return; }
-  const mr = mob.getBoundingClientRect();
-  if (modo === 'final'){
-    const alvo = document.getElementById('coinnum');
-    const ox = mr.left + mr.width / 2, oy = mr.top + mr.height / 2;
-    const n = Math.max(4, Math.min(10, Math.round((moedasGanhas || 0) / 4) + 4));
-    for (let k = 0; k < n; k++){
-      setTimeout(() => {
-        voarRecompensa(ox + (Math.random() * 40 - 20), oy + (Math.random() * 20 - 10), alvo, COIN_SVG);
-        setTimeout(() => {
-          if (typeof window.tocarSom === 'function' && k % 3 === 0) window.tocarSom('chegadaRecompensa');
-          const cn = document.querySelector('.coins');
-          if (cn){ cn.classList.remove('pulso'); void cn.offsetWidth; cn.classList.add('pulso'); }
-        }, 750);
-      }, k * 70);
-    }
-    setTimeout(fim, n * 70 + 800);
+  const mob = document.getElementById('mobSprite');
+  const heroi = document.getElementById('heroSprite');
+  if (!arena || !mob || !heroi){
+    if (typeof aoTerminar === 'function') aoTerminar(); // nao trava a sequencia se algo faltar
     return;
   }
-  if (modo !== 'parcial'){
-    const ar = arena.getBoundingClientRect();
-    const el = document.createElement('div');
-    el.className = 'dano-rpg';
-    el.textContent = '-1';
-    el.style.left = (mr.left - ar.left + mr.width / 2) + 'px';
-    el.style.top = (mr.top - ar.top - 14) + 'px';
-    arena.appendChild(el);
-    setTimeout(() => el.remove(), 1000);
-  }
-  setTimeout(fim, 420);
+  const mobRect = mob.getBoundingClientRect();
+  const origemX = mobRect.left + mobRect.width / 2;
+  const origemY = mobRect.top + mobRect.height / 2;
+
+  voarRecompensa(origemX, origemY, heroi, COIN_SVG);
+  setTimeout(() => voarRecompensa(origemX, origemY, heroi, XP_GEM_SVG), 90);
+
+  // pedido do usuario: som quando cada icone CHEGA no heroi, nao quando
+  // sai do monstro -- 750ms bate com a duracao real da transicao CSS
+  // (.75s, .recompensa-voando em style.css), a moeda sai em t=0 entao
+  // chega em 750ms; o XP sai 90ms depois (setTimeout acima) entao chega
+  // em 840ms. Reaproveita o catalogo de SFX que ja existe no app
+  // (window.tocarSom), nao um AudioContext a parte -- respeita volume/
+  // liga-desliga que o usuario ja configurou nas Opcoes.
+  setTimeout(() => { if (typeof window.tocarSom === 'function') window.tocarSom('chegadaRecompensa'); }, 750);
+
+  // "+moedas +XP" so aparece quando os icones JA CHEGARAM no heroi --
+  // 840ms bate com a duracao do voo (.75s, .recompensa-voando em
+  // style.css) mais a folga do segundo icone (90ms de atraso acima).
+  // aoTerminar() e chamado AQUI, como continuacao de verdade, nao um
+  // timer paralelo adivinhando essa mesma duracao (era assim antes --
+  // o contador do topo terminava de contar bem antes do "+X" aparecer,
+  // confirmado em video).
+  setTimeout(() => {
+    if (typeof window.tocarSom === 'function') window.tocarSom('chegadaRecompensa'); // chegada do XP (2o icone)
+    if (typeof numeroFlutuanteHeroi === 'function') numeroFlutuanteHeroi(xpGanho, moedasGanhas);
+    if (typeof aoTerminar === 'function') aoTerminar();
+  }, 840);
 }
 window.voarRecompensaFinal = voarRecompensaFinal;
 
@@ -6166,7 +6165,7 @@ function alternar(i){
       window._adiarContadoresRecompensa = false;
       // mesmo voo de icones do golpe final, e barra so anda quando ele
       // chega (aoTerminar)
-      voarRecompensaFinal(xpGanho, moedasGanhas, () => render(), 'parcial');
+      voarRecompensaFinal(xpGanho, moedasGanhas, () => render());
       return false;
     }
   }
@@ -12307,16 +12306,17 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   const _alt = window.alternar;
   if (typeof _alt === 'function') window.alternar = function(){ snap(); return _alt.apply(this, arguments); };
 
-  const bg = document.createElement('div'); bg.className = 'baubg'; bg.id = 'resDiaBG';
-  const pop = document.createElement('div'); pop.className = 'resDiaPop'; pop.id = 'resDiaPop';
-  document.body.appendChild(bg); document.body.appendChild(pop);
+  const tela = document.createElement('div'); tela.id = 'resDiaTela'; tela.className = 'cq-tela';
+  document.body.appendChild(tela);
   let aoFecharCb = null;
   function fechar(){
-    pop.classList.remove('on'); bg.classList.remove('on');
-    const cb = aoFecharCb; aoFecharCb = null;
-    if (cb) cb();
+    tela.classList.add('estagio-tela-saindo');
+    setTimeout(() => {
+      tela.classList.remove('on', 'estagio-tela-saindo'); tela.innerHTML = '';
+      const cb = aoFecharCb; aoFecharCb = null;
+      if (cb) cb();
+    }, 240);
   }
-  bg.onclick = fechar;
 
   window.mostrarResumoDia = function(d, aoFechar){
     aoFecharCb = aoFechar || null;
@@ -12332,34 +12332,39 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     let est = null;
     try {
       const e0 = estagioAtual();
-      if (e0 >= 4) est = { l: en ? 'Stage ' + e0 : 'Estágio ' + e0, v: 'MAX', p: 100 };
+      if (e0 >= 4) est = { l: (en ? 'Stage ' : 'Estágio ') + e0, v: 'MAX' };
       else {
         const tot = window.totalTarefasConcluidas(), ini = e0 === 1 ? 0 : LIMIARES_ESTAGIO[e0 - 2], alvo = LIMIARES_ESTAGIO[e0 - 1];
-        est = { l: (en ? 'Stage ' : 'Estágio ') + (e0 + 1), v: Math.max(0, Math.min(alvo - ini, tot - ini)) + ' / ' + (alvo - ini), p: Math.round(progressoEstagio() * 100) };
+        est = { l: (en ? 'To stage ' : 'Rumo ao estágio ') + (e0 + 1), v: Math.max(0, Math.min(alvo - ini, tot - ini)) + ' / ' + (alvo - ini) };
       }
     } catch(e){}
-    const linhas = [
-      [en ? 'Tasks' : 'Tarefas', String(d.nTarefas)],
-      ['XP', '+' + xpDia],
-      [en ? 'Coins' : 'Moedas', '+' + d.ganho],
-      [en ? 'Streak' : 'Sequência', streak + (streak === 1 ? (en ? ' day' : ' dia') : (en ? ' days' : ' dias'))]
+    const heroImg = (typeof heroiAtual === 'function') ? heroiAtual().img : '';
+    const cq = window.cqHelpers;
+    const rows = [
+      ['\u2713', en ? 'Tasks done' : 'Tarefas concluídas', String(d.nTarefas)],
+      ['XP', en ? 'Experience' : 'Experiência', '+' + xpDia],
+      ['$', en ? 'Coins' : 'Moedas', '+' + d.ganho],
+      ['>', en ? 'Streak' : 'Sequência', streak + (streak === 1 ? (en ? ' day' : ' dia') : (en ? ' days' : ' dias'))]
     ];
-    pop.innerHTML =
-      '<div class="resdialabel">' + (en ? 'Day won' : 'Dia vencido') + '</div>' +
-      (m ? '<div class="resdiaicone"><img src="' + m.img + '" alt=""></div>' : '') +
-      '<div class="resdiatitulo">' + (en ? 'Monster defeated' : 'Monstro derrotado') + (nomeM ? '<span>' + nomeM + '</span>' : '') + '</div>' +
-      '<div class="resdiagrade">' + linhas.map((l, i) =>
-        '<div class="resdiacel" style="animation-delay:' + (120 + i * 90) + 'ms"><span class="resdiaval">' + l[1] + '</span><span class="resdialbl">' + l[0] + '</span></div>').join('') + '</div>' +
-(est ? '<div class="resdianivel resdiaest"><div class="resdianivelrow"><span>' + est.l + '</span><span>' + est.v + '</span></div><div class="resdiabarra"><div class="resdiafill" id="resDiaEstFill"></div></div></div>' : '') +
-            '<div class="resdianivel"><div class="resdianivelrow"><span>' + (en ? 'Level ' : 'Nível ') + romano(pr.nivel) + '</span><span>' + pr.resto + ' / ' + pr.meta + '</span></div>' +
-      '<div class="resdiabarra"><div class="resdiafill" id="resDiaFill"></div></div></div>' +
-      '<button class="resdiaok" id="resDiaOk">' + (en ? 'Continue' : 'Continuar') + '</button>';
+    if (est) rows.push(['E', est.l, est.v]);
+    tela.className = 'cq-tela';
+    tela.innerHTML =
+      '<div class="md-back"></div><div class="md-sheet"><div class="md-handle"></div>' +
+      '<div class="md-k">' + (en ? 'DAY WON' : 'DIA VENCIDO') + '</div>' +
+      '<div class="md-t">' + (nomeM ? (en ? nomeM + ' defeated' : nomeM + ' derrotado') : (en ? 'Monster defeated' : 'Monstro derrotado')) + '</div>' +
+      '<div class="md-art"><div class="zoom"><div class="l" style="' + (cq ? cq.bgMasmorra() : '') + '"></div></div><div class="shade"></div>' +
+        '<div class="tocha-arena tocha-esq"></div><div class="tocha-arena tocha-dir"></div>' +
+        (heroImg ? '<img class="md-hero rd-hero" src="' + heroImg + '" alt="">' : '') +
+        (m ? '<img class="md-hero rd-mob" src="' + m.img + '" alt="">' : '') + '</div>' +
+      '<div class="md-seg"><i><b id="resDiaFill" style="animation:none;transform:scaleX(0);transition:transform .8s cubic-bezier(.3,.7,.2,1)"></b></i></div>' +
+      '<div class="md-segl"><span>' + (en ? 'Level ' : 'Nível ') + romano(pr.nivel) + '</span><span>' + pr.resto + ' / ' + pr.meta + '</span></div>' +
+      '<div class="md-rows">' + rows.map((r, i) => '<div class="md-row" style="--i:' + i + '"><span class="ic">' + r[0] + '</span><span class="t">' + r[1] + '</span><span class="v">' + r[2] + '</span></div>').join('') + '</div>' +
+      '<button class="md-btn" style="--bd:1.7s" id="resDiaOk">' + (en ? 'Continue' : 'Continuar') + '</button></div>';
     document.getElementById('resDiaOk').onclick = fechar;
-    bg.classList.add('on');
+    if (typeof tocarSom === 'function') tocarSom('levelup');
     requestAnimationFrame(() => {
-      pop.classList.add('on');
-      setTimeout(() => { const f = document.getElementById('resDiaFill'); if (f) f.style.width = pct + '%'; }, 350);
-      setTimeout(() => { const f = document.getElementById('resDiaEstFill'); if (f && est) f.style.width = est.p + '%'; }, 450);
+      tela.classList.add('on');
+      setTimeout(() => { const f = document.getElementById('resDiaFill'); if (f) f.style.transform = 'scaleX(' + (pct / 100) + ')'; }, 600);
     });
   };
 })();
@@ -14305,7 +14310,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   function ofertarTrialPrimeiraVitoria(){
     const CHAVE = 'questlog.ofertaTrialPrimeira.v1';
     try { if (localStorage.getItem(window.chaveConta(CHAVE))) return; } catch(e){}
-    const ocupado = () => [...document.querySelectorAll('.dlgOverlay.on, #paywallOverlay.on, [class*="verlay"].on, .levelup.on, .nivelUp.on, .resDiaPop.on')]
+    const ocupado = () => [...document.querySelectorAll('.dlgOverlay.on, #paywallOverlay.on, [class*="verlay"].on, .levelup.on, .nivelUp.on, #resDiaTela.on')]
       .some(e => { const c = getComputedStyle(e); return c.display !== 'none' && c.visibility !== 'hidden' && Number(c.opacity) > 0; });
     let tentativas = 0;
     const tentar = () => {

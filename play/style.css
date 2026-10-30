@@ -6970,3 +6970,7 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 .arpg-coin{position:fixed;z-index:200;width:16px;height:16px;pointer-events:none}
 .arpg-coin svg{width:100%;height:100%;display:block;image-rendering:pixelated}
 .arpg-vinheta{position:fixed;inset:0;z-index:190;pointer-events:none;box-shadow:inset 0 0 70px 16px #c01818}
+
+/* nome do heroi saiu do topo: aparece em outras telas */
+.nomeBadgeTopo{display:none !important}
+.topbar .coins{grid-column:3}

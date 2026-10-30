@@ -6910,3 +6910,63 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 .estFlut[data-pro] .estFlutBar{ display:none; }
 
 .paywallOverlay{ --pw-accent:#FAFAFA; --pw-panel:#323232; --pw-panel2:#3D3D3D; --pw-line:#5C5C5C; --pw-muted:#D8D8D8; color:#FAFAFA; }
+
+/* ===== Arena: sprites assentados no chao + barra de vida do monstro (30/10) ===== */
+/* pedido do usuario: sprites "voando" sobre o chao dos biomas -- descem ~34px (o conjunto .fight) e o
+   nome + "2 / 2" de baixo saem (#mobinfo fica no DOM, so escondido, pra nao quebrar quem atualiza ele).
+   min-height mantem a altura da arena (188px) -- a arte de fundo nao se desloca. */
+  .arena{padding-top:56px !important;min-height:188px;box-sizing:border-box}
+  .mobinfo{display:none !important}
+  .fighter.mob{position:relative}
+  .mobBarra{position:absolute;left:50%;top:-6px;transform:translateX(-50%);width:62px;height:8px;
+    background:rgba(8,6,12,.78);border:1px solid rgba(0,0,0,.85);border-radius:3px;padding:1px;box-sizing:border-box;
+    box-shadow:0 1px 3px rgba(0,0,0,.5);transition:opacity .3s;z-index:3;pointer-events:none}
+  .mobBarra.off{opacity:0}
+  .mobBarraFill{height:100%;width:100%;border-radius:1px;background:linear-gradient(180deg,#E8556E,#B8283F);
+    transition:width .45s cubic-bezier(.22,1,.36,1)}
+  .mobBarra.baixa .mobBarraFill{background:linear-gradient(180deg,#F2A65A,#D9822B)}
+  .mobBarra.golpe{animation:mobBarraGolpe .3s ease-out}
+  @keyframes mobBarraGolpe{0%{transform:translateX(-50%) scale(1.12);filter:brightness(1.6)}100%{transform:translateX(-50%) scale(1);filter:none}}
+
+/* ===== Resumo do dia (tela de vitoria) ===== */
+.resDiaPop{position:fixed;left:50%;top:50%;z-index:96;
+  transform:translate(-50%,-50%) scale(.9);opacity:0;pointer-events:none;
+  transition:transform .25s cubic-bezier(.2,.9,.3,1.2), opacity .22s;
+  background:var(--panel-2);border:1px solid var(--verde,#A6E08B);border-radius:18px;
+  padding:24px 20px 18px;width:min(320px, calc(100% - 48px));text-align:center;
+  box-shadow:0 0 28px -8px var(--verde,#A6E08B)}
+  .resDiaPop.on{transform:translate(-50%,-50%) scale(1);opacity:1;pointer-events:auto}
+  .resdialabel{font-family:'Silkscreen',monospace;font-size:11px;color:var(--verde,#A6E08B);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}
+  .resdiaicone{width:64px;height:64px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center}
+  .resdiaicone img{width:64px;height:64px;image-rendering:pixelated}
+  .resdiatitulo{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:21px;font-weight:600;color:var(--text);line-height:1.2;margin-bottom:16px;display:flex;flex-direction:column;gap:2px}
+  .resdiatitulo span{font-family:'Outfit',sans-serif;font-style:normal;font-size:12px;font-weight:500;color:var(--dim)}
+  .resdiagrade{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+  .resdiacel{display:flex;flex-direction:column;align-items:center;gap:2px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 6px;opacity:0;transform:translateY(6px);animation:largitemIn .32s ease forwards}
+  .resdiaval{font-family:'Outfit',sans-serif;font-size:18px;font-weight:700;color:var(--text)}
+  .resdialbl{font-family:'Outfit',sans-serif;font-size:11px;font-weight:500;color:var(--dim);letter-spacing:.04em}
+  .resdianivel{margin-bottom:16px}
+  .resdianivelrow{display:flex;justify-content:space-between;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px}
+  .resdiabarra{height:8px;border-radius:4px;background:var(--panel);overflow:hidden}
+  .resdiafill{height:100%;width:0;border-radius:4px;background:linear-gradient(90deg,#F2A65A,#F2C94C);transition:width .7s cubic-bezier(.22,1,.36,1)}
+  .resdiaok{width:100%;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;padding:11px;border-radius:11px;border:none;background:var(--accent);color:var(--bg);cursor:pointer}
+
+/* estagio saiu da home: agora vive no resumo do dia */
+.estFlut{display:none !important}
+.resdiaest{margin-bottom:10px}
+/* resumo do dia: sprites lado a lado na arte */
+.md-hero.rd-hero{left:34%;bottom:16px}
+.md-hero.rd-mob{left:66%;bottom:16px;animation-delay:.8s;filter:grayscale(.6) brightness(.7) drop-shadow(0 4px 0 rgba(0,0,0,.35))}
+.md-row .ic svg{width:16px;height:16px}
+.coins.pulso{animation:coinsPulso .3s ease-out}
+@keyframes coinsPulso{0%{transform:scale(1)}40%{transform:scale(1.25)}100%{transform:scale(1)}}
+
+/* ARPG: numeros em arco, moedas que quicam */
+.arpg-num{position:absolute;z-index:31;pointer-events:none;white-space:nowrap;font-family:'Silkscreen',monospace;font-weight:700;
+  font-size:20px;color:#fff;text-shadow:2px 2px 0 #000,-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000}
+.arpg-num.crit{font-size:30px;color:#ffd23f}
+.arpg-num.xp{font-size:12px;color:#7dffb0;text-shadow:1px 1px 0 #000}
+.arpg-num.dano{font-size:24px}
+.arpg-coin{position:fixed;z-index:200;width:16px;height:16px;pointer-events:none}
+.arpg-coin svg{width:100%;height:100%;display:block;image-rendering:pixelated}
+.arpg-vinheta{position:fixed;inset:0;z-index:190;pointer-events:none;box-shadow:inset 0 0 70px 16px #c01818}

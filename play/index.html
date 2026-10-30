@@ -133,7 +133,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=343">
+<link rel="stylesheet" href="style.css?v=352">
 <script>
 // A abertura so sai quando (1) a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado (sair antes mostrava um flash
 // cinza vazio e depois a tela de login por baixo, visto em video de teste) E (2) quem ja tinha sessao neste aparelho teve login confirmado e o
@@ -347,6 +347,7 @@ html{background:var(--bsBg,#282828)}
       <span class="vs">vs</span>
 
       <div class="fighter mob" id="ladoMob">
+        <div class="mobBarra" id="mobBarra" aria-hidden="true"><div class="mobBarraFill" id="mobBarraFill"></div></div>
         <div class="mob-sprite" id="mobSprite"><div class="sombra"></div>
           <svg viewBox="0 0 16 16" shape-rendering="crispEdges">
             <rect x="3" y="1" width="1" height="3" fill="#7A4A9E"/><rect x="12" y="1" width="1" height="3" fill="#7A4A9E"/>
@@ -2861,6 +2862,12 @@ function dispararVitoriaDoDia(doDia, nivelAntes, xpGanho, moedasGanhas){
     const mobEl = document.getElementById('mobSprite');
     if (mobEl) mobEl.style.opacity = '';
     setTimeout(()=>aviso((idiomaApp() === 'en' ? 'MONSTER DEFEATED  +' : 'MONSTRO DERROTADO  +')+ganho+(idiomaApp() === 'en' ? ' COINS' : ' MOEDAS'), true), 350);
+    // resumo do dia (tela de vitoria detalhada): entra na fila ANTES do level-up (650ms < 700ms)
+    setTimeout(() => {
+      if (typeof window.enfileirarPopup === 'function' && typeof window.mostrarResumoDia === 'function'){
+        window.enfileirarPopup(prox => window.mostrarResumoDia({ ganho: ganho, nTarefas: doDia.length }, prox));
+      }
+    }, 650);
     const nivelDepois = progresso().nivel;
     if (nivelDepois > nivelAntes){
       setTimeout(() => {
@@ -3160,7 +3167,7 @@ function variante(baseId, afx, rer){
   return (_varMapa[key] = ITENS.length - 1);
 }
 function ehEquipBase(id){ return id >= 0 && id < BASE_N && ITENS[id] && !ITENS[id][8] && ['arma','armadura','elmo','escudo','acess'].includes(ITENS[id][2]); }
-const P_SEM_AFX = 0.30;   // chance de o equipamento vir sem nenhum encantamento
+const P_SEM_AFX = 0.90;   // chance de o equipamento vir sem nenhum encantamento (era 0.30; encantado de fabrica agora e raro, o caminho normal e a forja)
 function comAfixo(id){ return ehEquipBase(id) ? variante(id, Math.random() < P_SEM_AFX ? null : afxRolar(ITENS[id][3], null, P_NEG_LOOT), 0) : id; }
 function baseDe(id){ const a = ITENS[id]; return (a && a[12] != null) ? a[12] : id; }
 function limparVariantes(){ ITENS.length = BASE_N; Object.keys(_varMapa).forEach(k => delete _varMapa[k]); }
@@ -5589,6 +5596,18 @@ function render(){
   }
   mobHpEl.textContent = hpTexto;
   mobHpEl.dataset.pronto = '1';
+  // barra de vida em cima do monstro (substitui nome + "2 / 2" embaixo)
+  const barraEl = document.getElementById('mobBarra'), barraFill = document.getElementById('mobBarraFill');
+  if (barraEl && barraFill){
+    const frac = hp.total > 0 ? Math.max(0, Math.min(1, hp.viva / hp.total)) : 0;
+    if (barraEl.dataset.pronto && barraEl.dataset.frac !== String(frac)){
+      barraEl.classList.remove('golpe'); void barraEl.offsetWidth; barraEl.classList.add('golpe');
+    }
+    barraFill.style.width = (frac * 100) + '%';
+    barraEl.dataset.frac = String(frac);
+    barraEl.dataset.pronto = '1';
+    barraEl.classList.toggle('baixa', frac > 0 && frac <= 0.34);
+  }
   desenharMonstro();
 
   const semTarefas = total === 0;
@@ -5603,6 +5622,7 @@ function render(){
   const venceu = monstroJaCaiu();
   document.querySelector('.arena').classList.toggle('venceu', venceu);
   document.getElementById('mobinfo').classList.toggle('off', venceu || total === 0);
+  { const bb = document.getElementById('mobBarra'); if (bb) bb.classList.toggle('off', venceu || total === 0); }
   document.getElementById('vitoria').classList.toggle('on', venceu);
   if (typeof window.atualizarBauArena === 'function') window.atualizarBauArena();
   if (venceu && !_vitoriaCelebrada){
@@ -5761,10 +5781,92 @@ function animarGolpe(){
     voo.onfinish = () => p.remove();
     setTimeout(() => p.remove(), T);   // garantia: nunca sobra projetil perdido na tela
   }
-  setTimeout(()=>m.classList.add('shake'), T*0.42);
+  setTimeout(()=>{ m.classList.add('shake'); }, T*0.42);
   clearTimeout(h._golpeFim);
   h._golpeFim = setTimeout(()=>{ h.classList.remove('golpeando'); h.style.zIndex=''; m.classList.remove('shake'); }, T+30);
 }
+
+// Animacoes de combate estilo ARPG (Diablo): numero salta em arco e cai com gravidade
+// (critico maior e amarelo); moedas caem no chao, quicam e depois sao sugadas pro contador.
+window.arpgNumero = function(txt, o){
+  o = o || {};
+  const arena = document.querySelector('.arena'), el = document.getElementById(o.alvo || 'mobSprite');
+  if (!arena || !el || !el.getBoundingClientRect) return;
+  const ar = arena.getBoundingClientRect(), r = el.getBoundingClientRect();
+  const crit = !!o.crit;
+  const e = document.createElement('div');
+  e.className = 'arpg-num' + (crit ? ' crit' : '') + (o.cls ? ' ' + o.cls : '');
+  e.textContent = crit ? txt + '!' : txt;
+  if (o.cor) e.style.color = o.cor;
+  e.style.left = (r.left - ar.left + r.width / 2) + 'px';
+  e.style.top = (r.top - ar.top + (o.y != null ? o.y : r.height * 0.2)) + 'px';
+  arena.appendChild(e);
+  const dx = o.dx != null ? o.dx : (Math.random() * 50 - 25), alt = o.alt != null ? o.alt : 70, dur = o.dur || 900;
+  const kf = [];
+  for (let i = 0; i <= 8; i++){
+    const t = i / 8;
+    kf.push({ transform: 'translate(-50%,-50%) translate(' + (dx * t) + 'px,' + (-alt * t + alt * 1.36 * t * t) + 'px) scale(' + (crit ? 1.3 - .3 * t : 1) + ')',
+              opacity: t > .8 ? Math.max(0, 1 - (t - .8) * 5) : 1, offset: t });
+  }
+  const an = e.animate(kf, { duration: dur, easing: 'linear', fill: 'forwards' });
+  an.onfinish = () => e.remove();
+  setTimeout(() => e.remove(), dur + 200);
+};
+window.arpgVinheta = function(){
+  const v = document.createElement('div');
+  v.className = 'arpg-vinheta';
+  document.body.appendChild(v);
+  const an = v.animate([{ opacity: 0 }, { opacity: .85, offset: .2 }, { opacity: 0 }], { duration: 650 });
+  an.onfinish = () => v.remove();
+  setTimeout(() => v.remove(), 900);
+};
+// n moedas saem do alvo, caem no chao, quicam e sao sugadas ate o contador do topo; cb() quando a ultima chega.
+window.arpgMoedas = function(n, alvoId, cb){
+  const el = document.getElementById(alvoId || 'mobSprite'), dest = document.getElementById('coinnum');
+  const fim = () => { if (typeof cb === 'function') cb(); };
+  if (!el || !dest){ fim(); return; }
+  const r = el.getBoundingClientRect(), d = dest.getBoundingClientRect();
+  if ((d.width === 0 && d.height === 0) || (r.width === 0 && r.height === 0)){ fim(); return; }
+  const ox = r.left + r.width / 2, oy = r.top + r.height * 0.45, chao = r.bottom - 4;
+  const dropMs = 600, vacMs = 420, espera = dropMs + n * 60 + 120;
+  const moedas = [];
+  for (let i = 0; i < n; i++){
+    const dx = Math.random() * 90 - 45;
+    const c = document.createElement('div');
+    c.className = 'arpg-coin'; c.innerHTML = COIN_SVG;
+    c.style.left = (ox - 8) + 'px'; c.style.top = (oy - 8) + 'px';
+    document.body.appendChild(c);
+    const dy = chao - oy;
+    c.animate([
+      { transform: 'translate(0,0)', offset: 0, easing: 'ease-out' },
+      { transform: 'translate(' + (dx * .5) + 'px,-30px)', offset: .3, easing: 'ease-in' },
+      { transform: 'translate(' + dx + 'px,' + dy + 'px)', offset: .62, easing: 'ease-out' },
+      { transform: 'translate(' + (dx * 1.15) + 'px,' + (dy - 10) + 'px)', offset: .8, easing: 'ease-in' },
+      { transform: 'translate(' + (dx * 1.3) + 'px,' + dy + 'px)', offset: .95 },
+      { transform: 'translate(' + (dx * 1.3) + 'px,' + dy + 'px)', offset: 1 }
+    ], { duration: dropMs, delay: i * 60, fill: 'forwards' });
+    moedas.push([c, dx * 1.3, dy]);
+  }
+  setTimeout(() => {
+    const tx = d.left + d.width / 2 - 8, ty = d.top + d.height / 2 - 8;
+    moedas.forEach(([c, x, y], i) => {
+      const an = c.animate([
+        { transform: 'translate(' + x + 'px,' + y + 'px) scale(1)' },
+        { transform: 'translate(' + (tx - (ox - 8)) + 'px,' + (ty - (oy - 8)) + 'px) scale(.45)' }
+      ], { duration: vacMs, delay: i * 40, easing: 'cubic-bezier(.5,0,1,.6)', fill: 'forwards' });
+      an.onfinish = () => {
+        c.remove();
+        if (i % 3 === 0 && typeof window.tocarSom === 'function') window.tocarSom('chegadaRecompensa');
+        if (i === n - 1){
+          const cn = document.querySelector('.coins');
+          if (cn){ cn.classList.remove('pulso'); void cn.offsetWidth; cn.classList.add('pulso'); }
+          fim();
+        }
+      };
+    });
+    setTimeout(() => moedas.forEach(([c]) => c.remove()), vacMs + n * 40 + 300);
+  }, espera);
+};
 
 const COIN_SVG = '<svg viewBox="0 0 13 13" shape-rendering="crispEdges"><image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAANCAYAAABy6+R8AAABNElEQVR42p2SsUrDUBSGvxtr0angcNup0SzOIop0cXBqcBGkpS59AR10qk+guOoLuCgWQZe2k4NLKXRwzhKlWzMEioOl2hyHkpQmBcG73cP3n//8h6NIPon9VRwwYrCMpcJYKogI0jCj+rwuIg2TwC5wVX4GwNJT7vD6gAV1H/Eq7B7Cezsp8pkRvUEagHxmxOvbpHf5ZgigUgBGs42lhTVrMSHoDdLsboS14TRTvdWnVMyyebqfEOQzI7K5HFvrKzOZRBom9VYfgFIxS2AXMLiD5ioAl7celpZoPAXIRWmZWlUT2AUeT55m1ut6ilpV03V8ts8+p6K4E/YHAUcYzTZdx+fd/cb1FOf1r7+dXG+ytXlOhEJLS5Qp3GrX8Xnp/EQu8RMRgIfjpcgBCOEZVv3n9n4BeByMZhegdHgAAAAASUVORK5CYII=" width="13" height="13" style="image-rendering:pixelated"/></svg>';
 
@@ -5816,41 +5918,15 @@ window.voarRecompensa = voarRecompensa;
 // so ENTAO e que os contadores reais (coinnum/xpnum, no topo/embaixo)
 // atualizam de verdade, via a contagem suave que render() ja faz.
 function voarRecompensaFinal(xpGanho, moedasGanhas, aoTerminar){
-  const arena = document.querySelector('.arena');
-  const mob = document.getElementById('mobSprite');
-  const heroi = document.getElementById('heroSprite');
-  if (!arena || !mob || !heroi){
-    if (typeof aoTerminar === 'function') aoTerminar(); // nao trava a sequencia se algo faltar
-    return;
-  }
-  const mobRect = mob.getBoundingClientRect();
-  const origemX = mobRect.left + mobRect.width / 2;
-  const origemY = mobRect.top + mobRect.height / 2;
-
-  voarRecompensa(origemX, origemY, heroi, COIN_SVG);
-  setTimeout(() => voarRecompensa(origemX, origemY, heroi, XP_GEM_SVG), 90);
-
-  // pedido do usuario: som quando cada icone CHEGA no heroi, nao quando
-  // sai do monstro -- 750ms bate com a duracao real da transicao CSS
-  // (.75s, .recompensa-voando em style.css), a moeda sai em t=0 entao
-  // chega em 750ms; o XP sai 90ms depois (setTimeout acima) entao chega
-  // em 840ms. Reaproveita o catalogo de SFX que ja existe no app
-  // (window.tocarSom), nao um AudioContext a parte -- respeita volume/
-  // liga-desliga que o usuario ja configurou nas Opcoes.
-  setTimeout(() => { if (typeof window.tocarSom === 'function') window.tocarSom('chegadaRecompensa'); }, 750);
-
-  // "+moedas +XP" so aparece quando os icones JA CHEGARAM no heroi --
-  // 840ms bate com a duracao do voo (.75s, .recompensa-voando em
-  // style.css) mais a folga do segundo icone (90ms de atraso acima).
-  // aoTerminar() e chamado AQUI, como continuacao de verdade, nao um
-  // timer paralelo adivinhando essa mesma duracao (era assim antes --
-  // o contador do topo terminava de contar bem antes do "+X" aparecer,
-  // confirmado em video).
-  setTimeout(() => {
-    if (typeof window.tocarSom === 'function') window.tocarSom('chegadaRecompensa'); // chegada do XP (2o icone)
-    if (typeof numeroFlutuanteHeroi === 'function') numeroFlutuanteHeroi(xpGanho, moedasGanhas);
-    if (typeof aoTerminar === 'function') aoTerminar();
-  }, 840);
+  // ARPG: "+XP" sobe verde do heroi; moedas caem do monstro, quicam e sao sugadas pro contador.
+  const fim = () => { if (typeof aoTerminar === 'function') aoTerminar(); };
+  if (!document.querySelector('.arena') || !document.getElementById('mobSprite')){ fim(); return; }
+  if (xpGanho && typeof window.arpgNumero === 'function')
+    window.arpgNumero('+' + xpGanho + ' XP', { alvo: 'heroSprite', cls: 'xp', dx: 0, alt: 40, dur: 1500, y: 4 });
+  if (moedasGanhas && typeof window.arpgMoedas === 'function'){
+    const n = Math.max(3, Math.min(10, Math.round(moedasGanhas / 3) + 2));
+    window.arpgMoedas(n, 'mobSprite', fim);
+  } else setTimeout(fim, 700);
 }
 window.voarRecompensaFinal = voarRecompensaFinal;
 
@@ -5944,14 +6020,8 @@ function numeroFlutuanteHeroi(xpGanho, moedasGanhas){
   const originX = arenaRect.width / 2;
   const originY = heroiRect.top - arenaRect.top - 4;
 
-  const el = document.createElement('div');
-  el.className = 'dmg-float centro';
-  el.style.left = originX + 'px';
-  el.style.top = originY + 'px';
-  el.innerHTML = '<span class="dmg-moeda">+' + moedasGanhas + ' ' + COIN_SVG + '</span>'
-    + '<span class="dmg-sep">·</span><span class="dmg-xp">+' + xpGanho + ' XP</span>';
-  arena.appendChild(el);
-  setTimeout(() => el.remove(), 1100);
+  window.danoMario({ txt: '+' + xpGanho + ' XP', cls: 'xp', alvo: 'heroSprite', y: 14 });
+  setTimeout(() => window.danoMario({ txt: '+' + moedasGanhas, cls: 'moeda', alvo: 'heroSprite', y: -16, svg: COIN_SVG }), 120);
 }
 window.numeroFlutuanteHeroi = numeroFlutuanteHeroi;
 
@@ -10204,6 +10274,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     vida -= n;
     tremer();
     flashHeroi();
+    try { window.arpgNumero(String(n), { alvo: 'heroSprite', cls: 'dano', cor: '#ff5a4d', dur: 800, alt: 60 }); window.arpgVinheta(); } catch(e){}
     window.tocarSom?.('danoHeroi'); // SFX: ferir() vive em IIFE, sem gancho externo possivel -- editado direto (ver roadmap.md, secao SFX)
 
     if (vida <= 0){
@@ -12271,6 +12342,87 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
 
 <script>
 (function(){
+  // RESUMO DO DIA (vitoria): tela detalhada que abre quando o dia e vencido -- monstro derrotado, tarefas,
+  // XP do dia, moedas da vitoria, sequencia e progresso do nivel. Mesma familia visual do pop-up de nivel/
+  // tarefas perdidas (fundo .baubg + cartao central), na fila de pop-ups (enfileirarPopup).
+  // XP do dia = xpTotal agora - xpTotal no 1o toque de tarefa do dia (snapshot em localStorage, por conta).
+  const CH = 'questlog.resumoDia.v1';
+  function lerSnap(){ try { return JSON.parse(localStorage.getItem(window.chaveConta(CH)) || 'null'); } catch(e){ return null; } }
+  function snap(){
+    try {
+      const d = isoAtual(), s = lerSnap();
+      if (!s || s.dia !== d) localStorage.setItem(window.chaveConta(CH), JSON.stringify({ dia: d, xp0: xpTotal }));
+    } catch(e){}
+  }
+  const _alt = window.alternar;
+  if (typeof _alt === 'function') window.alternar = function(){ snap(); return _alt.apply(this, arguments); };
+
+  const tela = document.createElement('div'); tela.id = 'resDiaTela'; tela.className = 'cq-tela';
+  document.body.appendChild(tela);
+  let aoFecharCb = null;
+  function fechar(){
+    tela.classList.add('estagio-tela-saindo');
+    setTimeout(() => {
+      tela.classList.remove('on', 'estagio-tela-saindo'); tela.innerHTML = '';
+      const cb = aoFecharCb; aoFecharCb = null;
+      if (cb) cb();
+    }, 240);
+  }
+
+  window.mostrarResumoDia = function(d, aoFechar){
+    aoFecharCb = aoFechar || null;
+    const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
+    const m = (typeof monstroDoDia === 'function') ? monstroDoDia() : null;
+    const snp = lerSnap();
+    const xpDia = (snp && snp.dia === isoAtual() && typeof xpTotal === 'number') ? Math.max(0, xpTotal - snp.xp0) : 0;
+    let streak = 0;
+    try { streak = estStreakAtual(estHistComHojeAoVivo(isoAtual())); } catch(e){}
+    const pr = progresso();
+    const pct = Math.max(0, Math.min(100, Math.round(pr.resto / pr.meta * 100)));
+    const nomeM = m ? ((en && m.nome_en) || m.nome) : '';
+    let est = null;
+    try {
+      const e0 = estagioAtual();
+      if (e0 >= 4) est = { l: (en ? 'Stage ' : 'Estágio ') + e0, v: 'MAX' };
+      else {
+        const tot = window.totalTarefasConcluidas(), ini = e0 === 1 ? 0 : LIMIARES_ESTAGIO[e0 - 2], alvo = LIMIARES_ESTAGIO[e0 - 1];
+        est = { l: (en ? 'To stage ' : 'Rumo ao estágio ') + (e0 + 1), v: Math.max(0, Math.min(alvo - ini, tot - ini)) + ' / ' + (alvo - ini) };
+      }
+    } catch(e){}
+    const heroImg = (typeof heroiAtual === 'function') ? heroiAtual().img : '';
+    const cq = window.cqHelpers;
+    const rows = [
+      ['\u2713', en ? 'Tasks done' : 'Tarefas concluídas', String(d.nTarefas)],
+      ['XP', en ? 'Experience' : 'Experiência', '+' + xpDia],
+      ['$', en ? 'Coins' : 'Moedas', '+' + d.ganho],
+      ['>', en ? 'Streak' : 'Sequência', streak + (streak === 1 ? (en ? ' day' : ' dia') : (en ? ' days' : ' dias'))]
+    ];
+    if (est) rows.push(['E', est.l, est.v]);
+    tela.className = 'cq-tela';
+    tela.innerHTML =
+      '<div class="md-back"></div><div class="md-sheet"><div class="md-handle"></div>' +
+      '<div class="md-k">' + (en ? 'DAY WON' : 'DIA VENCIDO') + '</div>' +
+      '<div class="md-t">' + (nomeM ? (en ? nomeM + ' defeated' : nomeM + ' derrotado') : (en ? 'Monster defeated' : 'Monstro derrotado')) + '</div>' +
+      '<div class="md-art"><div class="zoom"><div class="l" style="' + (cq ? cq.bgMasmorra() : '') + '"></div></div><div class="shade"></div>' +
+        '<div class="tocha-arena tocha-esq"></div><div class="tocha-arena tocha-dir"></div>' +
+        (heroImg ? '<img class="md-hero rd-hero" src="' + heroImg + '" alt="">' : '') +
+        (m ? '<img class="md-hero rd-mob" src="' + m.img + '" alt="">' : '') + '</div>' +
+      '<div class="md-seg"><i><b id="resDiaFill" style="animation:none;transform:scaleX(0);transition:transform .8s cubic-bezier(.3,.7,.2,1)"></b></i></div>' +
+      '<div class="md-segl"><span>' + (en ? 'Level ' : 'Nível ') + romano(pr.nivel) + '</span><span>' + pr.resto + ' / ' + pr.meta + '</span></div>' +
+      '<div class="md-rows">' + rows.map((r, i) => '<div class="md-row" style="--i:' + i + '"><span class="ic">' + r[0] + '</span><span class="t">' + r[1] + '</span><span class="v">' + r[2] + '</span></div>').join('') + '</div>' +
+      '<button class="md-btn" style="--bd:1.7s" id="resDiaOk">' + (en ? 'Continue' : 'Continuar') + '</button></div>';
+    document.getElementById('resDiaOk').onclick = fechar;
+    if (typeof tocarSom === 'function') tocarSom('levelup');
+    requestAnimationFrame(() => {
+      tela.classList.add('on');
+      setTimeout(() => { const f = document.getElementById('resDiaFill'); if (f) f.style.transform = 'scaleX(' + (pct / 100) + ')'; }, 600);
+    });
+  };
+})();
+</script>
+
+<script>
+(function(){
   // Pop-up "Tarefas perdidas" -- caso NAO-FATAL de verificarVirada() (ferir()
   // retornou false). Mesma familia visual do bau: reusa .baubg (fundo
   // escurecido) e fecha com toque nele, igual ao bau -- ver mostrarBauLoot().
@@ -14209,7 +14361,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   function ofertarTrialPrimeiraVitoria(){
     const CHAVE = 'questlog.ofertaTrialPrimeira.v1';
     try { if (localStorage.getItem(window.chaveConta(CHAVE))) return; } catch(e){}
-    const ocupado = () => [...document.querySelectorAll('.dlgOverlay.on, #paywallOverlay.on, [class*="verlay"].on, .levelup.on, .nivelUp.on')]
+    const ocupado = () => [...document.querySelectorAll('.dlgOverlay.on, #paywallOverlay.on, [class*="verlay"].on, .levelup.on, .nivelUp.on, #resDiaTela.on')]
       .some(e => { const c = getComputedStyle(e); return c.display !== 'none' && c.visibility !== 'hidden' && Number(c.opacity) > 0; });
     let tentativas = 0;
     const tentar = () => {

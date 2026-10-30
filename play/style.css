@@ -6993,11 +6993,11 @@ body.tourAberto .edov.on .edsheet{opacity:1}
   --arena-1:#454545; --arena-2:#383838; --arena-3:#2C2C2C; --xp2:#EDEDED;
 }
 /* fosforo: leve aberracao cromatica + brilho no texto */
-:root[data-tema="crt"] body{text-shadow:1.2px 0 rgba(255,70,70,.5),-1.2px 0 rgba(70,200,255,.5),0 0 5px rgba(255,255,255,.16)}
+:root[data-tema="crt"] body{text-shadow:1px 0 rgba(255,70,70,.4),-1px 0 rgba(70,200,255,.4),0 0 4px rgba(255,255,255,.13)}
 /* scanlines + vinheta de tubo, acima de tudo (inclusive popups) */
 :root[data-tema="crt"]::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:2147483000;
-  background:repeating-linear-gradient(0deg,rgba(0,0,0,.32) 0 1px,rgba(0,0,0,0) 1px 3px);
-  box-shadow:inset 0 0 140px 24px rgba(0,0,0,.78);
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.24) 0 1px,rgba(0,0,0,0) 1px 3px);
+  box-shadow:inset 0 0 125px 18px rgba(0,0,0,.68);
   animation:crtFlicker 4s steps(1,end) infinite}
-@keyframes crtFlicker{0%{opacity:1}7%{opacity:.86}8%{opacity:1}43%{opacity:1}44%{opacity:.9}46%{opacity:1}81%{opacity:.87}82%{opacity:1}100%{opacity:1}}
+@keyframes crtFlicker{0%{opacity:1}7%{opacity:.9}8%{opacity:1}43%{opacity:1}44%{opacity:.93}46%{opacity:1}81%{opacity:.91}82%{opacity:1}100%{opacity:1}}
 @media (prefers-reduced-motion:reduce){:root[data-tema="crt"]::after{animation:none}}

@@ -10,6 +10,8 @@ Cada artigo-fonte (blog/_fonte/artigos/<slug>.html) tem um cabecalho e o corpo e
     titulo: Titulo do artigo
     descricao: Resumo de ate ~155 caracteres
     data: 2026-11-07
+    capa: /blog/img/nome.jpg   (opcional; imagem 1200x630: card do indice, og:image e topo do artigo;
+                                sem capa, usa /img/og-pt.jpg (ou og-en.jpg) e nada no topo)
     publicar: sim          (qualquer outro valor = rascunho: nao gera pagina nem entra no sitemap)
     ---
     <p>Corpo em HTML...</p>
@@ -58,6 +60,8 @@ def carregar(p):
     for k in ('titulo', 'descricao', 'data'):
         if not meta.get(k): sys.exit(f'{p.name}: falta "{k}:" no cabecalho')
     if not SLUG_OK.match(meta['slug']): sys.exit(f'{p.name}: nome de arquivo (slug) invalido')
+    capa = meta.get('capa', '')
+    if capa and not re.match(r'^/[A-Za-z0-9_./-]+\.(?:jpg|jpeg|png|webp)$', capa): sys.exit(f'{p.name}: capa deve ser caminho absoluto no site (ex.: /blog/img/nome.jpg)')
     if not re.match(r'^\d{4}-\d{2}-\d{2}$', meta['data']): sys.exit(f'{p.name}: data deve ser AAAA-MM-DD')
     return meta
 
@@ -76,13 +80,16 @@ def aplicar(modelo, d):
     for k, v in d.items(): modelo = modelo.replace(k, v)
     return modelo
 
+def imagem(m):
+    return BASE + m['capa'] if m.get('capa') else f"{BASE}/img/{IDIOMAS[m['idioma']]['ogimg']}"
+
 def jsonld(m, url):
     return json.dumps({
         '@context': 'https://schema.org', '@type': 'Article',
         'headline': m['titulo'], 'description': m['descricao'],
         'datePublished': m['data'], 'dateModified': m['data'],
         'inLanguage': LOC[m['idioma']], 'mainEntityOfPage': url, 'url': url,
-        'image': f"{BASE}/img/{IDIOMAS[m['idioma']]['ogimg']}",
+        'image': imagem(m),
         'author': {'@type': 'Organization', 'name': 'Weberlabs', 'url': BASE + '/'},
         'publisher': {'@type': 'Organization', 'name': 'Weberlabs', 'url': BASE + '/'},
     }, ensure_ascii=False)
@@ -103,7 +110,9 @@ def main():
         raiz_blog = RAIZ / t['pre'].strip('/')
         for a in pi:
             url = f"{BASE}{t['pre']}{a['slug']}/"
-            saida = aplicar(modelo, trocas(i))
+            saida = aplicar(modelo, trocas(i)).replace('{{OGIMGURL}}', imagem(a))
+            capa_html = f'<img class="capa" src="{esc(a["capa"])}" width="1200" height="630" alt="{esc(a["titulo"])}">' if a.get('capa') else ''
+            saida = saida.replace('{{CAPA}}', capa_html)
             saida = (saida.replace('{{TITULO}}', esc(a['titulo'])).replace('{{DESCRICAO}}', esc(a['descricao']))
                      .replace('{{URL}}', url).replace('{{DATA}}', a['data']).replace('{{DATA_BR}}', data_br(a['data'], i))
                      .replace('{{JSONLD}}', jsonld(a, url).replace('</', '<\\/')).replace('{{CONTEUDO}}', a['corpo']))
@@ -111,16 +120,26 @@ def main():
             (d / 'index.html').write_text(saida, encoding='utf-8')
             urls.append((url, a['data']))
         # indice do idioma
+        modelo_ind = ler(FONTE / 'modelo-indice.html')
+        card = re.search(r'<!--CARD-->(.*?)<!--/CARD-->', modelo_ind, re.S).group(1).strip('\n')
+        modelo_ind = re.sub(r'[ \t]*<!--CARD-->.*?<!--/CARD-->\n?', '', modelo_ind, flags=re.S)
         if pi:
-            lista = '\n  <ul>\n' + '\n'.join(
-                f'    <li><a href="{t["pre"]}{a["slug"]}/">{html.escape(a["titulo"])}</a> <span class="updated">· {data_br(a["data"], i)}</span></li>' for a in pi) + '\n  </ul>'
+            cards = []
+            for a in pi:
+                c = card
+                capa_html = f'<img src="{esc(a["capa"])}" width="1200" height="630" alt="{esc(a["titulo"])}" loading="lazy">' if a.get('capa') else ''
+                for k, v in (('{{CARD_URL}}', f'{t["pre"]}{a["slug"]}/'), ('{{CARD_CAPA}}', capa_html), ('{{CARD_TITULO}}', esc(a['titulo'])),
+                             ('{{CARD_DATA}}', a['data']), ('{{CARD_DATA_BR}}', data_br(a['data'], i)), ('{{CARD_DESC}}', esc(a['descricao']))):
+                    c = c.replace(k, v)
+                cards.append(c)
+            lista = '\n  <div class="cards">\n' + '\n'.join(cards) + '\n  </div>'
             robots = ''
             urls.append((f"{BASE}{t['pre']}", pi[0]['data']))
         else:
             lista = f'\n  <p>{t["breve"]}</p>'
             robots = '<meta name="robots" content="noindex">\n'
         raiz_blog.mkdir(parents=True, exist_ok=True)
-        ind = aplicar(ler(FONTE / 'modelo-indice.html'), trocas(i)).replace('{{CANON}}', f"{BASE}{t['pre']}")
+        ind = aplicar(modelo_ind, trocas(i)).replace('{{CANON}}', f"{BASE}{t['pre']}")
         (raiz_blog / 'index.html').write_text(ind.replace('{{LISTA}}', lista).replace('{{ROBOTS}}', robots), encoding='utf-8')
     # sitemap: remove entradas /blog/ e /en/blog/ e re-adiciona so as de idiomas com artigo publicado
     sm = RAIZ / 'sitemap.xml'; x = ler(sm)

@@ -12,14 +12,15 @@
 <meta property="og:title" content="{{TITULO}}">
 <meta property="og:description" content="{{DESCRICAO}}">
 <meta property="og:url" content="{{URL}}">
-<meta property="og:image" content="https://dungeonlog.weberlabs.com.br/img/{{OGIMG}}">
+<meta property="og:image" content="{{OGIMGURL}}">
 <meta property="og:locale" content="{{OGLOCALE}}">
 <meta property="article:published_time" content="{{DATA}}">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="{{OGIMGURL}}">
 <link rel="icon" href="/play/icon-192.png">
 <link rel="apple-touch-icon" href="/play/icon-192.png">
 <link rel="stylesheet" href="/fonts/fonts2.css">
-<link rel="stylesheet" href="/legal.css?v=4">
+<link rel="stylesheet" href="/legal.css?v=5">
 <script type="application/ld+json">{{JSONLD}}</script>
 </head>
 <body>
@@ -36,6 +37,7 @@
   <p class="updated"><a href="{{HOMEURL}}">{{HOME}}</a> · <a href="{{BLOGURL}}">Blog</a></p>
   <h1>{{TITULO}}</h1>
   <p class="updated"><time datetime="{{DATA}}">{{DATA_BR}}</time></p>
+{{CAPA}}
 
 {{CONTEUDO}}
 

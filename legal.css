@@ -47,3 +47,23 @@ footer.site .credit a{ font-size:inherit; color:var(--muted); text-decoration:un
   html, body{ cursor:url(/cursors/cursor.png) 1 1, auto; cursor:-webkit-image-set(url(/cursors/cursor.png) 1x, url(/cursors/cursor@2x.png) 2x) 1 1, auto; cursor:image-set(url(/cursors/cursor.png) 1x, url(/cursors/cursor@2x.png) 2x) 1 1, auto; }
   html a, html button, html summary{ cursor:url(/cursors/cursor-hover.png) 1 1, pointer; cursor:-webkit-image-set(url(/cursors/cursor-hover.png) 1x, url(/cursors/cursor-hover@2x.png) 2x) 1 1, pointer; cursor:image-set(url(/cursors/cursor-hover.png) 1x, url(/cursors/cursor-hover@2x.png) 2x) 1 1, pointer; }
 }
+
+/* menu do topo das paginas internas: Blog + idioma */
+header.site .hright{ display:flex; align-items:center; gap:14px; }
+header.site .hlnk{ color:#e4e4e4; text-decoration:none; font-size:.98rem; font-weight:600; }
+header.site .hlnk:hover{ color:#fff; }
+
+/* blog: capa do artigo e cards do indice */
+img.capa{ display:block; width:100%; height:auto; aspect-ratio:1200/630; border-radius:10px; border:1px solid #3a3a3a; margin:20px 0 6px; background:#1f1f1f; }
+.cards{ display:grid; gap:22px; margin-top:24px; }
+.card{ background:var(--panel); border:1px solid var(--line); border-radius:12px; overflow:hidden; display:flex; flex-direction:column; transition:border-color .15s, transform .15s; }
+.card:hover{ border-color:#7a7a7a; transform:translateY(-2px); }
+.card-img{ display:block; background:#1f1f1f; }
+.card-img img{ display:block; width:100%; height:auto; aspect-ratio:1200/630; object-fit:cover; }
+.card-txt{ padding:16px 20px 20px; }
+.card-txt h2{ margin:0; padding:0; border:0; font-size:1.3rem; }
+.card-txt h2 a{ color:#fff; text-decoration:none; }
+.card-txt h2 a::after{ content:""; position:absolute; inset:0; }
+.card{ position:relative; }
+.card-txt h2 a:hover{ text-decoration:underline; }
+.card-desc{ margin:.6em 0 0; color:var(--muted); }

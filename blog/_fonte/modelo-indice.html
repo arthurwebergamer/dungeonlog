@@ -16,7 +16,7 @@
 <link rel="icon" href="/play/icon-192.png">
 <link rel="apple-touch-icon" href="/play/icon-192.png">
 <link rel="stylesheet" href="/fonts/fonts2.css">
-<link rel="stylesheet" href="/legal.css?v=4">
+<link rel="stylesheet" href="/legal.css?v=5">
 </head>
 <body>
 
@@ -28,6 +28,16 @@
   <div class="lang"><a href="{{BLOGURL}}" class="active">Blog</a></div>
 </header>
 
+<!--CARD-->
+    <article class="card">
+      <a class="card-img" href="{{CARD_URL}}" tabindex="-1" aria-hidden="true">{{CARD_CAPA}}</a>
+      <div class="card-txt">
+        <h2><a href="{{CARD_URL}}">{{CARD_TITULO}}</a></h2>
+        <p class="updated"><time datetime="{{CARD_DATA}}">{{CARD_DATA_BR}}</time></p>
+        <p class="card-desc">{{CARD_DESC}}</p>
+      </div>
+    </article>
+<!--/CARD-->
 <main class="wrap">
   <h1>Blog</h1>
 {{LISTA}}

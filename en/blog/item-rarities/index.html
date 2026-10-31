@@ -34,6 +34,12 @@
 .lb .lb-n{right:12px;top:50%;transform:translateY(-50%)}
 .lb .lb-c{position:absolute;top:22px;left:50%;transform:translateX(-50%);color:#ddd;font-size:.95rem}
 .lb.um .lb-p,.lb.um .lb-n,.lb.um .lb-c{display:none}
+.bnav{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin:18px 0}
+.bnav .bn-v{flex:0 0 100%}
+.bnav .bn-p,.bnav .bn-n{flex:1 1 40%;min-width:0}
+.bnav .bn-n{text-align:right}
+.bnav small{display:block;color:var(--dim);font-size:.85rem}
+@media (max-width:560px){.bnav{display:block}.bnav a{display:block;margin:0 0 12px}.bnav .bn-n{text-align:left}}
 </style>
 </head>
 <body>
@@ -50,6 +56,7 @@
   <p class="updated"><a href="/en/">Home</a> · <a href="/en/blog/">Blog</a></p>
   <h1>Item rarities in Dungeonlog: from Common to Unique</h1>
   <p class="updated"><time datetime="2026-10-31">2026-10-31</time></p>
+<nav class="bnav" aria-label="Blog navigation"><a class="bn-v" href="/en/blog/">&larr; Back to blog</a><a class="bn-p" href="/en/blog/habitica-alternative/" rel="prev"><small>&larr; Previous post</small>Habitica alternative: Dungeonlog, a simpler task RPG</a><a class="bn-n" href="/en/blog/turn-to-do-list-into-rpg/" rel="next"><small>Next post &rarr;</small>Turn your to-do list into an RPG</a></nav>
 <img class="capa" src="/blog/img/capa-item-rarities.jpg" width="1200" height="630" alt="Item rarities in Dungeonlog: from Common to Unique">
 
 <div class="corpo">
@@ -89,6 +96,8 @@
 <h2>How items show up</h2>
 <p>In normal drops, the higher the rarity, the less often the item appears. The draw uses weights, which work as relative chances: Common has weight 50, Uncommon 28, Rare 8, Superior 6, Epic 6, Legendary 1.4 and Ancestral 0.6. So in the normal draw, Ancestral is the rarest, then comes Legendary, and Common is the most frequent. Unique has weight zero in the normal draw, so it does not drop from a normal drop. That is why it pays to keep finishing the day's tasks consistently: that is how your gear gets better over time.</p>
 </div>
+
+<nav class="bnav" aria-label="Blog navigation"><a class="bn-v" href="/en/blog/">&larr; Back to blog</a><a class="bn-p" href="/en/blog/habitica-alternative/" rel="prev"><small>&larr; Previous post</small>Habitica alternative: Dungeonlog, a simpler task RPG</a><a class="bn-n" href="/en/blog/turn-to-do-list-into-rpg/" rel="next"><small>Next post &rarr;</small>Turn your to-do list into an RPG</a></nav>
 
   <h2>Dungeonlog</h2>
   <p><a href="/en/">Meet Dungeonlog</a> · <a href="https://play.google.com/store/apps/details?id=com.dungeonlog" rel="noopener">Get Dungeonlog on Google Play</a></p>

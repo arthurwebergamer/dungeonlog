@@ -217,5 +217,8 @@ body.lb-open{ overflow:hidden; }
 @media (max-width:720px){ .lp-card{ grid-template-columns:1fr; } }
 
 .tt{ display:inline-flex; align-items:center; line-height:0; color:inherit; }
-.tt svg{ display:block; }
-.tt + .tt{ margin-left:10px; }
+.tt svg{ display:block; width:16px; height:16px; }
+.tt{ opacity:.75; transition:opacity .15s; }
+.tt:hover, .tt:focus-visible{ opacity:1; }
+.tt + .tt{ margin-left:6px; }
+.lang + .tt{ margin-left:10px; padding-left:12px; border-left:1px solid rgba(255,255,255,.18); height:16px; box-sizing:content-box; }

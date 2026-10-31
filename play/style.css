@@ -6995,5 +6995,8 @@ body.tourAberto .edov.on .edsheet{opacity:1}
     repeating-linear-gradient(90deg,rgba(255,0,0,.06) 0 1px,rgba(0,255,0,.04) 1px 2px,rgba(0,80,255,.06) 2px 3px);
   box-shadow:inset 0 0 90px 4px rgba(0,0,0,.35);
   animation:crtFlicker 4s steps(1,end) infinite}
+/* sem CRT no onboarding/login (#intro visivel): texto legivel */
+:root[data-crt="1"]:has(#intro:not(.off))::before,:root[data-crt="1"]:has(#intro:not(.off))::after{display:none}
+:root[data-crt="1"]:has(#intro:not(.off)) body{text-shadow:none}
 @keyframes crtFlicker{0%{opacity:1}7%{opacity:.9}8%{opacity:1}43%{opacity:1}44%{opacity:.93}46%{opacity:1}81%{opacity:.91}82%{opacity:1}100%{opacity:1}}
 @media (prefers-reduced-motion:reduce){:root[data-crt="1"]::after{animation:none}}

@@ -37,7 +37,11 @@ a{ color:var(--text); }
 .menu .mhelp{ margin-top:auto; background:#2a2a2a; border-bottom:0; border-top:1px solid #3a3a3a; padding-bottom:calc(22px + env(safe-area-inset-bottom)); }
 body.menu-open{ overflow:hidden; }
 body.menu-open .topbar{ position:fixed; z-index:50; background:#1f1f1f; }
-@media (max-width:720px){ .topbar nav .lnk{ display:none; } .menu-btn{ display:flex; } }
+@media (max-width:720px){ .topbar nav .lnk{ display:none; } .topbar nav .tt{ display:none; } .menu-btn{ display:flex; } }
+.menu .msoc{ display:flex; justify-content:center; align-items:center; gap:14px; padding:22px 24px; border-bottom:1px solid #333; margin-top:auto; }
+.menu .msoc .tt{ padding:10px; }
+.menu .msoc .tt + .tt{ margin-left:0; }
+.menu .msoc + .mhelp{ margin-top:0; }
 @media (min-width:721px){ .menu{ display:none !important; } body.menu-open{ overflow:auto; } }
 
 /* ---------- cenário em camadas (parallax horizontal) ---------- */

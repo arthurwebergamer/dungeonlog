@@ -202,3 +202,16 @@ body.lb-open{ overflow:hidden; }
   .lb-next{ right:calc(50% - 64px); left:auto; }
   .lb-fig img{ max-height:calc(100svh - 190px); }
 }
+
+/* ultimo post do blog (bloco gerado por blog/_fonte/novo.py) */
+.lp-card{ position:relative; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); background:var(--panel); border:1px solid var(--line); border-radius:18px; overflow:hidden; box-shadow:0 6px 18px rgba(0,0,0,.25); }
+.lp-card:hover{ border-color:#7a7a7a; }
+.lp-img{ display:block; background:#1f1f1f; }
+.lp-img img{ display:block; width:100%; height:100%; aspect-ratio:1200/630; object-fit:cover; }
+.lp-txt{ padding:24px; align-self:center; }
+.lp-txt h3{ margin:0; font-size:1.4rem; line-height:1.2; }
+.lp-txt h3 a{ color:#fff; text-decoration:none; }
+.lp-txt h3 a::after{ content:""; position:absolute; inset:0; }
+.lp-data{ margin:8px 0 0; color:var(--dim,#9a9a9a); font-size:.9rem; }
+.lp-desc{ margin:10px 0 0; color:var(--muted); }
+@media (max-width:720px){ .lp-card{ grid-template-columns:1fr; } }

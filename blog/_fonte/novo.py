@@ -19,7 +19,8 @@ Cada artigo-fonte (blog/_fonte/artigos/<slug>.html) tem um cabecalho e o corpo e
 O script gera blog/<slug>/index.html (PT) ou en/blog/<slug>/index.html (EN), com canonical, OG e
 JSON-LD Article; regenera blog/index.html e en/blog/index.html (cada um lista so os artigos do seu
 idioma; ficam noindex enquanto nao houver artigo publicado nele) e atualiza as URLs de blog
-(indices e artigos, PT e EN) no sitemap.xml. Python stdlib apenas.
+(indices e artigos, PT e EN) no sitemap.xml e o bloco "Ultimo post" das homes (entre <!--ULTIMO-POST--> e
+<!--/ULTIMO-POST--> em index.html e en/index.html; vazio se o idioma nao tem artigo). Python stdlib apenas.
 """
 import html, json, re, sys
 from pathlib import Path
@@ -35,13 +36,13 @@ IDIOMAS = {
                termst='Termos de Uso', delete='/delete-account', deletet='Excluir Conta', contact='Contato',
                email='E-mail', copy='© 2026 Weberlabs. Todos os direitos reservados.',
                know='Conheça o Dungeonlog', play='Baixe o Dungeonlog no Google Play',
-               idxdesc='Artigos do Dungeonlog.', breve='Em breve.', data=lambda d: f'{d[8:]}/{d[5:7]}/{d[:4]}'),
+               idxdesc='Artigos do Dungeonlog.', t_viewer='Visualizador de imagens', t_close='Fechar', t_prev='Anterior', t_next='Próxima', ultimo='Último post do blog', breve='Em breve.', data=lambda d: f'{d[8:]}/{d[5:7]}/{d[:4]}'),
     'en': dict(lang='en', ogloc='en_US', ogimg='og-en.jpg', pre='/en/blog/', home='/en/', homet='Home',
                nav='Navigation', legal='Legal', priv='/en/privacy', privt='Privacy Policy', terms='/en/terms',
                termst='Terms of Use', delete='/en/delete-account', deletet='Delete Account', contact='Contact',
                email='Email', copy='© 2026 Weberlabs. All rights reserved.',
                know='Meet Dungeonlog', play='Get Dungeonlog on Google Play',
-               idxdesc='Dungeonlog articles.', breve='Coming soon.', data=lambda d: d),
+               idxdesc='Dungeonlog articles.', t_viewer='Image viewer', t_close='Close', t_prev='Previous', t_next='Next', ultimo='Latest blog post', breve='Coming soon.', data=lambda d: d),
 }
 LOC = {'pt': 'pt-BR', 'en': 'en-US'}
 
@@ -74,7 +75,8 @@ def trocas(i):
             '{{PRIVACY}}': t['priv'], '{{T_PRIVACY}}': t['privt'], '{{TERMS}}': t['terms'], '{{T_TERMS}}': t['termst'],
             '{{DELETE}}': t['delete'], '{{T_DELETE}}': t['deletet'], '{{T_CONTACT}}': t['contact'],
             '{{T_EMAIL}}': t['email'], '{{T_COPY}}': t['copy'], '{{T_KNOW}}': t['know'], '{{T_PLAY}}': t['play'],
-            '{{T_IDXDESC}}': t['idxdesc']}
+            '{{T_IDXDESC}}': t['idxdesc'], '{{T_VIEWER}}': t['t_viewer'], '{{T_CLOSE}}': t['t_close'],
+            '{{T_PREV}}': t['t_prev'], '{{T_NEXT}}': t['t_next']}
 
 def aplicar(modelo, d):
     for k, v in d.items(): modelo = modelo.replace(k, v)
@@ -93,6 +95,33 @@ def jsonld(m, url):
         'author': {'@type': 'Organization', 'name': 'Weberlabs', 'url': BASE + '/'},
         'publisher': {'@type': 'Organization', 'name': 'Weberlabs', 'url': BASE + '/'},
     }, ensure_ascii=False)
+
+def home_block(i, a):
+    """Escreve o card do artigo mais recente da home do idioma entre <!--ULTIMO-POST--> e <!--/ULTIMO-POST-->."""
+    t = IDIOMAS[i]; f = RAIZ / ('index.html' if i == 'pt' else 'en/index.html')
+    if not f.exists(): return
+    esc = lambda s: html.escape(s, quote=True)
+    if a:
+        u = f"{t['pre']}{a['slug']}/"
+        capa = f'<a class="lp-img" href="{u}" tabindex="-1" aria-hidden="true"><img src="{esc(a["capa"])}" width="1200" height="630" alt="" loading="lazy" decoding="async"></a>' if a.get('capa') else ''
+        NL = chr(10)
+        bloco = NL.join([
+            '<section class="block lp" aria-labelledby="lp-h">',
+            '  <div class="wrapL">',
+            f'    <h2 id="lp-h">{t["ultimo"]}</h2>',
+            '    <article class="lp-card">',
+            f'      {capa}',
+            '      <div class="lp-txt">',
+            f'        <h3><a href="{u}">{esc(a["titulo"])}</a></h3>',
+            f'        <p class="lp-data"><time datetime="{a["data"]}">{data_br(a["data"], i)}</time></p>',
+            f'        <p class="lp-desc">{esc(a["descricao"])}</p>',
+            '      </div>', '    </article>', '  </div>', '</section>'])
+    else:
+        bloco = ''
+    x = ler(f)
+    novo, n = re.subn(r'<!--ULTIMO-POST-->.*?<!--/ULTIMO-POST-->', lambda m: '<!--ULTIMO-POST-->' + bloco + '<!--/ULTIMO-POST-->', x, flags=re.S)
+    if n != 1: sys.exit(f'{f.name}: marcadores <!--ULTIMO-POST--> ausentes')
+    f.write_text(novo, encoding='utf-8')
 
 def main():
     arts = [carregar(p) for p in sorted((FONTE / 'artigos').glob('*.html'))]
@@ -138,6 +167,7 @@ def main():
         else:
             lista = f'\n  <p>{t["breve"]}</p>'
             robots = '<meta name="robots" content="noindex">\n'
+        home_block(i, pi[0] if pi else None)
         raiz_blog.mkdir(parents=True, exist_ok=True)
         ind = aplicar(modelo_ind, trocas(i)).replace('{{CANON}}', f"{BASE}{t['pre']}")
         (raiz_blog / 'index.html').write_text(ind.replace('{{LISTA}}', lista).replace('{{ROBOTS}}', robots), encoding='utf-8')

@@ -22,6 +22,19 @@
 <link rel="stylesheet" href="/fonts/fonts2.css">
 <link rel="stylesheet" href="/legal.css?v=5">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "CRT effect in Dungeonlog: an old tube-TV look", "description": "How Dungeonlog's CRT effect gives the app an old tube-TV look, and how to turn it on or off.", "datePublished": "2026-10-31", "dateModified": "2026-10-31", "inLanguage": "en-US", "mainEntityOfPage": "https://dungeonlog.weberlabs.com.br/en/blog/crt-effect/", "url": "https://dungeonlog.weberlabs.com.br/en/blog/crt-effect/", "image": "https://dungeonlog.weberlabs.com.br/blog/img/capa-crt-effect.jpg", "author": {"@type": "Organization", "name": "Weberlabs", "url": "https://dungeonlog.weberlabs.com.br/"}, "publisher": {"@type": "Organization", "name": "Weberlabs", "url": "https://dungeonlog.weberlabs.com.br/"}}</script>
+<style>
+.corpo img{cursor:zoom-in}
+.lb{position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.92);touch-action:pan-y}
+.lb.on{display:flex}
+.lb img{max-width:92vw;max-height:88vh;width:auto;height:auto;object-fit:contain;border-radius:6px;cursor:default;user-select:none}
+.lb button{position:absolute;border:0;background:rgba(40,40,40,.85);color:#fff;font:inherit;font-size:1.6rem;line-height:1;width:48px;height:48px;border-radius:50%;cursor:pointer}
+.lb button:hover{background:#555}
+.lb .lb-x{top:14px;right:14px}
+.lb .lb-p{left:12px;top:50%;transform:translateY(-50%)}
+.lb .lb-n{right:12px;top:50%;transform:translateY(-50%)}
+.lb .lb-c{position:absolute;top:22px;left:50%;transform:translateX(-50%);color:#ddd;font-size:.95rem}
+.lb.um .lb-p,.lb.um .lb-n,.lb.um .lb-c{display:none}
+</style>
 </head>
 <body>
 
@@ -39,6 +52,7 @@
   <p class="updated"><time datetime="2026-10-31">2026-10-31</time></p>
 <img class="capa" src="/blog/img/capa-crt-effect.jpg" width="1200" height="630" alt="CRT effect in Dungeonlog: an old tube-TV look">
 
+<div class="corpo">
 <p>Dungeonlog now has a CRT effect, which gives the app the look of an old tube TV. It goes well with the game's pixel art, and you can turn it on and off whenever you like. This article explains what the effect does, why it fits the app and where you turn it on or off.</p>
 
 <h2>Why a tube-TV effect</h2>
@@ -65,6 +79,7 @@
 </figure>
 <p>At any time, the "CRT effect" switch in Preferences turns the effect on or off. If you picked "Not now" on the invitation, that is where you can turn it on later, and if you turned it on and did not like it, that is where you turn it off.</p>
 <p>The CRT effect is not a Pro feature.</p>
+</div>
 
   <h2>Dungeonlog</h2>
   <p><a href="/en/">Meet Dungeonlog</a> · <a href="https://play.google.com/store/apps/details?id=com.dungeonlog" rel="noopener">Get Dungeonlog on Google Play</a></p>
@@ -92,6 +107,46 @@
     <span class="copy">© 2026 Weberlabs. All rights reserved.</span>
   </div>
 </footer>
+
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Image viewer">
+  <button type="button" class="lb-x" aria-label="Close">&times;</button>
+  <button type="button" class="lb-p" aria-label="Previous">&#8249;</button>
+  <img alt="">
+  <button type="button" class="lb-n" aria-label="Next">&#8250;</button>
+  <span class="lb-c" aria-live="polite"></span>
+</div>
+<script>
+(function(){
+  var imgs=[].slice.call(document.querySelectorAll('.corpo img'));
+  var lb=document.getElementById('lb');
+  if(!imgs.length||!lb) return;
+  var big=lb.querySelector('img'), cnt=lb.querySelector('.lb-c'), i=0, x0=null;
+  if(imgs.length<2) lb.className+=' um';
+  function show(n){
+    i=(n+imgs.length)%imgs.length;
+    big.src=imgs[i].currentSrc||imgs[i].src; big.alt=imgs[i].alt;
+    cnt.textContent=(i+1)+' / '+imgs.length;
+  }
+  function open(n){ show(n); lb.classList.add('on'); document.body.style.overflow='hidden'; lb.querySelector('.lb-x').focus(); }
+  function close(){ lb.classList.remove('on'); document.body.style.overflow=''; big.removeAttribute('src'); }
+  imgs.forEach(function(im,n){ im.addEventListener('click',function(){ open(n); }); });
+  lb.querySelector('.lb-x').addEventListener('click',close);
+  lb.querySelector('.lb-p').addEventListener('click',function(e){ e.stopPropagation(); show(i-1); });
+  lb.querySelector('.lb-n').addEventListener('click',function(e){ e.stopPropagation(); show(i+1); });
+  lb.addEventListener('click',function(e){ if(e.target!==big && !e.target.closest('button')) close(); });
+  document.addEventListener('keydown',function(e){
+    if(!lb.classList.contains('on')) return;
+    if(e.key==='Escape') close();
+    else if(e.key==='ArrowLeft') show(i-1);
+    else if(e.key==='ArrowRight') show(i+1);
+  });
+  lb.addEventListener('touchstart',function(e){ x0=e.touches[0].clientX; },{passive:true});
+  lb.addEventListener('touchend',function(e){
+    if(x0===null) return; var d=e.changedTouches[0].clientX-x0; x0=null;
+    if(Math.abs(d)>50) show(d<0?i+1:i-1);
+  });
+})();
+</script>
 
 </body>
 </html>

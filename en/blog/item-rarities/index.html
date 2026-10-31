@@ -22,6 +22,19 @@
 <link rel="stylesheet" href="/fonts/fonts2.css">
 <link rel="stylesheet" href="/legal.css?v=5">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Item rarities in Dungeonlog: from Common to Ancestral", "description": "How the 8 equipment rarities in Dungeonlog work and how they raise your XP and coin bonus.", "datePublished": "2026-10-31", "dateModified": "2026-10-31", "inLanguage": "en-US", "mainEntityOfPage": "https://dungeonlog.weberlabs.com.br/en/blog/item-rarities/", "url": "https://dungeonlog.weberlabs.com.br/en/blog/item-rarities/", "image": "https://dungeonlog.weberlabs.com.br/blog/img/capa-item-rarities.jpg", "author": {"@type": "Organization", "name": "Weberlabs", "url": "https://dungeonlog.weberlabs.com.br/"}, "publisher": {"@type": "Organization", "name": "Weberlabs", "url": "https://dungeonlog.weberlabs.com.br/"}}</script>
+<style>
+.corpo img{cursor:zoom-in}
+.lb{position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.92);touch-action:pan-y}
+.lb.on{display:flex}
+.lb img{max-width:92vw;max-height:88vh;width:auto;height:auto;object-fit:contain;border-radius:6px;cursor:default;user-select:none}
+.lb button{position:absolute;border:0;background:rgba(40,40,40,.85);color:#fff;font:inherit;font-size:1.6rem;line-height:1;width:48px;height:48px;border-radius:50%;cursor:pointer}
+.lb button:hover{background:#555}
+.lb .lb-x{top:14px;right:14px}
+.lb .lb-p{left:12px;top:50%;transform:translateY(-50%)}
+.lb .lb-n{right:12px;top:50%;transform:translateY(-50%)}
+.lb .lb-c{position:absolute;top:22px;left:50%;transform:translateX(-50%);color:#ddd;font-size:.95rem}
+.lb.um .lb-p,.lb.um .lb-n,.lb.um .lb-c{display:none}
+</style>
 </head>
 <body>
 
@@ -39,6 +52,7 @@
   <p class="updated"><time datetime="2026-10-31">2026-10-31</time></p>
 <img class="capa" src="/blog/img/capa-item-rarities.jpg" width="1200" height="630" alt="Item rarities in Dungeonlog: from Common to Ancestral">
 
+<div class="corpo">
 <p>Items in Dungeonlog now have a ladder of eight rarities. It shows in each item's name and color, and it sets how much a piece of equipment helps your hero. In this article you will see, step by step, how each rarity works and where to find that information inside the app.</p>
 
 <h2>The eight rarities</h2>
@@ -74,6 +88,7 @@
 
 <h2>How items show up</h2>
 <p>The higher the rarity, the less often the item appears: Common items are the most frequent, and Ancestral items are the rarest among the ones that drop. There are only a few Ancestral items. So it pays to keep finishing the day's tasks consistently: that is how your gear gets better over time.</p>
+</div>
 
   <h2>Dungeonlog</h2>
   <p><a href="/en/">Meet Dungeonlog</a> · <a href="https://play.google.com/store/apps/details?id=com.dungeonlog" rel="noopener">Get Dungeonlog on Google Play</a></p>
@@ -101,6 +116,46 @@
     <span class="copy">© 2026 Weberlabs. All rights reserved.</span>
   </div>
 </footer>
+
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Image viewer">
+  <button type="button" class="lb-x" aria-label="Close">&times;</button>
+  <button type="button" class="lb-p" aria-label="Previous">&#8249;</button>
+  <img alt="">
+  <button type="button" class="lb-n" aria-label="Next">&#8250;</button>
+  <span class="lb-c" aria-live="polite"></span>
+</div>
+<script>
+(function(){
+  var imgs=[].slice.call(document.querySelectorAll('.corpo img'));
+  var lb=document.getElementById('lb');
+  if(!imgs.length||!lb) return;
+  var big=lb.querySelector('img'), cnt=lb.querySelector('.lb-c'), i=0, x0=null;
+  if(imgs.length<2) lb.className+=' um';
+  function show(n){
+    i=(n+imgs.length)%imgs.length;
+    big.src=imgs[i].currentSrc||imgs[i].src; big.alt=imgs[i].alt;
+    cnt.textContent=(i+1)+' / '+imgs.length;
+  }
+  function open(n){ show(n); lb.classList.add('on'); document.body.style.overflow='hidden'; lb.querySelector('.lb-x').focus(); }
+  function close(){ lb.classList.remove('on'); document.body.style.overflow=''; big.removeAttribute('src'); }
+  imgs.forEach(function(im,n){ im.addEventListener('click',function(){ open(n); }); });
+  lb.querySelector('.lb-x').addEventListener('click',close);
+  lb.querySelector('.lb-p').addEventListener('click',function(e){ e.stopPropagation(); show(i-1); });
+  lb.querySelector('.lb-n').addEventListener('click',function(e){ e.stopPropagation(); show(i+1); });
+  lb.addEventListener('click',function(e){ if(e.target!==big && !e.target.closest('button')) close(); });
+  document.addEventListener('keydown',function(e){
+    if(!lb.classList.contains('on')) return;
+    if(e.key==='Escape') close();
+    else if(e.key==='ArrowLeft') show(i-1);
+    else if(e.key==='ArrowRight') show(i+1);
+  });
+  lb.addEventListener('touchstart',function(e){ x0=e.touches[0].clientX; },{passive:true});
+  lb.addEventListener('touchend',function(e){
+    if(x0===null) return; var d=e.changedTouches[0].clientX-x0; x0=null;
+    if(Math.abs(d)>50) show(d<0?i+1:i-1);
+  });
+})();
+</script>
 
 </body>
 </html>

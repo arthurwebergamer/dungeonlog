@@ -67,3 +67,6 @@ img.capa{ display:block; width:100%; height:auto; aspect-ratio:1200/630; border-
 .card{ position:relative; }
 .card-txt h2 a:hover{ text-decoration:underline; }
 .card-desc{ margin:.6em 0 0; color:var(--muted); }
+
+.tt{ display:inline-flex; align-items:center; line-height:0; color:inherit; }
+.tt svg{ display:block; }

@@ -215,3 +215,6 @@ body.lb-open{ overflow:hidden; }
 .lp-data{ margin:8px 0 0; color:var(--dim,#9a9a9a); font-size:.9rem; }
 .lp-desc{ margin:10px 0 0; color:var(--muted); }
 @media (max-width:720px){ .lp-card{ grid-template-columns:1fr; } }
+
+.tt{ display:inline-flex; align-items:center; line-height:0; color:inherit; }
+.tt svg{ display:block; }

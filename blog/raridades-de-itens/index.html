@@ -34,6 +34,12 @@
 .lb .lb-n{right:12px;top:50%;transform:translateY(-50%)}
 .lb .lb-c{position:absolute;top:22px;left:50%;transform:translateX(-50%);color:#ddd;font-size:.95rem}
 .lb.um .lb-p,.lb.um .lb-n,.lb.um .lb-c{display:none}
+.bnav{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin:18px 0}
+.bnav .bn-v{flex:0 0 100%}
+.bnav .bn-p,.bnav .bn-n{flex:1 1 40%;min-width:0}
+.bnav .bn-n{text-align:right}
+.bnav small{display:block;color:var(--dim);font-size:.85rem}
+@media (max-width:560px){.bnav{display:block}.bnav a{display:block;margin:0 0 12px}.bnav .bn-n{text-align:left}}
 </style>
 </head>
 <body>
@@ -50,6 +56,7 @@
   <p class="updated"><a href="/">Início</a> · <a href="/blog/">Blog</a></p>
   <h1>Raridades de itens no Dungeonlog: de Comum a Único</h1>
   <p class="updated"><time datetime="2026-10-31">31/10/2026</time></p>
+<nav class="bnav" aria-label="Navegação do blog"><a class="bn-v" href="/blog/">&larr; Voltar ao blog</a><a class="bn-p" href="/blog/efeito-crt/" rel="prev"><small>&larr; Post anterior</small>Efeito CRT no Dungeonlog: o visual de TV de tubo</a><a class="bn-n" href="/blog/transforme-lista-tarefas-rpg/" rel="next"><small>Próximo post &rarr;</small>Transforme sua lista de tarefas num RPG</a></nav>
 <img class="capa" src="/blog/img/capa-raridades-itens.jpg" width="1200" height="630" alt="Raridades de itens no Dungeonlog: de Comum a Único">
 
 <div class="corpo">
@@ -89,6 +96,8 @@
 <h2>Como os itens aparecem</h2>
 <p>Nos drops normais, quanto mais alta a raridade, menos vezes o item aparece. O sorteio usa pesos, que funcionam como chances relativas: o Comum tem peso 50, o Incomum 28, o Raro 8, o Superior 6, o Épico 6, o Lendário 1,4 e o Ancestral 0,6. Ou seja, no sorteio normal o Ancestral é o mais raro, depois vem o Lendário, e o Comum é o mais frequente. O Único tem peso zero no sorteio normal, então ele não cai em um drop normal. Por isso, vale ir completando as tarefas do dia com constância: é assim que o seu equipamento melhora com o tempo.</p>
 </div>
+
+<nav class="bnav" aria-label="Navegação do blog"><a class="bn-v" href="/blog/">&larr; Voltar ao blog</a><a class="bn-p" href="/blog/efeito-crt/" rel="prev"><small>&larr; Post anterior</small>Efeito CRT no Dungeonlog: o visual de TV de tubo</a><a class="bn-n" href="/blog/transforme-lista-tarefas-rpg/" rel="next"><small>Próximo post &rarr;</small>Transforme sua lista de tarefas num RPG</a></nav>
 
   <h2>Dungeonlog</h2>
   <p><a href="/">Conheça o Dungeonlog</a> · <a href="https://play.google.com/store/apps/details?id=com.dungeonlog" rel="noopener">Baixe o Dungeonlog no Google Play</a></p>

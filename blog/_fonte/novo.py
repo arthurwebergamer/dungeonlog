@@ -36,13 +36,13 @@ IDIOMAS = {
                termst='Termos de Uso', delete='/delete-account', deletet='Excluir Conta', contact='Contato', social='Redes',
                email='E-mail', copy='© 2026 Weberlabs. Todos os direitos reservados.',
                know='Conheça o Dungeonlog', play='Baixe o Dungeonlog no Google Play',
-               idxdesc='Artigos do Dungeonlog.', t_viewer='Visualizador de imagens', t_close='Fechar', t_prev='Anterior', t_next='Próxima', ultimo='Último post do blog', breve='Em breve.', data=lambda d: f'{d[8:]}/{d[5:7]}/{d[:4]}'),
+               idxdesc='Artigos do Dungeonlog.', t_viewer='Visualizador de imagens', t_close='Fechar', t_prev='Anterior', t_next='Próxima', ttl='TikTok do Dungeonlog', igl='Instagram do Dungeonlog', ultimo='Último post do blog', breve='Em breve.', data=lambda d: f'{d[8:]}/{d[5:7]}/{d[:4]}'),
     'en': dict(lang='en', ogloc='en_US', ogimg='og-en.jpg', pre='/en/blog/', home='/en/', homet='Home',
                nav='Navigation', legal='Legal', priv='/en/privacy', privt='Privacy Policy', terms='/en/terms',
                termst='Terms of Use', delete='/en/delete-account', deletet='Delete Account', contact='Contact', social='Social',
                email='Email', copy='© 2026 Weberlabs. All rights reserved.',
                know='Meet Dungeonlog', play='Get Dungeonlog on Google Play',
-               idxdesc='Dungeonlog articles.', t_viewer='Image viewer', t_close='Close', t_prev='Previous', t_next='Next', ultimo='Latest blog post', breve='Coming soon.', data=lambda d: d),
+               idxdesc='Dungeonlog articles.', t_viewer='Image viewer', t_close='Close', t_prev='Previous', t_next='Next', ttl='Dungeonlog on TikTok', igl='Dungeonlog on Instagram', ultimo='Latest blog post', breve='Coming soon.', data=lambda d: d),
 }
 LOC = {'pt': 'pt-BR', 'en': 'en-US'}
 
@@ -57,6 +57,7 @@ def carregar(p):
     meta['idioma'] = meta.get('idioma', 'pt').lower()
     if meta['idioma'] not in IDIOMAS: sys.exit(f'{p.name}: idioma deve ser pt ou en')
     meta['slug'] = meta.get('slug', p.stem)
+    meta['par'] = re.sub(r'-(?:pt|en)$', '', p.stem)  # pares PT/EN: mesmo nome de arquivo, so muda o sufixo
     meta['corpo'] = corpo.strip()
     for k in ('titulo', 'descricao', 'data'):
         if not meta.get(k): sys.exit(f'{p.name}: falta "{k}:" no cabecalho')
@@ -76,7 +77,19 @@ def trocas(i):
             '{{DELETE}}': t['delete'], '{{T_DELETE}}': t['deletet'], '{{T_CONTACT}}': t['contact'], '{{T_SOCIAL}}': t['social'],
             '{{T_EMAIL}}': t['email'], '{{T_COPY}}': t['copy'], '{{T_KNOW}}': t['know'], '{{T_PLAY}}': t['play'],
             '{{T_IDXDESC}}': t['idxdesc'], '{{T_VIEWER}}': t['t_viewer'], '{{T_CLOSE}}': t['t_close'],
-            '{{T_PREV}}': t['t_prev'], '{{T_NEXT}}': t['t_next']}
+            '{{T_TTLABEL}}': t['ttl'], '{{T_IGLABEL}}': t['igl'], '{{T_PREV}}': t['t_prev'], '{{T_NEXT}}': t['t_next']}
+
+def seletor(i, a, pub):
+    """Seletor PT | EN do cabecalho do blog: cada idioma leva ao artigo par (ou ao indice do idioma, se nao houver)."""
+    alvo = {}
+    for j in ('pt', 'en'):
+        alvo[j] = IDIOMAS[j]['pre']
+        if a:
+            for b in pub:
+                if b['idioma'] == j and b['par'] == a['par']: alvo[j] = f"{IDIOMAS[j]['pre']}{b['slug']}/"
+    cl = lambda j: ' class="active"' if j == i else ''
+    return (f'<a href="{alvo["pt"]}"{cl("pt")} hreflang="pt-BR">PT</a><span class="sep">·</span>'
+            f'<a href="{alvo["en"]}"{cl("en")} hreflang="en">EN</a>')
 
 def aplicar(modelo, d):
     for k, v in d.items(): modelo = modelo.replace(k, v)
@@ -139,7 +152,7 @@ def main():
         raiz_blog = RAIZ / t['pre'].strip('/')
         for a in pi:
             url = f"{BASE}{t['pre']}{a['slug']}/"
-            saida = aplicar(modelo, trocas(i)).replace('{{OGIMGURL}}', imagem(a))
+            saida = aplicar(modelo, trocas(i)).replace('{{LANGSW}}', seletor(i, a, pub)).replace('{{OGIMGURL}}', imagem(a))
             capa_html = f'<img class="capa" src="{esc(a["capa"])}" width="1200" height="630" alt="{esc(a["titulo"])}">' if a.get('capa') else ''
             saida = saida.replace('{{CAPA}}', capa_html)
             saida = (saida.replace('{{TITULO}}', esc(a['titulo'])).replace('{{DESCRICAO}}', esc(a['descricao']))
@@ -169,7 +182,7 @@ def main():
             robots = '<meta name="robots" content="noindex">\n'
         home_block(i, pi[0] if pi else None)
         raiz_blog.mkdir(parents=True, exist_ok=True)
-        ind = aplicar(modelo_ind, trocas(i)).replace('{{CANON}}', f"{BASE}{t['pre']}")
+        ind = aplicar(modelo_ind, trocas(i)).replace('{{LANGSW}}', seletor(i, None, pub)).replace('{{CANON}}', f"{BASE}{t['pre']}")
         (raiz_blog / 'index.html').write_text(ind.replace('{{LISTA}}', lista).replace('{{ROBOTS}}', robots), encoding='utf-8')
     # sitemap: remove entradas /blog/ e /en/blog/ e re-adiciona so as de idiomas com artigo publicado
     sm = RAIZ / 'sitemap.xml'; x = ler(sm)

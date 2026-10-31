@@ -51,7 +51,7 @@
 // padrao 'grafite' de temaSalvo()).
 try { var _cb=localStorage.getItem('questlog.corBarra.v1'); if(_cb){var _m=document.querySelector('meta[name="theme-color"]'); if(_m)_m.content=_cb; document.documentElement.style.setProperty('--bsBg',_cb);}
    document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite');
-   if (localStorage.getItem('questlog.crt.v1') === '1') document.documentElement.setAttribute('data-crt', '1'); }
+   var _c=localStorage.getItem('questlog.crt.v1'); if (_c==='1' || (_c===null && localStorage.getItem('questlog.crtAviso.v1')==='1')) document.documentElement.setAttribute('data-crt', '1'); }
 catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
 <link rel="preload" href="sheet.png?v=1" as="image">
@@ -134,7 +134,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=375">
+<link rel="stylesheet" href="style.css?v=379">
 <script>
 // A abertura so sai quando (1) a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado (sair antes mostrava um flash
 // cinza vazio e depois a tela de login por baixo, visto em video de teste) E (2) quem ja tinha sessao neste aparelho teve login confirmado e o
@@ -1054,7 +1054,6 @@ html{background:var(--bsBg,#282828)}
         <div class="cfgtxt">
           <b data-i18n="cfg.crt">Efeito CRT</b>
         </div>
-        <span class="temaSelo" id="cfgCrtSelo" style="display:none">PRO</span>
         <button class="swch" id="cfgCrtBtn" type="button" role="switch" aria-checked="false" aria-label="Efeito CRT">
           <span class="swch-bolinha"></span>
         </button>
@@ -1255,7 +1254,6 @@ html{background:var(--bsBg,#282828)}
           <div class="pwNRow"><div class="pwNIc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20l6-10 4 6 3-4 5 8z"/><circle cx="17" cy="6" r="2"/></svg></div><div class="pwNTxt"><b data-i18n="pro.b2t">Temas exclusivos</b><span data-i18n="pro.b2s">Esmeralda e Terracota</span></div></div>
           <div class="pwNRow"><div class="pwNIc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div><div class="pwNTxt"><b data-i18n="pro.b3t">Tarefas sem limite</b><span data-i18n="pro.b3s">Sem o limite diário do plano grátis</span></div></div>
           <div class="pwNRow"><div class="pwNIc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18M8 17V10M13 17V6M18 17v-4"/></svg></div><div class="pwNTxt"><b data-i18n="pro.b4t">Estatísticas completas</b><span data-i18n="pro.b4s">Histórico completo e todos os gráficos</span></div></div>
-          <div class="pwNRow"><div class="pwNIc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="13" rx="3"/><path d="M8 21h8M12 17v4"/></svg></div><div class="pwNTxt"><b data-i18n="pro.b5t">Efeito CRT</b><span data-i18n="pro.b5s">TV de tubo antiga em qualquer tema</span></div></div>
         </div>
 
         <div class="pwSpacer"></div>
@@ -4141,8 +4139,7 @@ function billingMostrarCompraOk(sku, restaurada, dados){
     linha('<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>', 'b1', ['Vários heróis', 'Several heroes'], ['Até 4 heróis por conta', 'Up to 4 heroes per account']) +
     linha('<path d="M3 20l6-10 4 6 3-4 5 8z"/><circle cx="17" cy="6" r="2"/>', 'b2', ['Temas exclusivos', 'Exclusive themes'], ['Esmeralda e Terracota', 'Emerald and Terracotta']) +
     linha('<path d="M20 6 9 17l-5-5"/>', 'b3ok', ['Tarefas sem limite', 'Unlimited tasks'], ['Sem limite de tarefas ativas', 'No limit on active tasks']) +
-    linha('<path d="M3 3v18h18M8 17V10M13 17V6M18 17v-4"/>', 'b4', ['Estatísticas completas', 'Full statistics'], ['Histórico completo e todos os gráficos', 'Full history and all charts']) +
-    linha('<rect x="3" y="4" width="18" height="13" rx="3"/><path d="M8 21h8M12 17v4"/>', 'b5', ['Efeito CRT', 'CRT effect'], ['TV de tubo antiga em qualquer tema', 'Old tube-TV look on any theme']);
+    linha('<path d="M3 3v18h18M8 17V10M13 17V6M18 17v-4"/>', 'b4', ['Estatísticas completas', 'Full statistics'], ['Histórico completo e todos os gráficos', 'Full history and all charts']) ;
   const heroiImg = (typeof heroiAtual === 'function' && heroiAtual()) ? heroiAtual().img : '';
   let ov = document.getElementById('compraOkOverlay');
   if (ov) ov.remove();
@@ -19767,32 +19764,55 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 })();
 </script>
 
-<!-- EFEITO CRT (Pro): preferencia em Config, vale sobre qualquer tema (CSS: :root[data-crt="1"]).
-     Preferencia fica salva (questlog.crt.v1); o efeito so aparece enquanto assinaturaAtiva(). -->
+<!-- EFEITO CRT: preferencia em Config, convite unico depois do tutorial (questlog.crtAviso.v1); resposta em questlog.crt.v1 ('1'/'0'). Sem resposta = desligado. -->
 <script>
 (function(){
-  const K = 'questlog.crt.v1', btn = document.getElementById('cfgCrtBtn'), selo = document.getElementById('cfgCrtSelo');
-  const t0 = Date.now();
-  const pref = () => { try { return localStorage.getItem(K) === '1'; } catch(e){ return false; } };
-  const pro = () => typeof window.assinaturaAtiva === 'function' && window.assinaturaAtiva();
+  const K = 'questlog.crt.v1', KA = 'questlog.crtAviso.v1', btn = document.getElementById('cfgCrtBtn');
+  const en = () => { try { return localStorage.getItem('questlog.idioma.v1') === 'en'; } catch(e){ return false; } };
+  // '1' ligado, '0' desligado; sem escolha ainda (null) = desligado ate responder o convite
+  // (quem ja tinha visto o aviso antigo, sem desligar, segue ligado)
+  const ligado = () => { try { const v = localStorage.getItem(K); return v === '1' || (v === null && localStorage.getItem(KA) === '1'); } catch(e){ return false; } };
   window.aplicarCrt = function(){
-    const root = document.documentElement, p = pref(), a = pro();
-    // carencia de 4s no boot: o entitlement do servidor chega depois (evita apagar e acender)
-    if (p && (a || Date.now() - t0 < 4000)) root.setAttribute('data-crt', '1'); else root.removeAttribute('data-crt');
-    if (btn){
-      const on = p && a;
-      btn.classList.toggle('on', on); btn.setAttribute('aria-checked', on ? 'true' : 'false');
-      if (selo) selo.style.display = a ? 'none' : '';
-    }
+    const on = ligado();
+    if (on) document.documentElement.setAttribute('data-crt', '1'); else document.documentElement.removeAttribute('data-crt');
+    if (btn){ btn.classList.toggle('on', on); btn.setAttribute('aria-checked', on ? 'true' : 'false'); }
   };
   if (btn) btn.onclick = () => {
-    if (!pro()){ if (typeof window.abrirPaywall === 'function') window.abrirPaywall('crt'); return; }
-    try { localStorage.setItem(K, pref() ? '0' : '1'); } catch(e){}
+    try { localStorage.setItem(K, ligado() ? '0' : '1'); } catch(e){}
     window.aplicarCrt();
   };
   window.aplicarCrt();
-  setInterval(window.aplicarCrt, 3000);
-  document.addEventListener('visibilitychange', window.aplicarCrt);
+
+  // aviso unico: "o app vem com efeito CRT; da pra desativar em Preferencias"
+  function jaAvisou(){ try { return localStorage.getItem(KA) === '1'; } catch(e){ return true; } }
+  function marcar(){ try { localStorage.setItem(KA, '1'); } catch(e){} }
+  function mostrarAviso(prox){
+    const e = en();
+    let ov = document.getElementById('crtAvisoOverlay');
+    if (ov) ov.remove();
+    ov = document.createElement('div'); ov.id = 'crtAvisoOverlay';
+    ov.style.cssText = 'position:fixed;inset:0;z-index:9600;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,.62)';
+    ov.innerHTML = '<div style="max-width:320px;width:100%;background:#2b2b2b;color:#fafafa;border-radius:18px;padding:22px 20px 18px;text-align:center;font-family:Outfit,sans-serif;box-shadow:0 12px 40px rgba(0,0,0,.6)">'
+      + '<div style="font-size:18px;font-weight:700;margin-bottom:8px">' + (e ? 'CRT effect' : 'Efeito CRT') + '</div>'
+      + '<div style="font-size:14px;line-height:1.45;color:#d8d8d8;margin-bottom:16px">' + (e ? 'Want an old tube-TV look in the app? You can change this anytime in Preferences &gt; CRT effect.' : 'Quer o visual de TV de tubo antiga no app? Você pode mudar quando quiser em Preferências &gt; Efeito CRT.') + '</div>'
+      + '<button id="crtAvisoOk" style="width:100%;padding:13px;border:none;border-radius:12px;background:#fafafa;color:#1c1c1c;font-weight:700;font-size:15px;font-family:inherit;cursor:pointer;margin-bottom:8px">' + (e ? 'Turn on' : 'Ativar') + '</button>'
+      + '<button id="crtAvisoOff" style="width:100%;padding:11px;border:none;border-radius:12px;background:transparent;color:#d8d8d8;font-size:14px;font-family:inherit;cursor:pointer">' + (e ? 'Not now' : 'Agora não') + '</button></div>';
+    document.body.appendChild(ov);
+    const fim = (ativar) => { marcar(); try { localStorage.setItem(K, ativar ? '1' : '0'); } catch(e){} window.aplicarCrt(); ov.remove(); if (prox) prox(); };
+    ov.querySelector('#crtAvisoOk').onclick = () => fim(true);
+    ov.querySelector('#crtAvisoOff').onclick = () => fim(false);
+  }
+  const t = setInterval(() => {
+    if (jaAvisou()){ clearInterval(t); return; }
+    const intro = document.getElementById('intro');
+    if (intro && !intro.classList.contains('off')) return;   // ainda no onboarding/login
+    // nao empilha em cima do tutorial de telas (dialogo do heroi) nem de outro popup aberto:
+    // espera o tutorial da aba Tarefas ter sido visto e nada estar aberto
+    try { if (!JSON.parse(localStorage.getItem('questlog.tutorialTelas.v2') || '{}').tarefas) return; } catch(e){}
+    if (document.querySelector('.dlgOverlay.on, .paywallOverlay.on, .cfgOverlay.on, .edov.on, .sheetbg.on, #resDiaTela.on, #lvlTela.on')) return;
+    clearInterval(t);
+    if (typeof window.enfileirarPopup === 'function') window.enfileirarPopup(mostrarAviso); else mostrarAviso();
+  }, 1500);
 })();
 </script>
 
@@ -19996,7 +20016,6 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'pro.b1t': { pt:'Vários heróis', en:'Several heroes' }, 'pro.b1s': { pt:'Até 4 heróis por conta', en:'Up to 4 heroes per account' },
     'pro.b2t': { pt:'Temas exclusivos', en:'Exclusive themes' }, 'pro.b2s': { pt:'Esmeralda e Terracota', en:'Emerald and Terracotta' },
     'pro.b3t': { pt:'Tarefas sem limite', en:'Unlimited tasks' }, 'pro.b3s': { pt:'No grátis são 5 tarefas ativas', en:'Free plan has 5 active tasks' },
-    'pro.b5t': { pt:'Efeito CRT', en:'CRT effect' }, 'pro.b5s': { pt:'TV de tubo antiga em qualquer tema', en:'Old tube-TV look on any theme' },
     'pro.b4t': { pt:'Estatísticas completas', en:'Full statistics' }, 'pro.b4s': { pt:'Histórico completo e todos os gráficos', en:'Full history and all charts' },
     'pro.dias': { pt:'DIAS', en:'DAYS' },
     'pro.ofertaT': { pt:'Teste grátis do Pro', en:'Free Pro trial' }, 'pro.ofertaS': { pt:'Estamos te oferecendo 7 dias grátis para testar o plano Pro.', en:'We are offering you 7 days free to try the Pro plan.' },

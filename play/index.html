@@ -134,7 +134,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=379">
+<link rel="stylesheet" href="style.css?v=380">
 <script>
 // A abertura so sai quando (1) a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado (sair antes mostrava um flash
 // cinza vazio e depois a tela de login por baixo, visto em video de teste) E (2) quem ja tinha sessao neste aparelho teve login confirmado e o
@@ -2376,15 +2376,15 @@ const ECO = {
 };
 
 /* Bonus percentual de cada equipamento por [tipo][raridade].
-   Indice = raridade: 0 comum, 1 incomum, 2 raro, 3 epico, 4 lendario.
+   Indice = raridade: 0 comum, 1 incomum, 2 raro, 3 superior, 4 epico, 5 lendario, 6 ancestral, 7 unico.
    x = % de XP a mais    |    m = % de moedas a mais
-   Teto com set lendario completo: +123% XP e +87% moedas. */
+   Superior fica entre Raro e Epico; Ancestral acima do Lendario (so ~10 itens). */
 const BONUS = {
-  arma:     { x:[ 5,10,17,26,40], m:[ 3, 6,10,16,25] },
-  armadura: { x:[ 3, 6,10,15,24], m:[ 1, 2, 3, 5, 8] },
-  elmo:     { x:[ 2, 5, 8,13,20], m:[ 1, 2, 3, 5, 8] },
-  escudo:   { x:[ 2, 4, 7,11,13], m:[ 2, 4, 6,10,16] },
-  acess:    { x:[ 3, 6,10,16,26], m:[ 4, 8,13,20,32] }
+  arma:     { x:[ 5,10,17,22,26,40,50,50], m:[ 3, 6,10,13,16,25,31,31] },
+  armadura: { x:[ 3, 6,10,12,15,24,30,30], m:[ 1, 2, 3, 4, 5, 8,10,10] },
+  elmo:     { x:[ 2, 5, 8,10,13,20,25,25], m:[ 1, 2, 3, 4, 5, 8,10,10] },
+  escudo:   { x:[ 2, 4, 7, 9,11,13,16,16], m:[ 2, 4, 6, 8,10,16,20,20] },
+  acess:    { x:[ 3, 6,10,13,16,26,32,32], m:[ 4, 8,13,16,20,32,40,40] }
 };
 
 // compatibilidade com o codigo antigo
@@ -3125,29 +3125,29 @@ function _limparCelebracaoDiaMostrada(){
    As variantes sao salvas no save ("variantes") e reconstruidas no carregar. */
 const BASE_N = ITENS.length;
 const AFIXOS = {
-  gan: {pt:'Ganancioso', en:'Greedy',    letra:'G', faixa:[[1,2],[1,3],[2,4],[3,6],[5,8]]},
-  est: {pt:'Estudioso',  en:'Scholarly', letra:'E', faixa:[[1,2],[1,3],[2,4],[3,6],[5,8]]},
-  sor: {pt:'Sortudo',    en:'Lucky',     letra:'S', faixa:[[1,1],[1,1],[1,2],[2,3],[2,4]]},
-  bar: {pt:'Barganhista',en:'Haggler',   letra:'B', faixa:[[1,1],[1,2],[2,3],[2,4],[3,5]]},
-  bau: {pt:'Caçador de Baús', en:'Chest Hunter', letra:'C', faixa:[[1,1],[1,2],[2,3],[3,4],[4,5]]},
-  abu: {pt:'Abundante',  en:'Bountiful', letra:'A', faixa:[[1,2],[2,3],[3,4],[4,6],[6,8]]},
-  tes: {pt:'Garimpeiro', en:'Prospector',letra:'P', faixa:[[2,3],[3,5],[4,6],[6,8],[8,12]]},
-  tex: {pt:'Tesoureiro', en:'Treasurer', letra:'T', faixa:[[1,2],[2,3],[3,4],[4,6],[6,9]]}   // chance de 1 tesouro EXTRA no bau
+  gan: {pt:'Ganancioso', en:'Greedy',    letra:'G', faixa:[[1,2],[1,3],[2,4],[3,5],[3,6],[5,8],[7,11],[7,11]]},
+  est: {pt:'Estudioso',  en:'Scholarly', letra:'E', faixa:[[1,2],[1,3],[2,4],[3,5],[3,6],[5,8],[7,11],[7,11]]},
+  sor: {pt:'Sortudo',    en:'Lucky',     letra:'S', faixa:[[1,1],[1,1],[1,2],[2,2],[2,3],[2,4],[3,6],[3,6]]},
+  bar: {pt:'Barganhista',en:'Haggler',   letra:'B', faixa:[[1,1],[1,2],[2,3],[2,3],[2,4],[3,5],[4,7],[4,7]]},
+  bau: {pt:'Caçador de Baús', en:'Chest Hunter', letra:'C', faixa:[[1,1],[1,2],[2,3],[3,3],[3,4],[4,5],[6,7],[6,7]]},
+  abu: {pt:'Abundante',  en:'Bountiful', letra:'A', faixa:[[1,2],[2,3],[3,4],[4,5],[4,6],[6,8],[8,11],[8,11]]},
+  tes: {pt:'Garimpeiro', en:'Prospector',letra:'P', faixa:[[2,3],[3,5],[4,6],[5,7],[6,8],[8,12],[11,17],[11,17]]},
+  tex: {pt:'Tesoureiro', en:'Treasurer', letra:'T', faixa:[[1,2],[2,3],[3,4],[4,5],[4,6],[6,9],[8,13],[8,13]]}   // chance de 1 tesouro EXTRA no bau
 };
 const AFX_CHAVES = ['gan','est','sor','bar','bau','abu','tes','tex'];
 const AFX_TETO = {gan:25, est:25, sor:10, bar:10, bau:10, abu:15, tes:20, tex:15};   // soma dos slots (% de afixo)
 const _varMapa = {};
 // encantamentos RUINS (maldicoes): mesmo tipo, valor negativo. Podem vir no loot (20%) e na forja (30%).
 const AFX_NEG = {
-  gan: {pt:'Maldição da Pobreza', en:'Curse of Poverty',    faixa:[[1,1],[1,2],[1,3],[2,4],[3,5]]},
-  est: {pt:'Maldição da Ignorância', en:'Curse of Ignorance',  faixa:[[1,1],[1,2],[1,3],[2,4],[3,5]]},
-  sor: {pt:'Maldição do Azar', en:'Curse of Bad Luck',        faixa:[[1,1],[1,1],[1,2],[1,3],[2,3]]},
-  bar: {pt:'Maldição do Desperdício', en:'Curse of Waste',       faixa:[[1,1],[1,1],[1,2],[2,3],[2,4]]}
+  gan: {pt:'Maldição da Pobreza', en:'Curse of Poverty',    faixa:[[1,1],[1,2],[1,3],[2,3],[2,4],[3,5],[4,6],[4,6]]},
+  est: {pt:'Maldição da Ignorância', en:'Curse of Ignorance',  faixa:[[1,1],[1,2],[1,3],[2,3],[2,4],[3,5],[4,6],[4,6]]},
+  sor: {pt:'Maldição do Azar', en:'Curse of Bad Luck',        faixa:[[1,1],[1,1],[1,2],[1,2],[1,3],[2,3],[3,4],[3,4]]},
+  bar: {pt:'Maldição do Desperdício', en:'Curse of Waste',       faixa:[[1,1],[1,1],[1,2],[2,2],[2,3],[2,4],[3,5],[3,5]]}
 };
 const AFX_NEG_CHAVES = ['gan','est','sor','bar'];
 const P_NEG_LOOT = 0.20, P_NEG_FORJA = 0.30;
 function afxRolar(rar, excluir, pNeg){
-  const r = Math.max(0, Math.min(4, rar));
+  const r = Math.max(0, Math.min(6, rar));
   const neg = pNeg && Math.random() < pNeg;
   const ch = (neg ? AFX_NEG_CHAVES : AFX_CHAVES).filter(k => k !== excluir);
   const k = ch[Math.floor(Math.random()*ch.length)];
@@ -7961,13 +7961,18 @@ render();
    ======================================================================= */
 
 const SHEET_COLS = 16, SHEET_ROWS = 27;
-const RARIDADES = ['Comum','Incomum','Raro','Épico','Lendário','Único'];
+const RARIDADES = ['Comum','Incomum','Raro','Superior','Épico','Lendário','Ancestral','Único'];
 const RARIDADES_PT = RARIDADES.slice();
-const RARIDADES_EN = ['Common','Uncommon','Rare','Epic','Legendary','Unique'];
+const RARIDADES_EN = ['Common','Uncommon','Rare','Superior','Epic','Legendary','Ancestral','Unique'];
 // forma feminina, usada quando o substantivo e "chave" (Comum/Incomum sao
 // invariaveis, so os outros mudam) -- Raro fica Rara, Epico fica Epica, etc.
-const RARIDADES_FEM_PT = ['Comum','Incomum','Rara','Épica','Lendária','Única'];
-const COR_RAR   = ['#8779A8','#63C99A','#5AA9F2','#B57BE8','#F2A65A','#5AE0D8'];
+const RARIDADES_FEM_PT = ['Comum','Incomum','Rara','Superior','Épica','Lendária','Ancestral','Única'];
+const COR_RAR   = ['#8779A8','#63C99A','#5AA9F2','#7C8CF2','#B57BE8','#F2A65A','#E5484D','#5AE0D8'];
+// escala "antiga" de cada degrau (0..5 = Comum..Unico antes das sub-raridades): usada onde a
+// formula dependia da distancia entre raridades (sorte do bau, nivel da loja, maldicao da forja)
+const RAR_ESCALA = [0, 1, 2, 2.5, 3, 4, 4.5, 5];
+// tier da chave (0..3, bau trancado) -> raridade minima da chave: Comum, Incomum, Raro, Epico
+const TIER_RAR = [0, 1, 2, 4];
 // mesma cor ja usada nos cards de atributo (--atr-cor, "PERFIL — ATRIBUTOS")
 const COR_ATR  = {fortuna:'#F2A65A', foco:'#5AA9F2', vigor:'#E5698A'};
 const NOME_ATR_PT = {fortuna:'Fortuna', foco:'Foco', vigor:'Vigor'};
@@ -8064,7 +8069,7 @@ const ID_GRIMORIO_INV = ITENS.findIndex(a => a[1] === 'Grimório');
 // (rar >= tierMin, tipo "chave", nunca o Grimorio). null se nao tiver.
 function chaveParaDestravar(tierMin){
   const candidatas = inventario
-    .filter(s => s.q > 0 && ITENS[s.id][2] === 'chave' && s.id !== ID_GRIMORIO_INV && ITENS[s.id][3] >= tierMin)
+    .filter(s => s.q > 0 && ITENS[s.id][2] === 'chave' && s.id !== ID_GRIMORIO_INV && ITENS[s.id][3] >= TIER_RAR[tierMin])
     .sort((a, b) => ITENS[a.id][3] - ITENS[b.id][3]);
   return candidatas.length ? candidatas[0].id : null;
 }
@@ -8166,23 +8171,23 @@ function venderItem(id, elOrigem){
 function persistir(){ if (typeof jaComecou !== 'undefined' && jaComecou) salvar(); }
 
 /* ---------- espolio ---------- */
-const PESO_RAR = [50, 28, 14, 6, 2];
+const PESO_RAR = [50, 28, 8, 6, 6, 1.4, 0.6, 0];   // Comum, Incomum, Raro, Superior, Epico, Lendario, Ancestral, Unico
 
 function sortearItem(sorte, permitirLendario){
   if (permitirLendario === undefined) permitirLendario = true;
   // sorte 0..1 desloca o peso para raridades altas
-  const pesos = PESO_RAR.map((p,i) => p * (1 + sorte * i * 0.9));
-  if (!permitirLendario) pesos[4] = 0;   // Lendario reservado pro bau especial (ver darLoot/sortearGanhos)
+  const pesos = PESO_RAR.map((p,i) => p * (1 + sorte * RAR_ESCALA[i] * 0.9));
+  if (!permitirLendario){ pesos[5] = 0; pesos[6] = 0; }   // Lendario reservado pro bau especial (ver darLoot/sortearGanhos)
   const total = pesos.reduce((a,b)=>a+b,0);
   let r = Math.random() * total, rar = 0;
   for (let i=0;i<pesos.length;i++){ r -= pesos[i]; if (r <= 0){ rar = i; break; } }
   let pool = ITENS.map((_,i)=>i).filter(i => i < BASE_N && ITENS[i][3] === rar && !ITENS[i][8]);
-  if (!pool.length) pool = ITENS.map((_,i)=>i).filter(i => i < BASE_N && !ITENS[i][8] && (permitirLendario || ITENS[i][3] < 4));
+  if (!pool.length) pool = ITENS.map((_,i)=>i).filter(i => i < BASE_N && !ITENS[i][8] && (permitirLendario || ITENS[i][3] < 5));
   let pick = pool[Math.floor(Math.random()*pool.length)];
   // Garimpeiro: chance de o item virar tesouro (mesma raridade, ou qualquer nao-lendario)
   if (ITENS[pick][2] !== 'tesouro' && Math.random() * 100 < afixoSoma('tes')){
     let tp = pool.length ? ITENS.map((_,i)=>i).filter(i => i < BASE_N && ITENS[i][2] === 'tesouro' && !ITENS[i][8] && ITENS[i][3] === rar) : [];
-    if (!tp.length) tp = ITENS.map((_,i)=>i).filter(i => i < BASE_N && ITENS[i][2] === 'tesouro' && !ITENS[i][8] && (permitirLendario || ITENS[i][3] < 4));
+    if (!tp.length) tp = ITENS.map((_,i)=>i).filter(i => i < BASE_N && ITENS[i][2] === 'tesouro' && !ITENS[i][8] && (permitirLendario || ITENS[i][3] < 5));
     if (tp.length) pick = tp[Math.floor(Math.random()*tp.length)];
   }
   return comAfixo(pick);
@@ -8191,11 +8196,11 @@ function sortearItem(sorte, permitirLendario){
 // Tesoureiro: chance de 1 tesouro EXTRA no bau (alem dos itens normais); raridade segue a sorte
 function tesouroExtra(sorte){
   if (!(Math.random() * 100 < afixoSoma('tex'))) return null;
-  const pesos = PESO_RAR.map((p,i) => i < 4 ? p * (1 + sorte * i * 0.9) : 0);
+  const pesos = PESO_RAR.map((p,i) => i < 5 ? p * (1 + sorte * RAR_ESCALA[i] * 0.9) : 0);
   let r = Math.random() * pesos.reduce((a,b)=>a+b,0), rar = 0;
   for (let i=0;i<pesos.length;i++){ r -= pesos[i]; if (r <= 0){ rar = i; break; } }
   let tp = ITENS.map((_,i)=>i).filter(i => i < BASE_N && ITENS[i][2] === 'tesouro' && !ITENS[i][8] && ITENS[i][3] === rar);
-  if (!tp.length) tp = ITENS.map((_,i)=>i).filter(i => i < BASE_N && ITENS[i][2] === 'tesouro' && !ITENS[i][8] && ITENS[i][3] < 4);
+  if (!tp.length) tp = ITENS.map((_,i)=>i).filter(i => i < BASE_N && ITENS[i][2] === 'tesouro' && !ITENS[i][8] && ITENS[i][3] < 5);
   return tp.length ? tp[Math.floor(Math.random()*tp.length)] : null;
 }
 
@@ -8633,7 +8638,7 @@ function forjaRoleta(it, nv, cb){
 /* tesouro mais raro = menos chance de maldição (0 -> 30%, raridade 4 -> ~6%) */
 function pNegForja(sel){
   if (!sel || !sel.length) return P_NEG_FORJA;
-  const m = sel.reduce((a, id) => a + item(id).rar, 0) / sel.length;
+  const m = sel.reduce((a, id) => a + RAR_ESCALA[item(id).rar], 0) / sel.length;
   return P_NEG_FORJA * (1 - 0.2 * m);
 }
 function abrirForja(id, novo, sel){
@@ -8881,7 +8886,7 @@ function gerarEstadoBauDia(dia, nTarefas){
     // loot do especial e melhor de proposito: bonus de sorte + garantia de
     // raridade minima, os dois crescendo com o tier da chave exigida
     // (Incomum p/ tier0 .. Lendario p/ tier3) -- ver sortearGanhos
-    const RAR_MINIMA_POR_TIER = [1, 2, 3, 4];
+    const RAR_MINIMA_POR_TIER = [1, 2, 4, 5];   // Incomum, Raro, Epico, Lendario
     especial = {
       ids: sortearGanhos(nTarefas, 0.35 + tier * 0.15, RAR_MINIMA_POR_TIER[tier]),
       tier, aberto: false
@@ -9051,8 +9056,8 @@ function abrirBauEspecial(){
     const dica = el && el.querySelector('.dica');
     if (dica){
       dica.textContent = en
-        ? 'Requires a ' + RARIDADES[esp.tier] + ' key or higher'
-        : 'Requer uma chave ' + RARIDADES_FEM_PT[esp.tier] + ' ou superior';
+        ? 'Requires a ' + RARIDADES[TIER_RAR[esp.tier]] + ' key or higher'
+        : 'Requer uma chave ' + RARIDADES_FEM_PT[TIER_RAR[esp.tier]] + ' ou superior';
       dica.classList.add('on');
       clearTimeout(dica._t);
       dica._t = setTimeout(() => dica.classList.remove('on'), 1800);
@@ -9103,7 +9108,7 @@ renderInventario();
 /* ---------- regras ---------- */
 // tesouro fica de fora: ele existe para ser vendido, nao comprado
 const LOJA_TIPOS = ['arma','armadura','elmo','escudo','acess','cons','chave'];
-const PESO_LOJA  = [38, 30, 19, 9, 0];   // chance por raridade na prateleira — Lendario (indice 4) so em bau, nunca comprado
+const PESO_LOJA  = [38, 30, 12, 7, 9, 0, 0, 0];   // chance por raridade na prateleira — Lendario (indice 4) so em bau, nunca comprado
 // item-chave especial (Grimorio) nunca pode ser sorteado pra loja -- ele
 // e recompensa de nivel, nao mercadoria (ver ID_GRIMORIO em outro bloco,
 // nao reaproveitado aqui de proposito pra nao criar dependencia de ordem
@@ -9111,7 +9116,7 @@ const PESO_LOJA  = [38, 30, 19, 9, 0];   // chance por raridade na prateleira �
 const ID_GRIMORIO_LOJA = ITENS.findIndex(a => a[1] === 'Grimório');
 
 function nivelMinimo(rar){
-  return 1 + rar * Math.max(0, Math.round(ECO.lojaNivelPorRaridade));
+  return 1 + Math.round(RAR_ESCALA[rar] * Math.max(0, Math.round(ECO.lojaNivelPorRaridade)));
 }
 
 // BUG DE BALANCEAMENTO ENCONTRADO E CORRIGIDO (simulacao de progressao
@@ -9128,9 +9133,9 @@ function nivelMinimo(rar){
 // inutil). Lendario (indice 4) fica de fora SEMPRE, comprado ou nao --
 // existe so via bau, nunca vendido, independente de nivel.
 function pesosLojaPorNivel(nivel){
-  const pesos = PESO_LOJA.map((p, rar) => (rar < 4 && nivelMinimo(rar) <= nivel) ? p : 0);
+  const pesos = PESO_LOJA.map((p, rar) => (rar < 5 && nivelMinimo(rar) <= nivel) ? p : 0);
   const soma = pesos.reduce((a, b) => a + b, 0);
-  return soma > 0 ? pesos : [1, 0, 0, 0, 0]; // defensivo: Comum (nivelMinimo=1) cobre qualquer nivel >=1, isto nunca deveria disparar
+  return soma > 0 ? pesos : [1, 0, 0, 0, 0, 0, 0, 0]; // defensivo: Comum (nivelMinimo=1) cobre qualquer nivel >=1, isto nunca deveria disparar
 }
 
 function precoLoja(id, oferta){
@@ -14802,7 +14807,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       icone:'<path d="M4 5.5C4 4.1 5.6 3 7.5 3H12v17H7.5C5.6 20 4 19.4 4 18V5.5z"/><path d="M20 5.5C20 4.1 18.4 3 16.5 3H12v17h4.5c1.9 0 3.5-.6 3.5-2V5.5z"/>',
       tiers:[
         { meta:1,   nome:'Primeira Descoberta',       nome_en:'First Discovery',    req:'Obtenha seu 1º item',              req_en:'Obtain your 1st item',            valor: ctx => ctx.itensVistos, xp:15 },
-        { meta:6,   nome:'Colecionador de Raridades', nome_en:'Rarity Collector',   req:'Obtenha um item de cada raridade', req_en:'Obtain one item of each rarity',  valor: ctx => ctx.raridadesObtidas, xp:60 },
+        { meta:8,   nome:'Colecionador de Raridades', nome_en:'Rarity Collector',   req:'Obtenha um item de cada raridade', req_en:'Obtain one item of each rarity',  valor: ctx => ctx.raridadesObtidas, xp:60 },
         { meta:1,   nome:'O Livro Proibido',          nome_en:'The Forbidden Book', req:'Obtenha o Grimório',               req_en:'Obtain the Grimoire',             valor: ctx => ctx.temGrimorio ? 1 : 0, xp:50 },
         { meta:10,  nome:'Iniciante do Catálogo',     nome_en:'Catalog Novice',     req:'Descubra 10 itens distintos',      req_en:'Discover 10 distinct items',      valor: ctx => ctx.itensVistos, xp:40 },
         { meta:20,  nome:'Explorador',                nome_en:'Explorer',           req:'Descubra 20 itens distintos',      req_en:'Discover 20 distinct items',      valor: ctx => ctx.itensVistos, xp:80 },
@@ -17662,10 +17667,10 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         const pr = palco.getBoundingClientRect(), mr2 = mob.getBoundingClientRect();
         const fx = document.createElement('div');
         const rar = (typeof item === 'function' && item(ESPADAS_OB[obEspadaIdx % ESPADAS_OB.length])) ? item(ESPADAS_OB[obEspadaIdx % ESPADAS_OB.length]).rar : 0;
-        fx.className = 'fx-sprite-slash ' + (['comum','incomum','raro','epico','lendario'][rar] || 'comum');
+        fx.className = 'fx-sprite-slash ' + (['comum','incomum','raro','raro','epico','lendario','lendario','lendario'][rar] || 'comum');
         fx.style.left = (mr2.left - pr.left + mr2.width / 2) + 'px';
         fx.style.top = (mr2.top - pr.top + mr2.height / 2) + 'px';
-        fx.style.setProperty('--escala-slash', [2, 2.2, 2.4, 2.6, 2.8][rar] || 2.4);   // raridade maior = corte maior, como no combate real
+        fx.style.setProperty('--escala-slash', [2, 2.2, 2.4, 2.4, 2.6, 2.8, 2.8, 2.8][rar] || 2.4);   // raridade maior = corte maior, como no combate real
         palco.appendChild(fx);
         setTimeout(() => fx.remove(), 450);
       }
@@ -19834,7 +19839,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     const idArma = (typeof equipado !== 'undefined') ? equipado.arma : null;
     if (idArma === null || idArma === undefined) return false;
     if (typeof ITENS === 'undefined' || !ITENS[idArma]) return false;
-    return item(idArma).rar === 4; // 4 = Lendario em RARIDADES/COR_RAR
+    return item(idArma).rar === 5 || item(idArma).rar === 6; // 5 Lendario, 6 Ancestral
   }
 
   // sem arma equipada = intensidade minima (rar 0, mesma faixa de "Comum")
@@ -19848,7 +19853,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // raridade nao muda a COR do efeito (isso e papel da categoria), so a
   // intensidade -- tamanho/alcance/numero de particulas. Decisao explicita
   // do usuario: cor de categoria fica intocada, so escala.
-  const ESCALA_RARIDADE = {0:1.4, 1:1.4, 2:1.4, 3:1.4, 4:1.4}; // TESTE: tamanhos iguais pra todas, so cor muda (pedido do usuario)
+  const ESCALA_RARIDADE = {0:1.4, 1:1.4, 2:1.4, 3:1.4, 4:1.4, 5:1.4, 6:1.4, 7:1.4}; // TESTE: tamanhos iguais pra todas, so cor muda (pedido do usuario)
   function escalaPorRaridade(rar){
     return ESCALA_RARIDADE[rar] !== undefined ? ESCALA_RARIDADE[rar] : 1;
   }
@@ -19885,7 +19890,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     // revisada no chat (categoria causava colisao visual, ex. taco=impacto
     // parecia igual a espada lendaria=impacto). indice 5 (Unico) nao foi
     // especificado; cai no mesmo visual de Lendario ate decisao em contrario.
-    const CLASSE_POR_RARIDADE = ['comum', 'incomum', 'raro', 'epico', 'lendario'];
+    const CLASSE_POR_RARIDADE = ['comum', 'incomum', 'raro', 'raro', 'epico', 'lendario', 'lendario', 'lendario'];
     const classeUsada = CLASSE_POR_RARIDADE[rar] || 'lendario';
     // duracao tem que bater com a animation-duration da classe CSS (.34s pra
     // Slash 2 = comum/incomum, .42s pra Slash 1/3 = raro/epico/lendario),

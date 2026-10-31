@@ -51,8 +51,8 @@
 // padrao 'grafite' de temaSalvo()).
 try { var _cb=localStorage.getItem('questlog.corBarra.v1'); if(_cb){var _m=document.querySelector('meta[name="theme-color"]'); if(_m)_m.content=_cb; document.documentElement.style.setProperty('--bsBg',_cb);}
    document.documentElement.setAttribute('data-tema', localStorage.getItem('questlog.tema.v1') || 'grafite');
-   if (localStorage.getItem('questlog.crt.v1') !== '0') document.documentElement.setAttribute('data-crt', '1'); }
-catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); document.documentElement.setAttribute('data-crt', '1'); }
+   var _c=localStorage.getItem('questlog.crt.v1'); if (_c==='1' || (_c===null && localStorage.getItem('questlog.crtAviso.v1')==='1')) document.documentElement.setAttribute('data-crt', '1'); }
+catch(e){ document.documentElement.setAttribute('data-tema', 'grafite'); }
 </script>
 <link rel="preload" href="sheet.png?v=1" as="image">
 <!-- TELA DE ABERTURA (feedback de testador: "tela preta ~10s no 1o uso"). No 1o uso o app nao tem tela de loading
@@ -134,7 +134,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=378">
+<link rel="stylesheet" href="style.css?v=379">
 <script>
 // A abertura so sai quando (1) a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado (sair antes mostrava um flash
 // cinza vazio e depois a tela de login por baixo, visto em video de teste) E (2) quem ja tinha sessao neste aparelho teve login confirmado e o
@@ -19764,13 +19764,14 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 })();
 </script>
 
-<!-- EFEITO CRT: preferencia em Config, LIGADO por padrao pra todos (CSS: :root[data-crt="1"]).
-     questlog.crt.v1 = '0' desliga. Aviso unico (questlog.crtAviso.v1) depois que o app principal aparece. -->
+<!-- EFEITO CRT: preferencia em Config, convite unico depois do tutorial (questlog.crtAviso.v1); resposta em questlog.crt.v1 ('1'/'0'). Sem resposta = desligado. -->
 <script>
 (function(){
   const K = 'questlog.crt.v1', KA = 'questlog.crtAviso.v1', btn = document.getElementById('cfgCrtBtn');
   const en = () => { try { return localStorage.getItem('questlog.idioma.v1') === 'en'; } catch(e){ return false; } };
-  const ligado = () => { try { return localStorage.getItem(K) !== '0'; } catch(e){ return true; } };
+  // '1' ligado, '0' desligado; sem escolha ainda (null) = desligado ate responder o convite
+  // (quem ja tinha visto o aviso antigo, sem desligar, segue ligado)
+  const ligado = () => { try { const v = localStorage.getItem(K); return v === '1' || (v === null && localStorage.getItem(KA) === '1'); } catch(e){ return false; } };
   window.aplicarCrt = function(){
     const on = ligado();
     if (on) document.documentElement.setAttribute('data-crt', '1'); else document.documentElement.removeAttribute('data-crt');
@@ -19793,13 +19794,13 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     ov.style.cssText = 'position:fixed;inset:0;z-index:9600;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,.62)';
     ov.innerHTML = '<div style="max-width:320px;width:100%;background:#2b2b2b;color:#fafafa;border-radius:18px;padding:22px 20px 18px;text-align:center;font-family:Outfit,sans-serif;box-shadow:0 12px 40px rgba(0,0,0,.6)">'
       + '<div style="font-size:18px;font-weight:700;margin-bottom:8px">' + (e ? 'CRT effect' : 'Efeito CRT') + '</div>'
-      + '<div style="font-size:14px;line-height:1.45;color:#d8d8d8;margin-bottom:16px">' + (e ? 'The app comes with an old tube-TV effect. You can turn it off anytime in Preferences &gt; CRT effect.' : 'O app vem com um efeito de TV de tubo antiga. Você pode desativar quando quiser em Preferências &gt; Efeito CRT.') + '</div>'
-      + '<button id="crtAvisoOk" style="width:100%;padding:13px;border:none;border-radius:12px;background:#fafafa;color:#1c1c1c;font-weight:700;font-size:15px;font-family:inherit;cursor:pointer;margin-bottom:8px">' + (e ? 'Got it' : 'Entendi') + '</button>'
-      + '<button id="crtAvisoOff" style="width:100%;padding:11px;border:none;border-radius:12px;background:transparent;color:#d8d8d8;font-size:14px;font-family:inherit;cursor:pointer">' + (e ? 'Turn off now' : 'Desativar agora') + '</button></div>';
+      + '<div style="font-size:14px;line-height:1.45;color:#d8d8d8;margin-bottom:16px">' + (e ? 'Want an old tube-TV look in the app? You can change this anytime in Preferences &gt; CRT effect.' : 'Quer o visual de TV de tubo antiga no app? Você pode mudar quando quiser em Preferências &gt; Efeito CRT.') + '</div>'
+      + '<button id="crtAvisoOk" style="width:100%;padding:13px;border:none;border-radius:12px;background:#fafafa;color:#1c1c1c;font-weight:700;font-size:15px;font-family:inherit;cursor:pointer;margin-bottom:8px">' + (e ? 'Turn on' : 'Ativar') + '</button>'
+      + '<button id="crtAvisoOff" style="width:100%;padding:11px;border:none;border-radius:12px;background:transparent;color:#d8d8d8;font-size:14px;font-family:inherit;cursor:pointer">' + (e ? 'Not now' : 'Agora não') + '</button></div>';
     document.body.appendChild(ov);
-    const fim = (desligar) => { marcar(); if (desligar){ try { localStorage.setItem(K, '0'); } catch(e){} window.aplicarCrt(); } ov.remove(); if (prox) prox(); };
-    ov.querySelector('#crtAvisoOk').onclick = () => fim(false);
-    ov.querySelector('#crtAvisoOff').onclick = () => fim(true);
+    const fim = (ativar) => { marcar(); try { localStorage.setItem(K, ativar ? '1' : '0'); } catch(e){} window.aplicarCrt(); ov.remove(); if (prox) prox(); };
+    ov.querySelector('#crtAvisoOk').onclick = () => fim(true);
+    ov.querySelector('#crtAvisoOff').onclick = () => fim(false);
   }
   const t = setInterval(() => {
     if (jaAvisou()){ clearInterval(t); return; }
@@ -19810,7 +19811,6 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     try { if (!JSON.parse(localStorage.getItem('questlog.tutorialTelas.v2') || '{}').tarefas) return; } catch(e){}
     if (document.querySelector('.dlgOverlay.on, .paywallOverlay.on, .cfgOverlay.on, .edov.on, .sheetbg.on, #resDiaTela.on, #lvlTela.on')) return;
     clearInterval(t);
-    if (!ligado()){ marcar(); return; }
     if (typeof window.enfileirarPopup === 'function') window.enfileirarPopup(mostrarAviso); else mostrarAviso();
   }, 1500);
 })();

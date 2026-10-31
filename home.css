@@ -218,3 +218,4 @@ body.lb-open{ overflow:hidden; }
 
 .tt{ display:inline-flex; align-items:center; line-height:0; color:inherit; }
 .tt svg{ display:block; }
+.tt + .tt{ margin-left:10px; }

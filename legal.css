@@ -70,3 +70,4 @@ img.capa{ display:block; width:100%; height:auto; aspect-ratio:1200/630; border-
 
 .tt{ display:inline-flex; align-items:center; line-height:0; color:inherit; }
 .tt svg{ display:block; }
+.tt + .tt{ margin-left:10px; }

@@ -36,13 +36,13 @@ IDIOMAS = {
                termst='Termos de Uso', delete='/delete-account', deletet='Excluir Conta', contact='Contato', social='Redes',
                email='E-mail', copy='© 2026 Weberlabs. Todos os direitos reservados.',
                know='Conheça o Dungeonlog', play='Baixe o Dungeonlog no Google Play',
-               idxdesc='Artigos do Dungeonlog.', t_viewer='Visualizador de imagens', t_close='Fechar', t_prev='Anterior', t_next='Próxima', ttl='TikTok do Dungeonlog', igl='Instagram do Dungeonlog', ultimo='Último post do blog', nav_aria='Navegação do blog', voltar='Voltar ao blog', anterior='Post anterior', proximo='Próximo post', breve='Em breve.', data=lambda d: f'{d[8:]}/{d[5:7]}/{d[:4]}'),
+               idxdesc='Artigos sobre rotina, tarefas e hábitos com RPG, e novidades do Dungeonlog.', t_viewer='Visualizador de imagens', t_close='Fechar', t_prev='Anterior', t_next='Próxima', ttl='TikTok do Dungeonlog', igl='Instagram do Dungeonlog', ultimo='Último post do blog', nav_aria='Navegação do blog', voltar='Voltar ao blog', anterior='Post anterior', proximo='Próximo post', breve='Em breve.', data=lambda d: f'{d[8:]}/{d[5:7]}/{d[:4]}'),
     'en': dict(lang='en', ogloc='en_US', ogimg='og-en.jpg', pre='/en/blog/', home='/en/', homet='Home',
                nav='Navigation', legal='Legal', priv='/en/privacy', privt='Privacy Policy', terms='/en/terms',
                termst='Terms of Use', delete='/en/delete-account', deletet='Delete Account', contact='Contact', social='Social',
                email='Email', copy='© 2026 Weberlabs. All rights reserved.',
                know='Meet Dungeonlog', play='Get Dungeonlog on Google Play',
-               idxdesc='Dungeonlog articles.', t_viewer='Image viewer', t_close='Close', t_prev='Previous', t_next='Next', ttl='Dungeonlog on TikTok', igl='Dungeonlog on Instagram', ultimo='Latest blog post', nav_aria='Blog navigation', voltar='Back to blog', anterior='Previous post', proximo='Next post', breve='Coming soon.', data=lambda d: d),
+               idxdesc='Articles on routine, tasks and habits with RPG, and Dungeonlog news.', t_viewer='Image viewer', t_close='Close', t_prev='Previous', t_next='Next', ttl='Dungeonlog on TikTok', igl='Dungeonlog on Instagram', ultimo='Latest blog post', nav_aria='Blog navigation', voltar='Back to blog', anterior='Previous post', proximo='Next post', breve='Coming soon.', data=lambda d: d),
 }
 LOC = {'pt': 'pt-BR', 'en': 'en-US'}
 
@@ -106,16 +106,46 @@ def aplicar(modelo, d):
 def imagem(m):
     return BASE + m['capa'] if m.get('capa') else f"{BASE}/img/{IDIOMAS[m['idioma']]['ogimg']}"
 
+def script_ld(obj):
+    return '<script type="application/ld+json">' + json.dumps(obj, ensure_ascii=False).replace('</', '<\\/') + '</script>'
+
 def jsonld(m, url):
-    return json.dumps({
-        '@context': 'https://schema.org', '@type': 'Article',
+    t = IDIOMAS[m['idioma']]
+    post = {
+        '@context': 'https://schema.org', '@type': 'BlogPosting',
         'headline': m['titulo'], 'description': m['descricao'],
         'datePublished': m['data'], 'dateModified': m['data'],
-        'inLanguage': LOC[m['idioma']], 'mainEntityOfPage': url, 'url': url,
+        'inLanguage': LOC[m['idioma']], 'mainEntityOfPage': url,
         'image': imagem(m),
-        'author': {'@type': 'Organization', 'name': 'Weberlabs', 'url': BASE + '/'},
-        'publisher': {'@type': 'Organization', 'name': 'Weberlabs', 'url': BASE + '/'},
-    }, ensure_ascii=False)
+        'author': {'@type': 'Organization', 'name': 'Weberlabs'},
+        'publisher': {'@type': 'Organization', 'name': 'Weberlabs'},
+    }
+    # breadcrumb visivel no artigo: Inicio > Blog (a pagina atual e o h1)
+    crumbs = {
+        '@context': 'https://schema.org', '@type': 'BreadcrumbList',
+        'itemListElement': [
+            {'@type': 'ListItem', 'position': 1, 'name': t['homet'], 'item': BASE + t['home']},
+            {'@type': 'ListItem', 'position': 2, 'name': 'Blog', 'item': BASE + t['pre']},
+            {'@type': 'ListItem', 'position': 3, 'name': m['titulo'], 'item': url},
+        ],
+    }
+    return script_ld(post) + '\n' + script_ld(crumbs)
+
+def pares(a, pub):
+    """URLs {pt, en} do par do artigo a (ou dos indices, se a for None); None onde nao ha par."""
+    par = {}
+    for j in ('pt', 'en'):
+        if a is None: par[j] = f"{BASE}{IDIOMAS[j]['pre']}" if any(b['idioma'] == j for b in pub) else None
+        else:
+            b = next((b for b in pub if b['idioma'] == j and b['par'] == a['par']), None)
+            par[j] = f"{BASE}{IDIOMAS[j]['pre']}{b['slug']}/" if b else None
+    return par
+
+def alternates(i, par):
+    """hreflang pt-BR, en e x-default (PT) se houver par; senao so o idioma da pagina."""
+    if par['pt'] and par['en']: L = [('pt-BR', par['pt']), ('en', par['en']), ('x-default', par['pt'])]
+    else: L = [(IDIOMAS[i]['lang'], par[i])]
+    return '\n'.join(f'<link rel="alternate" hreflang="{h}" href="{u}">' for h, u in L)
 
 def home_block(i, a):
     """Escreve o card do artigo mais recente da home do idioma entre <!--ULTIMO-POST--> e <!--/ULTIMO-POST-->."""
@@ -168,10 +198,10 @@ def main():
             saida = saida.replace('{{NAV}}', nav).replace('{{CAPA}}', capa_html)
             saida = (saida.replace('{{TITULO}}', esc(a['titulo'])).replace('{{DESCRICAO}}', esc(a['descricao']))
                      .replace('{{URL}}', url).replace('{{DATA}}', a['data']).replace('{{DATA_BR}}', data_br(a['data'], i))
-                     .replace('{{JSONLD}}', jsonld(a, url).replace('</', '<\\/')).replace('{{CONTEUDO}}', a['corpo']))
+                     .replace('{{JSONLD}}', jsonld(a, url)).replace('{{ALTERNATES}}', alternates(i, pares(a, pub))).replace('{{CONTEUDO}}', a['corpo']))
             d = raiz_blog / a['slug']; d.mkdir(parents=True, exist_ok=True)
             (d / 'index.html').write_text(saida, encoding='utf-8')
-            urls.append((url, a['data']))
+            urls.append((url, a['data'], pares(a, pub)))
         # indice do idioma
         modelo_ind = ler(FONTE / 'modelo-indice.html')
         card = re.search(r'<!--CARD-->(.*?)<!--/CARD-->', modelo_ind, re.S).group(1).strip('\n')
@@ -187,18 +217,23 @@ def main():
                 cards.append(c)
             lista = '\n  <div class="cards">\n' + '\n'.join(cards) + '\n  </div>'
             robots = ''
-            urls.append((f"{BASE}{t['pre']}", pi[0]['data']))
+            urls.append((f"{BASE}{t['pre']}", pi[0]['data'], pares(None, pub)))
         else:
             lista = f'\n  <p>{t["breve"]}</p>'
             robots = '<meta name="robots" content="noindex">\n'
         home_block(i, pi[0] if pi else None)
         raiz_blog.mkdir(parents=True, exist_ok=True)
-        ind = aplicar(modelo_ind, trocas(i)).replace('{{LANGSW}}', seletor(i, None, pub)).replace('{{CANON}}', f"{BASE}{t['pre']}")
+        ind = aplicar(modelo_ind, trocas(i)).replace('{{LANGSW}}', seletor(i, None, pub)).replace('{{CANON}}', f"{BASE}{t['pre']}").replace('{{ALTERNATES}}', alternates(i, pares(None, pub)))
         (raiz_blog / 'index.html').write_text(ind.replace('{{LISTA}}', lista).replace('{{ROBOTS}}', robots), encoding='utf-8')
     # sitemap: remove entradas /blog/ e /en/blog/ e re-adiciona so as de idiomas com artigo publicado
     sm = RAIZ / 'sitemap.xml'; x = ler(sm)
     x = re.sub(r'  <url><loc>' + re.escape(BASE) + r'(?:/en)?/blog/[^<]*</loc>.*?</url>\n', '', x, flags=re.S)
-    novas = ''.join(f'  <url><loc>{u}</loc><lastmod>{lm}</lastmod>\n  </url>\n' for u, lm in urls)
+    def entrada(u, lm, par):
+        links = ''
+        if par['pt'] and par['en']:
+            links = ''.join(f'    <xhtml:link rel="alternate" hreflang="{h}" href="{hu}"/>\n' for h, hu in (('pt-BR', par['pt']), ('en', par['en']), ('x-default', par['pt'])))
+        return f'  <url><loc>{u}</loc><lastmod>{lm}</lastmod>\n{links}  </url>\n'
+    novas = ''.join(entrada(u, lm, par) for u, lm, par in urls)
     x = x.replace('</urlset>', novas + '</urlset>')
     sm.write_text(x, encoding='utf-8')
     print(f'{len(pub)} artigo(s) publicado(s); {len(arts) - len(pub)} rascunho(s).')

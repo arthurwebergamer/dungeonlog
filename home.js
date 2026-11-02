@@ -238,3 +238,17 @@
     }
   });
 })();
+
+/* Origem da visita: se a URL trouxer ?utm_source=<origem>, repassa ao link da Google Play como "referrer",
+   para o Play Console mostrar de onde veio a instalação. Nada é guardado nem enviado por este site. */
+(function () {
+  'use strict';
+  try {
+    var src = new URLSearchParams(location.search).get('utm_source');
+    if (!src || !/^[a-z0-9_-]{1,30}$/i.test(src)) return;
+    var ref = encodeURIComponent('utm_source=' + src + '&utm_medium=bio');
+    [].forEach.call(document.querySelectorAll('a[href^="https://play.google.com/store/apps/details?id=com.dungeonlog"]'), function (a) {
+      a.href = a.href.split('&referrer=')[0] + '&referrer=' + ref;
+    });
+  } catch (e) {}
+})();

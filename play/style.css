@@ -7003,3 +7003,18 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 :root[data-crt="1"]:has(#intro:not(.off)) body{text-shadow:none}
 @keyframes crtFlicker{0%{opacity:1}7%{opacity:.9}8%{opacity:1}43%{opacity:1}44%{opacity:.93}46%{opacity:1}81%{opacity:.91}82%{opacity:1}100%{opacity:1}}
 @media (prefers-reduced-motion:reduce){:root[data-crt="1"]::after{animation:none}}
+
+/* avatar (rosto do heroi) no topo: toque abre o Perfil */
+.topAvatar{ width:28px; height:28px; flex:none; border-radius:50%; border:1.5px solid var(--line); padding:0; cursor:pointer;
+  background-color:var(--panel-2,#3D3D3D); background-repeat:no-repeat; background-size:154%; background-position:50% 8%;
+  image-rendering:pixelated; -webkit-tap-highlight-color:transparent }
+
+/* tarefas mais compactas + alca de reordenar (rolagem nativa no resto do card) */
+  .task{touch-action:pan-y !important;padding:7px 8px 7px 11px !important;gap:10px !important;margin-bottom:6px}
+  .task .box{width:34px !important;height:34px !important;min-width:34px !important;border-radius:10px !important}
+  .task .box svg{width:18px;height:18px}
+  .task .del{width:34px !important;height:34px !important;min-width:34px !important;font-size:20px !important}
+  .task .tinfo{gap:2px}
+  .task .grip{flex:none;width:30px;height:38px;display:grid;place-items:center;color:var(--dim);
+    touch-action:none;cursor:grab;-webkit-tap-highlight-color:transparent;opacity:.8}
+  .task .grip:active{color:var(--accent)}

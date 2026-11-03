@@ -7031,3 +7031,27 @@ body.tourAberto .edov.on .edsheet{opacity:1}
   .app:not(:has(.view.on)) .list{flex:none;overflow:visible}
   .app:not(:has(.view.on)) .nav{position:sticky;bottom:0;z-index:20;background:var(--panel) !important}
 }
+
+/* ===== GOLPES VARIADOS: efeitos, respiracao do heroi e de cada especie de monstro ===== */
+.gv-fx{position:absolute;pointer-events:none;z-index:30;image-rendering:pixelated;will-change:transform,opacity}
+.gv-ghost{position:absolute;pointer-events:none;z-index:4;image-rendering:pixelated}
+.hero-sprite .heroArma.gv-trail{pointer-events:none;z-index:2;animation:none !important}
+@keyframes gvBobHeroi{0%,100%{translate:0 0}50%{translate:0 -2px}}
+#heroSprite .heroimg,#heroSprite .heroArma:not(.gv-trail),#heroSprite .heroMao{animation:gvBobHeroi 1.1s steps(2,end) infinite}
+.hero-sprite.golpeando .heroArma{animation:gvBobHeroi 1.1s steps(2,end) infinite}
+#mobSprite .mobimg{transform-origin:50% 100%}
+#mobSprite:not(.dead):not(.fugiu) .mobimg{animation-duration:1.8s;animation-timing-function:steps(2,end);animation-iteration-count:infinite}
+.gvm-goblin:not(.dead):not(.fugiu) .mobimg{animation-name:gvmGoblin;animation-duration:1.4s}@keyframes gvmGoblin{0%,60%,100%{transform:translateY(0)}15%{transform:translateY(-7px)}30%{transform:translateY(0)}42%{transform:translateY(-4px)}50%{transform:translateY(0)}}
+.gvm-gosma:not(.dead):not(.fugiu) .mobimg{animation-name:gvmGosma;animation-duration:1.2s}@keyframes gvmGosma{0%,100%{transform:scale(1,1)}30%{transform:scale(1.13,.84)}60%{transform:scale(.92,1.12)}80%{transform:scale(1.04,.97)}}
+.gvm-morcego:not(.dead):not(.fugiu) .mobimg{animation-name:gvmMorc;animation-duration:.8s}@keyframes gvmMorc{0%{transform:translate(0,0) rotate(0)}25%{transform:translate(2px,-5px) rotate(5deg)}50%{transform:translate(0,-1px) rotate(0)}75%{transform:translate(-2px,-5px) rotate(-5deg)}100%{transform:translate(0,0) rotate(0)}}
+.gvm-rato:not(.dead):not(.fugiu) .mobimg{animation-name:gvmRato;animation-duration:1.6s}@keyframes gvmRato{0%,45%,100%{transform:rotate(0) translate(0,0)}10%{transform:rotate(-5deg) translate(-2px,1px)}20%{transform:rotate(0)}30%{transform:rotate(-5deg) translate(-2px,1px)}40%{transform:rotate(0)}}
+.gvm-aranha:not(.dead):not(.fugiu) .mobimg{animation-name:gvmAranha;animation-duration:1.5s}@keyframes gvmAranha{0%,100%{transform:translate(0,0) scale(1,1)}20%{transform:translate(4px,1px) scale(1,.96)}40%{transform:translate(4px,0)}60%{transform:translate(-4px,1px) scale(1,.96)}80%{transform:translate(-4px,0)}}
+.gvm-olho:not(.dead):not(.fugiu) .mobimg{animation-name:gvmOlho;animation-duration:2.4s;animation-timing-function:steps(5,end)}@keyframes gvmOlho{0%,100%{transform:translateY(0) rotate(0)}25%{transform:translateY(-4px) rotate(3deg)}50%{transform:translateY(-6px) rotate(0)}75%{transform:translateY(-3px) rotate(-3deg)}}
+.gvm-golem:not(.dead):not(.fugiu) .mobimg{animation-name:gvmGolem;animation-duration:2.8s}@keyframes gvmGolem{0%,100%{transform:translateY(0) scale(1,1)}45%,55%{transform:translateY(-1px) scale(1.01,1.02)}70%{transform:translateY(1px) scale(1.04,.96)}85%{transform:translateY(0) scale(1,1)}}
+.gvm-espectro:not(.dead):not(.fugiu) .mobimg{animation-name:gvmEsp;animation-duration:2.2s;animation-timing-function:steps(4,end)}@keyframes gvmEsp{0%,100%{transform:translate(0,0);opacity:1}30%{transform:translate(5px,-5px);opacity:.78}60%{transform:translate(-5px,-2px);opacity:.9}}
+.gvm-demonio:not(.dead):not(.fugiu) .mobimg{animation-name:gvmDem}@keyframes gvmDem{0%,100%{transform:rotate(0) translateX(0) scale(1)}30%{transform:rotate(3deg) translateX(2px) scale(1.03)}60%{transform:rotate(0) scale(1.01)}88%{transform:translateX(-1px)}92%{transform:translateX(1px)}96%{transform:translateX(-1px)}}
+.gvm-esqueleto:not(.dead):not(.fugiu) .mobimg{animation-name:gvmEsq;animation-duration:1.3s;animation-timing-function:steps(1,end)}@keyframes gvmEsq{0%,45%,100%{transform:translate(0,0) rotate(0)}8%{transform:translate(1px,0) rotate(2deg)}16%{transform:translate(-1px,0) rotate(-2deg)}24%{transform:translate(1px,-1px) rotate(1deg)}32%{transform:translate(0,0) rotate(0) scale(1,.97)}}
+.gvm-verme:not(.dead):not(.fugiu) .mobimg{animation-name:gvmVerme;animation-duration:1.6s}@keyframes gvmVerme{0%,100%{transform:scale(1,1) translateX(0)}25%{transform:scale(1.1,.88) translateX(2px)}50%{transform:scale(.92,1.12)}75%{transform:scale(1.07,.93) translateX(-2px)}}
+.gvm-cogumelo:not(.dead):not(.fugiu) .mobimg{animation-name:gvmCog;animation-duration:2.2s;animation-timing-function:steps(4,end)}@keyframes gvmCog{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+.gvm-mimic:not(.dead):not(.fugiu) .mobimg{animation-name:gvmMimic;animation-duration:3.4s;animation-timing-function:steps(1,end)}@keyframes gvmMimic{0%,74%,100%{transform:none}78%{transform:scale(1.03) rotate(-1.5deg)}82%{transform:scale(1.03) rotate(1.5deg)}86%{transform:translateY(-10px) scale(.95,1.1)}92%{transform:translateY(0) scale(1.12,.86)}96%{transform:scale(.98,1.03)}}
+@media (prefers-reduced-motion:reduce){#heroSprite .heroimg,#heroSprite .heroArma,#heroSprite .heroMao,#mobSprite .mobimg{animation:none !important}}

@@ -134,7 +134,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=387">
+<link rel="stylesheet" href="style.css?v=388">
 <script>
 // A abertura so sai quando (1) a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado (sair antes mostrava um flash
 // cinza vazio e depois a tela de login por baixo, visto em video de teste) E (2) quem ja tinha sessao neste aparelho teve login confirmado e o
@@ -1056,6 +1056,15 @@ html{background:var(--bsBg,#282828)}
           <b data-i18n="cfg.crt">Efeito CRT</b>
         </div>
         <button class="swch" id="cfgCrtBtn" type="button" role="switch" aria-checked="false" aria-label="Efeito CRT">
+          <span class="swch-bolinha"></span>
+        </button>
+      </div>
+      <div class="cfgrow" id="cfgRowGolpes">
+        <span class="cfgicone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5 3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2"/></svg></span>
+        <div class="cfgtxt">
+          <b data-i18n="cfg.golpes">Golpes variados</b>
+        </div>
+        <button class="swch on" id="cfgGolpesBtn" type="button" role="switch" aria-checked="true" aria-label="Golpes variados">
           <span class="swch-bolinha"></span>
         </button>
       </div>
@@ -2808,7 +2817,9 @@ function terminarDia(){
   if (typeof _arenaBgEmTransicao !== 'undefined' && _arenaBgEmTransicao) return;
   const nivelAntes = progresso().nivel;
   _vitoriaSequenciaEmAndamento = true;
-  if (typeof animarGolpe === 'function') animarGolpe();
+  // golpe final (critico): devolve em quantos ms o monstro pode "morrer" (o golpe antigo nao devolve nada -> 300ms)
+  const _golpeFinal = (typeof animarGolpe === 'function') ? animarGolpe({ final: true }) : null;
+  const _esperaVitoria = (_golpeFinal && _golpeFinal.vitoriaMs) || 300;
   window.tocarSom?.('golpe');
   render(); // esconde o botao ja
   setTimeout(() => {
@@ -2816,7 +2827,7 @@ function terminarDia(){
     if (typeof window.curarVitoriaDia === 'function') window.curarVitoriaDia();
     // garante o bau do dia (antes era criado pelo gancho em volta de alternar())
     setTimeout(() => { if (typeof window.atualizarBauArena === 'function') window.atualizarBauArena(); }, 2600);
-  }, 300);
+  }, _esperaVitoria);
 }
 window.terminarDia = terminarDia;
 
@@ -5529,7 +5540,7 @@ function render(){
       // concorrente). Chamando aqui, o bicho reage no mesmo frame do
       // toque; os 350/460ms continuam so pra dar tempo da animacao da
       // LISTA (vanish) terminar antes do render() trocar a tela.
-      animarGolpe();
+      animarGolpe({ dif: dId });
 
       const seraFinal = (vezesAtual + 1) >= meta;
       if (seraFinal){
@@ -19970,6 +19981,306 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 })();
 </script>
 
+<!-- GOLPES VARIADOS: 5 estilos de golpe, espada com rastro, cor por raridade, respiracao do heroi e dos monstros. Substitui o golpe corpo a corpo antigo (arco/besta/funda seguem no antigo). Preferencia: questlog.golpesVariados.v1 -->
+<script>
+(function(){
+  // GOLPES VARIADOS: 5 estilos de golpe corpo a corpo (Investida, Combo, Lamina, Vulto, Critico),
+  // espada animada com rastro, cor por raridade da arma, respiracao do heroi e de cada especie de
+  // monstro. Arco/besta/funda seguem no golpe antigo (projetil). Qualquer falha cai no golpe antigo.
+  const KEY = 'questlog.golpesVariados.v1';
+  const variado = () => { try { return localStorage.getItem(KEY) !== '0'; } catch(e){ return true; } };
+  const $ = id => document.getElementById(id);
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const CANCEL = { cancelado: true };
+
+  // ---- preferencia (Config) ----
+  const btnPref = $('cfgGolpesBtn');
+  function pintarPref(){ if (btnPref){ btnPref.classList.toggle('on', variado()); btnPref.setAttribute('aria-checked', variado() ? 'true' : 'false'); } }
+  if (btnPref) btnPref.onclick = () => { try { localStorage.setItem(KEY, variado() ? '0' : '1'); } catch(e){} pintarPref(); };
+  pintarPref();
+
+  // ---- raridade da arma -> cores ----
+  const CORES = (window.COR_RAR && window.COR_RAR.length === 8) ? window.COR_RAR : ['#8779A8','#63C99A','#5AA9F2','#F05AB5','#B57BE8','#F2A65A','#E5484D','#5AE0D8'];
+  function rar(){
+    try {
+      const id = (typeof equipado !== 'undefined') ? equipado.arma : null;
+      if (id === null || id === undefined || typeof ITENS === 'undefined' || !ITENS[id]) return 0;
+      const r = item(id).rar; return (r >= 0 && r <= 7) ? r : 0;
+    } catch(e){ return 0; }
+  }
+  function mix(h, w){ const n = parseInt(h.slice(1), 16), r = n >> 16, g = n >> 8 & 255, b = n & 255, f = c => Math.round(c + (255 - c) * w).toString(16).padStart(2, '0'); return '#' + f(r) + f(g) + f(b); }
+  const palR = R => R === 0 ? ['#ffffff', CORES[0]] : [mix(CORES[R], .82), CORES[R]];
+  const spR = R => { const p = palR(R); return [p[0], p[1], p[1], '#ffffff']; };
+
+  // filtros SVG que pintam uma silhueta com a cor de cada raridade (rastro da espada / imagens fantasma)
+  (function(){
+    const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    s.setAttribute('width', '0'); s.setAttribute('height', '0'); s.style.cssText = 'position:absolute;pointer-events:none';
+    s.innerHTML = CORES.map((c, i) => '<filter id="gvTint' + i + '" color-interpolation-filters="sRGB"><feFlood flood-color="' + c + '"/><feComposite in2="SourceAlpha" operator="in"/></filter>').join('');
+    document.body.appendChild(s);
+  })();
+
+  // ---- sprites pixel art gerados na grade ----
+  const cache = {};
+  const cv = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
+  function slashSheet(ang, R){
+    const key = ang + '|' + R; if (cache[key]) return cache[key];
+    const N = 28, F = 5, c = cv(N * F, N), g = c.getContext('2d'), pal = palR(R), a = ang * Math.PI / 180, ca = Math.cos(a), sa = Math.sin(a);
+    const P = t => { const x = (1-t)*(1-t)*2 + 2*(1-t)*t*12 + t*t*25, y = (1-t)*(1-t)*25 + 2*(1-t)*t*10 + t*t*3, dx = x - 14, dy = y - 14; return [14 + dx*ca - dy*sa, 14 + dx*sa + dy*ca]; };
+    const dot = (f, x, y, r, cl) => { g.fillStyle = cl; const Q = Math.ceil(r); for (let j = -Q; j <= Q; j++) for (let i = -Q; i <= Q; i++) if (i*i + j*j <= r*r + .3) g.fillRect(f*N + Math.round(x + i), Math.round(y + j), 1, 1); };
+    for (let f = 0; f < F; f++){
+      const head = f < 3 ? (f + 1) / 3 : 1, tail = f < 3 ? 0 : (f - 2) * .38;
+      for (let layer = 0; layer < 3; layer++){
+        for (let s = tail; s <= head; s += .012){
+          const w = .45 + 1.35 * Math.sin(Math.PI * Math.min(1, Math.max(0, (s - tail) / (1 - tail || 1) || s))) * (f >= 3 ? .8 : 1);
+          const [x, y] = P(s), cl = ['#1a1030', pal[1], pal[0]][layer], r = [w + 1, w, Math.max(.4, w - .9)][layer];
+          dot(f, x, y, r, cl);
+        }
+      }
+      if (f >= 3){ g.clearRect(f*N, 0, N, N); for (let k = 0; k < 7; k++){ const s = rnd(.15, .95), [x, y] = P(s); dot(f, x + rnd(-3, 3), y + rnd(-3, 3), .6, k % 2 ? pal[0] : pal[1]); } }
+    }
+    return cache[key] = c.toDataURL();
+  }
+  function ringImg(col){
+    const key = 'ring' + col; if (cache[key]) return cache[key];
+    const c = cv(48, 14), g = c.getContext('2d');
+    for (let a = 0; a < 6.283; a += .02){ const x = 24 + 22.5*Math.cos(a), y = 7 + 5.5*Math.sin(a); g.fillStyle = '#1a1030'; g.fillRect(Math.round(x) - 1, Math.round(y) - 1, 3, 3); }
+    for (let a = 0; a < 6.283; a += .02){ const x = 24 + 22.5*Math.cos(a), y = 7 + 5.5*Math.sin(a); g.fillStyle = col; g.fillRect(Math.round(x), Math.round(y), 1, 1); }
+    return cache[key] = c.toDataURL();
+  }
+  function laminaImg(R){
+    const key = 'lam' + R; if (cache[key]) return cache[key];
+    const p = palR(R), c = cv(22, 26), g = c.getContext('2d');
+    for (let y = 0; y < 26; y++) for (let x = 0; x < 22; x++){ const d1 = Math.hypot(x - 4, y - 13), d2 = Math.hypot(x - 11, y - 13); if (d1 <= 13 && d2 >= 9.4){ const edge = d1 > 11.4 || d2 < 10.6; g.fillStyle = (d1 > 12 || d2 < 10) ? '#1a1030' : (edge ? p[1] : p[0]); g.fillRect(x, y, 1, 1); } }
+    return cache[key] = c.toDataURL();
+  }
+
+  // ---- estado da execucao ----
+  let gen = 0, emAndamento = false, ultimo = null, ativas = [], fimTimer = null;
+  const prev = window.animarGolpe;   // golpe antigo (ou o wrapper dele): usado em armas de longo alcance e como rede de seguranca
+
+  function ctx(){
+    const arena = document.querySelector('.arena'), h = $('heroSprite'), m = $('mobSprite');
+    if (!arena || !h || !m) return null;
+    const ar = arena.getBoundingClientRect(), hr = h.getBoundingClientRect(), mr = m.getBoundingClientRect();
+    return { arena, h, m, ar, hr, mr, R: rar(),
+      dx: Math.max(0, Math.round(mr.left - hr.right - 4)),
+      c: { x: mr.left - ar.left + mr.width / 2, y: mr.top - ar.top + mr.height * .45 },
+      hx: hr.left - ar.left, hy: hr.top - ar.top };
+  }
+  const armaEl = () => { const a = document.querySelector('#heroSprite .heroArma'); return (a && !a.classList.contains('ranged')) ? a : null; };
+
+  function limpar(){
+    ativas.forEach(a => { try { a.cancel(); } catch(e){} }); ativas = [];
+    document.querySelectorAll('.gv-fx,.gv-trail,.gv-ghost').forEach(e => e.remove());
+    const h = $('heroSprite'), m = $('mobSprite');
+    if (h){ h.style.zIndex = ''; h.style.opacity = ''; h.style.transform = ''; h.style.filter = ''; }
+    if (m){ m.classList.remove('shake'); m.style.transform = ''; }
+    const a = armaEl(); if (a) a.style.filter = '';
+  }
+
+  // ---- ferramentas de efeito (uma por execucao, presas ao token T) ----
+  function mk(C, T){
+    const alive = () => T.g === gen;
+    const X = { C, alive };
+    X.wait = ms => new Promise((res, rej) => setTimeout(() => alive() ? res() : rej(CANCEL), ms));
+    X.an = (el, kf, ms, o) => {
+      if (!el || !el.animate) return Promise.resolve();
+      const a = el.animate(kf, Object.assign({ duration: ms, fill: 'forwards', easing: 'ease-out' }, o || {}));
+      ativas.push(a); return a.finished.catch(() => {});
+    };
+    const add = el => { C.arena.appendChild(el); return el; };
+    X.swing = (r, ms, o) => { const a = armaEl(); return a ? X.an(a, r.map(v => ({ transform: 'rotate(' + v + 'deg)' })), ms, o) : Promise.resolve(); };
+    X.trail = (a0, a1, n, ms) => {
+      const a = armaEl(); if (!a) return;
+      n += C.R >= 5 ? (C.R - 4) * 2 : 0;
+      for (let i = 0; i < n; i++){
+        const c = a.cloneNode(true); c.classList.add('gv-trail'); c.removeAttribute('id');
+        c.style.transform = 'rotate(' + (a0 + (a1 - a0) * (i + 1) / n) + 'deg)'; c.style.filter = 'url(#gvTint' + C.R + ')'; c.style.opacity = '0';
+        a.parentNode.insertBefore(c, a);
+        const an = c.animate([{ opacity: .65 }, { opacity: 0 }], { duration: 220 + i * 20, delay: ms * i / n, fill: 'both', easing: 'steps(3)' });
+        an.finished.then(() => c.remove()).catch(() => c.remove());
+      }
+    };
+    X.parts = (x, y, n, cores, o) => {
+      o = o || {};
+      for (let i = 0; i < n; i++){
+        const d = document.createElement('div'); d.className = 'gv-fx'; const s = o.s || rnd(3, 6);
+        d.style.cssText = 'left:' + x + 'px;top:' + y + 'px;width:' + s + 'px;height:' + s + 'px;background:' + cores[i % cores.length];
+        add(d);
+        const ang = o.dir != null ? o.dir + rnd(-o.spread, o.spread) : rnd(0, 6.283), v = rnd(o.v0 || 30, o.v1 || 80), gx = Math.cos(ang) * v, gy = Math.sin(ang) * v;
+        d.animate([{ transform: 'translate(0,0)', opacity: 1 }, { transform: 'translate(' + gx * .6 + 'px,' + (gy * .6 - 12) + 'px)', opacity: 1, offset: .5 }, { transform: 'translate(' + gx + 'px,' + (gy + (o.grav || 30)) + 'px)', opacity: 0 }], { duration: o.t || 520, easing: 'steps(6)', fill: 'forwards' }).finished.then(() => d.remove()).catch(() => d.remove());
+      }
+    };
+    X.slash = (x, y, ang, sz) => {
+      const k = Math.max(2, Math.round((sz || 80) / 28)), W = 28 * k, e = document.createElement('div'); e.className = 'gv-fx';
+      e.style.cssText = 'left:' + (x - W / 2) + 'px;top:' + (y - W / 2) + 'px;width:' + W + 'px;height:' + W + 'px;background:url(' + slashSheet(Math.round((ang || 0) / 15) * 15, C.R) + ') 0 0/' + (W * 5) + 'px ' + W + 'px no-repeat';
+      add(e);
+      if (C.R >= 5) X.parts(x, y, (C.R - 4) * 5, spR(C.R), { v0: 25, v1: 70 + C.R * 6, t: 520, s: 4 });
+      e.animate([{ backgroundPositionX: '0px' }, { backgroundPositionX: (-W * 5) + 'px' }], { duration: 300, easing: 'steps(5,end)', fill: 'forwards' }).finished.then(() => e.remove()).catch(() => e.remove());
+    };
+    X.ring = (x, y, w, col) => {
+      const r = document.createElement('div'), h = w * 14 / 48; r.className = 'gv-fx';
+      r.style.cssText = 'left:' + (x - w / 2) + 'px;top:' + (y - h / 2) + 'px;width:' + w + 'px;height:' + h + 'px;background:url(' + ringImg(col) + ') center/100% 100% no-repeat';
+      add(r); r.animate([{ transform: 'scale(.2)', opacity: 1 }, { transform: 'scale(.55)', opacity: 1, offset: .34 }, { transform: 'scale(.9)', opacity: .8, offset: .67 }, { transform: 'scale(1.3)', opacity: 0 }], { duration: 440, easing: 'steps(1,end)', fill: 'forwards' }).finished.then(() => r.remove()).catch(() => r.remove());
+    };
+    X.shake = (p, ms) => {
+      const f = []; for (let i = 0; i < 9; i++){ const k = 1 - i / 9; f.push({ translate: (rnd(-p, p) * k) + 'px ' + (rnd(-p, p) * k) + 'px' }); } f.push({ translate: '0 0' });
+      X.an(C.arena, f, ms, { easing: 'steps(10)', fill: 'none' });
+    };
+    X.flashMob = ms => { C.m.classList.add('shake'); setTimeout(() => C.m.classList.remove('shake'), ms); };
+    X.flashWhite = (a, ms) => {
+      const w = document.createElement('div'); w.className = 'gv-fx'; w.style.cssText = 'left:0;top:0;right:0;bottom:0;background:#fff;opacity:0;z-index:40'; add(w);
+      w.animate([{ opacity: a }, { opacity: 0 }], { duration: ms, fill: 'forwards' }).finished.then(() => w.remove()).catch(() => w.remove());
+    };
+    X.vig = (ms, hold) => {
+      const v = document.createElement('div'); v.className = 'gv-fx'; v.style.cssText = 'left:0;top:0;right:0;bottom:0;z-index:38;background:radial-gradient(ellipse at 50% 55%,transparent 35%,rgba(0,0,0,.7))'; add(v);
+      v.animate([{ opacity: 0 }, { opacity: 1, offset: ms / (ms + hold + 320) }, { opacity: 1, offset: (ms + hold) / (ms + hold + 320) }, { opacity: 0 }], { duration: ms + hold + 320, fill: 'forwards' }).finished.then(() => v.remove()).catch(() => v.remove());
+    };
+    X.ghost = (n, x0, x1, y) => {
+      const src = (document.querySelector('#heroSprite .heroimg') || {}).src; if (!src) return;
+      for (let i = 0; i < n; i++){
+        const g = document.createElement('img'); g.className = 'gv-ghost'; g.src = src; const t = i / (n - 1 || 1);
+        g.style.cssText = 'left:' + (C.hx + x0 + (x1 - x0) * t) + 'px;top:' + (C.hy + (y || 0)) + 'px;width:' + C.hr.width + 'px;height:' + C.hr.width + 'px;filter:url(#gvTint' + C.R + ');opacity:0';
+        add(g); g.animate([{ opacity: .45 }, { opacity: 0 }], { duration: 260, delay: i * 40, fill: 'both', easing: 'ease-out' }).finished.then(() => g.remove()).catch(() => g.remove());
+      }
+    };
+    X.knock = (kb, rot, ms) => X.an(C.m, [{ transform: 'translate(0,0) rotate(0)' }, { transform: 'translate(' + kb + 'px,-6px) rotate(' + rot + 'deg)', offset: .3 }, { transform: 'translate(0,0) rotate(0)' }], ms || 460, { easing: 'cubic-bezier(.2,.9,.3,1)' });
+    X.sparks = (n, o) => X.parts(C.c.x - 10, C.c.y, n, spR(C.R), Object.assign({ dir: 3.14, spread: 1.3, v0: 30, v1: 90, t: 480 }, o || {}));
+    return X;
+  }
+
+  // ---- os estilos: imp = ms ate o 1o impacto, vit = ms ate o monstro poder "morrer" (golpe final), tot = duracao ----
+  const ESTILOS = {
+    rel: { imp: 282, vit: 300, tot: 800, async run(X){
+      const C = X.C, dx = C.dx;
+      X.swing([8, -72], 160); await X.an(C.h, [{ transform: 'translate(0,0) scale(1,1)' }, { transform: 'translate(-9px,3px) scale(1.12,.84)' }], 160);
+      X.ghost(4, -9, dx - 14, 3); X.swing([-72, 28], 130, { easing: 'cubic-bezier(.5,0,.9,.4)' });
+      X.an(C.h, [{ transform: 'translate(-9px,3px) scale(1.12,.84)' }, { transform: 'translate(' + dx + 'px,-2px) scale(1.25,.9)' }], 130, { easing: 'cubic-bezier(.5,0,.9,.4)' });
+      await X.wait(122); X.trail(28, 118, 6, 110); X.swing([28, 118], 110, { easing: 'cubic-bezier(.2,.9,.4,1)' });
+      X.flashMob(110); X.slash(C.c.x - 4, C.c.y - 2, -8, 96); X.sparks(16); X.shake(5, 260); X.knock(16, 7, 520);
+      await X.wait(95); X.swing([118, 8], 420, { delay: 80 });
+      await X.an(C.h, [{ transform: 'translate(' + dx + 'px,-2px) scale(1.25,.9)' }, { transform: 'translate(' + (dx + 4) + 'px,0) scale(1.05,.98)', offset: .2 }, { transform: 'translate(0,0) scale(1,1)' }], 420, { easing: 'cubic-bezier(.3,.8,.3,1)' });
+    } },
+    combo: { imp: 150, vit: 300, tot: 1050, async run(X){
+      const C = X.C, dx = C.dx, SW = [[-42, -42, 98], [98, 98, -28], [-28, -88, 142]], ANG = [-20, 40, -95];
+      X.swing([8, -42], 150); X.an(C.h, [{ transform: 'translate(0,0)' }, { transform: 'translate(' + (dx - 6) + 'px,-3px) scale(1.12,.94)' }], 150, { easing: 'cubic-bezier(.4,0,.8,.5)' });
+      await X.wait(150);
+      for (let i = 0; i < 3; i++){
+        const last = i === 2;
+        X.trail(SW[i][1], SW[i][2], last ? 7 : 4, last ? 260 : 150); X.swing(SW[i], last ? 260 : 150, { easing: 'cubic-bezier(.2,.9,.4,1)' });
+        X.slash(C.c.x - 6, C.c.y + (i - 1) * 4, ANG[i], last ? 110 : 84); X.flashMob(last ? 130 : 70);
+        X.an(C.h, [{ transform: 'translate(' + (dx - 6 + (i % 2 ? 4 : 0)) + 'px,-3px) scale(1.12,.94)' }, { transform: 'translate(' + (dx + (last ? 10 : 0)) + 'px,' + (last ? -8 : -2) + 'px) scale(' + (last ? 1.3 : 1.18) + ',' + (last ? .9 : .92) + ')', offset: .3 }, { transform: 'translate(' + (dx - 6) + 'px,-3px) scale(1.12,.94)' }], last ? 260 : 150);
+        X.sparks(last ? 18 : 7, { dir: 3.14 - i * .5, spread: 1, v0: 25, v1: last ? 95 : 55, t: 420 }); X.shake(last ? 9 : 3, last ? 320 : 140);
+        if (last){ X.flashWhite(.55, 200); X.knock(34, 14, 620); await X.wait(110); }
+        else { X.an(C.m, [{ transform: 'translate(0,0)' }, { transform: 'translate(' + (6 + i * 3) + 'px,0)', offset: .3 }, { transform: 'translate(0,0)' }], 200); await X.wait(i === 1 ? 150 : 120); }
+      }
+      await X.wait(60); X.swing([142, 8], 420);
+      await X.an(C.h, [{ transform: 'translate(' + (dx - 6) + 'px,-3px) scale(1.12,.94)' }, { transform: 'translate(0,0) scale(1,1)' }], 420, { easing: 'cubic-bezier(.3,.8,.3,1)' });
+    } },
+    lamina: { imp: 570, vit: 300, tot: 1050, async run(X){
+      const C = X.C;
+      X.swing([8, -112], 150); await X.an(C.h, [{ transform: 'rotate(0) scale(1)' }, { transform: 'rotate(-14deg) translate(-6px,0) scale(1.05)' }], 150);
+      X.trail(-112, 150, 8, 260); X.swing([-112, 150], 260, { easing: 'cubic-bezier(.3,.8,.3,1)' });
+      X.an(C.h, [{ transform: 'rotate(-14deg) translate(-6px,0) scale(1.05)' }, { transform: 'rotate(10deg) translate(8px,0) scale(1.1)', offset: .5 }, { transform: 'rotate(0) scale(1)' }], 340, { easing: 'cubic-bezier(.3,.8,.3,1)' });
+      await X.wait(120); X.swing([150, 8], 300, { delay: 60 });
+      const p = document.createElement('div'); p.className = 'gv-fx';
+      p.style.cssText = 'left:' + (C.hx + 70) + 'px;top:' + (C.hy + 22) + 'px;width:44px;height:52px;z-index:34;background:url(' + laminaImg(C.R) + ') center/100% 100% no-repeat';
+      C.arena.appendChild(p);
+      const x1 = C.c.x - 22, dxp = x1 - (C.hx + 70);
+      const tr = setInterval(() => { const r = p.getBoundingClientRect(); X.parts(r.left - C.ar.left + 8, r.top - C.ar.top + 22, 2, spR(C.R), { v0: 4, v1: 14, t: 360, s: 4, grav: 8 }); }, 45);
+      await X.an(p, [{ transform: 'translateX(0) scale(.6)', opacity: .2 }, { transform: 'translateX(' + dxp * .2 + 'px) scale(1)', opacity: 1, offset: .2 }, { transform: 'translateX(' + dxp + 'px) scale(1.15)', opacity: 1 }], 300, { easing: 'cubic-bezier(.4,0,.9,.6)' });
+      clearInterval(tr); p.remove();
+      X.flashMob(120); X.slash(C.c.x, C.c.y, -30, 100); X.shake(5, 240); X.parts(C.c.x, C.c.y, 14, spR(C.R), { dir: 0, spread: 3.1, v0: 25, v1: 75, t: 480 });
+      X.knock(14, 6, 460); await X.wait(380);
+    } },
+    vulto: { imp: 310, vit: 300, tot: 1500, async run(X){
+      const C = X.C, atras = Math.min(C.mr.right - C.hr.left + 2, C.ar.right - 4 - C.hr.right);
+      const px = (x, y, n) => X.parts(x, y, n, ['#b7a8e8', '#8e84c4', '#ece8ff'], { v0: 15, v1: 50, t: 420, s: 4, grav: -10 });
+      px(C.hx + 40, C.hy + 44, 14); await X.an(C.h, [{ opacity: 1, filter: 'brightness(1)' }, { opacity: 0, filter: 'brightness(3)' }], 110, { easing: 'steps(3)' });
+      await X.wait(130); C.h.style.transform = 'translateX(' + atras + 'px) scaleX(-1)'; px(C.hx + atras + 40, C.hy + 44, 12);
+      X.an(C.h, [{ opacity: 0, filter: 'brightness(3)' }, { opacity: 1, filter: 'brightness(1)' }], 110, { easing: 'steps(3)' }); await X.wait(70);
+      [[-35, 0, [-60, 60]], [35, 34, [70, -50]], [-90, 68, [-50, 80]]].forEach(([a, dl, S]) => setTimeout(() => {
+        if (!X.alive()) return; X.slash(C.c.x, C.c.y, a, 96); X.flashMob(60); X.shake(3, 120); X.trail(S[0], S[1], 3, 90); X.swing(S, 90);
+      }, dl));
+      await X.wait(150); await X.wait(180); X.flashWhite(.4, 180); X.shake(8, 260); X.knock(-26, -12, 600);
+      await X.wait(420); X.an(C.h, [{ opacity: 1 }, { opacity: 0 }], 90, { easing: 'steps(3)' }); px(C.hx + atras + 40, C.hy + 44, 10);
+      await X.wait(120); C.h.style.transform = ''; X.swing([80, 8], 10);
+      X.an(C.h, [{ opacity: 0, filter: 'brightness(3)' }, { opacity: 1, filter: 'brightness(1)' }], 160, { easing: 'steps(4)' }); px(C.hx + 40, C.hy + 44, 12); await X.wait(200);
+    } },
+    crit: { imp: 405, vit: 925, tot: 1300, async run(X){
+      const C = X.C, dx = C.dx;
+      X.an(C.arena, [{ transform: 'scale(1)' }, { transform: 'scale(1.04)' }], 260, { fill: 'forwards' }); X.vig(260, 420);
+      X.swing([8, -118], 260); await X.an(C.h, [{ transform: 'translate(0,0) scale(1,1)' }, { transform: 'translate(-12px,4px) scale(1.15,.82)' }], 260);
+      X.ghost(5, -12, dx - 10, 4); X.an(C.h, [{ transform: 'translate(-12px,4px) scale(1.15,.82)' }, { transform: 'translate(' + dx + 'px,-2px) scale(1.3,.88)' }], 150, { easing: 'cubic-bezier(.5,0,.9,.4)' });
+      await X.wait(135); X.trail(-118, 148, 9, 130); X.swing([-118, 148], 130, { easing: 'cubic-bezier(.2,.9,.4,1)' }); await X.wait(10);
+      X.flashMob(260); X.flashWhite(.9, 380); X.slash(C.c.x - 4, C.c.y, -18, 150); X.shake(12, 420); X.sparks(30, { dir: 3.14, spread: 1.6, v0: 40, v1: 130, t: 700, s: 5 });
+      await X.wait(160);
+      X.knock(30, 14, 300);
+      X.an(C.arena, [{ transform: 'scale(1.04)' }, { transform: 'scale(1)' }], 380, { easing: 'ease-in-out' });
+      X.swing([148, 8], 620, { delay: 60 });
+      await X.an(C.h, [{ transform: 'translate(' + dx + 'px,-2px) scale(1.3,.88)' }, { transform: 'translate(0,0) scale(1,1)' }], 620, { delay: 20, easing: 'cubic-bezier(.3,.8,.3,1)' });
+    } }
+  };
+
+  const POOL = { trivial: ['rel', 'lamina'], facil: ['rel', 'lamina'], media: ['vulto', 'combo', 'rel'], dificil: ['combo', 'rel'] };
+  function escolher(dif){
+    if (!variado()) return 'rel';
+    const base = POOL[dif] || POOL.media; let p = base.filter(s => s !== ultimo); if (!p.length) p = base;
+    return p[Math.floor(Math.random() * p.length)];
+  }
+
+  window.animarGolpe = function(o){
+    o = o || {};
+    try {
+      if (document.querySelector('#heroSprite .heroArma.ranged')) return prev.apply(this, arguments);   // arco/besta/funda: projetil antigo
+      if (emAndamento && !o.final){   // toque durante o golpe anterior: so treme o monstro
+        const m = $('mobSprite'); if (m){ m.classList.add('shake'); setTimeout(() => m.classList.remove('shake'), 220); }
+        return { impactMs: 0, vitoriaMs: 300 };
+      }
+      if (emAndamento) { gen++; limpar(); }
+      const C = ctx(); if (!C) return prev.apply(this, arguments);
+      const nome = o.final ? 'crit' : escolher(o.dif), E = ESTILOS[nome];
+      ultimo = nome; emAndamento = true; const T = { g: ++gen }; window._golpeImpactoMs = E.imp;
+      C.h.style.zIndex = 5;
+      const a = armaEl(); if (a && C.R >= 6) a.style.filter = 'drop-shadow(0 1px 0 rgba(0,0,0,.5)) drop-shadow(0 0 5px ' + CORES[C.R] + ')';
+      clearTimeout(fimTimer);
+      fimTimer = setTimeout(() => { if (T.g === gen){ limpar(); emAndamento = false; } }, E.tot + 400);   // vigia: nunca deixa travado
+      E.run(mk(C, T)).catch(e => { if (e !== CANCEL) console.error('golpe variado falhou:', e); })
+        .then(() => { if (T.g === gen){ limpar(); emAndamento = false; clearTimeout(fimTimer); } });
+      return { impactMs: E.imp, vitoriaMs: E.vit };
+    } catch(e){
+      console.error('golpes variados: usando o golpe antigo', e);
+      try { gen++; limpar(); } catch(_){}
+      emAndamento = false;
+      return prev.apply(this, arguments);
+    }
+  };
+
+  // ---- respiracao do monstro: uma familia por especie (classe no #mobSprite, que sobrevive aos render()) ----
+  function familia(nomeEn){
+    const n = String(nomeEn || '');
+    const T = [['mimic', /Mimic/i], ['verme', /Worm/i], ['gosma', /Slime/i], ['morcego', /\bBat\b/i], ['rato', /\bRat\b/i], ['aranha', /Spider/i], ['olho', /\bEye\b/i], ['golem', /Golem/i],
+      ['goblin', /Goblin/i], ['espectro', /Specter|Spirit|Soul/i], ['demonio', /Demon/i], ['cogumelo', /Mushroom|Fungus/i], ['esqueleto', /Skeleton|Skull|Bones/i]];
+    for (const [k, re] of T) if (re.test(n)) return k;
+    return 'olho';
+  }
+  function pintarFamilia(){
+    const m = $('mobSprite'), img = m && m.querySelector('.mobimg'); if (!m || !img) return;
+    let fam = 'olho';
+    try { const reg = (typeof MONSTROS !== 'undefined') ? MONSTROS.find(x => x.img === img.getAttribute('src')) : null; if (reg) fam = familia(reg.nome_en || reg.nome); } catch(e){}
+    const novo = 'gvm-' + fam;
+    if (!m.classList.contains(novo)){ [...m.classList].filter(c => c.indexOf('gvm-') === 0).forEach(c => m.classList.remove(c)); m.classList.add(novo); }
+  }
+  if (typeof window.desenharMonstro === 'function'){
+    const dm = window.desenharMonstro;
+    window.desenharMonstro = function(){ const r = dm.apply(this, arguments); try { pintarFamilia(); } catch(e){} return r; };
+  }
+  try { pintarFamilia(); } catch(e){}
+})();
+</script>
+
+
 <!-- =====================================================================
      I18N — IDIOMA  —  bloco autonomo, cole antes de </body>
      Item 46 do roadmap (item 13d finalmente decidido). Arquitetura
@@ -20271,6 +20582,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'cfg.feedbackDeCliqueDesc': { pt:'Vibração ao tocar em botões e nos eventos do jogo', en:'Vibration on buttons and game events' },
     'cfg.som':     { pt:'Som', en:'Sound' },
     'cfg.crt':     { pt:'Efeito CRT', en:'CRT effect' },
+    'cfg.golpes':  { pt:'Golpes variados', en:'Varied attacks' },
     'cfg.somDesc': { pt:'Efeitos sonoros do jogo', en:'Game sound effects' },
     'cfg.novoHeroi': { pt:'Criar novo herói', en:'Create new hero' },
 

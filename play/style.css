@@ -7018,3 +7018,6 @@ body.tourAberto .edov.on .edsheet{opacity:1}
   .task .grip{flex:none;width:30px;height:38px;display:grid;place-items:center;color:var(--dim);
     touch-action:none;cursor:grab;-webkit-tap-highlight-color:transparent;opacity:.8}
   .task .grip:active{color:var(--accent)}
+
+/* vao do arrasto abre/fecha suave; mesma margem da linha compacta */
+  .task-placeholder{margin-bottom:6px !important;transition:height .14s ease-out}

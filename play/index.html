@@ -20061,6 +20061,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       c: { x: mr.left - ar.left + mr.width / 2, y: mr.top - ar.top + mr.height * .45 },
       hx: hr.left - ar.left, hy: hr.top - ar.top };
   }
+  // modo leve: celular / aparelho fraco -> menos efeitos simultaneos
+  const LEVE = (() => { try { return matchMedia('(pointer:coarse)').matches || (navigator.hardwareConcurrency || 8) <= 4 || (navigator.deviceMemory || 8) <= 4; } catch(e){ return false; } })();
   const armaEl = () => { const a = document.querySelector('#heroSprite .heroArma'); return (a && !a.classList.contains('ranged')) ? a : null; };
 
   function limpar(){
@@ -20086,7 +20088,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     X.swing = (r, ms, o) => { const a = armaEl(); return a ? X.an(a, r.map(v => ({ transform: 'rotate(' + v + 'deg)' })), ms, o) : Promise.resolve(); };
     X.trail = (a0, a1, n, ms) => {
       const a = armaEl(); if (!a) return;
-      n += C.R >= 5 ? Math.min(2, C.R - 4) : 0;
+      n += (!LEVE && C.R >= 5) ? Math.min(2, C.R - 4) : 0;
+      if (LEVE) n = Math.max(2, n - 1);
       for (let i = 0; i < n; i++){
         const c = a.cloneNode(true); c.classList.add('gv-trail'); c.removeAttribute('id');
         c.style.transform = 'rotate(' + (a0 + (a1 - a0) * (i + 1) / n) + 'deg)'; c.style.opacity = '0';
@@ -20097,7 +20100,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     };
     X.parts = (x, y, n, cores, o) => {
       o = o || {};
-      n = Math.min(n, Math.max(0, 18 - C.arena.querySelectorAll('.gv-fx').length));   // teto de particulas simultaneas (desempenho)
+      n = Math.min(n, Math.max(0, (LEVE ? 8 : 18) - C.arena.querySelectorAll('.gv-fx').length));   // teto de particulas simultaneas (desempenho)
       for (let i = 0; i < n; i++){
         const d = document.createElement('div'); d.className = 'gv-fx'; const s = o.s || rnd(3, 6);
         d.style.cssText = 'left:' + x + 'px;top:' + y + 'px;width:' + s + 'px;height:' + s + 'px;background:' + cores[i % cores.length];
@@ -20110,7 +20113,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       const k = Math.max(2, Math.round((sz || 80) / 28)), W = 28 * k, e = document.createElement('div'); e.className = 'gv-fx';
       e.style.cssText = 'left:' + (x - W / 2) + 'px;top:' + (y - W / 2) + 'px;width:' + W + 'px;height:' + W + 'px;background:url(' + slashSheet(Math.round((ang || 0) / 15) * 15, C.R) + ') 0 0/' + (W * 5) + 'px ' + W + 'px no-repeat';
       add(e);
-      if (C.R >= 5) X.parts(x, y, (C.R - 4) * 5, spR(C.R), { v0: 25, v1: 70 + C.R * 6, t: 520, s: 4 });
+      if (C.R >= 5 && !LEVE) X.parts(x, y, (C.R - 4) * 5, spR(C.R), { v0: 25, v1: 70 + C.R * 6, t: 520, s: 4 });
       e.animate([{ backgroundPositionX: '0px' }, { backgroundPositionX: (-W * 5) + 'px' }], { duration: 300, easing: 'steps(5,end)', fill: 'forwards' }).finished.then(() => e.remove()).catch(() => e.remove());
     };
     X.ring = (x, y, w, col) => {
@@ -20119,19 +20122,23 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       add(r); r.animate([{ transform: 'scale(.2)', opacity: 1 }, { transform: 'scale(.55)', opacity: 1, offset: .34 }, { transform: 'scale(.9)', opacity: .8, offset: .67 }, { transform: 'scale(1.3)', opacity: 0 }], { duration: 440, easing: 'steps(1,end)', fill: 'forwards' }).finished.then(() => r.remove()).catch(() => r.remove());
     };
     X.shake = (p, ms) => {
+      if (LEVE) return;   // tremor da arena inteira e o efeito mais caro
       const f = []; for (let i = 0; i < 9; i++){ const k = 1 - i / 9; f.push({ translate: (rnd(-p, p) * k) + 'px ' + (rnd(-p, p) * k) + 'px' }); } f.push({ translate: '0 0' });
       X.an(C.arena, f, ms, { easing: 'steps(10)', fill: 'none' });
     };
     X.flashMob = ms => { C.m.classList.add('shake'); setTimeout(() => C.m.classList.remove('shake'), ms); };
     X.flashWhite = (a, ms) => {
+      if (LEVE) a *= .5;
       const w = document.createElement('div'); w.className = 'gv-fx'; w.style.cssText = 'left:0;top:0;right:0;bottom:0;background:#fff;opacity:0;z-index:40'; add(w);
       w.animate([{ opacity: a }, { opacity: 0 }], { duration: ms, fill: 'forwards' }).finished.then(() => w.remove()).catch(() => w.remove());
     };
     X.vig = (ms, hold) => {
+      if (LEVE) return;
       const v = document.createElement('div'); v.className = 'gv-fx'; v.style.cssText = 'left:0;top:0;right:0;bottom:0;z-index:38;background:radial-gradient(ellipse at 50% 55%,transparent 35%,rgba(0,0,0,.7))'; add(v);
       v.animate([{ opacity: 0 }, { opacity: 1, offset: ms / (ms + hold + 320) }, { opacity: 1, offset: (ms + hold) / (ms + hold + 320) }, { opacity: 0 }], { duration: ms + hold + 320, fill: 'forwards' }).finished.then(() => v.remove()).catch(() => v.remove());
     };
     X.ghost = (n, x0, x1, y) => {
+      if (LEVE) n = Math.min(n, 2);
       const src = (document.querySelector('#heroSprite .heroimg') || {}).src; if (!src) return;
       for (let i = 0; i < n; i++){
         const g = document.createElement('img'); g.className = 'gv-ghost'; g.src = src; const t = i / (n - 1 || 1);

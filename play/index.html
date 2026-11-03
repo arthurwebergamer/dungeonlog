@@ -134,7 +134,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=381">
+<link rel="stylesheet" href="style.css?v=384">
 <script>
 // A abertura so sai quando (1) a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado (sair antes mostrava um flash
 // cinza vazio e depois a tela de login por baixo, visto em video de teste) E (2) quem ja tinha sessao neste aparelho teve login confirmado e o
@@ -282,6 +282,7 @@ html{background:var(--bsBg,#282828)}
          transicao de troca disparada pelo acordeao de Config), so o
          GATILHO daqui que sumiu. -->
     <div class="pjTrigger" id="pjTrigger">
+      <button class="topAvatar" id="topAvatar" type="button" aria-label="Perfil" data-i18n-aria="nav.perfil"></button>
       <span class="pjNomeTopo" id="pjNomeTopo"></span>
       <span class="lvl" id="lvl">Nível I</span>
     </div>
@@ -1590,7 +1591,7 @@ html{background:var(--bsBg,#282828)}
       <span data-i18n="nav.loja">Loja</span>
     </button>
     <button data-aba="perfil">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v5a5 5 0 01-10 0V4z"/><path d="M17 5.5h2.5a2.5 2.5 0 01-2.5 4"/><path d="M7 5.5H4.5a2.5 2.5 0 002.5 4"/><path d="M12 14v3"/><path d="M8.5 20h7"/><path d="M10 17h4l.8 3H9.2l.8-3z"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
       <span data-i18n="nav.perfil">Perfil</span>
     </button>
     <button data-aba="estatisticas">
@@ -5480,7 +5481,8 @@ function render(){
       + '<div class="tinfo"><span class="label"></span>'
       + '<span class="tmeta"><span class="difpip">' + '<i></i>'.repeat(dObj.pips) + '</span>'
       + '<span class="repeat"></span><span class="vezesbadge"></span></span></div>'
-      + '<button class="del" aria-label="Apagar tarefa">×</button>';
+      + '<button class="del" aria-label="Apagar tarefa">×</button>'
+      + '<span class="grip" aria-label="Reordenar" role="button"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg></span>';
     el.querySelector('.label').textContent = t.texto;
     el.querySelector('.repeat').textContent = rotulo(t);
     el.querySelector('.difpip').title = dObj.nome;
@@ -10074,17 +10076,13 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   }
 
   list.addEventListener('pointerdown', e => {
-    if (e.target.closest('.del') || e.target.closest('.box')) return;
-    const task = e.target.closest('.task');
+    // so a ALCA (.grip) arma o arrasto, na hora; o resto do card rola nativamente (touch-action:pan-y)
+    const grip = e.target.closest('.grip');
+    if (!grip) return;
+    const task = grip.closest('.task');
     if (!task) return;
-    const startX = e.clientX, startY = e.clientY;
-    pendente = {
-      task, startX, startY, lastY: startY, veloc: 0,
-      timer: setTimeout(() => {
-        if (pendente) iniciarArrasto(task, e);
-        pendente = null;
-      }, ATRASO_LONGPRESS)
-    };
+    e.preventDefault();
+    iniciarArrasto(task, e);
   });
 
   list.addEventListener('pointermove', e => {
@@ -10729,14 +10727,24 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     el.innerHTML = '<img class="heroimg" src="' + heroiAtual().img + '" alt="' + (idiomaApp() === 'en' ? 'hero' : 'herói') + '">' +
                    '<div class="sombra"></div>';
   }
+  // avatar (rosto do heroi) no topo; toque abre a aba Perfil. Acompanha a troca de heroi/sprite.
+  function pintarAvatarTopo(){
+    const el = document.getElementById('topAvatar');
+    if (!el || typeof heroiAtual !== 'function') return;
+    el.style.backgroundImage = 'url("' + heroiAtual().img + '")';
+  }
   const _dh = window.desenharHeroi;
   if (typeof _dh === 'function'){
     window.desenharHeroi = function(){
       _dh.apply(this, arguments);
       pintarSpriteNoPerfil();
+      pintarAvatarTopo();
     };
   }
   window.pintarSpriteNoPerfil = pintarSpriteNoPerfil;
+  const _av = document.getElementById('topAvatar');
+  if (_av) _av.onclick = () => { if (typeof mostrarAba === 'function') mostrarAba('perfil'); };
+  pintarAvatarTopo();
 })();
 
 (function(){

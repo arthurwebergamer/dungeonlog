@@ -20220,6 +20220,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   const POOL = { trivial: ['rel', 'lamina'], facil: ['rel', 'lamina'], media: ['vulto', 'combo', 'rel'], dificil: ['combo', 'rel'] };
   function escolher(dif){
     if (!variado()) return 'rel';
+    if (window._gvForce) return window._gvForce;   // gancho de teste de desempenho
     const base = POOL[dif] || POOL.media; let p = base.filter(s => s !== ultimo); if (!p.length) p = base;
     return p[Math.floor(Math.random() * p.length)];
   }

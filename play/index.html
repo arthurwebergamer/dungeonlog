@@ -20012,13 +20012,6 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   const palR = R => R === 0 ? ['#ffffff', CORES[0]] : [mix(CORES[R], .82), CORES[R]];
   const spR = R => { const p = palR(R); return [p[0], p[1], p[1], '#ffffff']; };
 
-  // filtros SVG que pintam uma silhueta com a cor de cada raridade (rastro da espada / imagens fantasma)
-  (function(){
-    const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    s.setAttribute('width', '0'); s.setAttribute('height', '0'); s.style.cssText = 'position:absolute;pointer-events:none';
-    s.innerHTML = CORES.map((c, i) => '<filter id="gvTint' + i + '" color-interpolation-filters="sRGB"><feFlood flood-color="' + c + '"/><feComposite in2="SourceAlpha" operator="in"/></filter>').join('');
-    document.body.appendChild(s);
-  })();
 
   // ---- sprites pixel art gerados na grade ----
   const cache = {};
@@ -20096,7 +20089,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       n += C.R >= 5 ? (C.R - 4) * 2 : 0;
       for (let i = 0; i < n; i++){
         const c = a.cloneNode(true); c.classList.add('gv-trail'); c.removeAttribute('id');
-        c.style.transform = 'rotate(' + (a0 + (a1 - a0) * (i + 1) / n) + 'deg)'; c.style.filter = 'url(#gvTint' + C.R + ')'; c.style.opacity = '0';
+        c.style.transform = 'rotate(' + (a0 + (a1 - a0) * (i + 1) / n) + 'deg)'; c.style.opacity = '0';
         a.parentNode.insertBefore(c, a);
         const an = c.animate([{ opacity: .65 }, { opacity: 0 }], { duration: 220 + i * 20, delay: ms * i / n, fill: 'both', easing: 'steps(3)' });
         an.finished.then(() => c.remove()).catch(() => c.remove());
@@ -20104,6 +20097,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     };
     X.parts = (x, y, n, cores, o) => {
       o = o || {};
+      n = Math.min(n, Math.max(0, 18 - C.arena.querySelectorAll('.gv-fx').length));   // teto de particulas simultaneas (desempenho)
       for (let i = 0; i < n; i++){
         const d = document.createElement('div'); d.className = 'gv-fx'; const s = o.s || rnd(3, 6);
         d.style.cssText = 'left:' + x + 'px;top:' + y + 'px;width:' + s + 'px;height:' + s + 'px;background:' + cores[i % cores.length];
@@ -20141,7 +20135,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       const src = (document.querySelector('#heroSprite .heroimg') || {}).src; if (!src) return;
       for (let i = 0; i < n; i++){
         const g = document.createElement('img'); g.className = 'gv-ghost'; g.src = src; const t = i / (n - 1 || 1);
-        g.style.cssText = 'left:' + (C.hx + x0 + (x1 - x0) * t) + 'px;top:' + (C.hy + (y || 0)) + 'px;width:' + C.hr.width + 'px;height:' + C.hr.width + 'px;filter:url(#gvTint' + C.R + ');opacity:0';
+        g.style.cssText = 'left:' + (C.hx + x0 + (x1 - x0) * t) + 'px;top:' + (C.hy + (y || 0)) + 'px;width:' + C.hr.width + 'px;height:' + C.hr.width + 'px;opacity:0';
         add(g); g.animate([{ opacity: .45 }, { opacity: 0 }], { duration: 260, delay: i * 40, fill: 'both', easing: 'ease-out' }).finished.then(() => g.remove()).catch(() => g.remove());
       }
     };
@@ -20188,7 +20182,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       p.style.cssText = 'left:' + (C.hx + 70) + 'px;top:' + (C.hy + 22) + 'px;width:44px;height:52px;z-index:34;background:url(' + laminaImg(C.R) + ') center/100% 100% no-repeat';
       C.arena.appendChild(p);
       const x1 = C.c.x - 22, dxp = x1 - (C.hx + 70);
-      const tr = setInterval(() => { const r = p.getBoundingClientRect(); X.parts(r.left - C.ar.left + 8, r.top - C.ar.top + 22, 2, spR(C.R), { v0: 4, v1: 14, t: 360, s: 4, grav: 8 }); }, 45);
+      const tr = setInterval(() => { const r = p.getBoundingClientRect(); X.parts(r.left - C.ar.left + 8, r.top - C.ar.top + 22, 2, spR(C.R), { v0: 4, v1: 14, t: 360, s: 4, grav: 8 }); }, 80);
       await X.an(p, [{ transform: 'translateX(0) scale(.6)', opacity: .2 }, { transform: 'translateX(' + dxp * .2 + 'px) scale(1)', opacity: 1, offset: .2 }, { transform: 'translateX(' + dxp + 'px) scale(1.15)', opacity: 1 }], 300, { easing: 'cubic-bezier(.4,0,.9,.6)' });
       clearInterval(tr); p.remove();
       X.flashMob(120); X.slash(C.c.x, C.c.y, -30, 100); X.shake(5, 240); X.parts(C.c.x, C.c.y, 14, spR(C.R), { dir: 0, spread: 3.1, v0: 25, v1: 75, t: 480 });
@@ -20197,16 +20191,16 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     vulto: { imp: 310, vit: 300, tot: 1500, async run(X){
       const C = X.C, atras = Math.min(C.mr.right - C.hr.left + 2, C.ar.right - 4 - C.hr.right);
       const px = (x, y, n) => X.parts(x, y, n, ['#b7a8e8', '#8e84c4', '#ece8ff'], { v0: 15, v1: 50, t: 420, s: 4, grav: -10 });
-      px(C.hx + 40, C.hy + 44, 14); await X.an(C.h, [{ opacity: 1, filter: 'brightness(1)' }, { opacity: 0, filter: 'brightness(3)' }], 110, { easing: 'steps(3)' });
+      px(C.hx + 40, C.hy + 44, 14); await X.an(C.h, [{ opacity: 1 }, { opacity: 0 }], 110, { easing: 'steps(3)' });
       await X.wait(130); C.h.style.transform = 'translateX(' + atras + 'px) scaleX(-1)'; px(C.hx + atras + 40, C.hy + 44, 12);
-      X.an(C.h, [{ opacity: 0, filter: 'brightness(3)' }, { opacity: 1, filter: 'brightness(1)' }], 110, { easing: 'steps(3)' }); await X.wait(70);
+      X.an(C.h, [{ opacity: 0 }, { opacity: 1 }], 110, { easing: 'steps(3)' }); await X.wait(70);
       [[-35, 0, [-60, 60]], [35, 34, [70, -50]], [-90, 68, [-50, 80]]].forEach(([a, dl, S]) => setTimeout(() => {
         if (!X.alive()) return; X.slash(C.c.x, C.c.y, a, 96); X.flashMob(60); X.shake(3, 120); X.trail(S[0], S[1], 3, 90); X.swing(S, 90);
       }, dl));
       await X.wait(150); await X.wait(180); X.flashWhite(.4, 180); X.shake(8, 260); X.knock(-26, -12, 600);
       await X.wait(420); X.an(C.h, [{ opacity: 1 }, { opacity: 0 }], 90, { easing: 'steps(3)' }); px(C.hx + atras + 40, C.hy + 44, 10);
       await X.wait(120); C.h.style.transform = ''; X.swing([80, 8], 10);
-      X.an(C.h, [{ opacity: 0, filter: 'brightness(3)' }, { opacity: 1, filter: 'brightness(1)' }], 160, { easing: 'steps(4)' }); px(C.hx + 40, C.hy + 44, 12); await X.wait(200);
+      X.an(C.h, [{ opacity: 0 }, { opacity: 1 }], 160, { easing: 'steps(4)' }); px(C.hx + 40, C.hy + 44, 12); await X.wait(200);
     } },
     crit: { imp: 405, vit: 925, tot: 1300, async run(X){
       const C = X.C, dx = C.dx;
@@ -20243,7 +20237,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       const nome = o.final ? 'crit' : escolher(o.dif), E = ESTILOS[nome];
       ultimo = nome; emAndamento = true; const T = { g: ++gen }; window._golpeImpactoMs = E.imp;
       C.h.style.zIndex = 5;
-      const a = armaEl(); if (a && C.R >= 6) a.style.filter = 'drop-shadow(0 1px 0 rgba(0,0,0,.5)) drop-shadow(0 0 5px ' + CORES[C.R] + ')';
+      const a = armaEl(); 
       clearTimeout(fimTimer);
       fimTimer = setTimeout(() => { if (T.g === gen){ limpar(); emAndamento = false; } }, E.tot + 400);   // vigia: nunca deixa travado
       E.run(mk(C, T)).catch(e => { if (e !== CANCEL) console.error('golpe variado falhou:', e); })

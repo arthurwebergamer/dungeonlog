@@ -7027,7 +7027,7 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 @media (max-width:520px){
   .app:not(:has(.view.on)){overflow-y:auto;overflow-x:hidden;overscroll-behavior-y:contain;scrollbar-width:none}
   .app:not(:has(.view.on))::-webkit-scrollbar{display:none}
-  .app:not(:has(.view.on)) .tasks{flex:none;overflow:visible;min-height:auto}
+  .app:not(:has(.view.on)) .tasks{flex:1 0 auto;overflow:visible;min-height:auto}
   .app:not(:has(.view.on)) .list{flex:none;overflow:visible}
   .app:not(:has(.view.on)) .nav{position:sticky;bottom:0;z-index:20;background:var(--panel) !important}
 }

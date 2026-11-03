@@ -19109,8 +19109,14 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       });
     }
     let umToqueEmCurso = false;
+    // iOS (Safari, Chrome iOS e navegadores embutidos = todos WebKit): sem FedCM, e o One Tap
+    // exige carregar o script do Google ANTES de cair no popup. Esse await tira o popup do
+    // gesto do toque, e o Safari abre uma janela em branco (tela branca na 1a tentativa).
+    // Aqui o popup abre sincrono, dentro do toque, sem passar pelo One Tap.
+    const ehIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     document.getElementById('loginGoogleBtn').onclick = async () => {
       if (umToqueEmCurso) return;
+      if (ehIOS()){ entrarGooglePopup(); return; }
       umToqueEmCurso = true;
       let resolvido = false;
       // loading ja no toque: a pessoa ve o "bonequinho correndo" enquanto o seletor abre/ela escolhe a conta

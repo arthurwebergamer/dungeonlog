@@ -7021,3 +7021,13 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 
 /* vao do arrasto abre/fecha suave; mesma margem da linha compacta */
   .task-placeholder{margin-bottom:6px !important;transition:height .14s ease-out}
+
+/* CELULAR, aba Tarefas: a tela inteira rola (arena sobe junto), nav fixa embaixo.
+   Antes a lista era uma rolagem interna de ~130px. Outras abas (.view) seguem como antes. */
+@media (max-width:520px){
+  .app:not(:has(.view.on)){overflow-y:auto;overflow-x:hidden;overscroll-behavior-y:contain;scrollbar-width:none}
+  .app:not(:has(.view.on))::-webkit-scrollbar{display:none}
+  .app:not(:has(.view.on)) .tasks{flex:none;overflow:visible;min-height:auto}
+  .app:not(:has(.view.on)) .list{flex:none;overflow:visible}
+  .app:not(:has(.view.on)) .nav{position:sticky;bottom:0;z-index:20;background:var(--panel) !important}
+}

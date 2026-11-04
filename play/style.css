@@ -7236,11 +7236,11 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 #viewEstatisticas > .est-statsrow{display:flex}
 #viewEstatisticas > #estHistCard{display:block}
 /* v2e: historico sem quadrados -- tocha solta acima do numero */
-#estMapaMes .est-tile{background:transparent !important;border-color:transparent !important;aspect-ratio:auto;height:46px;border-radius:0}
-#estMapaMes .est-tile .est-tocha{top:0;transform:translateX(-50%) scale(.95)}
-#estMapaMes .est-tile .est-tiledia{margin-bottom:0;text-shadow:none;font-family:'Silkscreen',monospace;font-size:10px;color:var(--dim)}
-#estMapaMes .est-tile-vitoria .est-tiledia{color:var(--text)}
-.est-mapalegenda .est-tile{border-radius:50%}
+#viewEstatisticas[data-tab="semana"] #estMapaMes .est-tile{background:transparent !important;border-color:transparent !important;aspect-ratio:auto;height:46px;border-radius:0}
+#viewEstatisticas[data-tab="semana"] #estMapaMes .est-tile .est-tocha{top:0;transform:translateX(-50%) scale(.95)}
+#viewEstatisticas[data-tab="semana"] #estMapaMes .est-tile .est-tiledia{margin-bottom:0;text-shadow:none;font-family:'Silkscreen',monospace;font-size:10px;color:var(--dim)}
+#viewEstatisticas[data-tab="semana"] #estMapaMes .est-tile-vitoria .est-tiledia{color:var(--text)}
+#viewEstatisticas[data-tab="semana"] .est-mapalegenda .est-tile{border-radius:50%}
 /* v2f: abas Semanal/Mensal/Anual sobre a tela antiga */
 #estTabsPeriodo{margin:18px 18px 6px}
 #estTabsPeriodo button{flex:none}
@@ -7250,3 +7250,7 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 #viewEstatisticas[data-tab="ano"] #estCard7Dias{display:none !important}
 #estHistCard .est-histchevron{display:none}
 #estHistCard{cursor:default}
+
+/* uma linha so entre as abas e o conteudo */
+#viewEstatisticas[data-tab="semana"] #estCard7Dias,#viewEstatisticas[data-tab="ano"] #estHistCard{border-top:0 !important}
+#viewEstatisticas[data-tab="mes"] .est-statsrow{border-top:0 !important}#viewEstatisticas[data-tab="mes"] .est-statsrow>.est-card{border-top:0 !important}

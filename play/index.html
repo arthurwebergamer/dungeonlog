@@ -20152,35 +20152,35 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   const ESTILOS = {
     rel: { imp: 282, vit: 300, tot: 800, async run(X){
       const C = X.C, dx = C.dx;
-      X.swing([8, -72], 160); await X.an(C.h, [{ transform: 'translate(0,0) scale(1,1)' }, { transform: 'translate(-9px,3px) scale(1.12,.84)' }], 160);
+      X.swing([8, -72], 160); await X.an(C.h, [{ transform: 'translate(0,0)' }, { transform: 'translate(-9px,3px)' }], 160);
       X.ghost(4, -9, dx - 14, 3); X.swing([-72, 28], 130, { easing: 'cubic-bezier(.5,0,.9,.4)' });
-      X.an(C.h, [{ transform: 'translate(-9px,3px) scale(1.12,.84)' }, { transform: 'translate(' + dx + 'px,-2px) scale(1.25,.9)' }], 130, { easing: 'cubic-bezier(.5,0,.9,.4)' });
+      X.an(C.h, [{ transform: 'translate(-9px,3px)' }, { transform: 'translate(' + dx + 'px,-2px)' }], 130, { easing: 'cubic-bezier(.5,0,.9,.4)' });
       await X.wait(122); X.trail(28, 118, 6, 110); X.swing([28, 118], 110, { easing: 'cubic-bezier(.2,.9,.4,1)' });
       X.flashMob(110); X.slash(C.c.x - 4, C.c.y - 2, -8, 96); X.sparks(16); X.shake(5, 260); X.knock(16, 7, 520);
       await X.wait(95); X.swing([118, 8], 420, { delay: 80 });
-      await X.an(C.h, [{ transform: 'translate(' + dx + 'px,-2px) scale(1.25,.9)' }, { transform: 'translate(' + (dx + 4) + 'px,0) scale(1.05,.98)', offset: .2 }, { transform: 'translate(0,0) scale(1,1)' }], 420, { easing: 'cubic-bezier(.3,.8,.3,1)' });
+      await X.an(C.h, [{ transform: 'translate(' + dx + 'px,-2px)' }, { transform: 'translate(' + (dx + 4) + 'px,0)', offset: .2 }, { transform: 'translate(0,0)' }], 420, { easing: 'cubic-bezier(.3,.8,.3,1)' });
     } },
     combo: { imp: 150, vit: 300, tot: 1050, async run(X){
       const C = X.C, dx = C.dx, SW = [[-42, -42, 98], [98, 98, -28], [-28, -88, 142]], ANG = [-20, 40, -95];
-      X.swing([8, -42], 150); X.an(C.h, [{ transform: 'translate(0,0)' }, { transform: 'translate(' + (dx - 6) + 'px,-3px) scale(1.12,.94)' }], 150, { easing: 'cubic-bezier(.4,0,.8,.5)' });
+      X.swing([8, -42], 150); X.an(C.h, [{ transform: 'translate(0,0)' }, { transform: 'translate(' + (dx - 6) + 'px,-3px)' }], 150, { easing: 'cubic-bezier(.4,0,.8,.5)' });
       await X.wait(150);
       for (let i = 0; i < 3; i++){
         const last = i === 2;
         X.trail(SW[i][1], SW[i][2], last ? 5 : 3, last ? 260 : 150); X.swing(SW[i], last ? 260 : 150, { easing: 'cubic-bezier(.2,.9,.4,1)' });
         X.slash(C.c.x - 6, C.c.y + (i - 1) * 4, ANG[i], last ? 110 : 84); X.flashMob(last ? 130 : 70);
-        X.an(C.h, [{ transform: 'translate(' + (dx - 6 + (i % 2 ? 4 : 0)) + 'px,-3px) scale(1.12,.94)' }, { transform: 'translate(' + (dx + (last ? 10 : 0)) + 'px,' + (last ? -8 : -2) + 'px) scale(' + (last ? 1.3 : 1.18) + ',' + (last ? .9 : .92) + ')', offset: .3 }, { transform: 'translate(' + (dx - 6) + 'px,-3px) scale(1.12,.94)' }], last ? 260 : 150);
+        X.an(C.h, [{ transform: 'translate(' + (dx - 6 + (i % 2 ? 4 : 0)) + 'px,-3px)' }, { transform: 'translate(' + (dx + (last ? 10 : 0)) + 'px,' + (last ? -8 : -2) + 'px) ', offset: .3 }, { transform: 'translate(' + (dx - 6) + 'px,-3px)' }], last ? 260 : 150);
         X.sparks(last ? 10 : 4, { dir: 3.14 - i * .5, spread: 1, v0: 25, v1: last ? 95 : 55, t: 420 }); X.shake(last ? 9 : 3, last ? 320 : 140);
         if (last){ X.flashWhite(.55, 200); X.knock(34, 14, 620); await X.wait(110); }
         else { X.an(C.m, [{ transform: 'translate(0,0)' }, { transform: 'translate(' + (6 + i * 3) + 'px,0)', offset: .3 }, { transform: 'translate(0,0)' }], 200); await X.wait(i === 1 ? 150 : 120); }
       }
       await X.wait(60); X.swing([142, 8], 420);
-      await X.an(C.h, [{ transform: 'translate(' + (dx - 6) + 'px,-3px) scale(1.12,.94)' }, { transform: 'translate(0,0) scale(1,1)' }], 420, { easing: 'cubic-bezier(.3,.8,.3,1)' });
+      await X.an(C.h, [{ transform: 'translate(' + (dx - 6) + 'px,-3px)' }, { transform: 'translate(0,0)' }], 420, { easing: 'cubic-bezier(.3,.8,.3,1)' });
     } },
     lamina: { imp: 570, vit: 300, tot: 1050, async run(X){
       const C = X.C;
-      X.swing([8, -112], 150); await X.an(C.h, [{ transform: 'rotate(0) scale(1)' }, { transform: 'rotate(-14deg) translate(-6px,0) scale(1.05)' }], 150);
+      X.swing([8, -112], 150); await X.an(C.h, [{ transform: 'translate(0,0)' }, { transform: 'translate(-6px,0)' }], 150);
       X.trail(-112, 150, 8, 260); X.swing([-112, 150], 260, { easing: 'cubic-bezier(.3,.8,.3,1)' });
-      X.an(C.h, [{ transform: 'rotate(-14deg) translate(-6px,0) scale(1.05)' }, { transform: 'rotate(10deg) translate(8px,0) scale(1.1)', offset: .5 }, { transform: 'rotate(0) scale(1)' }], 340, { easing: 'cubic-bezier(.3,.8,.3,1)' });
+      X.an(C.h, [{ transform: 'translate(-6px,0)' }, { transform: 'translate(8px,0)', offset: .5 }, { transform: 'translate(0,0)' }], 340, { easing: 'cubic-bezier(.3,.8,.3,1)' });
       await X.wait(120); X.swing([150, 8], 300, { delay: 60 });
       const p = document.createElement('div'); p.className = 'gv-fx';
       p.style.cssText = 'left:' + (C.hx + 70) + 'px;top:' + (C.hy + 22) + 'px;width:44px;height:52px;z-index:34;background:url(' + laminaImg(C.R) + ') center/100% 100% no-repeat';
@@ -20209,14 +20209,14 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     crit: { imp: 405, vit: 925, tot: 1300, async run(X){
       const C = X.C, dx = C.dx;
       X.vig(260, 420);
-      X.swing([8, -118], 260); await X.an(C.h, [{ transform: 'translate(0,0) scale(1,1)' }, { transform: 'translate(-12px,4px) scale(1.15,.82)' }], 260);
-      X.ghost(3, -12, dx - 10, 4); X.an(C.h, [{ transform: 'translate(-12px,4px) scale(1.15,.82)' }, { transform: 'translate(' + dx + 'px,-2px) scale(1.3,.88)' }], 150, { easing: 'cubic-bezier(.5,0,.9,.4)' });
+      X.swing([8, -118], 260); await X.an(C.h, [{ transform: 'translate(0,0)' }, { transform: 'translate(-12px,4px)' }], 260);
+      X.ghost(3, -12, dx - 10, 4); X.an(C.h, [{ transform: 'translate(-12px,4px)' }, { transform: 'translate(' + dx + 'px,-2px)' }], 150, { easing: 'cubic-bezier(.5,0,.9,.4)' });
       await X.wait(135); X.trail(-118, 148, 5, 130); X.swing([-118, 148], 130, { easing: 'cubic-bezier(.2,.9,.4,1)' }); await X.wait(10);
       X.flashMob(260); X.flashWhite(.9, 380); X.slash(C.c.x - 4, C.c.y, -18, 150); X.shake(12, 420); X.sparks(14, { dir: 3.14, spread: 1.6, v0: 40, v1: 130, t: 700, s: 5 });
       await X.wait(160);
       X.knock(30, 14, 300);
       X.swing([148, 8], 620, { delay: 60 });
-      await X.an(C.h, [{ transform: 'translate(' + dx + 'px,-2px) scale(1.3,.88)' }, { transform: 'translate(0,0) scale(1,1)' }], 620, { delay: 20, easing: 'cubic-bezier(.3,.8,.3,1)' });
+      await X.an(C.h, [{ transform: 'translate(' + dx + 'px,-2px)' }, { transform: 'translate(0,0)' }], 620, { delay: 20, easing: 'cubic-bezier(.3,.8,.3,1)' });
     } }
   };
 

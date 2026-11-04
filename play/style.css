@@ -7072,3 +7072,14 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 .cq-stt>div{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.06);border-radius:11px;padding:9px;font-size:13px;color:var(--muted);opacity:0;animation:mdFade2 .3s ease forwards;animation-delay:calc(1.1s + var(--i)*.08s)}
 .cq-stt .ic{width:20px;height:20px;display:grid;place-items:center;flex:none}.cq-stt .ic svg{width:18px;height:18px}
 .cq-stt b{margin-left:auto;font-size:16px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums}
+
+/* painel Equipamento/Vida/Experiencia da aba Tarefas: ~20% mais baixo (pedido do usuario) */
+#statsBarra.xpwrap{padding:11px 16px !important}
+#statsBarra .eqrow{margin-bottom:8px}
+#statsBarra .eqbadges{margin-top:4px;gap:5px}
+#statsBarra .eqb{width:26px;height:26px;border-radius:6px}
+#statsBarra .eqb.eqb-arma{width:42px;height:42px;border-radius:9px}
+#statsBarra .xprow{margin-bottom:4px}
+#statsBarra .bar{margin-bottom:10px}
+#statsBarra .bar:has(> #fill){margin-bottom:0}
+#statsBarra #estagioTopoRow{margin-bottom:0}

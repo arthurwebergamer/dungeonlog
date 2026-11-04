@@ -7092,12 +7092,12 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 #viewEstatisticas .est-titulo{font-size:11.5px;text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px}
 #viewEstatisticas .est-streakcard{background:linear-gradient(135deg,var(--panel-3),var(--panel-2));border-radius:20px;padding:16px 18px 14px;margin-bottom:6px}
 #viewEstatisticas .est-streakcard .est-titulo{margin-bottom:6px}
-#viewEstatisticas .est-streaknum{font-family:'Outfit',sans-serif;font-weight:700;font-size:52px}
+#viewEstatisticas .est-streaknum{font-family:'Silkscreen',monospace;font-weight:400;font-size:46px}
 #viewEstatisticas .est-tocha-principal{right:18px;bottom:12px}
 #viewEstatisticas .est-cardseta{top:22px;right:18px;z-index:2}
 #viewEstatisticas .est-divider{display:none}
 #viewEstatisticas #estCardPrincipal>.est-titulo{margin-top:14px}
-#viewEstatisticas .est-resumonum{font-family:'Outfit',sans-serif;font-weight:700;font-size:26px;color:var(--text)}
+#viewEstatisticas .est-resumonum{font-family:'Silkscreen',monospace;font-weight:400;font-size:22px;color:var(--text)}
 #viewEstatisticas .est-resumolbl{font-size:11px}
 #viewEstatisticas .est-statsrow{gap:22px;margin:0;padding:18px 0;border-top:1px solid var(--line);align-items:flex-start}
 #viewEstatisticas .est-statscol{padding:0;border:0;align-items:flex-start;text-align:left;flex:1 1 0}
@@ -7107,7 +7107,7 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 #viewEstatisticas .est-statscol .est-donutbox{display:none}
 #viewEstatisticas .est-donutlegenda-compacta{margin-top:6px;gap:12px}
 #viewEstatisticas .est-donutlegenda-compacta .est-legitem{font-size:13px}
-#viewEstatisticas .est-ringtxt .n{font-family:'Outfit',sans-serif;font-weight:700;font-size:20px}
+#viewEstatisticas .est-ringtxt .n{font-family:'Silkscreen',monospace;font-weight:400;font-size:15px}
 #viewEstatisticas .est-lockoverlay{border-radius:14px}
 #viewEstatisticas .est-statscol .est-titulo{min-height:2.6em;align-items:flex-start;line-height:1.3}
 #viewEstatisticas .est-lockoverlay{background:transparent;border-radius:0}

@@ -7083,3 +7083,5 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 #statsBarra .bar{margin-bottom:10px}
 #statsBarra .bar:has(> #fill){margin-bottom:0}
 #statsBarra #estagioTopoRow{margin-bottom:0}
+/* faixa de equipamentos some da aba Tarefas (pedido do usuario); o codigo continua, so nao aparece */
+#statsBarra .eqrow{display:none !important}

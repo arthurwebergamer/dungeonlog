@@ -7111,3 +7111,11 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 #viewEstatisticas .est-lockoverlay{border-radius:14px}
 #viewEstatisticas .est-statscol .est-titulo{min-height:2.6em;align-items:flex-start;line-height:1.3}
 #viewEstatisticas .est-lockoverlay{background:transparent;border-radius:0}
+
+#est7DiasLabels span{font-size:10.5px;letter-spacing:.02em}
+#est7DiasLabels span.hoje{color:var(--text);font-weight:700}
+/* rotulos dos dias centralizados embaixo de cada ponto do grafico */
+#viewEstatisticas .est-chartwrap,#est7DiasLabels{margin-left:16px;margin-right:16px}
+#est7DiasLabels{position:relative;display:block;height:14px}
+#est7DiasLabels span{position:absolute;top:0;transform:translateX(-50%);white-space:nowrap}
+#est7DiasLabels span:nth-child(1){left:0}#est7DiasLabels span:nth-child(2){left:16.6667%}#est7DiasLabels span:nth-child(3){left:33.3333%}#est7DiasLabels span:nth-child(4){left:50%}#est7DiasLabels span:nth-child(5){left:66.6667%}#est7DiasLabels span:nth-child(6){left:83.3333%}#est7DiasLabels span:nth-child(7){left:100%}

@@ -134,7 +134,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=399">
+<link rel="stylesheet" href="style.css?v=400">
 <script>
 // A abertura so sai quando (1) a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado (sair antes mostrava um flash
 // cinza vazio e depois a tela de login por baixo, visto em video de teste) E (2) quem ja tinha sessao neste aparelho teve login confirmado e o
@@ -1461,6 +1461,30 @@ html{background:var(--bsBg,#282828)}
     <div class="vhead">
       <span class="vtitle" data-i18n="nav.estatisticas">Estatísticas</span>
       <span class="vsub" id="estMesLabel"></span>
+    </div>
+
+    <!-- ESTATISTICAS v2 (abas Semana/Mes/Tudo). Os cards antigos abaixo
+         continuam no DOM (escondidos por CSS) so pra o JS antigo nao quebrar;
+         #estHistCard reaparece ao tocar em "Historico completo". -->
+    <div id="estn">
+      <div class="estn-head">
+        <div class="est-tocha estn-tocha" id="estnTocha" aria-hidden="true"></div>
+        <div class="estn-streak"><div class="estn-lab" id="estnLabSeq">SEQUÊNCIA</div><div class="estn-num"><b id="estnNum">0</b><span id="estnDias">dias</span></div></div>
+        <div class="estn-rec"><span id="estnRecLab">recorde</span><b id="estnRec">0</b></div>
+      </div>
+      <div class="estn-tabs" id="estnTabs">
+        <button type="button" data-tab="semana" class="on">Semana</button>
+        <button type="button" data-tab="mes">Mês</button>
+        <button type="button" data-tab="tudo">Tudo</button>
+      </div>
+      <div class="est-card estn-panel" id="estnPanel">
+        <div id="estnConteudo"></div>
+        <div class="est-lockoverlay" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          <span data-i18n="pro.trancado">PRO</span>
+        </div>
+      </div>
+      <button type="button" class="estn-hist" id="estnHist"><span id="estnHistTxt">Histórico completo</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
     </div>
 
     <div class="est-card est-clicavel" id="estCardPrincipal">
@@ -7859,6 +7883,137 @@ function renderEstatisticas(){
   document.getElementById('estMesLabel').textContent = nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1);
 
   renderHistoricoConteudo(hist, ano, mes);
+  try { renderEstN(hist, hoje, streak, recorde, bloqueadoPro); } catch(e){ console.error('renderEstN', e); }
+}
+
+// ---------- ESTATISTICAS v2: abas Semana / Mes / Tudo ----------
+let estnAba = null; // null = escolhe padrao (Semana pro, Tudo gratis) na 1a renderizacao
+function renderEstN(hist, hoje, streak, recorde, bloqueadoPro){
+  const raiz = document.getElementById('estn');
+  if (!raiz) return;
+  const en = (typeof window.idiomaAtual === 'function' && window.idiomaAtual() === 'en');
+  const L = (pt, e) => en ? e : pt;
+  const porData = new Map(hist.map(h => [h.data, h.resultado]));
+  if (estnAba === null) estnAba = bloqueadoPro ? 'tudo' : 'semana';
+
+  // cabecalho: sequencia + recorde
+  document.getElementById('estnLabSeq').textContent = L('SEQUÊNCIA', 'STREAK');
+  document.getElementById('estnDias').textContent = streak === 1 ? L('dia', 'day') : L('dias', 'days');
+  document.getElementById('estnRecLab').textContent = L('recorde', 'record');
+  document.getElementById('estnHistTxt').textContent = L('Histórico completo', 'Full history');
+  const numEl = document.getElementById('estnNum');
+  numEl.textContent = streak;
+  if (typeof window.corDoStreak === 'function') numEl.style.color = window.corDoStreak(streak);
+  document.getElementById('estnRec').textContent = recorde;
+  const tochaEl = document.getElementById('estnTocha');
+  tochaEl.classList.toggle('est-tocha-apagada', streak === 0);
+  tochaEl.classList.toggle('est-tocha-estatica', streak === 0);
+
+  const tabs = raiz.querySelectorAll('#estnTabs button');
+  const nomes = { semana: L('Semana','Week'), mes: L('Mês','Month'), tudo: L('Tudo','All') };
+  tabs.forEach(b => {
+    b.textContent = nomes[b.dataset.tab];
+    b.classList.toggle('on', b.dataset.tab === estnAba);
+    b.onclick = () => { estnAba = b.dataset.tab; renderEstN(hist, hoje, streak, recorde, bloqueadoPro); };
+  });
+
+  const loc = en ? 'en-US' : 'pt-BR';
+  const painel = document.getElementById('estnPanel');
+  const cont = document.getElementById('estnConteudo');
+  const fmt = n => String(n);
+  let h = '';
+
+  if (estnAba === 'semana'){
+    const dias = ['dom','seg','ter','qua','qui','sex','sáb'], diasEn = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    let venc = 0, cols = '';
+    for (let i = 6; i >= 0; i--){
+      const iso = isoDe(new Date(new Date(hoje + 'T12:00:00').getTime() - i * 86400000));
+      const r = porData.get(iso);
+      const dow = new Date(iso + 'T12:00:00').getDay();
+      if (r === 'vitoria') venc++;
+      let mk;
+      if (r === 'vitoria') mk = '<span class="est-tocha estn-t"></span>';
+      else if (r === 'fuga') mk = '<span class="est-tocha estn-t est-tocha-apagada est-tocha-estatica"></span>';
+      else if (i === 0) mk = '<span class="estn-hoje"></span>';
+      else mk = '<span class="estn-vazio"></span>';
+      cols += '<div class="estn-wk' + (i === 0 ? ' hoje' : '') + '"><div class="estn-mk">' + mk + '</div><span>' + (en ? diasEn[dow] : dias[dow]) + '</span></div>';
+    }
+    h = '<div class="estn-lab">' + L('ESTA SEMANA','THIS WEEK') + '</div>'
+      + '<div class="estn-big"><b>' + venc + '</b><span>' + L('de 7 dias vencidos','of 7 days won') + '</span></div>'
+      + '<div class="estn-semana">' + cols + '</div>';
+  } else if (estnAba === 'mes'){
+    const [aS, mS] = hoje.split('-'); const ano = +aS, mes = +mS;
+    const diasNoMes = new Date(ano, mes, 0).getDate();
+    const primeiro = new Date(ano, mes - 1, 1).getDay();
+    const hojeN = +hoje.slice(8);
+    let v = 0, f = 0, sT = 0;
+    let cel = (en ? ['S','M','T','W','T','F','S'] : ['D','S','T','Q','Q','S','S']).map(x => '<span class="wd">' + x + '</span>').join('');
+    for (let i = 0; i < primeiro; i++) cel += '<span></span>';
+    for (let d = 1; d <= diasNoMes; d++){
+      const iso = aS + '-' + mS + '-' + String(d).padStart(2,'0');
+      const r = porData.get(iso);
+      let c = '';
+      if (r === 'vitoria'){ c = 'won'; v++; }
+      else if (r === 'fuga'){ c = 'fled'; f++; }
+      else if (r === 'sem_tarefa'){ c = 'none'; sT++; }
+      else if (d > hojeN) c = 'fut';
+      if (d === hojeN) c += ' today';
+      cel += '<span class="estn-d ' + c + '">' + d + '</span>';
+    }
+    const taxa = (v + f) > 0 ? Math.round(v / (v + f) * 100) : 0;
+    const nomeMes = new Date(ano, mes - 1, 1).toLocaleDateString(loc, { month: 'long' }).toUpperCase();
+    h = '<div class="estn-lab">' + nomeMes + '</div>'
+      + '<div class="estn-big"><b>' + taxa + '%</b><span>' + L('de taxa no mês','completion this month') + '</span></div>'
+      + '<div class="estn-cal">' + cel + '</div>'
+      + '<div class="estn-leg"><span class="w">' + L('venceu','won') + '</span><b>' + v + '</b><span class="f">' + L('fugiu','fled') + '</span><b>' + f + '</b><span class="n">' + L('sem tarefa','no tasks') + '</span><b>' + sT + '</b></div>';
+  } else {
+    const totalC = (typeof window.totalTarefasConcluidas === 'function') ? window.totalTarefasConcluidas() : 0;
+    const vit = hist.filter(x => x.resultado === 'vitoria').length;
+    const fug = hist.filter(x => x.resultado === 'fuga').length;
+    const taxaG = (vit + fug) > 0 ? Math.round(vit / (vit + fug) * 100) : 0;
+    // taxa por mes (ultimos 6 com dias com tarefa)
+    const meses = new Map();
+    hist.forEach(x => {
+      if (x.resultado !== 'vitoria' && x.resultado !== 'fuga') return;
+      const k = x.data.slice(0, 7);
+      const o = meses.get(k) || { v: 0, f: 0 };
+      if (x.resultado === 'vitoria') o.v++; else o.f++;
+      meses.set(k, o);
+    });
+    const lista = Array.from(meses.keys()).sort().slice(-6);
+    const linhas = lista.map(k => {
+      const o = meses.get(k), p = Math.round(o.v / (o.v + o.f) * 100);
+      const nome = new Date(+k.slice(0,4), +k.slice(5,7) - 1, 1).toLocaleDateString(loc, { month: 'short' }).replace('.','');
+      return '<div class="estn-mrow"><span>' + nome + '</span><i><u style="width:' + p + '%"></u></i><b>' + p + '%</b></div>';
+    }).join('');
+    h = '<div class="estn-lab">' + L('DESDE O INÍCIO','ALL TIME') + '</div>'
+      + '<div class="estn-trio"><div><b>' + fmt(totalC) + '</b><span>' + L('tarefas concluídas','tasks done') + '</span></div>'
+      + '<div><b>' + vit + '</b><span>' + L('dias vencidos','days won') + '</span></div>'
+      + '<div><b>' + taxaG + '%</b><span>' + L('taxa geral','overall rate') + '</span></div></div>'
+      + (linhas ? '<div class="estn-lab estn-sub">' + L('POR MÊS','BY MONTH') + '</div><div class="estn-meses">' + linhas + '</div>' : '');
+  }
+  cont.innerHTML = h;
+
+  // Pro: Semana e Mes trancados; Tudo mostra os 3 numeros (como antes) e tranca so a parte por mes
+  const trancar = bloqueadoPro && estnAba !== 'tudo';
+  painel.classList.toggle('premiumBloqueado', trancar);
+  painel.onclick = trancar ? () => { if (typeof window.abrirPaywall === 'function') window.abrirPaywall('estatisticas'); } : null;
+  const sub = cont.querySelector('.estn-sub'), mm = cont.querySelector('.estn-meses');
+  if (bloqueadoPro && estnAba === 'tudo' && sub && mm){
+    sub.style.filter = mm.style.filter = 'blur(5px)'; mm.style.pointerEvents = 'none';
+    sub.parentNode.style.cursor = 'pointer';
+    cont.onclick = () => { if (typeof window.abrirPaywall === 'function') window.abrirPaywall('estatisticas'); };
+  } else cont.onclick = null;
+
+  // "Historico completo" reabre o card antigo (mapa + seletor de periodo)
+  const histCard = document.getElementById('estHistCard');
+  const btn = document.getElementById('estnHist');
+  btn.onclick = () => {
+    if (bloqueadoPro){ if (typeof window.abrirPaywall === 'function') window.abrirPaywall('estatisticas'); return; }
+    const aberto = histCard.classList.toggle('estn-aberto');
+    btn.classList.toggle('on', aberto);
+    if (aberto) histCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  };
 }
 
 document.querySelectorAll('#nav button').forEach(b => {

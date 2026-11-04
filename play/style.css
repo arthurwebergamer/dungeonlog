@@ -7057,12 +7057,12 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 @media (prefers-reduced-motion:reduce){#heroSprite .heroimg,#heroSprite .heroArma,#heroSprite .heroMao,#mobSprite .mobimg{animation:none !important}}
 
 /* TELAS C: relatorio de batalha (dia vencido) + carta do heroi (nivel) */
-.rl{width:100%;display:flex;flex-direction:column;gap:9px;margin-top:16px;font-family:'Silkscreen',monospace;font-size:12px;color:var(--muted)}
+.rl{width:100%;display:flex;flex-direction:column;gap:9px;margin-top:16px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:500;color:var(--muted)}
 .rl hr{border:0;border-top:2px solid var(--line);margin:2px 0;opacity:0;animation:mdFade2 .3s ease calc(1.35s + 3*.08s) forwards}
 .rl-l{display:flex;align-items:baseline;gap:7px;opacity:0;animation:mdFade2 .3s ease forwards;animation-delay:calc(1.1s + var(--i)*.08s)}
 .rl-l:after{content:"";order:2;flex:1;border-bottom:2px dotted var(--line);margin-bottom:3px}
-.rl-l em{order:3;font-style:normal;color:var(--text);font-weight:700;font-variant-numeric:tabular-nums}
-.rl-tot{color:#f2c14e;font-size:14px}.rl-tot em{color:#f2c14e}
+.rl-l em{order:3;font-style:normal;color:var(--text);font-weight:600;font-size:15px;font-variant-numeric:tabular-nums}
+.rl-tot{color:#f2c14e;font-size:15px;font-weight:600}.rl-tot em{color:#f2c14e}.rl-l small{font-size:11px;font-weight:700;color:#7fe0b5;margin-left:3px}
 .cq-card{width:100%;border-radius:20px;padding:3px;margin:12px 0 0;background:linear-gradient(135deg,#f2c14e,#b57be8 55%,#5ad7e0);opacity:0;transform:translateY(24px) scale(.96);animation:mdRow .6s var(--spr2) .5s forwards}
 .cq-card>div{background:var(--panel-2);border-radius:17px;padding:10px;display:flex;flex-direction:column;gap:10px;align-items:center}
 .cq-card .md-art{margin:0;height:150px}

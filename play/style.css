@@ -7175,3 +7175,24 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 .estn-head{cursor:pointer;-webkit-tap-highlight-color:transparent}
 .estn-head:active{opacity:.7}
 .estn-seta{width:15px;height:15px;color:var(--dim);flex:none;margin-left:-4px}
+
+/* v2b: pagina unica em secoes (sem caixas), ocupa a tela */
+#estn{padding:0 18px 28px;display:flex;flex-direction:column}
+.estn-head{padding:8px 0 26px}
+.estn-tocha{transform:scale(2);margin:0 14px 0 6px}
+.estn-num b{font-size:52px}
+#estnSecs{display:flex;flex-direction:column}
+.estn-sec{position:relative;padding:28px 0 34px !important;border-top:1px solid var(--line) !important;background:transparent !important}
+.estn-sec.premiumBloqueado{cursor:pointer}
+.estn-big{margin:10px 0 26px}
+.estn-mk{height:104px}
+.estn-semana{padding-bottom:4px}
+.estn-cal{row-gap:17px}
+.estn-d{font-size:15px}
+.estn-cont{margin-top:30px;gap:18px}
+.estn-mrow span.w{color:var(--text)}.estn-mrow span.f{text-decoration:line-through}
+.estn-trio{margin-top:26px}
+.estn-trio b{font-size:26px}
+.estn-meses{margin-top:22px}
+.estn-meses.estn-cont{margin-top:34px;gap:20px}
+.estn-cont .estn-mrow{grid-template-columns:78px 1fr 28px;white-space:nowrap}

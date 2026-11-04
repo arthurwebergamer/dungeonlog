@@ -7171,3 +7171,7 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 .estn-hist svg{width:18px;height:18px;color:var(--dim);transition:transform .2s}
 .estn-hist.on svg{transform:rotate(90deg)}
 #viewEstatisticas #estnPanel{border-top:0 !important}
+
+.estn-head{cursor:pointer;-webkit-tap-highlight-color:transparent}
+.estn-head:active{opacity:.7}
+.estn-seta{width:15px;height:15px;color:var(--dim);flex:none;margin-left:-4px}

@@ -7236,11 +7236,6 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 #viewEstatisticas > .est-statsrow{display:flex}
 #viewEstatisticas > #estHistCard{display:block}
 /* v2e: historico sem quadrados -- tocha solta acima do numero */
-#viewEstatisticas[data-tab="semana"] #estMapaMes .est-tile{background:transparent !important;border-color:transparent !important;aspect-ratio:auto;height:46px;border-radius:0}
-#viewEstatisticas[data-tab="semana"] #estMapaMes .est-tile .est-tocha{top:0;transform:translateX(-50%) scale(.95)}
-#viewEstatisticas[data-tab="semana"] #estMapaMes .est-tile .est-tiledia{margin-bottom:0;text-shadow:none;font-family:'Silkscreen',monospace;font-size:10px;color:var(--dim)}
-#viewEstatisticas[data-tab="semana"] #estMapaMes .est-tile-vitoria .est-tiledia{color:var(--text)}
-#viewEstatisticas[data-tab="semana"] .est-mapalegenda .est-tile{border-radius:50%}
 /* v2f: abas Semanal/Mensal/Anual sobre a tela antiga */
 #estTabsPeriodo{margin:18px 18px 6px}
 #estTabsPeriodo button{flex:none}

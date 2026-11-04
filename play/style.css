@@ -7196,3 +7196,10 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 .estn-meses{margin-top:22px}
 .estn-meses.estn-cont{margin-top:34px;gap:20px}
 .estn-cont .estn-mrow{grid-template-columns:78px 1fr 28px;white-space:nowrap}
+/* v2c: streak em destaque (fundo cinza) + calendario antigo (tiles) */
+.estn-head{background:linear-gradient(135deg,var(--panel-3),var(--panel-2));border-radius:20px;padding:20px 18px 20px;margin:4px 0 8px}
+.estn-mapa{gap:6px;margin-top:4px}
+.estn-leg{display:flex;gap:16px;flex-wrap:wrap;align-items:center;font-size:12px;color:var(--dim);margin-top:20px}
+.estn-leg .lg{display:inline-flex;align-items:center;gap:6px}
+.estn-leg i.est-tile{display:inline-block;width:12px;height:12px;aspect-ratio:auto;flex:none}
+.estn-leg b{color:var(--text);font:400 12px 'Silkscreen',monospace;margin-left:2px}

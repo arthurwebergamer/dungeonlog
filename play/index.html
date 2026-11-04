@@ -134,7 +134,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=403">
+<link rel="stylesheet" href="style.css?v=404">
 <script>
 // A abertura so sai quando (1) a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado (sair antes mostrava um flash
 // cinza vazio e depois a tela de login por baixo, visto em video de teste) E (2) quem ja tinha sessao neste aparelho teve login confirmado e o
@@ -7923,17 +7923,14 @@ function renderEstN(hist, hoje, streak, recorde, bloqueadoPro){
   const primeiro = new Date(ano, mes - 1, 1).getDay();
   const hojeN = +hoje.slice(8);
   let v = 0, f = 0, sT = 0;
-  let cel = (en ? ['S','M','T','W','T','F','S'] : ['D','S','T','Q','Q','S','S']).map(x => '<span class="wd">' + x + '</span>').join('');
-  for (let i = 0; i < primeiro; i++) cel += '<span></span>';
+  let cel = '';
   for (let d = 1; d <= diasNoMes; d++){
-    const r = porData.get(aS + '-' + mS + '-' + String(d).padStart(2,'0'));
-    let c = '';
-    if (r === 'vitoria'){ c = 'won'; v++; }
-    else if (r === 'fuga'){ c = 'fled'; f++; }
-    else if (r === 'sem_tarefa'){ c = 'none'; sT++; }
-    else if (d > hojeN) c = 'fut';
-    if (d === hojeN) c += ' today';
-    cel += '<span class="estn-d ' + c + '">' + d + '</span>';
+    const r = (d <= hojeN) ? porData.get(aS + '-' + mS + '-' + String(d).padStart(2,'0')) : null;
+    let t = '<div class="est-tile';
+    if (r === 'vitoria'){ v++; t += ' est-tile-vitoria"><div class="est-tocha est-tocha-estatica" aria-hidden="true"></div>'; }
+    else if (r === 'fuga'){ f++; t += ' est-tile-fuga"><div class="est-tocha est-tocha-estatica est-tocha-apagada" aria-hidden="true"></div>'; }
+    else { if (r === 'sem_tarefa') sT++; t += '">'; }
+    cel += t + '<span class="est-tiledia">' + d + '</span></div>';
   }
   const taxaMes = (v + f) > 0 ? Math.round(v / (v + f) * 100) : 0;
   const nomeMes = new Date(ano, mes - 1, 1).toLocaleDateString(loc, { month: 'long' }).toUpperCase();
@@ -7941,8 +7938,8 @@ function renderEstN(hist, hoje, streak, recorde, bloqueadoPro){
   const barra = (rot, n, cls) => '<div class="estn-mrow"><span class="' + cls + '">' + rot + '</span><i><u style="width:' + Math.round(n / tot * 100) + '%"></u></i><b>' + n + '</b></div>';
   const secMes = sec(nomeMes,
     '<div class="estn-big"><b>' + taxaMes + '%</b><span>' + L('de taxa no mês','completion this month') + '</span></div>'
-    + '<div class="estn-cal">' + cel + '</div>'
-    + '<div class="estn-meses estn-cont">' + barra(L('venceu','won'), v, 'w') + barra(L('fugiu','fled'), f, 'f') + barra(L('sem tarefa','no tasks'), sT, 'n') + '</div>', true);
+    + '<div class="est-mapames estn-mapa">' + cel + '</div>'
+    + '<div class="estn-leg"><span class="lg"><i class="est-tile"></i>' + L('sem tarefa','no tasks') + ' <b>' + sT + '</b></span><span class="lg"><i class="est-tile est-tile-fuga"></i>' + L('fugiu','fled') + ' <b>' + f + '</b></span><span class="lg"><i class="est-tile est-tile-vitoria"></i>' + L('venceu','won') + ' <b>' + v + '</b></span></div>', true);
 
   // ---- DESDE O INICIO (3 numeros livres) + POR MES (Pro)
   const totalC = (typeof window.totalTarefasConcluidas === 'function') ? window.totalTarefasConcluidas() : 0;

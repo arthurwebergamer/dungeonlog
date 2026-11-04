@@ -134,7 +134,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=404">
+<link rel="stylesheet" href="style.css?v=405">
 <script>
 // A abertura so sai quando (1) a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado (sair antes mostrava um flash
 // cinza vazio e depois a tela de login por baixo, visto em video de teste) E (2) quem ja tinha sessao neste aparelho teve login confirmado e o
@@ -1467,11 +1467,14 @@ html{background:var(--bsBg,#282828)}
          continuam no DOM (escondidos por CSS) so pra o JS antigo nao quebrar;
          #estHistCard reaparece ao tocar em "Historico completo". -->
     <div id="estn">
-      <div class="estn-head" id="estnHead" role="button" tabindex="0">
-        <div class="est-tocha estn-tocha" id="estnTocha" aria-hidden="true"></div>
-        <div class="estn-streak"><div class="estn-lab" id="estnLabSeq">SEQUÊNCIA</div><div class="estn-num"><b id="estnNum">0</b><span id="estnDias">dias</span></div></div>
-        <div class="estn-rec"><span id="estnRecLab">recorde</span><b id="estnRec">0</b></div>
-        <svg class="estn-seta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+      <div class="estn-hero" id="estnHead" role="button" tabindex="0">
+        <div class="estn-head">
+          <div class="est-tocha estn-tocha" id="estnTocha" aria-hidden="true"></div>
+          <div class="estn-streak"><div class="estn-lab" id="estnLabSeq">SEQUÊNCIA</div><div class="estn-num"><b id="estnNum">0</b><span id="estnDias">dias</span></div></div>
+          <div class="estn-rec"><span id="estnRecLab">recorde</span><b id="estnRec">0</b></div>
+          <svg class="estn-seta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+        </div>
+        <div class="estn-trioWrap" id="estnTrio"></div>
       </div>
       <div id="estnSecs"></div>
     </div>
@@ -7899,7 +7902,40 @@ function renderEstN(hist, hoje, streak, recorde, bloqueadoPro){
   const cadeado = '<div class="est-lockoverlay" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span>PRO</span></div>';
   const sec = (titulo, corpo, pro) => '<section class="est-card estn-sec' + (pro && bloqueadoPro ? ' premiumBloqueado' : '') + '"' + (pro ? ' data-pro="1"' : '') + '><div class="estn-lab">' + titulo + '</div>' + corpo + (pro ? cadeado : '') + '</section>';
 
-  // ---- ESTA SEMANA (tochas flutuando)
+  // ---- hero: desde o inicio dentro do cartao cinza
+  const totalC = (typeof window.totalTarefasConcluidas === 'function') ? window.totalTarefasConcluidas() : 0;
+  const vit = hist.filter(x => x.resultado === 'vitoria').length;
+  const fug = hist.filter(x => x.resultado === 'fuga').length;
+  const taxaG = (vit + fug) > 0 ? Math.round(vit / (vit + fug) * 100) : 0;
+  document.getElementById('estnTrio').innerHTML = '<div class="estn-lab">' + L('DESDE O INÍCIO','SINCE THE START') + '</div>'
+    + '<div class="estn-trio"><div><b>' + totalC + '</b><span>' + L('tarefas concluídas','tasks done') + '</span></div>'
+    + '<div><b>' + vit + '</b><span>' + L('dias vencidos','days won') + '</span></div>'
+    + '<div><b>' + taxaG + '%</b><span>' + L('taxa geral','overall rate') + '</span></div></div>';
+
+  // ---- TAXA + COMO FOI O MES (lado a lado)
+  const [aS, mS] = hoje.split('-'); const ano = +aS, mes = +mS;
+  const diasNoMes = new Date(ano, mes, 0).getDate();
+  const hojeN = +hoje.slice(8);
+  let v = 0, f = 0, sT = 0, cel = '';
+  const tocha = (apagada) => '<div class="est-tocha est-tocha-estatica' + (apagada ? ' est-tocha-apagada' : '') + '" aria-hidden="true"></div>';
+  for (let d = 1; d <= diasNoMes; d++){
+    const r = (d <= hojeN) ? porData.get(aS + '-' + mS + '-' + String(d).padStart(2,'0')) : null;
+    let c = 'estn-cd', m = '';
+    if (r === 'vitoria'){ v++; c += ' won'; m = tocha(false); }
+    else if (r === 'fuga'){ f++; c += ' fled'; m = tocha(true); }
+    else if (r === 'sem_tarefa') sT++;
+    if (d === hojeN) c += ' today';
+    cel += '<div class="' + c + '"><div class="estn-cdm">' + m + '</div><span>' + d + '</span></div>';
+  }
+  const taxaMes = (v + f) > 0 ? Math.round(v / (v + f) * 100) : 0;
+  const tot = Math.max(1, v + f + sT);
+  const barra = (rot, n, cls) => '<div class="estn-lrow"><span class="' + cls + '">' + rot + '</span><i><u style="width:' + Math.round(n / tot * 100) + '%"></u></i><b>' + n + '</b></div>';
+  const secTaxa = sec(L('ESTE MÊS','THIS MONTH'),
+    '<div class="estn-duo"><div><div class="estn-sublab">' + L('Taxa de conclusão','Completion rate') + '</div><div class="estn-bigp"><b>' + taxaMes + '%</b></div></div>'
+    + '<div><div class="estn-sublab">' + L('Como foi o mês','How the month went') + '</div><div class="estn-lrows">'
+    + barra(L('venceu','won'), v, 'w') + barra(L('fugiu','fled'), f, 'f') + barra(L('sem tarefa','no tasks'), sT, 'n') + '</div></div></div>', true);
+
+  // ---- ULTIMOS 7 DIAS (tochas flutuando)
   const dias = ['dom','seg','ter','qua','qui','sex','sáb'], diasEn = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   let venc = 0, cols = '';
   for (let i = 6; i >= 0; i--){
@@ -7914,43 +7950,11 @@ function renderEstN(hist, hoje, streak, recorde, bloqueadoPro){
     else mk = '<span class="estn-vazio"></span>';
     cols += '<div class="estn-wk' + (i === 0 ? ' hoje' : '') + '"><div class="estn-mk">' + mk + '</div><span>' + (en ? diasEn[dow] : dias[dow]) + '</span></div>';
   }
-  const secSemana = sec(L('ESTA SEMANA','THIS WEEK'),
+  const secSemana = sec(L('ÚLTIMOS 7 DIAS','LAST 7 DAYS'),
     '<div class="estn-big"><b>' + venc + '</b><span>' + L('de 7 dias vencidos','of 7 days won') + '</span></div><div class="estn-semana">' + cols + '</div>', true);
 
-  // ---- ESTE MES (taxa + calendario + contagens)
-  const [aS, mS] = hoje.split('-'); const ano = +aS, mes = +mS;
-  const diasNoMes = new Date(ano, mes, 0).getDate();
-  const primeiro = new Date(ano, mes - 1, 1).getDay();
-  const hojeN = +hoje.slice(8);
-  let v = 0, f = 0, sT = 0;
-  let cel = '';
-  for (let d = 1; d <= diasNoMes; d++){
-    const r = (d <= hojeN) ? porData.get(aS + '-' + mS + '-' + String(d).padStart(2,'0')) : null;
-    let t = '<div class="est-tile';
-    if (r === 'vitoria'){ v++; t += ' est-tile-vitoria"><div class="est-tocha est-tocha-estatica" aria-hidden="true"></div>'; }
-    else if (r === 'fuga'){ f++; t += ' est-tile-fuga"><div class="est-tocha est-tocha-estatica est-tocha-apagada" aria-hidden="true"></div>'; }
-    else { if (r === 'sem_tarefa') sT++; t += '">'; }
-    cel += t + '<span class="est-tiledia">' + d + '</span></div>';
-  }
-  const taxaMes = (v + f) > 0 ? Math.round(v / (v + f) * 100) : 0;
-  const nomeMes = new Date(ano, mes - 1, 1).toLocaleDateString(loc, { month: 'long' }).toUpperCase();
-  const tot = Math.max(1, v + f + sT);
-  const barra = (rot, n, cls) => '<div class="estn-mrow"><span class="' + cls + '">' + rot + '</span><i><u style="width:' + Math.round(n / tot * 100) + '%"></u></i><b>' + n + '</b></div>';
-  const secMes = sec(nomeMes,
-    '<div class="estn-big"><b>' + taxaMes + '%</b><span>' + L('de taxa no mês','completion this month') + '</span></div>'
-    + '<div class="est-mapames estn-mapa">' + cel + '</div>'
-    + '<div class="estn-leg"><span class="lg"><i class="est-tile"></i>' + L('sem tarefa','no tasks') + ' <b>' + sT + '</b></span><span class="lg"><i class="est-tile est-tile-fuga"></i>' + L('fugiu','fled') + ' <b>' + f + '</b></span><span class="lg"><i class="est-tile est-tile-vitoria"></i>' + L('venceu','won') + ' <b>' + v + '</b></span></div>', true);
-
-  // ---- DESDE O INICIO (3 numeros livres) + POR MES (Pro)
-  const totalC = (typeof window.totalTarefasConcluidas === 'function') ? window.totalTarefasConcluidas() : 0;
-  const vit = hist.filter(x => x.resultado === 'vitoria').length;
-  const fug = hist.filter(x => x.resultado === 'fuga').length;
-  const taxaG = (vit + fug) > 0 ? Math.round(vit / (vit + fug) * 100) : 0;
-  const secTudo = sec(L('DESDE O INÍCIO','ALL TIME'),
-    '<div class="estn-trio"><div><b>' + totalC + '</b><span>' + L('tarefas concluídas','tasks done') + '</span></div>'
-    + '<div><b>' + vit + '</b><span>' + L('dias vencidos','days won') + '</span></div>'
-    + '<div><b>' + taxaG + '%</b><span>' + L('taxa geral','overall rate') + '</span></div></div>', false);
-
+  // ---- HISTORICO (mes) + por mes
+  const nomeMes = new Date(ano, mes - 1, 1).toLocaleDateString(loc, { month: 'long' });
   const meses = new Map();
   hist.forEach(x => {
     if (x.resultado !== 'vitoria' && x.resultado !== 'fuga') return;
@@ -7965,9 +7969,12 @@ function renderEstN(hist, hoje, streak, recorde, bloqueadoPro){
     const nome = new Date(+k.slice(0,4), +k.slice(5,7) - 1, 1).toLocaleDateString(loc, { month: 'short' }).replace('.','');
     return '<div class="estn-mrow"><span>' + nome + '</span><i><u style="width:' + p + '%"></u></i><b>' + p + '%</b></div>';
   }).join('');
-  const secPorMes = linhas ? sec(L('POR MÊS','BY MONTH'), '<div class="estn-meses">' + linhas + '</div>', true) : '';
+  const secHist = sec(L('HISTÓRICO','HISTORY') + ' · ' + nomeMes.toUpperCase(),
+    '<div class="estn-cgrid">' + cel + '</div>'
+    + '<div class="estn-leg"><span class="lg">' + tocha(false) + L('venceu','won') + '</span><span class="lg">' + tocha(true) + L('fugiu','fled') + '</span></div>'
+    + (linhas ? '<div class="estn-sublab estn-gap">' + L('Taxa por mês','Rate by month') + '</div><div class="estn-meses">' + linhas + '</div>' : ''), true);
 
-  document.getElementById('estnSecs').innerHTML = secSemana + secMes + secTudo + secPorMes;
+  document.getElementById('estnSecs').innerHTML = secTaxa + secSemana + secHist;
   raiz.querySelectorAll('.estn-sec[data-pro]').forEach(el => {
     el.onclick = bloqueadoPro ? () => { if (typeof window.abrirPaywall === 'function') window.abrirPaywall('estatisticas'); } : null;
   });

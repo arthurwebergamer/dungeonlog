@@ -7203,3 +7203,32 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 .estn-leg .lg{display:inline-flex;align-items:center;gap:6px}
 .estn-leg i.est-tile{display:inline-block;width:12px;height:12px;aspect-ratio:auto;flex:none}
 .estn-leg b{color:var(--text);font:400 12px 'Silkscreen',monospace;margin-left:2px}
+/* v2d: layout antigo (hero cinza com 'desde o inicio', taxa|mes lado a lado, 7 dias, historico) sem caixas/quadrados */
+.estn-hero{background:linear-gradient(135deg,var(--panel-3),var(--panel-2));border-radius:20px;padding:18px 18px 22px;margin:4px 0 6px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.estn-hero:active{opacity:.85}
+.estn-head{background:none;border-radius:0;padding:0;margin:0 0 20px}
+.estn-trioWrap{border-top:1px solid var(--line);padding-top:16px}
+.estn-trioWrap .estn-trio{margin-top:14px}
+.estn-trio b{font-size:24px}
+.estn-duo{display:grid;grid-template-columns:1fr 1fr;gap:0;margin-top:20px}
+.estn-duo>div{padding:0 4px}
+.estn-duo>div+div{border-left:1px solid var(--line);padding-left:18px}
+.estn-sublab{font:600 13px 'Outfit',sans-serif;color:var(--text);margin-bottom:16px}
+.estn-bigp b{font:400 40px/1 'Silkscreen',monospace;color:var(--text)}
+.estn-lrows{display:flex;flex-direction:column;gap:18px;margin-top:2px}
+.estn-lrow{display:grid;grid-template-columns:1fr 28px;grid-template-rows:auto 3px;row-gap:7px;font-size:12px;color:var(--dim)}
+.estn-lrow span.w{color:var(--text)}.estn-lrow span.f{text-decoration:line-through}
+.estn-lrow b{text-align:right;font:400 12px 'Silkscreen',monospace;color:var(--text)}
+.estn-lrow i{grid-column:1/3;grid-row:2;display:block;height:3px;background:var(--panel-3)}
+.estn-lrow u{display:block;height:100%;background:var(--text);text-decoration:none}
+.estn-cgrid{display:grid;grid-template-columns:repeat(7,1fr);row-gap:10px;margin-top:22px}
+.estn-cd{display:flex;flex-direction:column;align-items:center;font:400 11px 'Silkscreen',monospace;color:var(--dim)}
+.estn-cdm{position:relative;width:16px;height:32px}
+.estn-cdm .est-tocha{position:absolute;left:0;top:0}
+.estn-cd.won,.estn-cd.today{color:var(--text)}
+.estn-cd.fled{color:var(--dim)}
+.estn-cd.today span{text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:2px}
+.estn-cd span{margin-top:-2px}
+.estn-leg{margin-top:22px;gap:22px}
+.estn-leg .lg .est-tocha{position:static;transform:scale(.6);transform-origin:center;margin:-8px -3px}
+.estn-gap{margin-top:38px}

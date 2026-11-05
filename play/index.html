@@ -2030,7 +2030,7 @@ html{background:var(--bsBg,#282828)}
 
 <div class="toast" id="toast"></div>
 
-<script src="assets.js?v=323"></script>
+<script src="assets.js?v=324"></script>
 <script>
 // ---------- namespace por conta (localStorage) ----------
 // Movido pro topo do arquivo de proposito: CHAVE_DIA/lerOffsetDia(), bem
@@ -3418,7 +3418,7 @@ function desenharHeroi(){
   };
   // so escudo (e a arma, acima) aparecem no heroi; armadura/elmo ficaram de fora por decisao do usuario
   const eqHTML = camada('escudo', 'eqEscudo', 34, 34, 19, 47, 1.2);
-  el.innerHTML = '<img class="heroimg" src="' + heroiAtual().img + '" alt="' + (idiomaApp() === 'en' ? 'hero' : 'herói') + '">' +
+  el.innerHTML = '<img class="heroimg" src="' + (heroiAtual().imgArena || heroiAtual().img) + '" alt="' + (idiomaApp() === 'en' ? 'hero' : 'herói') + '">' +
                  eqHTML + armaHTML + maoHTML + '<div class="sombra"></div>';
 }
 

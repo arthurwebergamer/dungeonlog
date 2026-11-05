@@ -7267,8 +7267,11 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 .restLista{margin:0 0 16px;padding-left:20px;font:400 14px/1.7 'Outfit',sans-serif;color:var(--muted,#ccc)}
 .restOk{display:block;width:100%;background:#4d5a8f;color:#fff;border:0;border-radius:12px;padding:12px;font:600 14px 'Outfit',sans-serif;margin-bottom:8px;cursor:pointer}
 .restNao{display:block;width:100%;background:transparent;color:var(--dim,#aaa);border:0;padding:8px;font:500 13px 'Outfit',sans-serif;cursor:pointer}
-body.diaDescanso .arena{filter:brightness(.62) saturate(.7) hue-rotate(10deg)}
-body.diaDescanso .arena .fighter:not(.mob){transform:rotate(-80deg) translateY(10px)}
+body.diaDescanso .arena{filter:brightness(.7) saturate(.75)}
+body.diaDescanso .arena .fighter:not(.mob){filter:brightness(.8)}
+body.diaDescanso .arena .fighter:not(.mob){position:relative;overflow:visible}
+body.diaDescanso .arena .fighter:not(.mob)::after{content:'z  Z';position:absolute;left:60%;top:-26px;z-index:6;font:400 16px 'Silkscreen',monospace;color:#9db4ff;letter-spacing:4px;animation:zzz 2.6s ease-in-out infinite;pointer-events:none}
+@keyframes zzz{0%{opacity:0;transform:translateY(10px)}40%{opacity:1}100%{opacity:0;transform:translateY(-14px)}}
 body.diaDescanso .arena .fighter.mob{opacity:.35}
 body.diaDescanso .list{opacity:.45}
 .est-tile-descanso{background:#4d5a8f;border-color:#4d5a8f;color:#dfe5ff}

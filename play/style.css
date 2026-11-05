@@ -7252,3 +7252,9 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 
 /* atributos desligados: some o painel de atributos do Perfil */
 .anelAtr,.planoAtr,.atributospontos{display:none !important}
+
+/* selo "Estagio N em X tarefas" no topo da arena */
+.estagioSelo{position:absolute;left:50%;top:10px;transform:translateX(-50%);z-index:6;pointer-events:none;
+  background:rgba(20,20,20,.72);border-radius:999px;padding:6px 12px;display:flex;gap:6px;align-items:center;line-height:1;white-space:nowrap;
+  font:600 11px 'Outfit',sans-serif;color:#eee}
+.estagioSelo b{font:400 11px 'Silkscreen',monospace;color:#fff}

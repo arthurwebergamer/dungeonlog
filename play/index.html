@@ -13537,6 +13537,10 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       pt: ['Dia de descanso', 'Doente ou sem condições? Toque na lua pra descansar: sem dano e sem perder a sequência.'], en: ['Rest day', 'Sick or not up to it? Tap the moon to rest: no damage and your streak stays safe.']},
     {aba: 'inventario',   sel: '#equipbox',          pt: ['Equipe seus itens', 'Aqui ficam seus itens. Itens bons dão mais XP e moedas.'],       en: ['Equip your items', 'Your items live here. Good ones boost your XP and coins.']},
     {aba: 'loja',         sel: '#lojaGrid .lrow',    pt: ['A loja renova todo dia', 'A loja renova todo dia. Compre equipamentos com suas moedas.'],  en: ['The shop restocks daily', 'The shop restocks daily. Buy gear with your coins.']},
+    {aba: 'perfil', sel: '#prevConquistas|#prevBestiario', scroll: true,
+      pt: ['Conquistas e bestiário', 'Aqui ficam suas conquistas e o bestiário, com todos os monstros que você já derrotou.'], en: ['Achievements and bestiary', 'Your achievements and the bestiary live here, with every monster you have defeated.']},
+    {aba: 'perfil', sel: '#perfilCfgBtn', scroll: true,
+      pt: ['Configurações', 'Na engrenagem você muda herói, tema, idioma, sons e pode rever este tutorial.'], en: ['Settings', 'The gear lets you change hero, theme, language, sounds, and replay this tutorial.']},
     {aba: 'estatisticas', sel: '#estCardPrincipal',  pt: ['Sua sequência de vitórias', 'Essa é sua sequência de vitórias. A tocha cresce a cada dia vencido.'], en: ['Your win streak', 'This is your win streak. The torch grows with every won day.']}
   ];
   let tourEl = null, tourI = 0, tourAtivo = false, tourTok = 0, tourPoll = null;
@@ -13590,7 +13594,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
   function tourPosicionar(anima){
     const st = TOUR[tourI], en = (typeof idiomaApp === 'function' && idiomaApp() === 'en');
     const hole = tourEl.querySelector('.tourHole'), card = tourEl.querySelector('.tourCard');
-    if (st.scroll){ const e0 = document.querySelector(typeof st.sel === 'function' ? st.sel() : st.sel); if (e0 && e0.scrollIntoView) try { e0.scrollIntoView({block: 'center'}); } catch (_){} }
+    if (st.scroll){ const e0 = document.querySelector((typeof st.sel === 'function' ? st.sel() : st.sel).split('|')[0]); if (e0 && e0.scrollIntoView) try { e0.scrollIntoView({block: 'center'}); } catch (_){} }
     const r = tourAlvo(st);
     if (!r || r.width < 4 || r.height < 4) return false;
     const pad = 6, W = window.innerWidth, H = window.innerHeight, t = en ? st.en : st.pt;

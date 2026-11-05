@@ -13533,6 +13533,8 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
       pt: ['Escreva a tarefa', 'Escreva a tarefa e toque em Criar tarefa.'], en: ['Write the task', 'Write the task and tap Create task.']},
     {aba: 'tarefas', sel: () => '#list .task[data-idx="' + tourIdx + '"] .box', espera: 'concluir', leve: true, scroll: true,
       pt: ['Agora conclua', 'Agora toque na caixinha e veja o monstro apanhar.'], en: ['Now finish it', 'Now tap the box and watch the monster take a hit.']},
+    {aba: 'tarefas', sel: '#restbtn',
+      pt: ['Dia de descanso', 'Doente ou sem condições? Toque na lua pra descansar: sem dano e sem perder a sequência.'], en: ['Rest day', 'Sick or not up to it? Tap the moon to rest: no damage and your streak stays safe.']},
     {aba: 'inventario',   sel: '#equipbox',          pt: ['Equipe seus itens', 'Aqui ficam seus itens. Itens bons dão mais XP e moedas.'],       en: ['Equip your items', 'Your items live here. Good ones boost your XP and coins.']},
     {aba: 'loja',         sel: '#lojaGrid .lrow',    pt: ['A loja renova todo dia', 'A loja renova todo dia. Compre equipamentos com suas moedas.'],  en: ['The shop restocks daily', 'The shop restocks daily. Buy gear with your coins.']},
     {aba: 'estatisticas', sel: '#estCardPrincipal',  pt: ['Sua sequência de vitórias', 'Essa é sua sequência de vitórias. A tocha cresce a cada dia vencido.'], en: ['Your win streak', 'This is your win streak. The torch grows with every won day.']}

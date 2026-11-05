@@ -7258,3 +7258,23 @@ body.tourAberto .edov.on .edsheet{opacity:1}
   background:rgba(20,20,20,.72);border-radius:999px;padding:6px 12px;display:flex;gap:6px;align-items:center;line-height:1;white-space:nowrap;
   font:600 11px 'Outfit',sans-serif;color:#eee}
 .estagioSelo b{font:400 11px 'Silkscreen',monospace;color:#fff}
+
+/* ---- dia de descanso ---- */
+.theadAcoes{display:flex;gap:6px;align-items:center}
+.restbtn{background:#3a3f55;color:#cdd6ff;border:0;border-radius:8px;padding:6px 10px;font:500 12px 'Outfit',sans-serif;cursor:pointer;white-space:nowrap}
+.restbtn.on{background:#4d5a8f;color:#fff}
+.restbtn[hidden]{display:none}
+.restLista{margin:0 0 16px;padding-left:20px;font:400 14px/1.7 'Outfit',sans-serif;color:var(--muted,#ccc)}
+.restOk{display:block;width:100%;background:#4d5a8f;color:#fff;border:0;border-radius:12px;padding:12px;font:600 14px 'Outfit',sans-serif;margin-bottom:8px;cursor:pointer}
+.restNao{display:block;width:100%;background:transparent;color:var(--dim,#aaa);border:0;padding:8px;font:500 13px 'Outfit',sans-serif;cursor:pointer}
+body.diaDescanso .arena{filter:brightness(.62) saturate(.7) hue-rotate(10deg)}
+body.diaDescanso .arena .fighter:not(.mob){transform:rotate(-80deg) translateY(10px)}
+body.diaDescanso .arena .fighter.mob{opacity:.35}
+body.diaDescanso .list{opacity:.45}
+.est-tile-descanso{background:#4d5a8f;border-color:#4d5a8f;color:#dfe5ff}
+.est-anodia.est-anodia-descanso{background:#4d5a8f}
+.estn-desc{display:block;width:16px;text-align:center;color:#8fa0ee;font-size:16px;line-height:32px}
+.estn-cd.rested{color:#8fa0ee}
+
+.add{white-space:nowrap}
+@media (max-width:400px){.restbtn:not(.on) #restbtnTxt{display:none}.restbtn:not(.on){padding:6px 9px}}

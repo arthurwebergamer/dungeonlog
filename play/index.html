@@ -134,7 +134,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=424">
+<link rel="stylesheet" href="style.css?v=427">
 <script>
 // A abertura so sai quando (1) a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado (sair antes mostrava um flash
 // cinza vazio e depois a tela de login por baixo, visto em video de teste) E (2) quem ja tinha sessao neste aparelho teve login confirmado e o
@@ -428,7 +428,7 @@ html{background:var(--bsBg,#282828)}
         <div class="ttitle" id="hoje">Tarefas de hoje</div>
         <div class="tcount" id="count">0 de 0 concluídas</div>
       </div>
-      <button class="add" id="addbtn" data-i18n="jogo.addTarefa">+ Adicionar</button>
+      <div class="theadAcoes"><button class="restbtn" id="restbtn" type="button">&#9790; <span id="restbtnTxt">Descansar</span></button><button class="add" id="addbtn" data-i18n="jogo.addTarefa">+ Adicionar</button></div>
     </div>
     <div class="cattabs" id="catTabsRow"></div>
     <div class="list" id="list"></div>
@@ -2087,6 +2087,23 @@ function chaveConta(chaveBase){
 }
 window.chaveConta = chaveConta;
 
+// ---------- DIA DE DESCANSO ----------
+// Lista de datas ISO em que o jogador marcou "descansar". Dia de descanso e' neutro: sem dano,
+// sem "monstro escapou", sem XP/moedas, sequencia congelada (nao sobe nem zera), fora da taxa.
+const CHAVE_DESCANSO = 'questlog.descanso.v1';
+function descansoLer(){
+  try { const d = JSON.parse(localStorage.getItem(window.chaveConta(CHAVE_DESCANSO))); return Array.isArray(d) ? d : []; }
+  catch(e){ return []; }
+}
+window.diaDescansando = function(iso){ return descansoLer().includes(iso || isoAtual()); };
+window.definirDescanso = function(iso, ligado){
+  iso = iso || isoAtual();
+  let l = descansoLer().filter(d => d !== iso);
+  if (ligado) l.push(iso);
+  l = l.sort().slice(-400);
+  try { localStorage.setItem(window.chaveConta(CHAVE_DESCANSO), JSON.stringify(l)); } catch(e){}
+};
+
 // FIX (item novo, bug relatado pelo usuario: contagem de dias/historico/
 // atributos/conquistas resetando toda vez que o app roda numa origem
 // nova -- ex: preview deploy novo do Cloudflare Pages -- mesmo com a
@@ -2108,6 +2125,7 @@ const CHAVES_SECUNDARIAS_CONTA = [
   'questlog.conquistasResgatadas.v1',
   'questlog.conquistasVistasV2.v1',
   'questlog.dia.v1',
+  'questlog.descanso.v1', // dias de descanso (lista de datas ISO)
   'questlog.estagioCerimoniaMostrada.v1', // sem isso a flag sumia ao relogar -> tema/estagio dessincronizados
   'questlog.hist.v1',
   'questlog.hpMonstro.v1',
@@ -3486,6 +3504,50 @@ function atualizarSeloEstagio(){
   el.style.display = '';
 }
 window.atualizarSeloEstagio = atualizarSeloEstagio;
+
+// ---------- DIA DE DESCANSO: botao, confirmacao e estado visual ----------
+function atualizarDescansoUI(){
+  const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
+  const desc = window.diaDescansando();
+  const btn = document.getElementById('restbtn'), txt = document.getElementById('restbtnTxt');
+  if (btn){
+    btn.classList.toggle('on', desc);
+    btn.disabled = !desc && (typeof monstroJaCaiu === 'function' && monstroJaCaiu());
+    btn.hidden = !desc && (typeof monstroJaCaiu === 'function' && monstroJaCaiu());
+  }
+  if (txt) txt.textContent = desc ? (en ? 'Cancel rest' : 'Cancelar descanso') : (en ? 'Rest' : 'Descansar');
+  document.body.classList.toggle('diaDescanso', desc);
+  const sub = document.getElementById('count');
+  if (desc && sub) sub.textContent = en ? 'Resting today — progress protected' : 'Descansando hoje — progresso protegido';
+}
+window.atualizarDescansoUI = atualizarDescansoUI;
+(function(){
+  const getOv = () => document.getElementById('restOverlay');
+  const fechar = () => { const o = getOv(); if (o) o.classList.remove('on'); };
+  const abrir = () => {
+    const en = typeof idiomaApp === 'function' && idiomaApp() === 'en';
+    document.getElementById('restTitulo').textContent = en ? 'Rest today?' : 'Descansar hoje?';
+    document.getElementById('restLista').innerHTML = (en
+      ? ['No damage and no "You fell" screen', 'Your streak freezes — it does not reset', 'Today earns no XP or coins', 'You can cancel anytime']
+      : ['Sem perda de vida nem "Você caiu"', 'A sequência fica congelada, não zera', 'Hoje não rende XP nem moedas', 'Dá pra cancelar a qualquer momento'])
+      .map(t => '<li>' + t + '</li>').join('');
+    document.getElementById('restOk').textContent = en ? 'Rest today' : 'Descansar hoje';
+    document.getElementById('restNao').textContent = en ? 'Cancel' : 'Cancelar';
+    const o = getOv(); if (o) o.classList.add('on');
+  };
+  const btn = document.getElementById('restbtn');
+  if (btn) btn.onclick = function(){
+    if (window.diaDescansando()){ window.definirDescanso(null, false); render(); return; }
+    abrir();
+  };
+  // os elementos do overlay vivem mais abaixo no arquivo: liga os cliques por delegacao
+  document.addEventListener('click', function(e){
+    const t = e.target;
+    if (!t || !t.closest) return;
+    if (t.closest('#restOk')){ window.definirDescanso(null, true); fechar(); render(); }
+    else if (t.closest('#restNao') || t.closest('#restFechar') || t.id === 'restOverlay') fechar();
+  });
+})();
 
 // 0 a 1 -- quanto falta pro PROXIMO estagio. No estagio 4 (ultimo, sem
 // proxima meta) retorna 1 (barra cheia) -- ver renderEstagioBar().
@@ -5489,6 +5551,7 @@ function render(){
   }
 
   document.getElementById('hoje').textContent = (idiomaApp() === 'en' ? 'Tasks for ' : 'Tarefas de ') + nomeDiaLocal(diaDaSemana());
+  try { atualizarDescansoUI(); } catch(e){}
 
   if (doDia.length === 0){
     lista.innerHTML = '<div class="empty">' + monstroDoDia().nome + (idiomaApp() === 'en' ? ' is lurking.<br>Add tasks to face it.' : ' está à espreita.<br>Adicione tarefas para encarar.') + '</div>';
@@ -5654,6 +5717,7 @@ function render(){
   document.getElementById('count').textContent = idiomaApp() === 'en'
     ? (feitas + ' of ' + total + ' completed')
     : (feitas + ' de ' + total + ' concluídas');
+  try { if (window.diaDescansando()) atualizarDescansoUI(); } catch(e){}
 
   // vida do monstro: contador persistido (modulo separado, no fim do
   // arquivo), NAO recalculado da lista ao vivo -- excluir tarefa nao pode
@@ -6295,6 +6359,7 @@ function alternar(i){
   // logo abaixo e nao entra aqui.
   const metaGuarda = (t.meta && t.meta > 1) ? Math.round(t.meta) : 1;
   if (metaGuarda <= 1 && feitaHoje(t)) return false;
+  if (window.diaDescansando()) window.definirDescanso(null, false);   // concluir tarefa cancela o descanso do dia
 
   const meta = (t.meta && t.meta > 1) ? Math.round(t.meta) : 1;
 
@@ -7346,8 +7411,8 @@ function estStreakAtual(hist){
   let cursor = isoAtual();
   if (!porData.has(cursor)) cursor = isoDe(new Date(new Date(cursor + 'T12:00:00').getTime() - 86400000));
   let streak = 0;
-  while (porData.get(cursor) === 'vitoria'){
-    streak++;
+  while (porData.get(cursor) === 'vitoria' || porData.get(cursor) === 'descanso'){
+    if (porData.get(cursor) === 'vitoria') streak++;
     cursor = isoDe(new Date(new Date(cursor + 'T12:00:00').getTime() - 86400000));
   }
   return streak;
@@ -7358,6 +7423,7 @@ function estRecorde(hist){
   let atual = 0, melhor = 0, anterior = null;
   ord.forEach(h => {
     const seguido = anterior !== null && diffDias(h.data, anterior) === 1;
+    if (h.resultado === 'descanso'){ anterior = h.data; return; }   // congela: nao soma nem zera
     if (h.resultado === 'vitoria'){
       atual = seguido ? atual + 1 : 1;
       if (atual > melhor) melhor = atual;
@@ -7657,6 +7723,8 @@ function preencherTileDia(tile, resultado, dia, iso){
     tocha.className = 'est-tocha est-tocha-estatica';
     tocha.setAttribute('aria-hidden', 'true');
     tile.appendChild(tocha);
+  } else if (resultado === 'descanso'){
+    tile.classList.add('est-tile-descanso');
   } else if (resultado === 'fuga'){
     tile.classList.add('est-tile-fuga');
     const tocha = document.createElement('div');
@@ -7754,6 +7822,7 @@ function renderHistoricoAno(hist, ano){
         // mesmas cores do Mes/Semana (.est-tile-vitoria marrom / .est-tile-fuga escuro) e da legenda
         if (resultado === 'vitoria') dia.classList.add('est-anodia-vitoria');
         else if (resultado === 'fuga') dia.classList.add('est-anodia-fuga');
+        else if (resultado === 'descanso') dia.classList.add('est-anodia-descanso');
       }
       dias.appendChild(dia);
     }
@@ -7799,6 +7868,7 @@ function renderHistoricoConteudo(hist, ano, mes){
 function estHistComHojeAoVivo(hoje){
   const hist = (typeof window.obterHistorico === 'function') ? window.obterHistorico() : [];
   if (hist.some(h => h.data === hoje)) return hist; // virada oficial ja registrou -- usa o real
+  if (typeof window.diaDescansando === 'function' && window.diaDescansando(hoje)) return hist.concat([{ data: hoje, resultado: 'descanso', monstroId: null, tarefas: 0 }]);
   if (typeof tarefas === 'undefined' || typeof ehDeHoje !== 'function' || typeof feitaHoje !== 'function') return hist;
 
   const doDia = tarefas.filter(ehDeHoje);
@@ -7972,6 +8042,7 @@ function renderEstN(hist, hoje, streak, recorde, bloqueadoPro){
     if (r === 'vitoria'){ v++; c += ' won'; m = tocha(false); }
     else if (r === 'fuga'){ f++; c += ' fled'; m = tocha(true); }
     else if (r === 'sem_tarefa') sT++;
+    else if (r === 'descanso') c += ' rested';
     if (d === hojeN) c += ' today';
     cel += '<div class="' + c + '"><div class="estn-cdm">' + m + '</div><span>' + d + '</span></div>';
   }
@@ -7992,7 +8063,8 @@ function renderEstN(hist, hoje, streak, recorde, bloqueadoPro){
     const dow = new Date(iso + 'T12:00:00').getDay();
     if (r === 'vitoria') venc++;
     let mk;
-    if (r === 'vitoria') mk = '<span class="est-tocha estn-t"></span>';
+    if (r === 'descanso') mk = '<span class="estn-desc">&#9790;</span>';
+    else if (r === 'vitoria') mk = '<span class="est-tocha estn-t"></span>';
     else if (r === 'fuga') mk = '<span class="est-tocha estn-t est-tocha-apagada est-tocha-estatica"></span>';
     else if (i === 0) mk = '<span class="estn-hoje"></span>';
     else mk = '<span class="estn-vazio"></span>';
@@ -10399,6 +10471,16 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
      Nao altera nenhum handler: espelha a classe .on por MutationObserver.
      ===================================================================== -->
 
+<div class="edov" id="restOverlay">
+  <div class="edsheet" id="restSheet">
+    <button type="button" class="edfechar" id="restFechar" aria-label="Fechar">&#215;</button>
+    <div class="edpuxador"></div>
+    <div class="edtitulo" id="restTitulo">Descansar hoje?</div>
+    <ul class="restLista" id="restLista"></ul>
+    <button type="button" class="restOk" id="restOk">Descansar hoje</button>
+    <button type="button" class="restNao" id="restNao">Cancelar</button>
+  </div>
+</div>
 <div class="edov" id="addOverlay">
   <div class="edsheet" id="addSheet">
     <button type="button" class="edfechar" id="addFechar" aria-label="Fechar">&#215;</button>
@@ -10585,7 +10667,8 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     // fuso horario, data do aparelho corrigida). So re-sincroniza: nunca pune.
     if (ultimoDia > hoje){ ultimoDia = hoje; gravar(); return; }
 
-    const largadas = pendentesEm(ultimoDia);
+    const descansou = typeof window.diaDescansando === 'function' && window.diaDescansando(ultimoDia);   // dia de descanso: nada e' perdido
+    const largadas = descansou ? [] : pendentesEm(ultimoDia);
     const diaVirada = ultimoDia;   // guarda ANTES do reassign abaixo -- e o dia que fechou, nao "hoje"
     const danoBruto = largadas.reduce((s, t) =>
       s + ECO.danoPorTarefa * (typeof multDif === 'function' ? multDif(difDe(t)) : 1), 0);
@@ -10627,14 +10710,14 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     // return antes desta linha) -- e so roda uma vez por data, porque
     // ultimoDia e atualizado e persistido logo em seguida.
     if (typeof window.registrarHistorico === 'function'){
-      window.registrarHistorico(ultimoDia, tarefasEm(ultimoDia).length, largadas.length);
+      window.registrarHistorico(ultimoDia, tarefasEm(ultimoDia).length, largadas.length, descansou);
     } else {
       // BUG (streak sumia): no boot, verificarVirada() roda ANTES do modulo
       // Historico (fim do arquivo) existir -- o registro era descartado em
       // silencio e o dia fechado nunca entrava no historico (sequencia zerava
       // sempre que o app abria so no dia seguinte). Enfileira; o modulo
       // Historico drena a fila assim que registrarHistorico existir.
-      (window._histPendentes = window._histPendentes || []).push([ultimoDia, tarefasEm(ultimoDia).length, largadas.length]);
+      (window._histPendentes = window._histPendentes || []).push([ultimoDia, tarefasEm(ultimoDia).length, largadas.length, descansou]);
     }
 
     // DIAS PULADOS (o app nao foi aberto): antes ficavam sem registro nenhum --
@@ -10645,9 +10728,10 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     try {
       let d = isoDe(new Date(new Date(diaVirada + 'T12:00:00').getTime() + 86400000));
       for (let n = 0; d < hoje && n < 366; n++){
-        const totalD = tarefasEm(d).length, largD = pendentesEm(d).length;
-        if (typeof window.registrarHistorico === 'function') window.registrarHistorico(d, totalD, largD);
-        else (window._histPendentes = window._histPendentes || []).push([d, totalD, largD]);
+        const descD = typeof window.diaDescansando === 'function' && window.diaDescansando(d);
+        const totalD = tarefasEm(d).length, largD = descD ? 0 : pendentesEm(d).length;
+        if (typeof window.registrarHistorico === 'function') window.registrarHistorico(d, totalD, largD, descD);
+        else (window._histPendentes = window._histPendentes || []).push([d, totalD, largD, descD]);
         d = isoDe(new Date(new Date(d + 'T12:00:00').getTime() + 86400000));
       }
     } catch(e){}
@@ -10656,7 +10740,7 @@ window.estoqueLoja = () => lojaEstoque.map((s, i) => ({slot: i, nome: item(s.id)
     // na virada. Credita as moedas do monstro (sem bau: ele e do dia corrente) + cura de vitoria.
     try {
       const totalDiaVirada = tarefasEm(diaVirada).length;
-      if (largadas.length === 0 && totalDiaVirada > 0 && derrotadoEm !== diaVirada && typeof recompensaVitoria === 'function'){
+      if (!descansou && largadas.length === 0 && totalDiaVirada > 0 && derrotadoEm !== diaVirada && typeof recompensaVitoria === 'function'){
         moedas += recompensaVitoria(totalDiaVirada);
         if (typeof salvar === 'function') salvar();
         curar(Math.round(vidaMax() * ECO.curaVitoria));
@@ -14657,12 +14741,13 @@ window.mostrarNivelUp = function(nivel, aoFechar){
 
   // chamada pelo modulo Vida (ver comentario em verificarVirada) -- o
   // proprio modulo Vida ja garante que isto so roda uma vez por data real
-  function registrarHistorico(iso, totalTarefas, largadas){
+  function registrarHistorico(iso, totalTarefas, largadas, descanso){
     if (!iso) return;
     if (historico.some(h => h.data === iso)) return;   // defesa extra contra duplicata
 
     let resultado;
-    if (totalTarefas === 0) resultado = 'sem_tarefa';
+    if (descanso) resultado = 'descanso';
+    else if (totalTarefas === 0) resultado = 'sem_tarefa';
     else if (largadas > 0) resultado = 'fuga';
     else resultado = 'vitoria';
 
@@ -14681,7 +14766,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
   // precisar reabrir este modulo. Retorna copia -- quem consome nao pode
   // mutar o array real por acidente.
   window.registrarHistorico = registrarHistorico;
-  (window._histPendentes || []).forEach(a => registrarHistorico(a[0], a[1], a[2]));
+  (window._histPendentes || []).forEach(a => registrarHistorico(a[0], a[1], a[2], a[3]));
   window._histPendentes = [];
   // RECUPERACAO (bug da sequencia que sumia): se ONTEM nao tem registro mas
   // as tarefas de ontem estao todas feitas com feitaEm === ontem, o dia foi
@@ -15066,6 +15151,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     let atual = 0, melhor = 0, anterior = null;
     ord.forEach(h => {
       const seguidoDoAnterior = anterior !== null && diffDias(h.data, anterior) === 1;
+      if (h.resultado === 'descanso'){ anterior = h.data; return; }   // congela: nao soma nem zera
       if (h.resultado === 'vitoria'){
         atual = seguidoDoAnterior ? atual + 1 : 1;
         if (atual > melhor) melhor = atual;

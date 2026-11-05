@@ -7249,3 +7249,6 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 /* uma linha so entre as abas e o conteudo */
 #viewEstatisticas[data-tab="semana"] #estCard7Dias,#viewEstatisticas[data-tab="ano"] #estHistCard{border-top:0 !important}
 #viewEstatisticas[data-tab="mes"] .est-statsrow{border-top:0 !important}#viewEstatisticas[data-tab="mes"] .est-statsrow>.est-card{border-top:0 !important}
+
+/* atributos desligados: some o painel de atributos do Perfil */
+.anelAtr,.planoAtr,.atributospontos{display:none !important}

@@ -7256,7 +7256,8 @@ body.tourAberto .edov.on .edsheet{opacity:1}
 /* selo "Estagio N em X tarefas" no topo da arena */
 .estagioSelo{position:absolute;left:50%;top:10px;transform:translateX(-50%);z-index:6;pointer-events:none;
   background:rgba(20,20,20,.72);border-radius:999px;padding:6px 12px;display:flex;gap:6px;align-items:center;line-height:1;white-space:nowrap;
-  font:600 11px 'Outfit',sans-serif;color:#eee}
+  font:600 11px 'Outfit',sans-serif;color:#eee;opacity:0;transition:opacity .45s ease}
+.estagioSelo.on{opacity:1}
 .estagioSelo b{font:400 11px 'Silkscreen',monospace;color:#fff}
 
 /* ---- dia de descanso ---- */
@@ -7281,3 +7282,6 @@ body.diaDescanso .list{opacity:.45}
 
 .add{white-space:nowrap}
 @media (max-width:400px){.restbtn:not(.on) #restbtnTxt{display:none}.restbtn:not(.on){padding:6px 9px}}
+
+/* barra flutuante de estagio acima da nav removida: o progresso aparece no selo temporario da arena */
+#estFlut{display:none !important}

@@ -4995,7 +4995,7 @@
   background:url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2012%2014%22%20shape-rendering=%22crispEdges%22%3E%3Crect%20x=%223%22%20y=%220%22%20width=%226%22%20height=%221%22%20fill=%22%232a2118%22/%3E%3Crect%20x=%222%22%20y=%221%22%20width=%222%22%20height=%226%22%20fill=%22%232a2118%22/%3E%3Crect%20x=%228%22%20y=%221%22%20width=%222%22%20height=%226%22%20fill=%22%232a2118%22/%3E%3Crect%20x=%224%22%20y=%221%22%20width=%224%22%20height=%221%22%20fill=%22%23d5d9e0%22/%3E%3Crect%20x=%223%22%20y=%222%22%20width=%221%22%20height=%225%22%20fill=%22%23b8bcc4%22/%3E%3Crect%20x=%228%22%20y=%222%22%20width=%221%22%20height=%225%22%20fill=%22%238b909a%22/%3E%3Crect%20x=%220%22%20y=%227%22%20width=%2212%22%20height=%227%22%20fill=%22%232a2118%22/%3E%3Crect%20x=%221%22%20y=%228%22%20width=%2210%22%20height=%225%22%20fill=%22%23e8a92a%22/%3E%3Crect%20x=%221%22%20y=%228%22%20width=%2210%22%20height=%221%22%20fill=%22%23ffe27a%22/%3E%3Crect%20x=%221%22%20y=%2212%22%20width=%2210%22%20height=%221%22%20fill=%22%23b9831f%22/%3E%3Crect%20x=%225%22%20y=%229%22%20width=%222%22%20height=%222%22%20fill=%22%232a2118%22/%3E%3Crect%20x=%225.5%22%20y=%2211%22%20width=%221%22%20height=%221%22%20fill=%22%232a2118%22/%3E%3C/svg%3E") center/contain no-repeat;image-rendering:pixelated;pointer-events:none;
   filter:drop-shadow(0 1px 1px rgba(0,0,0,.6))}
 .bauArena .dica{
-  position:absolute; bottom:100%; left:50%; transform:translateX(-50%);
+  position:absolute; bottom:100%; left:0; transform:none;
   white-space:nowrap; background:#000; color:#fff; padding:3px 8px;
   border-radius:4px; font-size:12px; opacity:0; pointer-events:none; transition:opacity .15s;
 }

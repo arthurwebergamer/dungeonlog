@@ -190,6 +190,42 @@
   });
 })();
 
+/* APARECER AO ROLAR: os blocos entram com um leve "pulinho" quando chegam na tela (o CSS só age sem "reduzir movimento") */
+(function () {
+  'use strict';
+  if (!('IntersectionObserver' in window)) return;
+  if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var grupos = ['section h2', '.sub', '.steps .card', '.features .feat', '.who .card', '.faq details', '.lp-card', '.bst-row img', '.bst-cap', '.final .fart', '.final .ftxt > *', '.gallery .phone', '.hero + .block .lp-card'];
+  var els = [];
+  grupos.forEach(function (sel) {
+    [].slice.call(document.querySelectorAll(sel)).forEach(function (el, i) {
+      if (el.classList.contains('rv') || el.closest('.hero')) return;
+      el.classList.add('rv');
+      el.style.setProperty('--d', ((i % 6) * 0.09).toFixed(2) + 's');
+      els.push(el);
+    });
+  });
+  var io = new IntersectionObserver(function (ents) {
+    ents.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+  els.forEach(function (el) { io.observe(el); });
+})();
+
+/* topo: as camadas da arte acompanham o mouse de leve (só com mouse) */
+(function () {
+  'use strict';
+  var art = document.querySelector('.hero .art');
+  if (!art || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
+  var hero = document.querySelector('.hero');
+  hero.addEventListener('pointermove', function (e) {
+    if (e.pointerType !== 'mouse') return;
+    var r = hero.getBoundingClientRect();
+    art.style.setProperty('--mx', (((e.clientX - r.left) / r.width) - 0.5) * -2);
+    art.style.setProperty('--my', (((e.clientY - r.top) / r.height) - 0.5) * -2);
+  }, { passive: true });
+  hero.addEventListener('pointerleave', function () { art.style.setProperty('--mx', 0); art.style.setProperty('--my', 0); });
+})();
+
 /* Origem da visita: se a URL trouxer ?utm_source=<origem>, repassa ao link da Google Play como "referrer",
    para o Play Console mostrar de onde veio a instalação. Nada é guardado nem enviado por este site. */
 (function () {

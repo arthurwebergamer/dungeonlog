@@ -20361,7 +20361,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         const c = a.cloneNode(true); c.classList.add('gv-trail'); c.removeAttribute('id');
         c.style.transform = 'rotate(' + (a0 + (a1 - a0) * (i + 1) / n) + 'deg)'; c.style.opacity = '0';
         a.parentNode.insertBefore(c, a);
-        const an = c.animate([{ opacity: .65 }, { opacity: 0 }], { duration: 220 + i * 20, delay: ms * i / n, fill: 'both', easing: 'steps(3)' });
+        const an = c.animate([{ opacity: .65 }, { opacity: 0 }], { duration: 220 + i * 20, delay: ms * (i + 1) / n, fill: 'both', easing: 'steps(3)' });
         an.finished.then(() => c.remove()).catch(() => c.remove());
       }
     };

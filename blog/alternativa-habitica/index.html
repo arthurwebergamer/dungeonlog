@@ -23,30 +23,31 @@
 <link rel="icon" href="/play/icon-192.png">
 <link rel="apple-touch-icon" href="/play/icon-192.png">
 <link rel="stylesheet" href="/fonts/fonts2.css">
-<link rel="stylesheet" href="/legal.css?v=5">
+<link rel="stylesheet" href="/fonts/patrick-hand.css">
+<link rel="stylesheet" href="/legal.css?v=6">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Alternativa ao Habitica: Dungeonlog, um RPG de tarefas mais simples", "description": "Dungeonlog é um RPG de tarefas com um monstro por dia, mais simples que o Habitica. Veja as diferenças de uso, preço e recursos.", "datePublished": "2026-10-31", "dateModified": "2026-10-31", "inLanguage": "pt-BR", "mainEntityOfPage": "https://dungeonlog.weberlabs.com.br/blog/alternativa-habitica/", "image": "https://dungeonlog.weberlabs.com.br/blog/img/capa-alternativa-habitica.jpg", "author": {"@type": "Organization", "name": "Weberlabs"}, "publisher": {"@type": "Organization", "name": "Weberlabs"}}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Início", "item": "https://dungeonlog.weberlabs.com.br/"}, {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://dungeonlog.weberlabs.com.br/blog/"}, {"@type": "ListItem", "position": 3, "name": "Alternativa ao Habitica: Dungeonlog, um RPG de tarefas mais simples", "item": "https://dungeonlog.weberlabs.com.br/blog/alternativa-habitica/"}]}</script>
 <style>
 .corpo img{cursor:zoom-in}
-.lb{position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.92);touch-action:pan-y}
+.lb{position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;background:rgba(35,26,18,.92);touch-action:pan-y}
 .lb.on{display:flex}
 .lb img{max-width:92vw;max-height:88vh;width:auto;height:auto;object-fit:contain;border-radius:6px;cursor:default;user-select:none}
-.lb button{position:absolute;border:0;background:rgba(40,40,40,.85);color:#fff;font:inherit;font-size:1.6rem;line-height:1;width:48px;height:48px;border-radius:50%;cursor:pointer}
-.lb button:hover{background:#555}
+.lb button{position:absolute;border:3px solid var(--ink);background:var(--paper);color:var(--ink);font:inherit;font-size:1.6rem;line-height:1;width:48px;height:48px;border-radius:50%;cursor:pointer}
+.lb button:hover{background:var(--gold)}
 .lb .lb-x{top:14px;right:14px}
 .lb .lb-p{left:12px;top:50%;transform:translateY(-50%)}
 .lb .lb-n{right:12px;top:50%;transform:translateY(-50%)}
-.lb .lb-c{position:absolute;top:22px;left:50%;transform:translateX(-50%);color:#ddd;font-size:.95rem}
+.lb .lb-c{position:absolute;top:22px;left:50%;transform:translateX(-50%);color:var(--paper);font-size:.95rem}
 .lb.um .lb-p,.lb.um .lb-n,.lb.um .lb-c{display:none}
 .bnav{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0}
-.bnav a{display:block;box-sizing:border-box;min-width:0;padding:10px 16px;border:1px solid rgba(250,250,250,.14);border-radius:8px;background:#323232;color:var(--text);text-decoration:none;line-height:1.35;transition:background .15s,border-color .15s,color .15s}
-.bnav a:hover{background:#3d3a35;border-color:#F2A65A;color:#FFE08A}
-.bnav a:focus-visible{outline:2px solid #FFE08A;outline-offset:2px}
+.bnav a{display:block;box-sizing:border-box;min-width:0;padding:10px 16px;border:3px solid var(--ink);border-radius:14px 8px 14px 8px;background:var(--card);box-shadow:3px 4px 0 var(--ink);color:var(--ink);text-decoration:none;line-height:1.35;transition:background .15s,border-color .15s,color .15s}
+.bnav a:hover{background:var(--paper2);transform:translate(-1px,-1px)}
+.bnav a:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
 .bnav .bn-v{grid-column:1/-1;justify-self:start;font-weight:600}
 .bnav .bn-p{grid-column:1}
 .bnav .bn-n{grid-column:2;text-align:right}
 .bnav small{display:block;margin-bottom:2px;color:var(--dim);font-size:.8rem;letter-spacing:.02em}
-.bnav a:hover small{color:#F2A65A}
+.bnav a:hover small{color:var(--blue)}
 .bnav .bn-p,.bnav .bn-n{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 @media (max-width:560px){.bnav{grid-template-columns:1fr}.bnav .bn-p,.bnav .bn-n{grid-column:1}.bnav .bn-n{text-align:left}}
 </style>

@@ -22,7 +22,7 @@
 <link rel="apple-touch-icon" href="/play/icon-192.png">
 <link rel="stylesheet" href="/fonts/fonts2.css">
 <link rel="stylesheet" href="/fonts/patrick-hand.css">
-<link rel="stylesheet" href="/legal.css?v=7">
+<link rel="stylesheet" href="/legal.css?v=8">
 {{JSONLD}}
 <style>
 .corpo img{cursor:zoom-in}
@@ -36,15 +36,14 @@
 .lb .lb-n{right:12px;top:50%;transform:translateY(-50%)}
 .lb .lb-c{position:absolute;top:22px;left:50%;transform:translateX(-50%);color:var(--paper);font-size:.95rem}
 .lb.um .lb-p,.lb.um .lb-n,.lb.um .lb-c{display:none}
-.bnav{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0}
-.bnav a{display:block;box-sizing:border-box;min-width:0;padding:10px 16px;border:3px solid var(--ink);border-radius:14px 8px 14px 8px;background:var(--card);box-shadow:3px 4px 0 var(--ink);color:var(--ink);text-decoration:none;line-height:1.35;transition:background .15s,border-color .15s,color .15s}
-.bnav a:hover{background:var(--paper2);transform:translate(-1px,-1px)}
+.bnav{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:48px 0 8px;padding-top:20px;border-top:2px dashed rgba(43,35,32,.3)}
+.bnav .bn-label{grid-column:1/-1;font-family:var(--hand);font-size:1.6rem;line-height:1.1;color:var(--ink)}
+.bnav a{display:block;box-sizing:border-box;min-width:0;padding:12px 16px;border:2px solid rgba(43,35,32,.4);border-radius:14px;background:var(--card);color:var(--ink);text-decoration:none;line-height:1.35;transition:border-color .15s,background .15s,transform .2s}
+.bnav a:hover{border-color:var(--ink);background:var(--paper2);transform:translateY(-2px)}
 .bnav a:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
-.bnav .bn-v{grid-column:1/-1;justify-self:start;font-weight:600}
 .bnav .bn-p{grid-column:1}
 .bnav .bn-n{grid-column:2;text-align:right}
 .bnav small{display:block;margin-bottom:2px;color:var(--dim);font-size:.8rem;letter-spacing:.02em}
-.bnav a:hover small{color:var(--blue)}
 .bnav .bn-p,.bnav .bn-n{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 @media (max-width:560px){.bnav{grid-template-columns:1fr}.bnav .bn-p,.bnav .bn-n{grid-column:1}.bnav .bn-n{text-align:left}}
 </style>
@@ -63,7 +62,6 @@
   <p class="updated"><a href="{{HOMEURL}}">{{HOME}}</a> · <a href="{{BLOGURL}}">Blog</a></p>
   <h1>{{TITULO}}</h1>
   <p class="updated"><time datetime="{{DATA}}">{{DATA_BR}}</time></p>
-{{NAV}}
 {{CAPA}}
 
 <div class="corpo">

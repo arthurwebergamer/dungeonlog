@@ -36,13 +36,13 @@ IDIOMAS = {
                termst='Termos de Uso', delete='/delete-account', deletet='Excluir Conta', contact='Contato', social='Redes',
                email='E-mail', copy='© 2026 Weberlabs. Todos os direitos reservados.',
                know='Conheça o Dungeonlog', play='Baixe o Dungeonlog no Google Play',
-               idxdesc='Artigos sobre rotina, tarefas e hábitos com RPG, e novidades do Dungeonlog.', t_viewer='Visualizador de imagens', t_close='Fechar', t_prev='Anterior', t_next='Próxima', ttl='TikTok do Dungeonlog', igl='Instagram do Dungeonlog', ultimo='Último post do blog', nav_aria='Navegação do blog', voltar='Voltar ao blog', anterior='Post anterior', proximo='Próximo post', breve='Em breve.', data=lambda d: f'{d[8:]}/{d[5:7]}/{d[:4]}'),
+               idxdesc='Artigos sobre rotina, tarefas e hábitos com RPG, e novidades do Dungeonlog.', t_viewer='Visualizador de imagens', t_close='Fechar', t_prev='Anterior', t_next='Próxima', ttl='TikTok do Dungeonlog', igl='Instagram do Dungeonlog', ultimo='Último post do blog', nav_aria='Navegação do blog', voltar='Voltar ao blog', seguir='Continue lendo', anterior='Post anterior', proximo='Próximo post', breve='Em breve.', data=lambda d: f'{d[8:]}/{d[5:7]}/{d[:4]}'),
     'en': dict(lang='en', ogloc='en_US', ogimg='og-en.jpg', pre='/en/blog/', home='/en/', homet='Home',
                nav='Navigation', legal='Legal', priv='/en/privacy', privt='Privacy Policy', terms='/en/terms',
                termst='Terms of Use', delete='/en/delete-account', deletet='Delete Account', contact='Contact', social='Social',
                email='Email', copy='© 2026 Weberlabs. All rights reserved.',
                know='Meet Dungeonlog', play='Get Dungeonlog on Google Play',
-               idxdesc='Articles on routine, tasks and habits with RPG, and Dungeonlog news.', t_viewer='Image viewer', t_close='Close', t_prev='Previous', t_next='Next', ttl='Dungeonlog on TikTok', igl='Dungeonlog on Instagram', ultimo='Latest blog post', nav_aria='Blog navigation', voltar='Back to blog', anterior='Previous post', proximo='Next post', breve='Coming soon.', data=lambda d: d),
+               idxdesc='Articles on routine, tasks and habits with RPG, and Dungeonlog news.', t_viewer='Image viewer', t_close='Close', t_prev='Previous', t_next='Next', ttl='Dungeonlog on TikTok', igl='Dungeonlog on Instagram', ultimo='Latest blog post', nav_aria='Blog navigation', voltar='Back to blog', seguir='Keep reading', anterior='Previous post', proximo='Next post', breve='Coming soon.', data=lambda d: d),
 }
 LOC = {'pt': 'pt-BR', 'en': 'en-US'}
 
@@ -92,9 +92,10 @@ def seletor(i, a, pub):
             f'<a href="{alvo["en"]}"{cl("en")} hreflang="en">EN</a>')
 
 def navegacao(i, ant, prox):
-    """Bloco <nav> com Voltar ao blog e vizinhos (so os que existem)."""
+    """Bloco <nav> "Continue lendo" so com os vizinhos que existem (sem Voltar ao blog: o caminho Inicio / Blog do topo ja serve)."""
     t = IDIOMAS[i]; e = lambda s: html.escape(s, quote=True)
-    L = [f'<a class="bn-v" href="{t["pre"]}">&larr; {t["voltar"]}</a>']
+    if not ant and not prox: return ''
+    L = [f'<span class="bn-label">{t["seguir"]}</span>']
     if ant: L.append(f'<a class="bn-p" href="{t["pre"]}{ant["slug"]}/" rel="prev"><small>&larr; {t["anterior"]}</small>{e(ant["titulo"])}</a>')
     if prox: L.append(f'<a class="bn-n" href="{t["pre"]}{prox["slug"]}/" rel="next"><small>{t["proximo"]} &rarr;</small>{e(prox["titulo"])}</a>')
     return f'<nav class="bnav" aria-label="{t["nav_aria"]}">' + ''.join(L) + '</nav>'

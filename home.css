@@ -68,6 +68,8 @@ body.menu-open .topbar{ position:fixed; left:0; right:0; z-index:50; background:
 .hero .art{ position:relative; justify-self:center; width:min(100%,560px); aspect-ratio:1080/1260; }
 .hero .art .ly{ position:absolute; display:block; height:auto; max-width:none; will-change:transform;
   translate:calc(var(--mx,0) * var(--dp,0px)) calc(var(--my,0) * var(--dp,0px)); transition:translate .35s ease-out; }
+.hero .art .ly.pm, .hero .art .ly.pb{ cursor:zoom-in; }
+.hero .art .ly.pm:focus-visible, .hero .art .ly.pb:focus-visible{ outline:3px solid var(--blue); outline-offset:4px; border-radius:30px; }
 .hero .sparkle{ position:absolute; color:var(--gold); font-size:2.2rem; line-height:1; pointer-events:none; }
 .hero .sparkle.a{ top:6%; left:4%; } .hero .sparkle.b{ top:2%; right:8%; font-size:1.6rem; } .hero .sparkle.c{ top:42%; right:-1%; font-size:1.3rem; }
 .cta{ display:flex; flex-wrap:wrap; gap:16px; margin-top:30px; align-items:center; }

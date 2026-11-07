@@ -171,6 +171,19 @@
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(i); }
     });
   });
+  // topo: clicar nos celulares da arte abre a mesma ampliação (celular da frente = 1ª tela; o de trás = loja)
+  [['.hero .art .ly.pm', 0], ['.hero .art .ly.pb', 2]].forEach(function (par) {
+    var el = document.querySelector(par[0]), alvo = phones[par[1]];
+    if (!el || !alvo) return;
+    var leg = alvo.querySelector('figcaption');
+    el.tabIndex = 0;
+    el.setAttribute('role', 'button');
+    el.setAttribute('aria-label', T.open + (leg ? leg.textContent : ''));
+    el.addEventListener('click', function () { open(par[1]); });
+    el.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(par[1]); }
+    });
+  });
   // o arrastar com o mouse já cancela o clique quando a galeria foi movida (ver bloco acima)
   g.addEventListener('click', function (e) {
     var p = e.target.closest('.phone');

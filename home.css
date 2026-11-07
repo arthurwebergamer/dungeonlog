@@ -24,7 +24,7 @@ a{ color:var(--blue); text-decoration-color:rgba(63,91,180,.4); }
 /* ---------- topo ---------- */
 .topbar{ position:relative; z-index:60; display:flex; align-items:center; justify-content:space-between; gap:16px; max-width:1240px; margin:0 auto; padding:16px 28px; }
 .topbar .brand{ display:flex; align-items:center; gap:10px; text-decoration:none; }
-.topbar .brand img{ width:40px; height:40px; border-radius:11px; border:3px solid var(--ink); box-shadow:2px 3px 0 var(--ink); }
+.topbar .brand img{ width:40px; height:40px; border-radius:11px; box-shadow:0 2px 8px rgba(43,35,32,.22); }
 .topbar .brand span{ font-family:var(--hand); font-size:2rem; line-height:1; color:var(--ink); }
 .topbar nav{ display:flex; align-items:center; gap:24px; font-size:1rem; font-weight:600; }
 .topbar nav a.lnk{ color:var(--ink); text-decoration:none; padding:4px 2px; background:linear-gradient(var(--gold),var(--gold)) no-repeat 0 94%/0 5px; transition:background-size .2s; }
@@ -33,7 +33,7 @@ a{ color:var(--blue); text-decoration-color:rgba(63,91,180,.4); }
 .lang a{ color:var(--muted); text-decoration:none; padding:3px 9px; border-radius:999px; font-weight:600; }
 .lang a.active{ color:var(--paper); background:var(--ink); }
 .lang .sep{ color:var(--dim); }
-.menu-btn{ display:none; width:46px; height:46px; margin-left:6px; padding:0; border:3px solid var(--ink); border-radius:14px; background:var(--card); box-shadow:2px 3px 0 var(--ink); align-items:center; justify-content:center; flex-direction:column; gap:5px; }
+.menu-btn{ display:none; width:46px; height:46px; margin-left:6px; padding:0; border:2px solid rgba(43,35,32,.55); border-radius:14px; background:var(--card); box-shadow:0 2px 8px rgba(43,35,32,.15); align-items:center; justify-content:center; flex-direction:column; gap:5px; }
 .menu-btn i{ display:block; width:20px; height:3px; border-radius:2px; background:var(--ink); transition:transform .2s, opacity .2s; }
 .menu-btn[aria-expanded="true"] i:nth-child(1){ transform:translateY(8px) rotate(45deg); }
 .menu-btn[aria-expanded="true"] i:nth-child(2){ opacity:0; }

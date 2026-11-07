@@ -19,7 +19,7 @@ a:hover{ text-decoration-color:var(--blue); }
 
 header.site{ display:flex; align-items:center; justify-content:space-between; padding:14px 28px; border-bottom:2px dashed rgba(43,35,32,.3); }
 header.site .brand{ display:flex; align-items:center; gap:10px; text-decoration:none; }
-header.site .brand img{ width:38px; height:38px; border-radius:10px; border:3px solid var(--ink); box-shadow:2px 3px 0 var(--ink); }
+header.site .brand img{ width:38px; height:38px; border-radius:10px; box-shadow:0 2px 8px rgba(43,35,32,.22); }
 header.site .brand span{ font-family:var(--hand); font-size:1.9rem; line-height:1; color:var(--ink); }
 .lang{ display:flex; align-items:center; gap:4px; font-size:.9rem; }
 .lang a{ color:var(--muted); text-decoration:none; padding:3px 9px; border-radius:999px; font-weight:600; }

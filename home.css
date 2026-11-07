@@ -60,7 +60,9 @@ body.menu-open .topbar{ position:fixed; left:0; right:0; z-index:50; background:
 .hero .inner{ position:relative; width:100%; max-width:1180px; margin:0 auto; display:grid; grid-template-columns:minmax(0,1.02fr) minmax(0,.98fr); gap:12px 24px; align-items:center; }
 .hero .col{ max-width:560px; }
 .hero h1{ font-size:clamp(3.1rem,6.4vw,5.6rem); line-height:1; }
-.hero h1 em{ font-style:normal; background:linear-gradient(transparent 56%, var(--gold) 56% 90%, transparent 90%); padding:0 .12em; margin:0 -.06em; -webkit-box-decoration-break:clone; box-decoration-break:clone; }
+.hero h1 em{ font-style:normal; position:relative; display:inline-block; }
+.hero h1 em::after{ content:""; position:absolute; left:-3%; right:-3%; bottom:-.12em; height:.3em;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 26' preserveAspectRatio='none'%3E%3Cpath d='M4 15 C 40 4, 92 22, 150 12 S 252 5, 296 14' fill='none' stroke='%23e9b44c' stroke-width='9' stroke-linecap='round'/%3E%3Cpath d='M14 21 C 70 15, 150 24, 280 19' fill='none' stroke='%23f2cf7a' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat center / 100% 100%; }
 .hero .lead{ margin-top:22px; font-size:1.2rem; line-height:1.55; color:var(--ink); }
 .hero .note{ margin-top:18px; max-width:470px; color:var(--muted); font-size:.98rem; }
 .hero .art{ position:relative; justify-self:center; width:min(100%,560px); aspect-ratio:1080/1260; }
@@ -242,7 +244,7 @@ body.lb-open{ overflow:hidden; }
    ===================================================================== */
 @keyframes rise{ from{ opacity:0; transform:translateY(22px); } to{ opacity:1; transform:none; } }
 @keyframes lyIn{ from{ opacity:0; scale:.82; } to{ opacity:1; scale:1; } }
-@keyframes markDraw{ from{ background-size:0% 100%; } to{ background-size:100% 100%; } }
+@keyframes strokeDraw{ from{ clip-path:inset(0 100% 0 0); } to{ clip-path:inset(0 0 0 0); } }
 @keyframes floatB{ 0%,100%{ transform:translateY(0) rotate(0deg); } 50%{ transform:translateY(-11px) rotate(-1deg); } }
 @keyframes floatM{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-15px); } }
 @keyframes hop{ 0%,72%,100%{ transform:translateY(0) scale(1,1); } 78%{ transform:translateY(0) scale(1.05,.94); } 86%{ transform:translateY(-22px) scale(.97,1.05); } 93%{ transform:translateY(0) scale(1.05,.94); } 97%{ transform:translateY(-4px) scale(1,1); } }
@@ -258,7 +260,7 @@ body.lb-open{ overflow:hidden; }
   /* entrada do topo */
   .hero .col > *{ animation:rise .85s cubic-bezier(.2,.8,.2,1) both; }
   .hero .col > :nth-child(2){ animation-delay:.12s; } .hero .col > :nth-child(3){ animation-delay:.24s; } .hero .col > :nth-child(4){ animation-delay:.36s; }
-  .hero h1 em{ background:linear-gradient(transparent 56%, var(--gold) 56% 90%, transparent 90%) no-repeat left center / 100% 100%; animation:markDraw .9s .55s cubic-bezier(.2,.8,.2,1) both; }
+  .hero h1 em::after{ animation:strokeDraw .9s .55s cubic-bezier(.2,.8,.2,1) both; }
   /* camadas da arte: entram com "pop", depois ficam flutuando; o herói pula de vez em quando */
   .hero .art .ly{ animation:lyIn .8s cubic-bezier(.34,1.56,.64,1) both; }
   .hero .art .ly.pb{ --dp:9px; animation:lyIn .8s .05s cubic-bezier(.34,1.56,.64,1) both, floatB 7s 1s ease-in-out infinite; transform-origin:50% 90%; }

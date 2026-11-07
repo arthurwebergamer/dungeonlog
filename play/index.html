@@ -20354,6 +20354,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     const add = el => { C.arena.appendChild(el); return el; };
     X.swing = (r, ms, o) => { const a = armaEl(); return a ? X.an(a, r.map(v => ({ transform: 'rotate(' + v + 'deg)' })), ms, o) : Promise.resolve(); };
     X.trail = (a0, a1, n, ms) => {
+      return;   // rastro da arma removido: ficava feio (copias semitransparentes da lamina)
       const a = armaEl(); if (!a) return;
       n += (!LEVE && C.R >= 5) ? Math.min(2, C.R - 4) : 0;
       if (LEVE) n = Math.max(2, n - 1);

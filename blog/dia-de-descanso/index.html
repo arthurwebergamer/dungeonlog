@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dia de descanso no Dungeonlog: pause sem perder a sequência | Dungeonlog</title>
+<meta name="description" content="Como funciona o dia de descanso do Dungeonlog: sem perda de vida, com a sequência congelada, e como marcar e cancelar o descanso.">
+<link rel="canonical" href="https://dungeonlog.weberlabs.com.br/blog/dia-de-descanso/">
+<link rel="alternate" hreflang="pt-BR" href="https://dungeonlog.weberlabs.com.br/blog/dia-de-descanso/">
+<link rel="alternate" hreflang="en" href="https://dungeonlog.weberlabs.com.br/en/blog/rest-day/">
+<link rel="alternate" hreflang="x-default" href="https://dungeonlog.weberlabs.com.br/blog/dia-de-descanso/">
+<meta name="theme-color" content="#282828">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Dungeonlog">
+<meta property="og:title" content="Dia de descanso no Dungeonlog: pause sem perder a sequência">
+<meta property="og:description" content="Como funciona o dia de descanso do Dungeonlog: sem perda de vida, com a sequência congelada, e como marcar e cancelar o descanso.">
+<meta property="og:url" content="https://dungeonlog.weberlabs.com.br/blog/dia-de-descanso/">
+<meta property="og:image" content="https://dungeonlog.weberlabs.com.br/blog/img/capa-descanso.jpg">
+<meta property="og:locale" content="pt_BR">
+<meta property="article:published_time" content="2026-11-06">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://dungeonlog.weberlabs.com.br/blog/img/capa-descanso.jpg">
+<link rel="icon" href="/play/icon-192.png">
+<link rel="apple-touch-icon" href="/play/icon-192.png">
+<link rel="stylesheet" href="/fonts/fonts2.css">
+<link rel="stylesheet" href="/legal.css?v=5">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Dia de descanso no Dungeonlog: pause sem perder a sequência", "description": "Como funciona o dia de descanso do Dungeonlog: sem perda de vida, com a sequência congelada, e como marcar e cancelar o descanso.", "datePublished": "2026-11-06", "dateModified": "2026-11-06", "inLanguage": "pt-BR", "mainEntityOfPage": "https://dungeonlog.weberlabs.com.br/blog/dia-de-descanso/", "image": "https://dungeonlog.weberlabs.com.br/blog/img/capa-descanso.jpg", "author": {"@type": "Organization", "name": "Weberlabs"}, "publisher": {"@type": "Organization", "name": "Weberlabs"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Início", "item": "https://dungeonlog.weberlabs.com.br/"}, {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://dungeonlog.weberlabs.com.br/blog/"}, {"@type": "ListItem", "position": 3, "name": "Dia de descanso no Dungeonlog: pause sem perder a sequência", "item": "https://dungeonlog.weberlabs.com.br/blog/dia-de-descanso/"}]}</script>
+<style>
+.corpo img{cursor:zoom-in}
+.lb{position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.92);touch-action:pan-y}
+.lb.on{display:flex}
+.lb img{max-width:92vw;max-height:88vh;width:auto;height:auto;object-fit:contain;border-radius:6px;cursor:default;user-select:none}
+.lb button{position:absolute;border:0;background:rgba(40,40,40,.85);color:#fff;font:inherit;font-size:1.6rem;line-height:1;width:48px;height:48px;border-radius:50%;cursor:pointer}
+.lb button:hover{background:#555}
+.lb .lb-x{top:14px;right:14px}
+.lb .lb-p{left:12px;top:50%;transform:translateY(-50%)}
+.lb .lb-n{right:12px;top:50%;transform:translateY(-50%)}
+.lb .lb-c{position:absolute;top:22px;left:50%;transform:translateX(-50%);color:#ddd;font-size:.95rem}
+.lb.um .lb-p,.lb.um .lb-n,.lb.um .lb-c{display:none}
+.bnav{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0}
+.bnav a{display:block;box-sizing:border-box;min-width:0;padding:10px 16px;border:1px solid rgba(250,250,250,.14);border-radius:8px;background:#323232;color:var(--text);text-decoration:none;line-height:1.35;transition:background .15s,border-color .15s,color .15s}
+.bnav a:hover{background:#3d3a35;border-color:#F2A65A;color:#FFE08A}
+.bnav a:focus-visible{outline:2px solid #FFE08A;outline-offset:2px}
+.bnav .bn-v{grid-column:1/-1;justify-self:start;font-weight:600}
+.bnav .bn-p{grid-column:1}
+.bnav .bn-n{grid-column:2;text-align:right}
+.bnav small{display:block;margin-bottom:2px;color:var(--dim);font-size:.8rem;letter-spacing:.02em}
+.bnav a:hover small{color:#F2A65A}
+.bnav .bn-p,.bnav .bn-n{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+@media (max-width:560px){.bnav{grid-template-columns:1fr}.bnav .bn-p,.bnav .bn-n{grid-column:1}.bnav .bn-n{text-align:left}}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <a class="brand" href="/">
+    <img src="/play/icon-192.png" alt="">
+    <span>Dungeonlog</span>
+  </a>
+  <div class="hright"><div class="lang"><a href="/blog/dia-de-descanso/" class="active" hreflang="pt-BR">PT</a><span class="sep">·</span><a href="/en/blog/rest-day/" hreflang="en">EN</a></div><a class="tt" href="https://www.tiktok.com/@dungeonlog" target="_blank" rel="noopener" aria-label="TikTok do Dungeonlog"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true" focusable="false"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg></a><a class="tt" href="https://www.instagram.com/dungeon.log/" target="_blank" rel="noopener" aria-label="Instagram do Dungeonlog"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a></div>
+</header>
+
+<main class="wrap">
+  <p class="updated"><a href="/">Início</a> · <a href="/blog/">Blog</a></p>
+  <h1>Dia de descanso no Dungeonlog: pause sem perder a sequência</h1>
+  <p class="updated"><time datetime="2026-11-06">06/11/2026</time></p>
+<nav class="bnav" aria-label="Navegação do blog"><a class="bn-v" href="/blog/">&larr; Voltar ao blog</a><a class="bn-p" href="/blog/transforme-lista-tarefas-rpg/" rel="prev"><small>&larr; Post anterior</small>Transforme sua lista de tarefas num RPG</a></nav>
+<img class="capa" src="/blog/img/capa-descanso.jpg" width="1200" height="630" alt="Dia de descanso no Dungeonlog: pause sem perder a sequência">
+
+<div class="corpo">
+<p>Nem todo dia dá para cumprir a lista. O Dungeonlog agora tem o dia de descanso: você avisa que hoje vai parar, o monstro do dia não te machuca e a sua sequência não zera. Neste artigo você vê como marcar o descanso, o que ele muda e como cancelar.</p>
+
+<h2>Onde fica o botão</h2>
+<p>Na aba Tarefas, ao lado do botão "+ Adicionar", há um botão com uma lua e o texto "Descansar". Ele só aparece enquanto o monstro do dia ainda não caiu: depois que você derrota o monstro, o botão some, porque o dia já foi vencido.</p>
+
+<h2>O que acontece ao descansar</h2>
+<p>Ao tocar em "Descansar", o app abre uma folha com a pergunta "Descansar hoje?" e quatro avisos, que são exatamente o que o dia de descanso faz:</p>
+<ul>
+  <li>sem perda de vida e sem a tela "Você caiu";</li>
+  <li>a sequência fica congelada, não zera;</li>
+  <li>hoje não rende XP nem moedas;</li>
+  <li>dá para cancelar a qualquer momento.</li>
+</ul>
+<figure style="margin:20px 0;max-width:340px">
+  <img src="/blog/img/descanso-folha.webp" width="720" height="1494" alt="Folha Descansar hoje? do Dungeonlog com quatro avisos (sem perda de vida, sequência congelada, hoje não rende XP nem moedas, dá para cancelar) e os botões Descansar hoje e Cancelar" loading="lazy" style="display:block;width:100%;height:auto;border-radius:10px;border:1px solid #3a3a3a;background:#1f1f1f">
+  <figcaption style="font-size:.9em;opacity:.8;margin-top:6px">A confirmação: o app explica o que muda antes de você descansar.</figcaption>
+</figure>
+<p>É uma troca clara: o dia não rende recompensas, mas também não cobra nada de você. Se o monstro do dia escaparia por causa das tarefas que ficaram, no dia de descanso nada disso é contado como perda.</p>
+
+<h2>Como a tela fica depois</h2>
+<p>Depois de confirmar, o botão passa a dizer "Cancelar descanso" e o contador de tarefas é trocado pela mensagem "Descansando hoje — progresso protegido". As suas tarefas continuam na lista, esperando.</p>
+<figure style="margin:20px 0;max-width:340px">
+  <img src="/blog/img/descanso-tarefas.webp" width="720" height="1494" alt="Tela de Tarefas do Dungeonlog em dia de descanso, com o botão Cancelar descanso, a mensagem Descansando hoje — progresso protegido e a lista de tarefas do dia" loading="lazy" style="display:block;width:100%;height:auto;border-radius:10px;border:1px solid #3a3a3a;background:#1f1f1f">
+  <figcaption style="font-size:.9em;opacity:.8;margin-top:6px">Em dia de descanso, o botão vira "Cancelar descanso".</figcaption>
+</figure>
+<p>Mudou de ideia? Toque em "Cancelar descanso" e o dia volta ao normal. Concluir uma tarefa também cancela o descanso do dia, então você pode voltar ao jogo a qualquer hora sem precisar fazer mais nada.</p>
+
+<h2>O descanso no histórico e na sequência</h2>
+<p>Na aba Estatísticas, o histórico do mês mostra cada dia. O dia de descanso aparece em azul, diferente dos dias vencidos, e a sequência atual continua com o mesmo número de antes: ela fica congelada, não sobe nem zera. Na captura abaixo, a sequência é 4 antes e depois do dia 10, que foi marcado como descanso.</p>
+<figure style="margin:20px 0;max-width:340px">
+  <img src="/blog/img/descanso-historico.webp" width="720" height="1494" alt="Tela de Estatísticas do Dungeonlog com a sequência atual 4 e o histórico do mês, onde o dia 10 aparece em azul por ser um dia de descanso" loading="lazy" style="display:block;width:100%;height:auto;border-radius:10px;border:1px solid #3a3a3a;background:#1f1f1f">
+  <figcaption style="font-size:.9em;opacity:.8;margin-top:6px">O dia 10, em azul, foi de descanso, e a sequência continua em 4.</figcaption>
+</figure>
+
+<h2>Quando usar</h2>
+<p>O dia de descanso serve para os dias em que você não consegue cumprir a lista e não quer ser punido por isso. Ele não é uma forma de pular o jogo todos os dias, já que o dia de descanso não rende XP nem moedas. O Dungeonlog continua sendo um app de tarefas: o descanso só garante que um dia ruim não apague o que você construiu.</p>
+</div>
+
+<nav class="bnav" aria-label="Navegação do blog"><a class="bn-v" href="/blog/">&larr; Voltar ao blog</a><a class="bn-p" href="/blog/transforme-lista-tarefas-rpg/" rel="prev"><small>&larr; Post anterior</small>Transforme sua lista de tarefas num RPG</a></nav>
+
+  <h2>Dungeonlog</h2>
+  <p><a href="/">Conheça o Dungeonlog</a> · <a href="https://play.google.com/store/apps/details?id=com.dungeonlog" rel="noopener">Baixe o Dungeonlog no Google Play</a></p>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <div class="footcols">
+      <div class="footcol">
+        <span class="footlabel">Navegação</span>
+        <a href="/">Início</a>
+        <a href="/blog/">Blog</a>
+      </div>
+      <div class="footcol">
+        <span class="footlabel">Legal</span>
+        <a href="/privacy">Política de Privacidade</a>
+        <a href="/terms">Termos de Uso</a>
+        <a href="/delete-account">Excluir Conta</a>
+      </div>
+      <div class="footcol">
+        <span class="footlabel">Contato</span>
+        <a href="mailto:arthurdungeonlog@gmail.com">E-mail</a>
+      </div>
+      <div class="footcol">
+        <span class="footlabel">Redes</span>
+        <a href="https://www.tiktok.com/@dungeonlog" target="_blank" rel="noopener">TikTok</a>
+        <a href="https://www.instagram.com/dungeon.log/" target="_blank" rel="noopener">Instagram</a>
+      </div>
+    </div>
+    <span class="copy">© 2026 Weberlabs. Todos os direitos reservados.</span>
+  </div>
+</footer>
+
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Visualizador de imagens">
+  <button type="button" class="lb-x" aria-label="Fechar">&times;</button>
+  <button type="button" class="lb-p" aria-label="Anterior">&#8249;</button>
+  <img alt="">
+  <button type="button" class="lb-n" aria-label="Próxima">&#8250;</button>
+  <span class="lb-c" aria-live="polite"></span>
+</div>
+<script>
+(function(){
+  var imgs=[].slice.call(document.querySelectorAll('.corpo img'));
+  var lb=document.getElementById('lb');
+  if(!imgs.length||!lb) return;
+  var big=lb.querySelector('img'), cnt=lb.querySelector('.lb-c'), i=0, x0=null;
+  if(imgs.length<2) lb.className+=' um';
+  function show(n){
+    i=(n+imgs.length)%imgs.length;
+    big.src=imgs[i].currentSrc||imgs[i].src; big.alt=imgs[i].alt;
+    cnt.textContent=(i+1)+' / '+imgs.length;
+  }
+  function open(n){ show(n); lb.classList.add('on'); document.body.style.overflow='hidden'; lb.querySelector('.lb-x').focus(); }
+  function close(){ lb.classList.remove('on'); document.body.style.overflow=''; big.removeAttribute('src'); }
+  imgs.forEach(function(im,n){ im.addEventListener('click',function(){ open(n); }); });
+  lb.querySelector('.lb-x').addEventListener('click',close);
+  lb.querySelector('.lb-p').addEventListener('click',function(e){ e.stopPropagation(); show(i-1); });
+  lb.querySelector('.lb-n').addEventListener('click',function(e){ e.stopPropagation(); show(i+1); });
+  lb.addEventListener('click',function(e){ if(e.target!==big && !e.target.closest('button')) close(); });
+  document.addEventListener('keydown',function(e){
+    if(!lb.classList.contains('on')) return;
+    if(e.key==='Escape') close();
+    else if(e.key==='ArrowLeft') show(i-1);
+    else if(e.key==='ArrowRight') show(i+1);
+  });
+  lb.addEventListener('touchstart',function(e){ x0=e.touches[0].clientX; },{passive:true});
+  lb.addEventListener('touchend',function(e){
+    if(x0===null) return; var d=e.changedTouches[0].clientX-x0; x0=null;
+    if(Math.abs(d)>50) show(d<0?i+1:i-1);
+  });
+})();
+</script>
+
+</body>
+</html>

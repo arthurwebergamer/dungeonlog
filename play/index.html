@@ -134,7 +134,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=441">
+<link rel="stylesheet" href="style.css?v=442">
 <script>
 // A abertura so sai quando (1) a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado (sair antes mostrava um flash
 // cinza vazio e depois a tela de login por baixo, visto em video de teste) E (2) quem ja tinha sessao neste aparelho teve login confirmado e o
@@ -5462,6 +5462,7 @@ function salvar(){
       nomeHeroi: nomeHeroi,
       heroi: heroiEscolhido,
       semente: semente,
+      salvoEm: Date.now(),   // carimbo: no login, quem for MAIS NOVO (local x nuvem) vence
       comecou: true
     }));
   } catch(e){
@@ -18753,6 +18754,51 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       return u ? puxarEntitlement(u.uid) : undefined;
     };
 
+    function lerSalvoEm(str){ try { return Number(JSON.parse(str).salvoEm) || 0; } catch(e){ return 0; } }
+    // 1) rede de seguranca LOCAL: ultimas 3 copias do save do aparelho antes de a nuvem sobrescrever.
+    //    Recuperar (console): restaurarBackupLocal(0) -> volta o mais recente.
+    function guardarBackupLocal(uid, dadosLocal){
+      try {
+        const k = 'questlog.backupLocal.v1.uid.' + uid;
+        const extras = {};
+        window.CHAVES_SECUNDARIAS_CONTA.forEach(cb => { if (cb === 'questlog.dia.v1') return; const v = localStorage.getItem(window.chaveConta(cb)); if (v !== null) extras[cb] = v; });
+        let lista = []; try { lista = JSON.parse(localStorage.getItem(k) || '[]'); } catch(e){}
+        lista.unshift({ em: Date.now(), data: dadosLocal, extras });
+        localStorage.setItem(k, JSON.stringify(lista.slice(0, 3)));
+      } catch(e){ console.warn('QuestLog: nao consegui guardar backup local', e); }
+    }
+    window.restaurarBackupLocal = function(i){
+      const uid = localStorage.getItem('questlog.uidAtivo.v1'); if (!uid) return 'sem conta';
+      const lista = JSON.parse(localStorage.getItem('questlog.backupLocal.v1.uid.' + uid) || '[]');
+      const b = lista[i || 0]; if (!b) return 'sem backup';
+      localStorage.setItem(window.chaveSaveAtual(), b.data);
+      Object.keys(b.extras || {}).forEach(cb => localStorage.setItem(window.chaveConta(cb), b.extras[cb]));
+      localStorage.setItem(chaveSujo(uid), String(Date.now()));   // manda o restaurado pra nuvem
+      location.reload(); return 'ok';
+    };
+    // 3) HISTORICO NA NUVEM: saves/{uid}/historico/{h0..h5 a cada 30 min | d0..d13 1x por dia}. Cada envio
+    //    bem sucedido alimenta; se um save for sobrescrito por engano, o anterior ainda esta aqui.
+    //    Precisa da regra de saves/{uid}/historico no firestore.rules (ver arquivo). Falha em silencio.
+    async function guardarHistorico(uid, data, extras, forcar){
+      try {
+        if (window.EH_DEV || !data) return;
+        const agora = Date.now(), kb = 'questlog.histNuvem.v1.uid.' + uid;
+        const ultH = Number(localStorage.getItem(kb + '.h') || 0), ultD = Number(localStorage.getItem(kb + '.d') || 0);
+        const dia = Math.floor(agora / 86400000);
+        const tarefas = [];
+        if (forcar || agora - ultH >= 30 * 60 * 1000){
+          const n = Number(localStorage.getItem(kb + '.n') || 0) % 6;
+          localStorage.setItem(kb + '.h', String(agora)); localStorage.setItem(kb + '.n', String(n + 1));
+          tarefas.push(setDoc(doc(db, 'saves', uid, 'historico', 'h' + n), { data, extras: extras || {}, em: agora }));
+        }
+        if (Math.floor(ultD / 86400000) !== dia){
+          localStorage.setItem(kb + '.d', String(agora));
+          tarefas.push(setDoc(doc(db, 'saves', uid, 'historico', 'd' + (dia % 14)), { data, extras: extras || {}, em: agora }));
+        }
+        await Promise.all(tarefas);
+      } catch(e){ console.warn('QuestLog: historico na nuvem nao gravou (regra publicada?)', e && e.code); }
+    }
+
     async function puxarNuvem(uid){
       const ref = doc(db, 'saves', uid);
       puxarEntitlement(uid);
@@ -18765,8 +18811,24 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       }
       const snap = await getDoc(ref);
       // (puxarEntitlement ja disparado acima) paralelo, nao bloqueia o resto de puxarNuvem() -- so precisa terminar antes da 1a checagem de assinaturaAtiva()/paywall, o que na pratica sempre acontece bem depois
-      if (snap.exists() && snap.data().data) {
-        try { localStorage.setItem(window.chaveSaveAtual(), snap.data().data); } catch(e){}
+
+      // ---- PROTECAO CONTRA PERDA DE SAVE (pedido: assinante nao pode perder progresso) ----
+      const dadosNuvem = snap.exists() ? (snap.data().data || null) : null;
+      let dadosLocal = null; try { dadosLocal = localStorage.getItem(window.chaveSaveAtual()); } catch(e){}
+      if (dadosNuvem && dadosLocal && dadosNuvem !== dadosLocal){
+        // 2) o local e MAIS NOVO que a nuvem (carimbo salvoEm): nao sobrescreve, sobe o local. Antes de
+        //    pisar na nuvem, guarda a copia dela no historico (da pra recuperar se o local estiver errado).
+        const tLocal = lerSalvoEm(dadosLocal), tNuvem = lerSalvoEm(dadosNuvem);
+        if (tLocal && tNuvem && tLocal > tNuvem + 2000){
+          await guardarHistorico(uid, dadosNuvem, snap.data().extras, true);
+          await empurrarNuvem(uid);
+          return;
+        }
+        // 1) vai sobrescrever o local pela nuvem: antes, guarda uma copia do local (ultimas 3)
+        guardarBackupLocal(uid, dadosLocal);
+      }
+      if (dadosNuvem) {
+        try { localStorage.setItem(window.chaveSaveAtual(), dadosNuvem); } catch(e){}
       }
       // restaura as 15 chaves secundarias (ver empurrarNuvem/
       // CHAVES_SECUNDARIAS_CONTA) -- so sobrescreve o que realmente veio
@@ -18846,6 +18908,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
         await setDoc(doc(db, 'saves', uid), { data: dados, extras: extras, atualizadoEm: Date.now() });
         if (seqInicio === _seqSalvar){ try { localStorage.removeItem(chaveSujo(uid)); } catch(e){} }
         window.__falhasSync = 0;
+        guardarHistorico(uid, dados, extras);   // sem await: nao atrasa nem derruba o envio principal
       } catch(e){
         // ANTES: catch vazio -- o envio falhava em silencio e o jogador so descobria ao perder o progresso
         // no proximo login (conta nova sem nenhum doc em saves/). Agora loga o codigo e avisa na tela.

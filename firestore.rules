@@ -35,6 +35,12 @@ service cloud.firestore {
       allow read, write: if request.auth != null && request.auth.uid == uid;
     }
 
+    // saves/{uid}/historico/{h0..h5, d0..d13} -- copias de seguranca do save (a cada 30 min e 1x/dia),
+    // gravadas pelo client (guardarHistorico em play/index.html). So o dono le/escreve.
+    match /saves/{uid}/historico/{h} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
     // fcmTokens/{uid} -- token(s) do FCM pra push de verdade (pedido do
     // usuario -- teste gratis acabando, streak em risco, monstro do dia).
     // Escrito pelo client em window.ativarNotificacaoPush() (play/index.html).

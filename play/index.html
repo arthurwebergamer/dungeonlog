@@ -134,7 +134,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=442">
+<link rel="stylesheet" href="style.css?v=443">
 <script>
 // A abertura so sai quando (1) a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado (sair antes mostrava um flash
 // cinza vazio e depois a tela de login por baixo, visto em video de teste) E (2) quem ja tinha sessao neste aparelho teve login confirmado e o
@@ -1598,6 +1598,7 @@ html{background:var(--bsBg,#282828)}
         <div class="est-tile"></div><span data-i18n="est.semTarefa">sem tarefa</span>
         <div class="est-tile est-tile-fuga"></div><span data-i18n="est.fuga">fugiu</span>
         <div class="est-tile est-tile-vitoria"></div><span data-i18n="est.vitoria">venceu</span>
+        <div class="est-tile est-tile-descanso"></div><span data-i18n="est.descanso">descanso</span>
       </div>
       <div class="est-lockoverlay" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
@@ -7767,6 +7768,10 @@ function preencherTileDia(tile, resultado, dia, iso){
     tile.appendChild(tocha);
   } else if (resultado === 'descanso'){
     tile.classList.add('est-tile-descanso');
+    const tocha = document.createElement('div');   // mesma tocha da Arena, em azul: dia de descanso
+    tocha.className = 'est-tocha est-tocha-estatica est-tocha-descanso';
+    tocha.setAttribute('aria-hidden', 'true');
+    tile.appendChild(tocha);
   } else if (resultado === 'fuga'){
     tile.classList.add('est-tile-fuga');
     const tocha = document.createElement('div');
@@ -8077,14 +8082,14 @@ function renderEstN(hist, hoje, streak, recorde, bloqueadoPro){
   const diasNoMes = new Date(ano, mes, 0).getDate();
   const hojeN = +hoje.slice(8);
   let v = 0, f = 0, sT = 0, cel = '';
-  const tocha = (apagada) => '<div class="est-tocha est-tocha-estatica' + (apagada ? ' est-tocha-apagada' : '') + '" aria-hidden="true"></div>';
+  const tocha = (apagada, azul) => '<div class="est-tocha est-tocha-estatica' + (apagada ? ' est-tocha-apagada' : '') + (azul ? ' est-tocha-descanso' : '') + '" aria-hidden="true"></div>';
   for (let d = 1; d <= diasNoMes; d++){
     const r = (d <= hojeN) ? porData.get(aS + '-' + mS + '-' + String(d).padStart(2,'0')) : null;
     let c = 'estn-cd', m = '';
     if (r === 'vitoria'){ v++; c += ' won'; m = tocha(false); }
     else if (r === 'fuga'){ f++; c += ' fled'; m = tocha(true); }
     else if (r === 'sem_tarefa') sT++;
-    else if (r === 'descanso') c += ' rested';
+    else if (r === 'descanso'){ c += ' rested'; m = tocha(false, true); }   // tocha azul: dia de descanso
     if (d === hojeN) c += ' today';
     cel += '<div class="' + c + '"><div class="estn-cdm">' + m + '</div><span>' + d + '</span></div>';
   }
@@ -8119,7 +8124,7 @@ function renderEstN(hist, hoje, streak, recorde, bloqueadoPro){
   const nomeMes = new Date(ano, mes - 1, 1).toLocaleDateString(loc, { month: 'long' });
   const secHist = sec(L('HISTÓRICO','HISTORY') + ' · ' + nomeMes.toUpperCase(),
     '<div class="estn-cgrid">' + cel + '</div>'
-    + '<div class="estn-leg"><span class="lg">' + tocha(false) + L('venceu','won') + '</span><span class="lg">' + tocha(true) + L('fugiu','fled') + '</span></div>'
+    + '<div class="estn-leg"><span class="lg">' + tocha(false) + L('venceu','won') + '</span><span class="lg">' + tocha(true) + L('fugiu','fled') + '</span><span class="lg">' + tocha(false, true) + L('descanso','rest') + '</span></div>'
 , true);
 
   document.getElementById('estnSecs').innerHTML = secTaxa + secSemana + secHist;
@@ -20737,6 +20742,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     'est.semTarefa':    { pt:'sem tarefa', en:'no task' },
     'est.fuga':         { pt:'fugiu', en:'fled' },
     'est.vitoria':      { pt:'venceu', en:'won' },
+    'est.descanso':     { pt:'descanso', en:'rest' },
     'est.emBreve':      { pt:'Distribuição por horário e "tarefas mais puladas" pedem rastrear novos dados — entram numa próxima etapa.', en:'Time-of-day breakdown and "most skipped tasks" need new data tracking — coming in a future update.' },
     'est.vencaHoje':       { pt:'Vença hoje pra começar uma sequência', en:'Win today to start a streak' },
     'est.recordeAtual':    { pt:'dias seguidos · essa é a sua maior sequência!', en:'days in a row · this is your best streak!' },

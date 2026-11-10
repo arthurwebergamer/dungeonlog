@@ -492,7 +492,7 @@
   .est-tile span.est-tiledia{position:relative;z-index:1;text-shadow:0 1px 2px rgba(0,0,0,.85);margin-bottom:1px}
   .est-tile-vitoria{background:#3A2E1A;border-color:#3A2E1A;color:#F2E7D5}
   .est-tile-fuga{background:#242428;border-color:#242428;color:#8a8a92}
-  .est-tile-vitoria .est-tocha, .est-tile-fuga .est-tocha{position:absolute;top:2px;left:50%;transform:translateX(-50%) scale(.85);transform-origin:top center}
+  .est-tile-vitoria .est-tocha, .est-tile-fuga .est-tocha, .est-tile-descanso .est-tocha{position:absolute;top:2px;left:50%;transform:translateX(-50%) scale(.85);transform-origin:top center}
   .est-tocha-apagada{filter:grayscale(1) brightness(.55);clip-path:inset(56% 0 0 0)}
   .est-mapalegenda{display:flex;align-items:center;gap:6px;margin-top:10px;font-size:9.5px;color:var(--dim);flex-wrap:wrap}
   .est-mapalegenda .est-tile{width:11px;height:11px;flex:none;font-size:0}
@@ -7285,3 +7285,6 @@ body.diaDescanso .list{opacity:.45}
 
 /* barra flutuante de estagio acima da nav removida: o progresso aparece no selo temporario da arena */
 #estFlut{display:none !important}
+
+/* tocha azul no dia de descanso (mesmo sprite da tocha acesa, matiz girado pro azul) */
+.est-tocha-descanso{filter:hue-rotate(190deg) saturate(1.15) brightness(1.05)}

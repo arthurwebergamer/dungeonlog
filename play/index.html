@@ -134,7 +134,7 @@ html{background:var(--bsBg,#282828)}
 <body>
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=443">
+<link rel="stylesheet" href="style.css?v=444">
 <script>
 // A abertura so sai quando (1) a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado (sair antes mostrava um flash
 // cinza vazio e depois a tela de login por baixo, visto em video de teste) E (2) quem ja tinha sessao neste aparelho teve login confirmado e o
@@ -1545,6 +1545,7 @@ html{background:var(--bsBg,#282828)}
         <div class="est-donutlegenda est-donutlegenda-compacta">
           <div class="est-legitem"><span class="est-dot" style="background:var(--accent)"></span><span data-i18n="est.vitoria">venceu</span><div class="est-legbar"><i id="estBarraVitoria" style="width:0%;background:var(--accent)"></i></div><b id="estQtdVitoria">0</b></div>
           <div class="est-legitem"><span class="est-dot" style="background:color-mix(in srgb, var(--accent) 40%, transparent)"></span><span data-i18n="est.fuga">fugiu</span><div class="est-legbar"><i id="estBarraFuga" style="width:0%;background:color-mix(in srgb, var(--accent) 40%, transparent)"></i></div><b id="estQtdFuga">0</b></div>
+          <div class="est-legitem"><span class="est-dot" style="background:#6f86e0"></span><span data-i18n="est.descanso">descanso</span><div class="est-legbar"><i id="estBarraDescanso" style="width:0%;background:#6f86e0"></i></div><b id="estQtdDescanso">0</b></div>
           <div class="est-legitem"><span class="est-dot" style="background:var(--panel-3)"></span><span data-i18n="est.semTarefa">sem tarefa</span><div class="est-legbar"><i id="estBarraSemTarefa" style="width:0%"></i></div><b id="estQtdSemTarefa">0</b></div>
         </div>
         <div class="est-lockoverlay" aria-hidden="true">
@@ -7718,35 +7719,41 @@ function renderUltimos7Dias(hist){
 // de fundo) em vez de sumir o card inteiro.
 // v4.151 (pedido do usuario): guarda o ultimo estado desenhado pra
 // interpolar a partir dele, em vez de saltar direto pro valor novo.
-let _donutMesAnterior = {pVit:0, pFuga:0};
-function renderDonutMes(vitorias, fugas, semTarefa){
+let _donutMesAnterior = {pVit:0, pFuga:0, pDesc:0};
+function renderDonutMes(vitorias, fugas, semTarefa, descansos){
+  descansos = descansos || 0;
   const el = document.getElementById('estDonutMes');
-  const total = vitorias + fugas + semTarefa;
+  const total = vitorias + fugas + semTarefa + descansos;
   if (total === 0){
     el.style.background = 'var(--panel-3)';
-    _donutMesAnterior = {pVit:0, pFuga:0};
+    _donutMesAnterior = {pVit:0, pFuga:0, pDesc:0};
   } else {
     const pVitAlvo = (vitorias / total) * 100;
     const pFugaAlvo = pVitAlvo + (fugas / total) * 100;
+    const pDescAlvo = pFugaAlvo + (descansos / total) * 100;
     const de = _donutMesAnterior;
-    function pintar(pVit, pFuga){
-      el.style.background = 'conic-gradient(var(--accent) 0% ' + pVit + '%, color-mix(in srgb, var(--accent) 40%, transparent) ' + pVit + '% ' + pFuga + '%, var(--panel-3) ' + pFuga + '% 100%)';
+    function pintar(pVit, pFuga, pDesc){
+      el.style.background = 'conic-gradient(var(--accent) 0% ' + pVit + '%, color-mix(in srgb, var(--accent) 40%, transparent) ' + pVit + '% ' + pFuga + '%, #6f86e0 ' + pFuga + '% ' + pDesc + '%, var(--panel-3) ' + pDesc + '% 100%)';
     }
     if (typeof window.spring === 'function'){
-      let atualPVit = de.pVit, atualPFuga = de.pFuga;
+      let atualPVit = de.pVit, atualPFuga = de.pFuga, atualPDesc = de.pDesc;
       window.spring({from:de.pVit, to:pVitAlvo, stiffness:120, damping:20,
-        onUpdate:v => { atualPVit = v; pintar(atualPVit, atualPFuga); }});
+        onUpdate:v => { atualPVit = v; pintar(atualPVit, atualPFuga, atualPDesc); }});
       window.spring({from:de.pFuga, to:pFugaAlvo, stiffness:120, damping:20,
-        onUpdate:v => { atualPFuga = v; pintar(atualPVit, atualPFuga); }});
+        onUpdate:v => { atualPFuga = v; pintar(atualPVit, atualPFuga, atualPDesc); }});
+      window.spring({from:de.pDesc, to:pDescAlvo, stiffness:120, damping:20,
+        onUpdate:v => { atualPDesc = v; pintar(atualPVit, atualPFuga, atualPDesc); }});
     } else {
-      pintar(pVitAlvo, pFugaAlvo);
+      pintar(pVitAlvo, pFugaAlvo, pDescAlvo);
     }
-    _donutMesAnterior = {pVit:pVitAlvo, pFuga:pFugaAlvo};
+    _donutMesAnterior = {pVit:pVitAlvo, pFuga:pFugaAlvo, pDesc:pDescAlvo};
   }
   document.getElementById('estDonutTotal').textContent = total;
   document.getElementById('estQtdVitoria').textContent = vitorias;
   document.getElementById('estQtdFuga').textContent = fugas;
   document.getElementById('estQtdSemTarefa').textContent = semTarefa;
+  document.getElementById('estQtdDescanso').textContent = descansos;
+  document.getElementById('estBarraDescanso').style.width = (total > 0 ? (descansos / total) * 100 : 0) + '%';
   document.getElementById('estBarraVitoria').style.width = (total > 0 ? (vitorias / total) * 100 : 0) + '%';
   document.getElementById('estBarraFuga').style.width = (total > 0 ? (fugas / total) * 100 : 0) + '%';
   document.getElementById('estBarraSemTarefa').style.width = (total > 0 ? (semTarefa / total) * 100 : 0) + '%';
@@ -7992,6 +7999,7 @@ function renderEstatisticas(){
   const vitoriasMes = doMes.filter(h => h.resultado === 'vitoria').length;
   const fugasMes = doMes.filter(h => h.resultado === 'fuga').length;
   const semTarefaMes = doMes.filter(h => h.resultado === 'sem_tarefa').length;
+  const descansoMes = doMes.filter(h => h.resultado === 'descanso').length;
   const comTarefaMes = vitoriasMes + fugasMes;
   const taxa = comTarefaMes > 0 ? Math.round((vitoriasMes / comTarefaMes) * 100) : 0;
   const ringEl = document.getElementById('estTaxaRing');
@@ -8014,7 +8022,7 @@ function renderEstatisticas(){
   document.getElementById('estTaxaNum').textContent = taxa + '%';
 
   renderUltimos7Dias(hist);
-  renderDonutMes(vitoriasMes, fugasMes, semTarefaMes);
+  renderDonutMes(vitoriasMes, fugasMes, semTarefaMes, descansoMes);
 
   const localeMes = (typeof window.idiomaAtual === 'function' && window.idiomaAtual() === 'en') ? 'en-US' : 'pt-BR';
   const nomeMes = new Date(ano, mes - 1, 1).toLocaleDateString(localeMes, { month: 'long', year: 'numeric' });
@@ -8081,7 +8089,7 @@ function renderEstN(hist, hoje, streak, recorde, bloqueadoPro){
   const [aS, mS] = hoje.split('-'); const ano = +aS, mes = +mS;
   const diasNoMes = new Date(ano, mes, 0).getDate();
   const hojeN = +hoje.slice(8);
-  let v = 0, f = 0, sT = 0, cel = '';
+  let v = 0, f = 0, sT = 0, dsc = 0, cel = '';
   const tocha = (apagada, azul) => '<div class="est-tocha est-tocha-estatica' + (apagada ? ' est-tocha-apagada' : '') + (azul ? ' est-tocha-descanso' : '') + '" aria-hidden="true"></div>';
   for (let d = 1; d <= diasNoMes; d++){
     const r = (d <= hojeN) ? porData.get(aS + '-' + mS + '-' + String(d).padStart(2,'0')) : null;
@@ -8089,17 +8097,17 @@ function renderEstN(hist, hoje, streak, recorde, bloqueadoPro){
     if (r === 'vitoria'){ v++; c += ' won'; m = tocha(false); }
     else if (r === 'fuga'){ f++; c += ' fled'; m = tocha(true); }
     else if (r === 'sem_tarefa') sT++;
-    else if (r === 'descanso'){ c += ' rested'; m = tocha(false, true); }   // tocha azul: dia de descanso
+    else if (r === 'descanso'){ dsc++; c += ' rested'; m = tocha(false, true); }   // tocha azul: dia de descanso
     if (d === hojeN) c += ' today';
     cel += '<div class="' + c + '"><div class="estn-cdm">' + m + '</div><span>' + d + '</span></div>';
   }
   const taxaMes = (v + f) > 0 ? Math.round(v / (v + f) * 100) : 0;
-  const tot = Math.max(1, v + f + sT);
+  const tot = Math.max(1, v + f + sT + dsc);
   const barra = (rot, n, cls) => '<div class="estn-lrow"><span class="' + cls + '">' + rot + '</span><i><u style="width:' + Math.round(n / tot * 100) + '%"></u></i><b>' + n + '</b></div>';
   const secTaxa = sec(L('ESTE MÊS','THIS MONTH'),
     '<div class="estn-duo"><div><div class="estn-sublab">' + L('Taxa de conclusão','Completion rate') + '</div><div class="estn-bigp"><b>' + taxaMes + '%</b></div></div>'
     + '<div><div class="estn-sublab">' + L('Como foi o mês','How the month went') + '</div><div class="estn-lrows">'
-    + barra(L('venceu','won'), v, 'w') + barra(L('fugiu','fled'), f, 'f') + barra(L('sem tarefa','no tasks'), sT, 'n') + '</div></div></div>', true);
+    + barra(L('venceu','won'), v, 'w') + barra(L('fugiu','fled'), f, 'f') + barra(L('descanso','rest'), dsc, 'r') + barra(L('sem tarefa','no tasks'), sT, 'n') + '</div></div></div>', true);
 
   // ---- ULTIMOS 7 DIAS (tochas flutuando)
   const dias = ['dom','seg','ter','qua','qui','sex','sáb'], diasEn = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];

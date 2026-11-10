@@ -1,43 +1,16 @@
 /* home.js — parallax em camadas (caverna), faixas de monstros ligadas à rolagem e faíscas de clique.
    Sem bibliotecas. Respeita "reduzir movimento" do sistema. */
+/* home.js — faixas de monstros ligadas à rolagem, menu do celular, galeria de telas e origem da visita.
+   Sem bibliotecas. Respeita "reduzir movimento" do sistema. */
 (function () {
   'use strict';
   var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var scene = document.getElementById('scene');
-  var layers = scene ? [].slice.call(scene.querySelectorAll('[data-sx],[data-sy]')) : [];
   var shifts = [].slice.call(document.querySelectorAll('.shift[data-sx]'));
-  var mx = 0, my = 0, ticking = false;
-
-  /* Cada camada só precisa ser larga o bastante para o deslocamento máximo dela (altura do cenário × velocidade
-     + mouse). Camadas gigantes e iguais ocupavam centenas de MB de GPU; o navegador descartava pedaços ao descer
-     a página e, ao subir direto, redesenhava tudo aos poucos (blocos escuros/borrados). */
-  function sizeLayers() {
-    if (!scene) return;
-    var h = scene.offsetHeight || window.innerHeight || 800;
-    for (var i = 0; i < layers.length; i++) {
-      var l = layers[i];
-      var sx = Math.abs(parseFloat(l.getAttribute('data-sx')) || 0);
-      var ax = Math.abs(parseFloat(l.getAttribute('data-mx')) || 0);
-      var m = Math.ceil(h * sx + ax / 2 + 48) + 'px';
-      l.style.left = '-' + m; l.style.right = '-' + m;
-    }
-  }
+  var ticking = false;
 
   function update() {
     ticking = false;
-    var y = window.pageYOffset || 0;
-    var py = scene ? Math.min(y, scene.offsetHeight) : y;   // o cenário não anda além da própria altura
     var vh = window.innerHeight || 800;
-
-    if (layers.length && y < scene.offsetHeight + 300) {
-      for (var i = 0; i < layers.length; i++) {
-        var l = layers[i];
-        var sx = parseFloat(l.getAttribute('data-sx')) || 0;   // deslocamento horizontal por px rolado
-        var sy = parseFloat(l.getAttribute('data-sy')) || 0;   // deslocamento vertical por px rolado
-        var ax = parseFloat(l.getAttribute('data-mx')) || 0;   // intensidade do mouse
-        l.style.transform = 'translate3d(' + (py * sx + mx * ax).toFixed(1) + 'px,' + (y * sy + my * ax * 0.6).toFixed(1) + 'px,0)';
-      }
-    }
     for (var j = 0; j < shifts.length; j++) {      // filas de monstros andam ao rolar (sentidos opostos)
       var s = shifts[j];
       var r = s.parentNode.getBoundingClientRect();
@@ -55,30 +28,8 @@
 
   if (!reduce) {
     window.addEventListener('scroll', req, { passive: true });
-    window.addEventListener('resize', function () { sizeLayers(); req(); }, { passive: true });
-    window.addEventListener('pointermove', function (e) {
-      if (e.pointerType !== 'mouse') return;
-      mx = (e.clientX / window.innerWidth - 0.5) * -1;
-      my = (e.clientY / window.innerHeight - 0.5) * -1;
-      req();
-    }, { passive: true });
-    sizeLayers();
+    window.addEventListener('resize', req, { passive: true });
     update();
-
-    /* faíscas douradas ao clicar (só mouse) */
-    window.addEventListener('pointerdown', function (e) {
-      if (e.pointerType !== 'mouse') return;
-      for (var i = 0; i < 8; i++) {
-        var sp = document.createElement('span');
-        var a = (Math.PI * 2 * i) / 8, d = 18 + Math.random() * 18;
-        sp.className = 'spark';
-        sp.style.left = e.clientX + 'px'; sp.style.top = e.clientY + 'px';
-        sp.style.setProperty('--dx', (Math.cos(a) * d).toFixed(1) + 'px');
-        sp.style.setProperty('--dy', (Math.sin(a) * d).toFixed(1) + 'px');
-        document.body.appendChild(sp);
-        (function (el) { setTimeout(function () { el.remove(); }, 480); })(sp);
-      }
-    });
   }
 })();
 
@@ -220,6 +171,19 @@
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(i); }
     });
   });
+  // topo: clicar nos celulares da arte abre a mesma ampliação (celular da frente = 1ª tela; o de trás = loja)
+  [['.hero .art .ly.pm', 0], ['.hero .art .ly.pb', 2]].forEach(function (par) {
+    var el = document.querySelector(par[0]), alvo = phones[par[1]];
+    if (!el || !alvo) return;
+    var leg = alvo.querySelector('figcaption');
+    el.tabIndex = 0;
+    el.setAttribute('role', 'button');
+    el.setAttribute('aria-label', T.open + (leg ? leg.textContent : ''));
+    el.addEventListener('click', function () { open(par[1]); });
+    el.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(par[1]); }
+    });
+  });
   // o arrastar com o mouse já cancela o clique quando a galeria foi movida (ver bloco acima)
   g.addEventListener('click', function (e) {
     var p = e.target.closest('.phone');
@@ -237,4 +201,54 @@
       f[(i + (e.shiftKey ? -1 : 1) + f.length) % f.length].focus();
     }
   });
+})();
+
+/* APARECER AO ROLAR: os blocos entram com um leve "pulinho" quando chegam na tela (o CSS só age sem "reduzir movimento") */
+(function () {
+  'use strict';
+  if (!('IntersectionObserver' in window)) return;
+  if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var grupos = ['section h2', '.sub', '.steps .card', '.features .feat', '.who .card', '.faq details', '.lp-card', '.bst-row img', '.bst-cap', '.final .fart', '.final .ftxt > *', '.gallery .phone', '.hero + .block .lp-card'];
+  var els = [];
+  grupos.forEach(function (sel) {
+    [].slice.call(document.querySelectorAll(sel)).forEach(function (el, i) {
+      if (el.classList.contains('rv') || el.closest('.hero')) return;
+      el.classList.add('rv');
+      el.style.setProperty('--d', ((i % 6) * 0.09).toFixed(2) + 's');
+      els.push(el);
+    });
+  });
+  var io = new IntersectionObserver(function (ents) {
+    ents.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+  els.forEach(function (el) { io.observe(el); });
+})();
+
+/* topo: as camadas da arte acompanham o mouse de leve (só com mouse) */
+(function () {
+  'use strict';
+  var art = document.querySelector('.hero .art');
+  if (!art || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
+  var hero = document.querySelector('.hero');
+  hero.addEventListener('pointermove', function (e) {
+    if (e.pointerType !== 'mouse') return;
+    var r = hero.getBoundingClientRect();
+    art.style.setProperty('--mx', (((e.clientX - r.left) / r.width) - 0.5) * -2);
+    art.style.setProperty('--my', (((e.clientY - r.top) / r.height) - 0.5) * -2);
+  }, { passive: true });
+  hero.addEventListener('pointerleave', function () { art.style.setProperty('--mx', 0); art.style.setProperty('--my', 0); });
+})();
+
+/* Origem da visita: se a URL trouxer ?utm_source=<origem>, repassa ao link da Google Play como "referrer",
+   para o Play Console mostrar de onde veio a instalação. Nada é guardado nem enviado por este site. */
+(function () {
+  'use strict';
+  try {
+    var src = new URLSearchParams(location.search).get('utm_source');
+    if (!src || !/^[a-z0-9_-]{1,30}$/i.test(src)) return;
+    var ref = encodeURIComponent('utm_source=' + src + '&utm_medium=bio');
+    [].forEach.call(document.querySelectorAll('a[href^="https://play.google.com/store/apps/details?id=com.dungeonlog"]'), function (a) {
+      a.href = a.href.split('&referrer=')[0] + '&referrer=' + ref;
+    });
+  } catch (e) {}
 })();

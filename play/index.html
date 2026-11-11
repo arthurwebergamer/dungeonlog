@@ -16255,7 +16255,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     function abrir(){
       if (document.getElementById('vibTeste')) return;
       const d = document.createElement('div');
-      d.id = 'vibTeste';
+      d.id = 'vibTeste'; d.setAttribute('data-sem-feedback', '');
       d.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#1b1b1f;color:#fff;overflow:auto;padding:calc(env(safe-area-inset-top,0px) + 40px) 16px 24px;font:15px system-ui,sans-serif';
       d.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><b style="font-size:18px">Teste de vibracoes</b><button id="vibFechar" style="padding:8px 14px;border-radius:10px;border:0;background:#444;color:#fff">fechar</button></div><div style="opacity:.7;margin-bottom:12px">Toque em cada um e me diga o numero que parece com o Skillion.</div>';
       const busca = document.createElement('input');

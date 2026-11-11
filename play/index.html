@@ -16215,14 +16215,15 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       document.body.appendChild(d);
       document.getElementById('vibFechar').onclick = function(){ d.remove(); };
     }
-    document.addEventListener('DOMContentLoaded', function(){
-      if (!H()) return;
+    const montarBotaoVib = function(){
+      if (!H() || document.getElementById('vibBtn')) return;
       const b = document.createElement('button');
-      b.textContent = 'vib';
+      b.textContent = 'vib'; b.id = 'vibBtn';
       b.style.cssText = 'position:fixed;right:10px;bottom:120px;z-index:9999;padding:8px 12px;border-radius:10px;border:1px dashed #6f86e0;background:#1b1b1f;color:#9fb0ff;font-size:13px';
       b.onclick = abrir;
       document.body.appendChild(b);
-    });
+    };
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', montarBotaoVib); else montarBotaoVib();
   })();
   function vibrarEvento(nome){
     const padrao = VIBRACAO[nome];

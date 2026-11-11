@@ -135,7 +135,7 @@ html{background:var(--bsBg,#282828)}
 <div id="bootSplash"><div class="bsPalco"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAEj0lEQVR42s2YX0hbZxjGf4lBaGv8F42mGDJHZqI4sWqFVrwYzuKEteLY6KAUXL0pFNYWBqXQsu1idAwyh0Jv5kXHmIowulrE4TYoo1okSyUVTVxIK5GlxhoTyCCtbdyF/Q7n5H/Ui30g5nvyvud7zvM+75fzHfifDNVektWa/G3xOfbyxd6ulcui8X8Al08bUn4vJ7pviqg1+dtiUTFso36JiG3Uj5yYHMtGrbxcSjC7EOFYvZaWJj2tHU2UxIIAtDTpMenUHKvX0nOmnQJNlMOGQ5h0amYXImzHXn2xJ0Xk0sar0dKkp6rOwuqiO+G/3RFQKJKNj1SZSAgCLU16AKrqLACUGI6z6Z9J+VlOKJsyqTJ5Ip5A/MJiDiQltrroBsDuCKQlk9IjKnXe57MLEUw6Nf/4/6VAE6WwvExaNBrxSbHRiE8xP6A1ckBrJBrxUVheRmF5GQWaaFrPaLIxq/CDuGtBJt2QK5LKM1nvI6I08rIkI1NiOC7N48tWVWeRyivfc7JSRB4oSIhay5VZXXTzdkefYi4fopPkN3L5tTJqTf623Ct56bql50x7UhJyyd94U0004pPmwksAheVlrC66+ePXJQ4bDgGk3F80qUoCcPvHPxU+iScRP796fYivvryQQLqlSZ+0lTN6xDbqVwTLfSJfNNn86vUh7I5AgoriRlK1cIIiIkCUKJkSzoCF0xcGAQs43Hw99BMA730klN7BBRG7I6C4TrJ9JKv2FbKKO1/frqG7u5vJyUnMFc+kuMHBQQkvVy1LZdqXxwC7I8D5vms4lws533cNAINhx0MTExOKWDEX38vz5B7ZFRHbqJ/h8REFptVqOWh8zq27Awr81t0BDhqfo9VqFfjw+EjazSwjEZF84/ud7tlYWdqpcXiGsqNblB3dUsQLLBaeUcSL/HRksnowEsa90t/OuQ8/psRYQZG+NGV8OBBk07fG8PiIRCLTw1HWRBobGgDoai2ip7URnamWEmNF4m+Mb42NlSVuz80zNRcGYN7pzEhEk60anR3v8NfDh8x5AOZhbj5t3pxHRWlpMc1HjjDvdCZs6TkRESQ+u/Qp/ec+4YbFSmdnJ8vPdACEQsGEnOJiUbIg09PTeNwuAL759ru0ZDIqcqW/nZ7aGGaLFY/bhWrrIqHQAMXFpdTW1iXE+/1PCYWCqLYu4nG7MFusfFAbI6+/XfLLro8Tzb29xMIzeL1eQut2tNYxadF4EgBa6xihdTter5dYeIbm3t79O9eEA0Hu3bEBEHk0y6vKm1SfHMPlPMGD30txOU9QfXKMV5U3iTyaBeDeHRvhQHDv5xrRLV2tRQBMzYWJVJt5t6Wav6faAGg765Hi7/9gBuCtrvv8Zn9MwWOPIjdd92T1WyPaUD7ev7RJcGODQGBNwtrOQqlOh2spfe6uicSPlSderK+NuvLEK+F6fYUMy+0onNUBq7GhgXmnU8LNp3qprC8G4OlCSMLlmOeXnyVcnp+qNGnNKpKSXURvqkFvqgGQFpVjmfL3/FpCqGQ+1asgkQzL5VXFrt5pxB8HYi9fqJJhuVzzP8I/dIxkYyj2AAAAAElFTkSuQmCC" alt=""><div class="bsSombra"></div></div><span id="bootSplashTxt">Carregando a masmorra...</span></div>
 <script>try{if(!/^pt/i.test(navigator.language||"pt"))document.getElementById("bootSplashTxt").textContent="Loading the dungeon..."}catch(e){}</script>
 <script>try{if(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform())document.documentElement.classList.add("cap")}catch(e){}</script>
-<link rel="stylesheet" href="style.css?v=445">
+<link rel="stylesheet" href="style.css?v=446">
 <script>
 // A abertura so sai quando (1) a pagina inteira ja foi lida (DOMContentLoaded) e o 1o quadro do app foi pintado (sair antes mostrava um flash
 // cinza vazio e depois a tela de login por baixo, visto em video de teste) E (2) quem ja tinha sessao neste aparelho teve login confirmado e o
@@ -21844,6 +21844,55 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
     t=setTimeout(function(){t=null;var l=pend;pend=[];l.forEach(run);},120);
   }).observe(document.body,{childList:true,subtree:true});
   run(document.body);
+})();
+</script>
+
+<script>
+/* RESPOSTA TATIL/VISUAL EXTRA (Capacitor): toque imediato nos botoes, foco em campo de texto e abertura de dialogos */
+(function(){
+  function nativo(){ try { return !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()); } catch(e){ return false; } }
+  function tick(tipo){ if (typeof window.hapticoNativo === 'function') window.hapticoNativo(['c', tipo || 26]); }
+  const ALVO = 'button, [role="button"], .cfgrow, .opcao, .catchip, .cattab';
+
+  // 1) toque imediato no DOWN (sem esperar o click): evita a sensacao de "travado"
+  if (nativo()) {
+    document.addEventListener('pointerdown', function(e){
+      if (e.pointerType === 'mouse') return;
+      const t = e.target && e.target.closest ? e.target.closest(ALVO) : null;
+      if (!t || t.disabled || t.closest('[data-sem-feedback]')) return;
+      if (window.__ultimoTickDown && Date.now() - window.__ultimoTickDown < 60) return;
+      window.__ultimoTickDown = Date.now();
+      window.__fbN = (window.__fbN || 0) + 1; // conta como feedback: o fallback de click nao vibra de novo
+      if (typeof window.feedbackPreferido !== 'function' || window.feedbackPreferido() === 'vibrar') tick(26);
+    }, true);
+  }
+
+  // 2) campo de texto: tique + brilho ao focar
+  document.addEventListener('focusin', function(e){
+    const t = e.target;
+    if (!t || !t.matches || !t.matches('input:not([type=checkbox]):not([type=radio]):not([type=range]), textarea')) return;
+    if (nativo() && (typeof window.feedbackPreferido !== 'function' || window.feedbackPreferido() === 'vibrar')) tick(26);
+  }, true);
+
+  // 3) dialogo/overlay em tela cheia abrindo (classe "on" adicionada): vibra
+  if (nativo() && window.MutationObserver) {
+    const mo = new MutationObserver(function(muts){
+      for (const m of muts) {
+        const el = m.target;
+        if (!el || el.nodeType !== 1) continue;
+        const antes = (m.oldValue || '').split(/\s+/);
+        if (antes.indexOf('on') >= 0 || !el.classList.contains('on')) continue;
+        const cs = getComputedStyle(el);
+        if (cs.position !== 'fixed' && cs.position !== 'absolute') continue;
+        const r = el.getBoundingClientRect();
+        if (r.width >= window.innerWidth * 0.7 && r.height >= window.innerHeight * 0.4) {
+          if (typeof window.feedbackPreferido !== 'function' || window.feedbackPreferido() === 'vibrar') tick(6);
+          break;
+        }
+      }
+    });
+    mo.observe(document.documentElement, { subtree: true, attributes: true, attributeFilter: ['class'], attributeOldValue: true });
+  }
 })();
 </script>
 </body>

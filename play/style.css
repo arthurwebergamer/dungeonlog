@@ -7293,3 +7293,10 @@ body.diaDescanso .list{opacity:.45}
 /* Capacitor (Android edge-to-edge): o plugin injeta --safe-area-inset-*; no navegador/TWA a var nao existe e cai em 0 */
 .topbar{padding-top:max(12px, env(safe-area-inset-top, 0px), var(--safe-area-inset-top, 0px))}
 html.cap .topbar{padding-top:calc(max(var(--safe-area-inset-top, 0px), env(safe-area-inset-top, 0px), 30px) + 12px)}
+
+/* foco em campo de texto: brilho suave animado */
+input:not([type=checkbox]):not([type=radio]):not([type=range]), textarea{transition:box-shadow .18s ease, border-color .18s ease}
+input:not([type=checkbox]):not([type=radio]):not([type=range]):focus, textarea:focus{box-shadow:0 0 0 3px rgba(242,166,90,.28);border-color:var(--accent)}
+/* resposta visual imediata ao tocar em botoes (so opacidade: nao mexe em transform/posicao) */
+button:active, [role="button"]:active, .cfgrow:active, .opcao:active, .catchip:active, .cattab:active{opacity:.78}
+button, [role="button"], .cfgrow, .opcao, .catchip, .cattab{transition:opacity .06s linear}

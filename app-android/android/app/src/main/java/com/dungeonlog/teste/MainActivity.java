@@ -9,7 +9,9 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsAnimationCompat;
 import androidx.core.view.WindowInsetsCompat;
+import android.webkit.WebView;
 import com.getcapacitor.BridgeActivity;
+import com.getcapacitor.WebViewListener;
 import java.util.List;
 
 public class MainActivity extends BridgeActivity {
@@ -52,6 +54,17 @@ public class MainActivity extends BridgeActivity {
             }
             if (!tecladoVisivel) enviarTeclado(0);
             return novos;
+        });
+        // pagina carregou: reaplica os insets (na 1a abertura os valores chegam antes da pagina existir e se perdiam)
+        getBridge().addWebViewListener(new WebViewListener() {
+            @Override
+            public void onPageCommitVisible(WebView view, String url) {
+                view.post(() -> { view.requestApplyInsets(); decor.requestApplyInsets(); });
+            }
+            @Override
+            public void onPageLoaded(WebView view) {
+                view.post(() -> { view.requestApplyInsets(); decor.requestApplyInsets(); });
+            }
         });
         ViewCompat.setWindowInsetsAnimationCallback(decor, new WindowInsetsAnimationCompat.Callback(WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_CONTINUE_ON_SUBTREE) {
             @Override

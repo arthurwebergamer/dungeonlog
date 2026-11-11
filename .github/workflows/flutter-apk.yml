@@ -1,0 +1,35 @@
+name: Flutter APK (teste)
+on:
+  push:
+    branches: [flutter-teste]
+    paths: ['app-flutter/**', '.github/workflows/flutter-apk.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - name: Gerar projeto Android e aplicar o prototipo
+        run: |
+          mkdir /tmp/fl && cd /tmp/fl
+          flutter create --platforms=android --org com.dungeonlog --project-name dungeonlog_flutter .
+          rm -rf lib && cp -r "$GITHUB_WORKSPACE/app-flutter/lib" lib
+          cp "$GITHUB_WORKSPACE/app-flutter/pubspec.yaml" pubspec.yaml
+          flutter pub get
+          flutter build apk --release
+          cp build/app/outputs/flutter-apk/app-release.apk "$GITHUB_WORKSPACE/dungeonlog-flutter.apk"
+      - name: Publicar APK numa pre-release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete flutter-teste --cleanup-tag --yes || true
+          gh release create flutter-teste dungeonlog-flutter.apk --prerelease --target "$GITHUB_SHA" --title "APK de teste (Flutter)" --notes "Build ${GITHUB_SHA::7} - prototipo Flutter, so pra teste"

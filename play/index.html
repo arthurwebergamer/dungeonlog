@@ -16262,13 +16262,19 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       busca.placeholder = 'filtrar (ex.: Pulsar, Peck, J1...)';
       busca.style.cssText = 'width:100%;box-sizing:border-box;margin:0 0 12px;padding:12px;border-radius:10px;border:1px solid #3a3a42;background:#111;color:#fff;font-size:15px';
       busca.oninput = function(){ const q = busca.value.toLowerCase(); d.querySelectorAll('button[data-n]').forEach(function(x){ x.style.display = x.dataset.n.indexOf(q) < 0 ? 'none' : 'block'; }); };
+      const st = document.createElement('div');
+      st.id = 'vibStatus';
+      let disp = '?'; try { disp = String(window.Capacitor.isPluginAvailable('Hapticos')); } catch(e){}
+      st.style.cssText = 'position:sticky;top:0;background:#111;padding:8px;margin:0 0 8px;border-radius:8px;font-size:13px;color:#ffd479;word-break:break-word';
+      st.textContent = 'plugin Hapticos disponivel: ' + disp;
+      d.appendChild(st);
       d.appendChild(busca);
       PADROES.forEach(function(p){
         const b = document.createElement('button');
         b.dataset.n = p[0].toLowerCase();
         b.textContent = p[0];
         b.style.cssText = 'display:block;width:100%;text-align:left;margin:0 0 8px;padding:14px;border-radius:12px;border:1px solid #3a3a42;background:#26262c;color:#fff;font-size:15px';
-        b.onclick = function(){ try { Promise.resolve(p[1]()).catch(function(){}); } catch(e){} };
+        b.onclick = function(){ const st = document.getElementById('vibStatus'); if (st) st.textContent = p[0] + ' ...'; try { Promise.resolve(p[1]()).then(function(){ if (st) st.textContent = 'ok: ' + p[0]; }).catch(function(e){ if (st) st.textContent = 'ERRO em ' + p[0] + ': ' + (e && (e.message || e.errorMessage) || JSON.stringify(e)); }); } catch(e){ if (st) st.textContent = 'ERRO(sync) em ' + p[0] + ': ' + e; } };
         d.appendChild(b);
       });
       document.body.appendChild(d);

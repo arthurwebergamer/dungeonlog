@@ -8,6 +8,7 @@ import android.os.VibrationAttributes;
 import android.media.AudioAttributes;
 
 import com.getcapacitor.JSArray;
+import com.swmansion.pulsar.Pulsar;
 import com.getcapacitor.JSObject;
 import org.json.JSONArray;
 import com.getcapacitor.Plugin;
@@ -170,6 +171,22 @@ public class HapticosPlugin extends Plugin {
             });
         } catch (Exception e) {
             call.reject(e.getMessage());
+        }
+    }
+    private Pulsar pulsar;
+
+    // Toca um preset do Pulsar pelo nome (ex.: "Tick", "Knock", "Peck")
+    @PluginMethod
+    public void pulsar(PluginCall call) {
+        try {
+            String nome = call.getString("nome", "");
+            if (pulsar == null) pulsar = new Pulsar(getContext());
+            var preset = pulsar.getPresets().getByName(nome);
+            if (preset == null) { call.reject("preset nao encontrado: " + nome); return; }
+            preset.play();
+            call.resolve();
+        } catch (Throwable e) {
+            call.reject(String.valueOf(e.getMessage()));
         }
     }
 }

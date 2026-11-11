@@ -16246,6 +16246,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       ['T5. Toque nativo: CONFIRM ao soltar', mt(16, 1, 0)], ['T6. Toque nativo: LONG_PRESS ao soltar', mt(0, 1, 0)],
       ['T7. Toque nativo: CLOCK_TICK ao encostar', mt(4, 0, 0)], ['T8. Toque nativo: VIRTUAL_KEY ao encostar', mt(1, 0, 0)]
     );
+    const PULSAR = ["Afterglow", "BalloonPop", "Barrage", "Batter", "Bloom", "Bongo", "Boulder", "Breath", "Buzz", "Cadence", "CameraShutter", "Canter", "Cascade", "Castanets", "Chime", "Clamor", "Clasp", "CombinationLock", "Explosion", "Finale", "FingerDrum", "Flush", "Gallop", "Heartbeat", "Herald", "HoofBeat", "Impact", "Jolt", "KeyboardMechanical", "March", "Metronome", "PassingCar", "Pendulum", "Ping", "Pip", "Plummet", "Rap", "Ratchet", "Ripple", "Shockwave", "Stagger", "Stamp", "Stampede", "Stomp", "Swell", "Syncopate", "Thud", "Thunder", "TickTock", "TidalSurge", "TideSwell", "WarDrum", "Wane", "Aftershock", "Applause", "CatPaw", "Dewdrop", "DogBark", "Gavel", "Hammer", "Knock", "Latch", "Lock", "Push", "Radar", "Snap", "Sway", "ThunderRoll", "Typewriter", "Alarm", "Burst", "Dirge", "EngineRev", "Exhale", "Fanfare", "Glitch", "Pound", "Rustle", "Vortex", "Ascent", "Blip", "BreakingWave", "Charge", "Crescendo", "Dissolve", "Drone", "FadeOut", "Feather", "Flick", "Flourish", "KeyboardMembrane", "Knell", "Lament", "Lighthouse", "Lilt", "Lope", "Murmur", "Patter", "Peck", "Piston", "Plunk", "PowerDown", "Poke", "Propel", "Rain", "Ramp", "Rebound", "Rivet", "Strike", "Surge", "Sweep", "Waterfall", "BassDrop", "Chip", "Chirp", "Coil", "CoinDrop", "Firecracker", "Hail", "Pulse", "Spark", "Spin", "Summon", "Trigger", "Triumph", "BellToll", "Buildup", "Cleave", "Fizz", "Flare", "Flinch", "Flurry", "Ignition", "Nudge", "Peal", "Plink", "Pummel", "Sonar", "StoneSkip", "Throb", "Thump", "Tremor", "Trumpet", "Unfurl", "Wave", "Wisp", "Anvil", "GuitarStrum", "Wobble", "Woodpecker", "Zipper", "SystemImpactLight", "SystemImpactMedium", "SystemImpactHeavy", "SystemPrimitiveClick", "SystemPrimitiveTick", "SystemPrimitiveLowTick"];
+    PULSAR.forEach(function(n){ PADROES.push(['Pulsar: ' + n, function(){ return HP().pulsar({ nome: n }); }]); });
     for (let n = 0; n <= 30; n++) PADROES.push(['Varredura: constante ' + n + ' (sistema)', fb0(n)]);
     PADROES.push(['Varredura: constante 9 com flag', fb(9)], ['Varredura: constante 10 com flag', fb(10)], ['Varredura: constante 11 com flag', fb(11)]);
     void [
@@ -16256,8 +16258,14 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       d.id = 'vibTeste';
       d.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#1b1b1f;color:#fff;overflow:auto;padding:calc(env(safe-area-inset-top,0px) + 40px) 16px 24px;font:15px system-ui,sans-serif';
       d.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><b style="font-size:18px">Teste de vibracoes</b><button id="vibFechar" style="padding:8px 14px;border-radius:10px;border:0;background:#444;color:#fff">fechar</button></div><div style="opacity:.7;margin-bottom:12px">Toque em cada um e me diga o numero que parece com o Skillion.</div>';
+      const busca = document.createElement('input');
+      busca.placeholder = 'filtrar (ex.: Pulsar, Peck, J1...)';
+      busca.style.cssText = 'width:100%;box-sizing:border-box;margin:0 0 12px;padding:12px;border-radius:10px;border:1px solid #3a3a42;background:#111;color:#fff;font-size:15px';
+      busca.oninput = function(){ const q = busca.value.toLowerCase(); d.querySelectorAll('button[data-n]').forEach(function(x){ x.style.display = x.dataset.n.indexOf(q) < 0 ? 'none' : 'block'; }); };
+      d.appendChild(busca);
       PADROES.forEach(function(p){
         const b = document.createElement('button');
+        b.dataset.n = p[0].toLowerCase();
         b.textContent = p[0];
         b.style.cssText = 'display:block;width:100%;text-align:left;margin:0 0 8px;padding:14px;border-radius:12px;border:1px solid #3a3a42;background:#26262c;color:#fff;font-size:15px';
         b.onclick = function(){ try { Promise.resolve(p[1]()).catch(function(){}); } catch(e){} };

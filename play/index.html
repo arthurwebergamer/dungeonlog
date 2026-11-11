@@ -16185,6 +16185,9 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     const imp = st => () => H().impact({ style: st });
     const not = ty => () => H().notification({ type: ty });
     const vib = ms => () => H().vibrate({ duration: ms });
+    const HP = () => { const C = window.Capacitor; return C && C.registerPlugin ? (window.__hapticosPlug || (window.__hapticosPlug = C.registerPlugin('Hapticos'))) : null; };
+    const ef = id => () => HP().efeito({ id: id });
+    const fb = t => () => HP().feedback({ tipo: t });
     const seq = (...p) => async () => { for (const x of p){ if (typeof x === 'number') await wait(x); else await x(); } };
     const PADROES = [
       ['1. Impact leve', imp('LIGHT')], ['2. Impact medio', imp('MEDIUM')], ['3. Impact pesado', imp('HEAVY')],
@@ -16197,7 +16200,12 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       ['14. Crescente (leve, medio, pesado)', seq(imp('LIGHT'), 70, imp('MEDIUM'), 70, imp('HEAVY'))],
       ['15. Decrescente (pesado, medio, leve)', seq(imp('HEAVY'), 70, imp('MEDIUM'), 70, imp('LIGHT'))],
       ['16. Triplo rapido', seq(imp('LIGHT'), 50, imp('LIGHT'), 50, imp('LIGHT'))],
-      ['17. Rajada (5 leves)', seq(imp('LIGHT'), 40, imp('LIGHT'), 40, imp('LIGHT'), 40, imp('LIGHT'), 40, imp('LIGHT'))]
+      ['17. Rajada (5 leves)', seq(imp('LIGHT'), 40, imp('LIGHT'), 40, imp('LIGHT'), 40, imp('LIGHT'), 40, imp('LIGHT'))],
+      ['18. [Android] Click', ef(0)], ['19. [Android] Click duplo', ef(1)], ['20. [Android] Tick (bem seco e curto)', ef(2)], ['21. [Android] Heavy click', ef(5)],
+      ['22. [Android] Tap de teclado', fb(3)], ['23. [Android] Tique de relogio', fb(4)], ['24. [Android] Context click', fb(6)],
+      ['25. [Android] Tecla virtual', fb(1)], ['26. [Android] Soltar tecla', fb(7)], ['27. [Android] Long press', fb(0)],
+      ['28. [Android] Confirmar', fb(16)], ['29. [Android] Rejeitar', fb(17)], ['30. [Android] Inicio de gesto', fb(12)], ['31. [Android] Fim de gesto', fb(13)],
+      ['32. [Android] Tick x3 rapido', seq(ef(2), 45, ef(2), 45, ef(2))], ['33. [Android] Click + heavy', seq(ef(0), 90, ef(5))]
     ];
     function abrir(){
       if (document.getElementById('vibTeste')) return;

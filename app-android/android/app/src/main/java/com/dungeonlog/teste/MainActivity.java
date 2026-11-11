@@ -20,7 +20,7 @@ public class MainActivity extends BridgeActivity {
         pedirMaiorTaxaDeAtualizacao();
     }
 
-    // O WebView de um app costuma ficar em 60 Hz; o Chrome pede a taxa maxima da tela. Pedimos a maior (mesma resolucao).
+    // Teste: fixa a taxa em ~60 Hz pra ritmo de quadros estavel (a 120 Hz o ritmo ficou irregular nas gravacoes).
     private void pedirMaiorTaxaDeAtualizacao() {
         try {
             if (Build.VERSION.SDK_INT < 23) return;
@@ -29,8 +29,9 @@ public class MainActivity extends BridgeActivity {
             Display.Mode atual = d.getMode();
             Display.Mode melhor = atual;
             for (Display.Mode m : d.getSupportedModes()) {
+                // fixa em ~60 Hz (ritmo estavel, como o Chrome): escolhe o modo mais proximo de 60 na mesma resolucao
                 if (m.getPhysicalWidth() == atual.getPhysicalWidth() && m.getPhysicalHeight() == atual.getPhysicalHeight()
-                        && m.getRefreshRate() > melhor.getRefreshRate()) {
+                        && Math.abs(m.getRefreshRate() - 60f) < Math.abs(melhor.getRefreshRate() - 60f)) {
                     melhor = m;
                 }
             }

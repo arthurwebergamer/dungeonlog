@@ -4,6 +4,8 @@ on:
     branches: [capacitor]
     paths: ['app-android/**', 'play/**', '.github/workflows/android-apk.yml']
   workflow_dispatch:
+permissions:
+  contents: write
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -27,3 +29,11 @@ jobs:
         with:
           name: dungeonlog-teste-apk
           path: app-android/android/app/build/outputs/apk/debug/app-debug.apk
+      - name: Publicar APK numa pre-release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        working-directory: .
+        run: |
+          cp app-android/android/app/build/outputs/apk/debug/app-debug.apk dungeonlog-teste.apk
+          gh release delete apk-teste --cleanup-tag --yes || true
+          gh release create apk-teste dungeonlog-teste.apk --prerelease --target "$GITHUB_SHA" --title "APK de teste (Capacitor)" --notes "Build ${GITHUB_SHA::7} - so pra teste"

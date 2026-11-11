@@ -16267,6 +16267,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       document.getElementById('vibFechar').onclick = function(){ d.remove(); };
     }
     const montarBotaoVib = function(){
+      try { if (localStorage.getItem('dl.vibteste') !== '1') return; } catch(e){ return; }
       if (!H() || document.getElementById('vibBtn')) return;
       const b = document.createElement('button');
       b.textContent = 'vib'; b.id = 'vibBtn';

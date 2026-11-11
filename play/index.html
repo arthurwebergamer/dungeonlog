@@ -21910,6 +21910,37 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
     out.id = 'perfOut'; out.setAttribute('data-sem-feedback', '');
     out.style.cssText = 'position:fixed;left:10px;right:10px;bottom:160px;z-index:99998;padding:10px;border-radius:10px;background:#111;color:#cfe;font:12px/1.4 monospace;display:none;white-space:pre-wrap';
     document.body.appendChild(out); document.body.appendChild(b);
+    // INTERRUPTORES DE EFEITO: desliga uma categoria por vez pra achar o que pesa
+    const EF = [
+      ['sombras', 'box-shadow:none!important;text-shadow:none!important;drop-shadow:none!important'],
+      ['filtros/blur', 'filter:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important'],
+      ['animacoes CSS', 'animation:none!important'],
+      ['transicoes', 'transition:none!important'],
+      ['gradientes/imagens de fundo', 'background-image:none!important'],
+      ['pixelado (image-rendering)', 'image-rendering:auto!important'],
+      ['mix-blend/opacidade', 'mix-blend-mode:normal!important;will-change:auto!important']
+    ];
+    const painel = document.createElement('div');
+    painel.setAttribute('data-sem-feedback', '');
+    painel.style.cssText = 'position:fixed;left:10px;right:10px;bottom:230px;z-index:99998;display:none;flex-wrap:wrap;gap:6px';
+    const estilos = {};
+    EF.forEach(function(e){
+      const t = document.createElement('button');
+      t.textContent = 'desligar ' + e[0];
+      t.setAttribute('data-sem-feedback', '');
+      t.style.cssText = 'padding:6px 9px;border-radius:8px;border:1px solid #444;background:#1b1b1f;color:#ddd;font-size:11px';
+      t.onclick = function(){
+        if (estilos[e[0]]) { estilos[e[0]].remove(); delete estilos[e[0]]; t.style.background = '#1b1b1f'; t.textContent = 'desligar ' + e[0]; }
+        else { const st = document.createElement('style'); st.textContent = '*,*::before,*::after{' + e[1] + '}'; document.head.appendChild(st); estilos[e[0]] = st; t.style.background = '#2d5a3d'; t.textContent = 'DESLIGADO: ' + e[0]; }
+      };
+      painel.appendChild(t);
+    });
+    document.body.appendChild(painel);
+    const tg = document.createElement('button');
+    tg.textContent = 'efeitos'; tg.setAttribute('data-sem-feedback', '');
+    tg.style.cssText = 'position:fixed;left:80px;bottom:120px;z-index:99998;padding:8px 12px;border-radius:10px;border:1px dashed #e5a05c;background:#1b1b1f;color:#e5a05c;font-size:13px';
+    tg.onclick = function(){ painel.style.display = painel.style.display === 'none' ? 'flex' : 'none'; };
+    document.body.appendChild(tg);
     b.onclick = function(){
       if (b.dataset.rodando) return; b.dataset.rodando = '1';
       out.style.display = 'block';

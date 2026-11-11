@@ -16189,6 +16189,9 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     const ef = id => () => HP().efeito({ id: id });
     const fb = t => () => HP().feedback({ tipo: t });
     const fb0 = t => () => HP().feedback({ tipo: t, flag: 0 });
+    const eft = id => () => HP().efeito({ id: id, touch: true });
+    const ondt = (t, a) => () => HP().onda({ tempos: t, amps: a, touch: true });
+    const prit = (ids, esc, atr) => () => HP().primitivas({ ids: ids, escalas: esc, atrasos: atr, touch: true });
     const nv = ms => () => navigator.vibrate(ms);
     const ond = (t, a) => () => HP().onda({ tempos: t, amps: a });
     const pri = (ids, esc, atr) => () => HP().primitivas({ ids: ids, escalas: esc, atrasos: atr });
@@ -16220,7 +16223,10 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       ['54. [Clique] Pulso 5ms', ond([0,5],[0,255])], ['55. [Clique] Pulso 8ms', ond([0,8],[0,255])], ['56. [Clique] Pulso 5ms fraco (amp 100)', ond([0,5],[0,100])],
       ['57. [Clique] navigator.vibrate(1)', nv(1)], ['58. [Clique] navigator.vibrate(3)', nv(3)], ['59. [Clique] navigator.vibrate(5)', nv(5)],
       ['60. [Sistema s/ flag] Tap de teclado', fb0(3)], ['61. [Sistema s/ flag] Tique de relogio', fb0(4)], ['62. [Sistema s/ flag] Context click', fb0(6)],
-      ['63. [Sistema s/ flag] Tecla virtual', fb0(1)], ['64. [Sistema s/ flag] Confirmar', fb0(16)]
+      ['63. [Sistema s/ flag] Tecla virtual', fb0(1)], ['64. [Sistema s/ flag] Confirmar', fb0(16)],
+      ['65. [TOUCH] Click', eft(0)], ['66. [TOUCH] Tick', eft(2)], ['67. [TOUCH] Heavy click', eft(5)], ['68. [TOUCH] Click duplo', eft(1)],
+      ['69. [TOUCH] Primitiva click', prit([1],[1],[0])], ['70. [TOUCH] Primitiva tick', prit([7],[1],[0])], ['71. [TOUCH] Primitiva low tick', prit([8],[1],[0])],
+      ['72. [TOUCH] Pulso 5ms', ondt([0,5],[0,255])], ['73. [TOUCH] Pulso 10ms', ondt([0,10],[0,255])], ['74. [TOUCH] Pulso 20ms amp 150', ondt([0,20],[0,150])]
     ];
     function abrir(){
       if (document.getElementById('vibTeste')) return;

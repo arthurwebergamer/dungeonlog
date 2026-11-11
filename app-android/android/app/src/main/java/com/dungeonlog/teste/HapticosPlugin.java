@@ -4,6 +4,8 @@ import android.content.Context;
 import android.os.Build;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.os.VibrationAttributes;
+import android.media.AudioAttributes;
 
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
@@ -16,6 +18,18 @@ import com.getcapacitor.annotation.CapacitorPlugin;
 @CapacitorPlugin(name = "Hapticos")
 public class HapticosPlugin extends Plugin {
 
+    // Dispara com o "uso" declarado: touch (cliques de interface) ou padrao
+    private void disparar(Vibrator v, VibrationEffect e, boolean touch) {
+        if (touch && Build.VERSION.SDK_INT >= 33) {
+            v.vibrate(e, VibrationAttributes.createForUsage(VibrationAttributes.USAGE_TOUCH));
+        } else if (touch && Build.VERSION.SDK_INT >= 26) {
+            v.vibrate(e, new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION).setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build());
+        } else {
+            v.vibrate(e);
+        }
+    }
+
+
     // Efeitos prontos do Android (API 29+): 0 click, 1 double click, 2 tick, 5 heavy click
     @PluginMethod
     public void efeito(PluginCall call) {
@@ -23,7 +37,7 @@ public class HapticosPlugin extends Plugin {
         try {
             Vibrator v = (Vibrator) getContext().getSystemService(Context.VIBRATOR_SERVICE);
             if (v != null && Build.VERSION.SDK_INT >= 29) {
-                v.vibrate(VibrationEffect.createPredefined(id));
+                disparar(v, VibrationEffect.createPredefined(id), call.getBoolean("touch", false));
                 call.resolve();
             } else {
                 call.reject("sem suporte");
@@ -66,7 +80,7 @@ public class HapticosPlugin extends Plugin {
             for (int i = 0; i < amps.length; i++) amps[i] = a.getInt(i);
             Vibrator v = (Vibrator) getContext().getSystemService(Context.VIBRATOR_SERVICE);
             if (v != null && Build.VERSION.SDK_INT >= 26) {
-                v.vibrate(VibrationEffect.createWaveform(tempos, amps, -1));
+                disparar(v, VibrationEffect.createWaveform(tempos, amps, -1), call.getBoolean("touch", false));
                 JSObject r = new JSObject();
                 r.put("controleIntensidade", v.hasAmplitudeControl());
                 call.resolve(r);
@@ -93,7 +107,7 @@ public class HapticosPlugin extends Plugin {
                 if (!v.areAllPrimitivesSupported(id)) { call.reject("primitiva " + id + " nao suportada"); return; }
                 c.addPrimitive(id, (float) esc.getDouble(i), atr.getInt(i));
             }
-            v.vibrate(c.compose());
+            disparar(v, c.compose(), call.getBoolean("touch", false));
             call.resolve();
         } catch (Exception e) {
             call.reject(e.getMessage());

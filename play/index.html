@@ -6736,6 +6736,7 @@ document.getElementById('addbtn').onclick = () => {
   composer.classList.toggle('on');
   if (composer.classList.contains('on')){
     input.focus();
+    requestAnimationFrame(() => requestAnimationFrame(() => { if (composer.classList.contains('on') && document.activeElement !== input) input.focus(); }));
     if (typeof difEscolhida !== 'undefined'){
       difEscolhida = DIF_PADRAO;
       document.querySelectorAll('#difs .dif').forEach(x => x.classList.toggle('on', x.dataset.dif === DIF_PADRAO));
@@ -21872,6 +21873,7 @@ document.addEventListener('dragstart', function(e){ if (e.target && e.target.tag
     const t = e.target;
     if (!t || !t.matches || !t.matches('input:not([type=checkbox]):not([type=radio]):not([type=range]), textarea')) return;
     if (nativo() && (typeof window.feedbackPreferido !== 'function' || window.feedbackPreferido() === 'vibrar')) tick(26);
+    if (nativo()) { try { window.Capacitor.Plugins.Hapticos.teclado(); } catch(_){} }
   }, true);
 
   // 3) dialogo/overlay em tela cheia abrindo (classe "on" adicionada): vibra

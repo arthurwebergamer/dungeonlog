@@ -2,6 +2,8 @@ package com.dungeonlog.teste;
 
 import android.content.Context;
 import android.os.Build;
+import android.view.inputmethod.InputMethodManager;
+import android.webkit.WebView;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.os.VibrationAttributes;
@@ -181,5 +183,19 @@ public class HapticosPlugin extends Plugin {
         } catch (Throwable e) {
             call.reject("pulsar: " + e);
         }
+    }
+
+    // Abre o teclado na hora (focus() fora de gesto nao abre o IME no WebView)
+    @PluginMethod
+    public void teclado(PluginCall call) {
+        final WebView wv = getBridge().getWebView();
+        getActivity().runOnUiThread(() -> {
+            try {
+                wv.requestFocus();
+                InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (imm != null) imm.showSoftInput(wv, InputMethodManager.SHOW_IMPLICIT);
+            } catch (Throwable e) { }
+        });
+        call.resolve();
     }
 }

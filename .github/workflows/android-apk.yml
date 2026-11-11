@@ -23,17 +23,17 @@ jobs:
           java-version: 21
       - run: npm ci
       - run: npx cap sync android
-      - run: chmod +x gradlew && ./gradlew assembleDebug
+      - run: chmod +x gradlew && ./gradlew assembleRelease
         working-directory: app-android/android
       - uses: actions/upload-artifact@v4
         with:
           name: dungeonlog-teste-apk
-          path: app-android/android/app/build/outputs/apk/debug/app-debug.apk
+          path: app-android/android/app/build/outputs/apk/release/app-release.apk
       - name: Publicar APK numa pre-release
         env:
           GH_TOKEN: ${{ github.token }}
         working-directory: .
         run: |
-          cp app-android/android/app/build/outputs/apk/debug/app-debug.apk dungeonlog-teste.apk
+          cp app-android/android/app/build/outputs/apk/release/app-release.apk dungeonlog-teste.apk
           gh release delete apk-teste --cleanup-tag --yes || true
           gh release create apk-teste dungeonlog-teste.apk --prerelease --target "$GITHUB_SHA" --title "APK de teste (Capacitor)" --notes "Build ${GITHUB_SHA::7} - so pra teste"

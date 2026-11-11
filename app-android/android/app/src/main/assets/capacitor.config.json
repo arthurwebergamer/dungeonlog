@@ -1,0 +1,11 @@
+{
+	"appId": "com.dungeonlog.teste",
+	"appName": "Dungeonlog Teste",
+	"webDir": "../play",
+	"server": {
+		"androidScheme": "https"
+	},
+	"android": {
+		"allowMixedContent": false
+	}
+}

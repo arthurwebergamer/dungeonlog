@@ -16188,6 +16188,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     const HP = () => { const C = window.Capacitor; return C && C.registerPlugin ? (window.__hapticosPlug || (window.__hapticosPlug = C.registerPlugin('Hapticos'))) : null; };
     const ef = id => () => HP().efeito({ id: id });
     const fb = t => () => HP().feedback({ tipo: t });
+    const ond = (t, a) => () => HP().onda({ tempos: t, amps: a });
+    const pri = (ids, esc, atr) => () => HP().primitivas({ ids: ids, escalas: esc, atrasos: atr });
     const seq = (...p) => async () => { for (const x of p){ if (typeof x === 'number') await wait(x); else await x(); } };
     const PADROES = [
       ['1. Impact leve', imp('LIGHT')], ['2. Impact medio', imp('MEDIUM')], ['3. Impact pesado', imp('HEAVY')],
@@ -16205,7 +16207,13 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       ['22. [Android] Tap de teclado', fb(3)], ['23. [Android] Tique de relogio', fb(4)], ['24. [Android] Context click', fb(6)],
       ['25. [Android] Tecla virtual', fb(1)], ['26. [Android] Soltar tecla', fb(7)], ['27. [Android] Long press', fb(0)],
       ['28. [Android] Confirmar', fb(16)], ['29. [Android] Rejeitar', fb(17)], ['30. [Android] Inicio de gesto', fb(12)], ['31. [Android] Fim de gesto', fb(13)],
-      ['32. [Android] Tick x3 rapido', seq(ef(2), 45, ef(2), 45, ef(2))], ['33. [Android] Click + heavy', seq(ef(0), 90, ef(5))]
+      ['32. [Android] Tick x3 rapido', seq(ef(2), 45, ef(2), 45, ef(2))], ['33. [Android] Click + heavy', seq(ef(0), 90, ef(5))],
+      ['34. [Onda] 30ms fraca (amp 40)', ond([0,30],[0,40])], ['35. [Onda] 30ms media (amp 120)', ond([0,30],[0,120])], ['36. [Onda] 30ms forte (amp 255)', ond([0,30],[0,255])],
+      ['37. [Onda] Sobe (amp 30>255)', ond([0,20,20,20,20,20],[0,30,0,120,0,255])], ['38. [Onda] Desce (amp 255>30)', ond([0,20,20,20,20,20],[0,255,0,120,0,30])],
+      ['39. [Onda] Toque curto forte x2', ond([0,15,50,15],[0,255,0,255])], ['40. [Onda] Pulso longo suave (200ms amp 60)', ond([0,200],[0,60])],
+      ['41. [Primitiva] Click', pri([1],[1],[0])], ['42. [Primitiva] Thud', pri([2],[1],[0])], ['43. [Primitiva] Tick', pri([7],[1],[0])], ['44. [Primitiva] Low tick', pri([8],[1],[0])],
+      ['45. [Primitiva] Quick rise', pri([4],[1],[0])], ['46. [Primitiva] Slow rise', pri([5],[1],[0])], ['47. [Primitiva] Quick fall', pri([6],[1],[0])], ['48. [Primitiva] Spin', pri([3],[1],[0])],
+      ['49. [Primitiva] Rise + thud', pri([4,2],[1,1],[0,30])], ['50. [Primitiva] Tick x4 rapido', pri([7,7,7,7],[1,1,1,1],[0,30,30,30])]
     ];
     function abrir(){
       if (document.getElementById('vibTeste')) return;

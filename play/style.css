@@ -7300,3 +7300,6 @@ input:not([type=checkbox]):not([type=radio]):not([type=range]):focus, textarea:f
 /* resposta visual imediata ao tocar em botoes (so opacidade: nao mexe em transform/posicao) */
 button:active, [role="button"]:active, .cfgrow:active, .opcao:active, .catchip:active, .cattab:active{opacity:.78}
 button, [role="button"], .cfgrow, .opcao, .catchip, .cattab{transition:opacity .06s linear}
+
+/* Capacitor: teclado nao redimensiona a janela; sobe so a folha (altura em --kb, via MainActivity) */
+html.cap .edov.on .edsheet{ transform:translateY(calc(-1 * var(--kb, 0px))); will-change:transform; }

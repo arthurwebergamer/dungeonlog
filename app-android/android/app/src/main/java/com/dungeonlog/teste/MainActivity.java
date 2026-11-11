@@ -21,31 +21,47 @@ public class MainActivity extends BridgeActivity {
         acompanharAnimacaoDoTeclado();
     }
 
-    private int baseInferior = -1;
+    private float densidade() { return getResources().getDisplayMetrics().density; }
 
-    // O Capacitor so ajusta o padding da janela no inicio/fim da animacao do teclado (pulo). Aqui acompanhamos cada quadro.
+    private void enviarTeclado(int pxInferior) {
+        final int dp = Math.round(pxInferior / densidade());
+        if (getBridge() == null || getBridge().getWebView() == null) return;
+        getBridge().getWebView().evaluateJavascript("window.__kb&&window.__kb(" + dp + ")", null);
+    }
+
+    // O teclado NAO redimensiona mais o WebView (isso refazia o layout da pagina inteira a cada quadro = travada).
+    // A janela fica fixa; mandamos a altura do teclado pro JS, que so sobe a folha (transform, barato).
     private void acompanharAnimacaoDoTeclado() {
         final View decor = getWindow().getDecorView();
+        ViewCompat.setOnApplyWindowInsetsListener(decor, (v, insets) -> {
+            Insets sb = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
+            boolean tecladoVisivel = insets.isVisible(WindowInsetsCompat.Type.ime());
+            v.setPadding(0, 0, 0, 0);
+            WindowInsetsCompat novos = new WindowInsetsCompat.Builder(insets)
+                .setInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout(),
+                    Insets.of(sb.left, sb.top, sb.right, tecladoVisivel ? 0 : sb.bottom))
+                .build();
+            float d = densidade();
+            if (getBridge() != null && getBridge().getWebView() != null) {
+                String js = "try{var r=document.documentElement.style;"
+                    + "r.setProperty('--safe-area-inset-top','" + (int) (sb.top / d) + "px');"
+                    + "r.setProperty('--safe-area-inset-right','" + (int) (sb.right / d) + "px');"
+                    + "r.setProperty('--safe-area-inset-bottom','" + (int) ((tecladoVisivel ? 0 : sb.bottom) / d) + "px');"
+                    + "r.setProperty('--safe-area-inset-left','" + (int) (sb.left / d) + "px');}catch(e){}";
+                getBridge().getWebView().evaluateJavascript(js, null);
+            }
+            if (!tecladoVisivel) enviarTeclado(0);
+            return novos;
+        });
         ViewCompat.setWindowInsetsAnimationCallback(decor, new WindowInsetsAnimationCompat.Callback(WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_CONTINUE_ON_SUBTREE) {
             @Override
-            public void onPrepare(WindowInsetsAnimationCompat animation) {
-                WindowInsetsCompat atual = ViewCompat.getRootWindowInsets(decor);
-                boolean tecladoVisivel = atual != null && atual.isVisible(WindowInsetsCompat.Type.ime());
-                if (baseInferior < 0 && !tecladoVisivel) baseInferior = decor.getPaddingBottom();
-            }
-
-            @Override
             public WindowInsetsCompat onProgress(WindowInsetsCompat insets, List<WindowInsetsAnimationCompat> animacoes) {
-                boolean temTeclado = false;
                 for (WindowInsetsAnimationCompat a : animacoes) {
-                    if ((a.getTypeMask() & WindowInsetsCompat.Type.ime()) != 0) temTeclado = true;
-                }
-                if (temTeclado) {
-                    Insets ime = insets.getInsets(WindowInsetsCompat.Type.ime());
-                    int base = baseInferior < 0 ? 0 : baseInferior;
-                    int inferior = Math.max(base, ime.bottom);
-                    if (decor.getPaddingBottom() != inferior) {
-                        decor.setPadding(decor.getPaddingLeft(), decor.getPaddingTop(), decor.getPaddingRight(), inferior);
+                    if ((a.getTypeMask() & WindowInsetsCompat.Type.ime()) != 0) {
+                        int ime = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom;
+                        int nav = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom;
+                        enviarTeclado(Math.max(0, ime - nav));
+                        break;
                     }
                 }
                 return insets;

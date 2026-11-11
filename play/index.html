@@ -16178,6 +16178,52 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       return true;
     } catch(e){ return false; }
   };
+  // TELA DE TESTE DE VIBRACOES (so no app Capacitor): botao flutuante "vib" abre uma lista de padroes
+  (function(){
+    const H = () => _hapticsNativo();
+    const wait = ms => new Promise(r => setTimeout(r, ms));
+    const imp = st => () => H().impact({ style: st });
+    const not = ty => () => H().notification({ type: ty });
+    const vib = ms => () => H().vibrate({ duration: ms });
+    const seq = (...p) => async () => { for (const x of p){ if (typeof x === 'number') await wait(x); else await x(); } };
+    const PADROES = [
+      ['1. Impact leve', imp('LIGHT')], ['2. Impact medio', imp('MEDIUM')], ['3. Impact pesado', imp('HEAVY')],
+      ['4. Selecao (tique)', async () => { await H().selectionStart(); await H().selectionChanged(); await H().selectionEnd(); }],
+      ['5. Notificacao sucesso', not('SUCCESS')], ['6. Notificacao aviso', not('WARNING')], ['7. Notificacao erro', not('ERROR')],
+      ['8. Vibrate 10ms', vib(10)], ['9. Vibrate 25ms', vib(25)], ['10. Vibrate 50ms', vib(50)],
+      ['11. Duplo leve', seq(imp('LIGHT'), 70, imp('LIGHT'))],
+      ['12. Duplo medio', seq(imp('MEDIUM'), 90, imp('MEDIUM'))],
+      ['13. Tum-tum (pesado, medio)', seq(imp('HEAVY'), 120, imp('MEDIUM'))],
+      ['14. Crescente (leve, medio, pesado)', seq(imp('LIGHT'), 70, imp('MEDIUM'), 70, imp('HEAVY'))],
+      ['15. Decrescente (pesado, medio, leve)', seq(imp('HEAVY'), 70, imp('MEDIUM'), 70, imp('LIGHT'))],
+      ['16. Triplo rapido', seq(imp('LIGHT'), 50, imp('LIGHT'), 50, imp('LIGHT'))],
+      ['17. Rajada (5 leves)', seq(imp('LIGHT'), 40, imp('LIGHT'), 40, imp('LIGHT'), 40, imp('LIGHT'), 40, imp('LIGHT'))]
+    ];
+    function abrir(){
+      if (document.getElementById('vibTeste')) return;
+      const d = document.createElement('div');
+      d.id = 'vibTeste';
+      d.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#1b1b1f;color:#fff;overflow:auto;padding:calc(env(safe-area-inset-top,0px) + 40px) 16px 24px;font:15px system-ui,sans-serif';
+      d.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><b style="font-size:18px">Teste de vibracoes</b><button id="vibFechar" style="padding:8px 14px;border-radius:10px;border:0;background:#444;color:#fff">fechar</button></div><div style="opacity:.7;margin-bottom:12px">Toque em cada um e me diga o numero que parece com o Skillion.</div>';
+      PADROES.forEach(function(p){
+        const b = document.createElement('button');
+        b.textContent = p[0];
+        b.style.cssText = 'display:block;width:100%;text-align:left;margin:0 0 8px;padding:14px;border-radius:12px;border:1px solid #3a3a42;background:#26262c;color:#fff;font-size:15px';
+        b.onclick = function(){ try { Promise.resolve(p[1]()).catch(function(){}); } catch(e){} };
+        d.appendChild(b);
+      });
+      document.body.appendChild(d);
+      document.getElementById('vibFechar').onclick = function(){ d.remove(); };
+    }
+    document.addEventListener('DOMContentLoaded', function(){
+      if (!H()) return;
+      const b = document.createElement('button');
+      b.textContent = 'vib';
+      b.style.cssText = 'position:fixed;right:10px;bottom:120px;z-index:9999;padding:8px 12px;border-radius:10px;border:1px dashed #6f86e0;background:#1b1b1f;color:#9fb0ff;font-size:13px';
+      b.onclick = abrir;
+      document.body.appendChild(b);
+    });
+  })();
   function vibrarEvento(nome){
     const padrao = VIBRACAO[nome];
     if (padrao && feedback === 'vibrar' && window.hapticoNativo(HAPT[nome])) return;

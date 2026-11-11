@@ -16185,7 +16185,13 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     const imp = st => () => H().impact({ style: st });
     const not = ty => () => H().notification({ type: ty });
     const vib = ms => () => H().vibrate({ duration: ms });
-    const HP = () => { const C = window.Capacitor; return C && C.registerPlugin ? (window.__hapticosPlug || (window.__hapticosPlug = C.registerPlugin('Hapticos'))) : null; };
+    const HP = () => {
+      const C = window.Capacitor;
+      if (!C) throw new Error('window.Capacitor ausente');
+      if (C.Plugins && C.Plugins.Hapticos) return C.Plugins.Hapticos;
+      if (C.registerPlugin) return (window.__hapticosPlug || (window.__hapticosPlug = C.registerPlugin('Hapticos')));
+      throw new Error('plugin Hapticos nao encontrado (Plugins: ' + Object.keys(C.Plugins || {}).join(',') + ')');
+    };
     const ef = id => () => HP().efeito({ id: id });
     const fb = t => () => HP().feedback({ tipo: t });
     const fb0 = t => () => HP().feedback({ tipo: t, flag: 0 });

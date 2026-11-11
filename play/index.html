@@ -16188,6 +16188,8 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     const HP = () => { const C = window.Capacitor; return C && C.registerPlugin ? (window.__hapticosPlug || (window.__hapticosPlug = C.registerPlugin('Hapticos'))) : null; };
     const ef = id => () => HP().efeito({ id: id });
     const fb = t => () => HP().feedback({ tipo: t });
+    const fb0 = t => () => HP().feedback({ tipo: t, flag: 0 });
+    const nv = ms => () => navigator.vibrate(ms);
     const ond = (t, a) => () => HP().onda({ tempos: t, amps: a });
     const pri = (ids, esc, atr) => () => HP().primitivas({ ids: ids, escalas: esc, atrasos: atr });
     const seq = (...p) => async () => { for (const x of p){ if (typeof x === 'number') await wait(x); else await x(); } };
@@ -16213,7 +16215,12 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       ['39. [Onda] Toque curto forte x2', ond([0,15,50,15],[0,255,0,255])], ['40. [Onda] Pulso longo suave (200ms amp 60)', ond([0,200],[0,60])],
       ['41. [Primitiva] Click', pri([1],[1],[0])], ['42. [Primitiva] Thud', pri([2],[1],[0])], ['43. [Primitiva] Tick', pri([7],[1],[0])], ['44. [Primitiva] Low tick', pri([8],[1],[0])],
       ['45. [Primitiva] Quick rise', pri([4],[1],[0])], ['46. [Primitiva] Slow rise', pri([5],[1],[0])], ['47. [Primitiva] Quick fall', pri([6],[1],[0])], ['48. [Primitiva] Spin', pri([3],[1],[0])],
-      ['49. [Primitiva] Rise + thud', pri([4,2],[1,1],[0,30])], ['50. [Primitiva] Tick x4 rapido', pri([7,7,7,7],[1,1,1,1],[0,30,30,30])]
+      ['49. [Primitiva] Rise + thud', pri([4,2],[1,1],[0,30])], ['50. [Primitiva] Tick x4 rapido', pri([7,7,7,7],[1,1,1,1],[0,30,30,30])],
+      ['51. [Clique] Pulso 1ms', ond([0,1],[0,255])], ['52. [Clique] Pulso 2ms', ond([0,2],[0,255])], ['53. [Clique] Pulso 3ms', ond([0,3],[0,255])],
+      ['54. [Clique] Pulso 5ms', ond([0,5],[0,255])], ['55. [Clique] Pulso 8ms', ond([0,8],[0,255])], ['56. [Clique] Pulso 5ms fraco (amp 100)', ond([0,5],[0,100])],
+      ['57. [Clique] navigator.vibrate(1)', nv(1)], ['58. [Clique] navigator.vibrate(3)', nv(3)], ['59. [Clique] navigator.vibrate(5)', nv(5)],
+      ['60. [Sistema s/ flag] Tap de teclado', fb0(3)], ['61. [Sistema s/ flag] Tique de relogio', fb0(4)], ['62. [Sistema s/ flag] Context click', fb0(6)],
+      ['63. [Sistema s/ flag] Tecla virtual', fb0(1)], ['64. [Sistema s/ flag] Confirmar', fb0(16)]
     ];
     function abrir(){
       if (document.getElementById('vibTeste')) return;

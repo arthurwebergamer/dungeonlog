@@ -37,12 +37,13 @@ public class HapticosPlugin extends Plugin {
     @PluginMethod
     public void feedback(final PluginCall call) {
         final int c = call.getInt("tipo", 3);
+        final int flag = call.getInt("flag", 2);
         try {
             getActivity().runOnUiThread(new Runnable() {
                 public void run() {
                     try {
                         // flag 2 = FLAG_IGNORE_GLOBAL_SETTING (vibra mesmo com "vibrar ao toque" desligado no sistema)
-                        getBridge().getWebView().performHapticFeedback(c, 2);
+                        getBridge().getWebView().performHapticFeedback(c, flag);
                         call.resolve();
                     } catch (Exception e) {
                         call.reject(e.getMessage());

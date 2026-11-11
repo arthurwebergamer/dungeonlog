@@ -16149,8 +16149,38 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     tom(c, { freq: 1568, tipo: 'sine', inicio: 0.2, duracao: 0.34, ganho: 0.14 });
   };
   VIBRACAO.roletaFim = [20, 40, 40];
+  // HAPTICS NATIVO (so no app Capacitor): impacto leve/medio/pesado e notificacao
+  // sucesso/aviso/erro. No navegador/TWA nao existe -> segue o navigator.vibrate de sempre.
+  const HAPT = {
+    golpe:['i','HEAVY'], danoHeroi:['i','HEAVY'], fuga:['n','WARNING'], morte:['n','ERROR'],
+    levelup:['n','SUCCESS'], proAtivado:['n','SUCCESS'], estagioNovo:['n','SUCCESS'], grimorio:['n','SUCCESS'],
+    loot:['i','LIGHT'], chegadaRecompensa:['i','LIGHT'], poofBau:['i','LIGHT'],
+    tarefa:['i','MEDIUM'], compra:['i','MEDIUM'], venda:['i','LIGHT'], investir:['i','LIGHT'],
+    equipar:['i','MEDIUM'], desequipar:['i','LIGHT'], trocarHeroi:['i','MEDIUM'], usar:['i','MEDIUM'],
+    abrirGrimorio:['i','LIGHT'], soltar:['i','LIGHT'], erro:['n','ERROR'], roletaFim:['i','HEAVY']
+  };
+  let _hapPlug;
+  function _hapticsNativo(){
+    if (_hapPlug !== undefined) return _hapPlug;
+    _hapPlug = null;
+    try {
+      const C = window.Capacitor;
+      if (C && C.isNativePlatform && C.isNativePlatform()) _hapPlug = (C.Plugins && C.Plugins.Haptics) || (C.registerPlugin && C.registerPlugin('Haptics')) || null;
+    } catch(e){ _hapPlug = null; }
+    return _hapPlug;
+  }
+  window.hapticoNativo = function(a){
+    const H = _hapticsNativo();
+    if (!H || !a) return false;
+    try {
+      const r = a[0] === 'n' ? H.notification({ type: a[1] }) : H.impact({ style: a[1] });
+      if (r && r.catch) r.catch(function(){});
+      return true;
+    } catch(e){ return false; }
+  };
   function vibrarEvento(nome){
     const padrao = VIBRACAO[nome];
+    if (padrao && feedback === 'vibrar' && window.hapticoNativo(HAPT[nome])) return;
     if (!padrao || feedback !== 'vibrar' || !('vibrate' in navigator)) return;
     try { navigator.vibrate(padrao); } catch(e){}
   }
@@ -16222,6 +16252,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     const usarVibracao = feedback === 'vibrar' && ('vibrate' in navigator);
     // clique NAO tem som: so vibra (se o tatil estiver ligado); o Som e so dos eventos do jogo
     if (!usarVibracao) return;
+    if (window.hapticoNativo(['i','LIGHT'])) return;
     try { navigator.vibrate(ms || 10); } catch(e){}
   };
 

@@ -7289,3 +7289,6 @@ body.diaDescanso .list{opacity:.45}
 
 /* tocha azul no dia de descanso (mesmo sprite da tocha acesa, matiz girado pro azul) */
 .est-tocha-descanso{filter:hue-rotate(190deg) saturate(1.15) brightness(1.05)}
+
+/* Capacitor (Android edge-to-edge): o plugin injeta --safe-area-inset-*; no navegador/TWA a var nao existe e cai em 0 */
+.topbar{padding-top:max(12px, env(safe-area-inset-top, 0px), var(--safe-area-inset-top, 0px))}

@@ -7292,3 +7292,4 @@ body.diaDescanso .list{opacity:.45}
 
 /* Capacitor (Android edge-to-edge): o plugin injeta --safe-area-inset-*; no navegador/TWA a var nao existe e cai em 0 */
 .topbar{padding-top:max(12px, env(safe-area-inset-top, 0px), var(--safe-area-inset-top, 0px))}
+html.cap .topbar{padding-top:calc(max(var(--safe-area-inset-top, 0px), env(safe-area-inset-top, 0px), 30px) + 12px)}

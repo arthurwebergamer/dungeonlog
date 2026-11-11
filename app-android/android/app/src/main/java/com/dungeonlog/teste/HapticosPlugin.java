@@ -113,4 +113,32 @@ public class HapticosPlugin extends Plugin {
             call.reject(e.getMessage());
         }
     }
+    // Vibra DENTRO do evento de toque (sincrono, na thread de UI), como um app nativo faz.
+    // quando: 0 = ao encostar (DOWN), 1 = ao soltar (UP); tipo < 0 desliga
+    @PluginMethod
+    public void modoToque(final PluginCall call) {
+        final int tipo = call.getInt("tipo", -1);
+        final int quando = call.getInt("quando", 1);
+        final int flag = call.getInt("flag", 0);
+        try {
+            getActivity().runOnUiThread(new Runnable() {
+                public void run() {
+                    final android.webkit.WebView w = getBridge().getWebView();
+                    if (tipo < 0) { w.setOnTouchListener(null); call.resolve(); return; }
+                    w.setOnTouchListener(new android.view.View.OnTouchListener() {
+                        public boolean onTouch(android.view.View v, android.view.MotionEvent e) {
+                            int a = e.getActionMasked();
+                            if ((quando == 0 && a == android.view.MotionEvent.ACTION_DOWN) || (quando == 1 && a == android.view.MotionEvent.ACTION_UP)) {
+                                v.performHapticFeedback(tipo, flag);
+                            }
+                            return false;
+                        }
+                    });
+                    call.resolve();
+                }
+            });
+        } catch (Exception e) {
+            call.reject(e.getMessage());
+        }
+    }
 }

@@ -16233,6 +16233,10 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       ['82. [Sistema novo c/ flag] Tique de segmento', fb(27)], ['83. [Sistema novo c/ flag] Toggle ligar', fb(21)],
       ['84. [Sistema] Tap de teclado 3x (150ms)', seq(fb0(3), 150, fb0(3), 150, fb0(3))]
     ];
+    for (let n = 0; n <= 30; n++) PADROES.push(['Varredura: constante ' + n + ' (sistema)', fb0(n)]);
+    PADROES.push(['Varredura: constante 9 com flag', fb(9)], ['Varredura: constante 10 com flag', fb(10)], ['Varredura: constante 11 com flag', fb(11)]);
+    void [
+    ];
     function abrir(){
       if (document.getElementById('vibTeste')) return;
       const d = document.createElement('div');

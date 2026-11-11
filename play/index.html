@@ -16193,6 +16193,7 @@ window.mostrarNivelUp = function(nivel, aoFechar){
     const ondt = (t, a) => () => HP().onda({ tempos: t, amps: a, touch: true });
     const prit = (ids, esc, atr) => () => HP().primitivas({ ids: ids, escalas: esc, atrasos: atr, touch: true });
     const mt = (t, q, f) => () => HP().modoToque({ tipo: t, quando: q, flag: f });
+    const fj = (t, alvo, f) => () => HP().feedbackJanela({ tipo: t, alvo: alvo, flag: f || 0 });
     const nv = ms => () => navigator.vibrate(ms);
     const ond = (t, a) => () => HP().onda({ tempos: t, amps: a });
     const pri = (ids, esc, atr) => () => HP().primitivas({ ids: ids, escalas: esc, atrasos: atr });
@@ -16235,6 +16236,10 @@ window.mostrarNivelUp = function(nivel, aoFechar){
       ['84. [Sistema] Tap de teclado 3x (150ms)', seq(fb0(3), 150, fb0(3), 150, fb0(3))]
     ];
     PADROES.unshift(
+      ['J1. Janela (decor): CLOCK_TICK', fj(4, 'decor')], ['J2. Janela (decor): KEYBOARD_TAP', fj(3, 'decor')], ['J3. Janela (decor): VIRTUAL_KEY', fj(1, 'decor')],
+      ['J4. Janela (decor): CONTEXT_CLICK', fj(6, 'decor')], ['J5. Janela (decor): CONFIRM', fj(16, 'decor')], ['J6. Janela (decor): LONG_PRESS', fj(0, 'decor')],
+      ['J7. View nova: CLOCK_TICK', fj(4, 'nova')], ['J8. View nova: VIRTUAL_KEY', fj(1, 'nova')], ['J9. View nova: KEYBOARD_TAP', fj(3, 'nova')],
+      ['J10. Content: CLOCK_TICK', fj(4, 'content')], ['J11. Content: VIRTUAL_KEY', fj(1, 'content')],
       ['T0. DESLIGAR modo toque nativo (volta ao normal)', mt(-1, 1, 0)],
       ['T1. Toque nativo: CLOCK_TICK ao soltar', mt(4, 1, 0)], ['T2. Toque nativo: KEYBOARD_TAP ao soltar', mt(3, 1, 0)],
       ['T3. Toque nativo: VIRTUAL_KEY ao soltar', mt(1, 1, 0)], ['T4. Toque nativo: CONTEXT_CLICK ao soltar', mt(6, 1, 0)],

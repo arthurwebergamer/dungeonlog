@@ -141,4 +141,35 @@ public class HapticosPlugin extends Plugin {
             call.reject(e.getMessage());
         }
     }
+    // Feedback disparado pela janela principal (DecorView) ou por uma View nativa nova, nao pelo WebView
+    @PluginMethod
+    public void feedbackJanela(final PluginCall call) {
+        final int c = call.getInt("tipo", 3);
+        final int flag = call.getInt("flag", 0);
+        final String alvo = call.getString("alvo", "decor");
+        try {
+            getActivity().runOnUiThread(new Runnable() {
+                public void run() {
+                    try {
+                        android.view.View v;
+                        if ("nova".equals(alvo)) {
+                            v = new android.view.View(getActivity());
+                            ((android.view.ViewGroup) getActivity().getWindow().getDecorView()).addView(v, new android.view.ViewGroup.LayoutParams(1, 1));
+                            v.performHapticFeedback(c, flag);
+                            ((android.view.ViewGroup) getActivity().getWindow().getDecorView()).removeView(v);
+                        } else if ("content".equals(alvo)) {
+                            getActivity().findViewById(android.R.id.content).performHapticFeedback(c, flag);
+                        } else {
+                            getActivity().getWindow().getDecorView().performHapticFeedback(c, flag);
+                        }
+                        call.resolve();
+                    } catch (Exception e) {
+                        call.reject(e.getMessage());
+                    }
+                }
+            });
+        } catch (Exception e) {
+            call.reject(e.getMessage());
+        }
+    }
 }

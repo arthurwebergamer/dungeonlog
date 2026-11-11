@@ -21,6 +21,20 @@ public class MainActivity extends BridgeActivity {
         super.onCreate(savedInstanceState);
         pedirMaiorTaxaDeAtualizacao();
         acompanharAnimacaoDoTeclado();
+        ajustarWebView();
+    }
+
+    // Teste de desempenho do desenho: camada de hardware, fundo opaco (sem mistura de transparencia), sem overscroll.
+    private void ajustarWebView() {
+        try {
+            WebView wv = getBridge().getWebView();
+            wv.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+            wv.setBackgroundColor(0xFF1A1526);
+            wv.setOverScrollMode(View.OVER_SCROLL_NEVER);
+            wv.setVerticalScrollBarEnabled(false);
+            wv.setHorizontalScrollBarEnabled(false);
+            getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(0xFF1A1526));
+        } catch (Throwable t) { }
     }
 
     private float densidade() { return getResources().getDisplayMetrics().density; }

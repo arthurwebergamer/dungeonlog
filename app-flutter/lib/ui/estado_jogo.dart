@@ -288,6 +288,21 @@ class EstadoJogo extends ChangeNotifier {
     return true;
   }
 
+  /// Edita texto, dificuldade e vezes por dia (a recorrência não muda aqui).
+  bool editarTarefa(Tarefa t, {required String texto, required String dif, required int meta}) {
+    final tx = texto.trim();
+    if (tx.isEmpty || !save.tarefas.contains(t)) return false;
+    final m = meta < 1 ? 1 : (meta > 9 ? 9 : meta);
+    t.dados['texto'] = tx;
+    t.dados['dif'] = difDe(dif);
+    t.dados['meta'] = m;
+    final vezes = (t.dados['vezesN'] as num?)?.toInt();
+    if (vezes != null && vezes > m) t.dados['vezesN'] = m;
+    _salvarTudo();
+    notifyListeners();
+    return true;
+  }
+
   /// Apaga uma tarefa. Em tarefa recorrente, [soHoje] só a pula neste dia.
   void apagarTarefa(Tarefa t, {bool soHoje = false}) {
     if (soHoje && t.tipo != 'hoje') {

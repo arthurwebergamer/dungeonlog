@@ -146,6 +146,20 @@ void main() {
     expect(e.save.tarefas.length, 1);
   });
 
+  test('editar tarefa muda texto, dificuldade e meta (e ajusta as vezes já feitas)', () async {
+    final arm = ArmazenamentoMemoria();
+    final e = await novoEstado(arm);
+    e.criarTarefa(texto: 'Água', modo: ModoTarefa.hoje, dif: 'facil', meta: 4);
+    final t = e.tarefasDeHoje.single;
+    e.concluir(t);
+    e.concluir(t);
+    expect(e.editarTarefa(t, texto: '  Beber água  ', dif: 'dificil', meta: 2), isTrue);
+    expect((t.texto, t.dif, t.meta, t.dados['vezesN']), ('Beber água', 'dificil', 2, 2));
+    expect(e.editarTarefa(t, texto: ' ', dif: 'facil', meta: 1), isFalse);
+    final e2 = await novoEstado(arm);
+    expect(e2.tarefasDeHoje.single.texto, 'Beber água');
+  });
+
   test('recusa tarefa sem texto ou sem dias', () async {
     final e = await novoEstado(ArmazenamentoMemoria());
     expect(e.criarTarefa(texto: '   ', modo: ModoTarefa.hoje, dif: 'media'), isFalse);

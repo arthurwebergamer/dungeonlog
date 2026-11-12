@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../dominio/economia.dart';
+import '../dominio/tarefa.dart';
 import 'estado_jogo.dart';
 import 'tema.dart';
 
@@ -12,19 +13,22 @@ const _meses = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', '
 const _nomesDif = {'trivial': 'Trivial', 'facil': 'Fácil', 'media': 'Média', 'dificil': 'Difícil'};
 
 /// Abre a folha e cria a tarefa no [estado] quando o jogador confirma.
-Future<void> abrirNovaTarefa(BuildContext context, EstadoJogo estado) {
+Future<void> abrirNovaTarefa(BuildContext context, EstadoJogo estado, {Tarefa? editar}) {
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
     backgroundColor: corCard,
     shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(22))),
-    builder: (_) => FolhaNovaTarefa(estado: estado),
+    builder: (_) => FolhaNovaTarefa(estado: estado, editar: editar),
   );
 }
 
 class FolhaNovaTarefa extends StatefulWidget {
-  const FolhaNovaTarefa({super.key, required this.estado});
+  const FolhaNovaTarefa({super.key, required this.estado, this.editar});
   final EstadoJogo estado;
+
+  /// Se informada, a folha edita esta tarefa (texto, dificuldade e vezes por dia).
+  final Tarefa? editar;
   @override
   State<FolhaNovaTarefa> createState() => _FolhaNovaTarefaState();
 }
@@ -47,6 +51,12 @@ class _FolhaNovaTarefaState extends State<FolhaNovaTarefa> {
     _diaMes = agora.day;
     _diaAno = agora.day;
     _mesAno = agora.month;
+    final t = widget.editar;
+    if (t != null) {
+      _ctrl.text = t.texto ?? '';
+      _dif = t.dif;
+      _meta = t.meta;
+    }
     _ctrl.addListener(() => setState(() {}));
   }
 
@@ -74,7 +84,10 @@ class _FolhaNovaTarefaState extends State<FolhaNovaTarefa> {
 
   void _criar() {
     if (!_valido) return;
-    final ok = widget.estado.criarTarefa(
+    final t = widget.editar;
+    final ok = t != null
+        ? widget.estado.editarTarefa(t, texto: _ctrl.text, dif: _dif, meta: _meta)
+        : widget.estado.criarTarefa(
       texto: _ctrl.text,
       modo: _modo,
       dif: _dif,
@@ -98,7 +111,7 @@ class _FolhaNovaTarefaState extends State<FolhaNovaTarefa> {
         child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
           Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(4)))),
           const SizedBox(height: 14),
-          const Text('Nova tarefa', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+          Text(widget.editar == null ? 'Nova tarefa' : 'Editar tarefa', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
           const SizedBox(height: 12),
           TextField(
             controller: _ctrl,
@@ -113,6 +126,7 @@ class _FolhaNovaTarefaState extends State<FolhaNovaTarefa> {
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
             ),
           ),
+          if (widget.editar == null) ...[
           _rotulo('REPETIR'),
           Wrap(spacing: 8, children: [
             _chip('Só hoje', _modo == ModoTarefa.hoje, () => setState(() => _modo = ModoTarefa.hoje)),
@@ -175,6 +189,7 @@ class _FolhaNovaTarefaState extends State<FolhaNovaTarefa> {
               ),
             ]),
           ],
+          ],
           _rotulo('DIFICULDADE'),
           Wrap(spacing: 8, children: [
             for (final d in dificuldades) _chip(_nomesDif[d.id]!, _dif == d.id, () => setState(() => _dif = d.id)),
@@ -191,7 +206,7 @@ class _FolhaNovaTarefaState extends State<FolhaNovaTarefa> {
             child: FilledButton(
               style: FilledButton.styleFrom(backgroundColor: Colors.white, foregroundColor: Colors.black, padding: const EdgeInsets.all(14)),
               onPressed: _valido ? _criar : null,
-              child: const Text('Criar tarefa'),
+              child: Text(widget.editar == null ? 'Criar tarefa' : 'Salvar'),
             ),
           ),
         ]),

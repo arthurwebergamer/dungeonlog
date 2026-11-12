@@ -51,7 +51,15 @@ class Arena extends StatelessWidget {
           Positioned.fill(child: Image.asset(tema.arte!, fit: BoxFit.cover, alignment: Alignment.bottomCenter, filterQuality: FilterQuality.none)),
         // chão
         Positioned(left: 0, right: 0, bottom: 0, height: 34, child: Container(color: const Color(0x66000000))),
-        Positioned(left: 26, bottom: 24, child: _sprite(h.imgArena ?? h.img, 96)),
+        Positioned(
+          left: 26,
+          bottom: 24,
+          child: AnimatedBuilder(
+            animation: golpe,
+            builder: (_, filho) => Transform.translate(offset: Offset(math.sin(golpe.value * math.pi) * 70, 0), child: filho), // avança e volta
+            child: _sprite(h.imgArena ?? h.img, 96),
+          ),
+        ),
         Positioned(
           right: 26,
           bottom: 24,

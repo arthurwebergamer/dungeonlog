@@ -119,6 +119,7 @@ class _TelaTarefasState extends State<TelaTarefas> with SingleTickerProviderStat
       builder: (_) => SafeArea(
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           ListTile(title: Text(t.texto ?? '', maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w700))),
+          ListTile(leading: const Icon(Icons.edit_outlined), title: const Text('Editar'), onTap: () => Navigator.pop(context, 'editar')),
           if (e.ehRecorrente(t)) ...[
             ListTile(leading: const Icon(Icons.today), title: const Text('Apagar só hoje'), onTap: () => Navigator.pop(context, 'hoje')),
             ListTile(leading: const Icon(Icons.delete_outline), title: const Text('Apagar todas'), onTap: () => Navigator.pop(context, 'todas')),
@@ -127,7 +128,11 @@ class _TelaTarefasState extends State<TelaTarefas> with SingleTickerProviderStat
         ]),
       ),
     );
-    if (opcao != null) e.apagarTarefa(t, soHoje: opcao == 'hoje');
+    if (opcao == 'editar') {
+      if (mounted) await abrirNovaTarefa(context, e, editar: t);
+    } else if (opcao != null) {
+      e.apagarTarefa(t, soHoje: opcao == 'hoje');
+    }
   }
 
   Future<void> _adicionar() async {

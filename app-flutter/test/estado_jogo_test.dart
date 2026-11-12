@@ -16,6 +16,7 @@ import 'package:dungeonlog_flutter/ui/arena.dart' show Arena;
 import 'package:dungeonlog_flutter/ui/estado_jogo.dart';
 import 'package:dungeonlog_flutter/ui/folha_nova_tarefa.dart';
 import 'package:dungeonlog_flutter/ui/tela_tarefas.dart';
+import 'package:dungeonlog_flutter/ui/popups_md.dart';
 import 'package:dungeonlog_flutter/ui/tela_inventario.dart';
 import 'package:dungeonlog_flutter/ui/tela_loja.dart';
 import 'package:dungeonlog_flutter/ui/tema.dart';
@@ -675,6 +676,39 @@ void main() {
     await tester.tap(find.text('Criar tarefa'));
     await tester.pump(const Duration(milliseconds: 500));
     expect(e.tarefasDeHoje.single.corBox, '#63C99A');
+    expect(tester.takeException(), isNull);
+  });
+
+
+  testWidgets('tela: nível, queda, resumo do dia e tarefas perdidas abrem, animam e fecham', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    late EstadoJogo e;
+    await tester.runAsync(() async => e = await novoEstado(ArmazenamentoMemoria()));
+    e.criarTarefa(texto: 'Escovar os dentes', modo: ModoTarefa.hoje, dif: 'dificil');
+    final ev = EventoVirada(largadas: 1, dano: 14, caiu: false, moedasPerdidas: 0, vitoriaAutomatica: false, tarefas: [e.tarefasDeHoje.single], diaVirada: '2026-11-10');
+    late BuildContext ctx;
+    await tester.pumpWidget(MaterialApp(theme: temaApp(), home: Builder(builder: (c) {
+      ctx = c;
+      return const Scaffold(body: SizedBox());
+    })));
+
+    Future<void> abrirEFechar(Future<void> Function() abrir, String botao, String texto) async {
+      final f = abrir();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 4000));
+      expect(find.textContaining(texto), findsWidgets, reason: texto);
+      await tester.tap(find.text(botao));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 600));
+      await f;
+      expect(find.text(botao), findsNothing);
+    }
+
+    await abrirEFechar(() => mostrarNivelUp(ctx, e, 3), 'Continuar', 'Nível 3!');
+    await abrirEFechar(() => mostrarQueda(ctx, e, 25), 'Levantar', 'Você caiu');
+    await abrirEFechar(() => mostrarResumoDia(ctx, e, nTarefas: 4, ganho: 36), 'Continuar', 'derrotado');
+    await abrirEFechar(() => mostrarTarefasPerdidas(ctx, e, ev), 'Continuar', 'Ele escapou.');
     expect(tester.takeException(), isNull);
   });
 

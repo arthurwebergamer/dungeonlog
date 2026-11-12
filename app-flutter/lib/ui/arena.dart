@@ -339,8 +339,8 @@ class _ArenaState extends State<Arena> with TickerProviderStateMixin {
         borderRadius: BorderRadius.circular(18),
         child: Stack(children: [
           Positioned.fill(child: _fundos(e)),
-          Positioned(left: 4, top: 4, child: AnimatedBuilder(animation: _relogio, builder: (_, __) => _Tocha('assets/img/ui/tocha_esq.png', _quadroTocha))),
-          Positioned(right: 4, top: 4, child: AnimatedBuilder(animation: _relogio, builder: (_, __) => _Tocha('assets/img/ui/tocha_dir.png', _quadroTocha))),
+          Positioned(left: 4, top: 4, child: AnimatedBuilder(animation: _relogio, builder: (_, __) => TochaArena('assets/img/ui/tocha_esq.png', _quadroTocha))),
+          Positioned(right: 4, top: 4, child: AnimatedBuilder(animation: _relogio, builder: (_, __) => TochaArena('assets/img/ui/tocha_dir.png', _quadroTocha))),
           Positioned(
             left: 16,
             right: 16,
@@ -474,8 +474,8 @@ class _Oval extends GradientTransform {
 }
 
 /// Tocha animada: folha 48x32 com 3 quadros de 16x32, ampliada 1,7x.
-class _Tocha extends StatelessWidget {
-  const _Tocha(this.folha, this.quadro);
+class TochaArena extends StatelessWidget {
+  const TochaArena(this.folha, this.quadro, {super.key});
   final String folha;
   final int quadro;
   @override

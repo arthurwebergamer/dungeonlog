@@ -16,6 +16,7 @@ import '../dominio/forja.dart';
 import '../dominio/js_compat.dart';
 import '../dominio/loja.dart';
 import '../dominio/regras.dart';
+import '../dominio/regras.dart' as regras show monstroDoDiaEm;
 import '../dominio/save.dart';
 import '../dominio/tarefa.dart';
 import '../dominio/vida.dart';
@@ -26,6 +27,7 @@ const _chaveDescanso = 'questlog.descanso.v1';
 const _chaveConcluidas = 'questlog.tarefasConcluidas.v1';
 const _chaveTemaArena = 'questlog.temaArena.v1';
 const _chaveBauDia = 'questlog.bauDia.v1';
+const _chaveResumoDia = 'questlog.resumoDia.v1';
 const _chaveCerimonia = 'questlog.estagioCerimoniaMostrada.v1';
 const _chaveDicaArrastar = 'questlog.dicaArrastar.v1';
 const _chavePity = 'questlog.bauSemEspecial.v1';
@@ -38,7 +40,17 @@ class EventoVirada {
   final bool caiu;
   final int moedasPerdidas;
   final bool vitoriaAutomatica;
-  const EventoVirada({required this.largadas, required this.dano, required this.caiu, required this.moedasPerdidas, required this.vitoriaAutomatica});
+  final List<Tarefa> tarefas; // as que escaparam (para a lista do popup)
+  final String? diaVirada; // o dia que fechou (o monstro dele é quem fugiu)
+  const EventoVirada({
+    required this.largadas,
+    required this.dano,
+    required this.caiu,
+    required this.moedasPerdidas,
+    required this.vitoriaAutomatica,
+    this.tarefas = const [],
+    this.diaVirada,
+  });
 }
 
 /// Ganho de uma conclusão (para o aviso "+XP +moedas").
@@ -350,6 +362,8 @@ class EstadoJogo extends ChangeNotifier {
         caiu: r.caiu,
         moedasPerdidas: r.moedasPerdidas,
         vitoriaAutomatica: r.vitoriaAutomatica,
+        tarefas: r.largadas,
+        diaVirada: r.diaQueVirou,
       );
     }
     if (mudou) {
@@ -367,6 +381,7 @@ class EstadoJogo extends ChangeNotifier {
   // ---------- ações ----------
   /// `alternar(i)`: concluir uma tarefa (o app atual não tem desfazer). Devolve null se nada mudou.
   GanhoTarefa? concluir(Tarefa t) {
+    _snapXpDoDia();
     if (!tarefasDeHoje.contains(t) || feitaHoje(t)) return null;
     if (descansando) {
       descanso = [for (final d in descanso) if (d != hoje) d]; // concluir tarefa cancela o descanso do dia
@@ -407,6 +422,35 @@ class EstadoJogo extends ChangeNotifier {
     Som.atual.tocar('golpe');
     if (nivel > nivelAntes) Som.atual.tocar('levelup');
     return GanhoTarefa(xp: g.xp, moedas: g.moedas, subiuNivel: nivel > nivelAntes, nivel: nivel, parcial: false);
+  }
+
+  /// `snap()` do resumo do dia: guarda o XP total no primeiro toque de tarefa do dia.
+  void _snapXpDoDia() {
+    final k = chaveConta(_chaveResumoDia, uid: uid, personagem: personagem);
+    final s = _lerJson(k);
+    if (s is Map && s['dia'] == hoje) return;
+    armazenamento.gravar(k, jsonEncode({'dia': hoje, 'xp0': save.xpTotal}));
+  }
+
+  /// XP ganho hoje (XP total agora menos o do primeiro toque do dia).
+  int get xpDoDia {
+    final s = _lerJson(chaveConta(_chaveResumoDia, uid: uid, personagem: personagem));
+    if (s is! Map || s['dia'] != hoje || s['xp0'] is! num) return 0;
+    final d = save.xpTotal - (s['xp0'] as num);
+    return d < 0 ? 0 : d.toInt();
+  }
+
+  /// Monstro de um dia passado (`monstroDoDiaEm(iso)`), o que fugiu na virada.
+  Monstro monstroDoDiaEm(String iso) {
+    final pool = poolMonstros(dados.biomasDosMonstros, temaArenaId);
+    final i = regras.monstroDoDiaEm(
+      pool: pool,
+      totalMonstros: dados.monstros.length,
+      diasCorridos: diasCorridos(_agora()),
+      diasAteHoje: diffDias(iso, hoje),
+      semente: save.semente.toInt(),
+    );
+    return dados.monstros[i];
   }
 
   void _aplicarGanho(int xp, int moedas) {

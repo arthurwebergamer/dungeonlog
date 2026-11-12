@@ -10,6 +10,7 @@ import '../dominio/economia.dart';
 import '../dominio/tarefa.dart';
 import 'arena.dart';
 import 'cerimonia_estagio.dart';
+import 'popups_md.dart';
 import 'popup_bau.dart';
 import 'estado_jogo.dart';
 import 'folha_nova_tarefa.dart';
@@ -108,12 +109,16 @@ class _TelaTarefasState extends State<TelaTarefas> with SingleTickerProviderStat
   Future<void> _mostrarEvento() async {
     final ev = e.consumirEvento();
     if (ev == null || !mounted) return;
-    final linhas = <String>[
-      if (ev.vitoriaAutomatica) 'Você concluiu todas as tarefas de ontem: a recompensa do dia foi creditada.',
-      if (ev.dano > 0) '${ev.largadas} ${ev.largadas == 1 ? 'tarefa largada' : 'tarefas largadas'}: -${ev.dano} de vida.',
-      if (ev.caiu) 'Você caiu! Perdeu ${ev.moedasPerdidas} moedas e voltou com a vida cheia.',
-    ];
-    await mostrarAviso(context, titulo: ev.caiu ? 'Você caiu' : (ev.dano > 0 ? 'O dia virou' : 'Dia concluído'), texto: linhas.join('\n\n'));
+    if (ev.vitoriaAutomatica) {
+      await mostrarAviso(context, titulo: 'Dia concluído', texto: 'Você concluiu todas as tarefas de ontem: a recompensa do dia foi creditada.');
+      if (!mounted) return;
+    }
+    // "Tarefas perdidas" primeiro (o que escapou) e, se o golpe foi fatal, depois "Você caiu"
+    if (ev.tarefas.isNotEmpty && ev.dano > 0) {
+      await mostrarTarefasPerdidas(context, e, ev);
+      if (!mounted) return;
+    }
+    if (ev.caiu) await mostrarQueda(context, e, ev.moedasPerdidas);
   }
 
   /// Toque na caixa: o golpe sai na hora (como no original) e a conta vem em seguida.
@@ -127,7 +132,7 @@ class _TelaTarefasState extends State<TelaTarefas> with SingleTickerProviderStat
     if (g == null) return;
     _avisar('+${g.xp} XP   ·   +${g.moedas} ${g.moedas == 1 ? 'moeda' : 'moedas'}');
     if (g.subiuNivel && mounted) {
-      await mostrarAviso(context, selo: 'Subiu de nível', titulo: 'Nível ${romano(g.nivel)}', texto: 'Sua vida máxima agora é ${e.vidaMaxima}.');
+      await mostrarNivelUp(context, e, g.nivel);
     }
     await _verCerimonia();
   }
@@ -139,16 +144,7 @@ class _TelaTarefasState extends State<TelaTarefas> with SingleTickerProviderStat
     HapticFeedback.heavyImpact();
     _golpe.forward(from: 0);
     if (!mounted) return;
-    final p = e.progressoAtual;
-    await mostrarDiaVencido(
-      context,
-      monstro: e.monstro.nomeNoIdioma(e.idioma),
-      nivel: p.nivel,
-      xp: p.resto.toInt(),
-      xpMeta: p.meta.toInt(),
-      tarefas: nTarefas,
-      moedas: ganho,
-    );
+    await mostrarResumoDia(context, e, nTarefas: nTarefas, ganho: ganho);
     await _verCerimonia();
   }
 

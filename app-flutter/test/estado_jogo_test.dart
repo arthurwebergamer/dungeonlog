@@ -5,6 +5,7 @@ import 'dart:math';
 
 import 'package:dungeonlog_flutter/dados/armazenamento.dart';
 import 'package:dungeonlog_flutter/dominio/dados_jogo.dart';
+import 'package:dungeonlog_flutter/dominio/tarefa.dart' show hexValido;
 import 'package:dungeonlog_flutter/dominio/forja.dart';
 import 'package:dungeonlog_flutter/dominio/loja.dart';
 import 'package:dungeonlog_flutter/dominio/regras.dart' show precoVenda;
@@ -624,6 +625,56 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
     expect(e.temaArenaId, isNot('deserto'));
+    expect(tester.takeException(), isNull);
+  });
+
+
+  test('cor da tarefa: aceita hex com ou sem #, 3 ou 6 dígitos, ignora o inválido e some com "sem cor"', () async {
+    expect([hexValido('f2a65a'), hexValido('#FFF'), hexValido(' #5ab4ec '), hexValido('xyz'), hexValido('#12345'), hexValido(''), hexValido(null)],
+        ['#f2a65a', '#FFF', '#5ab4ec', null, null, null, null]);
+    final arm = ArmazenamentoMemoria();
+    final e = await novoEstado(arm);
+    e.criarTarefa(texto: 'Colorida', modo: ModoTarefa.hoje, dif: 'facil', corBox: '#63C99A');
+    e.criarTarefa(texto: 'Sem cor', modo: ModoTarefa.hoje, dif: 'facil', corBox: 'lixo');
+    final a = e.tarefasDeHoje[0], b = e.tarefasDeHoje[1];
+    expect((a.corBox, b.corBox), ('#63C99A', null));
+    expect(b.dados.containsKey('corBox'), isFalse, reason: 'cor inválida não é gravada');
+    e.editarTarefa(a, texto: 'Colorida', dif: 'facil', meta: 1, corBox: '#B47EE5');
+    expect(a.corBox, '#B47EE5');
+    e.editarTarefa(a, texto: 'Colorida', dif: 'facil', meta: 1);
+    expect(a.dados.containsKey('corBox'), isFalse, reason: 'editar sem cor remove a cor');
+    e.editarTarefa(b, texto: 'Sem cor', dif: 'facil', meta: 1, corBox: '#F45781');
+    final e2 = await novoEstado(arm);
+    expect(e2.tarefasDeHoje[1].corBox, '#F45781', reason: 'a cor é salva no save v3');
+  });
+
+  testWidgets('tela: opções avançadas da folha escolhem a cor e o cartão aparece colorido', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    late EstadoJogo e;
+    await tester.runAsync(() async => e = await novoEstado(ArmazenamentoMemoria()));
+    await tester.pumpWidget(MaterialApp(theme: temaApp(), home: Casca(estado: e)));
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.tap(find.text('+ Adicionar'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 600));
+    await tester.enterText(find.byType(TextField).first, 'Pintar');
+    await tester.pump();
+    await tester.ensureVisible(find.text('Opções avançadas'));
+    await tester.pump();
+    await tester.tap(find.text('Opções avançadas'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(find.text('Sem cor'), findsOneWidget);
+    await tester.ensureVisible(find.bySemanticsLabel('Cor #63C99A'));
+    await tester.pump();
+    await tester.tap(find.bySemanticsLabel('Cor #63C99A'));
+    await tester.pump();
+    await tester.ensureVisible(find.text('Criar tarefa'));
+    await tester.pump();
+    await tester.tap(find.text('Criar tarefa'));
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(e.tarefasDeHoje.single.corBox, '#63C99A');
     expect(tester.takeException(), isNull);
   });
 

@@ -437,6 +437,7 @@ class EstadoJogo extends ChangeNotifier {
     int diaMes = 1,
     int diaAno = 1,
     int mesAno = 1,
+    String? corBox,
   }) {
     final t = texto.trim();
     if (derrotado || t.isEmpty) return false;
@@ -453,6 +454,8 @@ class EstadoJogo extends ChangeNotifier {
         base.addAll({'tipo': 'repete', 'dias': [...dias]});
     }
     base.addAll({'feitaEm': null, 'dif': difDe(dif), 'meta': meta < 1 ? 1 : (meta > 9 ? 9 : meta)});
+    final cor = hexValido(corBox);
+    if (cor != null) base['corBox'] = cor;
     save.tarefas.add(Tarefa(base));
     Som.atual.tocar('tarefa');
     _salvarTudo();
@@ -461,13 +464,19 @@ class EstadoJogo extends ChangeNotifier {
   }
 
   /// Edita texto, dificuldade e vezes por dia (a recorrência não muda aqui).
-  bool editarTarefa(Tarefa t, {required String texto, required String dif, required int meta}) {
+  bool editarTarefa(Tarefa t, {required String texto, required String dif, required int meta, String? corBox}) {
     final tx = texto.trim();
     if (tx.isEmpty || !save.tarefas.contains(t)) return false;
     final m = meta < 1 ? 1 : (meta > 9 ? 9 : meta);
     t.dados['texto'] = tx;
     t.dados['dif'] = difDe(dif);
     t.dados['meta'] = m;
+    final cor = hexValido(corBox);
+    if (cor != null) {
+      t.dados['corBox'] = cor;
+    } else {
+      t.dados.remove('corBox');
+    }
     final vezes = (t.dados['vezesN'] as num?)?.toInt();
     if (vezes != null && vezes > m) t.dados['vezesN'] = m;
     _salvarTudo();

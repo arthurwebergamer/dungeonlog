@@ -417,8 +417,11 @@ class _Cabecalho extends StatelessWidget {
 
 /// Caixa de seleção quadrada arredondada da tarefa (.box).
 class CaixaTarefa extends StatelessWidget {
-  const CaixaTarefa({super.key, required this.feita, required this.aoTocar});
+  const CaixaTarefa({super.key, required this.feita, required this.aoTocar, this.cor});
   final bool feita;
+
+  /// Cor da tarefa (`.task.comcor`): a borda da caixa vira 60% dessa cor.
+  final Color? cor;
   final VoidCallback aoTocar;
   @override
   Widget build(BuildContext context) => Toque(
@@ -432,11 +435,18 @@ class CaixaTarefa extends StatelessWidget {
           decoration: BoxDecoration(
             color: feita ? corVerde : Colors.transparent,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: feita ? corVerde : corApagado, width: 1.6),
+            border: Border.all(color: feita ? corVerde : (cor?.withValues(alpha: 0.6) ?? corApagado), width: 1.6),
           ),
           child: feita ? const Icone(IconeApp.check, tamanho: 18, cor: corFundo) : null,
         ),
       );
+}
+
+/// "#RGB" ou "#RRGGBB" para [Color].
+Color corDeHex(String hex) {
+  var h = hex.replaceFirst('#', '');
+  if (h.length == 3) h = h.split('').map((c) => '$c$c').join();
+  return Color(0xFF000000 | int.parse(h, radix: 16));
 }
 
 /// Cartão de tarefa (.task): caixa, título, losangos + repetição + contador, "x" de apagar e alça de arrastar.
@@ -463,6 +473,7 @@ class _CartaoTarefa extends StatefulWidget {
 }
 
 class _CartaoTarefaState extends State<_CartaoTarefa> {
+  Color? _cor;
   bool _feita = false; // caixa verde, logo antes de sair
   bool _saindo = false; // desliza para a direita e some (.vanish)
   bool _travado = false; // trava contra toque duplo, como o dataset.travado do original
@@ -494,6 +505,8 @@ class _CartaoTarefaState extends State<_CartaoTarefa> {
     final t = widget.tarefa;
     final meta = t.meta;
     final pips = dificuldades.firstWhere((d) => d.id == t.dif).pips;
+    final hex = t.corBox;
+    _cor = hex == null ? null : corDeHex(hex);
     return AnimatedSlide(
       duration: const Duration(milliseconds: 200),
       offset: Offset(_saindo ? 0.11 : 0, 0),
@@ -506,9 +519,9 @@ class _CartaoTarefaState extends State<_CartaoTarefa> {
           child: Container(
             constraints: const BoxConstraints(minHeight: 52),
             padding: const EdgeInsets.fromLTRB(11, 7, 8, 7),
-            decoration: BoxDecoration(color: corPainel3, borderRadius: BorderRadius.circular(14)),
+            decoration: BoxDecoration(color: _cor == null ? corPainel3 : Color.alphaBlend(_cor!.withValues(alpha: 0.10), corPainel3), borderRadius: BorderRadius.circular(14)),
             child: Row(children: [
-              CaixaTarefa(feita: _feita, aoTocar: _tocarCaixa),
+              CaixaTarefa(feita: _feita, aoTocar: _tocarCaixa, cor: _cor),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [

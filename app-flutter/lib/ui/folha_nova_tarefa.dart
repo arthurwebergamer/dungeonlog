@@ -8,6 +8,7 @@ import '../dominio/tarefa.dart';
 import 'estado_jogo.dart';
 import 'folhas.dart';
 import 'icones.dart';
+import 'tela_tarefas.dart' show corDeHex;
 import 'tema.dart';
 
 const _letrasDia = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
@@ -64,6 +65,9 @@ class _FolhaNovaTarefaState extends State<FolhaNovaTarefa> {
   String _modo = ModoTarefa.hoje;
   String _dif = difPadrao;
   int _meta = 1;
+  String? _cor; // corBox escolhida (null = sem cor)
+  bool _avancado = false;
+  final _hexCtrl = TextEditingController();
   final Set<int> _dias = {};
   int _diaMes = 1;
   int _diaAno = 1;
@@ -81,6 +85,9 @@ class _FolhaNovaTarefaState extends State<FolhaNovaTarefa> {
       _ctrl.text = t.texto ?? '';
       _dif = t.dif;
       _meta = t.meta;
+      _cor = t.corBox;
+      _hexCtrl.text = t.corBox ?? '';
+      _avancado = t.corBox != null;
     }
     _ctrl.addListener(() {
       if (_dica != null) setState(() => _dica = null);
@@ -114,7 +121,7 @@ class _FolhaNovaTarefaState extends State<FolhaNovaTarefa> {
     }
     final t = widget.editar;
     final ok = t != null
-        ? widget.estado.editarTarefa(t, texto: _ctrl.text, dif: _dif, meta: _meta)
+        ? widget.estado.editarTarefa(t, texto: _ctrl.text, dif: _dif, meta: _meta, corBox: _cor)
         : widget.estado.criarTarefa(
             texto: _ctrl.text,
             modo: _modo,
@@ -124,12 +131,117 @@ class _FolhaNovaTarefaState extends State<FolhaNovaTarefa> {
             diaMes: _diaMes,
             diaAno: _diaAno,
             mesAno: _mesAno,
+            corBox: _cor,
           );
     if (ok) {
       HapticFeedback.mediumImpact();
       Navigator.pop(context);
     }
   }
+
+  // ---------- cor da tarefa (opções avançadas) ----------
+  void _definirCor(String? hex) {
+    setState(() {
+      _cor = hex;
+      if (hex == null) {
+        _hexCtrl.clear();
+      } else if (_hexCtrl.text.toLowerCase() != hex.toLowerCase()) {
+        _hexCtrl.text = hex;
+      }
+    });
+  }
+
+  Widget _opcoesAvancadas() => Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Toque(
+          rotulo: 'Opções avançadas',
+          aoTocar: () => setState(() => _avancado = !_avancado),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+              const Text('Opções avançadas', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: corApagado, letterSpacing: 0.25)),
+              AnimatedRotation(turns: _avancado ? 0.5 : 0, duration: const Duration(milliseconds: 180), child: const Text('▾', style: TextStyle(fontSize: 11, color: corApagado))),
+            ]),
+          ),
+        ),
+        AnimatedSize(
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.ease,
+          alignment: Alignment.topCenter,
+          child: _avancado
+              ? Padding(
+                  padding: const EdgeInsets.only(top: 8, bottom: 4),
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    const RotuloSecao('Cor da tarefa'),
+                    const SizedBox(height: 9),
+                    Row(children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(color: _cor == null ? corApagado : corDeHex(_cor!), borderRadius: BorderRadius.circular(9), border: Border.all(color: corLinha, width: 0.8)),
+                      ),
+                      const SizedBox(width: 9),
+                      Expanded(
+                        child: SizedBox(
+                          height: 40,
+                          child: TextField(
+                            controller: _hexCtrl,
+                            maxLength: 7,
+                            autocorrect: false,
+                            enableSuggestions: false,
+                            style: const TextStyle(fontSize: 14, letterSpacing: 0.4),
+                            decoration: InputDecoration(
+                              counterText: '',
+                              hintText: '#F2A65A',
+                              hintStyle: const TextStyle(color: corApagado),
+                              filled: true,
+                              fillColor: corPainel,
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(9), borderSide: const BorderSide(color: corLinha, width: 0.8)),
+                              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(9), borderSide: const BorderSide(color: corLinha, width: 0.8)),
+                              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(9), borderSide: const BorderSide(color: Colors.white, width: 0.8)),
+                            ),
+                            onChanged: (v) {
+                              final h = hexValido(v);
+                              if (h != null) setState(() => _cor = h);
+                            },
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 9),
+                      Toque(
+                        rotulo: 'Sem cor',
+                        aoTocar: () => _definirCor(null),
+                        child: Container(
+                          height: 40,
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(color: corPainel, borderRadius: BorderRadius.circular(9), border: Border.all(color: corLinha, width: 0.8)),
+                          child: const Text('Sem cor', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: corSuave)),
+                        ),
+                      ),
+                    ]),
+                    const SizedBox(height: 9),
+                    Wrap(spacing: 8, runSpacing: 8, children: [
+                      for (final c in coresPreset)
+                        Toque(
+                          rotulo: 'Cor $c',
+                          aoTocar: () => _definirCor(c),
+                          child: Container(
+                            width: 28,
+                            height: 28,
+                            decoration: BoxDecoration(
+                              color: corDeHex(c),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: _cor != null && _cor!.toLowerCase() == c.toLowerCase() ? corTexto : Colors.transparent, width: 2),
+                            ),
+                          ),
+                        ),
+                    ]),
+                  ]),
+                )
+              : const SizedBox(width: double.infinity),
+        ),
+      ]);
 
   // ---------- peças ----------
   Widget _campo() => TextField(
@@ -284,6 +396,8 @@ class _FolhaNovaTarefaState extends State<FolhaNovaTarefa> {
       const RotuloSecao('Vezes por dia'),
       const SizedBox(height: 7),
       _passo(valor: '$_meta', sufixo: '×', menos: _meta > 1 ? () => _meta-- : null, mais: _meta < 9 ? () => _meta++ : null),
+      vao,
+      _opcoesAvancadas(),
       if (_dica != null)
         Padding(
           padding: const EdgeInsets.only(top: 10),

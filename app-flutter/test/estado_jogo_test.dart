@@ -750,6 +750,11 @@ void main() {
     e.equipar(arco);
     await tester.pump(const Duration(milliseconds: 100));
     await golpe('media');
+    // cena "monstro escapou": o monstro bate no herói uma vez por tarefa largada
+    controle.escapar(3);
+    for (var i = 0; i < 100; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
     expect(tester.takeException(), isNull);
   });
 

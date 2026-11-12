@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show HapticFeedback;
 
 import '../dominio/bau.dart' show tierRar;
+import '../dominio/save.dart' show chaveConta;
 import '../dominio/catalogo.dart';
 import '../dominio/dados_jogo.dart' show TemaArena;
 import '../dominio/regras.dart';
@@ -164,9 +165,41 @@ class _ArenaState extends State<Arena> with TickerProviderStateMixin {
     });
     _verSelo(primeira: true);
     widget.golpe.addListener(_aoGolpe);
+    _espia.addListener(() {
+      if (_alvo != null && _espia.isAnimating) setState(() => _dx = -44 * math.sin(math.pi * _espia.value));
+    });
+    _espia.addStatusListener((st) {
+      if (st == AnimationStatus.completed && mounted) {
+        setState(() {
+          _alvo = null;
+          _dx = 0;
+        });
+      }
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) => _talvezEspiar());
+  }
+
+  late final AnimationController _espia = AnimationController(vsync: this, duration: const Duration(milliseconds: 1100));
+
+  /// Primeira abertura com mais de um cenário liberado: a arena "espia" para o lado e volta (uma vez só).
+  Future<void> _talvezEspiar() async {
+    final e = widget.estado;
+    const k = 'questlog.dicaSwipeArena.v3';
+    final chave = chaveConta(k, uid: e.uid, personagem: e.personagem);
+    if (e.estagio < 2 || e.armazenamento.ler(chave) != null) return;
+    await Future<void>.delayed(const Duration(milliseconds: 1500));
+    if (!mounted || _alvo != null) return;
+    e.armazenamento.gravar(chave, '1');
+    setState(() {
+      _frente = e.indiceTemaExibido;
+      _direcao = 1;
+      _alvo = (_frente + 1) % e.dados.temas.length;
+    });
+    _espia.forward(from: 0);
   }
 
   int _golpeVisto = 0;
+  int _escapadaVista = 0;
 
   /// Geometria do herói e do monstro dentro da arena (a linha `.fight` fica centralizada: 83 + 28 + "VS" + 28 + 78).
   GeometriaGolpe _geometria() {
@@ -182,7 +215,13 @@ class _ArenaState extends State<Arena> with TickerProviderStateMixin {
 
   void _aoGolpe() {
     final g = widget.golpe;
-    if (g.contador == _golpeVisto || !mounted) return;
+    if (!mounted) return;
+    if (g.contadorEscapada != _escapadaVista) {
+      _escapadaVista = g.contadorEscapada;
+      _motor.escapada(_geometria(), g.escapadas);
+      return;
+    }
+    if (g.contador == _golpeVisto) return;
     _golpeVisto = g.contador;
     final e = widget.estado;
     final id = e.save.equipado['arma'];
@@ -205,6 +244,7 @@ class _ArenaState extends State<Arena> with TickerProviderStateMixin {
     _seloTimer?.cancel();
     _pontosTimer?.cancel();
     widget.golpe.removeListener(_aoGolpe);
+    _espia.dispose();
     _motor.dispose();
     _pouso.dispose();
     _relogio.dispose();

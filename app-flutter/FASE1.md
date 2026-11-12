@@ -56,3 +56,12 @@ Ainda não portado na aba Tarefas:
 - A cena "monstro escapou" na arena (o monstro do dia perdido bate no herói, uma vez por tarefa largada).
 - A dica de arrastar a arena na primeira abertura (a arena "espia" para o lado).
 - Linha de sequência no resumo do dia (depende do histórico, Fase 4).
+
+## Atualização final do acabamento
+Feitos também: **golpes variados** (`lib/ui/golpes_fx.dart`: 5 estilos, espada girando, corte em pixel art na cor da raridade da
+arma, partículas, tremor da arena, flash, golpe crítico no "Terminar dia"; arco/besta usam o golpe simples), a cena **"monstro escapou"**
+na arena (uma pancada por tarefa largada, antes do popup de tarefas perdidas) e a **dica de arrastar a arena** na primeira abertura.
+Diferenças: a respiração dos monstros por espécie e o rastro-fantasma/rastro da arma (desligados também no original) não foram portados;
+a posição do monstro e do herói na cena é calculada pela mesma geometria da arena, não medida na tela.
+Ainda depende de fases futuras: linha de sequência no resumo do dia (histórico, Fase 4) e o interruptor "golpes variados" nas
+Configurações (Fase 3; a chave \`questlog.golpesVariados.v1\` já é respeitada).

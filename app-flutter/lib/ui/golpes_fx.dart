@@ -7,6 +7,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
+import 'som.dart';
 import 'tela_inventario.dart' show corRaridade;
 
 /// Pedido de golpe vindo da tela (toque na caixa de uma tarefa).
@@ -14,6 +15,18 @@ class GolpeControlador extends ChangeNotifier {
   String dif = 'media';
   bool fim = false;
   int contador = 0;
+  int contadorEscapada = 0;
+  int escapadas = 0;
+
+  /// Duração aproximada da cena (ms), para a tela esperar antes do popup.
+  static int duracaoEscapada(int n) => 500 + n * (5200 / n).clamp(150, 650).round() + 450;
+
+  /// "Monstro escapou": o monstro do dia perdido bate no herói, uma vez por tarefa largada.
+  void escapar(int n) {
+    escapadas = n;
+    contadorEscapada++;
+    notifyListeners();
+  }
 
   /// [fim]: última tarefa do dia (golpe crítico).
   void golpear({String dif = 'media', bool fim = false}) {
@@ -408,6 +421,49 @@ class MotorGolpe extends ChangeNotifier {
         notifyListeners();
       }
     });
+  }
+
+  /// `escapadaNaArena`: o monstro avança sobre o herói uma vez por tarefa largada; o herói treme a cada pancada.
+  void escapada(GeometriaGolpe g, int n) {
+    if (n <= 0) return;
+    _geracao++;
+    _limpar();
+    emAndamento = true;
+    final gen = _geracao;
+    () async {
+      try {
+        Som.atual.tocar('fuga');
+        await _esperar(500, gen);
+        final gap = (5200 / n).clamp(150, 650).round();
+        final dur = (gap * 0.9).clamp(130, 480).toDouble();
+        final dx = math.max(20.0, g.monstro.left - g.heroi.right + 12);
+        for (var i = 0; i < n; i++) {
+          _an('m', [
+            [0, 0, 0],
+            [-dx, 0, 0],
+            [-dx, 0, 0],
+            [0, 0, 0],
+          ], dur, offsets: const [0, .4, .55, 1], curva: Curves.easeOut);
+          _esperar((dur * 0.4).round(), gen).then((_) {
+            Som.atual.tocar('danoHeroi');
+            _an('h', [
+              [0, 0],
+              [-6, 0],
+              [4, 0],
+              [0, 0],
+            ], 200, offsets: const [0, .33, .66, 1]);
+          }).catchError((Object _) {});
+          await _esperar(gap, gen);
+        }
+      } catch (e) {
+        if (e is! _Cancelado) debugPrint('escapada falhou: $e');
+      } finally {
+        if (gen == _geracao) {
+          _limpar();
+          emAndamento = false;
+        }
+      }
+    }();
   }
 
   void _limpar() {

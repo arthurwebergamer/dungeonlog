@@ -114,6 +114,11 @@ class _TelaTarefasState extends State<TelaTarefas> with SingleTickerProviderStat
       await mostrarAviso(context, titulo: 'Dia concluído', texto: 'Você concluiu todas as tarefas de ontem: a recompensa do dia foi creditada.');
       if (!mounted) return;
     }
+    if (ev.tarefas.isNotEmpty && ev.dano > 0) {
+      _golpe.escapar(ev.tarefas.length);
+      await Future<void>.delayed(Duration(milliseconds: GolpeControlador.duracaoEscapada(ev.tarefas.length)));
+      if (!mounted) return;
+    }
     // "Tarefas perdidas" primeiro (o que escapou) e, se o golpe foi fatal, depois "Você caiu"
     if (ev.tarefas.isNotEmpty && ev.dano > 0) {
       await mostrarTarefasPerdidas(context, e, ev);

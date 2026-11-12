@@ -10,6 +10,7 @@ import '../dominio/economia.dart';
 import '../dominio/tarefa.dart';
 import 'arena.dart';
 import 'cerimonia_estagio.dart';
+import 'golpes_fx.dart';
 import 'popups_md.dart';
 import 'popup_bau.dart';
 import 'estado_jogo.dart';
@@ -30,7 +31,7 @@ class TelaTarefas extends StatefulWidget {
 }
 
 class _TelaTarefasState extends State<TelaTarefas> with SingleTickerProviderStateMixin, WidgetsBindingObserver {
-  late final AnimationController _golpe = AnimationController(vsync: this, duration: const Duration(milliseconds: 480), value: 1);
+  final GolpeControlador _golpe = GolpeControlador();
   EstadoJogo get e => widget.estado;
   String _aviso = ''; // texto do aviso que desce do topo (.toast)
   bool _avisoVisivel = false;
@@ -122,9 +123,9 @@ class _TelaTarefasState extends State<TelaTarefas> with SingleTickerProviderStat
   }
 
   /// Toque na caixa: o golpe sai na hora (como no original) e a conta vem em seguida.
-  void _golpear() {
+  void _golpear([String dif = 'media']) {
     HapticFeedback.mediumImpact();
-    _golpe.forward(from: 0);
+    _golpe.golpear(dif: dif);
   }
 
   Future<void> _concluir(Tarefa t) async {
@@ -142,7 +143,7 @@ class _TelaTarefasState extends State<TelaTarefas> with SingleTickerProviderStat
     final ganho = e.terminarDia();
     if (ganho == null) return;
     HapticFeedback.heavyImpact();
-    _golpe.forward(from: 0);
+    _golpe.golpear(fim: true);
     if (!mounted) return;
     await mostrarResumoDia(context, e, nTarefas: nTarefas, ganho: ganho);
     await _verCerimonia();
@@ -459,7 +460,7 @@ class _CartaoTarefa extends StatefulWidget {
   final Tarefa tarefa;
   final int indice;
   final EstadoJogo estado;
-  final VoidCallback aoGolpear;
+  final void Function(String dif) aoGolpear;
   final VoidCallback aoConcluir;
   final VoidCallback aoEditar;
   final VoidCallback aoApagar;
@@ -481,7 +482,7 @@ class _CartaoTarefaState extends State<_CartaoTarefa> {
 
   Future<void> _tocarCaixa() async {
     if (_travado) return;
-    widget.aoGolpear();
+    widget.aoGolpear(widget.tarefa.dif);
     if (_vezes + 1 < widget.tarefa.meta) {
       widget.aoConcluir(); // toque parcial (meta > 1): só soma no contador
       return;

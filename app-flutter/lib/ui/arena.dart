@@ -14,6 +14,7 @@ import '../dominio/dados_jogo.dart' show TemaArena;
 import '../dominio/regras.dart';
 import 'equip_arena.dart';
 import 'estado_jogo.dart';
+import 'golpes_fx.dart';
 import 'icones.dart';
 import 'itens_ui.dart';
 import 'popup_bau.dart' show imagemBau;
@@ -39,8 +40,8 @@ class Arena extends StatefulWidget {
   /// Toque num baú fechado que pode ser aberto: 'padrao', 'extra' ou 'especial' (este só quando há chave).
   final ValueChanged<String>? aoAbrirBau;
 
-  /// 0 a 1 a cada golpe (conclusão de tarefa): o herói avança e o monstro treme.
-  final Animation<double> golpe;
+  /// Pedidos de golpe (conclusão de tarefa): o herói ataca e o monstro treme (golpes variados do original).
+  final GolpeControlador golpe;
 
   @override
   State<Arena> createState() => _ArenaState();
@@ -49,6 +50,7 @@ class Arena extends StatefulWidget {
 class _ArenaState extends State<Arena> with TickerProviderStateMixin {
   // relógio único das animações em laço: chama das tochas (0,6 s em 3 quadros) e balanço do herói (1,1 s em passos)
   static const _cicloMs = 6600;
+  late final MotorGolpe _motor = MotorGolpe(this);
   late final AnimationController _relogio = AnimationController(vsync: this, duration: const Duration(milliseconds: _cicloMs))..repeat();
 
   // ----- cenário: arrastar para o lado troca de bioma (touchstart/move/end de play/index.html ~5310) -----
@@ -161,6 +163,34 @@ class _ArenaState extends State<Arena> with TickerProviderStateMixin {
       }
     });
     _verSelo(primeira: true);
+    widget.golpe.addListener(_aoGolpe);
+  }
+
+  int _golpeVisto = 0;
+
+  /// Geometria do herói e do monstro dentro da arena (a linha `.fight` fica centralizada: 83 + 28 + "VS" + 28 + 78).
+  GeometriaGolpe _geometria() {
+    const vs = 17.0;
+    final largura = _larg;
+    final esq = 16 + (largura - 32 - (83 + 28 + vs + 28 + 78)) / 2;
+    return GeometriaGolpe(
+      heroi: Rect.fromLTWH(esq, 56, 83, 87),
+      monstro: Rect.fromLTWH(esq + 83 + 28 + vs + 28, 61, 78, 82),
+      arena: Size(largura, 188),
+    );
+  }
+
+  void _aoGolpe() {
+    final g = widget.golpe;
+    if (g.contador == _golpeVisto || !mounted) return;
+    _golpeVisto = g.contador;
+    final e = widget.estado;
+    final id = e.save.equipado['arma'];
+    final arma = id is num ? e.catalogo.item(id) : null;
+    _motor.raridade = (arma?.raridade ?? 0).clamp(0, 7);
+    _motor.preferenciaVariada = e.armazenamento.ler('questlog.golpesVariados.v1') != '0';
+    final distancia = arma != null && RegExp(r'^(Arco|Besta|Arbalesta|Zarabatana|Estilingue|Funda)', caseSensitive: false).hasMatch(arma.nome);
+    _motor.golpear(g: _geometria(), dif: g.dif, fim: g.fim, distancia: distancia);
   }
 
   @override
@@ -174,6 +204,8 @@ class _ArenaState extends State<Arena> with TickerProviderStateMixin {
     _dicaTimer?.cancel();
     _seloTimer?.cancel();
     _pontosTimer?.cancel();
+    widget.golpe.removeListener(_aoGolpe);
+    _motor.dispose();
     _pouso.dispose();
     _relogio.dispose();
     super.dispose();
@@ -277,12 +309,12 @@ class _ArenaState extends State<Arena> with TickerProviderStateMixin {
       child: Stack(clipBehavior: Clip.none, children: [
         const Positioned(left: 13.5, top: 75, child: _Sombra()),
         AnimatedBuilder(
-          animation: Listenable.merge([_relogio, widget.golpe]),
+          animation: Listenable.merge([_relogio, _motor]),
           builder: (_, filho) => Transform.translate(
-            offset: Offset(math.sin(widget.golpe.value * math.pi) * 60, descansando ? 0 : _balanco),
-            child: filho,
+            offset: _motor.heroi + Offset(0, descansando ? 0 : _balanco),
+            child: Opacity(opacity: _motor.heroiOpacidade, child: Transform.scale(scaleX: _motor.heroiEscalaX, child: filho)),
           ),
-          child: _HeroiEquipado(estado: e),
+          child: _HeroiEquipado(estado: e, motor: _motor),
         ),
         if (descansando)
           const Positioned(
@@ -299,11 +331,8 @@ class _ArenaState extends State<Arena> with TickerProviderStateMixin {
       child: Stack(clipBehavior: Clip.none, children: [
         Positioned(left: 11, top: 70, child: Opacity(opacity: semTarefas ? 0.4 : 1, child: const _Sombra())),
         AnimatedBuilder(
-          animation: widget.golpe,
-          builder: (_, filho) {
-            final t = widget.golpe.value;
-            return Transform.translate(offset: Offset(math.sin(t * math.pi * 7) * 6 * (1 - t), 0), child: filho);
-          },
+          animation: _motor,
+          builder: (_, filho) => Transform.translate(offset: _motor.monstro, child: Transform.rotate(angle: _motor.monstroGiro, child: filho)),
           child: semTarefas
               ? Opacity(opacity: 0.45, child: ColorFiltered(colorFilter: _saturacao(0.45), child: pixel(m.img, largura: 78, altura: 78)))
               : pixel(m.img, largura: 78, altura: 78),
@@ -319,7 +348,7 @@ class _ArenaState extends State<Arena> with TickerProviderStateMixin {
         onHorizontalDragStart: _arrastoInicio,
         onHorizontalDragUpdate: _arrastoMove,
         onHorizontalDragEnd: _arrastoFim,
-        child: _corpo(e, venceu, heroi, monstro, bloqueada, semTarefas, descansando),
+        child: AnimatedBuilder(animation: _motor, builder: (_, filho) => Transform.translate(offset: _motor.arena, child: filho), child: _corpo(e, venceu, heroi, monstro, bloqueada, semTarefas, descansando)),
       );
     });
   }
@@ -361,6 +390,7 @@ class _ArenaState extends State<Arena> with TickerProviderStateMixin {
                     Opacity(opacity: descansando ? 0.35 : 1, child: monstro),
                   ]),
           ),
+          if (!bloqueada) Positioned.fill(child: IgnorePointer(child: CustomPaint(painter: PintorGolpe(_motor)))),
           if (venceu && !bloqueada)
             Positioned(
               left: 16,
@@ -557,8 +587,9 @@ class _BarraMonstro extends StatelessWidget {
 /// Herói da arena com o equipamento por cima (`desenharHeroi()`): corpo < escudo < arma < mão.
 /// Só o escudo e a arma aparecem; armadura, elmo e acessório ficam de fora, como no original.
 class _HeroiEquipado extends StatelessWidget {
-  const _HeroiEquipado({required this.estado});
+  const _HeroiEquipado({required this.estado, required this.motor});
   final EstadoJogo estado;
+  final MotorGolpe motor;
 
   ItemCatalogo? _item(String slot) {
     final id = estado.save.equipado[slot];
@@ -620,7 +651,12 @@ class _HeroiEquipado extends StatelessWidget {
           topo = lado == 56 ? 15 : 64 - 0.88 * lado;
           pivo = Offset(lado * 0.2, lado * 0.85);
         }
-        desenho = Transform.rotate(angle: 8 * math.pi / 180, origin: pivo - Offset(lado / 2, lado / 2), child: desenho);
+        final centro = pivo - Offset(lado / 2, lado / 2);
+        desenho = AnimatedBuilder(
+          animation: motor,
+          builder: (_, f) => Transform.rotate(angle: motor.armaGraus * math.pi / 180, origin: centro, child: f),
+          child: desenho,
+        );
       }
       filhos.add(Positioned(left: esq, top: topo, width: lado, height: lado, child: desenho));
     }

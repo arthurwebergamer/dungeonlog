@@ -16,6 +16,7 @@ import 'package:dungeonlog_flutter/ui/arena.dart' show Arena;
 import 'package:dungeonlog_flutter/ui/estado_jogo.dart';
 import 'package:dungeonlog_flutter/ui/folha_nova_tarefa.dart';
 import 'package:dungeonlog_flutter/ui/tela_tarefas.dart';
+import 'package:dungeonlog_flutter/ui/golpes_fx.dart';
 import 'package:dungeonlog_flutter/ui/popups_md.dart';
 import 'package:dungeonlog_flutter/ui/tela_inventario.dart';
 import 'package:dungeonlog_flutter/ui/tela_loja.dart';
@@ -709,6 +710,46 @@ void main() {
     await abrirEFechar(() => mostrarQueda(ctx, e, 25), 'Levantar', 'Você caiu');
     await abrirEFechar(() => mostrarResumoDia(ctx, e, nTarefas: 4, ganho: 36), 'Continuar', 'derrotado');
     await abrirEFechar(() => mostrarTarefasPerdidas(ctx, e, ev), 'Continuar', 'Ele escapou.');
+    expect(tester.takeException(), isNull);
+  });
+
+
+  testWidgets('tela: golpes variados rodam todos os estilos sem erro, com e sem arma', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    late EstadoJogo e;
+    await tester.runAsync(() async => e = await novoEstado(ArmazenamentoMemoria()));
+    e.criarTarefa(texto: 'a', modo: ModoTarefa.hoje, dif: 'media');
+    final controle = GolpeControlador();
+    await tester.pumpWidget(MaterialApp(theme: temaApp(), home: Scaffold(body: Arena(estado: e, golpe: controle))));
+    await tester.pump(const Duration(milliseconds: 300));
+    Future<void> golpe(String dif, {bool fim = false}) async {
+      controle.golpear(dif: dif, fim: fim);
+      for (var i = 0; i < 40; i++) {
+        await tester.pump(const Duration(milliseconds: 50));
+      }
+    }
+
+    for (final dif in ['trivial', 'facil', 'media', 'media', 'media', 'dificil', 'dificil']) {
+      await golpe(dif);
+    }
+    await golpe('media', fim: true);
+    // com arma lendária equipada (cor e partículas por raridade)
+    final cat = e.catalogo;
+    final arma = [for (var i = 0; i < cat.baseN; i++) if (cat.item(i)!.tipo == 'arma' && cat.item(i)!.raridade == 5) i].first;
+    e.save.inventario.add({'id': arma, 'q': 1});
+    e.equipar(arma);
+    await tester.pump(const Duration(milliseconds: 100));
+    for (final dif in ['media', 'dificil', 'facil']) {
+      await golpe(dif);
+    }
+    await golpe('media', fim: true);
+    // arma de longo alcance: golpe simples
+    final arco = [for (var i = 0; i < cat.baseN; i++) if (cat.item(i)!.tipo == 'arma' && cat.item(i)!.nome.startsWith('Arco')) i].first;
+    e.save.inventario.add({'id': arco, 'q': 1});
+    e.equipar(arco);
+    await tester.pump(const Duration(milliseconds: 100));
+    await golpe('media');
     expect(tester.takeException(), isNull);
   });
 

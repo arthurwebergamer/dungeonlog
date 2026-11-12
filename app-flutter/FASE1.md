@@ -40,3 +40,19 @@ Rodar a tela no Chrome: compilar a casca web (ver `tools/rodar_emulador.ps1` par
 - Limite de tarefas do plano grátis e paywall (Fase 7).
 - Idioma: a interface está só em PT por enquanto (os textos do catálogo e as abas já respeitam o idioma).
 - Notificações de vitória em tela cheia, sons e vibração além do toque.
+
+## Atualização: acabamento da aba Tarefas (depois da Fase 2)
+Feito: selo "Estágio N em X tarefas" e bolinhas na arena, troca de cenário arrastando (com cadeado e prévia quando trancado),
+cerimônia "Estágio concluído" em tela cheia, cor da tarefa (Opções avançadas), e as telas cheias "Nível alcançado", "Você caiu",
+"Tarefas perdidas" e resumo do dia vencido (formato `md` do original, em `lib/ui/sheet_md.dart` e `popups_md.dart`).
+
+Achados importantes sobre o app original (play/index.html de hoje):
+- **Categorias de tarefa estão desligadas** (`window.CATEGORIAS_ATIVAS = false`, a pedido do dono): sem abas, sem grupos, sem seletor.
+  Os dados ficam no save e são ignorados. Não foram portadas de propósito.
+- **O dropdown de troca de herói no topo foi removido**; a troca vive em Configurações (Fase 3).
+
+Ainda não portado na aba Tarefas:
+- "Golpes variados" (5 estilos de golpe, espada com rastro, corte por raridade da arma, respiração do herói e dos monstros) — padrão ligado no original.
+- A cena "monstro escapou" na arena (o monstro do dia perdido bate no herói, uma vez por tarefa largada).
+- A dica de arrastar a arena na primeira abertura (a arena "espia" para o lado).
+- Linha de sequência no resumo do dia (depende do histórico, Fase 4).

@@ -227,11 +227,12 @@ class EtiquetaRaridade extends StatelessWidget {
 }
 
 /// Nome do item na ficha (.iname): Cormorant Garamond itálico 20px na cor da raridade.
-/// A fonte não vem no app (ver FASE2.md); sem ela o sistema usa a serifada padrão.
+/// Fonte variável (eixo de peso): pedimos 500.
 TextStyle estiloNomeItem(Color cor) => TextStyle(
       fontFamily: 'Cormorant Garamond',
       fontFamilyFallback: const ['serif'],
       fontStyle: FontStyle.italic,
+      fontVariations: const [FontVariation('wght', 500)],
       fontSize: 20,
       height: 1.15,
       color: cor,

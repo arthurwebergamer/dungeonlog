@@ -3,6 +3,7 @@
 // Também desenha os baús do dia no canto esquerdo (.bauArena) e a arma e o escudo equipados no herói (desenharHeroi).
 import 'dart:async';
 import 'dart:math' as math;
+import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show HapticFeedback;
@@ -542,7 +543,18 @@ class _BauArenaState extends State<_BauArena> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final imagem = Image.asset(imagemBau(widget.variante, aberto: widget.aberto), width: 64, height: 64, filterQuality: FilterQuality.none, gaplessPlayback: true);
+    final foto = Image.asset(imagemBau(widget.variante, aberto: widget.aberto), width: 64, height: 64, filterQuality: FilterQuality.none, gaplessPlayback: true);
+    // sombra projetada (drop-shadow 0 8px 14px rgba(0,0,0,.55)): cópia escura e borrada atrás do baú
+    final imagem = Stack(clipBehavior: Clip.none, children: [
+      Transform.translate(
+        offset: const Offset(0, 8),
+        child: ImageFiltered(
+          imageFilter: ImageFilter.blur(sigmaX: 7, sigmaY: 7),
+          child: ColorFiltered(colorFilter: const ColorFilter.mode(Color(0x8C000000), BlendMode.srcIn), child: foto),
+        ),
+      ),
+      foto,
+    ]);
     return Semantics(
       button: !widget.aberto,
       label: widget.trancado ? 'Baú trancado' : 'Baú',

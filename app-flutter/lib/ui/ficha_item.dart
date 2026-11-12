@@ -15,6 +15,7 @@ import 'estado_jogo.dart';
 import 'flutuante.dart';
 import 'folhas.dart';
 import 'itens_ui.dart';
+import 'som.dart';
 import 'tema.dart';
 
 /// Abre a ficha de [item]. [origem] é o centro do ícone tocado na grade: é dali que sobem os avisos de usar e vender.
@@ -562,6 +563,7 @@ class _RoletaState extends State<_Roleta> with SingleTickerProviderStateMixin {
     _c.forward().whenComplete(() async {
       if (!mounted) return;
       HapticFeedback.mediumImpact();
+      Som.atual.tocar('roletaFim');
       setState(() => _parou = true);
       await Future<void>.delayed(const Duration(milliseconds: 500));
       if (mounted) widget.aoTerminar();
@@ -575,7 +577,10 @@ class _RoletaState extends State<_Roleta> with SingleTickerProviderStateMixin {
     final linha = (-_desloc / _Roleta.passo).floor();
     if (linha != _ultima) {
       _ultima = linha;
-      if (_c.value < 1) HapticFeedback.selectionClick();
+      if (_c.value < 1) {
+        HapticFeedback.selectionClick();
+        Som.atual.tocar('roletaTick', progresso: _c.value);
+      }
     }
   }
 

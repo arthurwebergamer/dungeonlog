@@ -8,6 +8,7 @@ dependencies:
   flutter:
     sdk: flutter
   shared_preferences: ^2.3.0
+  audioplayers: ^6.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -21,6 +22,7 @@ flutter:
     - assets/img/arena/
     - assets/img/baus/
     - assets/img/ui/
+    - assets/sons/
   fonts:
     - family: Outfit
       fonts:
@@ -37,3 +39,7 @@ flutter:
     - family: Silkscreen
       fonts:
         - asset: assets/fonts/Silkscreen-Regular.ttf
+    - family: Cormorant Garamond
+      fonts:
+        - asset: assets/fonts/CormorantGaramond-Italic.ttf
+          style: italic

@@ -6,6 +6,7 @@ import '../dominio/catalogo.dart';
 import 'estado_jogo.dart';
 import 'folhas.dart';
 import 'itens_ui.dart';
+import 'particulas.dart';
 import 'tema.dart';
 
 /// Imagem do baú: [variante] é 'padrao' ou 't0'..'t3' (tier do baú trancado).
@@ -58,6 +59,7 @@ class _PopupBauState extends State<_PopupBau> with SingleTickerProviderStateMixi
         border: Border(top: BorderSide(color: corLinha, width: 0.8)),
       ),
       child: Stack(clipBehavior: Clip.none, children: [
+        const Positioned.fill(child: ExplosaoParticulas()),
         Positioned(
           top: -20,
           left: 0,

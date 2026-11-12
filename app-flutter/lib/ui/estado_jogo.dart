@@ -19,6 +19,7 @@ import '../dominio/regras.dart';
 import '../dominio/save.dart';
 import '../dominio/tarefa.dart';
 import '../dominio/vida.dart';
+import 'som.dart';
 
 const _chaveVida = 'questlog.vida.v1';
 const _chaveDescanso = 'questlog.descanso.v1';
@@ -227,6 +228,9 @@ class EstadoJogo extends ChangeNotifier {
     ultimoDia = r.ultimoDia;
     save.moedas = r.moedas;
     if (r.danoAplicado > 0 || r.vitoriaAutomatica) {
+      if (r.largadas.isNotEmpty) Som.atual.tocar('fuga');
+      if (r.danoAplicado > 0) Som.atual.tocar('danoHeroi');
+      if (r.caiu) Som.atual.tocar('morte');
       eventoPendente = EventoVirada(
         largadas: r.largadas.length,
         dano: r.danoAplicado,
@@ -273,6 +277,8 @@ class EstadoJogo extends ChangeNotifier {
         _aplicarGanho(g.xp, g.moedas);
         _salvarTudo();
         notifyListeners();
+        Som.atual.tocar('golpe');
+        if (nivel > nivelAntes) Som.atual.tocar('levelup');
         return GanhoTarefa(xp: g.xp, moedas: g.moedas, subiuNivel: nivel > nivelAntes, nivel: nivel, parcial: true);
       }
     }
@@ -285,6 +291,8 @@ class EstadoJogo extends ChangeNotifier {
     totalConcluidas++;
     _salvarTudo();
     notifyListeners();
+    Som.atual.tocar('golpe');
+    if (nivel > nivelAntes) Som.atual.tocar('levelup');
     return GanhoTarefa(xp: g.xp, moedas: g.moedas, subiuNivel: nivel > nivelAntes, nivel: nivel, parcial: false);
   }
 
@@ -333,6 +341,7 @@ class EstadoJogo extends ChangeNotifier {
     }
     base.addAll({'feitaEm': null, 'dif': difDe(dif), 'meta': meta < 1 ? 1 : (meta > 9 ? 9 : meta)});
     save.tarefas.add(Tarefa(base));
+    Som.atual.tocar('tarefa');
     _salvarTudo();
     notifyListeners();
     return true;
@@ -429,6 +438,7 @@ class EstadoJogo extends ChangeNotifier {
     g.creditar.forEach(_darItem);
     pity = g.pity;
     bauDia = g.estado;
+    Som.atual.tocar('poofBau');
   }
 
   /// O baú [qual] ('padrao', 'especial' ou 'extra') existe hoje e ainda está fechado?
@@ -498,14 +508,21 @@ class EstadoJogo extends ChangeNotifier {
     if (i < 0 || i >= lojaEstoque.length || lojaVendidos.contains(i)) return 'invalido';
     final v = lojaEstoque[i];
     final it = catalogo.item(v.id)!;
-    if (nivel < nivelMinimo(it.raridade)) return 'nivel';
+    if (nivel < nivelMinimo(it.raridade)) {
+      Som.atual.tocar('semMoedas');
+      return 'nivel';
+    }
     final preco = precoNaLoja(v);
-    if (save.moedas < preco) return 'moedas';
+    if (save.moedas < preco) {
+      Som.atual.tocar('semMoedas');
+      return 'moedas';
+    }
     save.moedas -= preco;
     _darItem(v.id);
     lojaVendidos.add(i);
     _salvarTudo();
     notifyListeners();
+    Som.atual.tocar('compra');
     return 'ok';
   }
 
@@ -530,6 +547,7 @@ class EstadoJogo extends ChangeNotifier {
     save.moedas += total;
     _salvarTudo();
     notifyListeners();
+    Som.atual.tocar('venda');
     return (qtd, total);
   }
 
@@ -603,6 +621,7 @@ class EstadoJogo extends ChangeNotifier {
     _equipado[it.tipo] = _equipado[it.tipo] == id ? null : id;
     _salvarTudo();
     notifyListeners();
+    Som.atual.tocar(_equipado[it.tipo] == id ? 'equipar' : 'desequipar');
     return _equipado[it.tipo] == id;
   }
 
@@ -617,6 +636,8 @@ class EstadoJogo extends ChangeNotifier {
     _tirarItem(id);
     _salvarTudo();
     notifyListeners();
+    Som.atual.tocar('usar');
+    if (nivel > nivelAntes) Som.atual.tocar('levelup');
     return GanhoTarefa(xp: it.bonusXp.toInt(), moedas: it.bonusMoedas.toInt(), subiuNivel: nivel > nivelAntes, nivel: nivel, parcial: false);
   }
 
@@ -630,6 +651,7 @@ class EstadoJogo extends ChangeNotifier {
     _tirarItem(id);
     _salvarTudo();
     notifyListeners();
+    Som.atual.tocar('venda');
     return preco;
   }
 

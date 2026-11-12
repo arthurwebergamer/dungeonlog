@@ -7,6 +7,7 @@ import '../dados/carregador_assets.dart';
 import 'equip_arena.dart';
 import 'estado_jogo.dart';
 import 'icones.dart';
+import 'som.dart';
 import 'tela_inventario.dart';
 import 'tela_loja.dart';
 import 'tela_tarefas.dart';
@@ -36,6 +37,7 @@ class _CarregadorState extends State<_Carregador> {
     final dados = await carregarDadosJogo();
     await EquipArena.carregar();
     final arm = await ArmazenamentoLocal.abrir();
+    Som.atual = SomAudio(arm);
     final estado = EstadoJogo(dados: dados, armazenamento: arm);
     await estado.iniciar();
     return estado;

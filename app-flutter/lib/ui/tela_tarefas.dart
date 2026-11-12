@@ -14,6 +14,7 @@ import 'estado_jogo.dart';
 import 'folha_nova_tarefa.dart';
 import 'folhas.dart';
 import 'icones.dart';
+import 'som.dart';
 import 'tema.dart';
 import 'topo.dart';
 
@@ -66,8 +67,12 @@ class _TelaTarefasState extends State<TelaTarefas> with SingleTickerProviderStat
   void _abrirBau(String qual) {
     final tier = e.tierBauEspecial;
     final itens = e.abrirBau(qual);
-    if (itens == null) return;
+    if (itens == null) {
+      if (qual == 'especial') Som.atual.tocar('bauTrancado');
+      return;
+    }
     HapticFeedback.heavyImpact();
+    Som.atual.tocar('loot');
     mostrarBauLoot(context, e, itens, variante: qual == 'especial' ? 't${(tier ?? 0).clamp(0, 3)}' : 'padrao');
   }
 

@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../dominio/bau.dart' show tierRar;
 import '../dominio/economia.dart';
 import '../dominio/tarefa.dart';
 import 'arena.dart';
@@ -61,13 +62,19 @@ class _TelaTarefasState extends State<TelaTarefas> with SingleTickerProviderStat
     }
   }
 
-  void _abrirBau() {
-    final itens = e.abrirBauPadrao();
+  void _abrirBau(String qual) {
+    if (qual == 'especial' && e.chaveDoEspecial == null) {
+      HapticFeedback.mediumImpact();
+      final t = e.tierBauEspecial ?? 0;
+      _avisar('Requer chave ${nomeRaridadeFem(tierRar[t])} ou superior');
+      return;
+    }
+    final itens = e.abrirBau(qual);
     if (itens == null) return;
     HapticFeedback.heavyImpact();
     abrirFolha<void>(
       context,
-      (ctx) => Folha(titulo: 'Baú do dia', filhos: [
+      (ctx) => Folha(titulo: qual == 'especial' ? 'Baú trancado' : (qual == 'extra' ? 'Baú extra' : 'Baú do dia'), filhos: [
         for (final it in itens)
           Padding(
             padding: const EdgeInsets.only(bottom: 8),
@@ -182,7 +189,14 @@ class _TelaTarefasState extends State<TelaTarefas> with SingleTickerProviderStat
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           _Topo(estado: e),
           Arena(estado: e, golpe: _golpe),
-          if (e.bauPadraoFechado) _BotaoBau(aoTocar: _abrirBau),
+          if (e.bauPadraoFechado) _BotaoBau('Abrir baú do dia', aoTocar: () => _abrirBau('padrao')),
+          if (e.bauFechado('extra')) _BotaoBau('Abrir baú extra', aoTocar: () => _abrirBau('extra')),
+          if (e.bauFechado('especial'))
+            _BotaoBau(
+              e.chaveDoEspecial == null ? 'Baú trancado (precisa de chave)' : 'Destrancar baú com chave',
+              aoTocar: () => _abrirBau('especial'),
+              apagado: e.chaveDoEspecial == null,
+            ),
           const SizedBox(height: 14),
           _CartaoBarras(
             vida: e.vida,
@@ -603,17 +617,19 @@ class _CartaoTarefaState extends State<_CartaoTarefa> {
 
 /// Botão do baú do dia (aparece depois de vencer o dia, até abrir).
 class _BotaoBau extends StatelessWidget {
-  const _BotaoBau({required this.aoTocar});
+  const _BotaoBau(this.texto, {required this.aoTocar, this.apagado = false});
+  final String texto;
   final VoidCallback aoTocar;
+  final bool apagado;
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.fromLTRB(14, 0, 14, 10),
+        padding: const EdgeInsets.fromLTRB(14, 0, 14, 8),
         child: GestureDetector(
           onTap: aoTocar,
           child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 13),
-            decoration: BoxDecoration(color: corXpB, borderRadius: BorderRadius.circular(14)),
-            child: const Center(child: Text('Abrir baú do dia', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700, fontSize: 15))),
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            decoration: BoxDecoration(color: apagado ? corPainel3 : corXpB, borderRadius: BorderRadius.circular(14)),
+            child: Center(child: Text(texto, style: TextStyle(color: apagado ? corApagado : Colors.black, fontWeight: FontWeight.w700, fontSize: 15))),
           ),
         ),
       );

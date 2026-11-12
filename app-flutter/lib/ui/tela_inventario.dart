@@ -5,7 +5,8 @@ import 'package:flutter/services.dart';
 
 import '../dominio/catalogo.dart';
 import '../dominio/economia.dart';
-import '../dominio/regras.dart' show precoVenda;
+import '../dominio/forja.dart';
+import '../dominio/regras.dart' show bonusItem, precoVenda;
 import 'estado_jogo.dart';
 import 'folhas.dart';
 import 'tema.dart';
@@ -24,6 +25,15 @@ const _nomesAfixo = {
   'gan': 'Ganancioso', 'est': 'Estudioso', 'sor': 'Sortudo', 'bar': 'Barganhista',
   'bau': 'Caçador de Baús', 'abu': 'Abundante', 'tes': 'Garimpeiro', 'tex': 'Tesoureiro',
 };
+
+const _nomesRaridadeFem = ['Comum', 'Incomum', 'Rara', 'Superior', 'Épica', 'Lendária', 'Ancestral', 'Única'];
+String nomeRaridadeFem(int r) => _nomesRaridadeFem[r.clamp(0, 7)];
+
+const _sufixos = {
+  'gan': 'do Ganancioso', 'est': 'do Estudioso', 'sor': 'do Sortudo', 'bar': 'do Barganhista',
+  'bau': 'do Caçador de Baús', 'abu': 'da Abundância', 'tes': 'do Garimpeiro', 'tex': 'do Tesoureiro',
+};
+const _sufixosNeg = {'gan': 'da Pobreza', 'est': 'da Ignorância', 'sor': 'do Azar', 'bar': 'do Desperdício'};
 
 String nomeRaridade(int r, String idioma) => (idioma == 'en' ? _nomesRaridadeEn : _nomesRaridadePt)[r.clamp(0, 7)];
 
@@ -282,81 +292,240 @@ class _Slots extends StatelessWidget {
   }
 }
 
-/// Ficha do item: nome, raridade, efeitos e as ações possíveis.
-class FichaItem extends StatelessWidget {
+/// Ficha do item: nome, raridade, efeitos e as ações possíveis (equipar, usar, vender, forjar).
+class FichaItem extends StatefulWidget {
   const FichaItem({super.key, required this.estado, required this.item});
   final EstadoJogo estado;
   final ItemCatalogo item;
+  @override
+  State<FichaItem> createState() => _FichaItemState();
+}
 
-  List<String> _efeitos() {
+class _FichaItemState extends State<FichaItem> {
+  late ItemCatalogo _item = widget.item;
+  String _tela = 'item'; // item | sel | res
+  final List<int> _sel = [];
+  Afixo? _novo;
+
+  EstadoJogo get e => widget.estado;
+
+  String _sufixo(Afixo a) => a.valor < 0 ? (_sufixosNeg[a.tipo] ?? '') : (_sufixos[a.tipo] ?? '');
+  String _nomeCompleto(ItemCatalogo it) =>
+      it.afixo == null ? it.nomeNoIdioma(e.idioma) : '${it.nomeNoIdioma(e.idioma)} ${_sufixo(it.afixo!)}';
+
+  List<String> _efeitos(ItemCatalogo it) {
+    final b = bonusItem(it);
     final l = <String>[];
-    if (item.bonusMoedas != 0) l.add('${item.bonusMoedas > 0 ? '+' : ''}${item.bonusMoedas}% moedas');
-    if (item.bonusXp != 0) l.add('${item.bonusXp > 0 ? '+' : ''}${item.bonusXp}% XP');
-    if (item.afixo != null) l.add('${_nomeAfixo(item.afixo!)}: ${_efeitoAfixo(item.afixo!)}');
+    if (it.tipo == 'cons') {
+      if (b.x != 0) l.add('+${b.x} XP');
+      if (b.m != 0) l.add('+${b.m} moedas');
+      if (it.cura != 0) l.add('+${it.cura} de vida');
+    } else if (slotsEquip.contains(it.tipo)) {
+      if (b.x != 0) l.add('XP ${b.x > 0 ? '+' : ''}${b.x}%');
+      if (b.m != 0) l.add('Moedas ${b.m > 0 ? '+' : ''}${b.m}%');
+      if (it.afixo != null) l.add('${_nomeAfixo(it.afixo!)}: ${_efeitoAfixo(it.afixo!)}');
+    }
     return l;
   }
+
+  Widget _linhaAfixo(Afixo? a, {bool destaque = false}) => Container(
+        margin: const EdgeInsets.only(bottom: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: corPainel3,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: destaque ? corXpB : corLinha),
+        ),
+        child: Text(
+          a == null ? 'Sem encantamento' : _efeitoAfixo(a),
+          style: TextStyle(color: a == null ? corApagado : (a.valor < 0 ? corVida : corTexto), fontWeight: FontWeight.w600),
+        ),
+      );
 
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: estado,
+      listenable: e,
       builder: (ctx, _) {
-        final q = estado.quantidadeDe(item.id);
-        final equip = slotsEquip.contains(item.tipo);
-        final equipado = estado.equipado(item.id);
-        final cor = corRaridade[item.raridade.clamp(0, 7)];
-        final preco = precoVenda(item.tipo, item.valor);
-        final consumivel = item.tipo == 'cons';
-        final efeitos = [
-          ..._efeitos(),
-          if (consumivel && item.cura != 0) '+${item.cura} de vida',
-          if (consumivel && item.bonusXp != 0) '+${item.bonusXp} XP ao usar',
-          if (consumivel && item.bonusMoedas != 0) '+${item.bonusMoedas} moedas ao usar',
-        ];
-        return Folha(titulo: item.nomeNoIdioma(estado.idioma), filhos: [
-          Row(children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(color: corPainel3, borderRadius: BorderRadius.circular(14), border: Border.all(color: cor)),
-              child: SpriteItem(estado: estado, item: item, tamanho: 54),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('${nomeRaridade(item.raridade, estado.idioma)} · ${_nomesTipoPt[item.tipo] ?? item.tipo}',
-                    style: TextStyle(color: cor, fontWeight: FontWeight.w600)),
-                const SizedBox(height: 4),
-                Text('Quantidade: $q', style: const TextStyle(color: corApagado, fontSize: 13)),
-              ]),
-            ),
-          ]),
-          if (efeitos.isNotEmpty) ...[
-            const SizedBox(height: 12),
-            for (final t in efeitos) Padding(padding: const EdgeInsets.only(bottom: 3), child: Text(t, style: const TextStyle(fontSize: 14, color: corSuave))),
-          ],
-          const SizedBox(height: 16),
-          if (q > 0 && equip)
-            BotaoFolha(equipado ? 'Desequipar' : 'Equipar', aoTocar: () {
-              HapticFeedback.mediumImpact();
-              estado.equipar(item.id);
-              Navigator.pop(ctx);
-            }),
-          if (q > 0 && consumivel)
-            BotaoFolha('Usar', aoTocar: () {
-              HapticFeedback.mediumImpact();
-              estado.usarItem(item.id);
-              if (estado.quantidadeDe(item.id) == 0) Navigator.pop(ctx);
-            }),
-          if (q > 0 && !(item.tipo == 'chave' && item.nome == 'Grimório')) ...[
-            const SizedBox(height: 9),
-            BotaoFolha('Vender por $preco', fundo: corPainel, cor: corTexto, borda: corLinha, aoTocar: () {
-              HapticFeedback.mediumImpact();
-              estado.venderItem(item.id);
-              if (estado.quantidadeDe(item.id) == 0) Navigator.pop(ctx);
-            }),
-          ],
+        final it = _item;
+        final cor = corRaridade[it.raridade.clamp(0, 7)];
+        final cab = Row(children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(color: corPainel3, borderRadius: BorderRadius.circular(14), border: Border.all(color: cor)),
+            child: SpriteItem(estado: e, item: it, tamanho: 54),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(_nomeCompleto(it), style: TextStyle(color: cor, fontWeight: FontWeight.w700, fontSize: 16)),
+              const SizedBox(height: 3),
+              Text('${nomeRaridade(it.raridade, e.idioma)} · ${_nomesTipoPt[it.tipo] ?? it.tipo}',
+                  style: const TextStyle(color: corApagado, fontSize: 13)),
+            ]),
+          ),
+        ]);
+        final titulo = _tela == 'item' ? 'Item' : 'Forja';
+        return Folha(titulo: titulo, filhos: [
+          cab,
+          const SizedBox(height: 14),
+          if (_tela == 'item') ..._corpoItem(ctx, it) else if (_tela == 'sel') ..._corpoSelecao(it) else ..._corpoResultado(ctx, it),
         ]);
       },
     );
+  }
+
+  List<Widget> _corpoItem(BuildContext ctx, ItemCatalogo it) {
+    final q = e.quantidadeDe(it.id);
+    final equip = slotsEquip.contains(it.tipo);
+    final equipado = e.equipado(it.id);
+    final preco = precoVenda(it.tipo, it.valor);
+    final consumivel = it.tipo == 'cons';
+    final grimorio = it.tipo == 'chave' && it.nome == 'Grimório';
+    return [
+      for (final t in _efeitos(it)) Padding(padding: const EdgeInsets.only(bottom: 4), child: Text(t, style: const TextStyle(fontSize: 14, color: corSuave))),
+      if (it.tipo == 'chave' && !grimorio)
+        const Text('Usada automaticamente para destrancar um baú trancado.', style: TextStyle(fontSize: 13, color: corApagado, height: 1.4)),
+      if (!grimorio) Text('Vende por $preco moedas', style: const TextStyle(fontSize: 13, color: corApagado)),
+      if (q > 1) Text('Quantidade: $q', style: const TextStyle(fontSize: 13, color: corApagado)),
+      const SizedBox(height: 14),
+      if (q > 0 && equip)
+        BotaoFolha(equipado ? 'Desequipar' : 'Equipar', aoTocar: () {
+          HapticFeedback.mediumImpact();
+          e.equipar(it.id);
+          Navigator.pop(ctx);
+        }),
+      if (q > 0 && consumivel)
+        BotaoFolha('Usar', aoTocar: () {
+          HapticFeedback.mediumImpact();
+          e.usarItem(it.id);
+          if (e.quantidadeDe(it.id) == 0) Navigator.pop(ctx);
+        }),
+      if (q > 0 && equip) ...[
+        const SizedBox(height: 9),
+        BotaoFolha('Forjar', fundo: corPainel, cor: corTexto, borda: corLinha, aoTocar: () => setState(() {
+              _tela = 'sel';
+              _sel.clear();
+            })),
+      ],
+      if (q > 0 && !grimorio) ...[
+        const SizedBox(height: 9),
+        BotaoFolha('Vender por $preco', fundo: corPainel, cor: corTexto, borda: corLinha, aoTocar: () {
+          HapticFeedback.mediumImpact();
+          e.venderItem(it.id);
+          if (e.quantidadeDe(it.id) == 0) Navigator.pop(ctx);
+        }),
+      ],
+    ];
+  }
+
+  List<Widget> _corpoSelecao(ItemCatalogo it) {
+    final custo = custoForja(it.rer);
+    final tesouros = <(ItemCatalogo, int)>[];
+    for (final sl in e.save.inventario) {
+      final t = e.catalogo.item(sl['id']);
+      if (t != null && t.tipo == 'tesouro') tesouros.add((t, ((sl['q'] as num?) ?? 0).toInt()));
+    }
+    tesouros.sort((a, b) {
+      final r = b.$1.raridade.compareTo(a.$1.raridade);
+      return r != 0 ? r : b.$1.valor.compareTo(a.$1.valor);
+    });
+    final pronto = _sel.length == custo;
+    return [
+      const RotuloSecao('Encantamento atual'),
+      const SizedBox(height: 6),
+      _linhaAfixo(it.afixo),
+      const SizedBox(height: 8),
+      RotuloSecao('Ofereça $custo ${custo > 1 ? 'tesouros' : 'tesouro'}'),
+      const SizedBox(height: 8),
+      Wrap(spacing: 8, runSpacing: 8, children: [
+        for (var k = 0; k < custo; k++)
+          GestureDetector(
+            onTap: k < _sel.length ? () => setState(() => _sel.removeAt(k)) : null,
+            child: Container(
+              width: 52,
+              height: 52,
+              decoration: BoxDecoration(color: corPainel3, borderRadius: BorderRadius.circular(12), border: Border.all(color: k < _sel.length ? corXpB : corLinha)),
+              child: k < _sel.length ? Center(child: SpriteItem(estado: e, item: e.catalogo.item(_sel[k])!, tamanho: 38)) : null,
+            ),
+          ),
+      ]),
+      const SizedBox(height: 8),
+      Text(
+        pronto ? 'Chance de maldição: ${(pNegForja(e.catalogo, _sel) * 100).round()}%' : 'Toque nos tesouros abaixo para escolher',
+        style: const TextStyle(fontSize: 13, color: corApagado),
+      ),
+      const SizedBox(height: 8),
+      if (tesouros.isEmpty)
+        const Text('Você não tem tesouros.', style: TextStyle(color: corApagado))
+      else
+        Wrap(spacing: 8, runSpacing: 8, children: [
+          for (final (t, q) in tesouros)
+            Builder(builder: (_) {
+              final usados = _sel.where((x) => x == t.id).length;
+              final livre = q - usados;
+              final pode = livre > 0 && _sel.length < custo;
+              return GestureDetector(
+                onTap: pode ? () => setState(() => _sel.add(t.id)) : null,
+                child: Opacity(
+                  opacity: pode ? 1 : 0.4,
+                  child: Container(
+                    width: 52,
+                    height: 52,
+                    decoration: BoxDecoration(color: corPainel3, borderRadius: BorderRadius.circular(12), border: Border.all(color: corRaridade[t.raridade.clamp(0, 7)])),
+                    child: Stack(alignment: Alignment.center, children: [
+                      SpriteItem(estado: e, item: t, tamanho: 38),
+                      Positioned(right: 4, bottom: 1, child: Text('$livre', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700))),
+                    ]),
+                  ),
+                ),
+              );
+            }),
+        ]),
+      const SizedBox(height: 16),
+      BotaoFolha('Forjar', aoTocar: pronto
+          ? () {
+              HapticFeedback.heavyImpact();
+              final novo = e.forjarSortear(it.id, List<int>.from(_sel));
+              if (novo != null) {
+                setState(() {
+                  _novo = novo;
+                  _tela = 'res';
+                });
+              }
+            }
+          : () {}),
+      const SizedBox(height: 9),
+      BotaoFolha('Voltar', fundo: corPainel, cor: corTexto, borda: corLinha, aoTocar: () => setState(() => _tela = 'item')),
+    ];
+  }
+
+  List<Widget> _corpoResultado(BuildContext ctx, ItemCatalogo it) {
+    void fechar(Afixo? afx) {
+      HapticFeedback.mediumImpact();
+      final id = e.forjarConfirmar(it.id, afx);
+      if (id == null) {
+        Navigator.pop(ctx);
+        return;
+      }
+      setState(() {
+        _item = e.catalogo.item(id)!;
+        _tela = 'item';
+      });
+    }
+
+    return [
+      const RotuloSecao('Atual'),
+      const SizedBox(height: 6),
+      _linhaAfixo(it.afixo),
+      const SizedBox(height: 8),
+      RotuloSecao('Novo · ${_nomeAfixo(_novo!)}'),
+      const SizedBox(height: 6),
+      _linhaAfixo(_novo, destaque: true),
+      const SizedBox(height: 16),
+      BotaoFolha('Ficar com o novo', aoTocar: () => fechar(_novo)),
+      const SizedBox(height: 9),
+      BotaoFolha('Manter atual', fundo: corPainel, cor: corTexto, borda: corLinha, aoTocar: () => fechar(it.afixo)),
+    ];
   }
 }

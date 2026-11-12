@@ -68,9 +68,13 @@ const FUNCOES = ['isoDe', 'diffDias', 'isoAtual', 'diaDaSemana', 'multDif', 'dif
   'multMoedas', 'multXP', 'item', 'variante', 'ehEquipBase', 'baseDe', 'limparVariantes', 'exportarVariantes',
   'restaurarVariantes', 'limparAfixosFabrica', 'migrarAfixos', 'afxRolar', 'comAfixo', 'nomePadraoHeroi',
   'nomeHeroiNorm', 'idiomaApp', 'resetarEstadoParaPadrao', 'salvar', '_carregarBase', 'chaveSaveAtual', 'chaveConta',
-  'monstroJaCaiu', 'sortearItem', 'tesouroExtra', 'lootDoEstagio'];
+  'monstroJaCaiu', 'sortearItem', 'tesouroExtra', 'lootDoEstagio',
+  'gerarEstadoBauDia', 'darLoot', 'sortearGanhos', 'mediaDifHoje', 'pipsDe', 'chanceBauTrancado', '_fatorDif', 'tierBauNecessario',
+  '_lerPityBau', '_gravarPityBau', 'darItem', 'tirarItem', 'acharSlot', 'persistir', 'chaveParaDestravar', 'nivelMinimo',
+  'pesosLojaPorNivel', 'precoLoja', 'rngLoja', 'montarEstoque', 'pNegForja'];
 const DECLS = ['ECO', 'BONUS', 'DIFS', 'DIF_PADRAO', 'AFIXOS', 'AFX_CHAVES', 'AFX_TETO', 'AFX_NEG', 'AFX_NEG_CHAVES',
-  'P_NEG_LOOT', 'P_SEM_AFX', 'SLOTS', 'LIMIARES_ESTAGIO', 'TIER_RAR', '_varMapa', '_restoMoedasTarefa', 'PESO_RAR', 'RAR_ESCALA'];
+  'P_NEG_LOOT', 'P_SEM_AFX', 'SLOTS', 'LIMIARES_ESTAGIO', 'TIER_RAR', '_varMapa', '_restoMoedasTarefa', 'PESO_RAR', 'RAR_ESCALA', 'PITY_BAU_ESPECIAL', 'CHAVE_PITY_BAU', 'PESO_TIER_ESPECIAL', 'LOJA_TIPOS', 'PESO_LOJA',
+  'ID_GRIMORIO_LOJA', 'ID_GRIMORIO_INV'];
 
 /* ---------------- sandbox ---------------- */
 function criarSandbox({ lang = 'pt', uid = null, pj = 'pj1', relogio = null } = {}) {
@@ -107,7 +111,7 @@ function criarSandbox({ lang = 'pt', uid = null, pj = 'pj1', relogio = null } = 
        let __bioma = null; function temaArenaAtual(){ return TEMAS_ARENA.find(t => t.id === __bioma) || TEMAS_ARENA[0]; }
        if (!__bioma) { __bioma = TEMAS_ARENA[0].id; }
        window.chaveConta = chaveConta; window.diaDescansando = (iso) => __descanso.includes(iso || isoAtual()); let __descanso = [];
-       function render(){} function aviso(){}`);
+       function render(){} function aviso(){} let abaAtual = 'tarefas'; window.afixoSoma = afixoSoma;`);
   // Math.random fixo (só usado na migração de contas legadas, cujo resultado líquido não depende dele)
   run('Math.random = () => 0.5;');
   return { ctx, run, store, window };
@@ -393,6 +397,70 @@ if (process.argv.includes('--tz')) {
     lootCasos.push({ modo, sorte, tes, tex, estagio, nTarefas, usados, ids, vars });
   }
   casos.loot = lootCasos;
+}
+
+/* ---------------- baú do dia, loja, forja ---------------- */
+{
+  const S = criarSandbox();
+  const gen0 = (seed) => { const g = mulberry32(seed), usados = []; S.ctx.__rnd = () => { const v = g(); usados.push(v); return v; }; S.run('Math.random = __rnd;'); return usados; };
+  const rb = mulberry32(31337);
+  const bau = [];
+  const DIFS_ID = ['trivial', 'facil', 'media', 'dificil'];
+  for (let i = 0; i < 300; i++) {
+    const nT = Math.floor(rb() * 9);
+    const difs = Array.from({ length: nT }, () => DIFS_ID[Math.floor(rb() * 4)]);
+    const pity = Math.floor(rb() * 8), estagio = 1 + Math.floor(rb() * 4);
+    const afx = { tes: [0, 15][Math.floor(rb() * 2)], tex: [0, 30][Math.floor(rb() * 2)], bau: [0, 10][Math.floor(rb() * 2)], abu: [0, 15, 60][Math.floor(rb() * 3)] };
+    S.run('limparVariantes(); inventario = [];');
+    S.run(`tarefas = ${JSON.stringify(difs.map((d, k) => ({ texto: 't' + k, tipo: 'hoje', data: '2026-11-11', feitaEm: null, dif: d })))};`);
+    S.run(`afixoSoma = (k) => (${JSON.stringify(afx)})[k] || 0; window.afixoSoma = afixoSoma; window.estagioAtual = () => ${estagio}; _gravarPityBau(${pity});`);
+    const usados = gen0(9000 + i);
+    const media = S.run('mediaDifHoje()');
+    const estado = S.run("gerarEstadoBauDia('2026-11-11', tarefas.filter(ehDeHoje).length)");
+    bau.push({ difs, pity, estagio, afx, usados, media, estado: JSON.parse(JSON.stringify(estado)), pityDepois: S.run('_lerPityBau()'),
+      inventario: JSON.parse(JSON.stringify(S.run('inventario'))), vars: S.run('exportarVariantes()') });
+  }
+  casos.bauDia = bau;
+
+  // chaveParaDestravar
+  const chaves = linhas.map((r, i) => [r, i]).filter(([r]) => r[2] === 'chave').map(([, i]) => i);
+  const rc = mulberry32(4242), chv = [];
+  for (let i = 0; i < 120; i++) {
+    const inv = Array.from({ length: Math.floor(rc() * 6) }, () => ({ id: chaves[Math.floor(rc() * chaves.length)], q: Math.floor(rc() * 3) }));
+    const tier = Math.floor(rc() * 4);
+    chv.push({ inv, tier, esperado: S.run(`inventario = ${JSON.stringify(inv)}; chaveParaDestravar(${tier})`) });
+  }
+  casos.chavesBau = chv;
+
+  // loja
+  const loja = [];
+  const rlj = mulberry32(555);
+  for (let i = 0; i < 120; i++) {
+    const dia = 1 + Math.floor(rlj() * 28), mes = Math.floor(rlj() * 12), ano = 2026 + Math.floor(rlj() * 2);
+    const sem = Math.floor(rlj() * 64), nivelAlvo = 1 + Math.floor(rlj() * 14);
+    const xp = [0, 100, 260, 480, 740, 1040, 1380, 1760, 2180, 2640, 3140, 3680, 4260, 4880][nivelAlvo - 1] + 5;
+    S.run(`__hoje = [${ano}, ${mes}, ${dia}]; semente = ${sem}; xpTotal = ${xp};`);
+    const desc = [0, 0.05, -0.1, 0.3][Math.floor(rlj() * 4)];
+    S.run(`window.descontoLoja = () => ${desc};`);
+    const est = S.run('montarEstoque()');
+    loja.push({ ano, mes, dia, sem, xp, nivel: S.run('progresso().nivel'), dc: S.run('diasCorridos()'), desc,
+      estoque: est.map((e) => ({ id: e.id, o: e.oferta })), precos: est.map((e) => S.run(`precoLoja(${e.id}, ${e.oferta})`)) });
+  }
+  casos.loja = { casos: loja, nivelMinimo: Array.from({ length: 8 }, (_, r) => S.run(`nivelMinimo(${r})`)),
+    pesos: Array.from({ length: 16 }, (_, n) => S.run(`pesosLojaPorNivel(${n + 1})`)) };
+
+  // forja
+  const tesouros = linhas.map((r, i) => [r, i]).filter(([r]) => r[2] === 'tesouro' && !r[8]).map(([, i]) => i);
+  const rf = mulberry32(8080), fj = [];
+  for (let i = 0; i < 300; i++) {
+    const rar = Math.floor(rf() * 8), excl = [null, 'gan', 'est', 'sor', 'bar'][Math.floor(rf() * 5)];
+    const sel = Array.from({ length: Math.floor(rf() * 4) }, () => tesouros[Math.floor(rf() * tesouros.length)]);
+    const pn = S.run(`pNegForja(${JSON.stringify(sel)})`);
+    const usados = gen0(12000 + i);
+    const afx = S.run(`afxRolar(${rar}, ${JSON.stringify(excl)}, ${pn})`);
+    fj.push({ rar, excl, sel, pn, usados, afx });
+  }
+  casos.forja = fj;
 }
 const fusos = ['America/Sao_Paulo', 'UTC', 'Asia/Tokyo', 'Europe/Lisbon', 'America/New_York', 'Pacific/Auckland', 'Asia/Kolkata', 'America/St_Johns'];
 casos.fusos = fusos.map((tz) => ({ tz, datas: JSON.parse(execFileSync(process.execPath, [fileURLToPath(import.meta.url), '--tz'], { env: { ...process.env, TZ: tz }, maxBuffer: 1 << 28 }).toString()) }));

@@ -7,6 +7,7 @@ import '../dados/carregador_assets.dart';
 import 'estado_jogo.dart';
 import 'icones.dart';
 import 'tela_inventario.dart';
+import 'tela_loja.dart';
 import 'tela_tarefas.dart';
 import 'tema.dart';
 
@@ -63,12 +64,13 @@ class _CascaState extends State<Casca> {
 
   @override
   Widget build(BuildContext context) {
-    const futuras = {2: 'Fase 2', 3: 'Fase 3', 4: 'Fase 4'};
+    const futuras = {3: 'Fase 3', 4: 'Fase 4'};
     return Scaffold(
       body: IndexedStack(index: _aba, children: [
         TelaTarefas(estado: widget.estado),
         TelaInventario(estado: widget.estado),
-        for (final i in [2, 3, 4]) Center(child: Text('Em breve (${futuras[i]})', style: const TextStyle(color: corApagado))),
+        TelaLoja(estado: widget.estado),
+        for (final i in [3, 4]) Center(child: Text('Em breve (${futuras[i]})', style: const TextStyle(color: corApagado))),
       ]),
       bottomNavigationBar: BarraNavegacao(
         estado: widget.estado,

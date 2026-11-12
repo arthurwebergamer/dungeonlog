@@ -7,12 +7,14 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 
 import '../dados/armazenamento.dart';
+import '../dominio/bau.dart';
 import '../dominio/catalogo.dart';
 import '../dominio/dados_jogo.dart';
 import '../dominio/datas.dart';
 import '../dominio/economia.dart';
+import '../dominio/forja.dart';
 import '../dominio/js_compat.dart';
-import '../dominio/loot.dart';
+import '../dominio/loja.dart';
 import '../dominio/regras.dart';
 import '../dominio/save.dart';
 import '../dominio/tarefa.dart';
@@ -23,6 +25,8 @@ const _chaveDescanso = 'questlog.descanso.v1';
 const _chaveConcluidas = 'questlog.tarefasConcluidas.v1';
 const _chaveTemaArena = 'questlog.temaArena.v1';
 const _chaveBauDia = 'questlog.bauDia.v1';
+const _chavePity = 'questlog.bauSemEspecial.v1';
+const _chaveLoja = 'questlog.loja.v1';
 
 /// O que a virada do dia causou, para a interface avisar uma vez.
 class EventoVirada {
@@ -80,6 +84,14 @@ class EstadoJogo extends ChangeNotifier {
 
   /// Baú do dia (`questlog.bauDia.v1`): `{dia, padrao:{ids,aberto}, especial, extra}`. Só o padrão existe por enquanto.
   Map<String, dynamic>? bauDia;
+
+  /// Dias vencidos seguidos sem baú especial (garantia aos 6).
+  int pity = 0;
+
+  /// Loja: dia do estoque, vagas e posições já compradas (`questlog.loja.v1`).
+  String? lojaDia;
+  List<VagaLoja> lojaEstoque = [];
+  List<int> lojaVendidos = [];
   EventoVirada? eventoPendente;
   final AcumuladorMoedas _acumulador = AcumuladorMoedas();
 
@@ -107,6 +119,18 @@ class EstadoJogo extends ChangeNotifier {
 
     final b = _lerJson(chaveConta(_chaveBauDia, uid: uid, personagem: personagem));
     bauDia = b is Map ? Map<String, dynamic>.from(b) : null;
+
+    pity = numeroOu0(armazenamento.ler(chaveConta(_chavePity, uid: uid, personagem: personagem))).toInt();
+    final lj = _lerJson(chaveConta(_chaveLoja, uid: uid, personagem: personagem));
+    if (lj is Map) {
+      lojaDia = lj['dia'] is String ? lj['dia'] as String : null;
+      lojaEstoque = [
+        if (lj['estoque'] is List)
+          for (final e in lj['estoque'] as List)
+            if (e is Map && catalogo.existe(e['id'])) VagaLoja((e['id'] as num).toInt(), e['o'] == 1 || e['o'] == true)
+      ];
+      lojaVendidos = [if (lj['vendidos'] is List) for (final v in lj['vendidos'] as List) if (v is num) v.toInt()];
+    }
 
     verificarDia();
     _garantirBau();
@@ -382,42 +406,171 @@ class EstadoJogo extends ChangeNotifier {
 
   int get _estagio => estagioAtual(totalConcluidas);
 
-  /// `garantirBauDia()`: com o monstro caído e sem baú de hoje, sorteia o padrão e já credita os itens.
+  int _pips(Tarefa t) => dificuldades.firstWhere((d) => d.id == difDe(t.dif), orElse: () => dificuldades.firstWhere((d) => d.id == difPadrao)).pips;
+
+  /// `garantirBauDia()`: com o monstro caído e sem baú de hoje, sorteia padrão/especial/extra e credita o que é imediato.
   void _garantirBau() {
     if (!derrotado) return;
     if (bauDia != null && bauDia!['dia'] == hoje) return;
-    final ids = sortearLootDoDia(
+    final doDia = tarefasDeHoje;
+    final g = gerarBauDia(
       catalogo,
       _aleatorio.nextDouble,
-      nTarefas: tarefasDeHoje.length,
+      dia: hoje,
+      nTarefas: doDia.length,
       estagio: _estagio,
+      media: mediaDif([for (final t in doDia) _pips(t)]),
+      pityAtual: pity,
       afixoTes: afixoSoma(catalogo, _equipado, 'tes'),
       afixoTex: afixoSoma(catalogo, _equipado, 'tex'),
+      afixoBau: afixoSoma(catalogo, _equipado, 'bau'),
+      afixoAbu: afixoSoma(catalogo, _equipado, 'abu'),
     );
-    ids.forEach(_darItem);
-    bauDia = {
-      'dia': hoje,
-      'padrao': {'ids': ids, 'aberto': false},
-      'especial': null,
-      'extra': null,
-    };
+    g.creditar.forEach(_darItem);
+    pity = g.pity;
+    bauDia = g.estado;
   }
 
-  /// Baú padrão de hoje ainda fechado?
-  bool get bauPadraoFechado {
+  /// O baú [qual] ('padrao', 'especial' ou 'extra') existe hoje e ainda está fechado?
+  bool bauFechado(String qual) {
     final b = bauDia;
-    return b != null && b['dia'] == hoje && b['padrao'] is Map && (b['padrao'] as Map)['aberto'] != true;
+    if (b == null || b['dia'] != hoje || b[qual] is! Map) return false;
+    return (b[qual] as Map)['aberto'] != true;
   }
 
-  /// `abrirBauPadrao()`: marca como aberto e devolve os itens para o popup (null se não há o que abrir).
-  List<ItemCatalogo>? abrirBauPadrao() {
-    if (!bauPadraoFechado) return null;
-    final p = bauDia!['padrao'] as Map;
+  bool get bauPadraoFechado => bauFechado('padrao');
+
+  /// Raridade mínima da chave pedida pelo baú especial (null se não há baú especial fechado).
+  int? get tierBauEspecial => bauFechado('especial') ? ((bauDia!['especial'] as Map)['tier'] as num).toInt() : null;
+
+  /// Id da chave do inventário que abre o baú especial hoje (null = sem chave).
+  int? get chaveDoEspecial {
+    final t = tierBauEspecial;
+    return t == null ? null : chaveParaDestravar(catalogo, save.inventario, t);
+  }
+
+  /// `abrirBauPadrao/Extra/Especial()`. Devolve os itens para o popup; null se não há o que abrir.
+  /// O especial exige uma chave (gasta uma) e só então credita os itens.
+  List<ItemCatalogo>? abrirBau(String qual) {
+    if (!bauFechado(qual)) return null;
+    final p = bauDia![qual] as Map;
     final ids = [for (final i in (p['ids'] as List)) (i as num).toInt()];
+    if (qual == 'especial') {
+      final chave = chaveDoEspecial;
+      if (chave == null) return null;
+      _tirarItem(chave);
+      ids.forEach(_darItem);
+    }
     p['aberto'] = true;
     _salvarTudo();
     notifyListeners();
     return [for (final i in ids) catalogo.item(i)!];
+  }
+
+  List<ItemCatalogo>? abrirBauPadrao() => abrirBau('padrao');
+
+  // ---------- loja ----------
+  int get _afixoBar => afixoSoma(catalogo, _equipado, 'bar');
+  int precoNaLoja(VagaLoja v) => precoLoja(catalogo.item(v.id)!, v.oferta, desconto: descontoLoja(_afixoBar));
+
+  /// `garantirEstoque()`: refaz a prateleira na virada do dia (ou se o formato salvo não confere).
+  void garantirEstoque() {
+    final vagas = Eco.lojaVagas < 1 ? 1 : Eco.lojaVagas;
+    final nCons = Eco.lojaConsumiveis < vagas ? Eco.lojaConsumiveis : vagas;
+    var formatoOk = lojaEstoque.length == vagas;
+    if (formatoOk) {
+      for (var i = 0; i < lojaEstoque.length; i++) {
+        final it = catalogo.item(lojaEstoque[i].id)!;
+        if (it.morto || (it.tipo == 'cons') != (i >= vagas - nCons)) formatoOk = false;
+      }
+    }
+    if (lojaDia != hoje || lojaEstoque.isEmpty || !formatoOk) {
+      lojaDia = hoje;
+      lojaEstoque = montarEstoque(catalogo, diasCorridos: diasCorridos(_agora()), semente: save.semente, nivel: nivel);
+      lojaVendidos = [];
+      _salvarTudo();
+    }
+  }
+
+  /// `comprar(i)`. Resultado: 'ok', 'nivel' (falta nível), 'moedas' ou 'invalido'.
+  String comprar(int i) {
+    garantirEstoque();
+    if (i < 0 || i >= lojaEstoque.length || lojaVendidos.contains(i)) return 'invalido';
+    final v = lojaEstoque[i];
+    final it = catalogo.item(v.id)!;
+    if (nivel < nivelMinimo(it.raridade)) return 'nivel';
+    final preco = precoNaLoja(v);
+    if (save.moedas < preco) return 'moedas';
+    save.moedas -= preco;
+    _darItem(v.id);
+    lojaVendidos.add(i);
+    _salvarTudo();
+    notifyListeners();
+    return 'ok';
+  }
+
+  /// `venderTesouros()`: vende todos os tesouros de uma vez. Devolve (quantidade, moedas).
+  (int, int) venderTesouros() {
+    var qtd = 0, total = 0;
+    final restantes = <Map<String, dynamic>>[];
+    for (final sl in save.inventario) {
+      final it = catalogo.item(sl['id']);
+      if (it != null && it.tipo == 'tesouro') {
+        final q = ((sl['q'] as num?) ?? 0).toInt();
+        total += precoVenda(it.tipo, it.valor) * q;
+        qtd += q;
+      } else {
+        restantes.add(sl);
+      }
+    }
+    if (qtd == 0) return (0, 0);
+    save.inventario
+      ..clear()
+      ..addAll(restantes);
+    save.moedas += total;
+    _salvarTudo();
+    notifyListeners();
+    return (qtd, total);
+  }
+
+  // ---------- forja ----------
+  int tesourosDisponiveis() => [
+        for (final sl in save.inventario)
+          if (catalogo.item(sl['id'])?.tipo == 'tesouro') ((sl['q'] as num?) ?? 0).toInt()
+      ].fold(0, (a, b) => a + b);
+
+  /// Gasta os tesouros [sel] e sorteia o novo afixo (`fgo`). Null se a seleção não vale.
+  Afixo? forjarSortear(int id, List<int> sel) {
+    final it = catalogo.item(id);
+    if (it == null || !slotsEquip.contains(it.tipo) || quantidadeDe(id) == 0) return null;
+    if (sel.length != custoForja(it.rer)) return null;
+    final tem = <int, int>{};
+    for (final s in sel) {
+      tem[s] = (tem[s] ?? 0) + 1;
+      if (catalogo.item(s)?.tipo != 'tesouro' || quantidadeDe(s) < tem[s]!) return null;
+    }
+    final novo = sortearAfixoForja(catalogo, id, sel, _aleatorio.nextDouble);
+    sel.forEach(_tirarItem);
+    _salvarTudo();
+    notifyListeners();
+    return novo;
+  }
+
+  /// Fecha a forja (`fnovo`/`fatual`): troca o item por uma variante com [afixo] e uma passagem a mais pela forja.
+  /// Devolve o id novo (null se o item já não está no inventário).
+  int? forjarConfirmar(int id, Afixo? afixo) {
+    final it = catalogo.item(id);
+    if (it == null || quantidadeDe(id) == 0) return null;
+    final idNovo = catalogo.variante(it.base, afixo, it.rer + 1);
+    final eqs = [for (final k in slotsEquip) if (_equipado[k] == id) k];
+    _tirarItem(id);
+    _darItem(idNovo);
+    for (final k in eqs) {
+      _equipado[k] = idNovo;
+    }
+    _salvarTudo();
+    notifyListeners();
+    return idNovo;
   }
 
   int quantidadeDe(int id) {
@@ -490,6 +643,12 @@ class EstadoJogo extends ChangeNotifier {
       armazenamento.gravar(chaveConta(_chaveDescanso, uid: uid, personagem: personagem), jsonEncode(descanso)),
       armazenamento.gravar(chaveConta(_chaveConcluidas, uid: uid, personagem: personagem), '$totalConcluidas'),
       if (bauDia != null) armazenamento.gravar(chaveConta(_chaveBauDia, uid: uid, personagem: personagem), jsonEncode(bauDia)),
+      armazenamento.gravar(chaveConta(_chavePity, uid: uid, personagem: personagem), '$pity'),
+      if (lojaDia != null)
+        armazenamento.gravar(
+          chaveConta(_chaveLoja, uid: uid, personagem: personagem),
+          jsonEncode({'dia': lojaDia, 'estoque': [for (final v in lojaEstoque) {'id': v.id, 'o': v.oferta ? 1 : 0}], 'vendidos': lojaVendidos}),
+        ),
     ]);
   }
 }

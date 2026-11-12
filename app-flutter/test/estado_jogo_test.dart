@@ -5,6 +5,9 @@ import 'dart:math';
 
 import 'package:dungeonlog_flutter/dados/armazenamento.dart';
 import 'package:dungeonlog_flutter/dominio/dados_jogo.dart';
+import 'package:dungeonlog_flutter/dominio/forja.dart';
+import 'package:dungeonlog_flutter/dominio/loja.dart';
+import 'package:dungeonlog_flutter/dominio/regras.dart' show precoVenda;
 import 'package:dungeonlog_flutter/dominio/save.dart';
 import 'package:dungeonlog_flutter/dominio/tarefa.dart';
 import 'package:dungeonlog_flutter/ui/app.dart';
@@ -12,6 +15,7 @@ import 'package:dungeonlog_flutter/ui/estado_jogo.dart';
 import 'package:dungeonlog_flutter/ui/folha_nova_tarefa.dart';
 import 'package:dungeonlog_flutter/ui/tela_tarefas.dart';
 import 'package:dungeonlog_flutter/ui/tela_inventario.dart';
+import 'package:dungeonlog_flutter/ui/tela_loja.dart';
 import 'package:dungeonlog_flutter/ui/tema.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -285,6 +289,91 @@ void main() {
     expect(e.venderItem(arma), isNull);
   });
 
+
+  test('baú trancado: sem chave não abre; com chave gasta uma e credita os itens', () async {
+    final e = await novoEstado(ArmazenamentoMemoria());
+    final cat = e.catalogo;
+    final item = [for (var i = 0; i < cat.baseN; i++) if (cat.item(i)!.tipo == 'cons' && !cat.item(i)!.morto) i].first;
+    final chave = [for (var i = 0; i < cat.baseN; i++) if (cat.item(i)!.tipo == 'chave' && cat.item(i)!.nome != 'Grimório' && cat.item(i)!.raridade == 0) i].first;
+    e.bauDia = {
+      'dia': e.hoje,
+      'padrao': {'ids': <int>[], 'aberto': true},
+      'especial': {'ids': [item], 'tier': 0, 'aberto': false},
+      'extra': null,
+    };
+    expect(e.bauFechado('especial'), isTrue);
+    expect(e.chaveDoEspecial, isNull);
+    expect(e.abrirBau('especial'), isNull, reason: 'sem chave');
+    expect(e.quantidadeDe(item), 0);
+    e.save.inventario.add({'id': chave, 'q': 2});
+    expect(e.chaveDoEspecial, chave);
+    final ganhos = e.abrirBau('especial')!;
+    expect(ganhos.map((i) => i.id), [item]);
+    expect(e.quantidadeDe(chave), 1, reason: 'gasta uma chave');
+    expect(e.quantidadeDe(item), 1);
+    expect(e.abrirBau('especial'), isNull, reason: 'só abre uma vez');
+  });
+
+  test('loja: comprar paga o preço, entrega o item, bloqueia repetir e reabre igual', () async {
+    final arm = ArmazenamentoMemoria();
+    final e = await novoEstado(arm);
+    e.garantirEstoque();
+    expect(e.lojaEstoque.length, 8);
+    expect(e.lojaEstoque.where((v) => v.oferta).length, 1);
+    e.save.moedas = 100000;
+    final i = [for (var k = 0; k < 8; k++) if (e.nivel >= nivelMinimo(e.catalogo.item(e.lojaEstoque[k].id)!.raridade)) k].first;
+    final v = e.lojaEstoque[i];
+    final preco = e.precoNaLoja(v);
+    expect(e.comprar(i), 'ok');
+    expect(e.save.moedas, 100000 - preco);
+    expect(e.quantidadeDe(v.id), greaterThan(0));
+    expect(e.comprar(i), 'invalido', reason: 'vaga já vendida');
+    final travada = [for (var k = 0; k < 8; k++) if (e.nivel < nivelMinimo(e.catalogo.item(e.lojaEstoque[k].id)!.raridade)) k];
+    if (travada.isNotEmpty) expect(e.comprar(travada.first), 'nivel');
+    e.save.moedas = 0;
+    final outra = [for (var k = 0; k < 8; k++) if (k != i && e.nivel >= nivelMinimo(e.catalogo.item(e.lojaEstoque[k].id)!.raridade)) k].first;
+    expect(e.comprar(outra), 'moedas');
+    final e2 = await novoEstado(arm);
+    expect(e2.lojaEstoque.map((x) => x.id), e.lojaEstoque.map((x) => x.id));
+    expect(e2.lojaVendidos, [i]);
+  });
+
+  test('loja: vender todos os tesouros de uma vez', () async {
+    final e = await novoEstado(ArmazenamentoMemoria());
+    final cat = e.catalogo;
+    final tes = [for (var i = 0; i < cat.baseN; i++) if (cat.item(i)!.tipo == 'tesouro' && !cat.item(i)!.morto) i].take(2).toList();
+    e.save.inventario.addAll([
+      {'id': tes[0], 'q': 3},
+      {'id': tes[1], 'q': 1},
+    ]);
+    final esperado = 3 * precoVenda('tesouro', cat.item(tes[0])!.valor) + precoVenda('tesouro', cat.item(tes[1])!.valor);
+    expect(e.venderTesouros(), (4, esperado));
+    expect(e.save.moedas, esperado);
+    expect(e.tesourosDisponiveis(), 0);
+    expect(e.venderTesouros(), (0, 0));
+  });
+
+  test('forja: gasta tesouro, sorteia novo afixo e a troca mantém o item equipado', () async {
+    final e = await novoEstado(ArmazenamentoMemoria());
+    final cat = e.catalogo;
+    final arma = [for (var i = 0; i < cat.baseN; i++) if (cat.item(i)!.tipo == 'arma' && !cat.item(i)!.morto) i].first;
+    final tes = [for (var i = 0; i < cat.baseN; i++) if (cat.item(i)!.tipo == 'tesouro' && !cat.item(i)!.morto) i].first;
+    e.save.inventario.addAll([
+      {'id': arma, 'q': 1},
+      {'id': tes, 'q': 2},
+    ]);
+    e.equipar(arma);
+    expect(e.forjarSortear(arma, const []), isNull, reason: 'precisa oferecer 1 tesouro');
+    final novo = e.forjarSortear(arma, [tes])!;
+    expect(e.quantidadeDe(tes), 1);
+    final id = e.forjarConfirmar(arma, novo)!;
+    expect(cat.item(id)!.afixo, novo);
+    expect(cat.item(id)!.rer, 1);
+    expect(e.quantidadeDe(arma), 0);
+    expect(e.equipado(id), isTrue, reason: 'continua equipado');
+    expect(custoForja(1), 2);
+  });
+
   testWidgets('tela: inventário mostra itens e abre a ficha sem estourar o layout', (tester) async {
     await tester.binding.setSurfaceSize(const Size(360, 800));
     addTearDown(() => tester.binding.setSurfaceSize(null));
@@ -301,6 +390,43 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
     expect(find.text('Desequipar'), findsOneWidget);
     expect(find.textContaining('Vender por'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+
+  testWidgets('tela: loja mostra a prateleira e abre a compra; ficha de equipamento abre a forja', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(360, 800));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    late EstadoJogo e;
+    await tester.runAsync(() async => e = await novoEstado(ArmazenamentoMemoria()));
+    await tester.pumpWidget(MaterialApp(theme: temaApp(), home: Scaffold(body: TelaLoja(estado: e))));
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text('Loja'), findsOneWidget);
+    expect(find.text('OFERTA'), findsOneWidget);
+    await tester.tap(find.byType(SpriteItem).first);
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(find.textContaining('Comprar por'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+
+    // forja pela ficha do equipamento
+    final cat = e.catalogo;
+    final arma = [for (var i = 0; i < cat.baseN; i++) if (cat.item(i)!.tipo == 'arma' && !cat.item(i)!.morto) i].first;
+    final tes = [for (var i = 0; i < cat.baseN; i++) if (cat.item(i)!.tipo == 'tesouro' && !cat.item(i)!.morto) i].first;
+    e.save.inventario.addAll([
+      {'id': arma, 'q': 1},
+      {'id': tes, 'q': 1},
+    ]);
+    await tester.pumpWidget(MaterialApp(key: UniqueKey(), theme: temaApp(), home: Scaffold(body: FichaItem(estado: e, item: cat.item(arma)!))));
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.tap(find.text('Forjar'));
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.textContaining('OFEREÇA 1 TESOURO'), findsOneWidget);
+    await tester.tap(find.byType(SpriteItem).last);
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.textContaining('Chance de maldição'), findsOneWidget);
+    await tester.tap(find.text('Forjar').last);
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text('Ficar com o novo'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 

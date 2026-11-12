@@ -2,6 +2,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:dungeonlog_flutter/dados/armazenamento.dart';
 import 'package:dungeonlog_flutter/dominio/dados_jogo.dart';
@@ -18,12 +19,19 @@ import 'package:dungeonlog_flutter/ui/folha_nova_tarefa.dart';
 import 'package:dungeonlog_flutter/ui/tela_tarefas.dart';
 import 'package:dungeonlog_flutter/ui/golpes_fx.dart';
 import 'package:dungeonlog_flutter/ui/popups_md.dart';
+import 'package:dungeonlog_flutter/ui/respiracao.dart';
 import 'package:dungeonlog_flutter/ui/tela_inventario.dart';
 import 'package:dungeonlog_flutter/ui/tela_loja.dart';
 import 'package:dungeonlog_flutter/ui/tema.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+/// Lê os assets direto do disco (os testes não passam pelo pacote do Flutter).
+class _PacoteArquivos extends CachingAssetBundle {
+  @override
+  Future<ByteData> load(String key) async => ByteData.sublistView(File(key).readAsBytesSync());
+}
 
 DadosJogo carregarDados() {
   String l(String n) => File('assets/dados/$n.json').readAsStringSync();
@@ -756,6 +764,29 @@ void main() {
       await tester.pump(const Duration(milliseconds: 50));
     }
     expect(tester.takeException(), isNull);
+  });
+
+
+  test('respiração: família pelo nome em inglês e movimento que varia no tempo', () async {
+    final d = carregarDados();
+    final fams = {for (final m in d.monstros) Respiracao.familiaDe(m.nomeEn)};
+    expect(fams.length, greaterThan(5), reason: 'os 63 monstros se espalham por várias famílias');
+    expect(Respiracao.familiaDe('Slime'), 'gosma');
+    expect(Respiracao.familiaDe('Giant Rat'), 'rato');
+    expect(Respiracao.familiaDe('Mimic Potion'), 'mimic');
+    expect(Respiracao.familiaDe('Skeleton Rat'), 'rato', reason: 'rato vem antes de esqueleto na lista do original');
+    expect(Respiracao.familiaDe('qualquer coisa'), 'olho');
+    await Respiracao.carregar(_PacoteArquivos());
+    // sem exceção em nenhum ponto do ciclo de nenhuma família
+    for (final f in ['goblin', 'gosma', 'morcego', 'rato', 'aranha', 'olho', 'golem', 'espectro', 'demonio', 'esqueleto', 'verme', 'cogumelo', 'mimic']) {
+      for (var ms = 0.0; ms < 4000; ms += 37) {
+        expect(Respiracao.aplicar(f, ms, const SizedBox()), isA<Widget>());
+      }
+    }
+    // a gosma realmente muda de forma (escala) entre o início e 30% do ciclo
+    Matrix4 m(double ms) => (Respiracao.aplicar('gosma', ms, const SizedBox()) as Transform).transform;
+    expect(m(0).storage[0], 1.0);
+    expect(m(1200 * 0.31).storage[0], greaterThan(1.05));
   });
 
   testWidgets('tela: criar uma tarefa, concluir e ver o ganho', (tester) async {

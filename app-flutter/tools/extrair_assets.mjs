@@ -180,3 +180,43 @@ console.log(
   const m = /class="tema-arena-cadeado-img" src="data:image\/png;base64,([A-Za-z0-9+/=]+)"/.exec(fs.readFileSync(path.join(raiz, 'play', 'index.html'), 'utf8'));
   if (m) fs.writeFileSync(path.join(raiz, 'app-flutter', 'assets', 'img', 'ui', 'cadeado_arena.png'), Buffer.from(m[1], 'base64'));
 }
+
+// respiração dos monstros por espécie (.gvm-* em play/style.css) -> assets/dados/respiracao.json
+{
+  const css = fs.readFileSync(path.join(raiz, 'play', 'style.css'), 'utf8');
+  const saida = {};
+  const re = /\.gvm-(\w+):not\(\.dead\):not\(\.fugiu\) \.mobimg\{([^}]*)\}@keyframes (\w+)\{/g;
+  let m;
+  while ((m = re.exec(css))) {
+    const [, fam, props, nome] = m;
+    // corpo dos keyframes: até a chave que fecha o @keyframes
+    let i = m.index + m[0].length, prof = 1;
+    const ini = i;
+    while (i < css.length && prof > 0) { if (css[i] === '{') prof++; else if (css[i] === '}') prof--; i++; }
+    const corpo = css.slice(ini, i - 1);
+    const dur = /animation-duration:([\d.]+)s/.exec(props);
+    const tim = /animation-timing-function:steps\((\d+)/.exec(props);
+    const quadros = [];
+    for (const b of corpo.matchAll(/([\d.%,\s]+)\{([^}]*)\}/g)) {
+      const decl = b[2];
+      const q = { tx: 0, ty: 0, rot: 0, sx: 1, sy: 1, op: 1 };
+      const t = /transform:([^;]*)/.exec(decl);
+      if (t && t[1].trim() !== 'none') {
+        for (const f of t[1].matchAll(/(translateX|translateY|translate|rotate|scale)\(([^)]*)\)/g)) {
+          const v = f[2].split(',').map((x) => parseFloat(x));
+          if (f[1] === 'translateX') q.tx = v[0]; else if (f[1] === 'translateY') q.ty = v[0];
+          else if (f[1] === 'translate') { q.tx = v[0]; q.ty = v[1] ?? 0; }
+          else if (f[1] === 'rotate') q.rot = v[0];
+          else { q.sx = v[0]; q.sy = v.length > 1 ? v[1] : v[0]; }
+        }
+      }
+      const o = /opacity:([\d.]+)/.exec(decl);
+      if (o) q.op = parseFloat(o[1]);
+      for (const p of b[1].split(',')) quadros.push({ p: parseFloat(p) / 100, ...q });
+    }
+    quadros.sort((a, b) => a.p - b.p);
+    saida[fam] = { dur: dur ? parseFloat(dur[1]) : 1.8, passos: tim ? parseInt(tim[1], 10) : 2, quadros };
+  }
+  fs.writeFileSync(path.join(raiz, 'app-flutter', 'assets', 'dados', 'respiracao.json'), JSON.stringify(saida));
+  console.log('respiração:', Object.keys(saida).length, 'famílias');
+}

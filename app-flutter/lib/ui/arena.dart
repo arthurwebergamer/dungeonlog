@@ -19,6 +19,7 @@ import 'golpes_fx.dart';
 import 'icones.dart';
 import 'itens_ui.dart';
 import 'popup_bau.dart' show imagemBau;
+import 'respiracao.dart';
 import 'som.dart';
 import 'tema.dart';
 
@@ -52,6 +53,8 @@ class _ArenaState extends State<Arena> with TickerProviderStateMixin {
   // relógio único das animações em laço: chama das tochas (0,6 s em 3 quadros) e balanço do herói (1,1 s em passos)
   static const _cicloMs = 6600;
   late final MotorGolpe _motor = MotorGolpe(this);
+  // relógio contínuo (1 h por volta) para a respiração dos monstros, cujas durações não dividem o ciclo das tochas
+  late final AnimationController _respira = AnimationController(vsync: this, duration: const Duration(hours: 1))..repeat();
   late final AnimationController _relogio = AnimationController(vsync: this, duration: const Duration(milliseconds: _cicloMs))..repeat();
 
   // ----- cenário: arrastar para o lado troca de bioma (touchstart/move/end de play/index.html ~5310) -----
@@ -245,6 +248,7 @@ class _ArenaState extends State<Arena> with TickerProviderStateMixin {
     _pontosTimer?.cancel();
     widget.golpe.removeListener(_aoGolpe);
     _espia.dispose();
+    _respira.dispose();
     _motor.dispose();
     _pouso.dispose();
     _relogio.dispose();
@@ -375,7 +379,13 @@ class _ArenaState extends State<Arena> with TickerProviderStateMixin {
           builder: (_, filho) => Transform.translate(offset: _motor.monstro, child: Transform.rotate(angle: _motor.monstroGiro, child: filho)),
           child: semTarefas
               ? Opacity(opacity: 0.45, child: ColorFiltered(colorFilter: _saturacao(0.45), child: pixel(m.img, largura: 78, altura: 78)))
-              : pixel(m.img, largura: 78, altura: 78),
+              : (venceu || descansando)
+                  ? pixel(m.img, largura: 78, altura: 78)
+                  : AnimatedBuilder(
+                      animation: _respira,
+                      builder: (_, filho) => Respiracao.aplicar(Respiracao.familiaDe(m.nomeEn), _respira.value * 3600000, filho!),
+                      child: pixel(m.img, largura: 78, altura: 78),
+                    ),
         ),
         if (!semTarefas) Positioned(left: 8, top: -6, child: _BarraMonstro(fracao: e.vidaMonstro)),
       ]),

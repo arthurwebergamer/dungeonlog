@@ -106,7 +106,11 @@ class _SheetMdState extends State<_SheetMd> with SingleTickerProviderStateMixin 
     return _MdTempo(
       c: _c,
       totalMs: widget.totalMs,
-      child: Stack(children: [
+      child: Material(
+        type: MaterialType.transparency,
+        child: Stack(children: [
+        // absorve os toques fora da folha (sem isso o toque passava para a barra de baixo)
+        Positioned.fill(child: GestureDetector(behavior: HitTestBehavior.opaque, onTap: () {})),
         Positioned.fill(
           child: FadeTransition(
             opacity: CurvedAnimation(parent: widget.anim, curve: Curves.ease),
@@ -136,6 +140,7 @@ class _SheetMdState extends State<_SheetMd> with SingleTickerProviderStateMixin 
           ),
         ),
       ]),
+      ),
     );
   }
 }

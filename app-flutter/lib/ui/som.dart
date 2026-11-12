@@ -33,7 +33,7 @@ class SomAudio implements Som {
 
   bool ativo = true;
   double volume = 0.55;
-  final Map<String, AudioPlayer> _jogadores = {};
+  final Set<AudioPlayer> _vivos = {};
 
   @override
   void tocar(String nome, {double progresso = 0}) {
@@ -41,9 +41,17 @@ class SomAudio implements Som {
     if (nome == 'clique' || nome == 'soltar') return; // sem som de toque (como no original)
     final arquivo = nome == 'roletaTick' ? 'roletaTick${(progresso.clamp(0.0, 1.0) * 5).round()}' : nome;
     try {
-      final j = _jogadores.putIfAbsent(arquivo, () => AudioPlayer()..setPlayerMode(PlayerMode.lowLatency));
-      j.stop();
-      j.play(AssetSource('sons/$arquivo.wav'), volume: volume);
+      // um tocador novo a cada efeito: reaproveitar o mesmo depois de `stop()` fazia o som sair só na primeira vez
+      final j = AudioPlayer();
+      _vivos.add(j);
+      void soltar() {
+        if (_vivos.remove(j)) j.dispose();
+      }
+
+      j.onPlayerComplete.first.then((_) => soltar()).catchError((Object _) {});
+      Future<void>.delayed(const Duration(seconds: 4), soltar); // rede de segurança se o fim não vier
+      j.setReleaseMode(ReleaseMode.release);
+      j.play(AssetSource('sons/$arquivo.wav'), volume: volume).catchError((Object _) => soltar());
     } catch (_) {}
   }
 }

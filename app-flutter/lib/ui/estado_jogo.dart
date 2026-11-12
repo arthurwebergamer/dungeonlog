@@ -406,7 +406,6 @@ class EstadoJogo extends ChangeNotifier {
         _salvarTudo();
         notifyListeners();
         Som.atual.tocar('golpe');
-        if (nivel > nivelAntes) Som.atual.tocar('levelup');
         return GanhoTarefa(xp: g.xp, moedas: g.moedas, subiuNivel: nivel > nivelAntes, nivel: nivel, parcial: true);
       }
     }
@@ -420,7 +419,6 @@ class EstadoJogo extends ChangeNotifier {
     _salvarTudo();
     notifyListeners();
     Som.atual.tocar('golpe');
-    if (nivel > nivelAntes) Som.atual.tocar('levelup');
     return GanhoTarefa(xp: g.xp, moedas: g.moedas, subiuNivel: nivel > nivelAntes, nivel: nivel, parcial: false);
   }
 
@@ -803,7 +801,6 @@ class EstadoJogo extends ChangeNotifier {
     _salvarTudo();
     notifyListeners();
     Som.atual.tocar('usar');
-    if (nivel > nivelAntes) Som.atual.tocar('levelup');
     return GanhoTarefa(xp: it.bonusXp.toInt(), moedas: it.bonusMoedas.toInt(), subiuNivel: nivel > nivelAntes, nivel: nivel, parcial: false);
   }
 

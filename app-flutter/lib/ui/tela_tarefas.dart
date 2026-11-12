@@ -11,6 +11,7 @@ import '../dominio/tarefa.dart';
 import 'arena.dart';
 import 'cerimonia_estagio.dart';
 import 'golpes_fx.dart';
+import 'som.dart';
 import 'popups_md.dart';
 import 'popup_bau.dart';
 import 'estado_jogo.dart';
@@ -136,20 +137,41 @@ class _TelaTarefasState extends State<TelaTarefas> with SingleTickerProviderStat
   Future<void> _concluir(Tarefa t) async {
     final g = e.concluir(t);
     if (g == null) return;
-    _avisar('+${g.xp} XP   ·   +${g.moedas} ${g.moedas == 1 ? 'moeda' : 'moedas'}');
+    // o golpe aparece primeiro (~1 s); só depois vêm "subiu de nível" e a cerimônia de estágio, como na fila do original
+    if (g.subiuNivel || e.cerimoniaPendente) {
+      await Future<void>.delayed(const Duration(milliseconds: 1100));
+      if (!mounted) return;
+    }
     if (g.subiuNivel && mounted) {
       await mostrarNivelUp(context, e, g.nivel);
     }
     await _verCerimonia();
   }
 
+  bool _vitoriaEmAndamento = false;
+
+  /// `terminarDia()` do original: golpe crítico → o monstro some numa nuvem → o dia vira "derrotado" (baú aparece)
+  /// → só depois o resumo do dia (`dispararVitoriaDoDia`, ~925 ms + 560 ms + 650 ms).
   Future<void> _terminarDia() async {
+    if (_vitoriaEmAndamento || !e.podeTerminarDia) return;
+    setState(() => _vitoriaEmAndamento = true);
     final nTarefas = e.tarefasDeHoje.length;
-    final ganho = e.terminarDia();
-    if (ganho == null) return;
     HapticFeedback.heavyImpact();
+    Som.atual.tocar('golpe');
     _golpe.golpear(fim: true);
+    await Future<void>.delayed(const Duration(milliseconds: 925));
     if (!mounted) return;
+    _golpe.poof();
+    await Future<void>.delayed(const Duration(milliseconds: 560));
+    final ganho = e.terminarDia();
+    _golpe.mostrarMonstro();
+    if (ganho == null || !mounted) {
+      if (mounted) setState(() => _vitoriaEmAndamento = false);
+      return;
+    }
+    await Future<void>.delayed(const Duration(milliseconds: 650));
+    if (!mounted) return;
+    setState(() => _vitoriaEmAndamento = false);
     await mostrarResumoDia(context, e, nTarefas: nTarefas, ganho: ganho);
     await _verCerimonia();
   }
@@ -250,7 +272,7 @@ class _TelaTarefasState extends State<TelaTarefas> with SingleTickerProviderStat
                           padding: const EdgeInsets.symmetric(vertical: 26, horizontal: 12),
                           child: Text(_vazio, textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, height: 1.5, color: corApagado)),
                         ),
-                      if (e.podeTerminarDia) ...[
+                      if (e.podeTerminarDia && !_vitoriaEmAndamento) ...[
                         const SizedBox(height: 14),
                         BotaoFolha('Terminar dia', aoTocar: _terminarDia),
                       ],

@@ -16,6 +16,23 @@ class GolpeControlador extends ChangeNotifier {
   bool fim = false;
   int contador = 0;
   int contadorEscapada = 0;
+  int contadorPoof = 0;
+
+  /// Durante a vitória o monstro some na nuvem (opacity 0) e só volta quando o estado vira "derrotado".
+  bool monstroOculto = false;
+
+  /// `mostrarPoofMonstro()`: nuvem branca no lugar do monstro e o sprite escondido.
+  void poof() {
+    monstroOculto = true;
+    contadorPoof++;
+    notifyListeners();
+  }
+
+  void mostrarMonstro() {
+    monstroOculto = false;
+    notifyListeners();
+  }
+
   int escapadas = 0;
 
   /// Duração aproximada da cena (ms), para a tela esperar antes do popup.
@@ -92,6 +109,11 @@ class _Flash {
 class _Vinheta {
   _Vinheta(this.inicio, this.sobe, this.segura);
   final double inicio, sobe, segura;
+}
+
+class _Poof {
+  _Poof(this.inicio, this.x, this.y);
+  final double inicio, x, y;
 }
 
 class _Lamina {
@@ -207,6 +229,7 @@ class MotorGolpe extends ChangeNotifier {
   }
   late final Ticker _ticker;
   double agora = 0;
+  double _desvio = 0; // o relógio do Ticker recomeça do zero a cada start(); o nosso nunca volta atrás
   int _geracao = 0;
   bool emAndamento = false;
   String? _ultimo;
@@ -218,6 +241,13 @@ class MotorGolpe extends ChangeNotifier {
   final List<_Flash> _flashes = [];
   final List<_Vinheta> _vinhetas = [];
   final List<_Lamina> _laminas = [];
+  final List<_Poof> _poofs = [];
+
+  /// Nuvem do monstro derrotado (390 ms): círculos brancos que crescem e somem.
+  void poof(double x, double y) {
+    _poofs.add(_Poof(agora, x, y));
+    _acordar();
+  }
 
   // estado persistente do herói (style.transform do JS no estilo "vulto")
   double baseX = 0;
@@ -226,7 +256,7 @@ class MotorGolpe extends ChangeNotifier {
   bool preferenciaVariada = true;
 
   void _tique(Duration d) {
-    agora = d.inMicroseconds / 1000.0;
+    agora = _desvio + d.inMicroseconds / 1000.0;
     final prontos = _espera.where((e) => e.quando <= agora).toList();
     for (final e in prontos) {
       _espera.remove(e);
@@ -238,7 +268,8 @@ class MotorGolpe extends ChangeNotifier {
     _flashes.removeWhere((f) => agora > f.inicio + f.dur);
     _vinhetas.removeWhere((v) => agora > v.inicio + v.sobe + v.segura + 320);
     _laminas.removeWhere((l) => agora > l.inicio + 300);
-    if (!emAndamento && _espera.isEmpty && _parts.isEmpty && _cortes.isEmpty && _flashes.isEmpty && _vinhetas.isEmpty && _laminas.isEmpty && !_temAnimAtiva) {
+    _poofs.removeWhere((p) => agora > p.inicio + 400);
+    if (!emAndamento && _espera.isEmpty && _parts.isEmpty && _cortes.isEmpty && _flashes.isEmpty && _vinhetas.isEmpty && _laminas.isEmpty && _poofs.isEmpty && !_temAnimAtiva) {
       _ticker.stop();
     }
     notifyListeners();
@@ -248,6 +279,7 @@ class MotorGolpe extends ChangeNotifier {
 
   void _acordar() {
     if (!_ticker.isActive) {
+      _desvio = agora;
       _ticker.start();
     }
   }
@@ -734,6 +766,13 @@ class MotorGolpe extends ChangeNotifier {
         o = 1 - u;
       }
       canvas.drawRect(Rect.fromLTWH(q.x + x, q.y + y, q.tam, q.tam), p..color = q.cor.withValues(alpha: o.clamp(0.0, 1.0)));
+    }
+    for (final q in _poofs) {
+      final t = ((agora - q.inicio) / 390).clamp(0.0, 1.0);
+      final o = (t < .15 ? t / .15 : 1 - (t - .15) / .85).clamp(0.0, 1.0);
+      for (final (dx, dy, r0) in const [(0.0, 0.0, 30.0), (-18.0, 6.0, 22.0), (18.0, 4.0, 24.0), (-6.0, -14.0, 20.0), (8.0, 14.0, 18.0)]) {
+        canvas.drawCircle(Offset(q.x + dx * (0.5 + t), q.y + dy * (0.5 + t)), r0 * (0.4 + 1.1 * t), Paint()..color = Colors.white.withValues(alpha: 0.9 * o));
+      }
     }
     for (final f in _flashes) {
       final t = ((agora - f.inicio) / f.dur).clamp(0.0, 1.0);

@@ -491,7 +491,7 @@ void main() {
     expect(e.save.moedas, lessThan(moedasAntes));
     expect(e.lojaVendidos, hasLength(1));
     expect(find.text('Esgotado'), findsOneWidget);
-    expect(find.textContaining('COMPROU '), findsOneWidget);
+    expect(find.textContaining('COMPROU '), findsNothing, reason: 'o aviso de compra está desligado no original');
     await tester.pump(const Duration(milliseconds: 1500));
     await tester.tap(find.text('Vender'));
     await tester.pump(const Duration(milliseconds: 100));
@@ -825,15 +825,21 @@ void main() {
 
     await tester.tap(find.byType(CaixaTarefa));
     await esperar(400); // caixa verde (80 ms) + saída do cartão (200 ms)
-    expect(find.textContaining('+42 XP'), findsOneWidget);
+    expect(find.textContaining('+42 XP'), findsNothing, reason: 'sem aviso no topo: o ganho aparece no golpe e na contagem');
+    expect(e.save.xpTotal, 42);
     expect(find.text('Estudar'), findsNothing, reason: 'concluída sai da lista');
     expect(find.text('1 de 1 concluídas'), findsOneWidget);
     await esperar(2000);
     expect(find.text('Terminar dia'), findsOneWidget);
 
     await tester.tap(find.text('Terminar dia'));
-    await esperar();
+    await esperar(400);
+    expect(find.textContaining('derrotado'), findsNothing, reason: 'primeiro o golpe e a nuvem; o resumo vem depois');
+    expect(e.derrotado, isFalse);
+    await esperar(2800); // golpe crítico (925 ms) + nuvem (560 ms) + pausa (650 ms)
+    expect(e.derrotado, isTrue);
     expect(find.textContaining('derrotado'), findsWidgets);
+    await esperar(2600); // a folha sobe e o botão entra por último
     await tester.tap(find.text('Continuar'));
     await esperar();
     expect(find.text('DIA VENCIDO'), findsOneWidget);

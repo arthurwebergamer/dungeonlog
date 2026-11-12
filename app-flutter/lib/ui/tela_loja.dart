@@ -14,6 +14,7 @@ import 'flutuante.dart';
 import 'folhas.dart';
 import 'icones.dart';
 import 'itens_ui.dart';
+import 'som.dart';
 import 'tema.dart';
 import 'topo.dart';
 
@@ -85,10 +86,8 @@ class _TelaLojaState extends State<TelaLoja> {
     HapticFeedback.selectionClick();
     final ok = await pedirConfirmacaoItem(context, e, it, verbo: 'Comprar', texto: 'Custa ${e.precoNaLoja(v)} moedas.');
     if (ok != true || !mounted) return;
-    final ponto = caixa.mounted ? centroDe(caixa) : null;
     if (e.comprar(i) == 'ok') {
       HapticFeedback.mediumImpact();
-      flutuanteTexto(context, ponto, 'COMPROU ${it.nomeNoIdioma(e.idioma).toUpperCase()}');
     }
   }
 
@@ -181,7 +180,10 @@ class _TelaLojaState extends State<TelaLoja> {
           preco: '$preco',
           botao: bloqueio ?? 'Comprar',
           estiloBotao: bloqueio == null ? _EstiloBotao.primario : _EstiloBotao.apagado,
-          aoTocar: bloqueio == null ? (caixa) => _comprar(i, caixa) : (_) => HapticFeedback.lightImpact(),
+          aoTocar: bloqueio == null ? (caixa) => _comprar(i, caixa) : (_) {
+                  HapticFeedback.lightImpact();
+                  Som.atual.tocar('semMoedas'); // esgotado, nível ou sem moedas: som de bloqueio, como no original
+                },
         ),
       ));
     }

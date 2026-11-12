@@ -13,6 +13,7 @@ import '../dominio/loot.dart' show afixoRolar;
 import '../dominio/regras.dart' show precoVenda;
 import 'estado_jogo.dart';
 import 'flutuante.dart';
+import 'popups_md.dart' show mostrarNivelUp;
 import 'folhas.dart';
 import 'itens_ui.dart';
 import 'som.dart';
@@ -63,9 +64,7 @@ class _FichaItemState extends State<FichaItem> {
   // ---------- ações da ficha ----------
   void _equipar() {
     HapticFeedback.mediumImpact();
-    final ponto = _ponto;
-    final ficou = e.equipar(_item.id);
-    if (ficou != null) flutuanteTexto(context, ponto, ficou ? 'EQUIPADO' : 'DESEQUIPADO');
+    e.equipar(_item.id); // sem aviso: no original o toast de equipar está desligado (só o som)
     Navigator.pop(context);
   }
 
@@ -73,7 +72,10 @@ class _FichaItemState extends State<FichaItem> {
     HapticFeedback.mediumImpact();
     final ponto = _ponto;
     final it = _item;
-    if (e.usarItem(it.id) != null) {
+    final g = e.usarItem(it.id);
+    final raiz = Navigator.of(context, rootNavigator: true);
+    if (g != null) {
+      if (g.subiuNivel) Future<void>.delayed(const Duration(milliseconds: 300), () => mostrarNivelUp(raiz.context, e, g.nivel));
       // mesma prioridade do original: vida, depois XP, depois moedas
       flutuanteTexto(context, ponto, it.cura != 0 ? '+${it.cura} HP' : (it.bonusXp != 0 ? '+${it.bonusXp.toInt()} XP' : '+${it.bonusMoedas.toInt()} MOEDAS'));
     }

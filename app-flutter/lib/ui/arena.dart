@@ -203,6 +203,7 @@ class _ArenaState extends State<Arena> with TickerProviderStateMixin {
 
   int _golpeVisto = 0;
   int _escapadaVista = 0;
+  int _poofVisto = 0;
 
   /// Geometria do herói e do monstro dentro da arena (a linha `.fight` fica centralizada: 83 + 28 + "VS" + 28 + 78).
   GeometriaGolpe _geometria() {
@@ -219,6 +220,12 @@ class _ArenaState extends State<Arena> with TickerProviderStateMixin {
   void _aoGolpe() {
     final g = widget.golpe;
     if (!mounted) return;
+    setState(() {}); // monstro oculto/visível
+    if (g.contadorPoof != _poofVisto) {
+      _poofVisto = g.contadorPoof;
+      final gm = _geometria().monstro;
+      _motor.poof(gm.center.dx, gm.center.dy);
+    }
     if (g.contadorEscapada != _escapadaVista) {
       _escapadaVista = g.contadorEscapada;
       _motor.escapada(_geometria(), g.escapadas);
@@ -377,7 +384,9 @@ class _ArenaState extends State<Arena> with TickerProviderStateMixin {
         AnimatedBuilder(
           animation: _motor,
           builder: (_, filho) => Transform.translate(offset: _motor.monstro, child: Transform.rotate(angle: _motor.monstroGiro, child: filho)),
-          child: semTarefas
+          child: widget.golpe.monstroOculto
+              ? const SizedBox(width: 78, height: 78)
+              : semTarefas
               ? Opacity(opacity: 0.45, child: ColorFiltered(colorFilter: _saturacao(0.45), child: pixel(m.img, largura: 78, altura: 78)))
               : (venceu || descansando)
                   ? pixel(m.img, largura: 78, altura: 78)

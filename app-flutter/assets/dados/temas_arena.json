@@ -1,0 +1,46 @@
+[
+ {
+  "id": "padrao",
+  "nome": "Padrão",
+  "nome_en": "Default",
+  "gratuito": true,
+  "arte": null
+ },
+ {
+  "id": "deserto",
+  "nome": "Deserto",
+  "nome_en": "Desert",
+  "gratuito": false,
+  "desbloqueioGratis": {
+   "tipo": "tarefasTotais",
+   "valor": 10
+  },
+  "arte": "assets/img/arena/deserto.png",
+  "arteEstagio": "assets/img/arena/deserto_estagio.png"
+ },
+ {
+  "id": "floresta",
+  "nome": "Floresta",
+  "nome_en": "Jungle",
+  "gratuito": false,
+  "desbloqueioGratis": {
+   "tipo": "tarefasTotais",
+   "valor": 30
+  },
+  "arte": "assets/img/arena/floresta.png",
+  "arteEstagio": "assets/img/arena/floresta_estagio.png"
+ },
+ {
+  "id": "montanhas",
+  "nome": "Montanhas",
+  "nome_en": "Mountains",
+  "gratuito": false,
+  "desbloqueioGratis": {
+   "tipo": "tarefasTotais",
+   "valor": 70
+  },
+  "arte": "assets/img/arena/montanhas.png",
+  "posicaoArte": "center 30%",
+  "arteEstagio": "assets/img/arena/montanhas_estagio.png"
+ }
+]

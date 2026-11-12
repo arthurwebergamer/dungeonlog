@@ -1,0 +1,50 @@
+[
+ {
+  "nome": "Cinza",
+  "nome_en": "Gray",
+  "img": "assets/img/herois/00.png",
+  "imgArena": "assets/img/herois/00_arena.png"
+ },
+ {
+  "nome": "Loiro",
+  "nome_en": "Blond",
+  "img": "assets/img/herois/01.png",
+  "imgArena": "assets/img/herois/01_arena.png"
+ },
+ {
+  "nome": "Musgo",
+  "nome_en": "Moss",
+  "img": "assets/img/herois/02.png",
+  "imgArena": "assets/img/herois/02_arena.png"
+ },
+ {
+  "nome": "Castanho",
+  "nome_en": "Chestnut",
+  "img": "assets/img/herois/03.png",
+  "imgArena": "assets/img/herois/03_arena.png"
+ },
+ {
+  "nome": "Ruiva",
+  "nome_en": "Redhead",
+  "img": "assets/img/herois/04.png",
+  "imgArena": "assets/img/herois/04_arena.png"
+ },
+ {
+  "nome": "Loira",
+  "nome_en": "Blonde",
+  "img": "assets/img/herois/05.png",
+  "imgArena": "assets/img/herois/05_arena.png"
+ },
+ {
+  "nome": "Morena",
+  "nome_en": "Brunette",
+  "img": "assets/img/herois/06.png",
+  "imgArena": "assets/img/herois/06_arena.png"
+ },
+ {
+  "nome": "Prata",
+  "nome_en": "Silver",
+  "img": "assets/img/herois/07.png",
+  "imgArena": "assets/img/herois/07_arena.png"
+ }
+]

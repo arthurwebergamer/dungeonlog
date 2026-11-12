@@ -1,5 +1,5 @@
 name: dungeonlog_flutter
-description: Prototipo Flutter do Dungeonlog (teste de fluidez)
+description: Dungeonlog em Flutter (reescrita do app HTML; ver PLANO.md)
 publish_to: none
 version: 0.1.0+1
 environment:
@@ -12,3 +12,9 @@ dev_dependencies:
     sdk: flutter
 flutter:
   uses-material-design: true
+  assets:
+    - assets/dados/
+    - assets/img/
+    - assets/img/monstros/
+    - assets/img/herois/
+    - assets/img/arena/

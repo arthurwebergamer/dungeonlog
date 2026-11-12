@@ -23,6 +23,7 @@ jobs:
           mkdir /tmp/fl && cd /tmp/fl
           flutter create --platforms=android --org com.dungeonlog --project-name dungeonlog_flutter .
           rm -rf lib && cp -r "$GITHUB_WORKSPACE/app-flutter/lib" lib
+          rm -rf assets && cp -r "$GITHUB_WORKSPACE/app-flutter/assets" assets
           cp "$GITHUB_WORKSPACE/app-flutter/pubspec.yaml" pubspec.yaml
           flutter pub get
           flutter build apk --release

@@ -1,0 +1,347 @@
+[
+ {
+  "nome": "Goblin ladino",
+  "nome_en": "Rogue Goblin",
+  "img": "assets/img/monstros/00.png"
+ },
+ {
+  "nome": "Gosma metálica",
+  "nome_en": "Metallic Slime",
+  "img": "assets/img/monstros/01.png"
+ },
+ {
+  "nome": "Morcego glacial",
+  "nome_en": "Glacial Bat",
+  "bioma": "montanhas",
+  "img": "assets/img/monstros/02.png"
+ },
+ {
+  "nome": "Rato blindado",
+  "nome_en": "Armored Rat",
+  "img": "assets/img/monstros/03.png"
+ },
+ {
+  "nome": "Aranha flamejante",
+  "nome_en": "Flaming Spider",
+  "bioma": "deserto",
+  "img": "assets/img/monstros/04.png"
+ },
+ {
+  "nome": "Olho incandescente",
+  "nome_en": "Glowing Eye",
+  "bioma": "deserto",
+  "img": "assets/img/monstros/05.png"
+ },
+ {
+  "nome": "Golem de sucata",
+  "nome_en": "Scrap Golem",
+  "img": "assets/img/monstros/06.png"
+ },
+ {
+  "nome": "Goblin curandeiro",
+  "nome_en": "Goblin Healer",
+  "img": "assets/img/monstros/07.png"
+ },
+ {
+  "nome": "Espectro sombrio",
+  "nome_en": "Shadowy Specter",
+  "img": "assets/img/monstros/08.png"
+ },
+ {
+  "nome": "Demônio flamejante",
+  "nome_en": "Flaming Demon",
+  "bioma": "deserto",
+  "img": "assets/img/monstros/09.png"
+ },
+ {
+  "nome": "Caveira saltitante",
+  "nome_en": "Hopping Skull",
+  "img": "assets/img/monstros/10.png"
+ },
+ {
+  "nome": "Minhoca de ossos",
+  "nome_en": "Bone Worm",
+  "img": "assets/img/monstros/11.png"
+ },
+ {
+  "nome": "Gosma pantanosa",
+  "nome_en": "Swamp Slime",
+  "bioma": "floresta",
+  "img": "assets/img/monstros/12.png"
+ },
+ {
+  "nome": "Morcego pantanoso",
+  "nome_en": "Swamp Bat",
+  "bioma": "floresta",
+  "img": "assets/img/monstros/13.png"
+ },
+ {
+  "nome": "Rato da peste",
+  "nome_en": "Plague Rat",
+  "bioma": "floresta",
+  "img": "assets/img/monstros/14.png"
+ },
+ {
+  "nome": "Aranha glacial",
+  "nome_en": "Glacial Spider",
+  "bioma": "montanhas",
+  "img": "assets/img/monstros/15.png"
+ },
+ {
+  "nome": "Olho congelante",
+  "nome_en": "Freezing Eye",
+  "bioma": "montanhas",
+  "img": "assets/img/monstros/16.png"
+ },
+ {
+  "nome": "Golem miúdo",
+  "nome_en": "Tiny Golem",
+  "img": "assets/img/monstros/17.png"
+ },
+ {
+  "nome": "Goblin bombardeiro",
+  "nome_en": "Goblin Bomber",
+  "img": "assets/img/monstros/18.png"
+ },
+ {
+  "nome": "Alma perdida",
+  "nome_en": "Lost Soul",
+  "img": "assets/img/monstros/19.png"
+ },
+ {
+  "nome": "Demônio menor",
+  "nome_en": "Lesser Demon",
+  "img": "assets/img/monstros/20.png"
+ },
+ {
+  "nome": "Esqueleto rei",
+  "nome_en": "Skeleton King",
+  "img": "assets/img/monstros/21.png"
+ },
+ {
+  "nome": "Minhoca",
+  "nome_en": "Worm",
+  "bioma": "floresta",
+  "img": "assets/img/monstros/22.png"
+ },
+ {
+  "nome": "Cogumelo venenoso",
+  "nome_en": "Poisonous Mushroom",
+  "bioma": "floresta",
+  "img": "assets/img/monstros/23.png"
+ },
+ {
+  "nome": "Baú mímico",
+  "nome_en": "Mimic Chest",
+  "img": "assets/img/monstros/24.png"
+ },
+ {
+  "nome": "Gosma venenosa",
+  "nome_en": "Poisonous Slime",
+  "bioma": "floresta",
+  "img": "assets/img/monstros/25.png"
+ },
+ {
+  "nome": "Morcego flamejante",
+  "nome_en": "Flaming Bat",
+  "bioma": "deserto",
+  "img": "assets/img/monstros/26.png"
+ },
+ {
+  "nome": "Rato do esgoto",
+  "nome_en": "Sewer Rat",
+  "img": "assets/img/monstros/27.png"
+ },
+ {
+  "nome": "Aranha das grutas",
+  "nome_en": "Cave Spider",
+  "bioma": "floresta",
+  "img": "assets/img/monstros/28.png"
+ },
+ {
+  "nome": "Olho das sombras",
+  "nome_en": "Shadow Eye",
+  "img": "assets/img/monstros/29.png"
+ },
+ {
+  "nome": "Golem de lama",
+  "nome_en": "Mud Golem",
+  "bioma": "floresta",
+  "img": "assets/img/monstros/30.png"
+ },
+ {
+  "nome": "Goblin fungoso",
+  "nome_en": "Fungal Goblin",
+  "bioma": "floresta",
+  "img": "assets/img/monstros/31.png"
+ },
+ {
+  "nome": "Espectro pálido",
+  "nome_en": "Pale Specter",
+  "img": "assets/img/monstros/32.png"
+ },
+ {
+  "nome": "Demônio venenoso",
+  "nome_en": "Poisonous Demon",
+  "bioma": "floresta",
+  "img": "assets/img/monstros/33.png"
+ },
+ {
+  "nome": "Monte de ossos",
+  "nome_en": "Pile of Bones",
+  "img": "assets/img/monstros/34.png"
+ },
+ {
+  "nome": "Minhoca de lava",
+  "nome_en": "Lava Worm",
+  "bioma": "deserto",
+  "img": "assets/img/monstros/35.png"
+ },
+ {
+  "nome": "Criatura cogumelo",
+  "nome_en": "Mushroom Creature",
+  "bioma": "floresta",
+  "img": "assets/img/monstros/36.png"
+ },
+ {
+  "nome": "Crânio mímico",
+  "nome_en": "Mimic Skull",
+  "img": "assets/img/monstros/37.png"
+ },
+ {
+  "nome": "Gosma glacial",
+  "nome_en": "Glacial Slime",
+  "bioma": "montanhas",
+  "img": "assets/img/monstros/38.png"
+ },
+ {
+  "nome": "Morcego vampiro",
+  "nome_en": "Vampire Bat",
+  "bioma": "floresta",
+  "img": "assets/img/monstros/39.png"
+ },
+ {
+  "nome": "Rato gigante",
+  "nome_en": "Giant Rat",
+  "img": "assets/img/monstros/40.png"
+ },
+ {
+  "nome": "Aranha de cristal",
+  "nome_en": "Crystal Spider",
+  "bioma": "montanhas",
+  "img": "assets/img/monstros/41.png"
+ },
+ {
+  "nome": "Olho sangrento",
+  "nome_en": "Bloodshot Eye",
+  "img": "assets/img/monstros/42.png"
+ },
+ {
+  "nome": "Golem de pedra",
+  "nome_en": "Stone Golem",
+  "img": "assets/img/monstros/43.png"
+ },
+ {
+  "nome": "Goblin arqueiro",
+  "nome_en": "Goblin Archer",
+  "img": "assets/img/monstros/44.png"
+ },
+ {
+  "nome": "Espírito do mau",
+  "nome_en": "Evil Spirit",
+  "img": "assets/img/monstros/45.png"
+ },
+ {
+  "nome": "Demônio glacial",
+  "nome_en": "Glacial Demon",
+  "bioma": "montanhas",
+  "img": "assets/img/monstros/46.png"
+ },
+ {
+  "nome": "Esqueleto rastejante",
+  "nome_en": "Crawling Skeleton",
+  "img": "assets/img/monstros/47.png"
+ },
+ {
+  "nome": "Minhoca gigante",
+  "nome_en": "Giant Worm",
+  "bioma": "floresta",
+  "img": "assets/img/monstros/48.png"
+ },
+ {
+  "nome": "Moeda mímica",
+  "nome_en": "Mimic Coin",
+  "img": "assets/img/monstros/49.png"
+ },
+ {
+  "nome": "Gosma escaldante",
+  "nome_en": "Scalding Slime",
+  "bioma": "deserto",
+  "img": "assets/img/monstros/50.png"
+ },
+ {
+  "nome": "Morcego da caverna",
+  "nome_en": "Cave Bat",
+  "bioma": "floresta",
+  "img": "assets/img/monstros/51.png"
+ },
+ {
+  "nome": "Rato esquelético",
+  "nome_en": "Skeletal Rat",
+  "img": "assets/img/monstros/52.png"
+ },
+ {
+  "nome": "Aranha peçonhenta",
+  "nome_en": "Venomous Spider",
+  "bioma": "floresta",
+  "img": "assets/img/monstros/53.png"
+ },
+ {
+  "nome": "Olho flutuante",
+  "nome_en": "Floating Eye",
+  "img": "assets/img/monstros/54.png"
+ },
+ {
+  "nome": "Golem de cristal",
+  "nome_en": "Crystal Golem",
+  "bioma": "montanhas",
+  "img": "assets/img/monstros/55.png"
+ },
+ {
+  "nome": "Goblin",
+  "nome_en": "Goblin",
+  "img": "assets/img/monstros/56.png"
+ },
+ {
+  "nome": "Espectro da lanterna",
+  "nome_en": "Lantern Specter",
+  "img": "assets/img/monstros/57.png"
+ },
+ {
+  "nome": "Demônio",
+  "nome_en": "Demon",
+  "img": "assets/img/monstros/58.png"
+ },
+ {
+  "nome": "Esqueleto",
+  "nome_en": "Skeleton",
+  "img": "assets/img/monstros/59.png"
+ },
+ {
+  "nome": "Minhoca arenosa",
+  "nome_en": "Sand Worm",
+  "bioma": "deserto",
+  "img": "assets/img/monstros/60.png"
+ },
+ {
+  "nome": "Fungo com cogumelos",
+  "nome_en": "Mushroom Fungus",
+  "bioma": "floresta",
+  "img": "assets/img/monstros/61.png"
+ },
+ {
+  "nome": "Poção mímica",
+  "nome_en": "Mimic Potion",
+  "img": "assets/img/monstros/62.png"
+ }
+]

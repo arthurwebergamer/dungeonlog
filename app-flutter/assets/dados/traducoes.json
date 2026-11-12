@@ -1,0 +1,1202 @@
+{
+ "nav.tarefas": {
+  "pt": "Tarefas",
+  "en": "Tasks"
+ },
+ "nav.inventario": {
+  "pt": "Inventário",
+  "en": "Inventory"
+ },
+ "nav.loja": {
+  "pt": "Loja",
+  "en": "Shop"
+ },
+ "nav.perfil": {
+  "pt": "Perfil",
+  "en": "Profile"
+ },
+ "nav.estatisticas": {
+  "pt": "Estatísticas",
+  "en": "Stats"
+ },
+ "est.diasSeguidos": {
+  "pt": "dias seguidos",
+  "en": "days in a row"
+ },
+ "est.recorde": {
+  "pt": "RECORDE",
+  "en": "RECORD"
+ },
+ "est.mes": {
+  "pt": "MÊS",
+  "en": "MONTH"
+ },
+ "est.taxaConclusao": {
+  "pt": "taxa de conclusão dos dias com tarefa, este mês",
+  "en": "completion rate of days with tasks, this month"
+ },
+ "est.mapaDoMes": {
+  "pt": "Histórico",
+  "en": "History"
+ },
+ "est.periodoMes": {
+  "pt": "· mês",
+  "en": "· month"
+ },
+ "est.periodoSemana": {
+  "pt": "· semana",
+  "en": "· week"
+ },
+ "est.periodoAno": {
+  "pt": "· ano",
+  "en": "· year"
+ },
+ "est.verPorPeriodo": {
+  "pt": "Ver por período",
+  "en": "View by period"
+ },
+ "est.periodoSemanaOpcao": {
+  "pt": "Semana",
+  "en": "Week"
+ },
+ "est.periodoMesOpcao": {
+  "pt": "Mês inteiro",
+  "en": "Whole month"
+ },
+ "est.periodoAnoOpcao": {
+  "pt": "Ano inteiro",
+  "en": "Whole year"
+ },
+ "est.ultimos7": {
+  "pt": "Últimos 7 dias",
+  "en": "Last 7 days"
+ },
+ "est.sequenciaAtual": {
+  "pt": "Sequência atual",
+  "en": "Current streak"
+ },
+ "est.desdeInicio": {
+  "pt": "Desde o início",
+  "en": "Since the start"
+ },
+ "est.tarefasConcluidas": {
+  "pt": "tarefas concluídas",
+  "en": "tasks completed"
+ },
+ "est.diasVencidos": {
+  "pt": "dias vencidos",
+  "en": "days won"
+ },
+ "est.taxaGeral": {
+  "pt": "taxa geral",
+  "en": "overall rate"
+ },
+ "est.taxaConclusaoTitulo": {
+  "pt": "Taxa de conclusão",
+  "en": "Completion rate"
+ },
+ "est.comoFoiMes": {
+  "pt": "Como foi o mês",
+  "en": "How the month went"
+ },
+ "est.semTarefa": {
+  "pt": "sem tarefa",
+  "en": "no task"
+ },
+ "est.fuga": {
+  "pt": "fugiu",
+  "en": "fled"
+ },
+ "est.vitoria": {
+  "pt": "venceu",
+  "en": "won"
+ },
+ "est.descanso": {
+  "pt": "descanso",
+  "en": "rest"
+ },
+ "est.emBreve": {
+  "pt": "Distribuição por horário e \"tarefas mais puladas\" pedem rastrear novos dados — entram numa próxima etapa.",
+  "en": "Time-of-day breakdown and \"most skipped tasks\" need new data tracking — coming in a future update."
+ },
+ "est.vencaHoje": {
+  "pt": "Vença hoje pra começar uma sequência",
+  "en": "Win today to start a streak"
+ },
+ "est.recordeAtual": {
+  "pt": "dias seguidos · essa é a sua maior sequência!",
+  "en": "days in a row · this is your best streak!"
+ },
+ "est.recordeFaltaUm": {
+  "pt": "dias seguidos · recorde de {recorde} (falta 1 dia)",
+  "en": "days in a row · record of {recorde} (1 day to go)"
+ },
+ "est.recordeFaltam": {
+  "pt": "dias seguidos · recorde de {recorde} (faltam {faltam} dias)",
+  "en": "days in a row · record of {recorde} ({faltam} days to go)"
+ },
+ "est.compartilhar": {
+  "pt": "Compartilhar",
+  "en": "Share"
+ },
+ "acao.continuar": {
+  "pt": "Continuar",
+  "en": "Continue"
+ },
+ "acao.voltar": {
+  "pt": "Voltar",
+  "en": "Back"
+ },
+ "onb.comoFunciona": {
+  "pt": "COMO FUNCIONA",
+  "en": "HOW IT WORKS"
+ },
+ "onb.regra1": {
+  "pt": "Cada tarefa concluída é um <b>golpe</b> no monstro do dia.",
+  "en": "Every task you complete is a <b>hit</b> on today's monster."
+ },
+ "onb.regra2": {
+  "pt": "Quanto mais tarefas você tem, <b>mais forte</b> ele fica.",
+  "en": "The more tasks you have, the <b>stronger</b> it gets."
+ },
+ "onb.regra3": {
+  "pt": "Derrote ele e ganhe <b>moedas</b> pra comprar equipamento melhor.",
+  "en": "Defeat it and earn <b>coins</b> to buy better gear."
+ },
+ "onb.personalizacao": {
+  "pt": "Personalização",
+  "en": "Personalization"
+ },
+ "onb.comoChamar": {
+  "pt": "Como quer ser chamado?",
+  "en": "What should we call you?"
+ },
+ "onb.placeholderNome": {
+  "pt": "Aventureiro",
+  "en": "Adventurer"
+ },
+ "onb.comecarAventura": {
+  "pt": "Começar aventura",
+  "en": "Start the adventure"
+ },
+ "onb.quemVaiEnfrentar": {
+  "pt": "Quem vai enfrentar os monstros?",
+  "en": "Who will face the monsters?"
+ },
+ "onb.quaisTarefas": {
+  "pt": "Quais tarefas você quer vencer hoje?",
+  "en": "Which tasks do you want to beat today?"
+ },
+ "onb.placeholderTarefa": {
+  "pt": "Ex: estudar 30 minutos",
+  "en": "E.g.: study for 30 minutes"
+ },
+ "onb.dicaAddMais": {
+  "pt": "Adicione pelo menos uma. Dá pra criar mais depois, e definir quais se repetem na semana.",
+  "en": "Add at least one. You can create more later, and choose which repeat during the week."
+ },
+ "onb.invocarMonstro": {
+  "pt": "Invocar o monstro",
+  "en": "Summon the monster"
+ },
+ "jogo.vida": {
+  "pt": "Vida",
+  "en": "Health"
+ },
+ "jogo.experiencia": {
+  "pt": "Experiência",
+  "en": "Experience"
+ },
+ "jogo.estagio": {
+  "pt": "Estágio",
+  "en": "Stage"
+ },
+ "jogo.tarefasParaEstagio": {
+  "pt": "Tarefas para Estágio",
+  "en": "Tasks for Stage"
+ },
+ "pro.titulo": {
+  "pt": "Plano Pro",
+  "en": "Pro Plan"
+ },
+ "pro.headline": {
+  "pt": "Queremos que você experimente o Plano Pro de graça",
+  "en": "We want you to try the Pro plan for free"
+ },
+ "pro.headlineNovo": {
+  "pt": "Continue sua jornada com o Pro",
+  "en": "Continue your journey with Pro"
+ },
+ "pro.b1t": {
+  "pt": "Vários heróis",
+  "en": "Several heroes"
+ },
+ "pro.b1s": {
+  "pt": "Até 4 heróis por conta",
+  "en": "Up to 4 heroes per account"
+ },
+ "pro.b2t": {
+  "pt": "Temas exclusivos",
+  "en": "Exclusive themes"
+ },
+ "pro.b2s": {
+  "pt": "Esmeralda e Terracota",
+  "en": "Emerald and Terracotta"
+ },
+ "pro.b3t": {
+  "pt": "Tarefas sem limite",
+  "en": "Unlimited tasks"
+ },
+ "pro.b3s": {
+  "pt": "No grátis são 5 tarefas ativas",
+  "en": "Free plan has 5 active tasks"
+ },
+ "pro.b4t": {
+  "pt": "Estatísticas completas",
+  "en": "Full statistics"
+ },
+ "pro.b4s": {
+  "pt": "Histórico completo e todos os gráficos",
+  "en": "Full history and all charts"
+ },
+ "pro.dias": {
+  "pt": "DIAS",
+  "en": "DAYS"
+ },
+ "pro.ofertaT": {
+  "pt": "Teste grátis do Pro",
+  "en": "Free Pro trial"
+ },
+ "pro.ofertaS": {
+  "pt": "Estamos te oferecendo 7 dias grátis para testar o plano Pro.",
+  "en": "We are offering you 7 days free to try the Pro plan."
+ },
+ "pro.avisoHeadlineNovo": {
+  "pt": "Avisamos você antes do teste acabar!",
+  "en": "We will remind you before the trial ends!"
+ },
+ "pro.avisoSubNovo": {
+  "pt": "Quando fica melhor para você?",
+  "en": "When works best for you?"
+ },
+ "pro.salvarLembrete": {
+  "pt": "Salvar lembrete",
+  "en": "Save reminder"
+ },
+ "pro.microcopy2": {
+  "pt": "Nada a pagar hoje, cancele quando quiser",
+  "en": "Nothing to pay today, cancel anytime"
+ },
+ "pro.sub": {
+  "pt": "7 dias grátis, sem compromisso. Cancele quando quiser.",
+  "en": "7 days free, no commitment. Cancel anytime."
+ },
+ "pro.passo1Titulo": {
+  "pt": "Suas tarefas",
+  "en": "Your tasks"
+ },
+ "pro.passo1Sub": {
+  "pt": "Já disponível",
+  "en": "Already unlocked"
+ },
+ "pro.beneficio1Titulo": {
+  "pt": "Sem limite diário",
+  "en": "No daily limit"
+ },
+ "pro.beneficio1": {
+  "pt": "Tarefas ilimitadas",
+  "en": "Unlimited tasks"
+ },
+ "pro.beneficio2Titulo": {
+  "pt": "Temas & heróis",
+  "en": "Themes & heroes"
+ },
+ "pro.beneficio2": {
+  "pt": "6 temas, 4 heróis",
+  "en": "6 themes, 4 heroes"
+ },
+ "pro.beneficio3Titulo": {
+  "pt": "Estatísticas",
+  "en": "Statistics"
+ },
+ "pro.beneficio3": {
+  "pt": "Histórico completo",
+  "en": "Full history"
+ },
+ "pro.continuar": {
+  "pt": "Continuar",
+  "en": "Continue"
+ },
+ "pro.verPlanos": {
+  "pt": "Ver planos",
+  "en": "See plans"
+ },
+ "pro.escolhaPlano": {
+  "pt": "Escolha como quer assinar",
+  "en": "Choose how you want to subscribe"
+ },
+ "pro.maisPopular": {
+  "pt": "Mais popular",
+  "en": "Most popular"
+ },
+ "pro.planoTrial": {
+  "pt": "7 dias grátis",
+  "en": "7 days free"
+ },
+ "pro.planoTrialSub": {
+  "pt": "Depois, Anual R$7,49/mês",
+  "en": "Then, Annual R$7.49/mo"
+ },
+ "pro.planoMensal": {
+  "pt": "Mensal",
+  "en": "Monthly"
+ },
+ "pro.planoMensalSub": {
+  "pt": "Cobrado todo mês",
+  "en": "Billed every month"
+ },
+ "pro.planoAnual": {
+  "pt": "Anual",
+  "en": "Annual"
+ },
+ "pro.planoAnualSub": {
+  "pt": "Cobrado R$89,90/ano",
+  "en": "Billed R$89.90/year"
+ },
+ "pro.planoVitalicio": {
+  "pt": "Vitalício",
+  "en": "Lifetime"
+ },
+ "pro.planoVitalicioSub": {
+  "pt": "Pagamento único",
+  "en": "One-time payment"
+ },
+ "pro.porMes": {
+  "pt": "/mês",
+  "en": "/mo"
+ },
+ "pro.precoTrial": {
+  "pt": "R$0,00",
+  "en": "R$0.00"
+ },
+ "pro.precoMensal": {
+  "pt": "R$17,90",
+  "en": "R$17.90"
+ },
+ "pro.precoAnual": {
+  "pt": "R$7,49",
+  "en": "R$7.49"
+ },
+ "pro.precoVitalicio": {
+  "pt": "R$199,90",
+  "en": "R$199.90"
+ },
+ "pro.microcopy": {
+  "pt": "Cancele quando quiser",
+  "en": "Cancel anytime"
+ },
+ "pro.assinar": {
+  "pt": "Assinar Plano Pro",
+  "en": "Subscribe to Pro"
+ },
+ "pro.agoraNao": {
+  "pt": "Agora não",
+  "en": "Not now"
+ },
+ "pro.descobriu": {
+  "pt": "Você descobriu um recurso premium!",
+  "en": "You found a premium feature!"
+ },
+ "pro.temaBloqueado": {
+  "pt": "Tema do Plano Pro",
+  "en": "Pro plan theme"
+ },
+ "pro.limiteHerois": {
+  "pt": "Limite de heróis atingido",
+  "en": "Hero limit reached"
+ },
+ "pro.limiteTarefas": {
+  "pt": "Limite diário de tarefas atingido",
+  "en": "Daily task limit reached"
+ },
+ "pro.trancado": {
+  "pt": "PRO",
+  "en": "PRO"
+ },
+ "pro.testarGratis": {
+  "pt": "Testar grátis por 7 dias",
+  "en": "Try free for 7 days"
+ },
+ "pro.avisoHeadline": {
+  "pt": "Quando avisamos que o teste tá acabando?",
+  "en": "When should we warn you the trial is ending?"
+ },
+ "pro.avisoSub": {
+  "pt": "Um aviso dentro do app, pra você decidir se quer assinar antes do teste acabar.",
+  "en": "An in-app alert, so you can decide whether to subscribe before the trial ends."
+ },
+ "pro.aviso3Titulo": {
+  "pt": "3 dias antes",
+  "en": "3 days before"
+ },
+ "pro.aviso1Titulo": {
+  "pt": "1 dia antes",
+  "en": "1 day before"
+ },
+ "pro.aviso0Titulo": {
+  "pt": "No último dia",
+  "en": "On the last day"
+ },
+ "pro.comecarTeste": {
+  "pt": "Começar teste grátis",
+  "en": "Start free trial"
+ },
+ "pro.confirmarHeadline": {
+  "pt": "Comece a evoluir com 7 dias grátis",
+  "en": "Start leveling up with 7 free days"
+ },
+ "pro.confirmarHojeTitulo": {
+  "pt": "Hoje",
+  "en": "Today"
+ },
+ "pro.confirmarHojeSub": {
+  "pt": "Acesso completo liberado na hora",
+  "en": "Full access unlocked right away"
+ },
+ "pro.confirmarAvisoSub": {
+  "pt": "Avisamos que o teste tá acabando",
+  "en": "We’ll remind you the trial is ending"
+ },
+ "pro.confirmarFimTitulo": {
+  "pt": "Em 7 dias",
+  "en": "In 7 days"
+ },
+ "pro.confirmarFimSub": {
+  "pt": "Teste acaba e volta pro plano grátis, sem cobrança",
+  "en": "Trial ends and reverts to the free plan, no charge"
+ },
+ "pro.meusDiasGratis": {
+  "pt": "Meus 7 dias grátis",
+  "en": "My 7 free days"
+ },
+ "jogo.addTarefa": {
+  "pt": "+ Adicionar",
+  "en": "+ Add"
+ },
+ "jogo.terminarDia": {
+  "pt": "Terminar dia",
+  "en": "End day"
+ },
+ "tar.novaTitulo": {
+  "pt": "Nova tarefa",
+  "en": "New task"
+ },
+ "jogo.oQuePrecisaSerFeito": {
+  "pt": "O que precisa ser feito?",
+  "en": "What needs to be done?"
+ },
+ "jogo.soHoje": {
+  "pt": "Só hoje",
+  "en": "Today only"
+ },
+ "jogo.repeteSemana": {
+  "pt": "Repete toda semana",
+  "en": "Repeats weekly"
+ },
+ "jogo.repeteMes": {
+  "pt": "Repete todo mês",
+  "en": "Repeats monthly"
+ },
+ "jogo.todoDia": {
+  "pt": "Todo dia",
+  "en": "Every month, on day"
+ },
+ "jogo.repeticao": {
+  "pt": "Repetição",
+  "en": "Repeat"
+ },
+ "jogo.soHojeCurto": {
+  "pt": "Hoje",
+  "en": "Today"
+ },
+ "jogo.repeteSemanaCurto": {
+  "pt": "Semana",
+  "en": "Week"
+ },
+ "jogo.repeteMesCurto": {
+  "pt": "Mês",
+  "en": "Month"
+ },
+ "jogo.repeteAnoCurto": {
+  "pt": "Ano",
+  "en": "Year"
+ },
+ "jogo.diaEMes": {
+  "pt": "Dia e mês",
+  "en": "Day and month"
+ },
+ "jogo.dificuldade": {
+  "pt": "Dificuldade",
+  "en": "Difficulty"
+ },
+ "jogo.vezesPorDia": {
+  "pt": "Vezes por dia",
+  "en": "Times per day"
+ },
+ "jogo.opcoesAvancadas": {
+  "pt": "Opções avançadas",
+  "en": "Advanced options"
+ },
+ "jogo.corDaTarefa": {
+  "pt": "Cor da tarefa",
+  "en": "Task color"
+ },
+ "jogo.semCor": {
+  "pt": "Sem cor",
+  "en": "No color"
+ },
+ "jogo.criarTarefa": {
+  "pt": "Criar tarefa",
+  "en": "Create task"
+ },
+ "dia.dom": {
+  "pt": "D",
+  "en": "S"
+ },
+ "dia.seg": {
+  "pt": "S",
+  "en": "M"
+ },
+ "dia.ter": {
+  "pt": "T",
+  "en": "T"
+ },
+ "dia.qua": {
+  "pt": "Q",
+  "en": "W"
+ },
+ "dia.qui": {
+  "pt": "Q",
+  "en": "T"
+ },
+ "dia.sex": {
+  "pt": "S",
+  "en": "F"
+ },
+ "dia.sab": {
+  "pt": "S",
+  "en": "S"
+ },
+ "inv.titulo": {
+  "pt": "Inventário",
+  "en": "Inventory"
+ },
+ "inv.moedas": {
+  "pt": "Moedas",
+  "en": "Coins"
+ },
+ "inv.moedasMinusculo": {
+  "pt": "moedas",
+  "en": "coins"
+ },
+ "inv.filtroTudo": {
+  "pt": "Tudo",
+  "en": "All"
+ },
+ "inv.filtroEquip": {
+  "pt": "Equipamento",
+  "en": "Equipment"
+ },
+ "perfil.equipamentos": {
+  "pt": "Equipamentos",
+  "en": "Equipment"
+ },
+ "inv.filtroCons": {
+  "pt": "Consumíveis",
+  "en": "Consumables"
+ },
+ "inv.filtroTesouro": {
+  "pt": "Tesouros",
+  "en": "Treasures"
+ },
+ "inv.filtroChave": {
+  "pt": "Item-chave",
+  "en": "Key items"
+ },
+ "inv.mochilaVazia": {
+  "pt": "Mochila vazia",
+  "en": "Empty bag"
+ },
+ "inv.mochilaVaziaDesc": {
+  "pt": "Derrote o monstro do dia para receber espólio. Quanto mais tarefas no dia, melhor o saque.",
+  "en": "Defeat today's monster to get loot. The more tasks in the day, the better the loot."
+ },
+ "inv.slotArma": {
+  "pt": "arma",
+  "en": "weapon"
+ },
+ "inv.slotPeito": {
+  "pt": "peito",
+  "en": "chest"
+ },
+ "inv.slotElmo": {
+  "pt": "elmo",
+  "en": "helmet"
+ },
+ "inv.slotEscudo": {
+  "pt": "escudo",
+  "en": "shield"
+ },
+ "inv.slotAcess": {
+  "pt": "acess.",
+  "en": "acc."
+ },
+ "perfil.vidaMaxima": {
+  "pt": "Vida máxima",
+  "en": "Max health"
+ },
+ "perfil.bonusXpEquip": {
+  "pt": "Bônus XP equip.",
+  "en": "Equip. XP bonus"
+ },
+ "perfil.bonusMoedasEquip": {
+  "pt": "Bônus moedas equip.",
+  "en": "Equip. coin bonus"
+ },
+ "perfil.pontosDeAtributo": {
+  "pt": "Pontos de atributo",
+  "en": "Attribute points"
+ },
+ "perfil.historico": {
+  "pt": "Histórico",
+  "en": "History"
+ },
+ "perfil.atributos": {
+  "pt": "Atributos",
+  "en": "Attributes"
+ },
+ "perfil.atrNota": {
+  "pt": "Cada ponto dá +2%. O teto é 30%.",
+  "en": "Each point gives +2%. The cap is 30%."
+ },
+ "perfil.conquistas": {
+  "pt": "Conquistas",
+  "en": "Achievements"
+ },
+ "perfil.bestiario": {
+  "pt": "Bestiário",
+  "en": "Bestiary"
+ },
+ "atr.fortuna": {
+  "pt": "Fortuna",
+  "en": "Fortune"
+ },
+ "atr.fortunaDesc": {
+  "pt": "raridade no espólio e chance de baú trancado",
+  "en": "loot rarity and locked chest chance"
+ },
+ "atr.foco": {
+  "pt": "Foco",
+  "en": "Focus"
+ },
+ "atr.focoDesc": {
+  "pt": "de desconto na loja",
+  "en": "shop discount"
+ },
+ "atr.vigor": {
+  "pt": "Vigor",
+  "en": "Vigor"
+ },
+ "atr.vigorDesc": {
+  "pt": "de perdão no dano por tarefa largada",
+  "en": "forgiveness on damage from skipped tasks"
+ },
+ "atr.fortunaInfo": {
+  "pt": "Chance de raridade melhor no espólio",
+  "en": "Better rarity chance on loot"
+ },
+ "atr.focoInfo": {
+  "pt": "Desconto nos preços da loja",
+  "en": "Discount on shop prices"
+ },
+ "atr.vigorInfo": {
+  "pt": "Perdão no dano por tarefa largada",
+  "en": "Forgiveness on damage from skipped tasks"
+ },
+ "atr.regra": {
+  "pt": "Cada ponto dá +2%, até 30%.",
+  "en": "Each point gives +2%, up to 30%."
+ },
+ "atr.pontoLbl": {
+  "pt": "ponto p/ investir",
+  "en": "point to spend"
+ },
+ "atr.pontosLbl": {
+  "pt": "pontos p/ investir",
+  "en": "points to spend"
+ },
+ "atr.investir": {
+  "pt": "Investir 1 ponto",
+  "en": "Invest 1 point"
+ },
+ "atr.semPontos": {
+  "pt": "Sem pontos disponíveis",
+  "en": "No points available"
+ },
+ "atr.teto": {
+  "pt": "Teto atingido",
+  "en": "Max reached"
+ },
+ "acao.verTudo": {
+  "pt": "Ver tudo",
+  "en": "View all"
+ },
+ "acao.verTodas": {
+  "pt": "Ver todas",
+  "en": "View all"
+ },
+ "cfg.configuracoes": {
+  "pt": "Configurações",
+  "en": "Settings"
+ },
+ "cfg.conta": {
+  "pt": "Conta",
+  "en": "Account"
+ },
+ "cfg.gerenciarConta": {
+  "pt": "Gerenciar conta",
+  "en": "Manage account"
+ },
+ "cfg.idDaConta": {
+  "pt": "ID da conta",
+  "en": "Account ID"
+ },
+ "cfg.gerenciarAssinatura": {
+  "pt": "Gerenciar assinatura",
+  "en": "Manage subscription"
+ },
+ "cfg.sair": {
+  "pt": "Sair",
+  "en": "Log out"
+ },
+ "cfg.criarConta": {
+  "pt": "Criar conta",
+  "en": "Create account"
+ },
+ "cfg.apagarDados": {
+  "pt": "Apagar dados",
+  "en": "Delete data"
+ },
+ "cfg.apagarDadosDesc": {
+  "pt": "Zera nível, moedas, itens e vida. Não tem volta.",
+  "en": "Resets level, coins, items and health. Cannot be undone."
+ },
+ "cfg.apagarTudo": {
+  "pt": "Apagar tudo",
+  "en": "Delete everything"
+ },
+ "cfg.excluirConta": {
+  "pt": "Excluir conta",
+  "en": "Delete account"
+ },
+ "cfg.excluirContaTitulo": {
+  "pt": "Excluir conta?",
+  "en": "Delete account?"
+ },
+ "cfg.excluirContaDesc": {
+  "pt": "Isso apaga sua conta de login e todo o progresso salvo na nuvem, em definitivo. Não tem volta.",
+  "en": "This permanently deletes your login and all progress saved in the cloud. Cannot be undone."
+ },
+ "cfg.excluirContaSenhaLabel": {
+  "pt": "Confirme sua senha pra continuar",
+  "en": "Confirm your password to continue"
+ },
+ "cfg.excluirContaSenhaPlaceholder": {
+  "pt": "Sua senha",
+  "en": "Your password"
+ },
+ "cfg.excluirContaGoogleAviso": {
+  "pt": "Sua conta usa login do Google. Vamos pedir pra você confirmar de novo com o Google antes de excluir.",
+  "en": "Your account signs in with Google. We'll ask you to confirm again with Google before deleting."
+ },
+ "cfg.excluirContaBotao": {
+  "pt": "Excluir conta",
+  "en": "Delete account"
+ },
+ "cfg.excluirContaExcluindo": {
+  "pt": "Excluindo…",
+  "en": "Deleting…"
+ },
+ "cfg.excluirContaSenhaErrada": {
+  "pt": "Senha incorreta.",
+  "en": "Wrong password."
+ },
+ "cfg.excluirContaGoogleFalhou": {
+  "pt": "Não deu pra confirmar com o Google. Tenta de novo.",
+  "en": "Couldn't confirm with Google. Please try again."
+ },
+ "cfg.excluirContaFalhouGenerico": {
+  "pt": "Não deu pra excluir a conta agora. Tenta de novo em instantes.",
+  "en": "Couldn't delete the account right now. Please try again shortly."
+ },
+ "cfg.excluirContaPrecisaRelogar": {
+  "pt": "Por segurança, entre na sua conta de novo e tente excluir em seguida.",
+  "en": "For security, please sign in again and then try deleting."
+ },
+ "cfg.app": {
+  "pt": "App",
+  "en": "App"
+ },
+ "cfg.heroi": {
+  "pt": "Herói",
+  "en": "Hero"
+ },
+ "cfg.herois": {
+  "pt": "Heróis",
+  "en": "Heroes"
+ },
+ "cfg.aparencia": {
+  "pt": "Aparência",
+  "en": "Appearance"
+ },
+ "cfg.preferencias": {
+  "pt": "Preferências",
+  "en": "Preferences"
+ },
+ "cfg.legal": {
+  "pt": "Legal",
+  "en": "Legal"
+ },
+ "cfg.geral": {
+  "pt": "Geral",
+  "en": "General"
+ },
+ "cfg.personagens": {
+  "pt": "Personagens",
+  "en": "Characters"
+ },
+ "cfg.editarHeroi": {
+  "pt": "Editar herói",
+  "en": "Edit hero"
+ },
+ "cfg.experiencia": {
+  "pt": "Experiência",
+  "en": "Experience"
+ },
+ "cfg.avisos": {
+  "pt": "Avisos",
+  "en": "Alerts"
+ },
+ "cfg.reverTutorial": {
+  "pt": "Rever tutorial",
+  "en": "Replay tutorial"
+ },
+ "cfg.privacidade": {
+  "pt": "Política de Privacidade",
+  "en": "Privacy Policy"
+ },
+ "cfg.termosDeUso": {
+  "pt": "Termos de Uso",
+  "en": "Terms of Use"
+ },
+ "pro.legalTermos": {
+  "pt": "Termos e Condições",
+  "en": "Terms & Conditions"
+ },
+ "pro.legalPrivacidade": {
+  "pt": "Privacidade",
+  "en": "Privacy"
+ },
+ "pro.legalRestaurar": {
+  "pt": "Restaurar compras",
+  "en": "Restore purchases"
+ },
+ "pro.restaurarEmBreve": {
+  "pt": "Restauração de compras em breve",
+  "en": "Restore purchases coming soon"
+ },
+ "pro.soNoApp": {
+  "pt": "Disponível no app instalado pela Google Play",
+  "en": "Available in the app installed from Google Play"
+ },
+ "pro.entrarParaAssinar": {
+  "pt": "Entre na sua conta para assinar",
+  "en": "Sign in to subscribe"
+ },
+ "pro.compraOk": {
+  "pt": "Plano Pro ativado!",
+  "en": "Pro plan activated!"
+ },
+ "pro.compraErro": {
+  "pt": "Não foi possível concluir a compra. Tente de novo.",
+  "en": "Could not complete the purchase. Try again."
+ },
+ "pro.compraVerificando": {
+  "pt": "Confirmando pagamento…",
+  "en": "Confirming payment…"
+ },
+ "pro.restaurado": {
+  "pt": "Compras restauradas",
+  "en": "Purchases restored"
+ },
+ "pro.nadaRestaurar": {
+  "pt": "Nenhuma compra encontrada",
+  "en": "No purchases found"
+ },
+ "cfg.historicoDesc": {
+  "pt": "Calendário de vitórias, fugas e dias sem tarefa",
+  "en": "Calendar of wins, escapes and days with no tasks"
+ },
+ "cfg.nomeDoHeroi": {
+  "pt": "Nome do herói",
+  "en": "Hero name"
+ },
+ "cfg.renomear": {
+  "pt": "Renomear",
+  "en": "Rename"
+ },
+ "cfg.spriteDoHeroi": {
+  "pt": "Sprite do herói",
+  "en": "Hero sprite"
+ },
+ "cfg.escolhaQuemEnfrenta": {
+  "pt": "Escolha quem enfrenta os monstros",
+  "en": "Choose who faces the monsters"
+ },
+ "cfg.tema": {
+  "pt": "Tema",
+  "en": "Theme"
+ },
+ "cfg.paletaDeCores": {
+  "pt": "Paleta de cores do app",
+  "en": "App color palette"
+ },
+ "cfg.notificacoes": {
+  "pt": "Notificações",
+  "en": "Notifications"
+ },
+ "cfg.notifDesc": {
+  "pt": "Teste grátis, streak em risco e monstro do dia",
+  "en": "Free trial, streak at risk and daily monster"
+ },
+ "cfg.feedbackDeClique": {
+  "pt": "Feedback tátil",
+  "en": "Haptic feedback"
+ },
+ "cfg.feedbackDeCliqueDesc": {
+  "pt": "Vibração ao tocar em botões e nos eventos do jogo",
+  "en": "Vibration on buttons and game events"
+ },
+ "cfg.som": {
+  "pt": "Som",
+  "en": "Sound"
+ },
+ "cfg.crt": {
+  "pt": "Efeito CRT",
+  "en": "CRT effect"
+ },
+ "cfg.golpes": {
+  "pt": "Golpes variados",
+  "en": "Varied attacks"
+ },
+ "cfg.somDesc": {
+  "pt": "Efeitos sonoros do jogo",
+  "en": "Game sound effects"
+ },
+ "cfg.novoHeroi": {
+  "pt": "Criar novo herói",
+  "en": "Create new hero"
+ },
+ "loja.comprar": {
+  "pt": "Comprar",
+  "en": "Buy"
+ },
+ "loja.vender": {
+  "pt": "Vender",
+  "en": "Sell"
+ },
+ "hist.vitoria": {
+  "pt": "vitória",
+  "en": "win"
+ },
+ "hist.fuga": {
+  "pt": "fuga",
+  "en": "escape"
+ },
+ "hist.semTarefa": {
+  "pt": "sem tarefa",
+  "en": "no task"
+ },
+ "ed.editarTarefa": {
+  "pt": "Editar tarefa",
+  "en": "Edit task"
+ },
+ "ed.quando": {
+  "pt": "Quando",
+  "en": "When"
+ },
+ "ed.salvarAlteracoes": {
+  "pt": "Salvar alterações",
+  "en": "Save changes"
+ },
+ "jogo.diaVencido": {
+  "pt": "DIA VENCIDO",
+  "en": "DAY WON"
+ },
+ "login.entreNaSuaConta": {
+  "pt": "Entre na sua conta",
+  "en": "Log into your account"
+ },
+ "login.email": {
+  "pt": "Email",
+  "en": "Email"
+ },
+ "login.senha": {
+  "pt": "Senha",
+  "en": "Password"
+ },
+ "login.senhaErro": {
+  "pt": "Sua senha deve ter pelo menos 6 caracteres e 1 número",
+  "en": "Your password must have at least 6 characters and 1 number"
+ },
+ "login.confirmarSenha": {
+  "pt": "Confirmar senha",
+  "en": "Confirm password"
+ },
+ "login.senhasNaoCoincidem": {
+  "pt": "As senhas não coincidem",
+  "en": "Passwords don't match"
+ },
+ "login.esqueceuSenha": {
+  "pt": "Esqueceu a senha?",
+  "en": "Forgot your password?"
+ },
+ "login.entrar": {
+  "pt": "Entrar",
+  "en": "Log in"
+ },
+ "login.ou": {
+  "pt": "ou",
+  "en": "or"
+ },
+ "login.entrarComGoogle": {
+  "pt": "Entrar com Google",
+  "en": "Sign in with Google"
+ },
+ "login.naoTemConta": {
+  "pt": "Não tem conta?",
+  "en": "Don't have an account?"
+ },
+ "login.cadastreSeAgora": {
+  "pt": "Cadastre-se agora",
+  "en": "Sign up now"
+ },
+ "login.agoraNao": {
+  "pt": "Agora não",
+  "en": "Not now"
+ },
+ "login.bemVindoDeVolta": {
+  "pt": "Bem-vindo de volta",
+  "en": "Welcome back"
+ },
+ "login.trocarConta": {
+  "pt": "Não é você? Trocar de conta",
+  "en": "Not you? Switch account"
+ },
+ "login.confirmeTitulo": {
+  "pt": "Confirme seu e-mail",
+  "en": "Confirm your email"
+ },
+ "login.confereSpam": {
+  "pt": "Não achou? Confere o <b>spam</b>.",
+  "en": "Can't find it? Check your <b>spam</b>."
+ },
+ "login.reenviarEmail": {
+  "pt": "Reenviar email",
+  "en": "Resend email"
+ },
+ "login.emailErrado": {
+  "pt": "Email errado? Corrigir",
+  "en": "Wrong email? Fix it"
+ },
+ "login.jaTemConta": {
+  "pt": "Já tem conta?",
+  "en": "Already have an account?"
+ },
+ "login.pular": {
+  "pt": "Pular",
+  "en": "Skip"
+ },
+ "login.semConta": {
+  "pt": "Entrar como convidado",
+  "en": "Continue as guest"
+ },
+ "login.tagline": {
+  "pt": "Suas tarefas viram uma aventura",
+  "en": "Your tasks become an adventure"
+ },
+ "login.aceitoPre": {
+  "pt": "Li e concordo com os ",
+  "en": "I have read and agree to the "
+ },
+ "login.aceiteErro": {
+  "pt": "Marque a caixa acima para continuar.",
+  "en": "Tick the box above to continue."
+ },
+ "login.termos": {
+  "pt": "Termos de Uso",
+  "en": "Terms of Use"
+ },
+ "login.aceitoE": {
+  "pt": " e a ",
+  "en": " and the "
+ },
+ "login.aceitoImplicitoOnb": {
+  "pt": "Ao continuar, você concorda com os ",
+  "en": "By continuing, you agree to the "
+ },
+ "login.conhecer": {
+  "pt": "Conhecer o app",
+  "en": "See how it works"
+ },
+ "login.aceiteCurto": {
+  "pt": "Ao continuar, você aceita os ",
+  "en": "By continuing, you accept the "
+ },
+ "login.termosCurto": {
+  "pt": "Termos",
+  "en": "Terms"
+ },
+ "login.privCurto": {
+  "pt": "Privacidade",
+  "en": "Privacy Policy"
+ },
+ "login.aceiteImplicito": {
+  "pt": "Ao continuar, você concorda com os ",
+  "en": "By continuing, you agree to the "
+ },
+ "login.privacidade": {
+  "pt": "Política de Privacidade",
+  "en": "Privacy Policy"
+ },
+ "login.continuarComGoogle": {
+  "pt": "Continuar com Google",
+  "en": "Continue with Google"
+ },
+ "login.continuarComEmail": {
+  "pt": "Continuar com email",
+  "en": "Continue with email"
+ },
+ "grim.titulo": {
+  "pt": "Grimório",
+  "en": "Grimoire"
+ },
+ "cfg.idioma": {
+  "pt": "Idioma",
+  "en": "Language"
+ },
+ "cfg.idiomaDesc": {
+  "pt": "Idioma dos textos do app",
+  "en": "Language of the app's text"
+ }
+}

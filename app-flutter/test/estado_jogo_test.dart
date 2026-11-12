@@ -521,6 +521,28 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+
+  testWidgets('tela: loja, aba Vender lista o inventário e mostra o botão de vender tesouros', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(360, 800));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    late EstadoJogo e;
+    await tester.runAsync(() async => e = await novoEstado(ArmazenamentoMemoria()));
+    final cat = e.catalogo;
+    final arma = [for (var i = 0; i < cat.baseN; i++) if (cat.item(i)!.tipo == 'arma' && !cat.item(i)!.morto) i].first;
+    final tes = [for (var i = 0; i < cat.baseN; i++) if (cat.item(i)!.tipo == 'tesouro' && !cat.item(i)!.morto) i].first;
+    e.save.inventario.addAll([
+      {'id': arma, 'q': 1},
+      {'id': tes, 'q': 2},
+    ]);
+    await tester.pumpWidget(MaterialApp(theme: temaApp(), home: Scaffold(body: TelaLoja(estado: e))));
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.tap(find.text(e.dados.traducoes.t('loja.vender', e.idioma)));
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(find.textContaining('Vender todos os tesouros'), findsOneWidget);
+    expect(find.byType(SpriteItem), findsWidgets);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('tela: criar uma tarefa, concluir e ver o ganho', (tester) async {
     await tester.binding.setSurfaceSize(const Size(390, 844));
     addTearDown(() => tester.binding.setSurfaceSize(null));

@@ -68,9 +68,9 @@ const FUNCOES = ['isoDe', 'diffDias', 'isoAtual', 'diaDaSemana', 'multDif', 'dif
   'multMoedas', 'multXP', 'item', 'variante', 'ehEquipBase', 'baseDe', 'limparVariantes', 'exportarVariantes',
   'restaurarVariantes', 'limparAfixosFabrica', 'migrarAfixos', 'afxRolar', 'comAfixo', 'nomePadraoHeroi',
   'nomeHeroiNorm', 'idiomaApp', 'resetarEstadoParaPadrao', 'salvar', '_carregarBase', 'chaveSaveAtual', 'chaveConta',
-  'monstroJaCaiu'];
+  'monstroJaCaiu', 'sortearItem', 'tesouroExtra', 'lootDoEstagio'];
 const DECLS = ['ECO', 'BONUS', 'DIFS', 'DIF_PADRAO', 'AFIXOS', 'AFX_CHAVES', 'AFX_TETO', 'AFX_NEG', 'AFX_NEG_CHAVES',
-  'P_NEG_LOOT', 'P_SEM_AFX', 'SLOTS', 'LIMIARES_ESTAGIO', 'TIER_RAR', '_varMapa', '_restoMoedasTarefa'];
+  'P_NEG_LOOT', 'P_SEM_AFX', 'SLOTS', 'LIMIARES_ESTAGIO', 'TIER_RAR', '_varMapa', '_restoMoedasTarefa', 'PESO_RAR', 'RAR_ESCALA'];
 
 /* ---------------- sandbox ---------------- */
 function criarSandbox({ lang = 'pt', uid = null, pj = 'pj1', relogio = null } = {}) {
@@ -364,6 +364,35 @@ if (process.argv.includes('--tz')) {
   }
   process.stdout.write(JSON.stringify(saida));
   process.exit(0);
+}
+
+/* ---------------- loot (sorteios com a sequência de Math.random gravada) ---------------- */
+{
+  const S = criarSandbox();
+  const lootCasos = [];
+  const rl = mulberry32(777);
+  for (let i = 0; i < 400; i++) {
+    const modo = i % 4; // 0 sortearItem, 1 sortearItem sem lendário, 2 tesouroExtra, 3 loot do dia
+    const sorte = [0, 0.25, 0.5, 0.8, 1][Math.floor(rl() * 5)];
+    const tes = [0, 0, 15, 40][Math.floor(rl() * 4)], tex = [0, 0, 20, 100][Math.floor(rl() * 4)];
+    const estagio = 1 + Math.floor(rl() * 4), nTarefas = Math.floor(rl() * 14);
+    const gen = mulberry32(5000 + i), usados = [];
+    S.ctx.__rnd = () => { const v = gen(); usados.push(v); return v; };
+    S.run('Math.random = __rnd; limparVariantes();');
+    S.run(`afixoSoma = (k) => k === 'tes' ? ${tes} : k === 'tex' ? ${tex} : 0; window.estagioAtual = () => ${estagio};`);
+    let ids;
+    if (modo === 0) ids = [S.run(`sortearItem(${sorte}, true)`)];
+    else if (modo === 1) ids = [S.run(`sortearItem(${sorte}, false)`)];
+    else if (modo === 2) { const r = S.run(`tesouroExtra(${sorte})`); ids = r === null ? [] : [r]; }
+    else {
+      ids = S.run(`(function(){ const le = lootDoEstagio(); const sorte = Math.min(1, ${nTarefas} / 10 + le.bonus); const out = [];
+        for (let i = 0; i < le.qtd; i++) out.push(sortearItem(sorte, false));
+        const tx = tesouroExtra(sorte); if (tx !== null) out.push(tx); return out; })()`);
+    }
+    const vars = S.run('exportarVariantes()');
+    lootCasos.push({ modo, sorte, tes, tex, estagio, nTarefas, usados, ids, vars });
+  }
+  casos.loot = lootCasos;
 }
 const fusos = ['America/Sao_Paulo', 'UTC', 'Asia/Tokyo', 'Europe/Lisbon', 'America/New_York', 'Pacific/Auckland', 'Asia/Kolkata', 'America/St_Johns'];
 casos.fusos = fusos.map((tz) => ({ tz, datas: JSON.parse(execFileSync(process.execPath, [fileURLToPath(import.meta.url), '--tz'], { env: { ...process.env, TZ: tz }, maxBuffer: 1 << 28 }).toString()) }));

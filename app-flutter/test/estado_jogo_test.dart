@@ -11,6 +11,7 @@ import 'package:dungeonlog_flutter/ui/app.dart';
 import 'package:dungeonlog_flutter/ui/estado_jogo.dart';
 import 'package:dungeonlog_flutter/ui/folha_nova_tarefa.dart';
 import 'package:dungeonlog_flutter/ui/tela_tarefas.dart';
+import 'package:dungeonlog_flutter/ui/tela_inventario.dart';
 import 'package:dungeonlog_flutter/ui/tema.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -237,6 +238,70 @@ void main() {
     expect(rotuloTarefa(Tarefa({'tipo': 'mensal', 'diaMes': 12})), 'todo dia 12');
     expect(rotuloTarefa(Tarefa({'tipo': 'anual', 'diaAno': 12, 'mesAno': 11})), '12 de nov');
     expect([1, 2, 4, 9, 14, 40].map(romano), ['I', 'II', 'IV', 'IX', 'XIV', 'XL']);
+  });
+
+
+  test('vencer o dia gera o baú: itens vão para o inventário e abrir só vale uma vez', () async {
+    final arm = ArmazenamentoMemoria();
+    final e = await novoEstado(arm);
+    expect(e.bauPadraoFechado, isFalse);
+    e.criarTarefa(texto: 'a', modo: ModoTarefa.hoje, dif: 'facil');
+    e.concluir(e.tarefasDeHoje.single);
+    e.terminarDia();
+    expect(e.bauPadraoFechado, isTrue);
+    final total = e.save.inventario.fold<int>(0, (a, sl) => a + (sl['q'] as int));
+    expect(total, inInclusiveRange(1, 2), reason: 'estágio 1: 1 item (+ tesouro extra só com Tesoureiro)');
+    final itens = e.abrirBauPadrao()!;
+    expect(itens.length, total);
+    expect(e.bauPadraoFechado, isFalse);
+    expect(e.abrirBauPadrao(), isNull);
+    final e2 = await novoEstado(arm);
+    expect(e2.bauPadraoFechado, isFalse, reason: 'o estado do baú é salvo');
+    expect(e2.save.inventario.length, e.save.inventario.length);
+  });
+
+  test('equipar, usar e vender', () async {
+    final e = await novoEstado(ArmazenamentoMemoria());
+    final cat = e.catalogo;
+    final arma = [for (var i = 0; i < cat.baseN; i++) if (cat.item(i)!.tipo == 'arma' && !cat.item(i)!.morto) i].first;
+    final pocao = [for (var i = 0; i < cat.baseN; i++) if (cat.item(i)!.tipo == 'cons' && cat.item(i)!.cura > 0 && !cat.item(i)!.morto) i].first;
+    e.save.inventario.addAll([
+      {'id': arma, 'q': 1},
+      {'id': pocao, 'q': 2},
+    ]);
+    expect(e.equipar(arma), isTrue);
+    expect(e.equipado(arma), isTrue);
+    expect(e.equipar(arma), isFalse, reason: 'tocar de novo desequipa');
+    expect(e.equipar(arma), isTrue);
+    e.vida = 5;
+    e.usarItem(pocao);
+    expect(e.vida, greaterThan(5));
+    expect(e.quantidadeDe(pocao), 1);
+    final moedas = e.save.moedas;
+    final preco = e.venderItem(arma)!;
+    expect(e.save.moedas, moedas + preco);
+    expect(e.quantidadeDe(arma), 0);
+    expect(e.equipado(arma), isFalse, reason: 'vender a última cópia desequipa');
+    expect(e.venderItem(arma), isNull);
+  });
+
+  testWidgets('tela: inventário mostra itens e abre a ficha sem estourar o layout', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(360, 800));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    late EstadoJogo e;
+    await tester.runAsync(() async => e = await novoEstado(ArmazenamentoMemoria()));
+    final cat = e.catalogo;
+    final arma = [for (var i = 0; i < cat.baseN; i++) if (cat.item(i)!.tipo == 'arma' && !cat.item(i)!.morto) i].first;
+    e.save.inventario.add({'id': arma, 'q': 1});
+    e.equipar(arma);
+    await tester.pumpWidget(MaterialApp(theme: temaApp(), home: Scaffold(body: TelaInventario(estado: e))));
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text('Inventário'), findsOneWidget);
+    await tester.tap(find.byType(SpriteItem).last);
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(find.text('Desequipar'), findsOneWidget);
+    expect(find.textContaining('Vender por'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('tela: criar uma tarefa, concluir e ver o ganho', (tester) async {

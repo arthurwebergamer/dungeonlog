@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import '../dominio/economia.dart';
 import '../dominio/tarefa.dart';
 import 'arena.dart';
+import 'tela_inventario.dart';
 import 'estado_jogo.dart';
 import 'folha_nova_tarefa.dart';
 import 'folhas.dart';
@@ -58,6 +59,37 @@ class _TelaTarefasState extends State<TelaTarefas> with SingleTickerProviderStat
       e.verificarDia(); // virada do dia enquanto o app estava em segundo plano
       WidgetsBinding.instance.addPostFrameCallback((_) => _mostrarEvento());
     }
+  }
+
+  void _abrirBau() {
+    final itens = e.abrirBauPadrao();
+    if (itens == null) return;
+    HapticFeedback.heavyImpact();
+    abrirFolha<void>(
+      context,
+      (ctx) => Folha(titulo: 'Baú do dia', filhos: [
+        for (final it in itens)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(color: corPainel3, borderRadius: BorderRadius.circular(14), border: Border.all(color: corRaridade[it.raridade.clamp(0, 7)])),
+              child: Row(children: [
+                SpriteItem(estado: e, item: it, tamanho: 44),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(it.nomeNoIdioma(e.idioma), style: const TextStyle(fontWeight: FontWeight.w600)),
+                    Text(nomeRaridade(it.raridade, e.idioma), style: TextStyle(fontSize: 12, color: corRaridade[it.raridade.clamp(0, 7)])),
+                  ]),
+                ),
+              ]),
+            ),
+          ),
+        const SizedBox(height: 6),
+        BotaoFolha('Guardar no inventário', aoTocar: () => Navigator.pop(ctx)),
+      ]),
+    );
   }
 
   void _avisar(String texto) {
@@ -150,6 +182,7 @@ class _TelaTarefasState extends State<TelaTarefas> with SingleTickerProviderStat
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           _Topo(estado: e),
           Arena(estado: e, golpe: _golpe),
+          if (e.bauPadraoFechado) _BotaoBau(aoTocar: _abrirBau),
           const SizedBox(height: 14),
           _CartaoBarras(
             vida: e.vida,
@@ -566,4 +599,22 @@ class _CartaoTarefaState extends State<_CartaoTarefa> {
       ),
     );
   }
+}
+
+/// Botão do baú do dia (aparece depois de vencer o dia, até abrir).
+class _BotaoBau extends StatelessWidget {
+  const _BotaoBau({required this.aoTocar});
+  final VoidCallback aoTocar;
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.fromLTRB(14, 0, 14, 10),
+        child: GestureDetector(
+          onTap: aoTocar,
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 13),
+            decoration: BoxDecoration(color: corXpB, borderRadius: BorderRadius.circular(14)),
+            child: const Center(child: Text('Abrir baú do dia', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700, fontSize: 15))),
+          ),
+        ),
+      );
 }

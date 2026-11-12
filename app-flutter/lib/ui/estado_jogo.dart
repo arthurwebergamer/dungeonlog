@@ -12,6 +12,7 @@ import '../dominio/dados_jogo.dart';
 import '../dominio/datas.dart';
 import '../dominio/economia.dart';
 import '../dominio/js_compat.dart';
+import '../dominio/loot.dart';
 import '../dominio/regras.dart';
 import '../dominio/save.dart';
 import '../dominio/tarefa.dart';
@@ -21,6 +22,7 @@ const _chaveVida = 'questlog.vida.v1';
 const _chaveDescanso = 'questlog.descanso.v1';
 const _chaveConcluidas = 'questlog.tarefasConcluidas.v1';
 const _chaveTemaArena = 'questlog.temaArena.v1';
+const _chaveBauDia = 'questlog.bauDia.v1';
 
 /// O que a virada do dia causou, para a interface avisar uma vez.
 class EventoVirada {
@@ -75,6 +77,9 @@ class EstadoJogo extends ChangeNotifier {
   String? ultimoDia;
   List<String> descanso = [];
   int totalConcluidas = 0;
+
+  /// Baú do dia (`questlog.bauDia.v1`): `{dia, padrao:{ids,aberto}, especial, extra}`. Só o padrão existe por enquanto.
+  Map<String, dynamic>? bauDia;
   EventoVirada? eventoPendente;
   final AcumuladorMoedas _acumulador = AcumuladorMoedas();
 
@@ -100,7 +105,11 @@ class EstadoJogo extends ChangeNotifier {
     totalConcluidas =
         numeroOu0(armazenamento.ler(chaveConta(_chaveConcluidas, uid: uid, personagem: personagem))).toInt();
 
+    final b = _lerJson(chaveConta(_chaveBauDia, uid: uid, personagem: personagem));
+    bauDia = b is Map ? Map<String, dynamic>.from(b) : null;
+
     verificarDia();
+    _garantirBau();
     await _salvarTudo();
   }
 
@@ -267,6 +276,7 @@ class EstadoJogo extends ChangeNotifier {
     save.moedas += ganho;
     save.derrotadoEm = hoje;
     vida = curar(vida: vida, vidaMaxima: vidaMaxima, cura: jsRound(vidaMaxima * Eco.curaVitoria));
+    _garantirBau();
     _salvarTudo();
     notifyListeners();
     return ganho;
@@ -358,6 +368,118 @@ class EstadoJogo extends ChangeNotifier {
     notifyListeners();
   }
 
+  // ---------- baú do dia, inventário ----------
+  /// `darItem(id, 1)`: empilha por id (equipamento já vem como variante do sorteio).
+  void _darItem(int id) {
+    for (final sl in save.inventario) {
+      if (sl['id'] == id) {
+        sl['q'] = ((sl['q'] as num?) ?? 0).toInt() + 1;
+        return;
+      }
+    }
+    save.inventario.add({'id': id, 'q': 1});
+  }
+
+  int get _estagio => estagioAtual(totalConcluidas);
+
+  /// `garantirBauDia()`: com o monstro caído e sem baú de hoje, sorteia o padrão e já credita os itens.
+  void _garantirBau() {
+    if (!derrotado) return;
+    if (bauDia != null && bauDia!['dia'] == hoje) return;
+    final ids = sortearLootDoDia(
+      catalogo,
+      _aleatorio.nextDouble,
+      nTarefas: tarefasDeHoje.length,
+      estagio: _estagio,
+      afixoTes: afixoSoma(catalogo, _equipado, 'tes'),
+      afixoTex: afixoSoma(catalogo, _equipado, 'tex'),
+    );
+    ids.forEach(_darItem);
+    bauDia = {
+      'dia': hoje,
+      'padrao': {'ids': ids, 'aberto': false},
+      'especial': null,
+      'extra': null,
+    };
+  }
+
+  /// Baú padrão de hoje ainda fechado?
+  bool get bauPadraoFechado {
+    final b = bauDia;
+    return b != null && b['dia'] == hoje && b['padrao'] is Map && (b['padrao'] as Map)['aberto'] != true;
+  }
+
+  /// `abrirBauPadrao()`: marca como aberto e devolve os itens para o popup (null se não há o que abrir).
+  List<ItemCatalogo>? abrirBauPadrao() {
+    if (!bauPadraoFechado) return null;
+    final p = bauDia!['padrao'] as Map;
+    final ids = [for (final i in (p['ids'] as List)) (i as num).toInt()];
+    p['aberto'] = true;
+    _salvarTudo();
+    notifyListeners();
+    return [for (final i in ids) catalogo.item(i)!];
+  }
+
+  int quantidadeDe(int id) {
+    for (final sl in save.inventario) {
+      if (sl['id'] == id) return ((sl['q'] as num?) ?? 0).toInt();
+    }
+    return 0;
+  }
+
+  void _tirarItem(int id) {
+    final i = save.inventario.indexWhere((sl) => sl['id'] == id);
+    if (i < 0) return;
+    final q = ((save.inventario[i]['q'] as num?) ?? 0).toInt() - 1;
+    if (q <= 0) {
+      save.inventario.removeAt(i);
+      for (final s in slotsEquip) {
+        if (_equipado[s] == id) _equipado[s] = null;
+      }
+    } else {
+      save.inventario[i]['q'] = q;
+    }
+  }
+
+  bool equipado(int id) => _equipado.values.contains(id);
+
+  /// `equipar(id)`: coloca no slot do tipo, ou tira se já estava equipado. Devolve true se ficou equipado.
+  bool? equipar(int id) {
+    final it = catalogo.item(id);
+    if (it == null || !slotsEquip.contains(it.tipo) || quantidadeDe(id) == 0) return null;
+    _equipado[it.tipo] = _equipado[it.tipo] == id ? null : id;
+    _salvarTudo();
+    notifyListeners();
+    return _equipado[it.tipo] == id;
+  }
+
+  /// `usarItem(id)`: consumível dá XP, moedas e/ou cura e some um da pilha.
+  GanhoTarefa? usarItem(int id) {
+    final it = catalogo.item(id);
+    if (it == null || it.tipo != 'cons' || quantidadeDe(id) == 0) return null;
+    final nivelAntes = nivel;
+    if (it.bonusXp != 0) save.xpTotal += it.bonusXp.toInt();
+    if (it.bonusMoedas != 0) save.moedas += it.bonusMoedas.toInt();
+    if (it.cura != 0) vida = vida + it.cura > vidaMaxima ? vidaMaxima : vida + it.cura;
+    _tirarItem(id);
+    _salvarTudo();
+    notifyListeners();
+    return GanhoTarefa(xp: it.bonusXp.toInt(), moedas: it.bonusMoedas.toInt(), subiuNivel: nivel > nivelAntes, nivel: nivel, parcial: false);
+  }
+
+  /// `venderItem(id)`: paga o preço de venda e tira um. Devolve as moedas (null se não vendeu).
+  int? venderItem(int id) {
+    final it = catalogo.item(id);
+    if (it == null || quantidadeDe(id) == 0) return null;
+    if (it.tipo == 'chave' && it.nome == 'Grimório') return null; // item único, não se vende
+    final preco = precoVenda(it.tipo, it.valor);
+    save.moedas += preco;
+    _tirarItem(id);
+    _salvarTudo();
+    notifyListeners();
+    return preco;
+  }
+
   // ---------- gravação ----------
   Future<void> _salvarTudo() async {
     final ms = _agora().millisecondsSinceEpoch;
@@ -367,6 +489,7 @@ class EstadoJogo extends ChangeNotifier {
       armazenamento.gravar(chaveConta(_chaveVida, uid: uid, personagem: personagem), jsonEncode({'vida': vida, 'ultimoDia': ultimoDia})),
       armazenamento.gravar(chaveConta(_chaveDescanso, uid: uid, personagem: personagem), jsonEncode(descanso)),
       armazenamento.gravar(chaveConta(_chaveConcluidas, uid: uid, personagem: personagem), '$totalConcluidas'),
+      if (bauDia != null) armazenamento.gravar(chaveConta(_chaveBauDia, uid: uid, personagem: personagem), jsonEncode(bauDia)),
     ]);
   }
 }

@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 
 import '../dados/armazenamento.dart';
 import '../dados/carregador_assets.dart';
+import 'equip_arena.dart';
 import 'estado_jogo.dart';
 import 'icones.dart';
 import 'tela_inventario.dart';
@@ -33,6 +34,7 @@ class _CarregadorState extends State<_Carregador> {
 
   Future<EstadoJogo> _iniciar() async {
     final dados = await carregarDadosJogo();
+    await EquipArena.carregar();
     final arm = await ArmazenamentoLocal.abrir();
     final estado = EstadoJogo(dados: dados, armazenamento: arm);
     await estado.iniciar();

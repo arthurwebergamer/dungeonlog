@@ -1,15 +1,65 @@
-// Aba Loja: prateleira do dia (8 vagas, uma em oferta), compra com nível mínimo e venda de itens/tesouros.
-// Regras em EstadoJogo (garantirEstoque/comprar/venderTesouros), espelho do bloco LOJA de play/index.html.
+// Aba Loja no visual do app original (#viewLoja): cabeçalho com "renova em Nh", pílula do saldo, abas
+// Comprar/Vender, linhas dos itens (oferta do dia, travado por nível, esgotado, sem moedas) e a folha de
+// confirmação. Medidas e cores do CSS computado de play/ em 390x844; regras em EstadoJogo
+// (garantirEstoque/comprar/venderItem/venderTesouros), espelho do bloco LOJA de play/index.html (~9553 a 9790).
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../dominio/catalogo.dart';
+import '../dominio/economia.dart';
 import '../dominio/loja.dart';
-import '../dominio/regras.dart' show bonusItem, precoVenda;
+import '../dominio/regras.dart' show afixoSoma, precoVenda;
 import 'estado_jogo.dart';
+import 'flutuante.dart';
 import 'folhas.dart';
-import 'tela_inventario.dart';
+import 'icones.dart';
+import 'itens_ui.dart';
 import 'tema.dart';
+import 'topo.dart';
+
+/// `horasAteVirar()`: quanto falta para a prateleira renovar (meia-noite).
+String horasAteVirar([DateTime? agora]) {
+  final a = agora ?? DateTime.now();
+  final meiaNoite = DateTime(a.year, a.month, a.day + 1);
+  final h = (meiaNoite.difference(a).inMilliseconds / 3600000).ceil();
+  return h <= 1 ? 'renova em menos de 1h' : 'renova em ${h}h';
+}
+
+/// Folha "Comprar / Vender" com o item no meio (`pedirConfirmacao` com item). Devolve true se confirmou.
+Future<bool?> pedirConfirmacaoItem(BuildContext context, EstadoJogo estado, ItemCatalogo item, {required String verbo, required String texto}) =>
+    abrirFolhaDesfocada<bool>(
+      context,
+      (ctx) => Container(
+        width: double.infinity,
+        padding: EdgeInsets.fromLTRB(16, 8, 16, 18 + MediaQuery.of(ctx).viewPadding.bottom),
+        decoration: const BoxDecoration(
+          color: corFicha,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          border: Border(top: BorderSide(color: corFichaLinha, width: 0.8)),
+        ),
+        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          const SizedBox(height: 6),
+          Center(child: Container(width: 38, height: 4, decoration: BoxDecoration(color: corFichaLinha, borderRadius: BorderRadius.circular(2)))),
+          const SizedBox(height: 14),
+          Text(verbo.toUpperCase(), style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1.54, color: corApagado, height: 1.3)),
+          const SizedBox(height: 4),
+          CabecalhoItem(
+            estado: estado,
+            item: item,
+            etiqueta: '${nomeRaridade(item.raridade, estado.idioma)} · ${nomeTipo(item.tipo)}',
+            bordaCaixa: corRaridade[item.raridade.clamp(0, 7)],
+          ),
+          const SizedBox(height: 12),
+          Text(texto, style: const TextStyle(fontSize: 13, height: 1.5, color: corApagado)),
+          const SizedBox(height: 20),
+          Row(children: [
+            Expanded(child: BotaoFolha('Cancelar', fundo: corPoco, cor: corTexto, borda: corFichaLinha, tamanho: 14, aoTocar: () => Navigator.pop(ctx, false))),
+            const SizedBox(width: 9),
+            Expanded(child: BotaoFolha(verbo, tamanho: 14, borda: Colors.white, aoTocar: () => Navigator.pop(ctx, true))),
+          ]),
+        ]),
+      ),
+    );
 
 class TelaLoja extends StatefulWidget {
   const TelaLoja({super.key, required this.estado});
@@ -20,7 +70,6 @@ class TelaLoja extends StatefulWidget {
 
 class _TelaLojaState extends State<TelaLoja> {
   String _aba = 'comprar';
-  String? _aviso;
 
   EstadoJogo get e => widget.estado;
 
@@ -30,208 +79,348 @@ class _TelaLojaState extends State<TelaLoja> {
     e.garantirEstoque();
   }
 
-  void _avisar(String t) {
-    setState(() => _aviso = t);
-    Future.delayed(const Duration(milliseconds: 1800), () {
-      if (mounted && _aviso == t) setState(() => _aviso = null);
-    });
-  }
-
-  String _efeito(ItemCatalogo it) {
-    final b = bonusItem(it);
-    final p = <String>[];
-    if (it.tipo == 'cons') {
-      if (b.x != 0) p.add('+${b.x} XP');
-      if (b.m != 0) p.add('+${b.m} moedas');
-      if (it.cura != 0) p.add('+${it.cura} vida');
-    } else {
-      if (b.x != 0) p.add('XP ${b.x > 0 ? '+' : ''}${b.x}%');
-      if (b.m != 0) p.add('Moedas ${b.m > 0 ? '+' : ''}${b.m}%');
-    }
-    return p.join(' · ');
-  }
-
-  void _comprar(int i) {
+  Future<void> _comprar(int i, BuildContext caixa) async {
     final v = e.lojaEstoque[i];
     final it = e.catalogo.item(v.id)!;
-    final exigido = nivelMinimo(it.raridade);
-    final preco = e.precoNaLoja(v);
-    abrirFolha<void>(
-      context,
-      (ctx) => Folha(titulo: 'Comprar', filhos: [
-        Row(children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(color: corPainel3, borderRadius: BorderRadius.circular(14), border: Border.all(color: corRaridade[it.raridade.clamp(0, 7)])),
-            child: SpriteItem(estado: e, item: it, tamanho: 54),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(it.nomeNoIdioma(e.idioma), style: TextStyle(color: corRaridade[it.raridade.clamp(0, 7)], fontWeight: FontWeight.w700, fontSize: 16)),
-              Text('${nomeRaridade(it.raridade, e.idioma)} · ${it.tipo}', style: const TextStyle(color: corApagado, fontSize: 13)),
-            ]),
-          ),
-        ]),
-        const SizedBox(height: 12),
-        if (_efeito(it).isNotEmpty) Text(_efeito(it), style: const TextStyle(color: corSuave, fontSize: 14)),
-        const SizedBox(height: 4),
-        Text('Preço: $preco moedas${v.oferta ? ' (oferta do dia)' : ''}', style: const TextStyle(color: corApagado, fontSize: 13)),
-        Text('Exige nível ${romano(exigido)}', style: const TextStyle(color: corApagado, fontSize: 13)),
-        const SizedBox(height: 14),
-        BotaoFolha('Comprar por $preco', aoTocar: () {
-          final r = e.comprar(i);
-          Navigator.pop(ctx);
-          HapticFeedback.mediumImpact();
-          _avisar(switch (r) {
-            'ok' => 'Comprou ${it.nomeNoIdioma(e.idioma)}',
-            'nivel' => 'Exige nível ${romano(exigido)}',
-            'moedas' => 'Moedas insuficientes',
-            _ => 'Item indisponível',
-          });
-        }),
-      ]),
-    );
+    HapticFeedback.selectionClick();
+    final ok = await pedirConfirmacaoItem(context, e, it, verbo: 'Comprar', texto: 'Custa ${e.precoNaLoja(v)} moedas.');
+    if (ok != true || !mounted) return;
+    final ponto = caixa.mounted ? centroDe(caixa) : null;
+    if (e.comprar(i) == 'ok') {
+      HapticFeedback.mediumImpact();
+      flutuanteTexto(context, ponto, 'COMPROU ${it.nomeNoIdioma(e.idioma).toUpperCase()}');
+    }
+  }
+
+  Future<void> _vender(ItemCatalogo it, BuildContext caixa) async {
+    HapticFeedback.selectionClick();
+    final ok = await pedirConfirmacaoItem(context, e, it, verbo: 'Vender', texto: 'Você recebe ${precoVenda(it.tipo, it.valor)} moedas.');
+    if (ok != true || !mounted) return;
+    final ponto = caixa.mounted ? centroDe(caixa) : null; // antes de a lista redesenhar
+    final preco = e.venderItem(it.id);
+    if (preco != null) {
+      HapticFeedback.mediumImpact();
+      flutuanteMoedas(context, ponto, preco);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
       listenable: e,
-      builder: (_, __) {
+      builder: (context, _) {
         e.garantirEstoque();
+        final t = e.dados.traducoes;
+        final legenda = _aba == 'comprar' ? horasAteVirar() : (e.save.inventario.isEmpty ? '' : 'Recompra por ${(Eco.taxaVenda * 100).round()}% do valor');
         return SafeArea(
           bottom: false,
-          child: Stack(children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Row(children: [
-                  const Expanded(child: Text('Loja', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700))),
-                  Text('${e.save.moedas.toInt()} moedas', style: const TextStyle(fontWeight: FontWeight.w700, color: corOuro)),
-                ]),
-                const SizedBox(height: 10),
-                Row(children: [
-                  for (final (id, nome) in const [('comprar', 'Comprar'), ('vender', 'Vender')])
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: ChoiceChip(label: Text(nome), selected: _aba == id, showCheckmark: false, onSelected: (_) => setState(() => _aba = id)),
-                    ),
-                ]),
-                const SizedBox(height: 10),
-                Expanded(child: _aba == 'comprar' ? _prateleira() : _venda()),
-              ]),
-            ),
-            if (_aviso != null)
-              Positioned(
-                left: 24,
-                right: 24,
-                top: 60,
-                child: Center(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                    decoration: BoxDecoration(color: corPainel2, borderRadius: BorderRadius.circular(999), border: Border.all(color: corLinha)),
-                    child: Text(_aviso!, style: const TextStyle(fontWeight: FontWeight.w600)),
-                  ),
-                ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            TopoApp(estado: e),
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(14, 14, 14, 16),
+                children: [
+                  CabecalhoAba(t.t('nav.loja', e.idioma), legenda),
+                  const SizedBox(height: 14),
+                  Row(children: [
+                    _Saldo(moedas: e.save.moedas.toInt(), rotulo: t.t('inv.moedasMinusculo', e.idioma)),
+                    const Spacer(),
+                    PilulaFiltro(t.t('loja.comprar', e.idioma), ativa: _aba == 'comprar', aoTocar: () => setState(() => _aba = 'comprar')),
+                    const SizedBox(width: 6),
+                    PilulaFiltro(t.t('loja.vender', e.idioma), ativa: _aba == 'vender', aoTocar: () => setState(() => _aba = 'vender')),
+                  ]),
+                  const SizedBox(height: 12),
+                  ...(_aba == 'comprar' ? _compra() : _venda()),
+                ],
               ),
+            ),
           ]),
         );
       },
     );
   }
 
-  Widget _prateleira() {
-    final vagas = e.lojaEstoque;
-    return GridView.builder(
-      padding: const EdgeInsets.only(bottom: 16),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, mainAxisSpacing: 10, crossAxisSpacing: 10, childAspectRatio: 1.15),
-      itemCount: vagas.length,
-      itemBuilder: (_, i) {
-        final v = vagas[i];
-        final it = e.catalogo.item(v.id)!;
-        final vendido = e.lojaVendidos.contains(i);
-        final travado = e.nivel < nivelMinimo(it.raridade);
-        final cor = corRaridade[it.raridade.clamp(0, 7)];
-        return GestureDetector(
-          onTap: vendido ? null : () => _comprar(i),
-          child: Opacity(
-            opacity: vendido ? 0.35 : (travado ? 0.6 : 1),
-            child: Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(color: corPainel3, borderRadius: BorderRadius.circular(14), border: Border.all(color: cor.withValues(alpha: 0.8))),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Row(children: [
-                  SpriteItem(estado: e, item: it, tamanho: 38),
-                  const Spacer(),
-                  if (v.oferta) const Text('OFERTA', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: corXpB)),
-                ]),
-                const Spacer(),
-                Text(it.nomeNoIdioma(e.idioma), maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, height: 1.15)),
-                const SizedBox(height: 3),
-                Text(
-                  vendido ? 'Vendido' : (travado ? 'Exige nível ${romano(nivelMinimo(it.raridade))}' : '${e.precoNaLoja(v)} moedas'),
-                  style: TextStyle(fontSize: 12, color: travado ? corVida : corOuro),
-                ),
-              ]),
-            ),
-          ),
-        );
-      },
-    );
+  /// `textoBonus(it)`: "XP +5% · Moedas +3%" (equipamento) ou "+15 XP · +10 moedas" (consumível).
+  InlineSpan? _bonus(ItemCatalogo it) {
+    const forte = TextStyle(fontWeight: FontWeight.w600, color: corSuave);
+    final partes = <List<InlineSpan>>[];
+    for (final (rotulo, valor) in bonusDoItem(it)) {
+      if (it.tipo == 'cons') {
+        if (rotulo == 'HP') continue; // o original só lista XP e moedas na loja
+        partes.add(rotulo == 'XP' ? [TextSpan(text: '$valor XP', style: forte)] : [TextSpan(text: valor, style: forte), const TextSpan(text: ' moedas')]);
+      } else {
+        partes.add([TextSpan(text: '$rotulo '), TextSpan(text: valor, style: forte)]);
+      }
+    }
+    if (partes.isEmpty) return null;
+    return TextSpan(children: [
+      for (var i = 0; i < partes.length; i++) ...[if (i > 0) const TextSpan(text: ' · '), ...partes[i]],
+    ]);
   }
 
-  Widget _venda() {
+  List<Widget> _compra() {
+    final linhas = <Widget>[];
+    for (var i = 0; i < e.lojaEstoque.length; i++) {
+      final v = e.lojaEstoque[i];
+      final it = e.catalogo.item(v.id)!;
+      final preco = e.precoNaLoja(v);
+      final exigido = nivelMinimo(it.raridade);
+      final vendido = e.lojaVendidos.contains(i);
+      final travado = e.nivel < exigido;
+      final semGrana = e.save.moedas < preco;
+      final bloqueio = vendido ? 'Esgotado' : (travado ? 'Nível ${romano(exigido)}' : (semGrana ? 'Sem moedas' : null));
+      linhas.add(Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: _LinhaLoja(
+          estado: e,
+          item: it,
+          oferta: v.oferta,
+          opacidade: vendido ? 0.38 : (travado ? 0.5 : 1),
+          bonus: _bonus(it),
+          precoCheio: v.oferta ? precoLoja(it, false, desconto: descontoLoja(afixoSoma(e.catalogo, e.save.equipado, 'bar'))) : null,
+          preco: '$preco',
+          botao: bloqueio ?? 'Comprar',
+          estiloBotao: bloqueio == null ? _EstiloBotao.primario : _EstiloBotao.apagado,
+          aoTocar: bloqueio == null ? (caixa) => _comprar(i, caixa) : (_) => HapticFeedback.lightImpact(),
+        ),
+      ));
+    }
+    return linhas;
+  }
+
+  List<Widget> _venda() {
+    const nota = TextStyle(fontSize: 11.5, height: 1.5, color: corApagado);
+    if (e.save.inventario.isEmpty) {
+      return const [Padding(padding: EdgeInsets.only(top: 14, bottom: 4), child: Text('Mochila vazia. Derrote o monstro do dia para conseguir espólio.', textAlign: TextAlign.center, style: nota))];
+    }
     final itens = <(ItemCatalogo, int)>[];
     for (final sl in e.save.inventario) {
       final it = e.catalogo.item(sl['id']);
       if (it == null || (it.tipo == 'chave' && it.nome == 'Grimório')) continue;
       itens.add((it, ((sl['q'] as num?) ?? 1).toInt()));
     }
-    final tesouros = e.tesourosDisponiveis();
-    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      if (tesouros > 0)
+    if (itens.isEmpty) {
+      return const [Padding(padding: EdgeInsets.only(top: 14, bottom: 4), child: Text('Só há itens-chave na mochila. Eles não podem ser vendidos.', textAlign: TextAlign.center, style: nota))];
+    }
+    // tesouros primeiro, depois o mais raro; empate mantém a ordem da mochila
+    final ordem = [for (var i = 0; i < itens.length; i++) i]
+      ..sort((a, b) {
+        final x = itens[a].$1, y = itens[b].$1;
+        if ((x.tipo == 'tesouro') != (y.tipo == 'tesouro')) return x.tipo == 'tesouro' ? -1 : 1;
+        final r = y.raridade.compareTo(x.raridade);
+        return r != 0 ? r : a.compareTo(b);
+      });
+    var totalTesouros = 0;
+    var temTesouro = false;
+    for (final (it, q) in itens) {
+      if (it.tipo == 'tesouro') {
+        temTesouro = true;
+        totalTesouros += precoVenda(it.tipo, it.valor) * q;
+      }
+    }
+    return [
+      for (final i in ordem)
         Padding(
-          padding: const EdgeInsets.only(bottom: 10),
-          child: BotaoFolha('Vender todos os tesouros ($tesouros)', aoTocar: () {
-            final (qtd, total) = e.venderTesouros();
-            HapticFeedback.mediumImpact();
-            if (qtd > 0) _avisar('Vendeu $qtd tesouros  +$total moedas');
-          }),
+          padding: const EdgeInsets.only(bottom: 8),
+          child: _LinhaLoja(
+            estado: e,
+            item: itens[i].$1,
+            quantidade: itens[i].$2,
+            bonus: itens[i].$2 == 1 && e.equipado(itens[i].$1.id) ? const TextSpan(text: 'em uso — será desequipado') : null,
+            preco: '+${precoVenda(itens[i].$1.tipo, itens[i].$1.valor)}',
+            botao: 'Vender',
+            estiloBotao: _EstiloBotao.secundario,
+            aoTocar: (caixa) => _vender(itens[i].$1, caixa),
+          ),
         ),
-      Expanded(
-        child: itens.isEmpty
-            ? const Center(child: Text('Nada para vender.', style: TextStyle(color: corApagado)))
-            : ListView.separated(
-                padding: const EdgeInsets.only(bottom: 16),
-                itemCount: itens.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 8),
-                itemBuilder: (_, i) {
-                  final (it, q) = itens[i];
-                  return Container(
-                    padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
-                    decoration: BoxDecoration(color: corPainel3, borderRadius: BorderRadius.circular(14), border: Border.all(color: corRaridade[it.raridade.clamp(0, 7)].withValues(alpha: 0.6))),
-                    child: Row(children: [
-                      SpriteItem(estado: e, item: it, tamanho: 36),
-                      const SizedBox(width: 10),
-                      Expanded(child: Text('${it.nomeNoIdioma(e.idioma)}${q > 1 ? '  ×$q' : ''}', style: const TextStyle(fontWeight: FontWeight.w600))),
-                      GestureDetector(
-                        onTap: () {
-                          final p = e.venderItem(it.id);
-                          HapticFeedback.mediumImpact();
-                          if (p != null) _avisar('Vendido  +$p moedas');
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
-                          child: Text('${precoVenda(it.tipo, it.valor)}', style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w700)),
-                        ),
-                      ),
-                    ]),
-                  );
-                },
+      if (temTesouro)
+        Padding(
+          padding: const EdgeInsets.only(top: 12),
+          child: Toque(
+            aoTocar: () {
+              HapticFeedback.mediumImpact();
+              e.venderTesouros();
+            },
+            child: CustomPaint(
+              painter: const _Tracejado(),
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: Text('Vender todos os tesouros  ·  +$totalTesouros moedas',
+                    textAlign: TextAlign.center, style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: corOuro, height: 1.3)),
               ),
-      ),
-    ]);
+            ),
+          ),
+        ),
+    ];
   }
+}
+
+/// Pílula do saldo (.saldo): pilha de moedas, número e "moedas".
+class _Saldo extends StatelessWidget {
+  const _Saldo({required this.moedas, required this.rotulo});
+  final int moedas;
+  final String rotulo;
+  @override
+  Widget build(BuildContext context) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 5),
+        decoration: BoxDecoration(
+          color: const Color(0x1AF5BE4A),
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: const Color(0x38F5BE4A), width: 0.8),
+        ),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          pixel('assets/img/ui/moedas.png', largura: 28, altura: 28),
+          const SizedBox(width: 5),
+          Text('$moedas', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: corOuro, height: 1.25)),
+          const SizedBox(width: 5),
+          Text(rotulo, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: corOuro, height: 1.25)),
+        ]),
+      );
+}
+
+enum _EstiloBotao { primario, secundario, apagado }
+
+/// Linha da loja (.lrow): caixa do ícone, nome / raridade / bônus, preço com a moeda e o botão.
+class _LinhaLoja extends StatefulWidget {
+  const _LinhaLoja({
+    required this.estado,
+    required this.item,
+    required this.preco,
+    required this.botao,
+    required this.estiloBotao,
+    required this.aoTocar,
+    this.oferta = false,
+    this.opacidade = 1,
+    this.bonus,
+    this.precoCheio,
+    this.quantidade = 1,
+  });
+  final EstadoJogo estado;
+  final ItemCatalogo item;
+  final String preco;
+  final String botao;
+  final _EstiloBotao estiloBotao;
+
+  /// Recebe o contexto da caixa do ícone (de onde sobe o aviso flutuante).
+  final void Function(BuildContext caixa) aoTocar;
+  final bool oferta;
+  final double opacidade;
+  final InlineSpan? bonus;
+  final int? precoCheio;
+  final int quantidade;
+
+  @override
+  State<_LinhaLoja> createState() => _LinhaLojaState();
+}
+
+class _LinhaLojaState extends State<_LinhaLoja> {
+  final _caixa = GlobalKey();
+
+  @override
+  Widget build(BuildContext context) {
+    final estado = widget.estado, item = widget.item, oferta = widget.oferta, bonus = widget.bonus;
+    final precoCheio = widget.precoCheio, quantidade = widget.quantidade, preco = widget.preco, botao = widget.botao;
+    final cor = corRaridade[item.raridade.clamp(0, 7)];
+    final (fundoBotao, bordaBotao, textoBotao) = switch (widget.estiloBotao) {
+      _EstiloBotao.primario => (Colors.white, Colors.white, corFundo),
+      _EstiloBotao.secundario => (corPoco, corLinha, corSuave),
+      _EstiloBotao.apagado => (corPoco, corLinha, corApagado),
+    };
+    return Opacity(
+      opacity: widget.opacidade,
+      child: Stack(clipBehavior: Clip.none, children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 9),
+          decoration: BoxDecoration(
+            color: corPainel3,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: oferta ? corOuro : corLinha, width: 0.8),
+            boxShadow: oferta ? const [BoxShadow(color: Color(0x24F2C94C), blurRadius: 10)] : null,
+          ),
+          child: Row(children: [
+            CaixaItem(key: _caixa, estado: estado, item: item, lado: 46, sprite: 32, raio: 10),
+            const SizedBox(width: 11),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+                Text.rich(
+                  TextSpan(children: [
+                    TextSpan(text: item.nomeNoIdioma(estado.idioma)),
+                    if (quantidade > 1) TextSpan(text: ' ×$quantidade', style: const TextStyle(fontSize: 11, color: corApagado)),
+                  ]),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600, color: corTexto, height: 1.25),
+                ),
+                const SizedBox(height: 2),
+                Text('${nomeRaridade(item.raridade, estado.idioma)} · ${nomeTipo(item.tipo)}'.toUpperCase(),
+                    maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.5, color: cor, height: 1.28)),
+                if (bonus != null) ...[
+                  const SizedBox(height: 3),
+                  Text.rich(bonus, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 11, color: corApagado, height: 1.3)),
+                ],
+              ]),
+            ),
+            const SizedBox(width: 11),
+            Column(crossAxisAlignment: CrossAxisAlignment.end, mainAxisSize: MainAxisSize.min, children: [
+              SizedBox(
+                height: 24,
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  if (precoCheio != null) ...[
+                    Text('$precoCheio',
+                        style: const TextStyle(
+                            fontSize: 10.5, fontWeight: FontWeight.w500, color: corApagado, decoration: TextDecoration.lineThrough, decorationColor: corApagado, fontFeatures: algarismosFixos)),
+                    const SizedBox(width: 4),
+                  ],
+                  Text(preco, style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: corOuro, fontFeatures: algarismosFixos)),
+                  const SizedBox(width: 2),
+                  pixel('assets/img/ui/moedas.png', largura: 24, altura: 24),
+                ]),
+              ),
+              const SizedBox(height: 5),
+              Toque(
+                aoTocar: () => widget.aoTocar(_caixa.currentContext ?? context),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                  decoration: BoxDecoration(color: fundoBotao, borderRadius: BorderRadius.circular(9), border: Border.all(color: bordaBotao, width: 0.8)),
+                  child: Text(botao, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: textoBotao, height: 1.27)),
+                ),
+              ),
+            ]),
+          ]),
+        ),
+        if (oferta)
+          Positioned(
+            left: 11,
+            top: -7,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+              decoration: BoxDecoration(color: corOuro, borderRadius: BorderRadius.circular(999)),
+              child: const Text('OFERTA DO DIA', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, letterSpacing: 0.72, color: corFundo, height: 1.25)),
+            ),
+          ),
+      ]),
+    );
+  }
+}
+
+/// Fundo do botão "Vender todos os tesouros" (.lbulk): poço com borda tracejada.
+class _Tracejado extends CustomPainter {
+  const _Tracejado();
+  @override
+  void paint(Canvas canvas, Size size) {
+    final r = RRect.fromRectAndRadius((Offset.zero & size).deflate(0.4), const Radius.circular(11));
+    canvas.drawRRect(r, Paint()..color = corPoco);
+    final traco = Paint()
+      ..color = corLinha
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.8;
+    for (final m in (Path()..addRRect(r)).computeMetrics()) {
+      for (var d = 0.0; d < m.length; d += 4.8) {
+        canvas.drawPath(m.extractPath(d, (d + 2.4).clamp(0, m.length)), traco);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(_Tracejado oldDelegate) => false;
 }

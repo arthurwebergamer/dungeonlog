@@ -19,6 +19,7 @@ flutter:
     - assets/img/monstros/
     - assets/img/herois/
     - assets/img/arena/
+    - assets/img/baus/
     - assets/img/ui/
   fonts:
     - family: Outfit

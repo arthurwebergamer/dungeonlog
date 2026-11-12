@@ -1,112 +1,58 @@
-// Aba Inventário: slots de equipamento, filtros, grade de itens e a ficha do item (equipar, usar, vender).
-// Regras em EstadoJogo (equipar/usarItem/venderItem), espelho de play/index.html (~8417 a 8466).
+// Aba Inventário no visual do app original (#viewInventario): cabeçalho com a contagem, caixa dos 5 slots com o
+// ícone fantasma do slot vazio e a linha de bônus, busca, filtros (com os subfiltros de equipamento) e a grade.
+// Medidas e cores do CSS computado de play/ em 390x844; regras em renderInventario() (play/index.html ~8611).
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../dominio/catalogo.dart';
 import '../dominio/economia.dart';
-import '../dominio/forja.dart';
-import '../dominio/regras.dart' show bonusItem, precoVenda;
 import 'estado_jogo.dart';
+import 'ficha_item.dart';
+import 'flutuante.dart';
 import 'folhas.dart';
+import 'icones.dart';
+import 'itens_ui.dart';
 import 'tema.dart';
+import 'topo.dart';
 
-const corRaridade = [
-  Color(0xFF8779A8), Color(0xFF63C99A), Color(0xFF5AA9F2), Color(0xFFF05AB5),
-  Color(0xFFB57BE8), Color(0xFFF2A65A), Color(0xFFE5484D), Color(0xFF5AE0D8),
+export 'ficha_item.dart' show FichaItem, abrirFichaItem;
+export 'itens_ui.dart';
+
+/// SUBCATS_EQUIP: subcategorias de equipamento (armas por tipo + as demais peças).
+const subcategoriasEquip = [
+  ('espada', 'Espadas'), ('adaga', 'Adagas'), ('machado', 'Machados'), ('haste', 'Lanças e hastes'),
+  ('impacto', 'Maças e martelos'), ('arco', 'Arcos'), ('besta', 'Bestas e fundas'), ('magico', 'Cajados e varinhas'),
+  ('escudo', 'Escudos'), ('elmo', 'Elmos'), ('armadura', 'Armaduras'), ('acess', 'Acessórios'),
 ];
-const _nomesRaridadePt = ['Comum', 'Incomum', 'Raro', 'Superior', 'Épico', 'Lendário', 'Ancestral', 'Único'];
-const _nomesRaridadeEn = ['Common', 'Uncommon', 'Rare', 'Superior', 'Epic', 'Legendary', 'Ancestral', 'Unique'];
-const _nomesTipoPt = {
-  'arma': 'Arma', 'armadura': 'Armadura', 'elmo': 'Elmo', 'escudo': 'Escudo', 'acess': 'Acessório',
-  'cons': 'Consumível', 'tesouro': 'Tesouro', 'chave': 'Item-chave',
-};
-const _nomesAfixo = {
-  'gan': 'Ganancioso', 'est': 'Estudioso', 'sor': 'Sortudo', 'bar': 'Barganhista',
-  'bau': 'Caçador de Baús', 'abu': 'Abundante', 'tes': 'Garimpeiro', 'tex': 'Tesoureiro',
-};
 
-const _nomesRaridadeFem = ['Comum', 'Incomum', 'Rara', 'Superior', 'Épica', 'Lendária', 'Ancestral', 'Única'];
-String nomeRaridadeFem(int r) => _nomesRaridadeFem[r.clamp(0, 7)];
-
-const _sufixos = {
-  'gan': 'do Ganancioso', 'est': 'do Estudioso', 'sor': 'do Sortudo', 'bar': 'do Barganhista',
-  'bau': 'do Caçador de Baús', 'abu': 'da Abundância', 'tes': 'do Garimpeiro', 'tex': 'do Tesoureiro',
-};
-const _sufixosNeg = {'gan': 'da Pobreza', 'est': 'da Ignorância', 'sor': 'do Azar', 'bar': 'do Desperdício'};
-
-String nomeRaridade(int r, String idioma) => (idioma == 'en' ? _nomesRaridadeEn : _nomesRaridadePt)[r.clamp(0, 7)];
-
-String _efeitoAfixo(Afixo a) {
-  final v = a.valor.abs();
-  if (a.valor < 0) {
-    return switch (a.tipo) {
-      'gan' => '-$v% moedas ganhas',
-      'est' => '-$v% XP ganho',
-      'sor' => '-$v% sorte nos baús',
-      _ => '+$v% preço na loja',
-    };
-  }
-  return switch (a.tipo) {
-    'gan' => '+$v% moedas ganhas',
-    'est' => '+$v% XP ganho',
-    'sor' => '+$v% sorte nos baús',
-    'bar' => '$v% de desconto na loja',
-    'bau' => '+$v% chance de baú trancado',
-    'abu' => '+$v% chance de baú extra',
-    'tes' => '+$v% chance de tesouro',
-    _ => '+$v% chance de tesouro extra',
-  };
+/// `subcatEquip(nome, tipo)`: a subcategoria sai do nome em português do item base.
+String subcatEquip(String nome, String tipo) {
+  if (tipo != 'arma') return tipo; // escudo | elmo | armadura | acess
+  bool tem(String padrao) => RegExp(padrao, caseSensitive: false).hasMatch(nome);
+  if (tem(r'^Arco')) return 'arco';
+  if (tem(r'^(Besta|Arbalesta|Zarabatana|Estilingue|Funda)')) return 'besta';
+  if (tem(r'Cajado|Varinha|Bast[aã]o Arcano|Cetro')) return 'magico';
+  if (tem(r'Adaga|Faca')) return 'adaga';
+  if (tem(r'Machad|Tomahawk|Bardiche')) return 'machado';
+  if (tem(r'Lan[cç]a|Alabarda|Tridente|Trishula|Glaive|Foice|Lajatang|Bord[aã]o|Chicote')) return 'haste';
+  if (tem(r'Ma[cç]a|Maca|Mangual|Martelo|Clava|Taco|Estrela|Flagelo')) return 'impacto';
+  return 'espada';
 }
 
-String _nomeAfixo(Afixo a) {
-  if (a.valor < 0) {
-    return switch (a.tipo) {
-      'gan' => 'Maldição da Pobreza',
-      'est' => 'Maldição da Ignorância',
-      'sor' => 'Maldição do Azar',
-      _ => 'Maldição do Desperdício',
-    };
+/// `semAcento()`: minúsculas sem acento, para a busca.
+String semAcento(String? t) {
+  const de = 'áàâãäéèêëíìîïóòôõöúùûüçñ', para = 'aaaaaeeeeiiiiooooouuuucn';
+  final s = StringBuffer();
+  for (final ch in (t ?? '').toLowerCase().split('')) {
+    final i = de.indexOf(ch);
+    s.write(i < 0 ? ch : para[i]);
   }
-  return _nomesAfixo[a.tipo] ?? a.tipo;
+  return s.toString();
 }
 
-/// Um tile da folha de sprites (16 x 27 tiles de 32 px) desenhado em [tamanho].
-class SpriteItem extends StatelessWidget {
-  const SpriteItem({super.key, required this.estado, required this.item, this.tamanho = 40});
-  final EstadoJogo estado;
-  final ItemCatalogo item;
-  final double tamanho;
-
-  @override
-  Widget build(BuildContext context) {
-    final f = estado.dados.folha;
-    final c = item.sprite % f.colunas, l = item.sprite ~/ f.colunas;
-    return SizedBox(
-      width: tamanho,
-      height: tamanho,
-      child: ClipRect(
-        child: OverflowBox(
-          alignment: Alignment.topLeft,
-          minWidth: 0,
-          minHeight: 0,
-          maxWidth: tamanho * f.colunas,
-          maxHeight: tamanho * f.linhas,
-          child: Transform.translate(
-            offset: Offset(-c * tamanho, -l * tamanho),
-            child: Image.asset(
-              f.arquivo,
-              width: tamanho * f.colunas,
-              height: tamanho * f.linhas,
-              fit: BoxFit.fill,
-              filterQuality: FilterQuality.none,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
+/// SPRITE_SLOT: sprite genérico usado como fantasma no slot vazio.
+const _spriteSlot = {'arma': 66, 'armadura': 70, 'elmo': 63, 'escudo': 128, 'acess': 102};
+const _chaveSlot = {'arma': 'inv.slotArma', 'armadura': 'inv.slotPeito', 'elmo': 'inv.slotElmo', 'escudo': 'inv.slotEscudo', 'acess': 'inv.slotAcess'};
 
 class TelaInventario extends StatefulWidget {
   const TelaInventario({super.key, required this.estado});
@@ -117,415 +63,398 @@ class TelaInventario extends StatefulWidget {
 
 class _TelaInventarioState extends State<TelaInventario> {
   String _filtro = 'tudo';
+  String _sub = 'todos';
   String _busca = '';
 
+  EstadoJogo get e => widget.estado;
+
   static const _filtros = [
-    ('tudo', 'Tudo'),
-    ('equip', 'Equipamento'),
-    ('cons', 'Consumíveis'),
-    ('tesouro', 'Tesouros'),
-    ('chave', 'Chaves'),
+    ('tudo', 'inv.filtroTudo'),
+    ('equip', 'inv.filtroEquip'),
+    ('cons', 'inv.filtroCons'),
+    ('tesouro', 'inv.filtroTesouro'),
+    ('chave', 'inv.filtroChave'),
   ];
 
-  bool _passa(ItemCatalogo it) {
-    final okFiltro = switch (_filtro) {
-      'equip' => slotsEquip.contains(it.tipo),
-      'cons' => it.tipo == 'cons',
-      'tesouro' => it.tipo == 'tesouro',
-      'chave' => it.tipo == 'chave',
-      _ => true,
+  String _subDe(ItemCatalogo it) => subcatEquip(it.nome, it.tipo);
+
+  bool _passa(ItemCatalogo it, String termo) {
+    if (termo.isNotEmpty) {
+      final a = it.afixo;
+      final achou = semAcento(it.nomeNoIdioma(e.idioma)).contains(termo) ||
+          semAcento(it.nome).contains(termo) ||
+          semAcento(it.nomeEn).contains(termo) ||
+          (a != null && semAcento(nomeAfixo(a)).contains(termo));
+      if (!achou) return false;
+    }
+    return switch (_filtro) {
+      'tudo' => true,
+      'equip' => slotsEquip.contains(it.tipo) && (_sub == 'todos' || _subDe(it) == _sub),
+      _ => it.tipo == _filtro,
     };
-    if (!okFiltro) return false;
-    if (_busca.isEmpty) return true;
-    return it.nomeNoIdioma(widget.estado.idioma).toLowerCase().contains(_busca.toLowerCase());
+  }
+
+  void _abrirFicha(ItemCatalogo it, BuildContext origem) {
+    HapticFeedback.selectionClick();
+    abrirFichaItem(context, e, it, origem: centroDe(origem));
   }
 
   @override
   Widget build(BuildContext context) {
-    final e = widget.estado;
     return ListenableBuilder(
       listenable: e,
-      builder: (_, __) {
-        final itens = <(ItemCatalogo, int)>[];
+      builder: (context, _) {
+        final t = e.dados.traducoes;
+        final inv = <(ItemCatalogo, int)>[];
+        var total = 0;
+        final contSub = <String>{};
         for (final sl in e.save.inventario) {
           final it = e.catalogo.item(sl['id']);
-          if (it != null && _passa(it)) itens.add((it, ((sl['q'] as num?) ?? 1).toInt()));
+          if (it == null) continue;
+          final q = ((sl['q'] as num?) ?? 1).toInt();
+          inv.add((it, q));
+          total += q;
+          if (slotsEquip.contains(it.tipo)) contSub.add(_subDe(it));
         }
-        itens.sort((a, b) {
-          final r = b.$1.raridade.compareTo(a.$1.raridade);
-          return r != 0 ? r : a.$1.nome.compareTo(b.$1.nome);
-        });
+        if (_sub != 'todos' && !contSub.contains(_sub)) _sub = 'todos';
+        final termo = semAcento(_busca).trim();
+        // mais raro primeiro; no empate fica a ordem do inventário (o sort do JS é estável)
+        final visiveis = [for (var i = 0; i < inv.length; i++) if (_passa(inv[i].$1, termo)) i]
+          ..sort((a, b) {
+            final r = inv[b].$1.raridade.compareTo(inv[a].$1.raridade);
+            return r != 0 ? r : a.compareTo(b);
+          });
+        final semNada = inv.isEmpty;
+
+        final cabecalho = Padding(
+          padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+          child: CabecalhoAba(t.t('inv.titulo', e.idioma), '$total ${total == 1 ? 'item' : 'itens'}'),
+        );
+
         return SafeArea(
           bottom: false,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Text('Inventário', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700)),
-              const SizedBox(height: 12),
-              _Slots(estado: e, aoTocar: (it) => _abrirFicha(it)),
-              const SizedBox(height: 12),
-              TextField(
-                onChanged: (v) => setState(() => _busca = v),
-                decoration: InputDecoration(
-                  hintText: 'Buscar',
-                  isDense: true,
-                  filled: true,
-                  fillColor: corPainel,
-                  prefixIcon: const Icon(Icons.search, size: 20, color: corApagado),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                ),
-              ),
-              const SizedBox(height: 10),
-              SizedBox(
-                height: 36,
-                child: ListView(scrollDirection: Axis.horizontal, children: [
-                  for (final (id, nome) in _filtros)
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: ChoiceChip(
-                        label: Text(nome),
-                        selected: _filtro == id,
-                        showCheckmark: false,
-                        onSelected: (_) {
-                          HapticFeedback.selectionClick();
-                          setState(() => _filtro = id);
-                        },
+          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            TopoApp(estado: e),
+            if (semNada) ...[
+              cabecalho,
+              Expanded(child: _MochilaVazia(titulo: t.t('inv.mochilaVazia', e.idioma), texto: t.t('inv.mochilaVaziaDesc', e.idioma))),
+            ] else
+              Expanded(
+                child: CustomScrollView(slivers: [
+                  SliverToBoxAdapter(child: cabecalho),
+                  SliverToBoxAdapter(child: Padding(padding: const EdgeInsets.fromLTRB(14, 0, 14, 14), child: _CaixaEquip(estado: e, aoTocar: _abrirFicha))),
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(14, 0, 14, 8),
+                      child: _CampoBusca(aoMudar: (v) => setState(() => _busca = v)),
+                    ),
+                  ),
+                  SliverPersistentHeader(
+                    pinned: true,
+                    delegate: _FaixaFixa(
+                      altura: 44,
+                      child: ColoredBox(
+                        color: corFundo,
+                        child: _LinhaPilulas(
+                          padding: const EdgeInsets.symmetric(horizontal: 14),
+                          filhos: [
+                            for (final (id, chave) in _filtros)
+                              PilulaFiltro(t.t(chave, e.idioma), ativa: _filtro == id, aoTocar: () {
+                                HapticFeedback.selectionClick();
+                                setState(() {
+                                  _filtro = id;
+                                  _sub = 'todos';
+                                });
+                              }),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SliverToBoxAdapter(child: SizedBox(height: 8)),
+                  if (_filtro == 'equip')
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: SizedBox(
+                          height: 24,
+                          child: _LinhaPilulas(
+                            padding: const EdgeInsets.symmetric(horizontal: 14),
+                            filhos: [
+                              for (final (id, nome) in [('todos', 'Todos'), ...subcategoriasEquip.where((c) => contSub.contains(c.$1))])
+                                PilulaFiltro(nome, pequena: true, ativa: _sub == id, aoTocar: () {
+                                  HapticFeedback.selectionClick();
+                                  setState(() => _sub = id);
+                                }),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  if (visiveis.isEmpty)
+                    const SliverToBoxAdapter(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 22),
+                        child: Text('Nada nesta categoria.', textAlign: TextAlign.center, style: TextStyle(fontSize: 13, color: corApagado)),
+                      ),
+                    )
+                  else
+                    SliverPadding(
+                      padding: const EdgeInsets.fromLTRB(14, 0, 14, 16),
+                      sliver: SliverGrid(
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 5, mainAxisSpacing: 8, crossAxisSpacing: 8),
+                        delegate: SliverChildBuilderDelegate(
+                          childCount: visiveis.length,
+                          (_, i) {
+                            final (it, q) = inv[visiveis[i]];
+                            return _CelulaItem(estado: e, item: it, q: q, aoTocar: (ctx) => _abrirFicha(it, ctx));
+                          },
+                        ),
                       ),
                     ),
                 ]),
               ),
-              const SizedBox(height: 10),
-              Expanded(
-                child: itens.isEmpty
-                    ? const Center(child: Text('Nada por aqui.', style: TextStyle(color: corApagado)))
-                    : GridView.builder(
-                        padding: const EdgeInsets.only(bottom: 16),
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 5, mainAxisSpacing: 8, crossAxisSpacing: 8),
-                        itemCount: itens.length,
-                        itemBuilder: (_, i) => _CelulaItem(estado: e, item: itens[i].$1, q: itens[i].$2, aoTocar: () => _abrirFicha(itens[i].$1)),
-                      ),
-              ),
-            ]),
-          ),
+          ]),
         );
       },
     );
   }
+}
 
-  void _abrirFicha(ItemCatalogo it) {
-    HapticFeedback.selectionClick();
-    abrirFolha<void>(context, (ctx) => FichaItem(estado: widget.estado, item: it));
+/// Faixa de altura fixa que fica presa no topo da rolagem (filtros com `position: sticky`).
+class _FaixaFixa extends SliverPersistentHeaderDelegate {
+  _FaixaFixa({required this.altura, required this.child});
+  final double altura;
+  final Widget child;
+  @override
+  double get minExtent => altura;
+  @override
+  double get maxExtent => altura;
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) => SizedBox.expand(child: child);
+  @override
+  bool shouldRebuild(_FaixaFixa o) => true;
+}
+
+/// Linha de pílulas que rola para o lado, com 7px de vão.
+class _LinhaPilulas extends StatelessWidget {
+  const _LinhaPilulas({required this.filhos, required this.padding});
+  final List<Widget> filhos;
+  final EdgeInsets padding;
+  @override
+  Widget build(BuildContext context) => SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        padding: padding,
+        child: Row(children: [
+          for (var i = 0; i < filhos.length; i++) ...[if (i > 0) const SizedBox(width: 7), filhos[i]],
+        ]),
+      );
+}
+
+/// Campo de busca em pílula (.invbusca input).
+class _CampoBusca extends StatelessWidget {
+  const _CampoBusca({required this.aoMudar});
+  final ValueChanged<String> aoMudar;
+  @override
+  Widget build(BuildContext context) => Container(
+        height: 33.6,
+        padding: const EdgeInsets.symmetric(horizontal: 14),
+        alignment: Alignment.centerLeft,
+        decoration: BoxDecoration(color: corPainel3, borderRadius: BorderRadius.circular(999), border: Border.all(color: corLinha, width: 0.8)),
+        child: TextField(
+          onChanged: aoMudar,
+          autocorrect: false,
+          enableSuggestions: false,
+          textInputAction: TextInputAction.search,
+          style: const TextStyle(fontSize: 13, color: corTexto, height: 1.25),
+          cursorWidth: 1.5,
+          decoration: const InputDecoration(
+            isCollapsed: true,
+            border: InputBorder.none,
+            hintText: 'Buscar item...',
+            hintStyle: TextStyle(fontSize: 13, color: corApagado, height: 1.25),
+          ),
+        ),
+      );
+}
+
+/// Estado sem nenhum item (.vazio).
+class _MochilaVazia extends StatelessWidget {
+  const _MochilaVazia({required this.titulo, required this.texto});
+  final String titulo;
+  final String texto;
+  @override
+  Widget build(BuildContext context) => Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 20),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            const Opacity(opacity: 0.45, child: Icone(IconeApp.inventario, tamanho: 46, cor: corApagado)),
+            const SizedBox(height: 9),
+            Text(titulo, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: corSuave)),
+            const SizedBox(height: 9),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 250),
+              child: Text(texto, textAlign: TextAlign.center, style: const TextStyle(fontSize: 13, height: 1.55, color: corApagado)),
+            ),
+          ]),
+        ),
+      );
+}
+
+/// Caixa de equipamento (.equipbox): os 5 slots e a linha "Moedas +N%  XP +N%".
+class _CaixaEquip extends StatelessWidget {
+  const _CaixaEquip({required this.estado, required this.aoTocar});
+  final EstadoJogo estado;
+  final void Function(ItemCatalogo, BuildContext) aoTocar;
+
+  @override
+  Widget build(BuildContext context) {
+    final b = estado.bonus;
+    String pct(int v) => '${v >= 0 ? '+' : ''}$v%';
+    const rotulo = TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: corApagado, height: 1.25);
+    return Container(
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
+      decoration: BoxDecoration(color: corPainel3, borderRadius: BorderRadius.circular(14), border: Border.all(color: corLinha, width: 0.8)),
+      child: Column(children: [
+        Row(children: [
+          for (var i = 0; i < slotsEquip.length; i++) ...[
+            if (i > 0) const SizedBox(width: 8),
+            Expanded(child: _Slot(estado: estado, slot: slotsEquip[i], aoTocar: aoTocar)),
+          ],
+        ]),
+        Container(
+          margin: const EdgeInsets.only(top: 11),
+          padding: const EdgeInsets.only(top: 9),
+          decoration: const BoxDecoration(border: Border(top: BorderSide(color: corLinha, width: 0.8))),
+          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Text.rich(TextSpan(style: rotulo, children: [
+              TextSpan(text: '${estado.dados.traducoes.t('inv.moedas', estado.idioma)} '),
+              TextSpan(text: pct(b.m), style: const TextStyle(fontWeight: FontWeight.w700, color: corOuro)),
+            ])),
+            const SizedBox(width: 14),
+            Text.rich(TextSpan(style: rotulo, children: [
+              const TextSpan(text: 'XP '),
+              TextSpan(text: pct(b.x), style: const TextStyle(fontWeight: FontWeight.w700, color: Colors.white)),
+            ])),
+          ]),
+        ),
+      ]),
+    );
   }
 }
 
+/// Um slot (.eslot): tracejado com o ícone fantasma e o rótulo quando vazio; borda da raridade e o sprite quando cheio.
+class _Slot extends StatelessWidget {
+  const _Slot({required this.estado, required this.slot, required this.aoTocar});
+  final EstadoJogo estado;
+  final String slot;
+  final void Function(ItemCatalogo, BuildContext) aoTocar;
+
+  @override
+  Widget build(BuildContext context) {
+    final id = estado.save.equipado[slot];
+    final it = id is num ? estado.catalogo.item(id) : null;
+    if (it != null) {
+      return GestureDetector(
+        onTap: () => aoTocar(it, context),
+        child: AspectRatio(
+          aspectRatio: 1,
+          child: Container(
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: corPoco,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: corBordaRaridade[it.raridade.clamp(0, 7)], width: 0.8),
+              boxShadow: brilhoRaridade(it.raridade),
+            ),
+            child: SpriteItem(estado: estado, item: it, tamanho: 34),
+          ),
+        ),
+      );
+    }
+    return AspectRatio(
+      aspectRatio: 1,
+      child: CustomPaint(
+        painter: const _BordaTracejada(cor: corLinha, raio: 10, fundo: corPoco),
+        child: Stack(alignment: Alignment.center, children: [
+          Sprite(estado: estado, sprite: _spriteSlot[slot]!, tamanho: 26, fantasma: true, clarear: false),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 2,
+            child: Text(
+              estado.dados.traducoes.t(_chaveSlot[slot]!, estado.idioma).toUpperCase(),
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 8, letterSpacing: 0.24, color: corApagado, height: 1.3),
+            ),
+          ),
+        ]),
+      ),
+    );
+  }
+}
+
+/// Fundo com borda tracejada de cantos redondos (`border: 1px dashed`).
+class _BordaTracejada extends CustomPainter {
+  const _BordaTracejada({required this.cor, required this.raio, required this.fundo});
+  final Color cor;
+  final double raio;
+  final Color fundo;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final r = RRect.fromRectAndRadius((Offset.zero & size).deflate(0.4), Radius.circular(raio));
+    canvas.drawRRect(r, Paint()..color = fundo);
+    final traco = Paint()
+      ..color = cor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.8;
+    for (final m in (Path()..addRRect(r)).computeMetrics()) {
+      const cheio = 2.4, vao = 2.4;
+      for (var d = 0.0; d < m.length; d += cheio + vao) {
+        canvas.drawPath(m.extractPath(d, (d + cheio).clamp(0, m.length)), traco);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(_BordaTracejada o) => o.cor != cor || o.raio != raio || o.fundo != fundo;
+}
+
+/// Célula da grade (.cel): sprite 32, quantidade no canto e a bolinha verde de "equipado".
 class _CelulaItem extends StatelessWidget {
   const _CelulaItem({required this.estado, required this.item, required this.q, required this.aoTocar});
   final EstadoJogo estado;
   final ItemCatalogo item;
   final int q;
-  final VoidCallback aoTocar;
+  final void Function(BuildContext) aoTocar;
 
   @override
   Widget build(BuildContext context) {
-    final equipado = estado.equipado(item.id);
-    return GestureDetector(
-      onTap: aoTocar,
+    final r = item.raridade.clamp(0, 7);
+    return Toque(
+      aoTocar: () => aoTocar(context),
+      escala: 0.94,
       child: Container(
         decoration: BoxDecoration(
           color: corPainel3,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: corRaridade[item.raridade.clamp(0, 7)].withValues(alpha: 0.75), width: equipado ? 2 : 1),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: corBordaRaridade[r], width: 0.8),
+          boxShadow: brilhoRaridade(r),
         ),
         child: Stack(alignment: Alignment.center, children: [
-          SpriteItem(estado: estado, item: item, tamanho: 38),
+          SpriteItem(estado: estado, item: item, tamanho: 32),
           if (q > 1)
-            Positioned(right: 4, bottom: 2, child: Text('×$q', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700))),
-          if (item.afixo != null)
             Positioned(
-              left: 4,
-              top: 2,
-              child: Text('✦', style: TextStyle(fontSize: 11, color: item.afixo!.valor < 0 ? corVida : corXpB)),
+              right: 3,
+              bottom: 2,
+              child: Text('$q',
+                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: corTexto, height: 1.28, shadows: [Shadow(color: Colors.black, blurRadius: 2, offset: Offset(0, 1))])),
             ),
+          if (estado.equipado(item.id))
+            const Positioned(left: 3, top: 3, child: SizedBox(width: 6, height: 6, child: DecoratedBox(decoration: BoxDecoration(color: corVerde, shape: BoxShape.circle)))),
         ]),
       ),
     );
-  }
-}
-
-class _Slots extends StatelessWidget {
-  const _Slots({required this.estado, required this.aoTocar});
-  final EstadoJogo estado;
-  final ValueChanged<ItemCatalogo> aoTocar;
-
-  static const _rotulos = {'arma': 'Arma', 'armadura': 'Armadura', 'elmo': 'Elmo', 'escudo': 'Escudo', 'acess': 'Acessório'};
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(children: [
-      for (final s in slotsEquip)
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 3),
-            child: Builder(builder: (_) {
-              final id = estado.save.equipado[s];
-              final it = id is num ? estado.catalogo.item(id) : null;
-              return GestureDetector(
-                onTap: it == null ? null : () => aoTocar(it),
-                child: AspectRatio(
-                  aspectRatio: 1,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: corPainel2,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: it == null ? corLinha : corRaridade[it.raridade.clamp(0, 7)], width: 1),
-                    ),
-                    child: it == null
-                        ? Center(child: Text(_rotulos[s]!, textAlign: TextAlign.center, style: const TextStyle(fontSize: 9.5, color: corApagado)))
-                        : Center(child: SpriteItem(estado: estado, item: it, tamanho: 38)),
-                  ),
-                ),
-              );
-            }),
-          ),
-        ),
-    ]);
-  }
-}
-
-/// Ficha do item: nome, raridade, efeitos e as ações possíveis (equipar, usar, vender, forjar).
-class FichaItem extends StatefulWidget {
-  const FichaItem({super.key, required this.estado, required this.item});
-  final EstadoJogo estado;
-  final ItemCatalogo item;
-  @override
-  State<FichaItem> createState() => _FichaItemState();
-}
-
-class _FichaItemState extends State<FichaItem> {
-  late ItemCatalogo _item = widget.item;
-  String _tela = 'item'; // item | sel | res
-  final List<int> _sel = [];
-  Afixo? _novo;
-
-  EstadoJogo get e => widget.estado;
-
-  String _sufixo(Afixo a) => a.valor < 0 ? (_sufixosNeg[a.tipo] ?? '') : (_sufixos[a.tipo] ?? '');
-  String _nomeCompleto(ItemCatalogo it) =>
-      it.afixo == null ? it.nomeNoIdioma(e.idioma) : '${it.nomeNoIdioma(e.idioma)} ${_sufixo(it.afixo!)}';
-
-  List<String> _efeitos(ItemCatalogo it) {
-    final b = bonusItem(it);
-    final l = <String>[];
-    if (it.tipo == 'cons') {
-      if (b.x != 0) l.add('+${b.x} XP');
-      if (b.m != 0) l.add('+${b.m} moedas');
-      if (it.cura != 0) l.add('+${it.cura} de vida');
-    } else if (slotsEquip.contains(it.tipo)) {
-      if (b.x != 0) l.add('XP ${b.x > 0 ? '+' : ''}${b.x}%');
-      if (b.m != 0) l.add('Moedas ${b.m > 0 ? '+' : ''}${b.m}%');
-      if (it.afixo != null) l.add('${_nomeAfixo(it.afixo!)}: ${_efeitoAfixo(it.afixo!)}');
-    }
-    return l;
-  }
-
-  Widget _linhaAfixo(Afixo? a, {bool destaque = false}) => Container(
-        margin: const EdgeInsets.only(bottom: 6),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        decoration: BoxDecoration(
-          color: corPainel3,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: destaque ? corXpB : corLinha),
-        ),
-        child: Text(
-          a == null ? 'Sem encantamento' : _efeitoAfixo(a),
-          style: TextStyle(color: a == null ? corApagado : (a.valor < 0 ? corVida : corTexto), fontWeight: FontWeight.w600),
-        ),
-      );
-
-  @override
-  Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: e,
-      builder: (ctx, _) {
-        final it = _item;
-        final cor = corRaridade[it.raridade.clamp(0, 7)];
-        final cab = Row(children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(color: corPainel3, borderRadius: BorderRadius.circular(14), border: Border.all(color: cor)),
-            child: SpriteItem(estado: e, item: it, tamanho: 54),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(_nomeCompleto(it), style: TextStyle(color: cor, fontWeight: FontWeight.w700, fontSize: 16)),
-              const SizedBox(height: 3),
-              Text('${nomeRaridade(it.raridade, e.idioma)} · ${_nomesTipoPt[it.tipo] ?? it.tipo}',
-                  style: const TextStyle(color: corApagado, fontSize: 13)),
-            ]),
-          ),
-        ]);
-        final titulo = _tela == 'item' ? 'Item' : 'Forja';
-        return Folha(titulo: titulo, filhos: [
-          cab,
-          const SizedBox(height: 14),
-          if (_tela == 'item') ..._corpoItem(ctx, it) else if (_tela == 'sel') ..._corpoSelecao(it) else ..._corpoResultado(ctx, it),
-        ]);
-      },
-    );
-  }
-
-  List<Widget> _corpoItem(BuildContext ctx, ItemCatalogo it) {
-    final q = e.quantidadeDe(it.id);
-    final equip = slotsEquip.contains(it.tipo);
-    final equipado = e.equipado(it.id);
-    final preco = precoVenda(it.tipo, it.valor);
-    final consumivel = it.tipo == 'cons';
-    final grimorio = it.tipo == 'chave' && it.nome == 'Grimório';
-    return [
-      for (final t in _efeitos(it)) Padding(padding: const EdgeInsets.only(bottom: 4), child: Text(t, style: const TextStyle(fontSize: 14, color: corSuave))),
-      if (it.tipo == 'chave' && !grimorio)
-        const Text('Usada automaticamente para destrancar um baú trancado.', style: TextStyle(fontSize: 13, color: corApagado, height: 1.4)),
-      if (!grimorio) Text('Vende por $preco moedas', style: const TextStyle(fontSize: 13, color: corApagado)),
-      if (q > 1) Text('Quantidade: $q', style: const TextStyle(fontSize: 13, color: corApagado)),
-      const SizedBox(height: 14),
-      if (q > 0 && equip)
-        BotaoFolha(equipado ? 'Desequipar' : 'Equipar', aoTocar: () {
-          HapticFeedback.mediumImpact();
-          e.equipar(it.id);
-          Navigator.pop(ctx);
-        }),
-      if (q > 0 && consumivel)
-        BotaoFolha('Usar', aoTocar: () {
-          HapticFeedback.mediumImpact();
-          e.usarItem(it.id);
-          if (e.quantidadeDe(it.id) == 0) Navigator.pop(ctx);
-        }),
-      if (q > 0 && equip) ...[
-        const SizedBox(height: 9),
-        BotaoFolha('Forjar', fundo: corPainel, cor: corTexto, borda: corLinha, aoTocar: () => setState(() {
-              _tela = 'sel';
-              _sel.clear();
-            })),
-      ],
-      if (q > 0 && !grimorio) ...[
-        const SizedBox(height: 9),
-        BotaoFolha('Vender por $preco', fundo: corPainel, cor: corTexto, borda: corLinha, aoTocar: () {
-          HapticFeedback.mediumImpact();
-          e.venderItem(it.id);
-          if (e.quantidadeDe(it.id) == 0) Navigator.pop(ctx);
-        }),
-      ],
-    ];
-  }
-
-  List<Widget> _corpoSelecao(ItemCatalogo it) {
-    final custo = custoForja(it.rer);
-    final tesouros = <(ItemCatalogo, int)>[];
-    for (final sl in e.save.inventario) {
-      final t = e.catalogo.item(sl['id']);
-      if (t != null && t.tipo == 'tesouro') tesouros.add((t, ((sl['q'] as num?) ?? 0).toInt()));
-    }
-    tesouros.sort((a, b) {
-      final r = b.$1.raridade.compareTo(a.$1.raridade);
-      return r != 0 ? r : b.$1.valor.compareTo(a.$1.valor);
-    });
-    final pronto = _sel.length == custo;
-    return [
-      const RotuloSecao('Encantamento atual'),
-      const SizedBox(height: 6),
-      _linhaAfixo(it.afixo),
-      const SizedBox(height: 8),
-      RotuloSecao('Ofereça $custo ${custo > 1 ? 'tesouros' : 'tesouro'}'),
-      const SizedBox(height: 8),
-      Wrap(spacing: 8, runSpacing: 8, children: [
-        for (var k = 0; k < custo; k++)
-          GestureDetector(
-            onTap: k < _sel.length ? () => setState(() => _sel.removeAt(k)) : null,
-            child: Container(
-              width: 52,
-              height: 52,
-              decoration: BoxDecoration(color: corPainel3, borderRadius: BorderRadius.circular(12), border: Border.all(color: k < _sel.length ? corXpB : corLinha)),
-              child: k < _sel.length ? Center(child: SpriteItem(estado: e, item: e.catalogo.item(_sel[k])!, tamanho: 38)) : null,
-            ),
-          ),
-      ]),
-      const SizedBox(height: 8),
-      Text(
-        pronto ? 'Chance de maldição: ${(pNegForja(e.catalogo, _sel) * 100).round()}%' : 'Toque nos tesouros abaixo para escolher',
-        style: const TextStyle(fontSize: 13, color: corApagado),
-      ),
-      const SizedBox(height: 8),
-      if (tesouros.isEmpty)
-        const Text('Você não tem tesouros.', style: TextStyle(color: corApagado))
-      else
-        Wrap(spacing: 8, runSpacing: 8, children: [
-          for (final (t, q) in tesouros)
-            Builder(builder: (_) {
-              final usados = _sel.where((x) => x == t.id).length;
-              final livre = q - usados;
-              final pode = livre > 0 && _sel.length < custo;
-              return GestureDetector(
-                onTap: pode ? () => setState(() => _sel.add(t.id)) : null,
-                child: Opacity(
-                  opacity: pode ? 1 : 0.4,
-                  child: Container(
-                    width: 52,
-                    height: 52,
-                    decoration: BoxDecoration(color: corPainel3, borderRadius: BorderRadius.circular(12), border: Border.all(color: corRaridade[t.raridade.clamp(0, 7)])),
-                    child: Stack(alignment: Alignment.center, children: [
-                      SpriteItem(estado: e, item: t, tamanho: 38),
-                      Positioned(right: 4, bottom: 1, child: Text('$livre', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700))),
-                    ]),
-                  ),
-                ),
-              );
-            }),
-        ]),
-      const SizedBox(height: 16),
-      BotaoFolha('Forjar', aoTocar: pronto
-          ? () {
-              HapticFeedback.heavyImpact();
-              final novo = e.forjarSortear(it.id, List<int>.from(_sel));
-              if (novo != null) {
-                setState(() {
-                  _novo = novo;
-                  _tela = 'res';
-                });
-              }
-            }
-          : () {}),
-      const SizedBox(height: 9),
-      BotaoFolha('Voltar', fundo: corPainel, cor: corTexto, borda: corLinha, aoTocar: () => setState(() => _tela = 'item')),
-    ];
-  }
-
-  List<Widget> _corpoResultado(BuildContext ctx, ItemCatalogo it) {
-    void fechar(Afixo? afx) {
-      HapticFeedback.mediumImpact();
-      final id = e.forjarConfirmar(it.id, afx);
-      if (id == null) {
-        Navigator.pop(ctx);
-        return;
-      }
-      setState(() {
-        _item = e.catalogo.item(id)!;
-        _tela = 'item';
-      });
-    }
-
-    return [
-      const RotuloSecao('Atual'),
-      const SizedBox(height: 6),
-      _linhaAfixo(it.afixo),
-      const SizedBox(height: 8),
-      RotuloSecao('Novo · ${_nomeAfixo(_novo!)}'),
-      const SizedBox(height: 6),
-      _linhaAfixo(_novo, destaque: true),
-      const SizedBox(height: 16),
-      BotaoFolha('Ficar com o novo', aoTocar: () => fechar(_novo)),
-      const SizedBox(height: 9),
-      BotaoFolha('Manter atual', fundo: corPainel, cor: corTexto, borda: corLinha, aoTocar: () => fechar(it.afixo)),
-    ];
   }
 }

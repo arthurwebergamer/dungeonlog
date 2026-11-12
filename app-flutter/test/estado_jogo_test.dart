@@ -387,9 +387,67 @@ void main() {
     await tester.pump(const Duration(milliseconds: 300));
     expect(find.text('Inventário'), findsOneWidget);
     await tester.tap(find.byType(SpriteItem).last);
+    await tester.pump(); // a folha começa a subir no primeiro quadro
     await tester.pump(const Duration(milliseconds: 400));
     expect(find.text('Desequipar'), findsOneWidget);
-    expect(find.textContaining('Vender por'), findsOneWidget);
+    expect(find.text('Vende por'), findsOneWidget);
+    expect(find.text('Forjar'), findsOneWidget);
+    expect(find.text('Vender'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+    // vender pela ficha: fecha a ficha, paga e mostra o "+N" flutuante em cima do item
+    final antes = e.save.moedas;
+    await tester.tap(find.text('Vender'));
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(e.quantidadeDe(arma), 0);
+    expect(e.save.moedas, greaterThan(antes));
+    expect(find.text('+${(e.save.moedas - antes).toInt()}'), findsOneWidget);
+    await tester.pump(const Duration(milliseconds: 1500)); // o flutuante some sozinho
+    expect(find.text('Mochila vazia'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('tela: inventário filtra por subcategoria de equipamento e pela busca', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    late EstadoJogo e;
+    await tester.runAsync(() async => e = await novoEstado(ArmazenamentoMemoria()));
+    final cat = e.catalogo;
+    int id(String nome) => [for (var i = 0; i < cat.baseN; i++) if (cat.item(i)!.nome == nome) i].first;
+    e.save.inventario.addAll([
+      {'id': id('Adaga'), 'q': 1},
+      {'id': id('Escudo de Madeira'), 'q': 2},
+      {'id': id('Pera'), 'q': 3},
+    ]);
+    await tester.pumpWidget(MaterialApp(theme: temaApp(), home: Scaffold(body: TelaInventario(estado: e))));
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text('6 itens'), findsOneWidget);
+    expect(find.byType(SpriteItem), findsNWidgets(3));
+    expect(find.text('Adagas'), findsNothing, reason: 'subfiltros só aparecem em Equipamento');
+    await tester.tap(find.text('Equipamento'));
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(find.byType(SpriteItem), findsNWidgets(2));
+    expect(find.text('Adagas'), findsOneWidget);
+    expect(find.text('Escudos'), findsOneWidget);
+    expect(find.text('Espadas'), findsNothing, reason: 'subcategoria sem item não aparece');
+    await tester.tap(find.text('Escudos'));
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(find.byType(SpriteItem), findsOneWidget);
+    await tester.tap(find.text('Tudo'));
+    await tester.pump(const Duration(milliseconds: 100));
+    await tester.enterText(find.byType(TextField), 'pêra');
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(find.byType(SpriteItem), findsOneWidget, reason: 'a busca ignora acento');
+    await tester.enterText(find.byType(TextField), 'xyz');
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(find.text('Nada nesta categoria.'), findsOneWidget);
+    expect(subcatEquip('Arco Longo', 'arma'), 'arco');
+    expect(subcatEquip('Besta Leve', 'arma'), 'besta');
+    expect(subcatEquip('Varinha de Prata', 'arma'), 'magico');
+    expect(subcatEquip('Tomahawk', 'arma'), 'machado');
+    expect(subcatEquip('Lança de Caça', 'arma'), 'haste');
+    expect(subcatEquip('Martelo de Guerra', 'arma'), 'impacto');
+    expect(subcatEquip('Espada Enferrujada', 'arma'), 'espada');
+    expect(subcatEquip('Elmo de Ferro', 'elmo'), 'elmo');
     expect(tester.takeException(), isNull);
   });
 
@@ -402,10 +460,30 @@ void main() {
     await tester.pumpWidget(MaterialApp(theme: temaApp(), home: Scaffold(body: TelaLoja(estado: e))));
     await tester.pump(const Duration(milliseconds: 300));
     expect(find.text('Loja'), findsOneWidget);
-    expect(find.text('OFERTA'), findsOneWidget);
-    await tester.tap(find.byType(SpriteItem).first);
+    expect(find.text('OFERTA DO DIA'), findsOneWidget);
+    expect(find.textContaining('renova em'), findsOneWidget);
+    expect(find.text('Sem moedas'), findsWidgets, reason: 'sem moedas o botão fica apagado');
+    e.save.moedas = 5000;
+    e.definirDescanso(false); // só para avisar a tela do saldo novo
+    await tester.pump(const Duration(milliseconds: 100));
+    final moedasAntes = e.save.moedas;
+    await tester.tap(find.text('Comprar').at(1)); // a primeira é a aba "Comprar"
+    await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
-    expect(find.textContaining('Comprar por'), findsOneWidget);
+    expect(find.text('COMPRAR'), findsOneWidget);
+    expect(find.textContaining('Custa '), findsOneWidget);
+    expect(find.text('Cancelar'), findsOneWidget);
+    await tester.tap(find.text('Comprar').last);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(e.save.moedas, lessThan(moedasAntes));
+    expect(e.lojaVendidos, hasLength(1));
+    expect(find.text('Esgotado'), findsOneWidget);
+    expect(find.textContaining('COMPROU '), findsOneWidget);
+    await tester.pump(const Duration(milliseconds: 1500));
+    await tester.tap(find.text('Vender'));
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(find.text('Recompra por 50% do valor'), findsOneWidget);
     expect(tester.takeException(), isNull);
 
     // forja pela ficha do equipamento
@@ -426,7 +504,20 @@ void main() {
     expect(find.textContaining('Chance de maldição'), findsOneWidget);
     await tester.tap(find.text('Forjar').last);
     await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text('SORTEANDO ENCANTAMENTO'), findsOneWidget);
+    expect(find.text('Forjando…'), findsOneWidget);
+    expect(e.quantidadeDe(tes), 0, reason: 'o tesouro é gasto ao forjar');
+    await tester.pump(const Duration(milliseconds: 2300)); // a roleta desacelera por 2,2 s
+    await tester.pump(const Duration(milliseconds: 600)); // meio segundo parada na moldura
+    await tester.pump(const Duration(milliseconds: 600));
+    expect(find.text('ATUAL'), findsOneWidget);
+    expect(find.text('NOVO'), findsOneWidget);
     expect(find.text('Ficar com o novo'), findsOneWidget);
+    expect(find.text('Manter atual'), findsOneWidget);
+    await tester.tap(find.text('Ficar com o novo'));
+    await tester.pump(const Duration(milliseconds: 600));
+    expect(e.quantidadeDe(arma), 0, reason: 'virou a variante forjada');
+    expect(find.text('Equipar'), findsOneWidget, reason: 'volta para a ficha do item novo');
     expect(tester.takeException(), isNull);
   });
 

@@ -124,6 +124,53 @@ for (const lado of ['esq', 'dir']) {
   escreverPng('img/ui/tocha_' + lado + '.png', m[1]);
 }
 
+// baús da arena (pack Treasure Chests): variáveis CSS --bau-* em :root, 128x128 cada; e o cadeado do baú trancado
+const varCss = (nome) => {
+  const m = css.match(new RegExp(nome + String.raw`\s*:\s*url\(["']?(data:image/png;base64,[^"')]+)`));
+  if (!m) throw new Error('não achei a variável ' + nome);
+  return m[1];
+};
+escreverPng('img/baus/padrao_fechado.png', varCss('--bau-fechado'));
+escreverPng('img/baus/padrao_aberto.png', varCss('--bau-aberto'));
+for (let t = 0; t < 4; t++) {
+  escreverPng('img/baus/t' + t + '_fechado.png', varCss('--bau-esp-t' + t + '-fechado'));
+  escreverPng('img/baus/t' + t + '_aberto.png', varCss('--bau-esp-t' + t + '-aberto'));
+}
+// cadeado do baú trancado: SVG de retângulos (12x14) embutido no CSS; vira lista [x, y, largura, altura, cor]
+let cadeado;
+{
+  const ini = css.indexOf('.bauArena.trancado::after{');
+  const m = ini < 0 ? null : css.slice(ini, css.indexOf('}', ini)).match(/url\(["']?data:image\/svg\+xml,([^"')]+)/);
+  if (!m) throw new Error('não achei o cadeado do baú');
+  const svg = decodeURIComponent(m[1]);
+  const vb = svg.match(/viewBox="0 0 (\d+) (\d+)"/);
+  const attr = (t, n) => (t.match(new RegExp(n + '="([^"]+)"')) || [])[1];
+  cadeado = {
+    largura: +vb[1],
+    altura: +vb[2],
+    rects: [...svg.matchAll(/<rect [^>]*>/g)].map((r) => [+attr(r[0], 'x'), +attr(r[0], 'y'), +attr(r[0], 'width'), +attr(r[0], 'height'), attr(r[0], 'fill')]),
+  };
+  if (!cadeado.rects.length) throw new Error('cadeado sem retângulos');
+}
+
+// ---------- equipamento desenhado no herói da arena (desenharHeroi) ----------
+// EQ_BB: retângulo real do desenho de cada peça [x0,y0,x1,y1] na célula 32x32; ARMA_GRIP: ponto do cabo [gx,gy];
+// ARMA_AJUSTE: ajuste fino [dx,dy]; ARMA_ESCURA: armas clareadas (também nos ícones, pelo índice do sprite).
+const literalJs = (nome) => {
+  const m = html.match(new RegExp(String.raw`window\.` + nome + String.raw`\s*=\s*([^;\n]+);`));
+  if (!m) throw new Error('não achei window.' + nome);
+  return vm.runInNewContext('(' + m[1] + ')');
+};
+const armaEscura = [...literalJs('ARMA_ESCURA')];
+escreverJson('dados/equip_arena.json', {
+  eqBB: literalJs('EQ_BB'),
+  armaGrip: literalJs('ARMA_GRIP'),
+  armaAjuste: literalJs('ARMA_AJUSTE'),
+  armaEscura,
+  cadeado,
+  spritesEscuros: [...new Set(armaEscura.map((id) => ITENS[id] && ITENS[id][0]).filter((x) => x != null))],
+});
+
 console.log(
   `monstros=${MONSTROS.length} herois=${HEROIS.length} itens=${ITENS.length} temas=${TEMAS_ARENA.length} traducoes=${Object.keys(traducoes).length}`
 );

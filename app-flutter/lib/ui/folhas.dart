@@ -1,4 +1,6 @@
 // Folhas (painéis que sobem de baixo) e diálogos no estilo do app original: .edov / .edsheet / .md-sheet.
+import 'dart:ui' show ImageFilter;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -6,10 +8,13 @@ import 'tema.dart';
 
 /// Área tocável que escurece de leve enquanto pressionada (sem a onda do Material).
 class Toque extends StatefulWidget {
-  const Toque({super.key, required this.aoTocar, required this.child, this.rotulo});
+  const Toque({super.key, required this.aoTocar, required this.child, this.rotulo, this.escala});
   final VoidCallback? aoTocar;
   final Widget child;
   final String? rotulo;
+
+  /// Se dado, o toque encolhe o filho para esta escala (`:active{transform:scale(.94)}`) em vez de escurecer.
+  final double? escala;
   @override
   State<Toque> createState() => _ToqueState();
 }
@@ -28,7 +33,9 @@ class _ToqueState extends State<Toque> {
           onTapCancel: () => setState(() => _apertado = false),
           onTapUp: (_) => setState(() => _apertado = false),
           onTap: widget.aoTocar,
-          child: AnimatedOpacity(duration: const Duration(milliseconds: 90), opacity: _apertado ? 0.7 : 1, child: widget.child),
+          child: widget.escala != null
+              ? AnimatedScale(duration: const Duration(milliseconds: 90), scale: _apertado ? widget.escala! : 1, child: widget.child)
+              : AnimatedOpacity(duration: const Duration(milliseconds: 90), opacity: _apertado ? 0.7 : 1, child: widget.child),
         ),
       );
 }
@@ -99,6 +106,38 @@ Future<T?> abrirFolha<T>(BuildContext context, WidgetBuilder builder) => showMod
       barrierColor: corVeu,
       elevation: 0,
       builder: builder,
+    );
+
+/// Folha que sobe de baixo com o fundo escurecido E desfocado (`backdrop-filter: blur` dos pop-ups do original:
+/// 3px na confirmação, 5px no baú). Tocar fora fecha.
+Future<T?> abrirFolhaDesfocada<T>(BuildContext context, WidgetBuilder builder, {double desfoque = 3, Color veu = corVeu}) => showGeneralDialog<T>(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'Fechar',
+      barrierColor: Colors.transparent,
+      transitionDuration: const Duration(milliseconds: 240),
+      pageBuilder: (ctx, anim, __) => Align(
+        alignment: Alignment.bottomCenter,
+        child: AnimatedBuilder(
+          animation: anim,
+          builder: (_, filho) => FractionalTranslation(translation: Offset(0, 1 - Curves.easeOut.transform(anim.value)), child: filho),
+          child: Material(type: MaterialType.transparency, child: builder(ctx)),
+        ),
+      ),
+      transitionBuilder: (_, anim, __, filho) {
+        final t = Curves.easeOut.transform(anim.value);
+        return Stack(children: [
+          Positioned.fill(
+            child: IgnorePointer(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: desfoque * t, sigmaY: desfoque * t),
+                child: ColoredBox(color: veu.withValues(alpha: veu.a * t)),
+              ),
+            ),
+          ),
+          filho,
+        ]);
+      },
     );
 
 /// Corpo de uma folha: puxador, "x" de fechar, título em maiúsculas e o conteúdo.

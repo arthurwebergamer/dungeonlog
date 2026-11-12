@@ -6,16 +6,16 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../dominio/bau.dart' show tierRar;
 import '../dominio/economia.dart';
 import '../dominio/tarefa.dart';
 import 'arena.dart';
-import 'tela_inventario.dart';
+import 'popup_bau.dart';
 import 'estado_jogo.dart';
 import 'folha_nova_tarefa.dart';
 import 'folhas.dart';
 import 'icones.dart';
 import 'tema.dart';
+import 'topo.dart';
 
 const _nomesDia = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
 
@@ -62,41 +62,13 @@ class _TelaTarefasState extends State<TelaTarefas> with SingleTickerProviderStat
     }
   }
 
+  /// Toque num baú da arena (`abrirBauPadrao/Extra/Especial`): marca como aberto e mostra o que saiu.
   void _abrirBau(String qual) {
-    if (qual == 'especial' && e.chaveDoEspecial == null) {
-      HapticFeedback.mediumImpact();
-      final t = e.tierBauEspecial ?? 0;
-      _avisar('Requer chave ${nomeRaridadeFem(tierRar[t])} ou superior');
-      return;
-    }
+    final tier = e.tierBauEspecial;
     final itens = e.abrirBau(qual);
     if (itens == null) return;
     HapticFeedback.heavyImpact();
-    abrirFolha<void>(
-      context,
-      (ctx) => Folha(titulo: qual == 'especial' ? 'Baú trancado' : (qual == 'extra' ? 'Baú extra' : 'Baú do dia'), filhos: [
-        for (final it in itens)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(color: corPainel3, borderRadius: BorderRadius.circular(14), border: Border.all(color: corRaridade[it.raridade.clamp(0, 7)])),
-              child: Row(children: [
-                SpriteItem(estado: e, item: it, tamanho: 44),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(it.nomeNoIdioma(e.idioma), style: const TextStyle(fontWeight: FontWeight.w600)),
-                    Text(nomeRaridade(it.raridade, e.idioma), style: TextStyle(fontSize: 12, color: corRaridade[it.raridade.clamp(0, 7)])),
-                  ]),
-                ),
-              ]),
-            ),
-          ),
-        const SizedBox(height: 6),
-        BotaoFolha('Guardar no inventário', aoTocar: () => Navigator.pop(ctx)),
-      ]),
-    );
+    mostrarBauLoot(context, e, itens, variante: qual == 'especial' ? 't${(tier ?? 0).clamp(0, 3)}' : 'padrao');
   }
 
   void _avisar(String texto) {
@@ -187,16 +159,8 @@ class _TelaTarefasState extends State<TelaTarefas> with SingleTickerProviderStat
       SafeArea(
         bottom: false,
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          _Topo(estado: e),
-          Arena(estado: e, golpe: _golpe),
-          if (e.bauPadraoFechado) _BotaoBau('Abrir baú do dia', aoTocar: () => _abrirBau('padrao')),
-          if (e.bauFechado('extra')) _BotaoBau('Abrir baú extra', aoTocar: () => _abrirBau('extra')),
-          if (e.bauFechado('especial'))
-            _BotaoBau(
-              e.chaveDoEspecial == null ? 'Baú trancado (precisa de chave)' : 'Destrancar baú com chave',
-              aoTocar: () => _abrirBau('especial'),
-              apagado: e.chaveDoEspecial == null,
-            ),
+          TopoApp(estado: e),
+          Arena(estado: e, golpe: _golpe, aoAbrirBau: _abrirBau),
           const SizedBox(height: 14),
           _CartaoBarras(
             vida: e.vida,
@@ -303,44 +267,6 @@ class _TelaTarefasState extends State<TelaTarefas> with SingleTickerProviderStat
         ),
       ),
     ]);
-  }
-}
-
-/// Topo: avatar redondo do herói + "Nível II" à esquerda, pilha de moedas + número à direita (.topbar).
-class _Topo extends StatelessWidget {
-  const _Topo({required this.estado});
-  final EstadoJogo estado;
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
-      child: SizedBox(
-        height: 30,
-        child: Row(children: [
-          Container(
-            width: 28,
-            height: 28,
-            clipBehavior: Clip.antiAlias,
-            decoration: BoxDecoration(color: corPainel2, shape: BoxShape.circle, border: Border.all(color: corLinha, width: 0.8)),
-            // background-size:154% / position:50% 8% -> o rosto do herói
-            child: OverflowBox(
-              maxWidth: 43.12,
-              maxHeight: 43.12,
-              minWidth: 43.12,
-              minHeight: 43.12,
-              alignment: const Alignment(0, -0.84),
-              child: pixel(estado.heroi.img, largura: 43.12, altura: 43.12),
-            ),
-          ),
-          const SizedBox(width: 6),
-          Text('Nível ${romano(estado.nivel)}', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white)),
-          const Spacer(),
-          pixel('assets/img/ui/moedas.png', largura: 30, altura: 30),
-          const SizedBox(width: 6),
-          Text('${estado.save.moedas.toInt()}', style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: corOuro)),
-        ]),
-      ),
-    );
   }
 }
 
@@ -613,24 +539,4 @@ class _CartaoTarefaState extends State<_CartaoTarefa> {
       ),
     );
   }
-}
-
-/// Botão do baú do dia (aparece depois de vencer o dia, até abrir).
-class _BotaoBau extends StatelessWidget {
-  const _BotaoBau(this.texto, {required this.aoTocar, this.apagado = false});
-  final String texto;
-  final VoidCallback aoTocar;
-  final bool apagado;
-  @override
-  Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.fromLTRB(14, 0, 14, 8),
-        child: GestureDetector(
-          onTap: aoTocar,
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            decoration: BoxDecoration(color: apagado ? corPainel3 : corXpB, borderRadius: BorderRadius.circular(14)),
-            child: Center(child: Text(texto, style: TextStyle(color: apagado ? corApagado : Colors.black, fontWeight: FontWeight.w700, fontSize: 15))),
-          ),
-        ),
-      );
 }

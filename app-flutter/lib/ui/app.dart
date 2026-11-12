@@ -81,6 +81,10 @@ class _CascaState extends State<Casca> {
         aba: _aba,
         aoTrocar: (i) {
           HapticFeedback.selectionClick();
+          if (i == 0 && _aba != 0) {
+            widget.estado.limparPreviewTema();
+            widget.estado.piscarSelo();
+          }
           setState(() => _aba = i);
         },
       ),

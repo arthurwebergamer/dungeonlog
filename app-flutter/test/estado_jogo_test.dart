@@ -11,6 +11,7 @@ import 'package:dungeonlog_flutter/dominio/regras.dart' show precoVenda;
 import 'package:dungeonlog_flutter/dominio/save.dart';
 import 'package:dungeonlog_flutter/dominio/tarefa.dart';
 import 'package:dungeonlog_flutter/ui/app.dart';
+import 'package:dungeonlog_flutter/ui/arena.dart' show Arena;
 import 'package:dungeonlog_flutter/ui/estado_jogo.dart';
 import 'package:dungeonlog_flutter/ui/folha_nova_tarefa.dart';
 import 'package:dungeonlog_flutter/ui/tela_tarefas.dart';
@@ -540,6 +541,89 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
     expect(find.textContaining('Vender todos os tesouros'), findsOneWidget);
     expect(find.byType(SpriteItem), findsWidgets);
+    expect(tester.takeException(), isNull);
+  });
+
+
+  test('estágios: faltam tarefas, cenário só libera com o total e a cerimônia aparece uma vez', () async {
+    final arm = ArmazenamentoMemoria();
+    final e = await novoEstado(arm);
+    expect(e.estagio, 1);
+    expect(e.faltamParaProximoEstagio, 10);
+    expect(e.cerimoniaPendente, isFalse);
+    expect([for (var i = 0; i < 4; i++) e.temaDesbloqueado(i)], [true, false, false, false]);
+    e.pousarTema(1); // trancado: só prévia
+    expect(e.temaExibidoId, e.dados.temas[1].id);
+    expect(e.temaArenaId, e.dados.temas[0].id, reason: 'não salva cenário trancado');
+    e.limparPreviewTema();
+    expect(e.temaExibidoId, e.dados.temas[0].id);
+
+    e.totalConcluidas = 10;
+    expect(e.estagio, 2);
+    expect(e.faltamParaProximoEstagio, 20);
+    expect(e.temaDesbloqueado(1), isTrue);
+    expect(e.cerimoniaPendente, isTrue);
+    final c = e.iniciarCerimonia()!;
+    expect((c.concluido, c.tema.id, c.anterior.id, c.alvo, c.todosBiomas), (1, e.dados.temas[1].id, e.dados.temas[0].id, 10, false));
+    expect(c.monstros.every((m) => m.bioma == c.tema.id), isTrue);
+    expect(e.temaArenaId, e.dados.temas[1].id, reason: 'a cerimônia grava o cenário novo');
+    expect(e.cerimoniaPendente, isFalse);
+    expect(e.iniciarCerimonia(), isNull, reason: 'só uma vez');
+
+    e.pousarTema(0); // cenário liberado: arrastar salva
+    expect(e.temaArenaId, e.dados.temas[0].id);
+
+    e.totalConcluidas = 70;
+    expect(e.estagio, 4);
+    final u = e.iniciarCerimonia()!;
+    expect((u.concluido, u.todosBiomas), (3, true), reason: 'último bioma: avisa uma vez que todos estão liberados');
+    e.totalConcluidas = 71;
+    expect(e.cerimoniaPendente, isFalse);
+
+    final e2 = await novoEstado(arm);
+    expect(e2.estagioCerimoniaMostrada, 4);
+  });
+
+  test('estágio máximo: a dica "arraste pra trocar de bioma" vale só nas 3 primeiras aberturas', () async {
+    final e = await novoEstado(ArmazenamentoMemoria());
+    expect([e.consumirDicaArrastar(), e.consumirDicaArrastar(), e.consumirDicaArrastar(), e.consumirDicaArrastar()], [true, true, true, false]);
+    e.pousarTema(0);
+    expect(e.consumirDicaArrastar(), isFalse, reason: 'arrastar uma vez já basta: a dica some de vez');
+  });
+
+
+  testWidgets('tela: cerimônia de estágio abre, anima e fecha; arrastar a arena troca de cenário', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    late EstadoJogo e;
+    await tester.runAsync(() async => e = await novoEstado(ArmazenamentoMemoria()));
+    e.totalConcluidas = 10;
+    await tester.pumpWidget(MaterialApp(theme: temaApp(), home: Casca(estado: e)));
+    await tester.pump(const Duration(milliseconds: 600));
+    expect(find.text('Estágio 1 Concluído!'), findsOneWidget, reason: 'a cerimônia abre sozinha ao entrar com o estágio novo');
+    await tester.pump(const Duration(milliseconds: 3500));
+    expect(find.text('NOVOS MONSTROS NESTE BIOMA'), findsOneWidget);
+    await tester.tap(find.text('Continuar'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 600));
+    expect(find.text('Estágio 1 Concluído!'), findsNothing);
+    expect(tester.takeException(), isNull);
+
+    // arrastar a arena para o lado do cenário liberado salva; para o trancado só mostra a prévia
+    expect(e.temaArenaId, 'deserto');
+    await tester.drag(find.byType(Arena), const Offset(-200, 0));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(e.temaArenaId, 'deserto', reason: 'a floresta ainda está trancada: só prévia');
+    expect(e.temaExibidoId, 'floresta');
+    await tester.drag(find.byType(Arena), const Offset(300, 0));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(e.temaArenaId, 'deserto', reason: 'voltou para o cenário liberado');
+    await tester.drag(find.byType(Arena), const Offset(300, 0));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(e.temaArenaId, isNot('deserto'));
     expect(tester.takeException(), isNull);
   });
 

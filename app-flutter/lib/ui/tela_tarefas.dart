@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import '../dominio/economia.dart';
 import '../dominio/tarefa.dart';
 import 'arena.dart';
+import 'cerimonia_estagio.dart';
 import 'popup_bau.dart';
 import 'estado_jogo.dart';
 import 'folha_nova_tarefa.dart';
@@ -39,7 +40,10 @@ class _TelaTarefasState extends State<TelaTarefas> with SingleTickerProviderStat
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     e.addListener(_mudou);
-    WidgetsBinding.instance.addPostFrameCallback((_) => _mostrarEvento());
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _mostrarEvento();
+      await _verCerimonia();
+    });
   }
 
   @override
@@ -59,8 +63,22 @@ class _TelaTarefasState extends State<TelaTarefas> with SingleTickerProviderStat
   void didChangeAppLifecycleState(AppLifecycleState estado) {
     if (estado == AppLifecycleState.resumed) {
       e.verificarDia(); // virada do dia enquanto o app estava em segundo plano
-      WidgetsBinding.instance.addPostFrameCallback((_) => _mostrarEvento());
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await _mostrarEvento();
+        await _verCerimonia();
+      });
     }
+  }
+
+  bool _cerimoniaAberta = false;
+
+  /// Cerimônia de estágio (tela cheia): abre quando o estágio atual passou o último já celebrado.
+  Future<void> _verCerimonia() async {
+    if (_cerimoniaAberta || !mounted || !e.cerimoniaPendente) return;
+    _cerimoniaAberta = true;
+    final c = e.iniciarCerimonia();
+    if (c != null && mounted) await mostrarCerimoniaEstagio(context, e, c);
+    _cerimoniaAberta = false;
   }
 
   /// Toque num baú da arena (`abrirBauPadrao/Extra/Especial`): marca como aberto e mostra o que saiu.
@@ -111,6 +129,7 @@ class _TelaTarefasState extends State<TelaTarefas> with SingleTickerProviderStat
     if (g.subiuNivel && mounted) {
       await mostrarAviso(context, selo: 'Subiu de nível', titulo: 'Nível ${romano(g.nivel)}', texto: 'Sua vida máxima agora é ${e.vidaMaxima}.');
     }
+    await _verCerimonia();
   }
 
   Future<void> _terminarDia() async {
@@ -130,6 +149,7 @@ class _TelaTarefasState extends State<TelaTarefas> with SingleTickerProviderStat
       tarefas: nTarefas,
       moedas: ganho,
     );
+    await _verCerimonia();
   }
 
   Future<void> _adicionar() async {

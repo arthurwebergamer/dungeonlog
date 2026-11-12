@@ -10,12 +10,14 @@ import 'package:flutter/services.dart' show HapticFeedback;
 
 import '../dominio/bau.dart' show tierRar;
 import '../dominio/catalogo.dart';
+import '../dominio/dados_jogo.dart' show TemaArena;
 import '../dominio/regras.dart';
 import 'equip_arena.dart';
 import 'estado_jogo.dart';
 import 'icones.dart';
 import 'itens_ui.dart';
 import 'popup_bau.dart' show imagemBau;
+import 'som.dart';
 import 'tema.dart';
 
 /// Matriz de saturação (0 = cinza, 1 = cor cheia), o `grayscale()` do CSS.
@@ -44,14 +46,135 @@ class Arena extends StatefulWidget {
   State<Arena> createState() => _ArenaState();
 }
 
-class _ArenaState extends State<Arena> with SingleTickerProviderStateMixin {
+class _ArenaState extends State<Arena> with TickerProviderStateMixin {
   // relógio único das animações em laço: chama das tochas (0,6 s em 3 quadros) e balanço do herói (1,1 s em passos)
   static const _cicloMs = 6600;
   late final AnimationController _relogio = AnimationController(vsync: this, duration: const Duration(milliseconds: _cicloMs))..repeat();
 
+  // ----- cenário: arrastar para o lado troca de bioma (touchstart/move/end de play/index.html ~5310) -----
+  late final AnimationController _pouso = AnimationController(vsync: this, duration: const Duration(milliseconds: 300))..addListener(_pousando);
+  double _larg = 360;
+  double _dx = 0;
+  double _dxInicio = 0;
+  double _dxFim = 0;
+  int? _alvo; // índice do cenário que entra
+  int _frente = 0; // índice do cenário que sai (guardado durante o gesto)
+  int _direcao = 0; // -1: puxa da esquerda, 1: puxa da direita
+  bool _pontos = false;
+  Timer? _pontosTimer;
+
+  void _pousando() {
+    setState(() => _dx = _dxInicio + (_dxFim - _dxInicio) * Curves.ease.transform(_pouso.value));
+  }
+
+  void _arrastoInicio(DragStartDetails d) {
+    if (_pouso.isAnimating) return;
+    _dx = 0;
+    _alvo = null;
+  }
+
+  void _arrastoMove(DragUpdateDetails d) {
+    if (_pouso.isAnimating) return;
+    final e = widget.estado;
+    setState(() {
+      _dx = (_dx + d.delta.dx).clamp(-_larg, _larg);
+      if (_alvo == null && _dx.abs() > 5) {
+        _direcao = _dx > 0 ? -1 : 1;
+        _frente = e.indiceTemaExibido;
+        _alvo = (_frente + _direcao + e.dados.temas.length) % e.dados.temas.length;
+        _pontosTimer?.cancel();
+        _pontos = true;
+      }
+    });
+  }
+
+  void _arrastoFim(DragEndDetails d) {
+    if (_alvo == null) return;
+    final e = widget.estado;
+    final passou = _dx.abs() > _larg * 0.16;
+    _dxInicio = _dx;
+    _dxFim = passou ? (_dx > 0 ? _larg : -_larg) : 0;
+    if (passou) {
+      HapticFeedback.selectionClick();
+      e.pousarTema(_alvo!);
+    }
+    _pouso.forward(from: 0);
+    _pontosTimer?.cancel();
+    _pontosTimer = Timer(const Duration(milliseconds: 900), () {
+      if (mounted) setState(() => _pontos = false);
+    });
+  }
+
+  /// As duas camadas de fundo acompanhando o dedo: a que sai e a que entra.
+  Widget _fundos(EstadoJogo e) {
+    final temas = e.dados.temas;
+    final bloqueadaAtual = !e.temaDesbloqueado(e.indiceTemaExibido);
+    if (_alvo == null) return FundoTema(tema: temas[e.indiceTemaExibido], bloqueado: bloqueadaAtual);
+    final frente = temas[_frente];
+    final entra = temas[_alvo!];
+    final lado = _direcao > 0 ? _larg : -_larg;
+    return Stack(clipBehavior: Clip.hardEdge, children: [
+      Positioned.fill(child: Transform.translate(offset: Offset(_dx, 0), child: FundoTema(tema: frente, bloqueado: !e.temaDesbloqueado(_frente)))),
+      Positioned.fill(child: Transform.translate(offset: Offset(_dx + lado, 0), child: FundoTema(tema: entra, bloqueado: !e.temaDesbloqueado(_alvo!)))),
+    ]);
+  }
+
+  // ----- selo "Estágio N em X tarefas" (some sozinho depois de 3,5 s) -----
+  bool _selo = false;
+  Timer? _seloTimer;
+  int? _totalVisto;
+  int _tickVisto = 0;
+
+  void _piscarSelo() {
+    _seloTimer?.cancel();
+    setState(() => _selo = true);
+    _seloTimer = Timer(const Duration(milliseconds: 3500), () {
+      if (mounted) setState(() => _selo = false);
+    });
+  }
+
+  void _verSelo({required bool primeira}) {
+    final e = widget.estado;
+    final total = e.totalConcluidas;
+    final tick = e.seloTick;
+    final max = e.estagio >= 4;
+    final mudou = !primeira && total != _totalVisto;
+    final aba = tick != _tickVisto;
+    _totalVisto = total;
+    _tickVisto = tick;
+    if (max) {
+      if (primeira && e.consumirDicaArrastar()) WidgetsBinding.instance.addPostFrameCallback((_) => mounted ? _piscarSelo() : null);
+      return;
+    }
+    if (primeira || mudou || aba) WidgetsBinding.instance.addPostFrameCallback((_) => mounted ? _piscarSelo() : null);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _pouso.addStatusListener((st) {
+      if (st == AnimationStatus.completed && mounted) {
+        setState(() {
+          _alvo = null;
+          _dx = 0;
+        });
+      }
+    });
+    _verSelo(primeira: true);
+  }
+
+  @override
+  void didUpdateWidget(Arena old) {
+    super.didUpdateWidget(old);
+    _verSelo(primeira: false);
+  }
+
   @override
   void dispose() {
     _dicaTimer?.cancel();
+    _seloTimer?.cancel();
+    _pontosTimer?.cancel();
+    _pouso.dispose();
     _relogio.dispose();
     super.dispose();
   }
@@ -66,6 +189,7 @@ class _ArenaState extends State<Arena> with SingleTickerProviderStateMixin {
     if (!e.bauFechado(qual)) return;
     if (qual == 'especial' && e.chaveDoEspecial == null) {
       HapticFeedback.mediumImpact();
+      Som.atual.tocar('bauTrancado');
       _dicaTimer?.cancel();
       setState(() {
         _dicaVisivel = true;
@@ -141,7 +265,7 @@ class _ArenaState extends State<Arena> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final e = widget.estado;
-    final tema = e.dados.temas.firstWhere((t) => t.id == e.temaArenaId);
+    final bloqueada = !e.temaDesbloqueado(e.indiceTemaExibido) && _alvo == null;
     final m = e.monstro;
     final venceu = e.derrotado;
     final semTarefas = e.tarefasDeHoje.isEmpty;
@@ -188,6 +312,20 @@ class _ArenaState extends State<Arena> with SingleTickerProviderStateMixin {
       ]),
     );
 
+    return LayoutBuilder(builder: (context, caixa) {
+      _larg = caixa.maxWidth - 28;
+      return GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onHorizontalDragStart: _arrastoInicio,
+        onHorizontalDragUpdate: _arrastoMove,
+        onHorizontalDragEnd: _arrastoFim,
+        child: _corpo(e, venceu, heroi, monstro, bloqueada, semTarefas, descansando),
+      );
+    });
+  }
+
+  Widget _corpo(EstadoJogo e, bool venceu, Widget heroi, Widget monstro, bool bloqueada, bool semTarefas, bool descansando) {
+    final m = e.monstro;
     return AnimatedContainer(
       duration: const Duration(milliseconds: 250),
       curve: Curves.easeOut,
@@ -200,36 +338,7 @@ class _ArenaState extends State<Arena> with SingleTickerProviderStateMixin {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(18),
         child: Stack(children: [
-          // parede: degradê cinza + tijolo 32x10 repetido em 130x41
-          const Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Color(0xFF454545), Color(0xFF383838), Color(0xFF2C2C2C)],
-                  stops: [0, 0.55, 1],
-                ),
-                image: DecorationImage(
-                  image: AssetImage('assets/img/arena/tile.png'),
-                  repeat: ImageRepeat.repeat,
-                  alignment: Alignment.topLeft,
-                  scale: 32 / 130,
-                  filterQuality: FilterQuality.none,
-                ),
-              ),
-            ),
-          ),
-          if (tema.arte != null)
-            Positioned.fill(child: Image.asset(tema.arte!, fit: BoxFit.cover, alignment: Alignment.bottomCenter, filterQuality: FilterQuality.none)),
-          // escurecido nas bordas (radial-gradient at 50% 45%, transparente até 55%)
-          const Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: RadialGradient(center: Alignment(0, -0.1), radius: 0.78, colors: [Color(0x00000000), Color(0x59000000)], stops: [0.55, 1], transform: _Oval(1.75)),
-              ),
-            ),
-          ),
+          Positioned.fill(child: _fundos(e)),
           Positioned(left: 4, top: 4, child: AnimatedBuilder(animation: _relogio, builder: (_, __) => _Tocha('assets/img/ui/tocha_esq.png', _quadroTocha))),
           Positioned(right: 4, top: 4, child: AnimatedBuilder(animation: _relogio, builder: (_, __) => _Tocha('assets/img/ui/tocha_dir.png', _quadroTocha))),
           Positioned(
@@ -237,7 +346,9 @@ class _ArenaState extends State<Arena> with SingleTickerProviderStateMixin {
             right: 16,
             top: 56,
             height: 87,
-            child: venceu
+            child: bloqueada
+                ? const SizedBox.shrink()
+                : venceu
                 ? Center(child: heroi)
                 : Row(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.end, children: [
                     heroi,
@@ -250,7 +361,7 @@ class _ArenaState extends State<Arena> with SingleTickerProviderStateMixin {
                     Opacity(opacity: descansando ? 0.35 : 1, child: monstro),
                   ]),
           ),
-          if (venceu)
+          if (venceu && !bloqueada)
             Positioned(
               left: 16,
               right: 16,
@@ -275,13 +386,77 @@ class _ArenaState extends State<Arena> with SingleTickerProviderStateMixin {
                 ]),
               ]),
             ),
-          ..._baus(e),
+          if (!bloqueada) ..._baus(e),
+          if (bloqueada) Positioned.fill(child: _BloqueioTema(estado: e)),
+          Positioned(top: 10, left: 0, right: 0, child: Center(child: _SeloEstagio(estado: e, visivel: _selo))),
+          Positioned(
+            bottom: 5,
+            left: 0,
+            right: 0,
+            child: IgnorePointer(
+              child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 250),
+                opacity: _pontos ? 1 : 0,
+                child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  for (var i = 0; i < e.dados.temas.length; i++)
+                    Container(
+                      width: 5,
+                      height: 5,
+                      margin: const EdgeInsets.symmetric(horizontal: 2.5),
+                      decoration: BoxDecoration(shape: BoxShape.circle, color: i == (_alvo != null ? _alvo : e.indiceTemaExibido) ? const Color(0xE6FFFFFF) : const Color(0x59FFFFFF)),
+                    ),
+                ]),
+              ),
+            ),
+          ),
           // dia de descanso: arena apagada (filter: brightness(.7) saturate(.75))
           if (descansando) const Positioned.fill(child: IgnorePointer(child: ColoredBox(color: Color(0x4D000000)))),
         ]),
       ),
     );
   }
+}
+
+
+/// Uma camada de cenário: parede de tijolos, arte do bioma e vinheta. [bloqueado] põe a silhueta escura por cima.
+class FundoTema extends StatelessWidget {
+  const FundoTema({required this.tema, this.bloqueado = false});
+  final TemaArena tema;
+  final bool bloqueado;
+  @override
+  Widget build(BuildContext context) => Stack(children: [
+        // parede: degradê cinza + tijolo 32x10 repetido em 130x41
+        const Positioned.fill(
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0xFF454545), Color(0xFF383838), Color(0xFF2C2C2C)],
+                stops: [0, 0.55, 1],
+              ),
+              image: DecorationImage(
+                image: AssetImage('assets/img/arena/tile.png'),
+                repeat: ImageRepeat.repeat,
+                alignment: Alignment.topLeft,
+                scale: 32 / 130,
+                filterQuality: FilterQuality.none,
+              ),
+            ),
+          ),
+        ),
+        if (tema.arte != null)
+          Positioned.fill(child: Image.asset(tema.arte!, fit: BoxFit.cover, alignment: Alignment.bottomCenter, filterQuality: FilterQuality.none)),
+        // escurecido nas bordas (radial-gradient at 50% 45%, transparente até 55%)
+        const Positioned.fill(
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: RadialGradient(center: Alignment(0, -0.1), radius: 0.78, colors: [Color(0x00000000), Color(0x59000000)], stops: [0.55, 1], transform: _Oval(1.75)),
+            ),
+          ),
+        ),
+        if (bloqueado) const Positioned.fill(child: ColoredBox(color: Color(0xD1000000))),
+      ]);
 }
 
 /// Estica o degradê radial na horizontal (o `radial-gradient` do CSS é uma elipse até o canto mais distante).
@@ -625,4 +800,72 @@ class _PintorCadeado extends CustomPainter {
 
   @override
   bool shouldRepaint(_PintorCadeado oldDelegate) => false;
+}
+
+/// Selo no topo da arena: "Estágio 2 em 7 tarefas" (ou a dica de arrastar no estágio máximo).
+class _SeloEstagio extends StatelessWidget {
+  const _SeloEstagio({required this.estado, required this.visivel});
+  final EstadoJogo estado;
+  final bool visivel;
+  @override
+  Widget build(BuildContext context) {
+    final e = estado;
+    const base = TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFFEEEEEE), height: 1);
+    final List<Widget> filhos;
+    if (e.estagio >= 4) {
+      filhos = const [Text('◀', style: base), Text('Arraste pra trocar de bioma', style: base), Text('▶', style: base)];
+    } else {
+      final falta = e.faltamParaProximoEstagio;
+      filhos = [
+        Text('Estágio ${e.estagio + 1} em', style: base),
+        Text('$falta', style: const TextStyle(fontFamily: fontePixel, fontSize: 11, color: Colors.white, height: 1)),
+        Text(falta == 1 ? 'tarefa' : 'tarefas', style: base),
+      ];
+    }
+    return IgnorePointer(
+      child: AnimatedOpacity(
+        duration: const Duration(milliseconds: 450),
+        opacity: visivel ? 1 : 0,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(color: const Color(0xB8141414), borderRadius: BorderRadius.circular(999)),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            for (var i = 0; i < filhos.length; i++) ...[if (i > 0) const SizedBox(width: 6), filhos[i]],
+          ]),
+        ),
+      ),
+    );
+  }
+}
+
+/// Cadeado e aviso quando o cenário ainda não foi liberado (só prévia, não é salvo).
+class _BloqueioTema extends StatelessWidget {
+  const _BloqueioTema({required this.estado});
+  final EstadoJogo estado;
+  @override
+  Widget build(BuildContext context) {
+    final e = estado;
+    final i = e.indiceTemaExibido;
+    final t = e.dados.temas[i];
+    return IgnorePointer(
+      child: ColoredBox(
+        color: const Color(0x59000000),
+        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Container(
+            decoration: const BoxDecoration(boxShadow: [BoxShadow(color: Color(0x80000000), blurRadius: 6, offset: Offset(0, 2))]),
+            child: Image.asset('assets/img/ui/cadeado_arena.png', width: 32, filterQuality: FilterQuality.none),
+          ),
+          const SizedBox(height: 10),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Text(
+              'Chegue no Estágio ${i + 1} pra desbloquear ${t.nome}',
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white, shadows: [Shadow(color: Color(0xB3000000), blurRadius: 6, offset: Offset(0, 2))]),
+            ),
+          ),
+        ]),
+      ),
+    );
+  }
 }

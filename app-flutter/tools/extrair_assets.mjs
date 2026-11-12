@@ -174,3 +174,9 @@ escreverJson('dados/equip_arena.json', {
 console.log(
   `monstros=${MONSTROS.length} herois=${HEROIS.length} itens=${ITENS.length} temas=${TEMAS_ARENA.length} traducoes=${Object.keys(traducoes).length}`
 );
+
+// cadeado do cenário trancado na arena (.tema-arena-cadeado-img)
+{
+  const m = /class="tema-arena-cadeado-img" src="data:image\/png;base64,([A-Za-z0-9+/=]+)"/.exec(fs.readFileSync(path.join(raiz, 'play', 'index.html'), 'utf8'));
+  if (m) fs.writeFileSync(path.join(raiz, 'app-flutter', 'assets', 'img', 'ui', 'cadeado_arena.png'), Buffer.from(m[1], 'base64'));
+}

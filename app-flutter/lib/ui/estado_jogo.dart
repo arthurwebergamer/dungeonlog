@@ -26,6 +26,8 @@ const _chaveDescanso = 'questlog.descanso.v1';
 const _chaveConcluidas = 'questlog.tarefasConcluidas.v1';
 const _chaveTemaArena = 'questlog.temaArena.v1';
 const _chaveBauDia = 'questlog.bauDia.v1';
+const _chaveCerimonia = 'questlog.estagioCerimoniaMostrada.v1';
+const _chaveDicaArrastar = 'questlog.dicaArrastar.v1';
 const _chavePity = 'questlog.bauSemEspecial.v1';
 const _chaveLoja = 'questlog.loja.v1';
 
@@ -47,6 +49,17 @@ class GanhoTarefa {
   final int nivel;
   final bool parcial; // toque de uma tarefa com meta > 1 que ainda não completou
   const GanhoTarefa({required this.xp, required this.moedas, required this.subiuNivel, required this.nivel, required this.parcial});
+}
+
+/// O que a tela cheia "Estágio concluído" precisa mostrar.
+class CerimoniaEstagio {
+  final int concluido; // estágio que o jogador acabou de terminar
+  final TemaArena tema; // cenário novo
+  final TemaArena anterior;
+  final int? alvo; // tarefas do estágio concluído (ex.: 10)
+  final List<Monstro> monstros;
+  final bool todosBiomas;
+  const CerimoniaEstagio({required this.concluido, required this.tema, required this.anterior, required this.alvo, required this.monstros, required this.todosBiomas});
 }
 
 class ModoTarefa {
@@ -133,6 +146,11 @@ class EstadoJogo extends ChangeNotifier {
       lojaVendidos = [if (lj['vendidos'] is List) for (final v in lj['vendidos'] as List) if (v is num) v.toInt()];
     }
 
+    final temaSalvo = armazenamento.ler(chaveConta(_chaveTemaArena, uid: uid, personagem: personagem));
+    if (estagio > 1 && estagioCerimoniaMostrada >= estagio && temaSalvo == null && estagio <= dados.temas.length) {
+      armazenamento.gravar(chaveConta(_chaveTemaArena, uid: uid, personagem: personagem), dados.temas[estagio - 1].id);
+    }
+
     verificarDia();
     _garantirBau();
     await _salvarTudo();
@@ -188,6 +206,101 @@ class EstadoJogo extends ChangeNotifier {
   String get temaArenaId {
     final salvo = armazenamento.ler(chaveConta(_chaveTemaArena, uid: uid, personagem: personagem));
     return (salvo != null && dados.temas.any((t) => t.id == salvo)) ? salvo : dados.temas.first.id;
+  }
+
+  // ---------- estágios e cenário da arena ----------
+  /// `estagioAtual()`: 1 a 4, pelas tarefas concluídas no total.
+  int get estagio => estagioAtual(totalConcluidas);
+
+  /// Tarefas que faltam para o próximo estágio (0 no último).
+  int get faltamParaProximoEstagio {
+    if (estagio >= 4) return 0;
+    final f = limiaresEstagio[estagio - 1] - totalConcluidas;
+    return f < 0 ? 0 : f;
+  }
+
+  /// Muda a cada vez que a aba Tarefas volta à tela (o selo de estágio reaparece).
+  int seloTick = 0;
+  void piscarSelo() {
+    seloTick++;
+    notifyListeners();
+  }
+
+  /// `estagioCerimoniaMostradaAte()`: maior estágio cuja cerimônia o jogador já viu (padrão 1).
+  int get estagioCerimoniaMostrada {
+    final n = numeroOu0(armazenamento.ler(chaveConta(_chaveCerimonia, uid: uid, personagem: personagem))).toInt();
+    return n < 1 ? 1 : n;
+  }
+
+  bool get cerimoniaPendente => estagio > estagioCerimoniaMostrada;
+
+  /// `temaArenaDesbloqueado(t)`: o cenário `i` (a posição na lista é o número do estágio, menos 1).
+  bool temaDesbloqueado(int i) {
+    if (i <= 0 || i >= dados.temas.length) return true;
+    final v = dados.temas[i].desbloqueioGratis?['valor'];
+    final lim = v is num ? v.toInt() : limiaresEstagio[i - 1];
+    return totalConcluidas >= lim;
+  }
+
+  String? _temaPreview; // cenário trancado que o jogador deixou aparecer arrastando (não é salvo)
+  String get temaExibidoId => _temaPreview ?? temaArenaId;
+  int get indiceTemaExibido {
+    final i = dados.temas.indexWhere((t) => t.id == temaExibidoId);
+    return i < 0 ? 0 : i;
+  }
+
+  /// Pouso do arrasto: grava o cenário se estiver liberado; trancado só aparece como prévia.
+  void pousarTema(int i) {
+    final t = dados.temas[i];
+    if (temaDesbloqueado(i)) {
+      armazenamento.gravar(chaveConta(_chaveTemaArena, uid: uid, personagem: personagem), t.id);
+      _temaPreview = null;
+    } else {
+      _temaPreview = t.id;
+    }
+    armazenamento.gravar(chaveConta(_chaveDicaArrastar, uid: uid, personagem: personagem), '99'); // já descobriu o gesto
+    notifyListeners();
+  }
+
+  /// Qualquer ação em Tarefas desfaz a prévia de um cenário trancado (como o `renderTemaArena()` do original).
+  void limparPreviewTema() {
+    if (_temaPreview == null) return;
+    _temaPreview = null;
+    notifyListeners();
+  }
+
+  /// No estágio máximo o selo vira a dica "Arraste pra trocar de bioma", só nas 3 primeiras aberturas.
+  bool consumirDicaArrastar() {
+    final k = chaveConta(_chaveDicaArrastar, uid: uid, personagem: personagem);
+    final n = numeroOu0(armazenamento.ler(k)).toInt();
+    if (n >= 3) return false;
+    armazenamento.gravar(k, '${n + 1}');
+    return true;
+  }
+
+  /// Dados da cerimônia "Estágio concluído". Chamar ao MOSTRAR: já grava o cenário novo e marca a cerimônia como vista.
+  CerimoniaEstagio? iniciarCerimonia() {
+    if (!cerimoniaPendente) return null;
+    final est = estagio;
+    final tema = dados.temas[(est - 1).clamp(0, dados.temas.length - 1)];
+    final concluido = est - 1;
+    final anterior = dados.temas[(concluido - 1).clamp(0, dados.temas.length - 1)];
+    armazenamento.gravar(chaveConta(_chaveTemaArena, uid: uid, personagem: personagem), tema.id);
+    armazenamento.gravar(chaveConta(_chaveCerimonia, uid: uid, personagem: personagem), '$est');
+    _temaPreview = null;
+    final ehUltimo = tema.id == dados.temas.last.id;
+    final kTodos = chaveConta('questlog.avisoTodosBiomas.v1', uid: uid, personagem: personagem);
+    final jaAvisado = armazenamento.ler(kTodos) == 'true';
+    if (ehUltimo && !jaAvisado) armazenamento.gravar(kTodos, 'true');
+    notifyListeners();
+    return CerimoniaEstagio(
+      concluido: concluido,
+      tema: tema,
+      anterior: anterior,
+      alvo: concluido >= 1 && concluido <= limiaresEstagio.length ? limiaresEstagio[concluido - 1] : null,
+      monstros: [for (final m in dados.monstros) if (m.bioma == tema.id) m].take(4).toList(),
+      todosBiomas: ehUltimo && !jaAvisado,
+    );
   }
 
   /// `monstroDoDia()`: índice no catálogo de monstros.
@@ -657,6 +770,7 @@ class EstadoJogo extends ChangeNotifier {
 
   // ---------- gravação ----------
   Future<void> _salvarTudo() async {
+    _temaPreview = null; // qualquer ação em Tarefas desfaz a prévia de um cenário trancado
     final ms = _agora().millisecondsSinceEpoch;
     // as quatro gravações saem juntas (cada uma já atualiza o cache na hora), sem esperar uma pela outra
     await Future.wait([

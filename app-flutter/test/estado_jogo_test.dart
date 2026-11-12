@@ -6,10 +6,14 @@ import 'dart:math';
 import 'package:dungeonlog_flutter/dados/armazenamento.dart';
 import 'package:dungeonlog_flutter/dominio/dados_jogo.dart';
 import 'package:dungeonlog_flutter/dominio/save.dart';
+import 'package:dungeonlog_flutter/dominio/tarefa.dart';
 import 'package:dungeonlog_flutter/ui/app.dart';
 import 'package:dungeonlog_flutter/ui/estado_jogo.dart';
+import 'package:dungeonlog_flutter/ui/folha_nova_tarefa.dart';
+import 'package:dungeonlog_flutter/ui/tela_tarefas.dart';
 import 'package:dungeonlog_flutter/ui/tema.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 DadosJogo carregarDados() {
@@ -24,7 +28,23 @@ Future<EstadoJogo> novoEstado(ArmazenamentoMemoria arm, {DateTime? agora}) async
   return e;
 }
 
+/// Carrega as fontes reais do app (sem isso o teste usa a fonte quadrada de teste, bem mais larga que a Outfit).
+Future<void> carregarFontes() async {
+  Future<void> familia(String nome, List<String> arquivos) async {
+    final l = FontLoader(nome);
+    for (final a in arquivos) {
+      l.addFont(Future.value(ByteData.sublistView(File('assets/fonts/$a').readAsBytesSync())));
+    }
+    await l.load();
+  }
+
+  await familia('Outfit', ['Outfit-Regular.ttf', 'Outfit-Medium.ttf', 'Outfit-SemiBold.ttf', 'Outfit-Bold.ttf']);
+  await familia('Silkscreen', ['Silkscreen-Regular.ttf']);
+}
+
 void main() {
+  setUpAll(carregarFontes);
+
   test('jogo novo: sem tarefas, vida cheia e save v3 gravado', () async {
     final arm = ArmazenamentoMemoria();
     final e = await novoEstado(arm);
@@ -166,28 +186,147 @@ void main() {
     expect(e.criarTarefa(texto: 'x', modo: ModoTarefa.repete, dif: 'media'), isFalse);
   });
 
+  test('reordenar: grava "ordem" de 10 em 10 nas pendentes e a lista segue essa ordem', () async {
+    final arm = ArmazenamentoMemoria();
+    final e = await novoEstado(arm);
+    for (final n in ['a', 'b', 'c']) {
+      e.criarTarefa(texto: n, modo: ModoTarefa.hoje, dif: 'media');
+    }
+    expect(e.pendentesDeHoje.map((t) => t.texto), ['a', 'b', 'c']);
+    e.reordenar(2, 0);
+    expect(e.pendentesDeHoje.map((t) => t.texto), ['c', 'a', 'b']);
+    expect(e.pendentesDeHoje.map((t) => t.dados['ordem']), [0, 10, 20]);
+    e.reordenar(0, 5); // fora da lista: nada muda
+    expect(e.pendentesDeHoje.map((t) => t.texto), ['c', 'a', 'b']);
+    // concluída sai das pendentes; a ordem sobrevive ao recarregar
+    e.concluir(e.pendentesDeHoje.first);
+    expect(e.pendentesDeHoje.map((t) => t.texto), ['a', 'b']);
+    final e2 = await novoEstado(arm);
+    expect(e2.pendentesDeHoje.map((t) => t.texto), ['a', 'b']);
+    // tarefa nova (sem "ordem") entra pela posição no save x 10, como no JS
+    e2.criarTarefa(texto: 'd', modo: ModoTarefa.hoje, dif: 'media');
+    expect(e2.pendentesDeHoje.map((t) => t.texto), ['a', 'b', 'd']);
+  });
+
+  test('descanso: liga e desliga o dia, grava a lista e concluir tarefa cancela', () async {
+    final arm = ArmazenamentoMemoria();
+    final e = await novoEstado(arm);
+    e.criarTarefa(texto: 'a', modo: ModoTarefa.hoje, dif: 'media');
+    expect(e.descansando, isFalse);
+    e.definirDescanso(true);
+    e.definirDescanso(true); // não duplica a data
+    expect(e.descansando, isTrue);
+    expect(jsonDecode(arm.ler('questlog.descanso.v1.pj.pj1')!), [e.hoje]);
+    expect(e.podeTerminarDia, isFalse);
+    e.definirDescanso(false);
+    expect(e.descansando, isFalse);
+    expect(jsonDecode(arm.ler('questlog.descanso.v1.pj.pj1')!), isEmpty);
+    e.definirDescanso(true);
+    e.concluir(e.tarefasDeHoje.single);
+    expect(e.descansando, isFalse, reason: 'concluir tarefa cancela o descanso do dia');
+    // depois que o monstro cai não dá mais para descansar (o botão some no original)
+    e.terminarDia();
+    e.definirDescanso(true);
+    expect(e.descansando, isFalse);
+  });
+
+  test('rótulo de repetição e numeral romano como no original', () {
+    expect(rotuloTarefa(Tarefa({'tipo': 'hoje'})), 'só hoje');
+    expect(rotuloTarefa(Tarefa({'tipo': 'repete', 'dias': [0, 1, 2, 3, 4, 5, 6]})), 'todo dia');
+    expect(rotuloTarefa(Tarefa({'tipo': 'repete', 'dias': [3, 1]})), 'seg, qua');
+    expect(rotuloTarefa(Tarefa({'tipo': 'mensal', 'diaMes': 12})), 'todo dia 12');
+    expect(rotuloTarefa(Tarefa({'tipo': 'anual', 'diaAno': 12, 'mesAno': 11})), '12 de nov');
+    expect([1, 2, 4, 9, 14, 40].map(romano), ['I', 'II', 'IV', 'IX', 'XIV', 'XL']);
+  });
+
   testWidgets('tela: criar uma tarefa, concluir e ver o ganho', (tester) async {
-    await tester.binding.setSurfaceSize(const Size(360, 800));
+    await tester.binding.setSurfaceSize(const Size(390, 844));
     addTearDown(() => tester.binding.setSurfaceSize(null));
     late EstadoJogo e;
     await tester.runAsync(() async => e = await novoEstado(ArmazenamentoMemoria()));
     await tester.pumpWidget(MaterialApp(theme: temaApp(), home: Casca(estado: e)));
-    await tester.pump(const Duration(milliseconds: 300));
-    expect(find.text('Nenhuma tarefa para hoje.\nToque em Adicionar para criar a primeira.'), findsOneWidget);
+    // a arena tem animações em laço (tochas, herói): os testes avançam o relógio com pump() em vez de pumpAndSettle()
+    Future<void> esperar([int ms = 600]) async {
+      await tester.pump();
+      await tester.pump(Duration(milliseconds: ms));
+    }
 
-    await tester.tap(find.text('Adicionar'));
-    await tester.pumpAndSettle();
+    await esperar(300);
+    expect(find.textContaining('está à espreita.\nAdicione tarefas para encarar.'), findsOneWidget);
+    expect(find.text('Nível I'), findsOneWidget);
+    expect(find.text('0 de 0 concluídas'), findsOneWidget);
+
+    await tester.tap(find.text('+ Adicionar'));
+    await esperar();
     await tester.enterText(find.byType(TextField), 'Estudar');
     await tester.pump();
     await tester.tap(find.text('Criar tarefa'));
-    await tester.pumpAndSettle();
+    await esperar();
     expect(find.text('Estudar'), findsOneWidget);
+    expect(find.text('só hoje'), findsOneWidget);
 
+    // tocar no corpo do cartão abre o editor (como no original); concluir é só pela caixa
     await tester.tap(find.text('Estudar'));
-    await tester.pump(const Duration(milliseconds: 200));
+    await esperar();
+    expect(find.text('Salvar alterações'), findsOneWidget);
+    await tester.tapAt(const Offset(195, 40)); // fora da folha: fecha
+    await esperar();
+    expect(find.text('Salvar alterações'), findsNothing);
+
+    await tester.tap(find.byType(CaixaTarefa));
+    await esperar(400); // caixa verde (80 ms) + saída do cartão (200 ms)
     expect(find.textContaining('+42 XP'), findsOneWidget);
-    await tester.pumpAndSettle(const Duration(seconds: 2));
+    expect(find.text('Estudar'), findsNothing, reason: 'concluída sai da lista');
+    expect(find.text('1 de 1 concluídas'), findsOneWidget);
+    await esperar(2000);
     expect(find.text('Terminar dia'), findsOneWidget);
+
+    await tester.tap(find.text('Terminar dia'));
+    await esperar();
+    expect(find.textContaining('derrotado'), findsWidgets);
+    await tester.tap(find.text('Continuar'));
+    await esperar();
+    expect(find.text('DIA VENCIDO'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('tela: o X apaga direto a tarefa de um dia e pergunta na que se repete', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    late EstadoJogo e;
+    await tester.runAsync(() async => e = await novoEstado(ArmazenamentoMemoria()));
+    e.criarTarefa(texto: 'Avulsa', modo: ModoTarefa.hoje, dif: 'media');
+    e.criarTarefa(texto: 'Diária', modo: ModoTarefa.repete, dif: 'media', dias: [0, 1, 2, 3, 4, 5, 6], meta: 4);
+    await tester.pumpWidget(MaterialApp(theme: temaApp(), home: Casca(estado: e)));
+    Future<void> esperar([int ms = 600]) async {
+      await tester.pump();
+      await tester.pump(Duration(milliseconds: ms));
+    }
+
+    await esperar(300);
+    expect(find.text('todo dia'), findsOneWidget);
+    expect(find.text('0/4'), findsOneWidget);
+
+    await tester.tap(find.bySemanticsLabel('Apagar tarefa').first);
+    await esperar();
+    expect(find.text('Avulsa'), findsNothing);
+    expect(e.save.tarefas.length, 1);
+
+    await tester.tap(find.bySemanticsLabel('Apagar tarefa').first);
+    await esperar();
+    expect(find.text('Essa tarefa se repete (todo dia). Apagar só hoje ou em todos os dias?'), findsOneWidget);
+    await tester.tap(find.text('Só hoje'));
+    await esperar();
+    expect(find.text('Diária'), findsNothing);
+    expect(e.save.tarefas.single.dados['pulaEm'], [e.hoje], reason: 'só hoje: a tarefa fica no save e pula o dia');
+
+    // descanso: a lua abre a confirmação e o subtítulo muda
+    await tester.tap(find.bySemanticsLabel('Descansar'));
+    await esperar();
+    await tester.tap(find.text('Descansar hoje'));
+    await esperar();
+    expect(e.descansando, isTrue);
+    expect(find.text('Descansando hoje — progresso protegido'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }

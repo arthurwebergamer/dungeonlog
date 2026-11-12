@@ -106,6 +106,24 @@ function literalApos(marca) {
 const traducoes = vm.runInNewContext('(' + literalApos('const TRADUCOES = {') + ')');
 escreverJson('dados/traducoes.json', traducoes);
 
+// ---------- imagens da interface (embutidas em index.html e style.css) ----------
+// pilha de moedas do topo (21x21) e moeda solta do ganho (13x13): <svg viewBox="0 0 N N"><image href="data:...">
+const imagemDoSvg = (lado) => {
+  const m = html.match(new RegExp('viewBox="0 0 ' + lado + ' ' + lado + '"[^>]*><image href="(data:image/png;base64,[^"]+)"'));
+  if (!m) throw new Error('não achei o svg ' + lado + 'x' + lado);
+  return m[1];
+};
+escreverPng('img/ui/moedas.png', imagemDoSvg(21));
+escreverPng('img/ui/moeda.png', imagemDoSvg(13));
+// tochas da arena: duas folhas 48x32 (3 quadros de 16x32), a direita já espelhada no PNG
+const css = fs.readFileSync(path.join(play, 'style.css'), 'utf8');
+for (const lado of ['esq', 'dir']) {
+  const ini = css.indexOf('.tocha-arena.tocha-' + lado + '{');
+  const m = ini < 0 ? null : css.slice(ini, css.indexOf('}', ini)).match(/url\("(data:image\/png;base64,[^"]+)"/);
+  if (!m) throw new Error('não achei a tocha ' + lado);
+  escreverPng('img/ui/tocha_' + lado + '.png', m[1]);
+}
+
 console.log(
   `monstros=${MONSTROS.length} herois=${HEROIS.length} itens=${ITENS.length} temas=${TEMAS_ARENA.length} traducoes=${Object.keys(traducoes).length}`
 );

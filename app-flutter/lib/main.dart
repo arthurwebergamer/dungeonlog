@@ -7,7 +7,7 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
-    systemNavigationBarColor: Color(0xFF13101C),
+    systemNavigationBarColor: Color(0xFF323232),
   ));
   runApp(const DungeonlogApp());
 }

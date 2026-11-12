@@ -128,6 +128,22 @@ class EstadoJogo extends ChangeNotifier {
   int get nFeitasHoje => tarefasDeHoje.where(feitaHoje).length;
   int get nPendentesHoje => tarefasDeHoje.length - nFeitasHoje;
 
+  /// Pendentes de hoje na ordem da lista, como o render() do JS: campo "ordem"; sem ele vale a posição no save x 10.
+  List<Tarefa> get pendentesDeHoje {
+    num ordemDe(Tarefa t) {
+      final o = t.dados['ordem'];
+      return o is num ? o : save.tarefas.indexOf(t) * 10;
+    }
+
+    final l = [for (final t in tarefasDeHoje) if (!feitaHoje(t)) t];
+    final pos = {for (var i = 0; i < l.length; i++) l[i]: i};
+    l.sort((x, y) {
+      final c = ordemDe(x).compareTo(ordemDe(y));
+      return c != 0 ? c : pos[x]!.compareTo(pos[y]!); // empate mantém a ordem do save
+    });
+    return l;
+  }
+
   /// Vida do monstro do dia, 0 a 1 (fração de tarefas ainda pendentes; 0 = derrotado).
   double get vidaMonstro {
     if (derrotado) return 0;
@@ -317,6 +333,30 @@ class EstadoJogo extends ChangeNotifier {
   }
 
   bool ehRecorrente(Tarefa t) => t.tipo != 'hoje';
+
+  /// Arrastar para reordenar (soltar() do JS): grava a ordem visual nas pendentes, de 10 em 10.
+  /// [de] e [para] são posições em [pendentesDeHoje] ([para] já é a posição final).
+  void reordenar(int de, int para) {
+    final l = pendentesDeHoje;
+    if (de < 0 || de >= l.length || para < 0 || para >= l.length || de == para) return;
+    l.insert(para, l.removeAt(de));
+    for (var i = 0; i < l.length; i++) {
+      l[i].dados['ordem'] = i * 10;
+    }
+    _salvarTudo();
+    notifyListeners();
+  }
+
+  /// definirDescanso() do JS: marca ou desmarca o dia de descanso (lista ordenada, no máximo 400 datas).
+  void definirDescanso(bool ligado) {
+    if (ligado && derrotado) return; // o botão some depois que o monstro cai
+    final l = [for (final d in descanso) if (d != hoje) d];
+    if (ligado) l.add(hoje);
+    l.sort();
+    descanso = l.length > 400 ? l.sublist(l.length - 400) : l;
+    _salvarTudo();
+    notifyListeners();
+  }
 
   // ---------- gravação ----------
   Future<void> _salvarTudo() async {

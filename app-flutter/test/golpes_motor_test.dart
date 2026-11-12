@@ -49,4 +49,36 @@ void main() {
     expect(motor.heroi, Offset.zero);
     expect(motor.monstro, Offset.zero);
   });
+  testWidgets('dois toques seguidos: o segundo golpe sai logo depois do impacto do primeiro (não é perdido)', (tester) async {
+    final motor = MotorGolpe(tester);
+    addTearDown(motor.dispose);
+    motor.preferenciaVariada = false; // sempre o estilo "relâmpago" (impacto em 282 ms)
+    motor.golpear(g: g, dif: 'media', fim: false, distancia: false);
+    await tester.pump(const Duration(milliseconds: 60));
+    motor.golpear(g: g, dif: 'media', fim: false, distancia: false); // segundo toque, antes do impacto
+    // 1º golpe segue; depois do impacto (~282 ms) o 2º reinicia a coreografia: o herói volta a sair do repouso
+    var saiuDoRepousoDeNovo = false;
+    var passouDoImpacto = false;
+    for (var t = 0; t < 40; t++) {
+      await tester.pump(const Duration(milliseconds: 25));
+      if (t * 25 > 450) passouDoImpacto = true;
+      if (passouDoImpacto && motor.armaGraus != 8) saiuDoRepousoDeNovo = true;
+    }
+    expect(saiuDoRepousoDeNovo, isTrue, reason: 'o segundo golpe aconteceu');
+    for (var t = 0; t < 60; t++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
+    expect(motor.emAndamento, isFalse);
+    expect(motor.heroi, Offset.zero);
+    expect(motor.armaGraus, 8);
+    // golpe depois do impacto já em andamento: também entra na hora
+    motor.golpear(g: g, dif: 'media', fim: false, distancia: false);
+    await tester.pump(const Duration(milliseconds: 400));
+    motor.golpear(g: g, dif: 'media', fim: false, distancia: false);
+    for (var t = 0; t < 80; t++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
+    expect(motor.emAndamento, isFalse);
+    expect(motor.heroi, Offset.zero);
+  });
 }

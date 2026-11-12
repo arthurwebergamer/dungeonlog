@@ -155,6 +155,25 @@ class _ArenaState extends State<Arena> with TickerProviderStateMixin {
     if (primeira || mudou || aba) WidgetsBinding.instance.addPostFrameCallback((_) => mounted ? _piscarSelo() : null);
   }
 
+  bool _aAtiva = true;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // com uma folha/diálogo por cima a arena não precisa animar (tochas, balanço, respiração): economiza quadros
+    final atual = ModalRoute.of(context)?.isCurrent ?? true;
+    if (atual != _aAtiva) {
+      _aAtiva = atual;
+      if (atual) {
+        _relogio.repeat();
+        _respira.repeat();
+      } else {
+        _relogio.stop(canceled: false);
+        _respira.stop(canceled: false);
+      }
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -407,7 +426,9 @@ class _ArenaState extends State<Arena> with TickerProviderStateMixin {
         onHorizontalDragStart: _arrastoInicio,
         onHorizontalDragUpdate: _arrastoMove,
         onHorizontalDragEnd: _arrastoFim,
-        child: AnimatedBuilder(animation: _motor, builder: (_, filho) => Transform.translate(offset: _motor.arena, child: filho), child: _corpo(e, venceu, heroi, monstro, bloqueada, semTarefas, descansando)),
+        child: RepaintBoundary(
+          child: AnimatedBuilder(animation: _motor, builder: (_, filho) => Transform.translate(offset: _motor.arena, child: filho), child: _corpo(e, venceu, heroi, monstro, bloqueada, semTarefas, descansando)),
+        ),
       );
     });
   }

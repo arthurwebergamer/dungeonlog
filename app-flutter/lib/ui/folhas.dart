@@ -1,5 +1,5 @@
 // Folhas (painéis que sobem de baixo) e diálogos no estilo do app original: .edov / .edsheet / .md-sheet.
-import 'dart:ui' show ImageFilter;
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -129,10 +129,8 @@ Future<T?> abrirFolhaDesfocada<T>(BuildContext context, WidgetBuilder builder, {
         return Stack(children: [
           Positioned.fill(
             child: IgnorePointer(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: desfoque * t, sigmaY: desfoque * t),
-                child: ColoredBox(color: veu.withValues(alpha: veu.a * t)),
-              ),
+              // sem BackdropFilter: o desfoque animado por cima da arena (que não para de animar) travava a abertura
+              child: ColoredBox(color: veu.withValues(alpha: math.min(1.0, veu.a * 1.12) * t)),
             ),
           ),
           filho,

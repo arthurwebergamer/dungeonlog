@@ -254,6 +254,10 @@ class MotorGolpe extends ChangeNotifier {
   double baseEscalaX = 1;
   int raridade = 0;
   bool preferenciaVariada = true;
+  double _inicioGolpe = 0;
+  int _impactoMs = 300;
+  ({GeometriaGolpe g, String dif, bool fim, bool distancia})? _pendente;
+  bool _aguardando = false;
 
   void _tique(Duration d) {
     agora = _desvio + d.inMicroseconds / 1000.0;
@@ -412,8 +416,32 @@ class MotorGolpe extends ChangeNotifier {
       return;
     }
     if (emAndamento && !fim) {
-      _piscarMonstro(220);
-      return;
+      // toque logo depois de outro: o golpe atual segue até o impacto e então o próximo sai (antes o segundo toque era perdido)
+      final decorrido = agora - _inicioGolpe;
+      if (decorrido < _impactoMs) {
+        _pendente = (g: g, dif: dif, fim: fim, distancia: distancia);
+        if (!_aguardando) {
+          _aguardando = true;
+          _esperar((_impactoMs - decorrido).round(), _geracao).then((_) {
+            _aguardando = false;
+            final p = _pendente;
+            _pendente = null;
+            if (p != null) {
+              _geracao++;
+              _limpar();
+              emAndamento = false;
+              golpear(g: p.g, dif: p.dif, fim: p.fim, distancia: p.distancia);
+            }
+          }).catchError((Object _) {
+            _aguardando = false;
+            _pendente = null;
+          });
+        }
+        return;
+      }
+      _geracao++; // já passou do impacto: o próximo golpe entra na hora
+      _limpar();
+      emAndamento = false;
     }
     if (emAndamento) {
       _geracao++;
@@ -421,6 +449,8 @@ class MotorGolpe extends ChangeNotifier {
     }
     final nome = fim ? 'crit' : _escolher(dif);
     _ultimo = nome;
+    _inicioGolpe = agora;
+    _impactoMs = const {'rel': 282, 'combo': 150, 'lamina': 570, 'vulto': 310, 'crit': 405}[nome]!;
     emAndamento = true;
     final gen = ++_geracao;
     Future<void> run;

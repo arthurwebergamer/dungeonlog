@@ -114,7 +114,7 @@ class _SheetMdState extends State<_SheetMd> with SingleTickerProviderStateMixin 
         Positioned.fill(
           child: FadeTransition(
             opacity: CurvedAnimation(parent: widget.anim, curve: Curves.ease),
-            child: BackdropFilter(filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5), child: const ColoredBox(color: Color(0x8C000000))),
+            child: const ColoredBox(color: Color(0xB3000000)), // sem desfoque: mais leve
           ),
         ),
         Align(

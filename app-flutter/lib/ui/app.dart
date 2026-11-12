@@ -72,12 +72,16 @@ class _CascaState extends State<Casca> {
   Widget build(BuildContext context) {
     const futuras = {3: 'Fase 3', 4: 'Fase 4'};
     return Scaffold(
-      body: IndexedStack(index: _aba, children: [
-        TelaTarefas(estado: widget.estado),
-        TelaInventario(estado: widget.estado),
-        TelaLoja(estado: widget.estado),
-        for (final i in [3, 4]) Center(child: Text('Em breve (${futuras[i]})', style: const TextStyle(color: corApagado))),
-      ]),
+      // só a aba aberta fica montada: com as cinco vivas, cada compra ou tarefa reconstruía arena, lista, loja e mochila juntas
+      body: KeyedSubtree(
+        key: ValueKey(_aba),
+        child: switch (_aba) {
+          0 => TelaTarefas(estado: widget.estado),
+          1 => TelaInventario(estado: widget.estado),
+          2 => TelaLoja(estado: widget.estado),
+          _ => Center(child: Text('Em breve (${futuras[_aba]})', style: const TextStyle(color: corApagado))),
+        },
+      ),
       bottomNavigationBar: BarraNavegacao(
         estado: widget.estado,
         aba: _aba,

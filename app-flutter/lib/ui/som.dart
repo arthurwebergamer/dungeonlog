@@ -74,6 +74,15 @@ class SomAudio implements Som {
         if (j['volume'] is num) volume = (j['volume'] as num).toDouble().clamp(0.0, 1.0);
       }
     } catch (_) {}
+    // efeito curto não pode pedir o foco de áudio do celular (isso pausava a música de outros apps e atrasava o início)
+    if (fabrica == null) {
+      try {
+      AudioPlayer.global.setAudioContext(AudioContext(
+        android: const AudioContextAndroid(audioFocus: AndroidAudioFocus.none, usageType: AndroidUsageType.game, contentType: AndroidContentType.sonification),
+        iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
+      )).catchError((Object _) {});
+    } catch (_) {}
+    }
     for (final nome in quentes) {
       _reabastecer(nome);
     }

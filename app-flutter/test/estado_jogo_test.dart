@@ -789,6 +789,32 @@ void main() {
     expect(m(1200 * 0.31).storage[0], greaterThan(1.05));
   });
 
+
+  testWidgets('tela: a sombra do herói avança junto com ele no golpe e volta ao lugar', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    late EstadoJogo e;
+    await tester.runAsync(() async => e = await novoEstado(ArmazenamentoMemoria()));
+    e.criarTarefa(texto: 'a', modo: ModoTarefa.hoje, dif: 'media');
+    final controle = GolpeControlador();
+    await tester.pumpWidget(MaterialApp(theme: temaApp(), home: Scaffold(body: Arena(estado: e, golpe: controle))));
+    await tester.pump(const Duration(milliseconds: 300));
+    final repouso = tester.getTopLeft(find.byKey(const ValueKey('sombra-heroi')));
+    controle.golpear(dif: 'dificil');
+    var maiorAvanco = 0.0;
+    for (var i = 0; i < 40; i++) {
+      await tester.pump(const Duration(milliseconds: 40));
+      final x = tester.getTopLeft(find.byKey(const ValueKey('sombra-heroi'))).dx - repouso.dx;
+      if (x > maiorAvanco) maiorAvanco = x;
+    }
+    expect(maiorAvanco, greaterThan(20), reason: 'a sombra acompanha o herói quando ele avança sobre o monstro');
+    for (var i = 0; i < 60; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
+    final fim = tester.getTopLeft(find.byKey(const ValueKey('sombra-heroi')));
+    expect((fim.dx - repouso.dx).abs() < 0.5 && (fim.dy - repouso.dy).abs() < 0.5, isTrue, reason: 'volta ao lugar');
+  });
+
   testWidgets('tela: criar uma tarefa, concluir e ver o ganho', (tester) async {
     await tester.binding.setSurfaceSize(const Size(390, 844));
     addTearDown(() => tester.binding.setSurfaceSize(null));

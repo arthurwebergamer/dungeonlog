@@ -373,26 +373,32 @@ class _ArenaState extends State<Arena> with TickerProviderStateMixin {
     final semTarefas = e.tarefasDeHoje.isEmpty;
     final descansando = e.descansando;
 
+    // a sombra faz parte do herói (como no original, onde ela fica dentro do #heroSprite): avança, some e vira junto com ele;
+    // só o balanço de respiração (sobe e desce 2 px) fica apenas no desenho do herói
     final heroi = SizedBox(
       width: 83,
       height: 87,
-      child: Stack(clipBehavior: Clip.none, children: [
-        const Positioned(left: 13.5, top: 75, child: _Sombra()),
-        AnimatedBuilder(
-          animation: Listenable.merge([_relogio, _motor]),
-          builder: (_, filho) => Transform.translate(
-            offset: _motor.heroi + Offset(0, descansando ? 0 : _balanco),
-            child: Opacity(opacity: _motor.heroiOpacidade, child: Transform.scale(scaleX: _motor.heroiEscalaX, child: filho)),
-          ),
-          child: _HeroiEquipado(estado: e, motor: _motor),
+      child: AnimatedBuilder(
+        animation: _motor,
+        builder: (_, filho) => Transform.translate(
+          offset: _motor.heroi,
+          child: Opacity(opacity: _motor.heroiOpacidade, child: Transform.scale(scaleX: _motor.heroiEscalaX, child: filho)),
         ),
-        if (descansando)
-          const Positioned(
-            left: 50,
-            top: -26,
-            child: Text('z Z', style: TextStyle(fontFamily: fontePixel, fontSize: 16, color: Color(0xFF9DB4FF), letterSpacing: 4)),
+        child: Stack(clipBehavior: Clip.none, children: [
+          const Positioned(left: 13.5, top: 75, child: _Sombra(key: ValueKey('sombra-heroi'))),
+          AnimatedBuilder(
+            animation: _relogio,
+            builder: (_, filho) => Transform.translate(offset: Offset(0, descansando ? 0 : _balanco), child: filho),
+            child: _HeroiEquipado(estado: e, motor: _motor),
           ),
-      ]),
+          if (descansando)
+            const Positioned(
+              left: 50,
+              top: -26,
+              child: Text('z Z', style: TextStyle(fontFamily: fontePixel, fontSize: 16, color: Color(0xFF9DB4FF), letterSpacing: 4)),
+            ),
+        ]),
+      ),
     );
 
     final monstro = SizedBox(
@@ -608,7 +614,7 @@ class TochaArena extends StatelessWidget {
 
 /// Sombra oval embaixo do herói e do monstro (56x12).
 class _Sombra extends StatelessWidget {
-  const _Sombra();
+  const _Sombra({super.key});
   @override
   Widget build(BuildContext context) => SizedBox(
         width: 56,

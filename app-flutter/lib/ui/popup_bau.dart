@@ -6,6 +6,7 @@ import '../dominio/catalogo.dart';
 import 'estado_jogo.dart';
 import 'folhas.dart';
 import 'itens_ui.dart';
+import 'sheet_md.dart' show FilaPopups;
 import 'particulas.dart';
 import 'tema.dart';
 
@@ -15,12 +16,16 @@ String imagemBau(String variante, {required bool aberto}) => 'assets/img/baus/${
 /// Mostra o que saiu do baú. [variante]: 'padrao' (baú do dia e baú extra) ou 't0'..'t3'.
 Future<void> mostrarBauLoot(BuildContext context, EstadoJogo estado, List<ItemCatalogo> ganhos, {String variante = 'padrao'}) {
   if (ganhos.isEmpty) return Future.value();
-  return abrirFolhaDesfocada<void>(
-    context,
-    (_) => _PopupBau(estado: estado, ganhos: ganhos, variante: variante),
-    desfoque: 5,
-    veu: const Color(0x8C000000), // .baubg: rgba(0,0,0,.55)
-  );
+  // na fila dos popups: não abre por cima de "subiu de nível", estágio, resumo etc.
+  return FilaPopups.enfileirar(() async {
+    if (!context.mounted) return;
+    await abrirFolhaDesfocada<void>(
+      context,
+      (_) => _PopupBau(estado: estado, ganhos: ganhos, variante: variante),
+      desfoque: 5,
+      veu: const Color(0x8C000000), // .baubg: rgba(0,0,0,.55)
+    );
+  });
 }
 
 class _PopupBau extends StatefulWidget {

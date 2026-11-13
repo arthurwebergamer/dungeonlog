@@ -18,7 +18,9 @@ import 'package:dungeonlog_flutter/ui/estado_jogo.dart';
 import 'package:dungeonlog_flutter/ui/folha_nova_tarefa.dart';
 import 'package:dungeonlog_flutter/ui/tela_tarefas.dart';
 import 'package:dungeonlog_flutter/ui/golpes_fx.dart';
+import 'package:dungeonlog_flutter/ui/cerimonia_estagio.dart';
 import 'package:dungeonlog_flutter/ui/popups_md.dart';
+import 'package:dungeonlog_flutter/ui/sheet_md.dart' show FilaPopups;
 import 'package:dungeonlog_flutter/ui/respiracao.dart';
 import 'package:dungeonlog_flutter/ui/tela_inventario.dart';
 import 'package:dungeonlog_flutter/ui/tela_loja.dart';
@@ -60,6 +62,7 @@ Future<void> carregarFontes() async {
 }
 
 void main() {
+  setUp(FilaPopups.reiniciar);
   setUpAll(carregarFontes);
 
   test('jogo novo: sem tarefas, vida cheia e save v3 gravado', () async {
@@ -813,6 +816,49 @@ void main() {
     }
     final fim = tester.getTopLeft(find.byKey(const ValueKey('sombra-heroi')));
     expect((fim.dx - repouso.dx).abs() < 0.5 && (fim.dy - repouso.dy).abs() < 0.5, isTrue, reason: 'volta ao lugar');
+  });
+
+
+  testWidgets('popups do jogo entram em fila: nível e estágio juntos não se empilham', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    late EstadoJogo e;
+    await tester.runAsync(() async => e = await novoEstado(ArmazenamentoMemoria()));
+    late BuildContext ctx;
+    await tester.pumpWidget(MaterialApp(theme: temaApp(), home: Builder(builder: (c) {
+      ctx = c;
+      return const Scaffold(body: SizedBox());
+    })));
+    e.totalConcluidas = 10; // estágio 2 pendente
+    final c = e.iniciarCerimonia()!;
+    // três pedidos ao mesmo tempo (nível, estágio, queda)
+    final f1 = mostrarNivelUp(ctx, e, 2);
+    final f2 = mostrarCerimoniaEstagio(ctx, e, c);
+    final f3 = mostrarQueda(ctx, e, 10);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 4000));
+    expect(find.text('Nível 2!'), findsOneWidget);
+    expect(find.text('Estágio 1 Concluído!'), findsNothing, reason: 'o estágio espera o nível fechar');
+    expect(find.text('Você caiu'), findsNothing);
+    expect(find.text('Continuar'), findsOneWidget, reason: 'só uma tela por vez');
+    await tester.tap(find.text('Continuar'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 4000));
+    expect(find.text('Nível 2!'), findsNothing);
+    expect(find.text('Estágio 1 Concluído!'), findsOneWidget);
+    expect(find.text('Você caiu'), findsNothing);
+    await tester.tap(find.text('Continuar'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 4000));
+    expect(find.text('Você caiu'), findsOneWidget);
+    expect(find.text('Estágio 1 Concluído!'), findsNothing);
+    await tester.tap(find.text('Levantar'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 1000));
+    await Future.wait([f1, f2, f3]);
+    expect(find.text('Você caiu'), findsNothing);
+    expect(FilaPopups.pendentes, 0);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('tela: criar uma tarefa, concluir e ver o ganho', (tester) async {

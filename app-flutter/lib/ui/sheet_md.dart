@@ -1,7 +1,7 @@
 // Folha "md" do app original (.cq-tela / .md-sheet, play/style.css ~6275): fundo escurecido e desfocado que aparece
 // em 0,35 s e a folha que sobe em 0,22 s; o conteúdo entra aos poucos, cada peça com o seu atraso (`mdIn`, `mdRow`).
 // Usada pela cerimônia de estágio, subir de nível, "Você caiu", tarefas perdidas e resumo do dia.
-import 'dart:ui' show ImageFilter;
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 
@@ -61,13 +61,63 @@ class MdQuadro extends StatelessWidget {
   }
 }
 
+/// Fila dos popups do jogo (nível, estágio, queda, resumo, tarefas perdidas, baú): só um fica na tela por vez e o
+/// próximo entra quando o anterior fecha, na ordem em que foram pedidos. Sem isso, subir de nível e mudar de estágio
+/// ao mesmo tempo abria uma tela em cima da outra.
+class FilaPopups {
+  FilaPopups._();
+  static final List<Future<void> Function()> _fila = [];
+  static bool _ocupada = false;
+
+  /// Quantos popups estão esperando (ou abertos) agora; serve para testes.
+  static int get pendentes => _fila.length + (_ocupada ? 1 : 0);
+
+  /// Esvazia a fila (testes: cada um começa sem herdar popups pendentes do anterior).
+  static void reiniciar() {
+    _fila.clear();
+    _ocupada = false;
+  }
+
+  /// Pede para abrir um popup: abre na hora se não há outro na tela; senão espera a vez (ordem de chegada).
+  static Future<T> enfileirar<T>(Future<T> Function() abrir) {
+    final c = Completer<T>();
+    _fila.add(() async {
+      try {
+        c.complete(await abrir());
+      } catch (e, st) {
+        c.completeError(e, st);
+      }
+    });
+    _proximo();
+    return c.future;
+  }
+
+  static void _proximo() {
+    if (_ocupada || _fila.isEmpty) return;
+    _ocupada = true;
+    _fila.removeAt(0)().whenComplete(() {
+      _ocupada = false;
+      _proximo();
+    });
+  }
+}
+
 /// Abre a folha. [filhos] recebe a função de fechar (com a animação de saída de 0,22 s). [totalMs] = duração da coreografia.
 Future<void> abrirSheetMd(
   BuildContext context, {
   required List<Widget> Function(VoidCallback fechar) filhos,
   int totalMs = 3200,
   bool dispensavel = false,
-}) {
+}) =>
+    FilaPopups.enfileirar(() => _abrirSheetMd(context, filhos: filhos, totalMs: totalMs, dispensavel: dispensavel));
+
+Future<void> _abrirSheetMd(
+  BuildContext context, {
+  required List<Widget> Function(VoidCallback fechar) filhos,
+  required int totalMs,
+  required bool dispensavel,
+}) async {
+  if (!context.mounted) return; // a tela que pediu já não existe
   return showGeneralDialog<void>(
     context: context,
     barrierDismissible: dispensavel,

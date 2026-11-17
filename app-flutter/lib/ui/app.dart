@@ -197,11 +197,14 @@ class BarraNavegacao extends StatelessWidget {
                     child: GestureDetector(
                       behavior: HitTestBehavior.opaque,
                       onTap: () => aoTrocar(i),
-                      child: Stack(clipBehavior: Clip.none, alignment: Alignment.center, children: [
-                        Icone(_icones[i], tamanho: 26, cor: i == aba ? corAccent : corApagado),
-                        // bolinha de conquistas novas no ícone do Perfil (.conqbadge no .nav)
-                        if (i == 3 && estado.conquistasNaoVistas > 0) Positioned(left: largura / 2 + 2, top: -6, child: BolinhaAviso(estado.conquistasNaoVistas)),
-                      ]),
+                      // o item ocupa os 54 px da barra e o ícone fica no centro (a bolinha não muda o tamanho do item)
+                      child: SizedBox.expand(
+                        child: Stack(clipBehavior: Clip.none, children: [
+                          Center(child: Icone(_icones[i], tamanho: 26, cor: i == aba ? corAccent : corApagado)),
+                          // bolinha de conquistas novas no ícone do Perfil (.conqbadge no .nav)
+                          if (i == 3 && estado.conquistasNaoVistas > 0) Positioned(left: largura / 2 + 2, top: 2, child: BolinhaAviso(estado.conquistasNaoVistas)),
+                        ]),
+                      ),
                     ),
                   ),
                 ),

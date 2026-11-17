@@ -33,3 +33,6 @@ As cores de `tema.dart` viraram getters sobre uma **paleta global** (`Paleta.atu
 
 ## Não verificado
 - No celular (fluidez, vibração real, som, abrir links, CRT em tempo real). O navegador embutido roda a ~1 quadro/s.
+
+## Nota de CI
+O build do GitHub pode falhar sozinho ao baixar o NDK do Android (`Error reading Zip content`, falha da infraestrutura, não do código). O workflow agora tenta o build uma segunda vez.

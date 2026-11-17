@@ -13,7 +13,7 @@ import { fileURLToPath } from 'node:url';
 
 const aqui = path.dirname(fileURLToPath(import.meta.url));
 const raiz = path.resolve(aqui, '..', '..');
-const html = fs.readFileSync(path.join(raiz, 'play', 'index.html'), 'utf8');
+const html = fs.readFileSync(path.join(raiz, 'play', 'index.html'), 'utf8').split(String.fromCharCode(13, 10)).join(String.fromCharCode(10));
 const assetsJs = fs.readFileSync(path.join(raiz, 'play', 'assets.js'), 'utf8');
 
 /* ---------------- extração de código do index.html ---------------- */
@@ -461,6 +461,76 @@ if (process.argv.includes('--tz')) {
     fj.push({ rar, excl, sel, pn, usados, afx });
   }
   casos.forja = fj;
+}
+/* ---------------- conquistas V2, histórico, Grimório (Fase 3) ---------------- */
+{
+  const indentFn = (nome) => {
+    const m = new RegExp('^[ \\t]+function ' + nome + '\\(', 'm').exec(html);
+    if (!m) throw new Error('função indentada não achada: ' + nome);
+    const abre = html.indexOf('{', html.indexOf(')', m.index));
+    return html.slice(m.index, fimBalanceado(html, abre) + 1);
+  };
+  const indentDecl = (nome) => {
+    const m = new RegExp('^[ \\t]+const ' + nome + '\\s*=', 'm').exec(html);
+    if (!m) throw new Error('decl indentada não achada: ' + nome);
+    let prof = 0, aspas = null, esc = false;
+    for (let i = m.index; i < html.length; i++) {
+      const c = html[i], n = html[i + 1];
+      if (aspas) { if (esc) esc = false; else if (c === '\\') esc = true; else if (c === aspas) aspas = null; continue; }
+      if (c === '/' && n === '/') { i = html.indexOf('\n', i); continue; }
+      if (c === '/' && n === '*') { i = html.indexOf('*/', i) + 1; continue; }
+      if (c === '\'' || c === '"' || c === '`') { aspas = c; continue; }
+      if ('{[('.includes(c)) prof++; else if ('}])'.includes(c)) prof--;
+      else if (c === ';' && prof === 0) return html.slice(m.index, i + 1);
+    }
+    throw new Error('decl sem fim: ' + nome);
+  };
+  const iniCat = html.indexOf('const CATEGORIAS = [');
+  const idFor = html.indexOf('CATEGORIAS.forEach(cat => {\n    cat.tiers.forEach((t, i) => { t.id');
+  const fimFor = html.indexOf('});\n  });', idFor) + 8;
+  const fonteConq = [
+    indentDecl('CATEGORIAS'), html.slice(idFor, fimFor), indentDecl('IDS_CURADOS_V2'), indentDecl('CONQUISTAS_V2'),
+    ...['idiomaConquistas', 'itensVistosSet', 'raridadesObtidasCount', 'melhorSequenciaDeVitorias', 'montarContexto', 'resolver'].map(indentFn),
+  ].join('\n');
+  void iniCat;
+  const rc = mulberry32(777);
+  const rI = (a, b) => a + Math.floor(rc() * (b - a + 1));
+  const idGrim = S0.run("ITENS.findIndex(a => a[1] === 'Grimório')");
+  const vivos = linhas.map((r, i) => [r, i]).filter(([r, i]) => i < baseN && !r[8]).map(([, i]) => i);
+  const casosC = [];
+  const S = criarSandbox();
+  S.run(`const ID_GRIMORIO = ITENS.findIndex(a => a[1] === 'Grimório'); let HIST = []; window.obterHistorico = () => HIST.slice();`);
+  S.run(fonteConq);
+  casos.conquistasDefs = JSON.parse(S.run(`JSON.stringify(CONQUISTAS_V2.map(c => ({id: c.id, nome: c.nome, nome_en: c.nome_en, cor: c.cor, req: c.req, req_en: c.req_en})))`));
+  casos.conquistasIds = JSON.parse(S.run('JSON.stringify(IDS_CURADOS_V2)'));
+  const dias = (n) => { const d = new Date(2026, 10, 11 - n, 12); return iso(d.getFullYear(), d.getMonth() + 1, d.getDate()); };
+  for (let i = 0; i < 250; i++) {
+    const nh = rI(0, i % 7 === 0 ? 70 : 20);
+    const res = ['vitoria', 'vitoria', 'vitoria', 'fuga', 'descanso', 'sem_tarefa'];
+    let d = rI(1, 90);
+    const hist = [];
+    for (let k = 0; k < nh; k++) {
+      hist.push({ data: dias(d), resultado: res[rI(0, 5)], monstroId: i % 11 === 0 && k === 0 ? null : rI(0, 62), tarefas: rI(0, 6) });
+      d -= (rc() < 0.8 ? 1 : rI(2, 4)); if (d < 1) break;
+    }
+    if (i % 5 === 0) hist.reverse();
+    const nVis = [0, 1, 3, 10, 25, 60, 120, 315][rI(0, 7)];
+    const vistos = []; while (vistos.length < nVis) { const id = vivos[rI(0, vivos.length - 1)]; if (!vistos.includes(id)) vistos.push(id); }
+    if (i % 3 === 0 && !vistos.includes(idGrim)) vistos.push(idGrim);
+    if (i % 13 === 0) vistos.push(vivos[0], vivos[0]); // duplicata
+    const xp = [0, 100, 260, 700, 2000, 9000, 40000, 300000][rI(0, 7)];
+    const tot = [0, 1, 5, 19, 20, 49, 50, 400][rI(0, 7)];
+    const venceu = i % 2 === 0;
+    S.run(`HIST = ${JSON.stringify(hist)}; xpTotal = ${xp}; __total = ${tot}; derrotadoEm = ${venceu ? "'2026-11-11'" : 'null'};`);
+    S.run(`localStorage.setItem(chaveConta('questlog.itensVistos.v1'), ${JSON.stringify(JSON.stringify(vistos))});`);
+    const ctx = JSON.parse(S.run('JSON.stringify(montarContexto(true))'));
+    const ctxSem = JSON.parse(S.run('JSON.stringify(montarContexto(false))'));
+    const resolvidas = JSON.parse(S.run(`JSON.stringify(CONQUISTAS_V2.map(c => { const ctx = montarContexto(true); return {id: c.id, meta: resolver(c.meta, ctx), valor: c.valor(ctx), req: resolver(c.req, ctx), req_en: resolver(c.req_en, ctx)}; }))`));
+    const idxHoje = S.run('MONSTROS.indexOf(monstroDoDia())');
+    casosC.push({ hist, vistos, xp, total: tot, venceu, idxHoje, nivel: S.run('progresso().nivel'), ctx, ctxSem, resolvidas, seq: S.run(`melhorSequenciaDeVitorias(HIST)`) });
+  }
+  casos.conquistas = casosC;
+  casos.grimorio = { idGrimorio: idGrim, niveis: [0, 1, 2, 3, 4, 5, 6, 7, 63, 17].map((s) => ({ s, nivel: 4 + (s % 4) })) };
 }
 const fusos = ['America/Sao_Paulo', 'UTC', 'Asia/Tokyo', 'Europe/Lisbon', 'America/New_York', 'Pacific/Auckland', 'Asia/Kolkata', 'America/St_Johns'];
 casos.fusos = fusos.map((tz) => ({ tz, datas: JSON.parse(execFileSync(process.execPath, [fileURLToPath(import.meta.url), '--tz'], { env: { ...process.env, TZ: tz }, maxBuffer: 1 << 28 }).toString()) }));

@@ -10,7 +10,10 @@ import 'equip_arena.dart';
 import 'estado_jogo.dart';
 import 'tema.dart';
 
-const corPoco = Color(0xFF1C1C1C); // --poco (fundo das caixas de ícone)
+/// Marca "use a cor de linha do tema" (um `const` não pode apontar para a paleta mutável).
+const bordaPadrao = Color(0x01000001);
+
+Color get corPoco => Paleta.atual.poco; // --poco (fundo das caixas de ícone)
 const corFicha = Color(0xFF251E38); // fundo da ficha do item e da confirmação (.isheet / #confirmSheet)
 const corFichaLinha = Color(0xFF3B3257);
 
@@ -61,7 +64,7 @@ const _sufixos = {
 const _sufixosNeg = {'gan': 'da Pobreza', 'est': 'da Ignorância', 'sor': 'do Azar', 'bar': 'do Desperdício'};
 
 /// --afx-*: cor de cada encantamento (o "gan" usa o --gold do tema).
-const _coresAfixo = {
+final _coresAfixo = {
   'gan': corOuro, 'est': Color(0xFF7FB8FF), 'sor': Color(0xFF8FE3A0), 'bar': Color(0xFFFFB070),
   'bau': Color(0xFFE6A8FF), 'abu': Color(0xFFFF8F8F), 'tes': Color(0xFF7FE0D6), 'tex': Color(0xFFB8E65C),
 };
@@ -192,7 +195,7 @@ class SpriteItem extends StatelessWidget {
 
 /// Caixa escura com o ícone do item (.ibox 60, .lbox 46, .baubox 34...).
 class CaixaItem extends StatelessWidget {
-  const CaixaItem({super.key, required this.estado, required this.item, this.lado = 60, this.sprite = 44, this.raio = 12, this.borda = corLinha});
+  CaixaItem({super.key, required this.estado, required this.item, this.lado = 60, this.sprite = 44, this.raio = 12, this.borda = bordaPadrao});
   final EstadoJogo estado;
   final ItemCatalogo item;
   final double lado;
@@ -204,7 +207,7 @@ class CaixaItem extends StatelessWidget {
         width: lado,
         height: lado,
         alignment: Alignment.center,
-        decoration: BoxDecoration(color: corPoco, borderRadius: BorderRadius.circular(raio), border: borda == null ? null : Border.all(color: borda!, width: 0.8)),
+        decoration: BoxDecoration(color: corPoco, borderRadius: BorderRadius.circular(raio), border: borda == null ? null : Border.all(color: borda == bordaPadrao ? corLinha : borda!, width: 0.8)),
         child: SpriteItem(estado: estado, item: item, tamanho: sprite),
       );
 }
@@ -240,7 +243,7 @@ TextStyle estiloNomeItem(Color cor) => TextStyle(
 
 /// Cabeçalho da ficha (.ihead.eqh): caixa do ícone, nome e etiqueta; em coluna (ficha) ou em linha (forja).
 class CabecalhoItem extends StatelessWidget {
-  const CabecalhoItem({super.key, required this.estado, required this.item, required this.etiqueta, this.emLinha = false, this.bordaCaixa = corLinha});
+  CabecalhoItem({super.key, required this.estado, required this.item, required this.etiqueta, this.emLinha = false, this.bordaCaixa = bordaPadrao});
   final EstadoJogo estado;
   final ItemCatalogo item;
   final String etiqueta;
@@ -278,11 +281,11 @@ class PilulaFiltro extends StatelessWidget {
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: pequena ? 10 : 12, vertical: pequena ? 4 : 5),
           decoration: BoxDecoration(
-            color: ativa ? Colors.white : corPainel3,
+            color: ativa ? corAccent : corPainel3,
             borderRadius: BorderRadius.circular(999),
-            border: Border.all(color: ativa ? Colors.white : corLinha, width: 0.8),
+            border: Border.all(color: ativa ? corAccent : corLinha, width: 0.8),
           ),
-          child: Text(texto, style: TextStyle(fontSize: pequena ? 11 : 11.5, fontWeight: FontWeight.w600, color: ativa ? corFundo : corApagado, height: 1.26)),
+          child: Text(texto, style: TextStyle(fontSize: pequena ? 11 : 11.5, fontWeight: FontWeight.w600, color: ativa ? corSobreAccent : corApagado, height: 1.26)),
         ),
       );
 }
@@ -294,8 +297,8 @@ class CabecalhoAba extends StatelessWidget {
   final String legenda;
   @override
   Widget build(BuildContext context) => Row(crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, children: [
-        Text(titulo, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: corTexto, height: 1.25)),
+        Text(titulo, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: corTexto, height: 1.25)),
         const Spacer(),
-        Text(legenda, style: const TextStyle(fontSize: 12, color: corApagado)),
+        Text(legenda, style: TextStyle(fontSize: 12, color: corApagado)),
       ]);
 }

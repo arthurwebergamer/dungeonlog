@@ -174,7 +174,7 @@ class _SheetMdState extends State<_SheetMd> with SingleTickerProviderStateMixin 
             child: Container(
               constraints: BoxConstraints(maxWidth: 520, maxHeight: mq.size.height * 0.94),
               width: double.infinity,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: corPainel2,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(26)),
                 border: Border(top: BorderSide(color: corLinha, width: 0.8)),
@@ -203,7 +203,7 @@ class MdRotulo extends StatelessWidget {
   @override
   Widget build(BuildContext context) => MdEntra(
         atraso: atraso,
-        filho: Text(texto, style: const TextStyle(fontFamily: fontePixel, fontSize: 10, letterSpacing: 1.8, color: corSuave)),
+        filho: Text(texto, style: TextStyle(fontFamily: fontePixel, fontSize: 10, letterSpacing: 1.8, color: corSuave)),
       );
 }
 
@@ -217,7 +217,7 @@ class MdTitulo extends StatelessWidget {
         atraso: atraso,
         filho: Padding(
           padding: const EdgeInsets.only(top: 8),
-          child: Text(texto, textAlign: TextAlign.center, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: corTexto, height: 1.2)),
+          child: Text(texto, textAlign: TextAlign.center, style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: corTexto, height: 1.2)),
         ),
       );
 }
@@ -241,8 +241,8 @@ class MdBotao extends StatelessWidget {
               onTap: aoTocar,
               child: Container(
                 padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14)),
-                child: Center(child: Text(texto, style: const TextStyle(color: corFundo, fontWeight: FontWeight.w600, fontSize: 15))),
+                decoration: BoxDecoration(color: corAccent, borderRadius: BorderRadius.circular(14)),
+                child: Center(child: Text(texto, style: TextStyle(color: corSobreAccent, fontWeight: FontWeight.w600, fontSize: 15))),
               ),
             ),
           ),
@@ -272,11 +272,11 @@ class MdLinha extends StatelessWidget {
               width: 28,
               height: 28,
               decoration: BoxDecoration(color: corLinha, borderRadius: BorderRadius.circular(8)),
-              child: Center(child: Text(icone, style: const TextStyle(fontFamily: fontePixel, fontSize: 10, color: corOuro))),
+              child: Center(child: Text(icone, style: TextStyle(fontFamily: fontePixel, fontSize: 10, color: corOuro))),
             ),
             const SizedBox(width: 10),
-            Expanded(child: Text(texto, style: const TextStyle(fontSize: 13.5, color: corSuave))),
-            DefaultTextStyle.merge(style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: corTexto, fontFeatures: algarismosFixos), child: valor),
+            Expanded(child: Text(texto, style: TextStyle(fontSize: 13.5, color: corSuave))),
+            DefaultTextStyle.merge(style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: corTexto, fontFeatures: algarismosFixos), child: valor),
           ]),
         ),
       );

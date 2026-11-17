@@ -5,6 +5,9 @@ abstract class Armazenamento {
   String? ler(String chave);
   Future<void> gravar(String chave, String valor);
   Future<void> remover(String chave);
+
+  /// Todas as chaves gravadas (para apagar as de um herói excluído).
+  Iterable<String> chaves();
 }
 
 /// Em memória (testes).
@@ -16,6 +19,8 @@ class ArmazenamentoMemoria implements Armazenamento {
   Future<void> gravar(String chave, String valor) async => dados[chave] = valor;
   @override
   Future<void> remover(String chave) async => dados.remove(chave);
+  @override
+  Iterable<String> chaves() => dados.keys.toList();
 }
 
 /// No aparelho (SharedPreferences). Carrega tudo na abertura, então a leitura é síncrona.
@@ -30,4 +35,6 @@ class ArmazenamentoLocal implements Armazenamento {
   Future<void> gravar(String chave, String valor) async => _p.setString(chave, valor);
   @override
   Future<void> remover(String chave) async => _p.remove(chave);
+  @override
+  Iterable<String> chaves() => _p.getKeys().toList();
 }

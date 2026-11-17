@@ -2,6 +2,7 @@
 // Comprar/Vender, linhas dos itens (oferta do dia, travado por nível, esgotado, sem moedas) e a folha de
 // confirmação. Medidas e cores do CSS computado de play/ em 390x844; regras em EstadoJogo
 // (garantirEstoque/comprar/venderItem/venderTesouros), espelho do bloco LOJA de play/index.html (~9553 a 9790).
+import 'vibra.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -42,7 +43,7 @@ Future<bool?> pedirConfirmacaoItem(BuildContext context, EstadoJogo estado, Item
           const SizedBox(height: 6),
           Center(child: Container(width: 38, height: 4, decoration: BoxDecoration(color: corFichaLinha, borderRadius: BorderRadius.circular(2)))),
           const SizedBox(height: 14),
-          Text(verbo.toUpperCase(), style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1.54, color: corApagado, height: 1.3)),
+          Text(verbo.toUpperCase(), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1.54, color: corApagado, height: 1.3)),
           const SizedBox(height: 4),
           CabecalhoItem(
             estado: estado,
@@ -51,12 +52,12 @@ Future<bool?> pedirConfirmacaoItem(BuildContext context, EstadoJogo estado, Item
             bordaCaixa: corRaridade[item.raridade.clamp(0, 7)],
           ),
           const SizedBox(height: 12),
-          Text(texto, style: const TextStyle(fontSize: 13, height: 1.5, color: corApagado)),
+          Text(texto, style: TextStyle(fontSize: 13, height: 1.5, color: corApagado)),
           const SizedBox(height: 20),
           Row(children: [
             Expanded(child: BotaoFolha('Cancelar', fundo: corPoco, cor: corTexto, borda: corFichaLinha, tamanho: 14, aoTocar: () => Navigator.pop(ctx, false))),
             const SizedBox(width: 9),
-            Expanded(child: BotaoFolha(verbo, tamanho: 14, borda: Colors.white, aoTocar: () => Navigator.pop(ctx, true))),
+            Expanded(child: BotaoFolha(verbo, tamanho: 14, borda: corAccent, aoTocar: () => Navigator.pop(ctx, true))),
           ]),
         ]),
       ),
@@ -83,22 +84,22 @@ class _TelaLojaState extends State<TelaLoja> {
   Future<void> _comprar(int i, BuildContext caixa) async {
     final v = e.lojaEstoque[i];
     final it = e.catalogo.item(v.id)!;
-    HapticFeedback.selectionClick();
+    Vibra.toque();
     final ok = await pedirConfirmacaoItem(context, e, it, verbo: 'Comprar', texto: 'Custa ${e.precoNaLoja(v)} moedas.');
     if (ok != true || !mounted) return;
     if (e.comprar(i) == 'ok') {
-      HapticFeedback.mediumImpact();
+      Vibra.media();
     }
   }
 
   Future<void> _vender(ItemCatalogo it, BuildContext caixa) async {
-    HapticFeedback.selectionClick();
+    Vibra.toque();
     final ok = await pedirConfirmacaoItem(context, e, it, verbo: 'Vender', texto: 'Você recebe ${precoVenda(it.tipo, it.valor)} moedas.');
     if (ok != true || !mounted) return;
     final ponto = caixa.mounted ? centroDe(caixa) : null; // antes de a lista redesenhar
     final preco = e.venderItem(it.id);
     if (preco != null) {
-      HapticFeedback.mediumImpact();
+      Vibra.media();
       flutuanteMoedas(context, ponto, preco);
     }
   }
@@ -141,7 +142,7 @@ class _TelaLojaState extends State<TelaLoja> {
 
   /// `textoBonus(it)`: "XP +5% · Moedas +3%" (equipamento) ou "+15 XP · +10 moedas" (consumível).
   InlineSpan? _bonus(ItemCatalogo it) {
-    const forte = TextStyle(fontWeight: FontWeight.w600, color: corSuave);
+    final forte = TextStyle(fontWeight: FontWeight.w600, color: corSuave);
     final partes = <List<InlineSpan>>[];
     for (final (rotulo, valor) in bonusDoItem(it)) {
       if (it.tipo == 'cons') {
@@ -181,7 +182,7 @@ class _TelaLojaState extends State<TelaLoja> {
           botao: bloqueio ?? 'Comprar',
           estiloBotao: bloqueio == null ? _EstiloBotao.primario : _EstiloBotao.apagado,
           aoTocar: bloqueio == null ? (caixa) => _comprar(i, caixa) : (_) {
-                  HapticFeedback.lightImpact();
+                  Vibra.leve();
                   Som.atual.tocar('semMoedas'); // esgotado, nível ou sem moedas: som de bloqueio, como no original
                 },
         ),
@@ -191,9 +192,9 @@ class _TelaLojaState extends State<TelaLoja> {
   }
 
   List<Widget> _venda() {
-    const nota = TextStyle(fontSize: 11.5, height: 1.5, color: corApagado);
+    final nota = TextStyle(fontSize: 11.5, height: 1.5, color: corApagado);
     if (e.save.inventario.isEmpty) {
-      return const [Padding(padding: EdgeInsets.only(top: 14, bottom: 4), child: Text('Mochila vazia. Derrote o monstro do dia para conseguir espólio.', textAlign: TextAlign.center, style: nota))];
+      return [Padding(padding: EdgeInsets.only(top: 14, bottom: 4), child: Text('Mochila vazia. Derrote o monstro do dia para conseguir espólio.', textAlign: TextAlign.center, style: nota))];
     }
     final itens = <(ItemCatalogo, int)>[];
     for (final sl in e.save.inventario) {
@@ -202,7 +203,7 @@ class _TelaLojaState extends State<TelaLoja> {
       itens.add((it, ((sl['q'] as num?) ?? 1).toInt()));
     }
     if (itens.isEmpty) {
-      return const [Padding(padding: EdgeInsets.only(top: 14, bottom: 4), child: Text('Só há itens-chave na mochila. Eles não podem ser vendidos.', textAlign: TextAlign.center, style: nota))];
+      return [Padding(padding: EdgeInsets.only(top: 14, bottom: 4), child: Text('Só há itens-chave na mochila. Eles não podem ser vendidos.', textAlign: TextAlign.center, style: nota))];
     }
     // tesouros primeiro, depois o mais raro; empate mantém a ordem da mochila
     final ordem = [for (var i = 0; i < itens.length; i++) i]
@@ -240,7 +241,7 @@ class _TelaLojaState extends State<TelaLoja> {
           padding: const EdgeInsets.only(top: 12),
           child: Toque(
             aoTocar: () {
-              HapticFeedback.mediumImpact();
+              Vibra.media();
               e.venderTesouros();
             },
             child: CustomPaint(
@@ -248,7 +249,7 @@ class _TelaLojaState extends State<TelaLoja> {
               child: Padding(
                 padding: const EdgeInsets.all(10),
                 child: Text('Vender todos os tesouros  ·  +$totalTesouros moedas',
-                    textAlign: TextAlign.center, style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: corOuro, height: 1.3)),
+                    textAlign: TextAlign.center, style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: corOuro, height: 1.3)),
               ),
             ),
           ),
@@ -273,9 +274,9 @@ class _Saldo extends StatelessWidget {
         child: Row(mainAxisSize: MainAxisSize.min, children: [
           pixel('assets/img/ui/moedas.png', largura: 28, altura: 28),
           const SizedBox(width: 5),
-          Text('$moedas', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: corOuro, height: 1.25)),
+          Text('$moedas', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: corOuro, height: 1.25)),
           const SizedBox(width: 5),
-          Text(rotulo, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: corOuro, height: 1.25)),
+          Text(rotulo, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: corOuro, height: 1.25)),
         ]),
       );
 }
@@ -324,7 +325,7 @@ class _LinhaLojaState extends State<_LinhaLoja> {
     final precoCheio = widget.precoCheio, quantidade = widget.quantidade, preco = widget.preco, botao = widget.botao;
     final cor = corRaridade[item.raridade.clamp(0, 7)];
     final (fundoBotao, bordaBotao, textoBotao) = switch (widget.estiloBotao) {
-      _EstiloBotao.primario => (Colors.white, Colors.white, corFundo),
+      _EstiloBotao.primario => (corAccent, corAccent, corSobreAccent),
       _EstiloBotao.secundario => (corPoco, corLinha, corSuave),
       _EstiloBotao.apagado => (corPoco, corLinha, corApagado),
     };
@@ -347,18 +348,18 @@ class _LinhaLojaState extends State<_LinhaLoja> {
                 Text.rich(
                   TextSpan(children: [
                     TextSpan(text: item.nomeNoIdioma(estado.idioma)),
-                    if (quantidade > 1) TextSpan(text: ' ×$quantidade', style: const TextStyle(fontSize: 11, color: corApagado)),
+                    if (quantidade > 1) TextSpan(text: ' ×$quantidade', style: TextStyle(fontSize: 11, color: corApagado)),
                   ]),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600, color: corTexto, height: 1.25),
+                  style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600, color: corTexto, height: 1.25),
                 ),
                 const SizedBox(height: 2),
                 Text('${nomeRaridade(item.raridade, estado.idioma)} · ${nomeTipo(item.tipo)}'.toUpperCase(),
                     maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.5, color: cor, height: 1.28)),
                 if (bonus != null) ...[
                   const SizedBox(height: 3),
-                  Text.rich(bonus, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 11, color: corApagado, height: 1.3)),
+                  Text.rich(bonus, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11, color: corApagado, height: 1.3)),
                 ],
               ]),
             ),
@@ -369,11 +370,11 @@ class _LinhaLojaState extends State<_LinhaLoja> {
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
                   if (precoCheio != null) ...[
                     Text('$precoCheio',
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 10.5, fontWeight: FontWeight.w500, color: corApagado, decoration: TextDecoration.lineThrough, decorationColor: corApagado, fontFeatures: algarismosFixos)),
                     const SizedBox(width: 4),
                   ],
-                  Text(preco, style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: corOuro, fontFeatures: algarismosFixos)),
+                  Text(preco, style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: corOuro, fontFeatures: algarismosFixos)),
                   const SizedBox(width: 2),
                   pixel('assets/img/ui/moedas.png', largura: 24, altura: 24),
                 ]),
@@ -397,7 +398,7 @@ class _LinhaLojaState extends State<_LinhaLoja> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
               decoration: BoxDecoration(color: corOuro, borderRadius: BorderRadius.circular(999)),
-              child: const Text('OFERTA DO DIA', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, letterSpacing: 0.72, color: corFundo, height: 1.25)),
+              child: Text('OFERTA DO DIA', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, letterSpacing: 0.72, color: corFundo, height: 1.25)),
             ),
           ),
       ]),

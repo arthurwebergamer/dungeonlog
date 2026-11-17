@@ -10,6 +10,7 @@ import '../dominio/tarefa.dart';
 import 'arena.dart' show FundoTema, TochaArena;
 import 'estado_jogo.dart';
 import 'icones.dart';
+import 'itens_ui.dart' show SpriteItem;
 import 'sheet_md.dart';
 import 'som.dart';
 import 'tema.dart';
@@ -114,7 +115,7 @@ class MdSegmentoUnico extends StatelessWidget {
           width: double.infinity,
           decoration: BoxDecoration(color: corLinha, borderRadius: BorderRadius.circular(3)),
           clipBehavior: Clip.antiAlias,
-          child: Align(alignment: Alignment.centerLeft, child: FractionallySizedBox(widthFactor: f.clamp(0.0, 1.0), child: const ColoredBox(color: corOuro, child: SizedBox.expand()))),
+          child: Align(alignment: Alignment.centerLeft, child: FractionallySizedBox(widthFactor: f.clamp(0.0, 1.0), child: ColoredBox(color: corOuro, child: SizedBox.expand()))),
         );
       });
 }
@@ -133,8 +134,8 @@ class MdLegenda extends StatelessWidget {
         filho: Padding(
           padding: const EdgeInsets.only(top: 7),
           child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            Text(esq, style: const TextStyle(fontSize: 12, color: corApagado)),
-            Text(dir, style: const TextStyle(fontSize: 12, color: corApagado, fontFeatures: algarismosFixos)),
+            Text(esq, style: TextStyle(fontSize: 12, color: corApagado)),
+            Text(dir, style: TextStyle(fontSize: 12, color: corApagado, fontFeatures: algarismosFixos)),
           ]),
         ),
       );
@@ -205,6 +206,8 @@ Future<void> mostrarNivelUp(BuildContext context, EstadoJogo e, int nivel) {
   final en = e.idioma == 'en';
   final vMax = e.vidaMaxima;
   final dV = Eco.vidaPorNivel.round();
+  // marco do Grimório (nível IV a VII, por herói): entrega o item e mostra "Você encontrou Grimório"
+  final grim = e.entregarGrimorioSe(nivel);
   return abrirSheetMd(
     context,
     totalMs: 2600,
@@ -227,9 +230,33 @@ Future<void> mostrarNivelUp(BuildContext context, EstadoJogo e, int nivel) {
           ]);
         }),
       ),
+      if (grim) MdEntra(atraso: 1300, filho: Padding(padding: const EdgeInsets.only(top: 14), child: Center(child: _BlocoGrimorio(estado: e)))),
       MdBotao(en ? 'Continue' : 'Continuar', atraso: 1400, aoTocar: fechar),
     ],
   );
+}
+
+/// `.lvlitem`: a caixa roxa "Você encontrou Grimório" do marco de nível.
+class _BlocoGrimorio extends StatelessWidget {
+  const _BlocoGrimorio({required this.estado});
+  final EstadoJogo estado;
+  @override
+  Widget build(BuildContext context) {
+    final e = estado;
+    final it = e.catalogo.item(e.idGrimorio)!;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(color: const Color(0xFF1F1930), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF332A4D), width: 0.8)),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        SpriteItem(estado: e, item: it, tamanho: 40),
+        const SizedBox(width: 10),
+        Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+          Text(e.idioma == 'en' ? 'You found' : 'Você encontrou', style: const TextStyle(fontSize: 12.5, color: Color(0xFFB3A8D4), height: 1.35)),
+          Text(it.nomeNoIdioma(e.idioma), style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: Color(0xFF5AE0D8), height: 1.35)),
+        ]),
+      ]),
+    );
+  }
 }
 
 /// Vida zerada: "DERROTA", "Você caiu", o herói caído e o que mudou.
@@ -295,7 +322,7 @@ Future<void> mostrarResumoDia(BuildContext context, EstadoJogo e, {required int 
 Future<void> mostrarTarefasPerdidas(BuildContext context, EstadoJogo e, EventoVirada ev) {
   final en = e.idioma == 'en';
   final m = ev.diaVirada != null ? e.monstroDoDiaEm(ev.diaVirada!) : e.monstro;
-  const base = TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: corTexto);
+  final base = TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: corTexto);
   return abrirSheetMd(
     context,
     totalMs: 1800,
@@ -322,7 +349,7 @@ Future<void> mostrarTarefasPerdidas(BuildContext context, EstadoJogo e, EventoVi
       const SizedBox(height: 8),
       MdEntra(
         atraso: 200,
-        filho: Text(en ? 'It got away.' : 'Ele escapou.', style: const TextStyle(fontFamily: 'Cormorant Garamond', fontStyle: FontStyle.italic, fontVariations: [FontVariation('wght', 600)], fontSize: 20, height: 1.2, color: corTexto)),
+        filho: Text(en ? 'It got away.' : 'Ele escapou.', style: TextStyle(fontFamily: 'Cormorant Garamond', fontStyle: FontStyle.italic, fontVariations: [FontVariation('wght', 600)], fontSize: 20, height: 1.2, color: corTexto)),
       ),
       const SizedBox(height: 14),
       ConstrainedBox(

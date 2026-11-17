@@ -1,4 +1,5 @@
 // Folhas (painéis que sobem de baixo) e diálogos no estilo do app original: .edov / .edsheet / .md-sheet.
+import 'vibra.dart';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -42,12 +43,12 @@ class _ToqueState extends State<Toque> {
 
 /// Botão largo das folhas: branco com texto escuro (padrão) ou com as cores dadas.
 class BotaoFolha extends StatelessWidget {
-  const BotaoFolha(
+  BotaoFolha(
     this.texto, {
     super.key,
     required this.aoTocar,
-    this.fundo = Colors.white,
-    this.cor = corFundo,
+    this.fundo,
+    this.cor,
     this.borda,
     this.raio = 12,
     this.tamanho = 15,
@@ -55,8 +56,8 @@ class BotaoFolha extends StatelessWidget {
   });
   final String texto;
   final VoidCallback? aoTocar;
-  final Color fundo;
-  final Color cor;
+  final Color? fundo;
+  final Color? cor;
   final Color? borda;
   final double raio;
   final double tamanho;
@@ -71,11 +72,11 @@ class BotaoFolha extends StatelessWidget {
             padding: EdgeInsets.all(padding),
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: fundo,
+              color: fundo ?? corAccent,
               borderRadius: BorderRadius.circular(raio),
               border: borda == null ? null : Border.all(color: borda!, width: 0.8),
             ),
-            child: Text(texto, style: TextStyle(fontSize: tamanho, fontWeight: FontWeight.w600, color: cor, height: 1.28)),
+            child: Text(texto, style: TextStyle(fontSize: tamanho, fontWeight: FontWeight.w600, color: cor ?? (fundo == null ? corSobreAccent : corFundo), height: 1.28)),
           ),
         ),
       );
@@ -173,7 +174,7 @@ class Folha extends StatelessWidget {
             child: Toque(
               rotulo: 'Fechar',
               aoTocar: () => Navigator.pop(context),
-              child: const SizedBox(width: 32, height: 32, child: Center(child: Text('×', style: TextStyle(fontSize: 24, color: corApagado, height: 1)))),
+              child: SizedBox(width: 32, height: 32, child: Center(child: Text('×', style: TextStyle(fontSize: 24, color: corApagado, height: 1)))),
             ),
           ),
         ]),
@@ -186,7 +187,7 @@ class Folha extends StatelessWidget {
 Future<bool?> perguntarApagarRecorrente(BuildContext context, String quando) => abrirFolha<bool>(
       context,
       (ctx) => Folha(titulo: 'Apagar tarefa', filhos: [
-        Text('Essa tarefa se repete ($quando). Apagar só hoje ou em todos os dias?', style: const TextStyle(fontSize: 14, height: 1.45, color: corApagado)),
+        Text('Essa tarefa se repete ($quando). Apagar só hoje ou em todos os dias?', style: TextStyle(fontSize: 14, height: 1.45, color: corApagado)),
         const SizedBox(height: 14),
         BotaoFolha('Só hoje', aoTocar: () => Navigator.pop(ctx, true)),
         const SizedBox(height: 9),
@@ -200,15 +201,15 @@ Future<bool?> perguntarDescanso(BuildContext context) => abrirFolha<bool>(
       (ctx) => Folha(titulo: 'Descansar hoje?', filhos: [
         for (final l in const ['Sem perda de vida nem "Você caiu"', 'A sequência fica congelada, não zera', 'Hoje não rende XP nem moedas', 'Dá pra cancelar a qualquer momento'])
           Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const SizedBox(width: 20, height: 23.8, child: Center(child: SizedBox(width: 5, height: 5, child: DecoratedBox(decoration: BoxDecoration(color: corSuave, shape: BoxShape.circle))))),
-            Expanded(child: Text(l, style: const TextStyle(fontSize: 14, height: 1.7, color: corSuave))),
+            SizedBox(width: 20, height: 23.8, child: Center(child: SizedBox(width: 5, height: 5, child: DecoratedBox(decoration: BoxDecoration(color: corSuave, shape: BoxShape.circle))))),
+            Expanded(child: Text(l, style: TextStyle(fontSize: 14, height: 1.7, color: corSuave))),
           ]),
         const SizedBox(height: 16),
         BotaoFolha('Descansar hoje', fundo: corDescansoAtivo, cor: Colors.white, tamanho: 14, padding: 12, aoTocar: () => Navigator.pop(ctx, true)),
         const SizedBox(height: 8),
         Toque(
           aoTocar: () => Navigator.pop(ctx, false),
-          child: const Padding(
+          child: Padding(
             padding: EdgeInsets.all(8),
             child: Center(child: Text('Cancelar', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: corApagado))),
           ),
@@ -266,7 +267,7 @@ Future<void> mostrarDiaVencido(
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           Container(width: 38, height: 4, decoration: BoxDecoration(color: corLinha, borderRadius: BorderRadius.circular(2))),
           const SizedBox(height: 16),
-          const Text('DIA VENCIDO', style: TextStyle(fontFamily: fontePixel, fontSize: 10, letterSpacing: 1.8, color: corSuave)),
+          Text('DIA VENCIDO', style: TextStyle(fontFamily: fontePixel, fontSize: 10, letterSpacing: 1.8, color: corSuave)),
           const SizedBox(height: 8),
           Text('$monstro derrotado', textAlign: TextAlign.center, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600, height: 1.27)),
           const SizedBox(height: 16),
@@ -276,15 +277,15 @@ Future<void> mostrarDiaVencido(
               height: 6,
               width: double.infinity,
               child: Stack(children: [
-                const Positioned.fill(child: ColoredBox(color: corLinha)),
-                FractionallySizedBox(alignment: Alignment.centerLeft, widthFactor: xpMeta <= 0 ? 0 : (xp / xpMeta).clamp(0.0, 1.0), child: const ColoredBox(color: corOuro, child: SizedBox.expand())),
+                Positioned.fill(child: ColoredBox(color: corLinha)),
+                FractionallySizedBox(alignment: Alignment.centerLeft, widthFactor: xpMeta <= 0 ? 0 : (xp / xpMeta).clamp(0.0, 1.0), child: ColoredBox(color: corOuro, child: SizedBox.expand())),
               ]),
             ),
           ),
           const SizedBox(height: 7),
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            Text('Nível ${romano(nivel)}', style: const TextStyle(fontSize: 12, color: corApagado)),
-            Text('$xp / $xpMeta', style: const TextStyle(fontSize: 12, color: corApagado)),
+            Text('Nível ${romano(nivel)}', style: TextStyle(fontSize: 12, color: corApagado)),
+            Text('$xp / $xpMeta', style: TextStyle(fontSize: 12, color: corApagado)),
           ]),
           const SizedBox(height: 16),
           _LinhaResumo('Tarefas concluídas', '$tarefas'),
@@ -300,7 +301,7 @@ Future<void> mostrarDiaVencido(
 
 /// Diálogo central simples (título, texto e "Continuar"), no estilo dos avisos do app original.
 Future<void> mostrarAviso(BuildContext context, {String? selo, required String titulo, required String texto, String botao = 'Continuar'}) {
-  HapticFeedback.mediumImpact();
+  Vibra.media();
   return showDialog<void>(
     context: context,
     barrierColor: corVeu,
@@ -313,12 +314,12 @@ Future<void> mostrarAviso(BuildContext context, {String? selo, required String t
           decoration: BoxDecoration(color: corPainel, borderRadius: BorderRadius.circular(22), border: Border.all(color: corLinha, width: 0.8)),
           child: Column(mainAxisSize: MainAxisSize.min, children: [
             if (selo != null) ...[
-              Text(selo.toUpperCase(), style: const TextStyle(fontFamily: fontePixel, fontSize: 10, letterSpacing: 1.8, color: corSuave)),
+              Text(selo.toUpperCase(), style: TextStyle(fontFamily: fontePixel, fontSize: 10, letterSpacing: 1.8, color: corSuave)),
               const SizedBox(height: 8),
             ],
             Text(titulo, textAlign: TextAlign.center, style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w600)),
             const SizedBox(height: 10),
-            Text(texto, textAlign: TextAlign.center, style: const TextStyle(fontSize: 14.5, height: 1.45, color: corSuave)),
+            Text(texto, textAlign: TextAlign.center, style: TextStyle(fontSize: 14.5, height: 1.45, color: corSuave)),
             const SizedBox(height: 20),
             BotaoFolha(botao, aoTocar: () => Navigator.pop(ctx)),
           ]),

@@ -1,12 +1,12 @@
 // Arena: parede de tijolos, duas tochas, herói x monstro do dia com "vs" no meio e a barra de vida fina
 // em cima do monstro. Medidas e cores copiadas de .arena / .fight / .mobBarra / .vitoria do app original.
 // Também desenha os baús do dia no canto esquerdo (.bauArena) e a arma e o escudo equipados no herói (desenharHeroi).
+import 'vibra.dart';
 import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show HapticFeedback;
 
 import '../dominio/bau.dart' show tierRar;
 import '../dominio/save.dart' show chaveConta;
@@ -101,7 +101,7 @@ class _ArenaState extends State<Arena> with TickerProviderStateMixin {
     _dxInicio = _dx;
     _dxFim = passou ? (_dx > 0 ? _larg : -_larg) : 0;
     if (passou) {
-      HapticFeedback.selectionClick();
+      Vibra.toque();
       e.pousarTema(_alvo!);
     }
     _pouso.forward(from: 0);
@@ -290,7 +290,7 @@ class _ArenaState extends State<Arena> with TickerProviderStateMixin {
     final e = widget.estado;
     if (!e.bauFechado(qual)) return;
     if (qual == 'especial' && e.chaveDoEspecial == null) {
-      HapticFeedback.mediumImpact();
+      Vibra.media();
       Som.atual.tocar('bauTrancado');
       _dicaTimer?.cancel();
       setState(() {
@@ -468,7 +468,7 @@ class _ArenaState extends State<Arena> with TickerProviderStateMixin {
                 : Row(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.end, children: [
                     heroi,
                     const SizedBox(width: 28),
-                    const Padding(
+                    Padding(
                       padding: EdgeInsets.only(bottom: 30),
                       child: Text('VS', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, letterSpacing: 1.2, color: corApagado, height: 1.27)),
                     ),
@@ -498,7 +498,7 @@ class _ArenaState extends State<Arena> with TickerProviderStateMixin {
                 Row(mainAxisSize: MainAxisSize.min, children: [
                   pixel('assets/img/ui/moeda.png', largura: 16, altura: 16),
                   const SizedBox(width: 5),
-                  Text('+${recompensaVitoria(e.tarefasDeHoje.length, multMoedas: e.bonus.multMoedas)}', style: const TextStyle(fontSize: 12, color: corOuro)),
+                  Text('+${recompensaVitoria(e.tarefasDeHoje.length, multMoedas: e.bonus.multMoedas)}', style: TextStyle(fontSize: 12, color: corOuro)),
                 ]),
               ]),
             ),

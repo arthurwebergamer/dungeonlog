@@ -1,9 +1,11 @@
 // Raiz do app: carrega dados e save, e mostra a barra de navegação do app original (5 ícones; só Tarefas está pronta nesta fase).
+import 'vibra.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../dados/armazenamento.dart';
 import '../dados/carregador_assets.dart';
+import 'crt.dart';
 import 'equip_arena.dart';
 import 'estado_jogo.dart';
 import 'icones.dart';
@@ -11,16 +13,51 @@ import 'respiracao.dart';
 import 'som.dart';
 import 'tela_inventario.dart';
 import 'tela_loja.dart';
+import 'tela_perfil.dart';
+import 'cfg_base.dart' show BolinhaAviso;
 import 'tela_tarefas.dart';
 import 'tema.dart';
 
-class DungeonlogApp extends StatelessWidget {
+class DungeonlogApp extends StatefulWidget {
   const DungeonlogApp({super.key});
+  @override
+  State<DungeonlogApp> createState() => _DungeonlogAppState();
+}
+
+class _DungeonlogAppState extends State<DungeonlogApp> {
+  @override
+  void initState() {
+    super.initState();
+    temaMudou.addListener(_aoMudarTema);
+    crtAtivo.addListener(_aoMudarCrt);
+  }
+
+  @override
+  void dispose() {
+    temaMudou.removeListener(_aoMudarTema);
+    crtAtivo.removeListener(_aoMudarCrt);
+    super.dispose();
+  }
+
+  /// A paleta é global: troca o tema do MaterialApp e refaz todos os widgets (sem perder o estado das telas).
+  void _aoMudarTema() {
+    setState(() {});
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) reconstruirTudo(context);
+    });
+  }
+
+  void _aoMudarCrt() => setState(() {});
+
   @override
   Widget build(BuildContext context) => MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Dungeonlog',
         theme: temaApp(),
+        builder: (context, child) => Stack(children: [
+          Positioned.fill(child: child ?? const SizedBox.shrink()),
+          if (crtAtivo.value) const Positioned.fill(child: CamadaCrt()),
+        ]),
         home: const _Carregador(),
       );
 }
@@ -40,8 +77,19 @@ class _CarregadorState extends State<_Carregador> {
     await Respiracao.carregar();
     final arm = await ArmazenamentoLocal.abrir();
     Som.atual = SomAudio(arm);
-    final estado = EstadoJogo(dados: dados, armazenamento: arm);
+    // preferências do aparelho: idioma, tema de cor, vibração e efeito CRT (as mesmas chaves do app original)
+    final idioma = arm.ler(chaveIdiomaApp) == 'en' ? 'en' : 'pt';
+    Paleta.atual = Paleta.porId(arm.ler(chaveTema)) ?? Paleta.grafite;
+    crtAtivo.value = arm.ler(chaveCrt) == '1';
+    final pjSalvo = arm.ler('questlog.personagemAtivo.v1');
+    final estado = EstadoJogo(dados: dados, armazenamento: arm, idioma: idioma, personagem: pjSalvo == null || pjSalvo.isEmpty ? 'pj1' : pjSalvo);
     await estado.iniciar();
+    // o herói ativo precisa existir na lista (senão volta ao primeiro)
+    if (!estado.personagens.any((p) => p.id == estado.personagem)) {
+      estado.personagem = estado.personagens.first.id;
+      await estado.iniciar();
+    }
+    Vibra.ligada = estado.vibracaoLigada;
     return estado;
   }
 
@@ -70,23 +118,27 @@ class _CascaState extends State<Casca> {
 
   @override
   Widget build(BuildContext context) {
-    const futuras = {3: 'Fase 3', 4: 'Fase 4'};
+    const futuras = {4: 'Fase 4'};
     return Scaffold(
       // só a aba aberta fica montada: com as cinco vivas, cada compra ou tarefa reconstruía arena, lista, loja e mochila juntas
-      body: KeyedSubtree(
-        key: ValueKey(_aba),
-        child: switch (_aba) {
-          0 => TelaTarefas(estado: widget.estado),
-          1 => TelaInventario(estado: widget.estado),
-          2 => TelaLoja(estado: widget.estado),
-          _ => Center(child: Text('Em breve (${futuras[_aba]})', style: const TextStyle(color: corApagado))),
-        },
+      body: ValueListenableBuilder<String>(
+        valueListenable: widget.estado.personagemAtivo,
+        builder: (_, pj, __) => KeyedSubtree(
+          key: ValueKey('$pj-$_aba'),
+          child: switch (_aba) {
+            0 => TelaTarefas(estado: widget.estado),
+            1 => TelaInventario(estado: widget.estado),
+            2 => TelaLoja(estado: widget.estado),
+            3 => TelaPerfil(estado: widget.estado),
+            _ => Center(child: Text('Em breve (${futuras[_aba]})', style: TextStyle(color: corApagado))),
+          },
+        ),
       ),
       bottomNavigationBar: BarraNavegacao(
         estado: widget.estado,
         aba: _aba,
         aoTrocar: (i) {
-          HapticFeedback.selectionClick();
+          Vibra.toque();
           if (i == 0 && _aba != 0) {
             widget.estado.limparPreviewTema();
             widget.estado.piscarSelo();
@@ -111,8 +163,8 @@ class BarraNavegacao extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = estado.dados.traducoes;
-    return Container(
-      decoration: const BoxDecoration(color: corPainel, border: Border(top: BorderSide(color: corLinha, width: 0.8))),
+    return ListenableBuilder(listenable: estado, builder: (context, _) => Container(
+      decoration: BoxDecoration(color: corPainel, border: Border(top: BorderSide(color: corLinha, width: 0.8))),
       padding: EdgeInsets.fromLTRB(8, 6, 8, 6 + MediaQuery.of(context).viewPadding.bottom),
       child: SizedBox(
         height: 54,
@@ -145,7 +197,11 @@ class BarraNavegacao extends StatelessWidget {
                     child: GestureDetector(
                       behavior: HitTestBehavior.opaque,
                       onTap: () => aoTrocar(i),
-                      child: Center(child: Icone(_icones[i], tamanho: 26, cor: i == aba ? Colors.white : corApagado)),
+                      child: Stack(clipBehavior: Clip.none, alignment: Alignment.center, children: [
+                        Icone(_icones[i], tamanho: 26, cor: i == aba ? corAccent : corApagado),
+                        // bolinha de conquistas novas no ícone do Perfil (.conqbadge no .nav)
+                        if (i == 3 && estado.conquistasNaoVistas > 0) Positioned(left: largura / 2 + 2, top: -6, child: BolinhaAviso(estado.conquistasNaoVistas)),
+                      ]),
                     ),
                   ),
                 ),
@@ -153,6 +209,6 @@ class BarraNavegacao extends StatelessWidget {
           ]);
         }),
       ),
-    );
+    ));
   }
 }

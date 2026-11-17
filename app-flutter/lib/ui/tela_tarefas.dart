@@ -1,6 +1,7 @@
 // Aba Tarefas, no visual do app original (tema grafite): topo (avatar, nível em romano, moedas), arena,
 // cartão de Vida e Experiência, cabeçalho "Tarefas de <dia>" com a lua e "+ Adicionar", e a lista de pendentes.
 // Medidas e cores copiadas do CSS computado de play/ em 390x844.
+import 'vibra.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -92,7 +93,7 @@ class _TelaTarefasState extends State<TelaTarefas> with SingleTickerProviderStat
       if (qual == 'especial') Som.atual.tocar('bauTrancado');
       return;
     }
-    HapticFeedback.heavyImpact();
+    Vibra.forte();
     Som.atual.tocar('loot');
     mostrarBauLoot(context, e, itens, variante: qual == 'especial' ? 't${(tier ?? 0).clamp(0, 3)}' : 'padrao');
   }
@@ -130,7 +131,7 @@ class _TelaTarefasState extends State<TelaTarefas> with SingleTickerProviderStat
 
   /// Toque na caixa: o golpe sai na hora (como no original) e a conta vem em seguida.
   void _golpear([String dif = 'media']) {
-    HapticFeedback.mediumImpact();
+    Vibra.media();
     _golpe.golpear(dif: dif);
   }
 
@@ -156,7 +157,7 @@ class _TelaTarefasState extends State<TelaTarefas> with SingleTickerProviderStat
     if (_vitoriaEmAndamento || !e.podeTerminarDia) return;
     setState(() => _vitoriaEmAndamento = true);
     final nTarefas = e.tarefasDeHoje.length;
-    HapticFeedback.heavyImpact();
+    Vibra.forte();
     Som.atual.tocar('golpe');
     _golpe.golpear(fim: true);
     await Future<void>.delayed(const Duration(milliseconds: 925));
@@ -178,12 +179,12 @@ class _TelaTarefasState extends State<TelaTarefas> with SingleTickerProviderStat
 
   Future<void> _adicionar() async {
     if (!e.podeCriarTarefa) return;
-    HapticFeedback.selectionClick();
+    Vibra.toque();
     await abrirNovaTarefa(context, e);
   }
 
   Future<void> _descanso() async {
-    HapticFeedback.selectionClick();
+    Vibra.toque();
     if (e.descansando) {
       e.definirDescanso(false);
       return;
@@ -238,7 +239,7 @@ class _TelaTarefasState extends State<TelaTarefas> with SingleTickerProviderStat
                   sliver: SliverReorderableList(
                     itemCount: pendentes.length,
                     onReorderItem: (de, para) {
-                      HapticFeedback.selectionClick();
+                      Vibra.toque();
                       e.reordenar(de, para);
                     },
                     proxyDecorator: (filho, _, __) => Material(type: MaterialType.transparency, child: Transform.scale(scale: 1.02, child: filho)),
@@ -270,7 +271,7 @@ class _TelaTarefasState extends State<TelaTarefas> with SingleTickerProviderStat
                       if (pendentes.isEmpty)
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 26, horizontal: 12),
-                          child: Text(_vazio, textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, height: 1.5, color: corApagado)),
+                          child: Text(_vazio, textAlign: TextAlign.center, style: TextStyle(fontSize: 15, height: 1.5, color: corApagado)),
                         ),
                       if (e.podeTerminarDia && !_vitoriaEmAndamento) ...[
                         const SizedBox(height: 14),
@@ -307,7 +308,7 @@ class _TelaTarefasState extends State<TelaTarefas> with SingleTickerProviderStat
                       borderRadius: BorderRadius.circular(22),
                       boxShadow: const [BoxShadow(color: Color(0x80000000), blurRadius: 20, offset: Offset(0, 6))],
                     ),
-                    child: Text(_aviso, style: const TextStyle(fontFamily: fontePixel, fontSize: 13, color: corFundo)),
+                    child: Text(_aviso, style: TextStyle(fontFamily: fontePixel, fontSize: 13, color: corFundo)),
                   ),
                 ),
               ),
@@ -330,7 +331,7 @@ class _CartaoBarras extends StatelessWidget {
   Widget _linha(String rotulo, String numero, Color corNumero) => SizedBox(
         height: 19.2,
         child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-          Text(rotulo, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: corSuave, height: 1.23)),
+          Text(rotulo, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: corSuave, height: 1.23)),
           const Spacer(),
           Text(numero, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: corNumero, height: 1.28, fontFeatures: algarismosFixos)),
         ]),
@@ -398,7 +399,7 @@ class _Cabecalho extends StatelessWidget {
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
               Text(titulo, style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w600, letterSpacing: 0.19, height: 1.263)),
-              Text(subtitulo, style: const TextStyle(fontSize: 13, color: corApagado, height: 1.23)),
+              Text(subtitulo, style: TextStyle(fontSize: 13, color: corApagado, height: 1.23)),
             ]),
           ),
           if (mostrarLua) ...[
@@ -430,8 +431,8 @@ class _Cabecalho extends StatelessWidget {
                 height: 44,
                 padding: const EdgeInsets.symmetric(horizontal: 18),
                 alignment: Alignment.center,
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(11)),
-                child: const Text('+ Adicionar', style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w600, color: corFundo)),
+                decoration: BoxDecoration(color: corAccent, borderRadius: BorderRadius.circular(11)),
+                child: Text('+ Adicionar', style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w600, color: corSobreAccent)),
               ),
             ),
           ),
@@ -461,7 +462,7 @@ class CaixaTarefa extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: feita ? corVerde : (cor?.withValues(alpha: 0.6) ?? corApagado), width: 1.6),
           ),
-          child: feita ? const Icone(IconeApp.check, tamanho: 18, cor: corFundo) : null,
+          child: feita ? Icone(IconeApp.check, tamanho: 18, cor: corFundo) : null,
         ),
       );
 }
@@ -565,7 +566,7 @@ class _CartaoTarefaState extends State<_CartaoTarefa> {
                       Losangos(pips, cor: corDificuldade(pips)),
                       const SizedBox(width: 8),
                       Flexible(
-                        child: Text(rotuloTarefa(t), maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 11, color: corApagado, height: 1.3)),
+                        child: Text(rotuloTarefa(t), maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11, color: corApagado, height: 1.3)),
                       ),
                       if (meta > 1) ...[
                         const SizedBox(width: 8),
@@ -584,13 +585,13 @@ class _CartaoTarefaState extends State<_CartaoTarefa> {
                   height: 34,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(color: const Color(0x0BFFFFFF), borderRadius: BorderRadius.circular(12)),
-                  child: const Text('×', style: TextStyle(fontSize: 21, color: corApagado, height: 1)),
+                  child: Text('×', style: TextStyle(fontSize: 21, color: corApagado, height: 1)),
                 ),
               ),
               const SizedBox(width: 10),
               ReorderableDragStartListener(
                 index: widget.indice,
-                child: const Opacity(
+                child: Opacity(
                   opacity: 0.8,
                   child: SizedBox(width: 30, height: 38, child: Center(child: Icone(IconeApp.alca, tamanho: 18, cor: corApagado))),
                 ),

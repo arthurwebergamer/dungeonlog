@@ -1,6 +1,7 @@
 // Aba Inventário no visual do app original (#viewInventario): cabeçalho com a contagem, caixa dos 5 slots com o
 // ícone fantasma do slot vazio e a linha de bônus, busca, filtros (com os subfiltros de equipamento) e a grade.
 // Medidas e cores do CSS computado de play/ em 390x844; regras em renderInventario() (play/index.html ~8611).
+import 'vibra.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -95,7 +96,7 @@ class _TelaInventarioState extends State<TelaInventario> {
   }
 
   void _abrirFicha(ItemCatalogo it, BuildContext origem) {
-    HapticFeedback.selectionClick();
+    Vibra.toque();
     abrirFichaItem(context, e, it, origem: centroDe(origem));
   }
 
@@ -160,7 +161,7 @@ class _TelaInventarioState extends State<TelaInventario> {
                           filhos: [
                             for (final (id, chave) in _filtros)
                               PilulaFiltro(t.t(chave, e.idioma), ativa: _filtro == id, aoTocar: () {
-                                HapticFeedback.selectionClick();
+                                Vibra.toque();
                                 setState(() {
                                   _filtro = id;
                                   _sub = 'todos';
@@ -183,7 +184,7 @@ class _TelaInventarioState extends State<TelaInventario> {
                             filhos: [
                               for (final (id, nome) in [('todos', 'Todos'), ...subcategoriasEquip.where((c) => contSub.contains(c.$1))])
                                 PilulaFiltro(nome, pequena: true, ativa: _sub == id, aoTocar: () {
-                                  HapticFeedback.selectionClick();
+                                  Vibra.toque();
                                   setState(() => _sub = id);
                                 }),
                             ],
@@ -192,7 +193,7 @@ class _TelaInventarioState extends State<TelaInventario> {
                       ),
                     ),
                   if (visiveis.isEmpty)
-                    const SliverToBoxAdapter(
+                    SliverToBoxAdapter(
                       child: Padding(
                         padding: EdgeInsets.symmetric(vertical: 22),
                         child: Text('Nada nesta categoria.', textAlign: TextAlign.center, style: TextStyle(fontSize: 13, color: corApagado)),
@@ -266,9 +267,9 @@ class _CampoBusca extends StatelessWidget {
           autocorrect: false,
           enableSuggestions: false,
           textInputAction: TextInputAction.search,
-          style: const TextStyle(fontSize: 13, color: corTexto, height: 1.25),
+          style: TextStyle(fontSize: 13, color: corTexto, height: 1.25),
           cursorWidth: 1.5,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             isCollapsed: true,
             border: InputBorder.none,
             hintText: 'Buscar item...',
@@ -288,13 +289,13 @@ class _MochilaVazia extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 20),
           child: Column(mainAxisSize: MainAxisSize.min, children: [
-            const Opacity(opacity: 0.45, child: Icone(IconeApp.inventario, tamanho: 46, cor: corApagado)),
+            Opacity(opacity: 0.45, child: Icone(IconeApp.inventario, tamanho: 46, cor: corApagado)),
             const SizedBox(height: 9),
-            Text(titulo, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: corSuave)),
+            Text(titulo, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: corSuave)),
             const SizedBox(height: 9),
             ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 250),
-              child: Text(texto, textAlign: TextAlign.center, style: const TextStyle(fontSize: 13, height: 1.55, color: corApagado)),
+              child: Text(texto, textAlign: TextAlign.center, style: TextStyle(fontSize: 13, height: 1.55, color: corApagado)),
             ),
           ]),
         ),
@@ -311,7 +312,7 @@ class _CaixaEquip extends StatelessWidget {
   Widget build(BuildContext context) {
     final b = estado.bonus;
     String pct(int v) => '${v >= 0 ? '+' : ''}$v%';
-    const rotulo = TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: corApagado, height: 1.25);
+    final rotulo = TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: corApagado, height: 1.25);
     return Container(
       padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
       decoration: BoxDecoration(color: corPainel3, borderRadius: BorderRadius.circular(14), border: Border.all(color: corLinha, width: 0.8)),
@@ -325,11 +326,11 @@ class _CaixaEquip extends StatelessWidget {
         Container(
           margin: const EdgeInsets.only(top: 11),
           padding: const EdgeInsets.only(top: 9),
-          decoration: const BoxDecoration(border: Border(top: BorderSide(color: corLinha, width: 0.8))),
+          decoration: BoxDecoration(border: Border(top: BorderSide(color: corLinha, width: 0.8))),
           child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
             Text.rich(TextSpan(style: rotulo, children: [
               TextSpan(text: '${estado.dados.traducoes.t('inv.moedas', estado.idioma)} '),
-              TextSpan(text: pct(b.m), style: const TextStyle(fontWeight: FontWeight.w700, color: corOuro)),
+              TextSpan(text: pct(b.m), style: TextStyle(fontWeight: FontWeight.w700, color: corOuro)),
             ])),
             const SizedBox(width: 14),
             Text.rich(TextSpan(style: rotulo, children: [
@@ -375,7 +376,7 @@ class _Slot extends StatelessWidget {
     return AspectRatio(
       aspectRatio: 1,
       child: CustomPaint(
-        painter: const _BordaTracejada(cor: corLinha, raio: 10, fundo: corPoco),
+        painter: _BordaTracejada(cor: corLinha, raio: 10, fundo: corPoco),
         child: Stack(alignment: Alignment.center, children: [
           Sprite(estado: estado, sprite: _spriteSlot[slot]!, tamanho: 26, fantasma: true, clarear: false),
           Positioned(
@@ -385,7 +386,7 @@ class _Slot extends StatelessWidget {
             child: Text(
               estado.dados.traducoes.t(_chaveSlot[slot]!, estado.idioma).toUpperCase(),
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 8, letterSpacing: 0.24, color: corApagado, height: 1.3),
+              style: TextStyle(fontSize: 8, letterSpacing: 0.24, color: corApagado, height: 1.3),
             ),
           ),
         ]),
@@ -449,7 +450,7 @@ class _CelulaItem extends StatelessWidget {
               right: 3,
               bottom: 2,
               child: Text('$q',
-                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: corTexto, height: 1.28, shadows: [Shadow(color: Colors.black, blurRadius: 2, offset: Offset(0, 1))])),
+                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: corTexto, height: 1.28, shadows: [Shadow(color: Colors.black, blurRadius: 2, offset: Offset(0, 1))])),
             ),
           if (estado.equipado(item.id))
             const Positioned(left: 3, top: 3, child: SizedBox(width: 6, height: 6, child: DecoratedBox(decoration: BoxDecoration(color: corVerde, shape: BoxShape.circle)))),

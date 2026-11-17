@@ -1,6 +1,7 @@
 // Ficha do item (.isheet do original) e as telas da Forja dentro dela: escolha dos tesouros, roleta do
 // encantamento (tira vertical que desacelera) e resultado "Atual / Novo". Espelha abrirFicha() (~8743),
 // forjaRoleta() (~8910) e abrirForja() (~8943) de play/index.html; as regras ficam em EstadoJogo.
+import 'vibra.dart';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -16,6 +17,7 @@ import 'flutuante.dart';
 import 'popups_md.dart' show mostrarNivelUp;
 import 'folhas.dart';
 import 'itens_ui.dart';
+import 'tela_catalogo.dart' show abrirCatalogoGrimorio;
 import 'som.dart';
 import 'tema.dart';
 
@@ -63,13 +65,13 @@ class _FichaItemState extends State<FichaItem> {
 
   // ---------- ações da ficha ----------
   void _equipar() {
-    HapticFeedback.mediumImpact();
+    Vibra.media();
     e.equipar(_item.id); // sem aviso: no original o toast de equipar está desligado (só o som)
     Navigator.pop(context);
   }
 
   void _usar() {
-    HapticFeedback.mediumImpact();
+    Vibra.media();
     final ponto = _ponto;
     final it = _item;
     final g = e.usarItem(it.id);
@@ -83,7 +85,7 @@ class _FichaItemState extends State<FichaItem> {
   }
 
   void _vender() {
-    HapticFeedback.mediumImpact();
+    Vibra.media();
     final ponto = _ponto;
     final preco = e.venderItem(_item.id);
     if (preco != null) flutuanteMoedas(context, ponto, preco);
@@ -94,10 +96,10 @@ class _FichaItemState extends State<FichaItem> {
   void _forjar() {
     final it = _item;
     if (_sel.length < custoForja(it.rer)) {
-      HapticFeedback.lightImpact();
+      Vibra.leve();
       return;
     }
-    HapticFeedback.heavyImpact();
+    Vibra.forte();
     final novo = e.forjarSortear(it.id, List<int>.from(_sel));
     if (novo == null) return;
     // a tira é só enfeite: 28 encantamentos ao acaso e o sorteado na antepenúltima linha
@@ -114,7 +116,7 @@ class _FichaItemState extends State<FichaItem> {
   void _fecharForja(Afixo? afixo) {
     if (_travado) return;
     _travado = true;
-    HapticFeedback.mediumImpact();
+    Vibra.media();
     final id = e.forjarConfirmar(_item.id, afixo);
     if (id == null) {
       Navigator.pop(context);
@@ -142,7 +144,7 @@ class _FichaItemState extends State<FichaItem> {
           width: double.infinity,
           constraints: BoxConstraints(maxHeight: mq.size.height - mq.viewPadding.top - 12),
           padding: EdgeInsets.fromLTRB(18, 18, 18, 18 + mq.viewPadding.bottom),
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             color: corFicha,
             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
             border: Border(top: BorderSide(color: corLinha, width: 0.8)),
@@ -193,7 +195,7 @@ class _FichaItemState extends State<FichaItem> {
       if (slotsEquip.contains(it.tipo) && it.afixo != null) _LinhaBonus(afixo: it.afixo),
       const _Separador(),
       if (it.tipo == 'chave' && !_grimorio)
-        const Padding(
+        Padding(
           padding: EdgeInsets.symmetric(horizontal: 14, vertical: 4),
           child: Text('Usada automaticamente pra destrancar um baú trancado na Arena',
               textAlign: TextAlign.center, style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic, color: corApagado, height: 1.26)),
@@ -248,7 +250,7 @@ class _FichaItemState extends State<FichaItem> {
         child: Text(
           pronto ? 'Chance de maldição: ${(pNegForja(e.catalogo, _sel) * 100).round()}%' : 'Toque nos tesouros abaixo pra escolher',
           textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: corApagado, height: 1.26),
+          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: corApagado, height: 1.26),
         ),
       ),
       ConstrainedBox(
@@ -266,7 +268,7 @@ class _FichaItemState extends State<FichaItem> {
                   return GestureDetector(
                     onTap: pode
                         ? () {
-                            HapticFeedback.selectionClick();
+                            Vibra.toque();
                             setState(() => _sel.add(t.id));
                           }
                         : null,
@@ -282,7 +284,7 @@ class _FichaItemState extends State<FichaItem> {
                         ),
                         child: Stack(alignment: Alignment.center, children: [
                           SpriteItem(estado: e, item: t, tamanho: 32),
-                          Positioned(right: 3, bottom: 1, child: Text('${q - usados}', style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: corTexto, height: 1.28))),
+                          Positioned(right: 3, bottom: 1, child: Text('${q - usados}', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: corTexto, height: 1.28))),
                         ]),
                       ),
                     ),
@@ -322,6 +324,12 @@ class _FichaItemState extends State<FichaItem> {
             _BotaoFicha('Forjar', aoTocar: () {
               _sel.clear();
               _irPara('sel');
+            }),
+          if (_grimorio && q > 0)
+            _BotaoFicha(e.idioma == 'en' ? 'Open' : 'Abrir', primario: true, aoTocar: () {
+              final nav = Navigator.of(context);
+              nav.pop();
+              abrirCatalogoGrimorio(nav.context, e);
             }),
           if (!_grimorio && q > 0) _BotaoFicha('Vender', primario: true, aoTocar: _vender),
         ],
@@ -379,11 +387,11 @@ class _BotaoFicha extends StatelessWidget {
             alignment: Alignment.center,
             padding: const EdgeInsets.symmetric(horizontal: 6),
             decoration: BoxDecoration(
-              color: primario ? Colors.white : const Color(0xFF404040), // color-mix(accent 16%, poço)
+              color: primario ? corAccent : Color.alphaBlend(corAccent.withValues(alpha: 0.16), corPoco), // color-mix(accent 16%, poço)
               borderRadius: BorderRadius.circular(11),
-              border: Border.all(color: primario ? Colors.white : const Color(0xA6FFFFFF), width: 0.8),
+              border: Border.all(color: primario ? corAccent : corAccent.withValues(alpha: 0.65), width: 0.8),
             ),
-            child: Text(texto, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: primario ? corFundo : Colors.white, height: 1.26)),
+            child: Text(texto, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: primario ? corSobreAccent : corAccent, height: 1.26)),
           ),
         ),
       );
@@ -397,11 +405,11 @@ class _LinhaBonus extends StatelessWidget {
   final Afixo? afixo;
   @override
   Widget build(BuildContext context) {
-    const base = TextStyle(fontSize: 15, color: corTexto, height: 1.28);
+    final base = TextStyle(fontSize: 15, color: corTexto, height: 1.28);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 3),
       child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-        const Padding(padding: EdgeInsets.only(left: 2), child: Text('◆', style: TextStyle(fontSize: 7, color: corApagado, height: 1.3))),
+        Padding(padding: EdgeInsets.only(left: 2), child: Text('◆', style: TextStyle(fontSize: 7, color: corApagado, height: 1.3))),
         const SizedBox(width: 6),
         if (afixo != null)
           Flexible(child: Text(efeitoAfixo(afixo!), style: base.copyWith(fontWeight: FontWeight.w600, color: corAfixo(afixo!))))
@@ -424,9 +432,9 @@ class _LinhaApagada extends StatelessWidget {
   Widget build(BuildContext context) => Padding(
         padding: const EdgeInsets.symmetric(vertical: 3),
         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Text(rotulo, style: const TextStyle(fontSize: 12, color: corApagado, height: 1.27)),
+          Text(rotulo, style: TextStyle(fontSize: 12, color: corApagado, height: 1.27)),
           const SizedBox(width: 5),
-          Text(valor, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: corApagado, height: 1.27, fontFeatures: algarismosFixos)),
+          Text(valor, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: corApagado, height: 1.27, fontFeatures: algarismosFixos)),
         ]),
       );
 }
@@ -443,8 +451,8 @@ class _Separador extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 6),
       padding: const EdgeInsets.only(top: 8),
-      decoration: const BoxDecoration(border: Border(top: BorderSide(color: corLinha, width: 0.8))),
-      child: Text(texto!.toUpperCase(), style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, letterSpacing: 1.4, color: corApagado, height: 1.28)),
+      decoration: BoxDecoration(border: Border(top: BorderSide(color: corLinha, width: 0.8))),
+      child: Text(texto!.toUpperCase(), style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, letterSpacing: 1.4, color: corApagado, height: 1.28)),
     );
   }
 }
@@ -500,7 +508,7 @@ class _LinhaAfixo extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
               decoration: BoxDecoration(color: corTexto, borderRadius: BorderRadius.circular(5)),
-              child: const Text('NOVO', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, letterSpacing: 0.9, color: corFundo, height: 1.25)),
+              child: Text('NOVO', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, letterSpacing: 0.9, color: corFundo, height: 1.25)),
             ),
           ],
         ]),
@@ -564,7 +572,7 @@ class _RoletaState extends State<_Roleta> with SingleTickerProviderStateMixin {
     _c.addListener(_tique);
     _c.forward().whenComplete(() async {
       if (!mounted) return;
-      HapticFeedback.mediumImpact();
+      Vibra.media();
       Som.atual.tocar('roletaFim');
       setState(() => _parou = true);
       await Future<void>.delayed(const Duration(milliseconds: 500));
@@ -580,7 +588,7 @@ class _RoletaState extends State<_Roleta> with SingleTickerProviderStateMixin {
     if (linha != _ultima) {
       _ultima = linha;
       if (_c.value < 1) {
-        HapticFeedback.selectionClick();
+        Vibra.toque();
         Som.atual.tocar('roletaTick', progresso: _c.value);
       }
     }

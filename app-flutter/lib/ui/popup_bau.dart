@@ -58,7 +58,7 @@ class _PopupBauState extends State<_PopupBau> with SingleTickerProviderStateMixi
       width: double.infinity,
       constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.86),
       padding: EdgeInsets.fromLTRB(20, 30, 20, 22 + MediaQuery.of(context).viewPadding.bottom),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: corPainel2,
         borderRadius: BorderRadius.vertical(top: Radius.circular(26)),
         border: Border(top: BorderSide(color: corLinha, width: 0.8)),
@@ -135,7 +135,7 @@ class _CartaoGanho extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-            Text(item.nomeNoIdioma(estado.idioma), style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: corTexto, height: 1.24)),
+            Text(item.nomeNoIdioma(estado.idioma), style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: corTexto, height: 1.24)),
             const SizedBox(height: 1),
             Text(nomeRaridade(item.raridade, estado.idioma).toUpperCase(), style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, letterSpacing: 0.525, color: cor, height: 1.22)),
             if (a != null) ...[

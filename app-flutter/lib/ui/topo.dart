@@ -36,7 +36,7 @@ class TopoApp extends StatelessWidget {
           const Spacer(),
           pixel('assets/img/ui/moedas.png', largura: 30, altura: 30),
           const SizedBox(width: 6),
-          Text('${estado.save.moedas.toInt()}', style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: corOuro)),
+          Text('${estado.save.moedas.toInt()}', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: corOuro)),
         ]),
       ),
     );

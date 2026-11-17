@@ -27,8 +27,8 @@ Future<void> mostrarCerimoniaEstagio(BuildContext context, EstadoJogo e, Cerimon
         filho: Padding(
           padding: const EdgeInsets.only(top: 7),
           child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            Text('${en ? 'Stage' : 'Estágio'} ${c.concluido} / 4', style: const TextStyle(fontSize: 12, color: corApagado)),
-            if (c.alvo != null) Text('${c.alvo} / ${c.alvo} ${en ? 'tasks' : 'tarefas'}', style: const TextStyle(fontSize: 12, color: corApagado)),
+            Text('${en ? 'Stage' : 'Estágio'} ${c.concluido} / 4', style: TextStyle(fontSize: 12, color: corApagado)),
+            if (c.alvo != null) Text('${c.alvo} / ${c.alvo} ${en ? 'tasks' : 'tarefas'}', style: TextStyle(fontSize: 12, color: corApagado)),
           ]),
         ),
       ),
@@ -40,7 +40,7 @@ Future<void> mostrarCerimoniaEstagio(BuildContext context, EstadoJogo e, Cerimon
             child: Padding(
               padding: const EdgeInsets.only(top: 16),
               child: Text(en ? 'NEW MONSTERS IN THIS BIOME' : 'NOVOS MONSTROS NESTE BIOMA',
-                  style: const TextStyle(fontFamily: fontePixel, fontSize: 10, letterSpacing: 1.6, color: corApagado)),
+                  style: TextStyle(fontFamily: fontePixel, fontSize: 10, letterSpacing: 1.6, color: corApagado)),
             ),
           ),
         ),
@@ -68,7 +68,7 @@ Future<void> mostrarCerimoniaEstagio(BuildContext context, EstadoJogo e, Cerimon
             padding: const EdgeInsets.only(top: 12),
             child: Text(
               en ? "You've unlocked every biome! Swipe the Arena sideways to use whichever one you like." : 'Você desbloqueou todos os biomas! Arraste a Arena pro lado pra usar o que você quiser.',
-              style: const TextStyle(fontSize: 13, color: corApagado, height: 1.4),
+              style: TextStyle(fontSize: 13, color: corApagado, height: 1.4),
             ),
           ),
         ),
@@ -157,7 +157,7 @@ class _Segmentos extends StatelessWidget {
                 height: 6,
                 decoration: BoxDecoration(color: k < concluido ? corOuro : corLinha, borderRadius: BorderRadius.circular(3)),
                 clipBehavior: Clip.antiAlias,
-                child: k == concluido ? Align(alignment: Alignment.centerLeft, child: FractionallySizedBox(widthFactor: enche, child: const ColoredBox(color: corOuro, child: SizedBox.expand()))) : null,
+                child: k == concluido ? Align(alignment: Alignment.centerLeft, child: FractionallySizedBox(widthFactor: enche, child: ColoredBox(color: corOuro, child: SizedBox.expand()))) : null,
               ),
             ),
           ],

@@ -1,5 +1,6 @@
 // Folha "Nova tarefa" / "Editar tarefa" no visual do app original (#addSheet / #edSheet): campo de texto,
 // repetição (Hoje / Semana / Mês / Ano), dificuldade com losangos e vezes por dia.
+import 'vibra.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -103,7 +104,7 @@ class _FolhaNovaTarefaState extends State<FolhaNovaTarefa> {
   String? _dica; // aviso rosa acima do botão (.saveHint), como o tentarCriar() do original
 
   void _mudar(VoidCallback f) {
-    HapticFeedback.selectionClick();
+    Vibra.toque();
     setState(() {
       f();
       _dica = null;
@@ -115,7 +116,7 @@ class _FolhaNovaTarefaState extends State<FolhaNovaTarefa> {
         ? 'Dê um nome à tarefa'
         : (widget.editar == null && _modo == ModoTarefa.repete && _dias.isEmpty ? 'Escolha pelo menos um dia' : null);
     if (falta != null) {
-      HapticFeedback.heavyImpact();
+      Vibra.forte();
       setState(() => _dica = falta);
       return;
     }
@@ -134,7 +135,7 @@ class _FolhaNovaTarefaState extends State<FolhaNovaTarefa> {
             corBox: _cor,
           );
     if (ok) {
-      HapticFeedback.mediumImpact();
+      Vibra.media();
       Navigator.pop(context);
     }
   }
@@ -158,8 +159,8 @@ class _FolhaNovaTarefaState extends State<FolhaNovaTarefa> {
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 6),
             child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              const Text('Opções avançadas', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: corApagado, letterSpacing: 0.25)),
-              AnimatedRotation(turns: _avancado ? 0.5 : 0, duration: const Duration(milliseconds: 180), child: const Text('▾', style: TextStyle(fontSize: 11, color: corApagado))),
+              Text('Opções avançadas', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: corApagado, letterSpacing: 0.25)),
+              AnimatedRotation(turns: _avancado ? 0.5 : 0, duration: const Duration(milliseconds: 180), child: Text('▾', style: TextStyle(fontSize: 11, color: corApagado))),
             ]),
           ),
         ),
@@ -192,13 +193,13 @@ class _FolhaNovaTarefaState extends State<FolhaNovaTarefa> {
                             decoration: InputDecoration(
                               counterText: '',
                               hintText: '#F2A65A',
-                              hintStyle: const TextStyle(color: corApagado),
+                              hintStyle: TextStyle(color: corApagado),
                               filled: true,
                               fillColor: corPainel,
                               contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(9), borderSide: const BorderSide(color: corLinha, width: 0.8)),
-                              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(9), borderSide: const BorderSide(color: corLinha, width: 0.8)),
-                              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(9), borderSide: const BorderSide(color: Colors.white, width: 0.8)),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(9), borderSide: BorderSide(color: corLinha, width: 0.8)),
+                              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(9), borderSide: BorderSide(color: corLinha, width: 0.8)),
+                              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(9), borderSide: BorderSide(color: corAccent, width: 0.8)),
                             ),
                             onChanged: (v) {
                               final h = hexValido(v);
@@ -216,7 +217,7 @@ class _FolhaNovaTarefaState extends State<FolhaNovaTarefa> {
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           alignment: Alignment.center,
                           decoration: BoxDecoration(color: corPainel, borderRadius: BorderRadius.circular(9), border: Border.all(color: corLinha, width: 0.8)),
-                          child: const Text('Sem cor', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: corSuave)),
+                          child: Text('Sem cor', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: corSuave)),
                         ),
                       ),
                     ]),
@@ -249,8 +250,8 @@ class _FolhaNovaTarefaState extends State<FolhaNovaTarefa> {
         textCapitalization: TextCapitalization.sentences,
         textInputAction: TextInputAction.done,
         onSubmitted: (_) => _criar(),
-        style: const TextStyle(fontSize: 15, color: corTexto),
-        cursorColor: Colors.white,
+        style: TextStyle(fontSize: 15, color: corTexto),
+        cursorColor: corAccent,
         decoration: InputDecoration(
           hintText: 'O que precisa ser feito?',
           hintStyle: const TextStyle(fontSize: 15, color: Color(0xFF757575)),
@@ -258,8 +259,8 @@ class _FolhaNovaTarefaState extends State<FolhaNovaTarefa> {
           filled: true,
           fillColor: corPainel,
           contentPadding: const EdgeInsets.all(13),
-          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(9), borderSide: const BorderSide(color: corLinha, width: 0.8)),
-          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(9), borderSide: const BorderSide(color: Colors.white, width: 0.8)),
+          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(9), borderSide: BorderSide(color: corLinha, width: 0.8)),
+          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(9), borderSide: BorderSide(color: corAccent, width: 0.8)),
         ),
       );
 
@@ -280,8 +281,8 @@ class _FolhaNovaTarefaState extends State<FolhaNovaTarefa> {
             child: Text(
               rot,
               style: pixel
-                  ? TextStyle(fontFamily: fontePixel, fontSize: 8, color: sel ? Colors.white : corApagado)
-                  : TextStyle(fontSize: 12, color: sel ? Colors.white : corSuave),
+                  ? TextStyle(fontFamily: fontePixel, fontSize: 8, color: sel ? corAccent : corApagado)
+                  : TextStyle(fontSize: 12, color: sel ? corAccent : corSuave),
             ),
           ),
         ),
@@ -329,7 +330,7 @@ class _FolhaNovaTarefaState extends State<FolhaNovaTarefa> {
                 decoration: BoxDecoration(
                   color: _dif == d.id ? corAtivo : corPainel,
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: _dif == d.id ? Colors.white : corLinha, width: 0.8),
+                  border: Border.all(color: _dif == d.id ? corAccent : corLinha, width: 0.8),
                 ),
                 child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                   Losangos(d.pips, cor: _dif == d.id ? corDificuldade(d.pips) : corApagado),

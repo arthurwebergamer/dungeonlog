@@ -14,6 +14,7 @@ import 'folhas.dart';
 import 'icones.dart';
 import 'itens_ui.dart';
 import 'tema.dart';
+import 'tour.dart';
 import 'topo.dart';
 
 export 'ficha_item.dart' show FichaItem, abrirFichaItem;
@@ -138,7 +139,8 @@ class _TelaInventarioState extends State<TelaInventario> {
             TopoApp(estado: e),
             if (semNada) ...[
               cabecalho,
-              Expanded(child: _MochilaVazia(titulo: t.t('inv.mochilaVazia', e.idioma), texto: t.t('inv.mochilaVaziaDesc', e.idioma))),
+              // mochila vazia não tem a caixa de equipamento: o tour destaca a própria mensagem
+              Expanded(child: KeyedSubtree(key: TourAlvos.equipbox, child: _MochilaVazia(titulo: t.t('inv.mochilaVazia', e.idioma), texto: t.t('inv.mochilaVaziaDesc', e.idioma)))),
             ] else
               Expanded(
                 child: CustomScrollView(slivers: [
@@ -314,6 +316,7 @@ class _CaixaEquip extends StatelessWidget {
     String pct(int v) => '${v >= 0 ? '+' : ''}$v%';
     final rotulo = TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: corApagado, height: 1.25);
     return Container(
+      key: TourAlvos.equipbox,
       padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
       decoration: BoxDecoration(color: corPainel3, borderRadius: BorderRadius.circular(14), border: Border.all(color: corLinha, width: 0.8)),
       child: Column(children: [

@@ -21,6 +21,7 @@ import 'folhas.dart';
 import 'icones.dart';
 import 'som.dart';
 import 'tema.dart';
+import 'tour.dart';
 import 'topo.dart';
 
 const _nomesDia = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
@@ -408,6 +409,7 @@ class _Cabecalho extends StatelessWidget {
               rotulo: descansando ? 'Cancelar descanso' : 'Descansar',
               aoTocar: aoDescansar,
               child: Container(
+                key: TourAlvos.restbtn,
                 height: 28,
                 padding: EdgeInsets.symmetric(horizontal: descansando ? 10 : 7.5),
                 alignment: Alignment.center,
@@ -428,6 +430,7 @@ class _Cabecalho extends StatelessWidget {
             child: Toque(
               aoTocar: podeAdicionar ? aoAdicionar : null,
               child: Container(
+                key: TourAlvos.addbtn,
                 height: 44,
                 padding: const EdgeInsets.symmetric(horizontal: 18),
                 alignment: Alignment.center,
@@ -546,7 +549,7 @@ class _CartaoTarefaState extends State<_CartaoTarefa> {
             padding: const EdgeInsets.fromLTRB(11, 7, 8, 7),
             decoration: BoxDecoration(color: _cor == null ? corPainel3 : Color.alphaBlend(_cor!.withValues(alpha: 0.10), corPainel3), borderRadius: BorderRadius.circular(14)),
             child: Row(children: [
-              CaixaTarefa(feita: _feita, aoTocar: _tocarCaixa, cor: _cor),
+              KeyedSubtree(key: identical(widget.tarefa, TourAlvos.tarefaAlvo) ? TourAlvos.tarefaBox : null, child: CaixaTarefa(feita: _feita, aoTocar: _tocarCaixa, cor: _cor)),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [

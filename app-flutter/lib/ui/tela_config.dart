@@ -15,6 +15,7 @@ import 'icones.dart';
 import 'som.dart';
 import 'svg_icone.dart';
 import 'tema.dart';
+import 'tour.dart';
 import 'vibra.dart';
 
 /// Endereço das páginas legais (muda para /en/... em inglês: `atualizarLinksLegais`).
@@ -105,11 +106,11 @@ class _TelaConfig extends StatelessWidget {
                 icone: 'rever',
                 titulo: tr(e, 'cfg.reverTutorial'),
                 seta: true,
-                // o tutorial guiado é da Fase 5
-                aoTocar: () => mostrarAviso(context,
-                    titulo: en ? 'Coming soon' : 'Disponível em breve',
-                    texto: en ? 'The guided tutorial arrives in a later version of the app.' : 'O tutorial guiado chega numa próxima versão do app.',
-                    botao: en ? 'OK' : 'Entendi'),
+                // fecha as Configurações e abre o tour de novo (`revisarTutorial`, 350 ms depois)
+                aoTocar: () {
+                  Navigator.of(context).popUntil((r) => r.isFirst);
+                  Timer(const Duration(milliseconds: 350), () => TourControle.instancia?.revisar());
+                },
               ),
             ]),
             CfgSecao(tr(e, 'cfg.legal')),

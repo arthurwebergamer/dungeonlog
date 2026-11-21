@@ -701,6 +701,42 @@ casos.fusos = fusos.map((tz) => ({ tz, datas: JSON.parse(execFileSync(process.ex
 casos.temasArena = S0.run('TEMAS_ARENA.map(t => t.id)');
 casos.nMonstros = S0.run('MONSTROS.length');
 
+// Entrada: idioma padrão do aparelho (script do <head>) e posição do cartão do tour (tourPosicionar), rodados do index.html
+{
+  const iniI = html.lastIndexOf('(function(){', html.indexOf("if (localStorage.getItem('questlog.idioma.v1')) return; // ja escolhido"));
+  const fimI = html.indexOf('})();', iniI) + 5;
+  const fonteIdioma = html.slice(iniI, fimI);
+  const idiomaJs = (langs) => {
+    const mem = {};
+    const ctx = vm.createContext({ navigator: { languages: langs, language: langs[0] || '' }, localStorage: { getItem: (k) => (k in mem ? mem[k] : null), setItem: (k, v) => { mem[k] = String(v); } } });
+    vm.runInContext(fonteIdioma, ctx);
+    return mem['questlog.idioma.v1'];
+  };
+  const listas = [['pt-BR'], ['pt'], ['PT-br'], ['pt-PT'], ['en-US'], ['en-US', 'pt-BR'], ['fr', 'es', 'pt-BR'], ['pt-PT', 'pt-BR'], ['es-419'], ['de'], ['pt-br', 'en'], ['ptbr'], ['zh-CN', 'en-GB'], ['pt-PT', 'en'], []];
+  const idioma = listas.map((l) => ({ langs: l, idioma: l.length ? idiomaJs(l) : 'en' }));
+  // listas vazias: o navegador usa navigator.language ('' aqui) -> en
+  const iniT = html.indexOf('const largo = W > 700, cw = largo');
+  const fimT = html.indexOf("card.classList.toggle('noTopo'", iniT);
+  const fonteTour = 'function posTour(W, H, r, pad, card){ ' + html.slice(iniT, fimT) + ' return {nl, nt, bot, largo, cw}; }';
+  const ctxT = vm.createContext({ Math });
+  vm.runInContext(fonteTour, ctxT);
+  const rc2 = mulberry32(4242);
+  const rn = (a, b) => a + Math.floor(rc2() * (b - a + 1));
+  const cartao = [];
+  const larguras = [320, 360, 375, 390, 412, 600, 700, 701, 800, 1024];
+  for (let i = 0; i < 400; i++) {
+    const W = larguras[rn(0, larguras.length - 1)], H = rn(480, 960), ch = rn(110, 280);
+    const nr = rn(1, 2);
+    const rects = [];
+    for (let k = 0; k < nr; k++) { const w = rn(20, Math.min(W - 10, 360)), h = rn(20, 200); const left = rn(0, W - w), top = rn(0, H - h); rects.push({ left, top, right: left + w, bottom: top + h }); }
+    const l = Math.min(...rects.map((q) => q.left)), t = Math.min(...rects.map((q) => q.top)), r2 = Math.max(...rects.map((q) => q.right)), b = Math.max(...rects.map((q) => q.bottom));
+    const r = { rects, left: l, top: t, right: r2, bottom: b, width: r2 - l, height: b - t };
+    const card = { style: {}, offsetHeight: ch };
+    const o = ctxT.posTour(W, H, r, 6, card);
+    cartao.push({ W, H, ch, rects, r: { left: l, top: t, right: r2, bottom: b }, saida: { nl: o.nl, nt: o.nt, bot: o.bot, largo: o.largo, cw: o.cw } });
+  }
+  casos.entrada = { idioma, cartao };
+}
 const dest = path.join(raiz, 'app-flutter', 'test', 'fixtures', 'casos_js.json');
 fs.mkdirSync(path.dirname(dest), { recursive: true });
 fs.writeFileSync(dest, JSON.stringify(casos));

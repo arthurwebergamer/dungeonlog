@@ -17,6 +17,7 @@ import 'svg_icone.dart';
 import 'tela_catalogo.dart';
 import 'tela_config.dart';
 import 'tema.dart';
+import 'tour.dart';
 import 'topo.dart';
 import 'vibra.dart';
 
@@ -64,6 +65,7 @@ class TelaPerfil extends StatelessWidget {
                             abrirConfiguracoes(context, e);
                           },
                           child: Container(
+                            key: TourAlvos.perfilCfgBtn,
                             width: 34,
                             height: 34,
                             decoration: BoxDecoration(color: corPainel3, borderRadius: BorderRadius.circular(10), border: Border.all(color: corLinha, width: 0.8)),
@@ -86,6 +88,7 @@ class TelaPerfil extends StatelessWidget {
                   const SizedBox(height: 28),
                   // cartão Conquistas
                   _PreviaLinha(
+                    chave: TourAlvos.prevConquistas,
                     titulo: tr(e, 'perfil.conquistas'),
                     texto: en ? '$conq of ${conquistasV2.length} unlocked' : '$conq de ${conquistasV2.length} desbloqueadas',
                     botao: tr(e, 'acao.verTodas'),
@@ -98,6 +101,7 @@ class TelaPerfil extends StatelessWidget {
                   const SizedBox(height: 28),
                   // cartão Bestiário
                   _PreviaLinha(
+                    chave: TourAlvos.prevBestiario,
                     titulo: tr(e, 'perfil.bestiario'),
                     texto: en
                         ? '${derrotados.length} of ${e.dados.monstros.length} monsters defeated'
@@ -148,7 +152,8 @@ class _Legenda extends StatelessWidget {
 
 /// Linha de prévia (`#prevConquistas` / `#prevBestiario`): linha fina em cima, título e texto à esquerda, botão à direita.
 class _PreviaLinha extends StatelessWidget {
-  const _PreviaLinha({required this.titulo, required this.texto, required this.botao, required this.aoTocar, this.bolinha = 0, this.rodape});
+  const _PreviaLinha({this.chave, required this.titulo, required this.texto, required this.botao, required this.aoTocar, this.bolinha = 0, this.rodape});
+  final GlobalKey? chave;
   final String titulo;
   final String texto;
   final String botao;
@@ -157,6 +162,7 @@ class _PreviaLinha extends StatelessWidget {
   final Widget? rodape;
   @override
   Widget build(BuildContext context) => Container(
+        key: chave,
         padding: const EdgeInsets.only(top: 12),
         decoration: BoxDecoration(border: Border(top: BorderSide(color: corLinha, width: 1))),
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [

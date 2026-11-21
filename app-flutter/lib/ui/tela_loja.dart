@@ -17,6 +17,7 @@ import 'icones.dart';
 import 'itens_ui.dart';
 import 'som.dart';
 import 'tema.dart';
+import 'tour.dart';
 import 'topo.dart';
 
 /// `horasAteVirar()`: quanto falta para a prateleira renovar (meia-noite).
@@ -170,6 +171,7 @@ class _TelaLojaState extends State<TelaLoja> {
       final semGrana = e.save.moedas < preco;
       final bloqueio = vendido ? 'Esgotado' : (travado ? 'Nível ${romano(exigido)}' : (semGrana ? 'Sem moedas' : null));
       linhas.add(Padding(
+        key: linhas.isEmpty ? TourAlvos.lojaLinha : null,
         padding: const EdgeInsets.only(bottom: 8),
         child: _LinhaLoja(
           estado: e,

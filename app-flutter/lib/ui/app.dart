@@ -1,5 +1,7 @@
 // Raiz do app: carrega dados e save, e mostra a barra de navegação do app original (5 ícones, as 5 abas prontas).
 import 'vibra.dart';
+import 'dart:async';
+import 'dart:ui' show PlatformDispatcher;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -18,6 +20,11 @@ import 'tela_perfil.dart';
 import 'cfg_base.dart' show BolinhaAviso;
 import 'tela_tarefas.dart';
 import 'tema.dart';
+import '../dominio/entrada.dart';
+import '../dominio/tutorial.dart' show telasTutorial;
+import 'onboarding.dart';
+import 'splash.dart';
+import 'tour.dart';
 
 class DungeonlogApp extends StatefulWidget {
   const DungeonlogApp({super.key});
@@ -57,6 +64,7 @@ class _DungeonlogAppState extends State<DungeonlogApp> {
         theme: temaApp(),
         builder: (context, child) => Stack(children: [
           Positioned.fill(child: child ?? const SizedBox.shrink()),
+          const Positioned.fill(child: CamadaTour()),
           if (crtAtivo.value) const Positioned.fill(child: CamadaCrt()),
         ]),
         home: const _Carregador(),
@@ -71,26 +79,37 @@ class _Carregador extends StatefulWidget {
 
 class _CarregadorState extends State<_Carregador> {
   late final Future<EstadoJogo> _futuro = _iniciar();
+  Color _corAbertura = Paleta.grafite.bg;
+  bool _splashSaiu = false;
+  bool _entrada = false; // a entrada (onboarding) está na tela
 
   Future<EstadoJogo> _iniciar() async {
+    final arm = await ArmazenamentoLocal.abrir();
+    // preferências do aparelho: idioma, tema de cor, vibração e efeito CRT (as mesmas chaves do app original)
+    var langSalva = arm.ler(chaveIdiomaApp);
+    if (langSalva == null || langSalva.isEmpty) {
+      // primeira abertura: idioma pelo aparelho (pt-BR = PT, o resto EN), gravado como o script do <head> do original
+      langSalva = idiomaPadraoDoAparelho([for (final l in PlatformDispatcher.instance.locales) l.toLanguageTag()]);
+      await arm.gravar(chaveIdiomaApp, langSalva);
+    }
+    final idioma = langSalva == 'en' ? 'en' : 'pt';
+    Paleta.atual = Paleta.porId(arm.ler(chaveTema)) ?? Paleta.grafite;
+    if (mounted) setState(() => _corAbertura = Paleta.atual.bg);
     final dados = await carregarDadosJogo();
     await EquipArena.carregar();
     await Respiracao.carregar();
-    final arm = await ArmazenamentoLocal.abrir();
     Som.atual = SomAudio(arm);
-    // preferências do aparelho: idioma, tema de cor, vibração e efeito CRT (as mesmas chaves do app original)
-    final idioma = arm.ler(chaveIdiomaApp) == 'en' ? 'en' : 'pt';
-    Paleta.atual = Paleta.porId(arm.ler(chaveTema)) ?? Paleta.grafite;
     crtAtivo.value = arm.ler(chaveCrt) == '1';
     final pjSalvo = arm.ler('questlog.personagemAtivo.v1');
     final estado = EstadoJogo(dados: dados, armazenamento: arm, idioma: idioma, personagem: pjSalvo == null || pjSalvo.isEmpty ? 'pj1' : pjSalvo);
-    await estado.iniciar();
+    await estado.iniciar(permitirOnboarding: true);
     // o herói ativo precisa existir na lista (senão volta ao primeiro)
     if (!estado.personagens.any((p) => p.id == estado.personagem)) {
       estado.personagem = estado.personagens.first.id;
-      await estado.iniciar();
+      await estado.iniciar(permitirOnboarding: true);
     }
     Vibra.ligada = estado.vibracaoLigada;
+    _entrada = estado.onboardingPendente;
     return estado;
   }
 
@@ -101,21 +120,59 @@ class _CarregadorState extends State<_Carregador> {
           if (snap.hasError) {
             return Scaffold(body: Center(child: Padding(padding: const EdgeInsets.all(24), child: Text('Erro ao carregar:\n${snap.error}'))));
           }
-          if (!snap.hasData) return const Scaffold(body: Center(child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)));
-          return Casca(estado: snap.data!);
+          final splash = AberturaSplash(cor: _corAbertura, texto: textoAbertura(PlatformDispatcher.instance.locale.languageCode));
+          if (!snap.hasData) return splash;
+          final estado = snap.data!;
+          return Stack(children: [
+            Positioned.fill(
+              child: _entrada
+                  ? Onboarding(estado: estado, aoConcluir: () => setState(() => _entrada = false))
+                  : Casca(estado: estado, comTutorial: true),
+            ),
+            if (!_splashSaiu)
+              Positioned.fill(
+                child: TweenAnimationBuilder<double>(
+                  tween: Tween(begin: 1, end: 0),
+                  duration: const Duration(milliseconds: 280),
+                  onEnd: () => setState(() => _splashSaiu = true),
+                  builder: (_, v, __) => IgnorePointer(child: Opacity(opacity: v, child: splash)),
+                ),
+              ),
+          ]);
         },
       );
 }
 
 class Casca extends StatefulWidget {
-  const Casca({super.key, required this.estado});
+  const Casca({super.key, required this.estado, this.comTutorial = false});
   final EstadoJogo estado;
+
+  /// true no app de verdade: o tutorial guiado abre sozinho na primeira vez (os testes de tela ficam sem ele).
+  final bool comTutorial;
   @override
   State<Casca> createState() => _CascaState();
 }
 
 class _CascaState extends State<Casca> {
   int _aba = 0;
+  TourControle? _tour;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.comTutorial) {
+      _tour = TourControle(estado: widget.estado, irParaAba: (i) => setState(() => _aba = i), abaAtual: () => _aba);
+      TourControle.instancia = _tour;
+      // jogador que volta ou que acabou de entrar: a aba Tarefas fala na primeira vez (`agendarDialogoTela('tarefas')`)
+      WidgetsBinding.instance.addPostFrameCallback((_) => _tour?.agendar());
+    }
+  }
+
+  @override
+  void dispose() {
+    _tour?.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -144,6 +201,15 @@ class _CascaState extends State<Casca> {
             widget.estado.piscarSelo();
           }
           setState(() => _aba = i);
+          final t = _tour;
+          if (t != null && !t.ativo) {
+            // as outras telas só marcam "vista" (o tour já cobre todas); Tarefas reabre o tour se ainda não foi visto
+            if (i == 0) {
+              t.agendar();
+            } else {
+              widget.estado.marcarTelasVistas([telasTutorial[i]]);
+            }
+          }
         },
       ),
     );

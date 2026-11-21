@@ -14,6 +14,7 @@ import '../dominio/historico.dart';
 import '../dominio/dados_jogo.dart';
 import '../dominio/datas.dart';
 import '../dominio/economia.dart';
+import '../dominio/entrada.dart';
 import '../dominio/estatisticas.dart';
 import '../dominio/forja.dart';
 import '../dominio/js_compat.dart';
@@ -22,6 +23,7 @@ import '../dominio/regras.dart';
 import '../dominio/regras.dart' as regras show monstroDoDiaEm;
 import '../dominio/save.dart';
 import '../dominio/tarefa.dart';
+import '../dominio/tutorial.dart';
 import '../dominio/vida.dart';
 import 'som.dart';
 import 'tema.dart' show crtAtivo;
@@ -160,8 +162,17 @@ class EstadoJogo extends ChangeNotifier {
   /// Herói ativo (a raiz do app usa para refazer as telas quando ele muda).
   final ValueNotifier<String> personagemAtivo = ValueNotifier<String>('pj1');
 
-  Future<void> iniciar() async {
+  /// true enquanto a entrada (apresentação, login e configuração do herói) ainda não terminou: nesse estado NADA é
+  /// gravado, então fechar o app no meio da entrada recomeça dela (como no original, que só grava no fim do setup).
+  bool onboardingPendente = false;
+  bool _gravacaoSuspensa = false;
+
+  /// [permitirOnboarding]: só a raiz do app passa true (ao abrir). Sem save começado (`comecou`) deste herói, o estado
+  /// nasce em modo "entrada pendente"; trocar ou criar herói depois nunca volta à entrada.
+  Future<void> iniciar({bool permitirOnboarding = false}) async {
     // reinicia o que vive só na memória (iniciar() também roda ao trocar de herói)
+    onboardingPendente = false;
+    _gravacaoSuspensa = false;
     ultimoDia = null;
     eventoPendente = null;
     _temaPreview = null;
@@ -173,6 +184,10 @@ class EstadoJogo extends ChangeNotifier {
     final semente = _aleatorio.nextInt(64);
     final carregado = SaveV3.carregar(bruto, catalogo, idioma: idioma, sementeAtual: semente);
     save = carregado ?? SaveV3.padrao(catalogo, idioma: idioma, semente: semente);
+    if (permitirOnboarding && carregado == null && pendenteNovo == null) {
+      onboardingPendente = true;
+      _gravacaoSuspensa = true;
+    }
     if (carregado == null && pendenteNovo != null) {
       // herói recém-criado: já nasce com o nome e o sprite escolhidos
       if (pendenteNovo!.nome != null) save.nomeHeroi = pendenteNovo!.nome!;
@@ -1173,11 +1188,57 @@ class EstadoJogo extends ChangeNotifier {
     notifyListeners();
   }
 
+  // ---------- entrada (onboarding) ----------
+  /// Resposta do quiz de categoria (`questlog.onboarding.categoria.v1`): as categorias de tarefa estão desligadas no
+  /// original, mas a resposta continua sendo gravada.
+  String get categoriaOnboarding => armazenamento.ler(chaveCategoriaOnboarding) ?? '';
+  void gravarCategoriaOnboarding(String id) => armazenamento.gravar(chaveCategoriaOnboarding, id);
+
+  /// "Entrar como convidado": marca o aparelho como jogo sem conta (`questlog.convidado.v1`).
+  void marcarConvidado() => armazenamento.gravar(chaveConvidado, '1');
+
+  /// Fim da configuração do herói (o `irEscolha` de `mostrarSetupPersonagemENome`): nome e sprite escolhidos, o save
+  /// nasce com `comecou: true` (`jaComecou = true` + `render()` no original, que é quem grava) e o dia/vida iniciais.
+  Future<void> concluirOnboarding({required String nome, required int heroi}) async {
+    if (heroi >= 0 && heroi < dados.herois.length) save.heroi = heroi;
+    final n = nome.trim();
+    if (n.isNotEmpty) save.nomeHeroi = n;
+    onboardingPendente = false;
+    _gravacaoSuspensa = false;
+    verificarDia();
+    _garantirBau();
+    await _salvarTudo();
+    notifyListeners();
+  }
+
+  // ---------- tutorial guiado ----------
+  Map<String, bool> get telasVistas => lerTelasVistas(armazenamento.ler(chaveTutorialTelas));
+  bool tutorialVisto(String tela) => telasVistas[tela] == true;
+
+  /// Marca as telas como vistas (o fim ou o "Pular" do tour marcam as cinco).
+  void marcarTelasVistas(Iterable<String> telas) {
+    final v = telasVistas;
+    for (final t in telas) {
+      v[t] = true;
+    }
+    armazenamento.gravar(chaveTutorialTelas, gravarTelasVistas(v));
+  }
+
+  /// `revisarTutorial()`: esquece que as cinco telas foram vistas.
+  void reiniciarTutorial() {
+    final v = telasVistas;
+    for (final t in telasTutorial) {
+      v.remove(t);
+    }
+    armazenamento.gravar(chaveTutorialTelas, gravarTelasVistas(v));
+  }
+
   /// Grava tudo agora (telas que mudam estado sem passar por uma ação do jogo, como abrir Conquistas).
   Future<void> persistir() => _salvarTudo();
 
   // ---------- gravação ----------
   Future<void> _salvarTudo() async {
+    if (_gravacaoSuspensa) return; // entrada ainda não terminou (ver [onboardingPendente])
     _temaPreview = null; // qualquer ação em Tarefas desfaz a prévia de um cenário trancado
     checarConquistas();
     final ms = _agora().millisecondsSinceEpoch;

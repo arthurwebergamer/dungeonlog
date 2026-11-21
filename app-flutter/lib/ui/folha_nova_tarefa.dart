@@ -11,6 +11,7 @@ import 'folhas.dart';
 import 'icones.dart';
 import 'tela_tarefas.dart' show corDeHex;
 import 'tema.dart';
+import 'tour.dart';
 
 const _letrasDia = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 const _nomesDiaLongo = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
@@ -93,10 +94,12 @@ class _FolhaNovaTarefaState extends State<FolhaNovaTarefa> {
     _ctrl.addListener(() {
       if (_dica != null) setState(() => _dica = null);
     });
+    if (t == null) TourAlvos.folhaNovaAberta.value = true;
   }
 
   @override
   void dispose() {
+    if (widget.editar == null) TourAlvos.folhaNovaAberta.value = false;
     _ctrl.dispose();
     super.dispose();
   }
@@ -246,6 +249,7 @@ class _FolhaNovaTarefaState extends State<FolhaNovaTarefa> {
 
   // ---------- peças ----------
   Widget _campo() => TextField(
+        key: widget.editar == null ? TourAlvos.input : null,
         controller: _ctrl,
         textCapitalization: TextCapitalization.sentences,
         textInputAction: TextInputAction.done,
@@ -406,7 +410,7 @@ class _FolhaNovaTarefaState extends State<FolhaNovaTarefa> {
         ),
       SizedBox(height: editando ? 20 : 24),
       if (!editando)
-        BotaoFolha('Criar tarefa', aoTocar: _criar)
+        KeyedSubtree(key: TourAlvos.save, child: BotaoFolha('Criar tarefa', aoTocar: _criar))
       else
         Row(children: [
           Expanded(child: BotaoFolha('Salvar alterações', aoTocar: _criar)),

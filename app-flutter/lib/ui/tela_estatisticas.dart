@@ -21,6 +21,7 @@ import 'estado_jogo.dart';
 import 'folhas.dart';
 import 'tela_config.dart' show avisoEmBreve;
 import 'tema.dart';
+import 'tour.dart';
 import 'topo.dart';
 import 'tocha_est.dart';
 import 'vibra.dart';
@@ -153,6 +154,7 @@ class _TelaEstatisticasState extends State<TelaEstatisticas> {
     final titulo = tr(e, 'est.sequenciaAtual').toUpperCase();
     final tituloStyle = _outfit(11.5, corSuave, peso: FontWeight.w600, ls: 0.805);
     return Toque(
+      key: TourAlvos.estCardPrincipal,
       escala: 0.97,
       aoTocar: () => _abrirSequencia(streak, rotulo),
       child: Stack(children: [

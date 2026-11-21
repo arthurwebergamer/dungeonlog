@@ -347,6 +347,159 @@ casos.virada = Array.from({ length: 160 }, (_, i) => {
 });
 casos.vidaMax = [0, 100, 260, 1000, 5000, 20000].map((xp) => { const S = criarSandbox(); S.run(`xpTotal=${xp};`); S.run(fonteVida); return { xp, vidaMax: S.run('window.vidaHeroi.max()') }; });
 
+/* ---------------- Estatísticas (Fase 4): o módulo real do index.html rodando contra um DOM falso ---------------- */
+// As funções de render (renderEstatisticas, renderUltimos7Dias, renderMapaDoMes, renderHistoricoSemana/Ano...) são as
+// do index.html, sem alteração. Só o DOM é simulado (El): o que elas escrevem nos elementos é o que o Dart precisa igualar.
+function gerarEstatisticas() {
+  const indentFn = (nome) => {
+    const m = new RegExp('^[ \\t]+function ' + nome + '\\(', 'm').exec(html);
+    if (!m) throw new Error('função indentada não achada: ' + nome);
+    const abre = html.indexOf('{', html.indexOf(')', m.index));
+    return html.slice(m.index, fimBalanceado(html, abre) + 1);
+  };
+  const fonteEst = [
+    ...['estStreakAtual', 'estRecorde', 'estHistComHojeAoVivo', 'renderEstatisticas', 'renderUltimos7Dias', 'renderDonutMes',
+      'preencherTileDia', 'renderMapaDoMes', 'renderHistoricoSemana', 'renderHistoricoAno', 'renderHistoricoConteudo',
+      'corAccentComOpacidade'].map(fonteFuncao),
+    ...['NOMES_MES_CURTO', 'estPeriodoAtual', 'estAnoEscolhido', '_donutMesAnterior'].map(fonteDecl),
+    ...['escalaTocha', 'corDoStreak', 'escalaTochaCompartilhar'].map(indentFn),
+  ].join('\n');
+
+  class El {
+    constructor(tag = 'div') {
+      this.tag = tag; this.children = []; this._cls = new Set(); this.dataset = {}; this.attrs = {}; this._text = '';
+      this.disabled = false; this.parent = null; this._nom = {}; this._st = {};
+      const st = this._st;
+      this.style = new Proxy({}, {
+        get: (_, k) => (k === 'setProperty' ? (a, b) => { st[a] = String(b); } : k === 'getPropertyValue' ? (a) => st[a] ?? '' : st[k]),
+        set: (_, k, v) => { st[k] = v; return true; },
+      });
+    }
+    get className() { return [...this._cls].join(' '); }
+    set className(v) { this._cls = new Set(String(v).split(/\s+/).filter(Boolean)); }
+    get classList() {
+      const s = this._cls;
+      return {
+        add: (...c) => c.forEach((x) => s.add(x)), remove: (...c) => c.forEach((x) => s.delete(x)),
+        toggle: (c, f) => { const on = f === undefined ? !s.has(c) : !!f; if (on) s.add(c); else s.delete(c); return on; },
+        contains: (c) => s.has(c),
+      };
+    }
+    appendChild(c) { c.parent = this; this.children.push(c); return c; }
+    setAttribute(k, v) { this.attrs[k] = String(v); if (k === 'class') this.className = v; }
+    get textContent() { return this._text; }
+    set textContent(v) { this._text = String(v); this.children = []; }
+    set innerHTML(v) { this.children = []; }
+    get innerHTML() { return ''; }
+    querySelector(sel) { const k = sel.replace(/^\./, ''); return (this._nom[k] ||= new El()); }
+    querySelectorAll(sel) { const k = sel.replace(/^\./, ''); return this.children.filter((c) => c._cls.has(k)); }
+    remove() { if (this.parent) this.parent.children = this.parent.children.filter((x) => x !== this); }
+    getTotalLength() { return 100; }
+    getBoundingClientRect() { return {}; }
+  }
+  const S = criarSandbox();
+  S.run('let HIST = []; window.obterHistorico = () => HIST.slice();');
+  S.run(fonteEst);
+  S.run('window.escalaTocha = escalaTocha; window.corDoStreak = corDoStreak; window.matchMedia = () => ({ matches: true });');
+  S.run("window.t = (k) => k + ':{recorde}:{faltam}';");
+  const ctx = S.ctx;
+  ctx.getComputedStyle = () => ({ getPropertyValue: () => '#FFFFFF' });
+
+  // entradas: sempre as mesmas (gerador fixo)
+  const r = mulberry32(4242);
+  const ri = (a, b) => a + Math.floor(r() * (b - a + 1));
+  const hojes = ['2026-11-21', '2026-12-31', '2027-01-01', '2026-03-01', '2024-02-29', '2026-02-28', '2026-01-31', '2026-10-31', '2025-12-01',
+    '2026-07-04', '2023-03-12', '2026-11-01', '2028-02-29', '2026-09-30', '2026-06-15', '2026-04-30'];
+  const dia = (hoje, n) => { const [y, m, d] = hoje.split('-').map(Number); return new Date(Date.UTC(y, m - 1, d - n)).toISOString().slice(0, 10); };
+  const res = ['vitoria', 'vitoria', 'vitoria', 'fuga', 'descanso', 'sem_tarefa'];
+  const casos = [];
+  for (let i = 0; i < 330; i++) {
+    const hoje = hojes[i % hojes.length];
+    const modo = i % 6;
+    const hist = [];
+    if (modo !== 0) {
+      let d = modo === 5 ? ri(1, 5) : ri(0, 3);
+      const n = ri(1, modo === 1 ? 90 : modo === 2 ? 260 : 40);
+      for (let k = 0; k < n && d < 800; k++) {
+        const rr = modo === 3 ? (r() < 0.93 ? 'vitoria' : 'fuga') : res[ri(0, 5)];
+        hist.push({ data: dia(hoje, d), resultado: rr, monstroId: ri(0, 62), tarefas: ri(0, 5) });
+        d += r() < 0.85 ? 1 : ri(2, 6);
+      }
+      if (i % 7 === 0 && hist.length) hist.push({ ...hist[ri(0, hist.length - 1)], resultado: res[ri(0, 5)] }); // data repetida
+      if (i % 5 === 0) hist.reverse();
+      if (i % 11 === 0) hist.push({ data: dia(hoje, -ri(1, 5)), resultado: 'vitoria', monstroId: 0, tarefas: 1 }); // futuro
+    }
+    const nT = [0, 1, 2, 3][i % 4];
+    const feitas = ri(0, nT);
+    const periodo = ['mes', 'semana', 'ano'][i % 3];
+    const anoEsc = periodo === 'ano' && i % 2 === 0 ? Number(hoje.slice(0, 4)) - ri(0, 2) : null;
+    casos.push({ hoje, lang: i % 5 === 4 ? 'en' : 'pt', hist, tarefas: { total: nT, feitas: i % 3 === 0 ? nT : feitas }, descanso: i % 13 === 0, total: ri(0, 900), periodo, anoEsc });
+  }
+
+  function rodar(c) {
+    const [y, m, d] = c.hoje.split('-').map(Number);
+    S.store.set('questlog.idioma.v1', c.lang);
+    S.run(`__hoje = [${y}, ${m - 1}, ${d}]; HIST = ${JSON.stringify(c.hist)}; __total = ${c.total}; __descanso = ${JSON.stringify(c.descanso ? [c.hoje] : [])};`);
+    const tar = [];
+    for (let k = 0; k < c.tarefas.total; k++) tar.push({ texto: 't' + k, tipo: 'repete', dias: [0, 1, 2, 3, 4, 5, 6], dif: 'media', meta: 1, feitaEm: k < c.tarefas.feitas ? c.hoje : null });
+    S.run(`tarefas = ${JSON.stringify(tar)};`);
+    S.run(`window.idiomaAtual = () => ${JSON.stringify(c.lang)}; estPeriodoAtual = ${JSON.stringify(c.periodo)}; estAnoEscolhido = ${c.anoEsc === null ? 'null' : c.anoEsc};`);
+    const ids = {};
+    const doc = {
+      getElementById: (id) => (ids[id] ||= new El()),
+      querySelector: () => null,
+      querySelectorAll: (sel) => (sel === '#estTabsPeriodo button' ? ['semana', 'mes', 'ano'].map((t) => { const e = new El('button'); e.dataset.tab = t; return e; }) : []),
+      documentElement: new El(),
+      createElement: (t) => new El(t),
+      createElementNS: (_, t) => new El(t),
+    };
+    ctx.document = doc;
+    S.run('renderEstatisticas();');
+    const txt = (id) => (ids[id] ? ids[id]._text : null);
+    const out = {
+      seq: { streak: txt('estStreakNum'), cor: ids.estStreakNum.style.color, escala: ids.estTochaPrincipal.style.transform, apagada: ids.estTochaPrincipal._cls.has('est-tocha-apagada'), lbl: txt('estStreakLbl') },
+      geral: [txt('estTotalConcluidas'), txt('estTotalVitorias'), txt('estTaxaGeral')],
+      taxa: { num: txt('estTaxaNum'), pct: ids.estTaxaRing.style.getPropertyValue('--pct'), fundo: ids.estTaxaRing.querySelector('.est-ringtrack').style.background ?? null },
+      donut: {
+        total: txt('estDonutTotal'), v: txt('estQtdVitoria'), f: txt('estQtdFuga'), s: txt('estQtdSemTarefa'), d: txt('estQtdDescanso'),
+        bv: ids.estBarraVitoria.style.width, bf: ids.estBarraFuga.style.width, bs: ids.estBarraSemTarefa.style.width, bd: ids.estBarraDescanso.style.width,
+        fundo: ids.estDonutMes.style.background,
+      },
+      mesLabel: txt('estMesLabel'),
+      graf: {
+        linha: ids.est7DiasLinha.attrs.d, area: ids.est7DiasArea.attrs.d,
+        circulos: ids.est7DiasSvg.children.filter((c2) => c2._cls.has('est-chartponto')).map((c2) => [c2.attrs.cx, c2.attrs.cy, c2.attrs.fill]),
+        rotulos: ids.est7DiasLabels.children.map((c2) => [c2._text, c2.className]),
+      },
+      anoSwitch: { on: ids.estAnoSwitcher._cls.has('on'), num: txt('estAnoNum'), proxDesab: ids.estAnoProximo ? ids.estAnoProximo.disabled : null },
+      mapaAno: ids.estMapaMes._cls.has('est-mapames-ano'),
+    };
+    const mapa = ids.estMapaMes;
+    if (c.periodo === 'ano') {
+      out.mapa = mapa.children[0].children.map((lin) => [lin.children[0]._text, lin.children[1].children.map((x) => ((/est-anodia-(\w+)/.exec(x.className) || [])[1] || '.')).join(',')]);
+    } else {
+      out.mapa = mapa.children.map((t) => [t.className, t.children.map((x) => x.className + '|' + x._text).join(';')]);
+    }
+    out.soltas = {
+      streak: S.run('estStreakAtual(HIST)'), recorde: S.run('estRecorde(HIST)'),
+      ao_vivo: (() => { const a = JSON.parse(S.run('JSON.stringify(estHistComHojeAoVivo(isoAtual()))')); return { n: a.length, ultimo: a.length ? a[a.length - 1] : null }; })(),
+    };
+    return out;
+  }
+  const saidas = casos.map(rodar);
+  const tochas = { escala: [], escalaCompartilhar: [], cor: [] };
+  for (const s of [0, 1, 2, 3, 4, 5, 6, 7, 8, 12, 15, 20, 29, 30, 31, 45, 100]) {
+    tochas.escala.push([s, S.run(`escalaTocha(${s})`)]);
+    tochas.escalaCompartilhar.push([s, S.run(`escalaTochaCompartilhar(${s})`)]);
+    tochas.cor.push([s, S.run(`corDoStreak(${s})`)]);
+  }
+  return { casos, saidas, tochas };
+}
+if (process.argv.includes('--est-tz')) {
+  process.stdout.write(JSON.stringify(gerarEstatisticas().saidas));
+  process.exit(0);
+}
+
 /* ---------------- dias corridos / monstro do dia, em vários fusos ---------------- */
 if (process.argv.includes('--tz')) {
   const S = criarSandbox();
@@ -531,6 +684,17 @@ if (process.argv.includes('--tz')) {
   }
   casos.conquistas = casosC;
   casos.grimorio = { idGrimorio: idGrim, niveis: [0, 1, 2, 3, 4, 5, 6, 7, 63, 17].map((s) => ({ s, nivel: 4 + (s % 4) })) };
+}
+// Estatísticas: gera no fuso atual e confere que o JS dá o MESMO resultado em outros fusos (sequência e mapas dependem de datas)
+{
+  const est = gerarEstatisticas();
+  const ref = JSON.stringify(est.saidas);
+  const tzs = ['UTC', 'Asia/Tokyo', 'Pacific/Auckland', 'America/St_Johns', 'Pacific/Kiritimati', 'Pacific/Pago_Pago', 'Europe/Lisbon', 'America/New_York', 'Asia/Kolkata'];
+  for (const tz of tzs) {
+    const o = execFileSync(process.execPath, [fileURLToPath(import.meta.url), '--est-tz'], { env: { ...process.env, TZ: tz }, maxBuffer: 1 << 29 }).toString();
+    if (o !== ref) throw new Error('estatísticas: o JS dá resultado diferente no fuso ' + tz);
+  }
+  casos.estatisticas = { casos: est.casos, saidas: est.saidas, tochas: est.tochas, fusosConferidos: tzs };
 }
 const fusos = ['America/Sao_Paulo', 'UTC', 'Asia/Tokyo', 'Europe/Lisbon', 'America/New_York', 'Pacific/Auckland', 'Asia/Kolkata', 'America/St_Johns'];
 casos.fusos = fusos.map((tz) => ({ tz, datas: JSON.parse(execFileSync(process.execPath, [fileURLToPath(import.meta.url), '--tz'], { env: { ...process.env, TZ: tz }, maxBuffer: 1 << 28 }).toString()) }));

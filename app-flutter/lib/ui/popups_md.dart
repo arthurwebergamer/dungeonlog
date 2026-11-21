@@ -298,6 +298,8 @@ Future<void> mostrarResumoDia(BuildContext context, EstadoJogo e, {required int 
   }
   final m = e.monstro;
   final nomeM = m.nomeNoIdioma(e.idioma);
+  // `estStreakAtual(estHistComHojeAoVivo(hoje))`: com todas as tarefas de hoje feitas, hoje já conta como vitória
+  final seq = e.sequenciaAtual;
   return abrirSheetMd(
     context,
     totalMs: 2400,
@@ -310,9 +312,10 @@ Future<void> mostrarResumoDia(BuildContext context, EstadoJogo e, {required int 
       const SizedBox(height: 16),
       MdRl(indice: 0, rotulo: en ? 'Tasks done' : 'Tarefas concluídas', valor: Text('$nTarefas')),
       MdRl(indice: 1, rotulo: en ? 'Experience' : 'Experiência', valor: Text('+${e.xpDoDia}')),
-      MdRl(indice: 2, rotulo: rotuloEst, valor: Text(valorEst)),
-      const MdRlLinha(indice: 3),
-      MdRl(indice: 3, rotulo: en ? 'Coins' : 'Moedas', valor: Text('+$ganho'), total: true),
+      MdRl(indice: 2, rotulo: en ? 'Streak' : 'Sequência', valor: Text('$seq ${seq == 1 ? (en ? 'day' : 'dia') : (en ? 'days' : 'dias')}')),
+      MdRl(indice: 3, rotulo: rotuloEst, valor: Text(valorEst)),
+      const MdRlLinha(indice: 4),
+      MdRl(indice: 4, rotulo: en ? 'Coins' : 'Moedas', valor: Text('+$ganho'), total: true),
       MdBotao(en ? 'Continue' : 'Continuar', atraso: 1700, aoTocar: fechar),
     ],
   );

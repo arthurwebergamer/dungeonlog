@@ -14,6 +14,7 @@ import '../dominio/historico.dart';
 import '../dominio/dados_jogo.dart';
 import '../dominio/datas.dart';
 import '../dominio/economia.dart';
+import '../dominio/estatisticas.dart';
 import '../dominio/forja.dart';
 import '../dominio/js_compat.dart';
 import '../dominio/loja.dart';
@@ -888,6 +889,22 @@ class EstadoJogo extends ChangeNotifier {
   }
 
   // ---------- histórico, Grimório, conquistas ----------
+  /// `estHistComHojeAoVivo(hoje)`: o histórico gravado só ganha o dia na virada; aqui hoje entra "ao vivo" (sem gravar)
+  /// como descanso ou, se todas as tarefas de hoje estão feitas, como vitória. É a base das Estatísticas.
+  List<EntradaHist> get histAoVivo {
+    final doDia = tarefasDeHoje;
+    return estHistComHojeAoVivo(
+      hist: hist,
+      hoje: hoje,
+      descansando: descansando,
+      totalTarefasHoje: doDia.length,
+      todasFeitasHoje: doDia.every(feitaHoje),
+    );
+  }
+
+  /// `estStreakAtual(estHistComHojeAoVivo(hoje))`: a sequência atual (Estatísticas e linha "Sequência" do resumo do dia).
+  int get sequenciaAtual => estStreakAtual(histAoVivo, hoje);
+
   /// `monstroIdDoDia(iso)`: índice do monstro daquele dia (o histórico guarda isto em cada entrada).
   int monstroIdDoDia(String iso) {
     final pool = poolMonstros(dados.biomasDosMonstros, temaArenaId);
@@ -1042,7 +1059,9 @@ class EstadoJogo extends ChangeNotifier {
   }
 
   // ---------- heróis (personagens da conta) ----------
-  /// "É Pro?" só passa a valer na Fase 7 (compra); até lá ninguém assina.
+  /// "É Pro?" só passa a valer na Fase 7 (compra); até lá ninguém assina. PONTO DE LIGAÇÃO da Fase 7: é este valor
+  /// (`assinaturaAtiva()` do original) que destrava os cartões de Estatísticas (taxa, composição, 7 dias e histórico),
+  /// os temas Pro e mais de um herói. Trocar para `true` (e chamar `notifyListeners`) já mostra tudo destravado.
   bool ehPro = false;
   int get limitePersonagens => ehPro ? 4 : 1;
 

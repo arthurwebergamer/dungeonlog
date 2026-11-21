@@ -1,4 +1,4 @@
-// Raiz do app: carrega dados e save, e mostra a barra de navegação do app original (5 ícones; só Tarefas está pronta nesta fase).
+// Raiz do app: carrega dados e save, e mostra a barra de navegação do app original (5 ícones, as 5 abas prontas).
 import 'vibra.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,6 +13,7 @@ import 'respiracao.dart';
 import 'som.dart';
 import 'tela_inventario.dart';
 import 'tela_loja.dart';
+import 'tela_estatisticas.dart';
 import 'tela_perfil.dart';
 import 'cfg_base.dart' show BolinhaAviso;
 import 'tela_tarefas.dart';
@@ -118,7 +119,6 @@ class _CascaState extends State<Casca> {
 
   @override
   Widget build(BuildContext context) {
-    const futuras = {4: 'Fase 4'};
     return Scaffold(
       // só a aba aberta fica montada: com as cinco vivas, cada compra ou tarefa reconstruía arena, lista, loja e mochila juntas
       body: ValueListenableBuilder<String>(
@@ -130,7 +130,7 @@ class _CascaState extends State<Casca> {
             1 => TelaInventario(estado: widget.estado),
             2 => TelaLoja(estado: widget.estado),
             3 => TelaPerfil(estado: widget.estado),
-            _ => Center(child: Text('Em breve (${futuras[_aba]})', style: TextStyle(color: corApagado))),
+            _ => TelaEstatisticas(estado: widget.estado),
           },
         ),
       ),

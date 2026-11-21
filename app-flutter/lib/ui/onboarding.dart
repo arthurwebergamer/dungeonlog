@@ -158,17 +158,19 @@ class _OnboardingState extends State<Onboarding> {
                         if (emSlide) Positioned(left: 0, right: 0, bottom: 78, child: IgnorePointer(child: Center(child: PontosOnb(total: slidesOnboarding.length, ativo: _slide)))),
                         Positioned.fill(
                           child: AnimatedSwitcher(
-                            duration: Duration(milliseconds: _tela == _Tela.heroi || _tela == _Tela.nome ? 320 : 300),
+                            duration: const Duration(milliseconds: 300), // DURACAO_SLIDE do original
                             reverseDuration: const Duration(milliseconds: 300),
                             transitionBuilder: (child, anim) {
                               final k = (child.key as ValueKey<String>).value;
                               final entrando = k == _chaveAtual;
-                              final d = entrando ? _dir : -_dir;
                               return AnimatedBuilder(
                                 animation: anim,
                                 builder: (_, f) {
-                                  final t = entrando ? anim.value : 1 - anim.value;
-                                  return LayoutBuilder(builder: (_, c) => Transform.translate(offset: Offset(d * c.maxWidth * (1 - t), 0), child: f));
+                                  // transform .3s var(--spring-curve): passa um pouco do ponto e assenta. A que entra vem de fora (1 -> 0);
+                                  // a que sai (o valor do AnimatedSwitcher desce de 1 a 0) vai de 0 para fora, para o lado oposto
+                                  final p = curvaMola.transform(entrando ? anim.value : 1 - anim.value);
+                                  final fator = entrando ? _dir * (1 - p) : -_dir * p;
+                                  return LayoutBuilder(builder: (_, c) => Transform.translate(offset: Offset(fator * c.maxWidth, 0), child: f));
                                 },
                                 child: child,
                               );

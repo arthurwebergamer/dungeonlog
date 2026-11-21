@@ -274,6 +274,24 @@ void main() {
     await t.pumpWidget(const SizedBox());
   });
 
+  testWidgets('troca de slide: o que sai vai para a esquerda e o que entra vem da direita, assentando em 300 ms', (t) async {
+    late EstadoJogo e;
+    await t.runAsync(() async => e = await _estado(ArmazenamentoMemoria(), onboarding: true));
+    await t.pumpWidget(_app(Onboarding(estado: e, aoConcluir: () {})));
+    await t.pump(const Duration(milliseconds: 500));
+    final saindo = find.text('Suas tarefas viram uma masmorra pra vencer');
+    final entrando = find.text('O que você mais quer organizar?');
+    final x0 = t.getCenter(saindo).dx;
+    await t.tap(find.byKey(const ValueKey('onb-btn1')));
+    await t.pump();
+    await t.pump(const Duration(milliseconds: 100));
+    expect(t.getCenter(saindo).dx, lessThan(x0), reason: 'o slide que sai anda para a esquerda');
+    expect(t.getCenter(entrando).dx, greaterThan(x0), reason: 'o que entra ainda está à direita');
+    await t.pump(const Duration(milliseconds: 400));
+    expect(saindo, findsNothing);
+    expect((t.getCenter(entrando).dx - x0).abs(), lessThan(1), reason: 'assentou no centro');
+  });
+
   testWidgets('tour: percorre os passos informativos até "Concluir"', (t) async {
     await t.binding.setSurfaceSize(const Size(390, 844));
     addTearDown(() => t.binding.setSurfaceSize(null));

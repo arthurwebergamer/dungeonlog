@@ -8,6 +8,7 @@ import '../dominio/catalogo.dart' show ItemCatalogo;
 import '../dominio/entrada.dart';
 import 'equip_arena.dart';
 import 'estado_jogo.dart';
+import 'golpes_fx.dart';
 import 'icones.dart' show pixel;
 import 'itens_ui.dart';
 import 'onb_comum.dart';
@@ -214,9 +215,14 @@ class PalcoGolpe extends StatefulWidget {
   State<PalcoGolpe> createState() => _PalcoGolpeState();
 }
 
-class _PalcoGolpeState extends State<PalcoGolpe> with SingleTickerProviderStateMixin {
+class _PalcoGolpeState extends State<PalcoGolpe> with TickerProviderStateMixin {
   late final Ticker _tk = createTicker(_tick);
+  // o golpe é o mesmo motor da arena (estilos variados, corte, faíscas, tremor); aqui só chamamos e desenhamos
+  late final MotorGolpe _motor = MotorGolpe(this);
   double _ms = -1; // tempo desde o início do primeiro golpe
+  double _impacto = -1; // instante (em _ms) do impacto do golpe atual
+  int _ciclo = -1;
+  int _espadaIdx = 0;
 
   @override
   void initState() {
@@ -230,28 +236,48 @@ class _PalcoGolpeState extends State<PalcoGolpe> with SingleTickerProviderStateM
     if (widget.ativo && !_tk.isActive) _tk.start();
     if (!widget.ativo && _tk.isActive) {
       _tk.stop();
-      setState(() => _ms = -1);
+      setState(() {
+        _ms = -1;
+        _ciclo = -1;
+        _impacto = -1;
+      });
     }
   }
 
-  void _tick(Duration d) => setState(() => _ms = d.inMilliseconds - 250.0);
+  static const _cicloMs = 2400.0;
+  Size _palco = const Size(320, 150);
+
+  GeometriaGolpe _geometria() {
+    final w = _palco.width;
+    final heroiEsq = w * 0.06 + 20.4;
+    final mobEsq = w - w * 0.06 - 108;
+    return GeometriaGolpe(
+      heroi: Rect.fromLTWH(heroiEsq, 150 - 126, 125, 126),
+      monstro: Rect.fromLTWH(mobEsq, 150 - 4 - 108, 108, 108),
+      arena: Size(w, 150),
+    );
+  }
+
+  void _tick(Duration d) {
+    final ms = d.inMilliseconds - 250.0;
+    final c = ms < 0 ? -1 : (ms ~/ _cicloMs);
+    if (c != _ciclo && c >= 0) {
+      _ciclo = c;
+      _espadaIdx = c % espadasOnboarding.length;
+      final espada = widget.estado.catalogo.item(espadasOnboarding[_espadaIdx])!;
+      _motor.raridade = espada.raridade.clamp(0, 7);
+      _motor.preferenciaVariada = true;
+      _motor.golpear(g: _geometria(), dif: 'media', fim: false, distancia: false);
+      _impacto = ms + _motor.impactoMs;
+    }
+    setState(() => _ms = ms);
+  }
 
   @override
   void dispose() {
     _tk.dispose();
+    _motor.dispose();
     super.dispose();
-  }
-
-  static const _T = 900.0, _ciclo = 2400.0;
-  static double _lerpKf(double t, List<(double, double)> kf) {
-    for (var i = 1; i < kf.length; i++) {
-      if (t <= kf[i].$1) {
-        final a = kf[i - 1], b = kf[i];
-        final u = b.$1 == a.$1 ? 1.0 : (t - a.$1) / (b.$1 - a.$1);
-        return a.$2 + (b.$2 - a.$2) * u;
-      }
-    }
-    return kf.last.$2;
   }
 
   @override
@@ -259,35 +285,15 @@ class _PalcoGolpeState extends State<PalcoGolpe> with SingleTickerProviderStateM
     final e = widget.estado;
     return LayoutBuilder(builder: (_, c) {
       final w = c.maxWidth;
-      final ciclo = _ms < 0 ? 0 : (_ms ~/ _ciclo);
-      final loc = _ms < 0 ? -1.0 : _ms % _ciclo;
-      final espadaIdx = (ciclo + (loc >= _T + 350 ? 1 : 0)) % espadasOnboarding.length;
-      final espada = e.catalogo.item(espadasOnboarding[espadaIdx])!;
-      // herói: caixa 125x126, bottom 0, a 40,9 px da esquerda; monstro 108 em right 6%, bottom 4
-      final heroiEsq = w * 0.06 + 20.4; // medido no original em repouso: 40,9 px do palco
-      final mobEsq = w - w * 0.06 - 108;
-      final dx = math.max(0.0, (mobEsq - (heroiEsq + 125) + 14).roundToDouble());
-      double tx = 0, ty = 0, esc = 1;
-      double grauArma = 8;
-      if (loc >= 0 && loc <= _T) {
-        final p = const Cubic(.3, .7, .3, 1).transform(loc / _T);
-        tx = dx * _lerpKf(p, [(0, 0), (.22, .55), (.40, 1), (.55, 1), (1, 0)]);
-        ty = _lerpKf(p, [(0, 0), (.22, -6), (.40, 0), (1, 0)]);
-        esc = _lerpKf(p, [(0, 1), (.22, 1.04), (.40, 1.08), (.55, 1.08), (1, 1)]);
-        final q = Curves.easeOut.transform(loc / _T);
-        grauArma = _lerpKf(q, [(0, -20), (.40, -20), (.55, 75), (.75, 75), (1, 8)]);
-      }
-      // impacto aos 42% do golpe
-      final imp = loc - _T * 0.42;
-      double mx = 0, my = 0, mrot = 0;
-      var branco = false;
-      if (imp >= 0 && imp <= 320) {
-        final u = imp / 320;
-        mx = _lerpKf(u, [(0, 0), (.3, -5), (.6, 4), (1, 0)]);
-        my = _lerpKf(u, [(0, 0), (.3, -2), (.6, 1), (1, 0)]);
-        mrot = _lerpKf(u, [(0, 0), (.3, -6), (.6, 5), (1, 0)]) * math.pi / 180;
-        branco = u > 0 && u < 1;
-      }
+      _palco = Size(w, 150);
+      final loc = _ms < 0 ? -1.0 : _ms % _cicloMs;
+      // a espada troca logo depois do golpe (a nova aparece com fade)
+      final trocou = loc >= 1250;
+      final espada = e.catalogo.item(espadasOnboarding[(_ciclo < 0 ? 0 : _ciclo + (trocou ? 1 : 0)) % espadasOnboarding.length])!;
+      final pop = loc >= 1250 && loc < 1510 ? (loc - 1250) / 260 : 1.0;
+      final g = _geometria();
+      final mobEsq = g.monstro.left, heroiEsq = g.heroi.left;
+      final imp = _impacto < 0 ? -1.0 : _ms - _impacto;
       final mobCentro = Offset(mobEsq + 54, 150 - 4 - 54);
       final heroiCentro = Offset(heroiEsq + 62.5, 150 - 63);
       final filhos = <Widget>[
@@ -296,15 +302,10 @@ class _PalcoGolpeState extends State<PalcoGolpe> with SingleTickerProviderStateM
           bottom: 4,
           width: 108,
           height: 108,
-          child: Transform.translate(
-            offset: Offset(mx, my),
-            child: Transform.rotate(
-              angle: mrot,
-              child: ColorFiltered(
-                colorFilter: branco ? const ColorFilter.mode(Colors.white, BlendMode.srcATop) : const ColorFilter.mode(Colors.transparent, BlendMode.dst),
-                child: pixel(e.dados.monstros[widget.monstro].img, largura: 108, altura: 108),
-              ),
-            ),
+          child: AnimatedBuilder(
+            animation: _motor,
+            builder: (_, f) => Transform.translate(offset: _motor.monstro, child: Transform.rotate(angle: _motor.monstroGiro, child: f)),
+            child: pixel(e.dados.monstros[widget.monstro].img, largura: 108, altura: 108),
           ),
         ),
         Positioned(
@@ -312,33 +313,20 @@ class _PalcoGolpeState extends State<PalcoGolpe> with SingleTickerProviderStateM
           bottom: 0,
           width: 125,
           height: 126,
-          child: Transform.translate(
-            offset: Offset(tx, ty),
-            child: Transform.scale(scale: esc, alignment: Alignment.bottomLeft, child: _HeroiGolpe(estado: e, espada: espada, grau: grauArma, pop: loc >= _T + 350 && loc < _T + 610 ? (loc - _T - 350) / 260 : 1)),
-          ),
-        ),
-      ];
-      // corte (9 quadros, .42 s) sobre o monstro
-      if (imp >= 0 && imp < 420) {
-        final rar = espada.raridade;
-        final quadro = (imp / 420 * 9).floor().clamp(0, 8);
-        final escala = escalaCorteOnboarding(rar) * 1.5;
-        filhos.add(Positioned(
-          left: mobCentro.dx - 32,
-          top: mobCentro.dy - 32,
-          width: 64,
-          height: 64,
-          child: IgnorePointer(
-            child: Transform.translate(
-              offset: Offset(0, 12.5 * escala),
-              child: Transform.scale(
-                scale: escala,
-                child: Transform.rotate(angle: 25 * math.pi / 180, child: _QuadroCorte(classe: classeCorteOnboarding(rar), quadro: quadro)),
-              ),
+          child: AnimatedBuilder(
+            animation: _motor,
+            builder: (_, f) => Transform.translate(
+              offset: _motor.heroi,
+              child: Opacity(opacity: _motor.heroiOpacidade, child: Transform.scale(scaleX: _motor.heroiEscalaX, alignment: Alignment.bottomLeft, child: f)),
+            ),
+            child: AnimatedBuilder(
+              animation: _motor,
+              builder: (_, __) => _HeroiGolpe(estado: e, espada: espada, grau: _motor.armaGraus, pop: pop),
             ),
           ),
-        ));
-      }
+        ),
+        Positioned.fill(child: IgnorePointer(child: CustomPaint(painter: PintorGolpe(_motor)))),
+      ];
       // moeda e gema voando até o herói (.75 s)
       for (final (atraso, gema) in [(0.0, false), (90.0, true)]) {
         final u = (imp - atraso) / 750;
@@ -410,30 +398,6 @@ class _PintorGema extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter o) => false;
-}
-
-class _QuadroCorte extends StatelessWidget {
-  const _QuadroCorte({required this.classe, required this.quadro});
-  final String classe;
-  final int quadro;
-  @override
-  Widget build(BuildContext context) {
-    Widget img = ClipRect(
-      child: OverflowBox(
-        alignment: Alignment.topLeft,
-        minWidth: 576,
-        maxWidth: 576,
-        minHeight: 64,
-        maxHeight: 64,
-        child: Transform.translate(offset: Offset(-64.0 * quadro, 0), child: Image.asset('assets/img/ui/slash_$classe.png', width: 576, height: 64, fit: BoxFit.fill, filterQuality: FilterQuality.none)),
-      ),
-    );
-    if (classe == 'comum') {
-      // filter: grayscale(1) brightness(2.4)
-      img = ColorFiltered(colorFilter: const ColorFilter.matrix(<double>[0.316, 1.064, 0.107, 0, 0, 0.316, 1.064, 0.107, 0, 0, 0.316, 1.064, 0.107, 0, 0, 0, 0, 0, 1, 0]), child: img);
-    }
-    return SizedBox(width: 64, height: 64, child: img);
-  }
 }
 
 /// Herói do carrossel (`obPintarHeroi`): corpo, espada na mão, manga por cima; ampliado 1,5x (feito por quem usa).

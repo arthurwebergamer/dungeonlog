@@ -175,7 +175,9 @@ void main() {
     expect(find.text('Desbloqueie conquistas conforme joga'), findsOneWidget);
     await toca(find.byKey(const ValueKey('onb-btn4')));
     expect(find.text('Marcou como feito. Golpe certeiro.'), findsOneWidget);
-    await t.pump(const Duration(milliseconds: 1500)); // roda o golpe
+    for (var i = 0; i < 90; i++) {
+      await t.pump(const Duration(milliseconds: 100)); // roda vários golpes do motor atual (espadas diferentes)
+    }
     expect(t.takeException(), isNull);
     await toca(find.byKey(const ValueKey('onb-voltar')));
     expect(find.text('Desbloqueie conquistas conforme joga'), findsOneWidget);

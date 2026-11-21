@@ -258,6 +258,8 @@ class MotorGolpe extends ChangeNotifier {
   int _impactoMs = 300;
   ({GeometriaGolpe g, String dif, bool fim, bool distancia})? _pendente;
   bool _aguardando = false;
+  /// Instante do impacto (ms depois do início) do golpe em curso.
+  int get impactoMs => _impactoMs;
 
   void _tique(Duration d) {
     agora = _desvio + d.inMicroseconds / 1000.0;

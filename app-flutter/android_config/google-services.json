@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "991047001122",
+    "project_id": "questlog-d4c11",
+    "storage_bucket": "questlog-d4c11.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:991047001122:android:c4d9e728580eed318c567b",
+        "android_client_info": {
+          "package_name": "com.dungeonlog.dungeonlog_flutter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "991047001122-n8p702k2e3qua2dm95joaobbkl5qso9h.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.dungeonlog.dungeonlog_flutter",
+            "certificate_hash": "eaf497d882930487df572129dd978e9720ba9b18"
+          }
+        },
+        {
+          "client_id": "991047001122-mq3ofpduhb4ssbvk6ctiuiptfb45aggb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCSfqiszrwI0tss45o0Zed6-pPqR-vfUy4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "991047001122-mq3ofpduhb4ssbvk6ctiuiptfb45aggb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

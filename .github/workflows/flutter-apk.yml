@@ -25,9 +25,17 @@ jobs:
           rm -rf lib && cp -r "$GITHUB_WORKSPACE/app-flutter/lib" lib
           rm -rf assets && cp -r "$GITHUB_WORKSPACE/app-flutter/assets" assets
           cp "$GITHUB_WORKSPACE/app-flutter/pubspec.yaml" pubspec.yaml
+          # Firebase (google-services.json + plugin) e assinatura fixa de teste (teste.keystore): falha alto se o projeto gerado mudou
+          bash "$GITHUB_WORKSPACE/app-flutter/android_config/preparar_android.sh" /tmp/fl
           flutter pub get
           # o download do NDK do Android às vezes vem corrompido no runner do GitHub: tenta de novo antes de desistir
           flutter build apk --release || { echo "build falhou, tentando de novo"; sleep 10; flutter build apk --release; }
+          # o SHA-1 do certificado do APK precisa ser o da chave de teste cadastrada no Firebase (login com Google).
+          # (o APK so tem assinatura v2/v3, entao keytool -jarfile nao serve: usa o apksigner do SDK)
+          APKSIGNER=$(ls -d "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -n 1)
+          SHA1=$("$APKSIGNER" verify --print-certs build/app/outputs/flutter-apk/app-release.apk | grep -i "certificate SHA-1 digest" | head -n 1 | awk '{print $NF}')
+          echo "SHA-1 do APK: $SHA1"
+          test "$SHA1" = "eaf497d882930487df572129dd978e9720ba9b18" || { echo "SHA-1 inesperado: o APK nao foi assinado com android_config/teste.keystore"; exit 1; }
           cp build/app/outputs/flutter-apk/app-release.apk "$GITHUB_WORKSPACE/dungeonlog-flutter.apk"
       - name: Publicar APK numa pre-release
         env:

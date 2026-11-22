@@ -236,3 +236,18 @@ class LogoDungeonlog extends StatelessWidget {
     );
   }
 }
+
+/// Cenário das montanhas por trás do login (`#introCenario.modoLogin`): a arte cobrindo a tela e escurecendo para baixo.
+class CenarioLogin extends StatelessWidget {
+  const CenarioLogin();
+  @override
+  Widget build(BuildContext context) => Stack(fit: StackFit.expand, children: [
+        const ColoredBox(color: onbFundoLogin),
+        Image.asset('assets/img/arena/montanhas.png', fit: BoxFit.cover, filterQuality: FilterQuality.none),
+        const DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x000B0710), Color(0x000B0710), Color(0x940B0710), Color(0xF00B0710)], stops: [0, .35, .68, 1]),
+          ),
+        ),
+      ]);
+}

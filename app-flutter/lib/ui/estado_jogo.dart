@@ -7,6 +7,8 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 
 import '../dados/armazenamento.dart';
+import '../dados/conta.dart';
+import '../dados/conta_falsa.dart';
 import '../dominio/bau.dart';
 import '../dominio/catalogo.dart';
 import '../dominio/conquistas.dart';
@@ -92,6 +94,10 @@ class CerimoniaEstagio {
 }
 
 /// Um herói da conta (`questlog.personagens.v1`): id, nome dado na criação e data.
+/// Qual entrada a raiz do app mostra: nenhuma (o jogo), a entrada completa (apresentação, login e herói) ou só o login
+/// (depois de "Sair" / excluir conta, ou pelo "Entrar" das Configurações).
+enum EntradaModo { nenhuma, completa, soLogin }
+
 class Personagem {
   final String id;
   final String? nome;
@@ -116,13 +122,20 @@ class EstadoJogo extends ChangeNotifier {
     this.uid,
     this.personagem = 'pj1',
     Random? aleatorio,
+    ServicoConta? conta,
   })  : _agora = agora ?? DateTime.now,
-        _aleatorio = aleatorio ?? Random();
+        _aleatorio = aleatorio ?? Random(),
+        conta = conta ?? ServicoContaFalso();
 
   final DadosJogo dados;
   final Armazenamento armazenamento;
   String idioma;
-  final String? uid;
+
+  /// Dono dos dados: o uid da conta logada, ou null (jogo sem conta / convidado). Troca em [entrarNaConta] e [sairDaConta].
+  String? uid;
+
+  /// Conta do jogador (Fase 6). Os testes usam o serviço falso; o app usa o do Firebase.
+  final ServicoConta conta;
   String personagem;
   final DateTime Function() _agora;
   final Random _aleatorio;
@@ -1196,6 +1209,94 @@ class EstadoJogo extends ChangeNotifier {
 
   /// "Entrar como convidado": marca o aparelho como jogo sem conta (`questlog.convidado.v1`).
   void marcarConvidado() => armazenamento.gravar(chaveConvidado, '1');
+
+  // ---------- conta (Fase 6, parte A: só autenticação e troca de dono dos dados locais) ----------
+  // A SINCRONIZAÇÃO com a nuvem (puxarNuvem/empurrarNuvem do original) é a parte B e NÃO existe aqui: ao entrar numa conta
+  // só se decide qual save LOCAL abrir (ver FASE6.md, "Decisões para a parte B").
+
+  /// Qual tela de entrada a raiz do app mostra (a raiz escuta este valor).
+  final ValueNotifier<EntradaModo> entrada = ValueNotifier(EntradaModo.nenhuma);
+
+  /// Conta logada que ainda não confirmou o e-mail: a raiz mostra a trava "Confirme seu e-mail" no lugar de tudo.
+  final ValueNotifier<UsuarioConta?> verificando = ValueNotifier(null);
+
+  UsuarioConta? get usuario => conta.atual;
+  bool get logado => conta.atual != null;
+
+  /// Abre os dados do dono atual ([uid]): o herói ativo dele e o save, ou o estado de entrada se ainda não há save.
+  /// A raiz do app chama ao abrir; [entrarNaConta] e [sairDaConta] chamam ao trocar de dono.
+  Future<void> abrirDonoAtual() async {
+    final pj = armazenamento.ler(_chavePersonagemAtivo);
+    personagem = pj == null || pj.isEmpty ? 'pj1' : pj;
+    await iniciar(permitirOnboarding: true);
+    // o herói ativo precisa existir na lista (senão volta ao primeiro)
+    if (!personagens.any((p) => p.id == personagem)) {
+      personagem = personagens.first.id;
+      await iniciar(permitirOnboarding: true);
+    }
+  }
+
+  /// O `aoLogar` do original, só na parte local e sem rede: troca o dono dos dados para a conta [u].
+  ///  - Veio do modo convidado (`questlog.convidado.v1`) E a conta é nova: as chaves do convidado (sem `.uid.`) passam
+  ///    para a conta (mesma regra do original: `.pj.<id>`, lista de heróis e herói ativo) e as cruas são apagadas.
+  ///  - Conta que já existe: NADA do convidado é copiado (no original a nuvem da conta vence; aqui ainda não há nuvem).
+  ///  - A marca de convidado é removida nos dois casos.
+  /// Devolve true se a conta já tem save começado neste aparelho ("Bem-vindo de volta"); false = configurar o herói.
+  Future<bool> entrarNaConta(UsuarioConta u) async {
+    if (uid != u.uid) {
+      await _salvarTudo(); // grava o dono de agora (não faz nada se a entrada ainda está pendente)
+      final veioDeConvidado = armazenamento.ler(chaveConvidado) == '1';
+      if (veioDeConvidado) {
+        if (u.contaNova) await _migrarConvidadoPara(u.uid);
+        await armazenamento.remover(chaveConvidado);
+      }
+      uid = u.uid;
+      await abrirDonoAtual();
+    }
+    notifyListeners();
+    return !onboardingPendente;
+  }
+
+  /// Copia as chaves do convidado para o namespace da conta e apaga as cruas (o bloco `if (contaNova)` do `aoLogar`).
+  Future<void> _migrarConvidadoPara(String novoUid) async {
+    final reHeroi = RegExp(r'\.pj\.([^.]+)$');
+    for (final k in armazenamento.chaves().toList()) {
+      if (!k.startsWith('questlog.') || k.contains('.uid.')) continue;
+      final ehHeroi = reHeroi.hasMatch(k);
+      if (!ehHeroi && k != 'questlog.personagens.v1' && k != 'questlog.personagemAtivo.v1') continue;
+      final nk = ehHeroi ? k.replaceFirstMapped(reHeroi, (m) => '.uid.$novoUid.pj.${m[1]}') : '$k.uid.$novoUid';
+      final v = armazenamento.ler(k);
+      if (v != null && armazenamento.ler(nk) == null) await armazenamento.gravar(nk, v);
+      await armazenamento.remover(k);
+    }
+  }
+
+  /// "Sair": desconecta e volta a jogar sem conta com o que há local (as chaves da conta ficam no aparelho, como no
+  /// original, que só apaga a marca da conta). A tela de login abre, com o jogo local de volta se houver save.
+  Future<void> sairDaConta() async {
+    await _salvarTudo();
+    try {
+      await conta.sair();
+    } catch (_) {
+      // sem rede ou erro: desconecta só aqui, como o original ("você foi desconectado aqui")
+    }
+    uid = null;
+    await abrirDonoAtual();
+    entrada.value = EntradaModo.soLogin;
+    notifyListeners();
+  }
+
+  /// Depois de excluir a conta no serviço: apaga do aparelho tudo que era dela (`.uid.<uid>`), volta ao jogo sem conta e
+  /// abre o login. (O original dá `localStorage.clear()` inteiro; aqui só o que é da conta excluída.)
+  Future<void> aposExcluirConta(String uidExcluido) async {
+    for (final k in armazenamento.chaves().toList()) {
+      if (k.contains('.uid.$uidExcluido.') || k.endsWith('.uid.$uidExcluido')) await armazenamento.remover(k);
+    }
+    uid = null;
+    await abrirDonoAtual();
+    entrada.value = EntradaModo.soLogin;
+    notifyListeners();
+  }
 
   /// Fim da configuração do herói (o `irEscolha` de `mostrarSetupPersonagemENome`): nome e sprite escolhidos, o save
   /// nasce com `comecou: true` (`jaComecou = true` + `render()` no original, que é quem grava) e o dia/vida iniciais.

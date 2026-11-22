@@ -1,7 +1,7 @@
 // Configurações (engrenagem do Perfil): a tela principal e as sub-telas Heróis, Editar herói, Novo herói, Aparência,
 // Preferências, Idioma e Gerenciar conta. Espelha os blocos "PERFIL — SUB-ABAS" e "PLANO PRO" de play/index.html
-// (~11216 a 12120) e as `.cfgOverlay` de play/style.css. O que depende de conta, nuvem ou compra (criar conta, plano,
-// excluir conta) aparece igual ao original, mas desabilitado, com o aviso "disponível em breve" (Fases 6 e 7).
+// (~11216 a 12120) e as `.cfgOverlay` de play/style.css. A conta (entrar, sair, excluir) funciona desde a Fase 6; o que
+// depende de compra (plano Pro) aparece igual ao original, com o aviso "disponível em breve" (Fase 7).
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -11,6 +11,7 @@ import '../dominio/save.dart' show nomeHeroiNorm, nomePadraoHeroi;
 import 'cfg_base.dart';
 import 'estado_jogo.dart';
 import 'folhas.dart';
+import 'login_conta.dart';
 import 'icones.dart';
 import 'som.dart';
 import 'svg_icone.dart';
@@ -27,7 +28,7 @@ Future<void> _abrirUrl(String url) async {
   } catch (_) {}
 }
 
-/// Aviso para o que ainda não existe no Flutter: conta, nuvem e plano Pro.
+/// Aviso para o que ainda não existe no Flutter: o plano Pro (e a nuvem, que é a parte B da Fase 6).
 Future<void> avisoEmBreve(BuildContext context, EstadoJogo e, {String? pro}) {
   final en = e.idioma == 'en';
   return mostrarAviso(
@@ -81,7 +82,6 @@ class _TelaConfig extends StatelessWidget {
     return ListenableBuilder(
       listenable: e,
       builder: (context, _) {
-        final en = e.idioma == 'en';
         return CfgTela(
           titulo: tr(e, 'cfg.configuracoes'),
           estado: e,
@@ -91,8 +91,8 @@ class _TelaConfig extends StatelessWidget {
               CfgLinha(
                 icone: 'conta',
                 titulo: tr(e, 'cfg.conta'),
-                subtitulo: en ? 'Playing without an account' : 'Jogando sem conta',
-                controle: CfgBotao(tr(e, 'cfg.criarConta'), aoTocar: () => avisoEmBreve(context, e)),
+                subtitulo: textoDaConta(e),
+                controle: e.logado ? null : CfgBotao(tr(e, 'cfg.criarConta'), aoTocar: () => entrarPelasConfiguracoes(context, e)),
                 seta: true,
                 aoTocar: () => abrirTelaCfg<void>(context, (_) => _TelaConta(estado: e)),
               ),
@@ -118,6 +118,7 @@ class _TelaConfig extends StatelessWidget {
               CfgLinha(icone: 'privacidade', titulo: tr(e, 'cfg.privacidade'), setaExterna: true, aoTocar: () => _abrirUrl(urlLegal('privacy', e.idioma))),
               CfgLinha(icone: 'termos', titulo: tr(e, 'cfg.termosDeUso'), setaExterna: true, aoTocar: () => _abrirUrl(urlLegal('terms', e.idioma))),
             ]),
+            if (e.logado) _ZonaRisco(estado: e),
           ],
         );
       },
@@ -126,6 +127,77 @@ class _TelaConfig extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------- Conta
+/// A linha da conta (`atualizarLinhaConta`): "Logado como <nome>" ou "Jogando sem conta".
+String textoDaConta(EstadoJogo e) {
+  final en = e.idioma == 'en';
+  final u = e.usuario;
+  return u != null ? '${en ? 'Logged in as ' : 'Logado como '}${u.nome}' : (en ? 'Playing without an account' : 'Jogando sem conta');
+}
+
+/// "Criar conta" / "Entrar" de quem joga sem conta: fecha as Configurações e abre o login com o jogo local intacto
+/// (o original recarrega a página com `forcarLogin` e `convidado`; o progresso do convidado migra para a conta nova).
+void entrarPelasConfiguracoes(BuildContext context, EstadoJogo e) {
+  Vibra.toque();
+  e.marcarConvidado();
+  Navigator.of(context).popUntil((r) => r.isFirst);
+  e.entrada.value = EntradaModo.soLogin;
+}
+
+/// A zona de risco no fim das Configurações: Sair e Excluir conta (só logado), pílulas com borda rosa.
+class _ZonaRisco extends StatefulWidget {
+  const _ZonaRisco({required this.estado});
+  final EstadoJogo estado;
+  @override
+  State<_ZonaRisco> createState() => _ZonaRiscoState();
+}
+
+class _ZonaRiscoState extends State<_ZonaRisco> {
+  bool _saindo = false;
+
+  Widget _botao(Key k, String icone, String texto, VoidCallback? aoTocar) => Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: Opacity(
+          opacity: aoTocar == null ? 0.5 : 1,
+          child: Toque(
+            aoTocar: aoTocar,
+            child: Container(
+              key: k,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(999), border: Border.all(color: corVida, width: 1.5)),
+              child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                IconeSvg(icone, tamanho: 18, cor: corVida),
+                const SizedBox(width: 8),
+                Text(texto, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: corVida, height: 1.25)),
+              ]),
+            ),
+          ),
+        ),
+      );
+
+  Future<void> _sair() async {
+    if (_saindo) return;
+    final e = widget.estado;
+    setState(() => _saindo = true);
+    Vibra.toque();
+    final nav = Navigator.of(context);
+    nav.popUntil((r) => r.isFirst);
+    await e.sairDaConta();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final e = widget.estado;
+    final en = e.idioma == 'en';
+    return Padding(
+      padding: const EdgeInsets.only(top: 28),
+      child: Column(children: [
+        _botao(const ValueKey('cfg-sair'), 'sair', _saindo ? (en ? 'Logging out…' : 'Saindo…') : tr(e, 'cfg.sair'), _saindo ? null : _sair),
+        _botao(const ValueKey('cfg-excluir-conta'), 'excluir', tr(e, 'cfg.excluirConta'), _saindo ? null : () => abrirExcluirConta(context, e)),
+      ]),
+    );
+  }
+}
+
 class _TelaConta extends StatelessWidget {
   const _TelaConta({required this.estado});
   final EstadoJogo estado;
@@ -145,7 +217,7 @@ class _TelaConta extends StatelessWidget {
         linha(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(tr(e, 'cfg.idDaConta'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: corTexto, height: 1.2)),
           const SizedBox(height: 2),
-          Text(en ? 'Playing without an account' : 'Jogando sem conta', style: TextStyle(fontSize: 12, color: corApagado, height: 1.26)),
+          Text(textoDaConta(e), key: const ValueKey('conta-id-info'), style: TextStyle(fontSize: 12, color: corApagado, height: 1.26)),
         ])),
         Toque(
           aoTocar: () => avisoEmBreve(context, e, pro: en ? 'The subscription' : 'A assinatura'),

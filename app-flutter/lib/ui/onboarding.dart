@@ -5,23 +5,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../dados/conta.dart';
 import '../dominio/entrada.dart';
 import 'estado_jogo.dart';
-import 'folhas.dart' show mostrarAviso;
+import 'login_conta.dart';
 import 'icones.dart' show pixel;
 import 'onb_comum.dart';
 import 'onb_slides.dart';
+import 'som.dart';
 import 'tema.dart';
 import 'vibra.dart';
 
 const _svgGoogle = '<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.7-6 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l6-6C34 5.1 29.3 3 24 3 12.4 3 3 12.4 3 24s9.4 21 21 21 21-9.4 21-21c0-1.4-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.9 18.9 13 24 13c3.1 0 5.8 1.1 8 3l6-6C34 5.1 29.3 3 24 3 16.3 3 9.7 7.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 45c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 36.4 26.7 37.3 24 37.3c-5.3 0-9.7-3.3-11.3-8l-6.5 5C9.6 40.6 16.2 45 24 45z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.2 4.2-4.1 5.6l6.2 5.2C40.9 36 44 30.5 44 24c0-1.4-.1-2.4-.4-3.5z"/></svg>';
 
-enum _Tela { slide, login, loginForm, heroi, nome }
+enum _Tela { slide, login, loginForm, boasVindas, heroi, nome }
 
 class Onboarding extends StatefulWidget {
-  const Onboarding({super.key, required this.estado, required this.aoConcluir});
+  const Onboarding({super.key, required this.estado, required this.aoConcluir, this.somenteLogin = false});
   final EstadoJogo estado;
   final VoidCallback aoConcluir;
+
+  /// Abre direto no login (depois de "Sair", de excluir a conta ou pelo "Entrar" das Configurações): sem apresentação.
+  final bool somenteLogin;
   @override
   State<Onboarding> createState() => _OnboardingState();
 }
@@ -36,13 +41,30 @@ class _OnboardingState extends State<Onboarding> {
   final _nome = TextEditingController();
   bool _nomeErro = false;
   bool _gravando = false;
+  final _carregando = ControleCarregando();
+  final _msgEmail = ValueNotifier<({String texto, bool ok})?>(null);
+  bool _googleEmCurso = false;
+  UsuarioConta? _entrou; // quem acabou de entrar (para o "Bem-vindo de volta")
 
   EstadoJogo get e => widget.estado;
   String get l => e.idioma;
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.somenteLogin) {
+      _tela = _Tela.login;
+    } else if (e.logado && e.uid != null) {
+      // já tem conta (entrou e o app fechou antes de escolher o herói): só falta o herói
+      _tela = _Tela.heroi;
+    }
+  }
+
+  @override
   void dispose() {
     _nome.dispose();
+    _carregando.dispose();
+    _msgEmail.dispose();
     super.dispose();
   }
 
@@ -56,16 +78,27 @@ class _OnboardingState extends State<Onboarding> {
     });
   }
 
-  bool get _setaVisivel => !(_tela == _Tela.slide && _slide == 1);
+  bool get _setaVisivel {
+    if (_tela == _Tela.boasVindas) return false;
+    if (_tela == _Tela.heroi && e.logado) return false; // depois de entrar na conta não há volta ao login
+    if (_tela == _Tela.login && widget.somenteLogin) return !e.onboardingPendente; // só se há um jogo para voltar
+    return !(_tela == _Tela.slide && _slide == 1);
+  }
 
   void _voltar() {
     switch (_tela) {
       case _Tela.slide:
         if (_slide > 1) _ir(_Tela.slide, slide: _slide - 1, dir: -1);
       case _Tela.login:
-        _ir(_Tela.slide, slide: _origemLogin, dir: -1);
+        if (widget.somenteLogin) {
+          widget.aoConcluir(); // volta ao jogo (só aparece a seta se há um jogo)
+        } else {
+          _ir(_Tela.slide, slide: _origemLogin, dir: -1);
+        }
       case _Tela.loginForm:
         _ir(_Tela.login, dir: -1);
+      case _Tela.boasVindas:
+        break;
       case _Tela.heroi:
         _ir(_Tela.login, dir: -1);
       case _Tela.nome:
@@ -75,7 +108,108 @@ class _OnboardingState extends State<Onboarding> {
 
   Future<void> _convidado() async {
     e.marcarConvidado();
+    // já havia jogo local (voltou do "Sair" ou do "Entrar" sem conta): reentra direto, como o original
+    if (!e.onboardingPendente) {
+      widget.aoConcluir();
+      return;
+    }
     _ir(_Tela.heroi, dir: 1);
+  }
+
+  // ---------- conta ----------
+  /// Terminou um login/cadastro/Google: se precisa confirmar o e-mail a raiz mostra a trava; senão troca o dono dos
+  /// dados e segue ("Bem-vindo de volta" se já há save desta conta aqui, senão a escolha do herói).
+  Future<void> _aoLogar(UsuarioConta u) async {
+    if (u.precisaVerificarEmail) {
+      _carregando.esconder();
+      e.verificando.value = u;
+      return;
+    }
+    final temSave = await e.entrarNaConta(u);
+    _carregando.esconder();
+    if (!mounted) return;
+    _entrou = u;
+    if (temSave) {
+      _ir(_Tela.boasVindas, dir: 1);
+    } else {
+      _ir(_Tela.heroi, dir: 1);
+    }
+  }
+
+  bool get _en => l == 'en';
+
+  void _erroEmail(String texto) => _msgEmail.value = (texto: texto, ok: false);
+
+  Future<void> _google() async {
+    if (_googleEmCurso) return;
+    _googleEmCurso = true;
+    _carregando.mostrar();
+    try {
+      final u = await e.conta.entrarComGoogle();
+      await _aoLogar(u);
+    } on ErroConta catch (err) {
+      if (err.cancelou) {
+        _carregando.esconder(); // fechou o seletor de propósito: não é erro
+      } else {
+        _carregando.erro(mensagemErroGoogle(err, en: _en));
+      }
+    } finally {
+      _googleEmCurso = false;
+    }
+  }
+
+  /// "Entrar" / "Criar conta" do formulário de e-mail (as validações e mensagens são as do loginEntrarBtn.onclick).
+  Future<void> _enviar(String email, String senha, String confirmar, bool cadastro) async {
+    final en = _en;
+    email = email.trim();
+    _msgEmail.value = null;
+    if (email.isEmpty || senha.isEmpty) {
+      _erroEmail(en ? 'Fill in email and password' : 'Preencha email e senha');
+      return;
+    }
+    if (cadastro) {
+      if (senha != confirmar) {
+        _erroEmail(en ? "Passwords don't match" : 'As senhas não são iguais');
+        return;
+      }
+      if (!senhaForteOk(senha)) {
+        _erroEmail(en ? 'Password needs at least 6 characters and 1 number' : 'Senha precisa de pelo menos 6 caracteres e 1 número');
+        return;
+      }
+    }
+    _carregando.mostrar();
+    try {
+      e.conta.definirIdioma(e.idioma);
+      final u = cadastro ? await e.conta.cadastrar(email, senha) : await e.conta.entrar(email, senha);
+      await _aoLogar(u);
+    } on ErroConta catch (err) {
+      Som.atual.tocar('erro');
+      final msg = mensagemErroLogin(err, en: en);
+      if (erroDoCampoEmail(err)) {
+        _erroEmail(msg);
+        _carregando.esconder();
+      } else {
+        _carregando.erro(msg);
+      }
+    }
+  }
+
+  /// "Esqueceu a senha?": usa o e-mail já digitado; o resultado aparece embaixo do campo.
+  Future<void> _esqueci(String email) async {
+    final en = _en;
+    email = email.trim();
+    _msgEmail.value = null;
+    if (email.isEmpty) {
+      _erroEmail(en ? 'Type your email first' : 'Digita seu email primeiro');
+      return;
+    }
+    try {
+      e.conta.definirIdioma(e.idioma);
+      await e.conta.enviarRedefinicaoDeSenha(email);
+      _msgEmail.value = (texto: en ? 'Recovery email sent -- check your inbox' : 'Email de recuperação enviado -- confira sua caixa de entrada', ok: true);
+    } on ErroConta catch (err) {
+      _erroEmail(mensagemErroRedefinir(err, en: en));
+    }
   }
 
   Future<void> _concluir() async {
@@ -89,16 +223,6 @@ class _OnboardingState extends State<Onboarding> {
     Vibra.toque();
     await e.concluirOnboarding(nome: n, heroi: _heroi);
     widget.aoConcluir();
-  }
-
-  Future<void> _emBreve() {
-    final en = l == 'en';
-    return mostrarAviso(
-      context,
-      titulo: en ? 'Coming soon' : 'Disponível em breve',
-      texto: en ? 'Accounts and cloud save arrive in a later version of the app.' : 'Conta e salvamento na nuvem chegam numa próxima versão do app.',
-      botao: en ? 'OK' : 'Entendi',
-    );
   }
 
   @override
@@ -117,7 +241,7 @@ class _OnboardingState extends State<Onboarding> {
         child: Stack(children: [
           // fundos: gradiente do carrossel e cenário (montanhas) do login/configuração, em fusão
           Positioned.fill(child: AnimatedOpacity(duration: const Duration(milliseconds: 450), opacity: emSlide ? 1 : 0, child: FundoGradienteCss(de: grad, ate: const Color(0xFF1E1E1E)))),
-          Positioned.fill(child: AnimatedOpacity(duration: const Duration(milliseconds: 350), opacity: fundoCenario ? 1 : 0, child: const _CenarioLogin())),
+          Positioned.fill(child: AnimatedOpacity(duration: const Duration(milliseconds: 350), opacity: fundoCenario ? 1 : 0, child: const CenarioLogin())),
           Padding(
             // o teclado encolhe a área útil (o campo de nome nunca fica coberto; o conteúdo rola)
             padding: EdgeInsets.only(bottom: mq.viewInsets.bottom),
@@ -187,6 +311,7 @@ class _OnboardingState extends State<Onboarding> {
             ),
           ),
           ),
+          CarregandoMasmorra(controle: _carregando, estado: e),
         ]),
       ),
     );
@@ -227,12 +352,14 @@ class _OnboardingState extends State<Onboarding> {
       case _Tela.login:
         return _LoginEscolha(
           idioma: l,
-          aoGoogle: _emBreve,
+          aoGoogle: _google,
           aoEmail: () => _ir(_Tela.loginForm, dir: 1),
           aoConvidado: _convidado,
         );
       case _Tela.loginForm:
-        return _LoginForm(idioma: l, aoEnviar: _emBreve);
+        return _LoginForm(idioma: l, mensagem: _msgEmail, aoEnviar: _enviar, aoEsqueci: _esqueci);
+      case _Tela.boasVindas:
+        return BoasVindasDeVolta(estado: e, usuario: _entrou ?? e.usuario!, aoContinuar: widget.aoConcluir);
       case _Tela.heroi:
         return _SetupHeroi(estado: e, selecionado: _heroi, aoMudar: (i) => setState(() => _heroi = i), aoContinuar: () => _ir(_Tela.nome, dir: 1));
       case _Tela.nome:
@@ -249,21 +376,6 @@ class _OnboardingState extends State<Onboarding> {
         );
     }
   }
-}
-
-/// Cenário das montanhas por trás do login (`#introCenario.modoLogin`): a arte cobrindo a tela e escurecendo para baixo.
-class _CenarioLogin extends StatelessWidget {
-  const _CenarioLogin();
-  @override
-  Widget build(BuildContext context) => Stack(fit: StackFit.expand, children: [
-        const ColoredBox(color: onbFundoLogin),
-        Image.asset('assets/img/arena/montanhas.png', fit: BoxFit.cover, filterQuality: FilterQuality.none),
-        const DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x000B0710), Color(0x000B0710), Color(0x940B0710), Color(0xF00B0710)], stops: [0, .35, .68, 1]),
-          ),
-        ),
-      ]);
 }
 
 const _sombraTexto = [Shadow(color: Color(0xD9000000), blurRadius: 4, offset: Offset(0, 1))];
@@ -330,12 +442,19 @@ class _LoginEscolha extends StatelessWidget {
 }
 
 class _LoginForm extends StatefulWidget {
-  const _LoginForm({required this.idioma, required this.aoEnviar});
+  const _LoginForm({required this.idioma, required this.mensagem, required this.aoEnviar, required this.aoEsqueci});
   final String idioma;
-  final VoidCallback aoEnviar;
+
+  /// Mensagem embaixo do campo de e-mail (`questlogMostrarErroEmail` / `questlogMostrarOkEmail`): erro em vermelho com o
+  /// X no campo, ou sucesso em verde.
+  final ValueNotifier<({String texto, bool ok})?> mensagem;
+  final Future<void> Function(String email, String senha, String confirmar, bool cadastro) aoEnviar;
+  final Future<void> Function(String email) aoEsqueci;
   @override
   State<_LoginForm> createState() => _LoginFormState();
 }
+
+enum _Status { nenhum, ok, erro }
 
 class _LoginFormState extends State<_LoginForm> {
   bool _cadastro = false;
@@ -343,42 +462,83 @@ class _LoginFormState extends State<_LoginForm> {
   final _email = TextEditingController(), _senha = TextEditingController(), _conf = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    widget.mensagem.addListener(_mudouMensagem);
+  }
+
+  @override
   void dispose() {
+    widget.mensagem.removeListener(_mudouMensagem);
     _email.dispose();
     _senha.dispose();
     _conf.dispose();
     super.dispose();
   }
 
-  Widget _campo(String rotulo, TextEditingController c, IconData ic, {bool senha = false, String? dica}) => Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-        Text(rotulo, style: const TextStyle(fontSize: 13, color: onbMudo, shadows: _sombraTexto)),
-        const SizedBox(height: 8),
-        SizedBox(
-          height: 46.8,
-          child: TextField(
-            controller: c,
-            obscureText: senha && !_ver,
-            keyboardType: senha ? TextInputType.visiblePassword : TextInputType.emailAddress,
-            style: const TextStyle(fontSize: 15, color: onbTexto),
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: corPainel2,
-              hintText: dica,
-              hintStyle: TextStyle(color: corApagado.withValues(alpha: .6)),
-              prefixIcon: Icon(ic, size: 20, color: corApagado),
-              suffixIcon: senha ? IconButton(icon: Icon(_ver ? Icons.visibility_off_outlined : Icons.visibility_outlined, size: 20, color: corApagado), onPressed: () => setState(() => _ver = !_ver)) : null,
-              contentPadding: const EdgeInsets.symmetric(vertical: 13),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: corLinha, width: 0.8)),
-              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: corLinha, width: 0.8)),
-              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: corAccent, width: 0.8)),
-            ),
+  void _mudouMensagem() {
+    if (mounted) setState(() {});
+  }
+
+  // check/X em tempo real dos campos de senha (só ao criar a conta; `atualizarStatusSenha` / `atualizarStatusConfirmar`)
+  _Status get _statusSenha => !_cadastro || _senha.text.isEmpty ? _Status.nenhum : (senhaForteOk(_senha.text) ? _Status.ok : _Status.erro);
+  _Status get _statusConf => !_cadastro || _conf.text.isEmpty ? _Status.nenhum : (_conf.text == _senha.text ? _Status.ok : _Status.erro);
+
+  Widget? _iconeStatus(_Status s) => switch (s) {
+        _Status.ok => const Icon(Icons.check_rounded, size: 20, color: Color(0xFF4ADE80)),
+        _Status.erro => const Icon(Icons.close_rounded, size: 20, color: corVida),
+        _Status.nenhum => null,
+      };
+
+  Widget _campo(String rotulo, TextEditingController c, IconData ic, {bool senha = false, String? dica, _Status status = _Status.nenhum, ValueChanged<String>? aoDigitar, Key? chave}) {
+    final iconeStatus = _iconeStatus(status);
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+      Text(rotulo, style: const TextStyle(fontSize: 13, color: onbMudo, shadows: _sombraTexto)),
+      const SizedBox(height: 8),
+      SizedBox(
+        height: 46.8,
+        child: TextField(
+          key: chave,
+          controller: c,
+          obscureText: senha && !_ver,
+          keyboardType: senha ? TextInputType.visiblePassword : TextInputType.emailAddress,
+          autocorrect: false,
+          enableSuggestions: false,
+          onChanged: aoDigitar,
+          style: const TextStyle(fontSize: 15, color: onbTexto),
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: corPainel2,
+            hintText: dica,
+            hintStyle: TextStyle(color: corApagado.withValues(alpha: .6)),
+            prefixIcon: Icon(ic, size: 20, color: corApagado),
+            suffixIcon: (senha || iconeStatus != null)
+                ? Row(mainAxisSize: MainAxisSize.min, children: [
+                    if (iconeStatus != null) iconeStatus,
+                    if (senha) IconButton(icon: Icon(_ver ? Icons.visibility_off_outlined : Icons.visibility_outlined, size: 20, color: corApagado), onPressed: () => setState(() => _ver = !_ver)),
+                    if (!senha) const SizedBox(width: 14),
+                  ])
+                : null,
+            contentPadding: const EdgeInsets.symmetric(vertical: 13),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: corLinha, width: 0.8)),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: corLinha, width: 0.8)),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: corAccent, width: 0.8)),
           ),
         ),
-      ]);
+      ),
+    ]);
+  }
+
+  Widget _erroAbaixo(Key k, String texto, {Color cor = corVida}) => Padding(
+        padding: const EdgeInsets.only(top: 6),
+        child: Align(alignment: Alignment.centerLeft, child: Text(texto, key: k, style: TextStyle(fontSize: 12, color: cor, shadows: _sombraTexto))),
+      );
 
   @override
   Widget build(BuildContext context) {
     final en = widget.idioma == 'en';
+    final msg = widget.mensagem.value;
+    final senhaStatus = _statusSenha, confStatus = _statusConf;
     return Stack(children: [
       _MarcaA36(altura: 85.1, filho: Column(mainAxisSize: MainAxisSize.min, children: [
         const LogoDungeonlog(),
@@ -390,31 +550,41 @@ class _LoginFormState extends State<_LoginForm> {
         child: SingleChildScrollView(
           reverse: true,
           child: Column(mainAxisSize: MainAxisSize.min, children: [
-            _campo(en ? 'Email' : 'Email', _email, Icons.mail_outline, dica: 'voce@email.com'),
+            _campo(en ? 'Email' : 'Email', _email, Icons.mail_outline, dica: 'voce@email.com', chave: const ValueKey('login-email-campo'), status: msg != null && !msg.ok ? _Status.erro : _Status.nenhum, aoDigitar: (_) {
+              if (widget.mensagem.value != null) widget.mensagem.value = null;
+            }),
+            if (msg != null) _erroAbaixo(const ValueKey('login-msg-email'), msg.texto, cor: msg.ok ? const Color(0xFF4CAF7A) : corVida),
             const SizedBox(height: 18),
-            _campo(en ? 'Password' : 'Senha', _senha, Icons.lock_outline, senha: true, dica: '••••••••'),
-            if (_cadastro) ...[const SizedBox(height: 18), _campo(en ? 'Confirm password' : 'Confirmar senha', _conf, Icons.lock_outline, senha: true, dica: '••••••••')],
+            _campo(en ? 'Password' : 'Senha', _senha, Icons.lock_outline, senha: true, dica: '••••••••', chave: const ValueKey('login-senha-campo'), status: senhaStatus, aoDigitar: (_) => setState(() {})),
+            if (senhaStatus == _Status.erro) _erroAbaixo(const ValueKey('login-msg-senha'), en ? 'Your password must have at least 6 characters and 1 number' : 'Sua senha deve ter pelo menos 6 caracteres e 1 número'),
+            if (_cadastro) ...[
+              const SizedBox(height: 18),
+              _campo(en ? 'Confirm password' : 'Confirmar senha', _conf, Icons.lock_outline, senha: true, dica: '••••••••', chave: const ValueKey('login-confirmar-campo'), status: confStatus, aoDigitar: (_) => setState(() {})),
+              if (confStatus == _Status.erro) _erroAbaixo(const ValueKey('login-msg-confirmar'), en ? "Passwords don't match" : 'As senhas não coincidem'),
+            ],
             const SizedBox(height: 10),
             _Termos(idioma: widget.idioma, prefixo: en ? 'By continuing, you agree to the ' : 'Ao continuar, você concorda com os ', cor: const Color(0xFFD5D8DE)),
             if (!_cadastro) ...[
               const SizedBox(height: 12),
-              Align(alignment: Alignment.centerRight, child: GestureDetector(onTap: widget.aoEnviar, child: Padding(padding: const EdgeInsets.symmetric(vertical: 4), child: Text(en ? 'Forgot your password?' : 'Esqueceu a senha?', style: const TextStyle(fontSize: 12.5, color: Colors.white, shadows: _sombraTexto))))),
+              Align(alignment: Alignment.centerRight, child: GestureDetector(key: const ValueKey('login-esqueci'), onTap: () => widget.aoEsqueci(_email.text), child: Padding(padding: const EdgeInsets.symmetric(vertical: 4), child: Text(en ? 'Forgot your password?' : 'Esqueceu a senha?', style: const TextStyle(fontSize: 12.5, color: Colors.white, shadows: _sombraTexto))))),
             ],
             const SizedBox(height: 18),
-            GestureDetector(
+            BotaoPilulaLogin(
               key: const ValueKey('login-enviar'),
-              onTap: widget.aoEnviar,
-              child: Container(
-                height: 47.2,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(borderRadius: BorderRadius.circular(999), gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.white, Color(0xFFECECEC)]), boxShadow: const [BoxShadow(color: Color(0xFFA9A9A9), offset: Offset(0, 4))]),
-                child: Text(_cadastro ? (en ? 'Create account' : 'Criar conta') : (en ? 'Log in' : 'Entrar'), style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: Color(0xFF111111))),
-              ),
+              _cadastro ? (en ? 'Create account' : 'Criar conta') : (en ? 'Log in' : 'Entrar'),
+              aoTocar: () => widget.aoEnviar(_email.text, _senha.text, _conf.text, _cadastro),
             ),
             const SizedBox(height: 18),
             Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               Text(_cadastro ? (en ? 'Already have an account? ' : 'Já tem conta? ') : (en ? "Don't have an account? " : 'Não tem conta? '), style: TextStyle(fontSize: 13, color: corApagado, shadows: _sombraTexto)),
-              GestureDetector(key: const ValueKey('login-alternar'), onTap: () => setState(() => _cadastro = !_cadastro), child: Text(_cadastro ? (en ? 'Log in' : 'Entrar') : (en ? 'Sign up now' : 'Cadastre-se agora'), style: const TextStyle(fontSize: 12.5, color: Colors.white, shadows: _sombraTexto))),
+              GestureDetector(
+                key: const ValueKey('login-alternar'),
+                onTap: () {
+                  widget.mensagem.value = null;
+                  setState(() => _cadastro = !_cadastro);
+                },
+                child: Text(_cadastro ? (en ? 'Log in' : 'Entrar') : (en ? 'Sign up now' : 'Cadastre-se agora'), style: const TextStyle(fontSize: 12.5, color: Colors.white, shadows: _sombraTexto)),
+              ),
             ]),
           ]),
         ),

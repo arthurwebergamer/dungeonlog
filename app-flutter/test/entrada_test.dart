@@ -185,13 +185,6 @@ void main() {
     await toca(find.byKey(const ValueKey('onb-btn5')));
     expect(find.text('Continuar com Google'), findsOneWidget);
     expect(find.text('Entrar como convidado'), findsOneWidget);
-    await t.tap(find.byKey(const ValueKey('login-google')));
-    await t.pump();
-    await t.pump(const Duration(milliseconds: 400));
-    expect(find.text('Disponível em breve'), findsOneWidget);
-    await t.tap(find.text('Entendi'));
-    await t.pump();
-    await t.pump(const Duration(milliseconds: 400));
     await toca(find.byKey(const ValueKey('login-convidado')));
     expect(arm.ler('questlog.convidado.v1'), '1');
     expect(find.text('Quem vai enfrentar os monstros?'), findsOneWidget);

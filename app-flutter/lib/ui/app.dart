@@ -7,10 +7,13 @@ import 'package:flutter/services.dart';
 
 import '../dados/armazenamento.dart';
 import '../dados/carregador_assets.dart';
+import '../dados/conta.dart';
+import '../dados/conta_falsa.dart' show ServicoContaIndisponivel;
 import 'crt.dart';
 import 'equip_arena.dart';
 import 'estado_jogo.dart';
 import 'icones.dart';
+import 'login_conta.dart';
 import 'respiracao.dart';
 import 'som.dart';
 import 'tela_inventario.dart';
@@ -27,7 +30,9 @@ import 'splash.dart';
 import 'tour.dart';
 
 class DungeonlogApp extends StatefulWidget {
-  const DungeonlogApp({super.key});
+  /// [conta]: o serviço de conta (o `main` passa o do Firebase). Sem ele ninguém pode entrar (só "convidado").
+  const DungeonlogApp({super.key, this.conta});
+  final ServicoConta? conta;
   @override
   State<DungeonlogApp> createState() => _DungeonlogAppState();
 }
@@ -67,12 +72,13 @@ class _DungeonlogAppState extends State<DungeonlogApp> {
           const Positioned.fill(child: CamadaTour()),
           if (crtAtivo.value) const Positioned.fill(child: CamadaCrt()),
         ]),
-        home: const _Carregador(),
+        home: _Carregador(conta: widget.conta ?? const ServicoContaIndisponivel()),
       );
 }
 
 class _Carregador extends StatefulWidget {
-  const _Carregador();
+  const _Carregador({required this.conta});
+  final ServicoConta conta;
   @override
   State<_Carregador> createState() => _CarregadorState();
 }
@@ -81,7 +87,6 @@ class _CarregadorState extends State<_Carregador> {
   late final Future<EstadoJogo> _futuro = _iniciar();
   Color _corAbertura = Paleta.grafite.bg;
   bool _splashSaiu = false;
-  bool _entrada = false; // a entrada (onboarding) está na tela
 
   Future<EstadoJogo> _iniciar() async {
     final arm = await ArmazenamentoLocal.abrir();
@@ -100,16 +105,17 @@ class _CarregadorState extends State<_Carregador> {
     await Respiracao.carregar();
     Som.atual = SomAudio(arm);
     crtAtivo.value = arm.ler(chaveCrt) == '1';
-    final pjSalvo = arm.ler('questlog.personagemAtivo.v1');
-    final estado = EstadoJogo(dados: dados, armazenamento: arm, idioma: idioma, personagem: pjSalvo == null || pjSalvo.isEmpty ? 'pj1' : pjSalvo);
-    await estado.iniciar(permitirOnboarding: true);
-    // o herói ativo precisa existir na lista (senão volta ao primeiro)
-    if (!estado.personagens.any((p) => p.id == estado.personagem)) {
-      estado.personagem = estado.personagens.first.id;
-      await estado.iniciar(permitirOnboarding: true);
-    }
+    // a sessão do Firebase é restaurada sozinha: quem já entrou antes abre direto na conta. Conta nova que ainda não
+    // confirmou o e-mail NÃO abre os dados da conta (a raiz mostra a trava "Confirme seu e-mail").
+    final conta = widget.conta;
+    conta.definirIdioma(idioma);
+    final usuario = conta.atual;
+    final trava = usuario != null && usuario.precisaVerificarEmail;
+    final estado = EstadoJogo(dados: dados, armazenamento: arm, idioma: idioma, uid: usuario != null && !trava ? usuario.uid : null, conta: conta);
+    await estado.abrirDonoAtual(); // o herói ativo do dono (conta ou convidado) e o save dele
     Vibra.ligada = estado.vibracaoLigada;
-    _entrada = estado.onboardingPendente;
+    estado.entrada.value = estado.onboardingPendente ? EntradaModo.completa : EntradaModo.nenhuma;
+    if (trava) estado.verificando.value = usuario;
     return estado;
   }
 
@@ -125,9 +131,17 @@ class _CarregadorState extends State<_Carregador> {
           final estado = snap.data!;
           return Stack(children: [
             Positioned.fill(
-              child: _entrada
-                  ? Onboarding(estado: estado, aoConcluir: () => setState(() => _entrada = false))
-                  : Casca(estado: estado, comTutorial: true),
+              child: ValueListenableBuilder<UsuarioConta?>(
+                valueListenable: estado.verificando,
+                builder: (_, pendente, __) => pendente != null
+                    ? TelaVerificarEmail(key: ValueKey('verificar-${pendente.uid}'), estado: estado, usuario: pendente)
+                    : ValueListenableBuilder<EntradaModo>(
+                        valueListenable: estado.entrada,
+                        builder: (_, modo, __) => modo == EntradaModo.nenhuma
+                            ? Casca(estado: estado, comTutorial: true)
+                            : Onboarding(key: ValueKey('entrada-${modo.name}'), estado: estado, somenteLogin: modo == EntradaModo.soLogin, aoConcluir: () => estado.entrada.value = EntradaModo.nenhuma),
+                      ),
+              ),
             ),
             if (!_splashSaiu)
               Positioned.fill(

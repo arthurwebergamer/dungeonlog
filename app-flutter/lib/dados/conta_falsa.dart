@@ -30,6 +30,9 @@ class ServicoContaFalso implements ServicoConta {
   /// Simula o jogador clicando no link do e-mail: o próximo [recarregar] devolve o e-mail como confirmado.
   bool confirmarNoProximoRecarregar = false;
 
+  /// O gancho `apagarNuvem` do serviço de verdade (chamado em [excluir], depois de conferir a senha).
+  Future<void> Function(String uid)? apagarNuvem;
+
   String? idiomaEmails;
   String? ultimoEmailRedefinicao;
   String? ultimaSenhaExcluir;
@@ -130,8 +133,12 @@ class ServicoContaFalso implements ServicoConta {
     if (!u.usaGoogle) {
       final c = _contas[(u.email ?? '').toLowerCase()];
       if (c == null || c.senha != senha) throw const ErroConta('wrong-password');
-      _contas.remove((u.email ?? '').toLowerCase());
     }
+    // como o ServicoContaFirebase: depois de reautenticar, apaga a nuvem (falha nela não impede a exclusão)
+    try {
+      await apagarNuvem?.call(u.uid);
+    } catch (_) {}
+    if (!u.usaGoogle) _contas.remove((u.email ?? '').toLowerCase());
     ultimaSenhaExcluir = senha;
     _definir(null);
   }

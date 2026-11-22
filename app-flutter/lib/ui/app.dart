@@ -9,6 +9,8 @@ import '../dados/armazenamento.dart';
 import '../dados/carregador_assets.dart';
 import '../dados/conta.dart';
 import '../dados/conta_falsa.dart' show ServicoContaIndisponivel;
+import '../dados/nuvem.dart';
+import '../dados/sincronizador_nuvem.dart';
 import 'crt.dart';
 import 'equip_arena.dart';
 import 'estado_jogo.dart';
@@ -31,8 +33,10 @@ import 'tour.dart';
 
 class DungeonlogApp extends StatefulWidget {
   /// [conta]: o serviço de conta (o `main` passa o do Firebase). Sem ele ninguém pode entrar (só "convidado").
-  const DungeonlogApp({super.key, this.conta});
+  /// [nuvem]: onde o save da conta é sincronizado (o `main` passa o Firestore). Sem ela o jogo fica só no aparelho.
+  const DungeonlogApp({super.key, this.conta, this.nuvem});
   final ServicoConta? conta;
+  final RepositorioNuvem? nuvem;
   @override
   State<DungeonlogApp> createState() => _DungeonlogAppState();
 }
@@ -72,19 +76,46 @@ class _DungeonlogAppState extends State<DungeonlogApp> {
           const Positioned.fill(child: CamadaTour()),
           if (crtAtivo.value) const Positioned.fill(child: CamadaCrt()),
         ]),
-        home: _Carregador(conta: widget.conta ?? const ServicoContaIndisponivel()),
+        home: _Carregador(conta: widget.conta ?? const ServicoContaIndisponivel(), nuvem: widget.nuvem),
       );
 }
 
 class _Carregador extends StatefulWidget {
-  const _Carregador({required this.conta});
+  const _Carregador({required this.conta, this.nuvem});
   final ServicoConta conta;
+  final RepositorioNuvem? nuvem;
   @override
   State<_Carregador> createState() => _CarregadorState();
 }
 
-class _CarregadorState extends State<_Carregador> {
+class _CarregadorState extends State<_Carregador> with WidgetsBindingObserver {
   late final Future<EstadoJogo> _futuro = _iniciar();
+  EstadoJogo? _estado;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _estado?.nuvem?.parar();
+    super.dispose();
+  }
+
+  /// Nuvem: indo para o fundo sobe o que falta já (sem esperar o atraso); voltando, tenta o que ficou pendente.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState s) {
+    final n = _estado?.nuvem;
+    if (n == null) return;
+    if (s == AppLifecycleState.paused || s == AppLifecycleState.hidden || s == AppLifecycleState.detached) {
+      n.descarregar();
+    } else if (s == AppLifecycleState.resumed) {
+      n.aoVoltar();
+    }
+  }
   Color _corAbertura = Paleta.grafite.bg;
   bool _splashSaiu = false;
 
@@ -111,7 +142,10 @@ class _CarregadorState extends State<_Carregador> {
     conta.definirIdioma(idioma);
     final usuario = conta.atual;
     final trava = usuario != null && usuario.precisaVerificarEmail;
-    final estado = EstadoJogo(dados: dados, armazenamento: arm, idioma: idioma, uid: usuario != null && !trava ? usuario.uid : null, conta: conta);
+    final nuvem = widget.nuvem == null ? null : SincronizadorNuvem(repo: widget.nuvem!, armazenamento: arm);
+    final estado = EstadoJogo(dados: dados, armazenamento: arm, idioma: idioma, uid: usuario != null && !trava ? usuario.uid : null, conta: conta, nuvem: nuvem);
+    _estado = estado;
+    await estado.sincronizarAoAbrir(); // conta já logada: local x nuvem ANTES de abrir os dados (no máximo 3 s)
     await estado.abrirDonoAtual(); // o herói ativo do dono (conta ou convidado) e o save dele
     Vibra.ligada = estado.vibracaoLigada;
     estado.entrada.value = estado.onboardingPendente ? EntradaModo.completa : EntradaModo.nenhuma;

@@ -498,7 +498,7 @@ class _FolhaExcluirContaState extends State<_FolhaExcluirConta> {
       _erro = null;
     });
     try {
-      await e.conta.excluir(senha: _google ? null : _senha.text);
+      await e.excluirConta(senha: _google ? null : _senha.text);
     } on ErroConta catch (err) {
       if (!mounted) return;
       final chave = chaveErroExcluir(err, google: _google);

@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import '../dados/armazenamento.dart';
 import '../dados/conta.dart';
 import '../dados/conta_falsa.dart';
+import '../dados/sincronizador_nuvem.dart';
 import '../dominio/bau.dart';
 import '../dominio/catalogo.dart';
 import '../dominio/conquistas.dart';
@@ -21,6 +22,7 @@ import '../dominio/estatisticas.dart';
 import '../dominio/forja.dart';
 import '../dominio/js_compat.dart';
 import '../dominio/loja.dart';
+import '../dominio/nuvem.dart' show chaveSujo, PlanoServidor, saveComecado;
 import '../dominio/regras.dart';
 import '../dominio/regras.dart' as regras show monstroDoDiaEm;
 import '../dominio/save.dart';
@@ -123,9 +125,13 @@ class EstadoJogo extends ChangeNotifier {
     this.personagem = 'pj1',
     Random? aleatorio,
     ServicoConta? conta,
+    this.nuvem,
   })  : _agora = agora ?? DateTime.now,
         _aleatorio = aleatorio ?? Random(),
-        conta = conta ?? ServicoContaFalso();
+        conta = conta ?? ServicoContaFalso() {
+    nuvem?.aoPuxarEmSegundoPlano = _aoPuxarDaNuvem;
+    nuvem?.aoLerPlano = _aoLerPlano;
+  }
 
   final DadosJogo dados;
   final Armazenamento armazenamento;
@@ -136,6 +142,10 @@ class EstadoJogo extends ChangeNotifier {
 
   /// Conta do jogador (Fase 6). Os testes usam o serviço falso; o app usa o do Firebase.
   final ServicoConta conta;
+
+  /// Sincronização do save com a nuvem (Fase 6, parte B). null = sem nuvem (testes, ou o Firebase não iniciou): o jogo
+  /// funciona igual, só local.
+  final SincronizadorNuvem? nuvem;
   String personagem;
   final DateTime Function() _agora;
   final Random _aleatorio;
@@ -359,7 +369,7 @@ class EstadoJogo extends ChangeNotifier {
   void pousarTema(int i) {
     final t = dados.temas[i];
     if (temaDesbloqueado(i)) {
-      armazenamento.gravar(chaveConta(_chaveTemaArena, uid: uid, personagem: personagem), t.id);
+      if (_gravarSeMudou(chaveConta(_chaveTemaArena, uid: uid, personagem: personagem), t.id) != null) _marcarAlteracaoNuvem();
       _temaPreview = null;
     } else {
       _temaPreview = t.id;
@@ -393,6 +403,7 @@ class EstadoJogo extends ChangeNotifier {
     final anterior = dados.temas[(concluido - 1).clamp(0, dados.temas.length - 1)];
     armazenamento.gravar(chaveConta(_chaveTemaArena, uid: uid, personagem: personagem), tema.id);
     armazenamento.gravar(chaveConta(_chaveCerimonia, uid: uid, personagem: personagem), '$est');
+    _marcarAlteracaoNuvem();
     _temaPreview = null;
     final ehUltimo = tema.id == dados.temas.last.id;
     final kTodos = chaveConta('questlog.avisoTodosBiomas.v1', uid: uid, personagem: personagem);
@@ -1017,6 +1028,7 @@ class EstadoJogo extends ChangeNotifier {
     }
     if (mudou) {
       armazenamento.gravar(chaveConta(_chaveConqVistas, uid: uid, personagem: personagem), jsonEncode(conqVistas.toList()));
+      _marcarAlteracaoNuvem();
       notifyListeners();
     }
   }
@@ -1181,6 +1193,7 @@ class EstadoJogo extends ChangeNotifier {
     }
     personagens = [for (final p in personagens) if (p.id != id) p];
     _gravarPersonagens();
+    _marcarAlteracaoNuvem(); // a nuvem pode estar com o herói apagado: o ativo sobe por cima
     notifyListeners();
     return true;
   }
@@ -1242,14 +1255,27 @@ class EstadoJogo extends ChangeNotifier {
   ///  - Conta que já existe: NADA do convidado é copiado (no original a nuvem da conta vence; aqui ainda não há nuvem).
   ///  - A marca de convidado é removida nos dois casos.
   /// Devolve true se a conta já tem save começado neste aparelho ("Bem-vindo de volta"); false = configurar o herói.
+  ///
+  /// Parte B (nuvem): ANTES de abrir os dados da conta, a nuvem é lida e a regra local x nuvem aplicada
+  /// ([SincronizadorNuvem.entrar]); então "Bem-vindo de volta" também vale para quem só tem o save na nuvem.
+  /// Convidado com progresso entrando numa conta que JÁ existe (decisão pendente da parte A, resolvida assim):
+  ///  - a nuvem da conta tem save → ela vence (como no original); o jogo do convidado fica intacto no aparelho (é o que
+  ///    aparece em "Sair").
+  ///  - a nuvem da conta confirmadamente não tem save, ou não deu para ler → o jogo do convidado é COPIADO para a conta
+  ///    (as chaves cruas ficam) e sobe; se a nuvem não foi lida, a regra decide depois pelo maior progresso (XP).
   Future<bool> entrarNaConta(UsuarioConta u) async {
     if (uid != u.uid) {
       await _salvarTudo(); // grava o dono de agora (não faz nada se a entrada ainda está pendente)
       final veioDeConvidado = armazenamento.ler(chaveConvidado) == '1';
-      if (veioDeConvidado) {
-        if (u.contaNova) await _migrarConvidadoPara(u.uid);
-        await armazenamento.remover(chaveConvidado);
+      if (veioDeConvidado && u.contaNova) await _migrarConvidadoPara(u.uid);
+      final r = await nuvem?.entrar(u.uid);
+      if (veioDeConvidado && !u.contaNova && r != null && !(r.lido && r.nuvemTemSave)) {
+        if (await _copiarConvidadoSeContaVazia(u.uid)) {
+          await armazenamento.gravar(chaveSujo(u.uid), '${_agora().millisecondsSinceEpoch}');
+          nuvem?.alterou(u.uid);
+        }
       }
+      if (veioDeConvidado) await armazenamento.remover(chaveConvidado);
       uid = u.uid;
       await abrirDonoAtual();
     }
@@ -1257,8 +1283,59 @@ class EstadoJogo extends ChangeNotifier {
     return !onboardingPendente;
   }
 
+  /// Abrir o app com a sessão do Firebase restaurada: a mesma decisão local x nuvem do login, antes de abrir os dados
+  /// (espera no máximo [limite]; sem rede o jogo abre local e a nuvem é tentada de novo em segundo plano).
+  /// O original NÃO lê a nuvem neste caminho (só passa a enviar), e um aparelho parado subiria o save velho por cima
+  /// do jogo feito em outro aparelho; aqui a regra é a mesma do login (ver FASE6.md, parte B).
+  Future<void> sincronizarAoAbrir({Duration limite = const Duration(seconds: 3)}) async {
+    final u = uid;
+    if (u == null || nuvem == null) return;
+    await nuvem!.entrar(u, limite: limite);
+  }
+
+  /// Conta que já existe, sem save começado no aparelho: copia o jogo do convidado (só se ele tem save começado), sem
+  /// apagar as chaves cruas. Devolve true se copiou.
+  Future<bool> _copiarConvidadoSeContaVazia(String contaUid) async {
+    final pjConvidado = armazenamento.ler('questlog.personagemAtivo.v1');
+    final pjc = pjConvidado == null || pjConvidado.isEmpty ? 'pj1' : pjConvidado;
+    if (!saveComecado(armazenamento.ler(chaveSave(personagem: pjc)))) return false;
+    final pjConta = armazenamento.ler('questlog.personagemAtivo.v1.uid.$contaUid');
+    final pja = pjConta == null || pjConta.isEmpty ? 'pj1' : pjConta;
+    if (saveComecado(armazenamento.ler(chaveSave(uid: contaUid, personagem: pja)))) return false;
+    await _migrarConvidadoPara(contaUid, apagarCruas: false);
+    return true;
+  }
+
+  /// Uma nova tentativa em segundo plano baixou a nuvem por cima do aparelho: relê tudo já (antes de qualquer gravação
+  /// com o estado velho da memória). Se a conta estava na escolha do herói e agora tem save, entra no jogo.
+  void _aoPuxarDaNuvem() {
+    final estavaNaEntrada = onboardingPendente;
+    _gravacaoSuspensa = true; // nada grava o estado velho até reler
+    () async {
+      await abrirDonoAtual();
+      if (estavaNaEntrada && !onboardingPendente) entrada.value = EntradaModo.nenhuma;
+      notifyListeners();
+    }();
+  }
+
+  /// `entitlements/{uid}` lido: guarda se a conta é Pro (vitalício ou assinatura no prazo). Sem paywall aqui (Fase 7).
+  void _aoLerPlano(PlanoServidor p) {
+    final pro = p.ehPro(_agora().millisecondsSinceEpoch);
+    if (pro == ehPro) return;
+    ehPro = pro;
+    notifyListeners();
+  }
+
+  /// Uma alteração de verdade na conta: marca "sujo" (como o `salvar()` do original) e agenda o envio.
+  void _marcarAlteracaoNuvem() {
+    final u = uid;
+    if (u == null || u.isEmpty) return;
+    armazenamento.gravar(chaveSujo(u), '${_agora().millisecondsSinceEpoch}');
+    nuvem?.alterou(u);
+  }
+
   /// Copia as chaves do convidado para o namespace da conta e apaga as cruas (o bloco `if (contaNova)` do `aoLogar`).
-  Future<void> _migrarConvidadoPara(String novoUid) async {
+  Future<void> _migrarConvidadoPara(String novoUid, {bool apagarCruas = true}) async {
     final reHeroi = RegExp(r'\.pj\.([^.]+)$');
     for (final k in armazenamento.chaves().toList()) {
       if (!k.startsWith('questlog.') || k.contains('.uid.')) continue;
@@ -1267,7 +1344,7 @@ class EstadoJogo extends ChangeNotifier {
       final nk = ehHeroi ? k.replaceFirstMapped(reHeroi, (m) => '.uid.$novoUid.pj.${m[1]}') : '$k.uid.$novoUid';
       final v = armazenamento.ler(k);
       if (v != null && armazenamento.ler(nk) == null) await armazenamento.gravar(nk, v);
-      await armazenamento.remover(k);
+      if (apagarCruas) await armazenamento.remover(k);
     }
   }
 
@@ -1275,20 +1352,39 @@ class EstadoJogo extends ChangeNotifier {
   /// original, que só apaga a marca da conta). A tela de login abre, com o jogo local de volta se houver save.
   Future<void> sairDaConta() async {
     await _salvarTudo();
+    // v4.139 do original: o último envio precisa terminar ANTES do signOut (depois a regra nega o setDoc). Espera até
+    // 4 s; se não der, o "sujo" fica no aparelho e o próximo login desta conta sobe o local em vez de baixar a nuvem.
+    await nuvem?.sair();
     try {
       await conta.sair();
     } catch (_) {
       // sem rede ou erro: desconecta só aqui, como o original ("você foi desconectado aqui")
     }
+    ehPro = false;
     uid = null;
     await abrirDonoAtual();
     entrada.value = EntradaModo.soLogin;
     notifyListeners();
   }
 
+  /// "Excluir conta": segura os envios (nenhum `setDoc` pode recriar `saves/{uid}` enquanto ele é apagado), e o serviço
+  /// reautentica, apaga a nuvem (gancho `apagarNuvem`: `saves/{uid}` + histórico) e o login. Se falhar, os envios voltam.
+  /// Depois de dar certo, quem chamou chama [aposExcluirConta].
+  Future<void> excluirConta({String? senha}) async {
+    await nuvem?.pausar();
+    try {
+      await conta.excluir(senha: senha);
+    } catch (_) {
+      nuvem?.retomar();
+      rethrow;
+    }
+  }
+
   /// Depois de excluir a conta no serviço: apaga do aparelho tudo que era dela (`.uid.<uid>`), volta ao jogo sem conta e
   /// abre o login. (O original dá `localStorage.clear()` inteiro; aqui só o que é da conta excluída.)
   Future<void> aposExcluirConta(String uidExcluido) async {
+    nuvem?.parar();
+    ehPro = false;
     for (final k in armazenamento.chaves().toList()) {
       if (k.contains('.uid.$uidExcluido.') || k.endsWith('.uid.$uidExcluido')) await armazenamento.remover(k);
     }
@@ -1343,22 +1439,75 @@ class EstadoJogo extends ChangeNotifier {
     _temaPreview = null; // qualquer ação em Tarefas desfaz a prévia de um cenário trancado
     checarConquistas();
     final ms = _agora().millisecondsSinceEpoch;
-    // as quatro gravações saem juntas (cada uma já atualiza o cache na hora), sem esperar uma pela outra
-    await Future.wait([
-      armazenamento.gravar(chaveSave(uid: uid, personagem: personagem), jsonEncode(save.paraJson(catalogo, salvoEm: ms))),
-      armazenamento.gravar(chaveConta(_chaveVida, uid: uid, personagem: personagem), jsonEncode({'vida': vida, 'ultimoDia': ultimoDia})),
-      armazenamento.gravar(chaveConta(_chaveDescanso, uid: uid, personagem: personagem), jsonEncode(descanso)),
-      armazenamento.gravar(chaveConta(_chaveConcluidas, uid: uid, personagem: personagem), '$totalConcluidas'),
-      if (bauDia != null) armazenamento.gravar(chaveConta(_chaveBauDia, uid: uid, personagem: personagem), jsonEncode(bauDia)),
-      armazenamento.gravar(chaveConta(_chavePity, uid: uid, personagem: personagem), '$pity'),
-      armazenamento.gravar(chaveConta(_chaveHist, uid: uid, personagem: personagem), gravarHistorico(hist)),
-      armazenamento.gravar(chaveConta(_chaveVistos, uid: uid, personagem: personagem), jsonEncode(itensVistos.toList()..sort())),
-      armazenamento.gravar(chaveConta(_chaveConqDesbloq, uid: uid, personagem: personagem), jsonEncode(conqDesbloq)),
-      if (lojaDia != null)
-        armazenamento.gravar(
-          chaveConta(_chaveLoja, uid: uid, personagem: personagem),
-          jsonEncode({'dia': lojaDia, 'estoque': [for (final v in lojaEstoque) {'id': v.id, 'o': v.oferta ? 1 : 0}], 'vendidos': lojaVendidos}),
-        ),
-    ]);
+    // Só grava o que MUDOU de verdade (parte B): o carimbo `salvoEm` do save é o da última alteração real, não o da
+    // última vez que o app abriu. É ele que decide local x nuvem; abrir um aparelho parado não pode deixar o save velho
+    // "mais novo" que o jogo feito em outro aparelho. Uma mudança real marca "sujo" e agenda o envio.
+    final futuros = <Future<void>>[];
+    void g(String chave, String valor) {
+      final f = _gravarSeMudou(chave, valor);
+      if (f != null) futuros.add(f);
+    }
+
+    final kSave = chaveSave(uid: uid, personagem: personagem);
+    final semCarimbo = jsonDecode(jsonEncode(save.paraJson(catalogo, salvoEm: 0))) as Map<String, dynamic>;
+    final antes = _lerJson(kSave);
+    if (antes is! Map || !_mesmoSave(antes, semCarimbo)) {
+      futuros.add(armazenamento.gravar(kSave, jsonEncode({...semCarimbo, 'salvoEm': ms})));
+    }
+    g(chaveConta(_chaveVida, uid: uid, personagem: personagem), jsonEncode({'vida': vida, 'ultimoDia': ultimoDia}));
+    g(chaveConta(_chaveDescanso, uid: uid, personagem: personagem), jsonEncode(descanso));
+    g(chaveConta(_chaveConcluidas, uid: uid, personagem: personagem), '$totalConcluidas');
+    if (bauDia != null) g(chaveConta(_chaveBauDia, uid: uid, personagem: personagem), jsonEncode(bauDia));
+    g(chaveConta(_chavePity, uid: uid, personagem: personagem), '$pity');
+    g(chaveConta(_chaveHist, uid: uid, personagem: personagem), gravarHistorico(hist));
+    g(chaveConta(_chaveVistos, uid: uid, personagem: personagem), jsonEncode(itensVistos.toList()..sort()));
+    g(chaveConta(_chaveConqDesbloq, uid: uid, personagem: personagem), jsonEncode(conqDesbloq));
+    if (lojaDia != null) {
+      g(
+        chaveConta(_chaveLoja, uid: uid, personagem: personagem),
+        jsonEncode({'dia': lojaDia, 'estoque': [for (final v in lojaEstoque) {'id': v.id, 'o': v.oferta ? 1 : 0}], 'vendidos': lojaVendidos}),
+      );
+    }
+    if (futuros.isNotEmpty) _marcarAlteracaoNuvem();
+    // as gravações saem juntas (cada uma já atualiza o cache na hora), sem esperar uma pela outra
+    await Future.wait(futuros);
+  }
+
+  /// Grava [valor] só se o conteúdo mudou (mesmo JSON com outra formatação conta como igual e o texto antigo fica).
+  /// Devolve o Future da gravação, ou null se não gravou.
+  Future<void>? _gravarSeMudou(String chave, String valor) {
+    final antes = armazenamento.ler(chave);
+    if (antes == valor) return null;
+    if (antes != null) {
+      try {
+        if (_jsonIgual(jsonDecode(antes), jsonDecode(valor))) return null;
+      } catch (_) {}
+    }
+    return armazenamento.gravar(chave, valor);
+  }
+
+  /// O save gravado tem o mesmo conteúdo, ignorando o carimbo `salvoEm`?
+  static bool _mesmoSave(Map antes, Map<String, dynamic> novo) {
+    final a = Map<String, dynamic>.from(antes)..remove('salvoEm');
+    final b = Map<String, dynamic>.from(novo)..remove('salvoEm');
+    return _jsonIgual(a, b);
+  }
+
+  static bool _jsonIgual(Object? a, Object? b) {
+    if (a is Map && b is Map) {
+      if (a.length != b.length) return false;
+      for (final e in a.entries) {
+        if (!b.containsKey(e.key) || !_jsonIgual(e.value, b[e.key])) return false;
+      }
+      return true;
+    }
+    if (a is List && b is List) {
+      if (a.length != b.length) return false;
+      for (var i = 0; i < a.length; i++) {
+        if (!_jsonIgual(a[i], b[i])) return false;
+      }
+      return true;
+    }
+    return a == b;
   }
 }

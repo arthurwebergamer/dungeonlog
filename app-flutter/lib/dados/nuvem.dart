@@ -33,6 +33,13 @@ abstract class RepositorioNuvem {
   Future<void> apagarTudo(String uid);
 }
 
+/// O gancho `apagarNuvem` do excluir conta, com teto de tempo: sem rede (cache offline desligado) o `commit` do batch
+/// só termina quando a rede volta, e a folha "Excluir conta" (que não fecha durante a exclusão) ficaria presa. Estourado o
+/// limite, o serviço de conta segue (como em qualquer falha do gancho) e o batch, que ficou na fila do Firestore, ainda
+/// chega quando a rede voltar.
+Future<void> Function(String uid) apagarNuvemComLimite(RepositorioNuvem repo, {Duration limite = const Duration(seconds: 10)}) =>
+    (uid) => repo.apagarTudo(uid).timeout(limite);
+
 /// Nuvem falsa em memória (testes). Simula as regras do firestore.rules: com [logado] definido, qualquer acesso a um
 /// uid diferente dá `permission-denied`.
 class RepositorioNuvemMemoria implements RepositorioNuvem {

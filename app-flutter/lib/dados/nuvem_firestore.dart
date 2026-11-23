@@ -2,9 +2,10 @@
 // arquivo (os testes não). Caminhos e campos: ver lib/dominio/nuvem.dart.
 //
 // - Leitura do save sempre do SERVIDOR (`Source.server`): sem rede dá erro e o jogo segue local (nunca decide com cache).
-// - Cache offline do Firestore desligado (ver [desligarCacheOffline]): uma gravação feita sem rede NÃO fica escondida
-//   numa fila do plugin que poderia subir depois de "Sair" ou de outra conta entrar; quem guarda o que falta subir é o
-//   marcador `questlog.sujo.v1.uid.<uid>` do próprio app, que tenta de novo.
+// - Cache offline do Firestore desligado (ver [desligarCacheOffline]): nada fica gravado em disco pelo plugin; quem
+//   guarda o que falta subir é o marcador `questlog.sujo.v1.uid.<uid>` do próprio app, que tenta de novo. ATENÇÃO
+//   (revisão extra): a fila de gravações continua existindo EM MEMÓRIA; um `setDoc` que estourou o limite ainda pode
+//   chegar quando a rede voltar (na mesma conta, em ordem; depois do `signOut` a regra nega).
 // - Nada aqui escreve em `entitlements` (a regra nega; ver firestore.rules).
 import 'package:cloud_firestore/cloud_firestore.dart';
 

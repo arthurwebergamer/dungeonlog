@@ -2,6 +2,7 @@
 // Os fluxos do pedido: (a) conta nova + convidado, (b) baixar, (c) local mais novo/velho/igual, (d) convidado em conta
 // que já existe, (e) sem rede / permissão, (f) vários heróis, (g) histórico, (h) excluir, (i) sair, (j) trocar de aparelho.
 // A paridade com o JS real está em nuvem_paridade_test.dart.
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
@@ -544,6 +545,94 @@ void main() {
       expect(a2.e.save.tarefas.map((t) => t.texto), contains('feita no B'), reason: 'A não subiu o save velho por cima');
       expect(_json(repo.saves['J1']!.data)['tarefas'], hasLength(1));
       a2.sync.parar();
+    });
+
+    group('revisão extra (bugs achados na revisão)', () {
+      test('abertura lenta + toque no save velho NÃO sobe por cima do progresso feito em outro aparelho', () async {
+        final repo = RepositorioNuvemMemoria();
+        final a = _Aparelho(repo);
+        await a.abrir();
+        await a.e.entrarNaConta(_nova('R1'));
+        await a.e.concluirOnboarding(nome: 'Parado', heroi: 0);
+        await a.assentar();
+        final localA = a.save('R1');
+        a.sync.parar();
+        // outro aparelho (ou o app HTML) jogou bastante nesta conta depois disso
+        final doOutro = _saveJs(nome: 'Outro', xp: 900, salvoEm: _hojeMs + 3600000);
+        repo.saves['R1'] = DocSave(data: doOutro, atualizadoEm: _hojeMs + 3600000);
+        // A abre com a sessão salva e a nuvem lenta (passa do limite de 3 s): abre o save velho e o jogador toca nele
+        repo.falhar = 'unavailable';
+        final a2 = _Aparelho(repo, arm: a.arm, uid: 'R1')..relogio = _hojeMs + 7200000;
+        await a2.abrir();
+        expect(a2.e.save.nomeHeroi, 'Parado');
+        a2.e.criarTarefa(texto: 'toque no save velho', modo: ModoTarefa.hoje, dif: 'facil');
+        expect(a2.sujo('R1'), isTrue);
+        repo.falhar = null;
+        await a2.assentar(); // nova tentativa em segundo plano lê a nuvem
+        await a2.assentar();
+        expect(_json(repo.saves['R1']!.data)['nomeHeroi'], 'Outro', reason: 'o progresso do outro aparelho não pode ser sobrescrito');
+        expect(a2.e.save.nomeHeroi, 'Outro', reason: 'vence o de mais progresso');
+        final bk = jsonDecode(a2.arm.ler(chaveBackupLocal('R1'))!) as List;
+        expect(_json((bk.first as Map)['data'] as String)['nomeHeroi'], 'Parado', reason: 'o toque local ficou no backup');
+        expect(localA, isNotNull);
+        a2.sync.parar();
+      });
+
+      test('"sujo" com a nuvem igual à última vista aqui continua subindo (regra 1 do HTML)', () {
+        final local = _saveJs(nome: 'L', xp: 1, salvoEm: 1000);
+        final nuvem = _saveJs(nome: 'N', xp: 900, salvoEm: 999999);
+        expect(decidirNuvem(sujo: true, jaSincronizou: true, local: local, nuvem: nuvem).acao, AcaoNuvem.empurrar);
+        final c = decidirNuvem(sujo: true, jaSincronizou: true, nuvemMudou: true, local: local, nuvem: nuvem);
+        expect(c.acao, AcaoNuvem.puxar, reason: 'conflito: a nuvem mudou por outro aparelho desde a última vista; vence o progresso');
+        expect(c.backupLocal, isTrue);
+        // o app HTML parado subiu um save VELHO por cima (sessão restaurada): o local alterado, com mais XP, sobe
+        final c2 = decidirNuvem(sujo: true, jaSincronizou: true, nuvemMudou: true, local: nuvem, nuvem: local);
+        expect(c2.acao, AcaoNuvem.empurrar);
+        expect(c2.nuvemNoHistorico, isTrue);
+      });
+
+      test('Sair com envio em voo + entrar em OUTRA conta: nada sobe na conta nova antes de ler a nuvem dela', () async {
+        final repo = RepositorioNuvemMemoria();
+        final arm = ArmazenamentoMemoria();
+        final s = SincronizadorNuvem(repo: repo, armazenamento: arm, atraso: const Duration(milliseconds: 5), agoraMs: () => _hojeMs, esperas: const [Duration(milliseconds: 30)]);
+        arm.dados[chaveSave(uid: 'A')] = _saveJs(nome: 'A', salvoEm: _hojeMs - 1000);
+        await s.entrar('A');
+        await s.esperarOcioso();
+        expect(repo.saves['A'], isNotNull);
+        // B já foi usada neste aparelho (save velho) e jogou muito em outro lugar depois
+        final velhoB = _saveJs(nome: 'Bvelho', xp: 10, salvoEm: _hojeMs - 100000);
+        final nuvemB = _saveJs(nome: 'Bnovo', xp: 900, salvoEm: _hojeMs - 5000);
+        arm.dados[chaveSave(uid: 'B')] = velhoB;
+        arm.dados[chaveSincronizado('B')] = '1';
+        repo.saves['B'] = DocSave(data: nuvemB, atualizadoEm: _hojeMs - 5000);
+        // A muda e o envio fica preso na rede
+        final segA = Completer<void>();
+        repo.segurar = segA;
+        arm.dados[chaveSave(uid: 'A')] = _saveJs(nome: 'A2', salvoEm: _hojeMs);
+        arm.dados[chaveSujo('A')] = '1';
+        s.alterou('A');
+        await Future<void>.delayed(const Duration(milliseconds: 30));
+        expect(repo.chamadas.last, 'gravar saves/A');
+        await s.sair(limite: const Duration(milliseconds: 10)); // desiste de esperar; o envio continua em voo
+        final segB = Completer<void>();
+        repo.segurar = segB;
+        final fb = s.entrar('B'); // a leitura de B fica presa também
+        segA.complete(); // o envio de A termina
+        await Future<void>.delayed(const Duration(milliseconds: 10));
+        repo.segurar = null;
+        segB.complete();
+        await fb;
+        await s.esperarOcioso();
+        expect(repo.saves['B']!.data, nuvemB, reason: 'o save velho de B não pode ter subido às cegas');
+        expect(arm.ler(chaveSave(uid: 'B')), nuvemB);
+        s.parar();
+      });
+
+      test('excluir conta: apagar a nuvem tem teto de tempo (sem rede o batch nunca termina e a folha travava)', () async {
+        final repo = RepositorioNuvemMemoria()..segurar = Completer<void>();
+        final apagar = apagarNuvemComLimite(repo, limite: const Duration(milliseconds: 20));
+        await expectLater(apagar('X'), throwsA(isA<TimeoutException>()));
+      });
     });
 
     test('Pro vem de entitlements/{uid}; sem rede não muda; sair volta a grátis', () async {

@@ -132,3 +132,36 @@ Nenhuma chamada real ao Firestore foi feita: regras publicadas, latência, o plu
 - **Abertura sem rede** espera até 3 s pela nuvem durante a tela de abertura (depois segue local).
 - **Releitura em segundo plano** (só quando a nuvem é lida mais tarde e vence) troca a tela por baixo do jogador; o local fica no backup.
 - **Excluir** pelo app HTML continua deixando o `historico` órfão (só o Flutter apaga tudo).
+
+---
+
+# Revisão extra (Fase 6, revisor sênior)
+
+Foco: o que pode **perder/sobrescrever progresso** ou **travar** o app. Código lido de verdade (`sincronizador_nuvem.dart`, `dominio/nuvem.dart`, `nuvem_firestore.dart`, `conta_firebase.dart`, `estado_jogo.dart`, `app.dart`, `main.dart`, `puxarNuvem`/`empurrarNuvem`/`guardarHistorico`/`excluirConta` do `play/index.html`, workflow e `android_config/`). Cada bug corrigido tem teste em `test/nuvem_test.dart`, grupo "revisão extra", que **falhava antes** da correção e passa depois.
+
+## Corrigidos
+1. **ALTA (rede ruim + troca de conta): envio em voo depois de "Sair" continuava na conta que entrou em seguida** (`sincronizador_nuvem.dart`, `_laco`/`_empurrar`). O `sair()` desiste de esperar após 4 s, mas o `setDoc` segue em voo; o próprio `descarregar` marcava "de novo" e, quando o envio terminava, o laço lia `_uid` (já da conta B) e **subia o save local velho de B sem ter lido a nuvem de B** (quebra a regra "nada sobe antes de ler"). O progresso de B na nuvem era perdido sem cópia no histórico. Correção: o laço de envio fica preso à conta e à geração em que nasceu; se a geração mudou, para. Teste: "Sair com envio em voo + entrar em OUTRA conta".
+2. **ALTA (abertura com a nuvem lenta/offline): o "sujo" subia por cima do progresso feito em outro aparelho.** Abrir o app logado com a leitura passando de 3 s abre o save local velho; um toque marca "sujo"; quando a nova tentativa lê a nuvem, a regra 1 ("sujo e já sincronizou → sobe") empurrava o save velho por cima do que o outro aparelho/app HTML fez (sobrava só em `historico/h*`, recuperável apenas pelo Console). O mesmo vale para login sem rede. Correção: nova chave só do Flutter `questlog.nuvemBase.v1.uid.<uid>` = o `atualizadoEm` da nuvem na última vez que este aparelho a leu/gravou (comparação do valor exato, sem depender de relógio). Se a nuvem lida tem outro `atualizadoEm` e há "sujo", é **conflito**: a regra 1 não vale e decide como 5a (mais XP) e depois pelo carimbo; o perdedor vai para backup local / histórico como antes. Sem a chave (aparelho que rodou a versão anterior) ou com a nuvem igual à base, nada muda (regra 1 do HTML). A paridade com o JS (196 cenários) não muda. Testes: "abertura lenta + toque no save velho..." e a unidade "sujo com a nuvem igual...".
+   - Linha nova da tabela: **1c** — "sujo" + já sincronizou + `atualizadoEm` da nuvem ≠ base → como 5a/5b/5c/5d (o HTML subiria o local).
+   - Caso coberto de propósito: o app HTML parado sobe um save **velho** na sessão restaurada; o Flutter com alteração e mais XP ainda sobe o dele (a nuvem velha vai para o histórico).
+3. **MÉDIA (trava): excluir conta sem rede depois da reautenticação.** Com o cache offline desligado, o `commit` do batch que apaga `saves/{uid}` + histórico só termina quando a rede volta; a folha "Excluir conta" não fecha durante a exclusão (`PopScope`) e ficava presa com o spinner. Correção: `apagarNuvemComLimite` (`lib/dados/nuvem.dart`, usado no `main.dart`), teto de 10 s; estourado, segue como qualquer falha do gancho (o HTML faz o mesmo: falha ao apagar não impede o `deleteUser`). Teste: "excluir conta: apagar a nuvem tem teto de tempo".
+
+## Conferidos sem bug
+- Ordem de excluir: segura envios → reautentica (senha errada não apaga nada) → apaga nuvem → apaga login → só então apaga o local. Falha parcial: nuvem apagada mas `delete()` falhou → a conta continua com o save local, e a próxima abertura sobe o local (regra 2); nuvem não apagada mas login apagado → documento órfão (igual ao HTML).
+- Convidado: conta nova copia e só então apaga as cruas (destino é uid novo, sem chaves); conta existente nunca apaga as cruas. Não achei caminho que perca o jogo do convidado.
+- Backup antes de sobrescrever: todo `puxar` com local diferente grava `backupLocal` (com as extras) antes de gravar a nuvem por cima (o trecho síncrono do `_backupLocal` roda antes das gravações); todo `empurrar` sobre nuvem diferente força `historico/h*`.
+- Formato: `saves/{uid}` `{data: string, extras: {string: string}, atualizadoEm: int, pj}` e `historico/h{n%6}`/`d{dia%14}` `{data, extras, em}` batem com o que o HTML lê/grava (`snap.data().data`, `extras[k]` em `localStorage.setItem`). O HTML apaga `pj` ao gravar (setDoc sem merge), já previsto.
+- Erros do Firebase: leitura/gravação/histórico/plano passam por `_rastrear`/try; `ServicoContaFirebase._traduz` converte tudo em `ErroConta` (a folha de excluir só captura `ErroConta`). Não achei exceção solta nem "sujo" perdido (só sai com envio confirmado sem alteração no meio).
+- Android/CI: `package_name` do `google-services.json` = `com.dungeonlog.dungeonlog_flutter` (o do `flutter create --org com.dungeonlog --project-name dungeonlog_flutter`), SHA-1 cadastrado = o conferido no CI; INTERNET vem do manifesto dos plugins (conferido com `aapt2` na parte A).
+
+## Deixados (e por quê)
+- **BAIXA, só documentação (comentário corrigido):** o comentário de `nuvem_firestore.dart` dizia que, com o cache desligado, uma gravação sem rede "não fica escondida numa fila". Não é exato: com `persistenceEnabled: false` a fila é em memória e um `setDoc` que estourou os 15 s ainda é enviado quando a rede volta (enquanto o processo vive). Não causa perda: na mesma conta a ordem é mantida e o app reenvia o mesmo; depois do `signOut` a regra nega; e uma gravação velha que chegue tarde agora aparece como "nuvem mudou" (base) na próxima decisão.
+- **BAIXA:** sem "sujo", a decisão entre dois saves começados ainda é pelo carimbo `salvoEm` (5b/5d, como o HTML), então um aparelho com relógio muito adiantado tende a vencer. Não mudei: é o carimbo que protege contra o app HTML subir o save velho na sessão restaurada (a base sozinha não distingue "outro aparelho jogou" de "HTML parado regravou o velho").
+- **BAIXA (custo, não perda):** ir para o fundo duas vezes seguidas (`hidden` + `paused`) com um envio em voo gera um segundo `setDoc` igual.
+- **BAIXA:** documento sem `pj` (gravado pelo HTML) desce no herói ativo do Flutter mesmo que seja outro herói (mesma regra do HTML; só importa com vários heróis, Pro/Fase 7).
+- O envio de histórico não é esperado por `pausar()` no excluir; como sai antes do batch na mesma fila do cliente, não sobra órfão na prática.
+
+## Verificação
+- `flutter test`: **2133 testes verdes** (eram 2129; +4 da revisão). `nuvem_paridade_test.dart` inalterado e verde (nenhuma mudança em `tools/gerar_casos_nuvem.mjs` nem nas fixtures).
+- `flutter analyze`: 0 erros (os mesmos 60 avisos/infos antigos).
+- Nenhuma chamada real ao Firebase. Nada mudou no app HTML.

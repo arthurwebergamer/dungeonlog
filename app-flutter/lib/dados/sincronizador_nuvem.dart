@@ -219,35 +219,42 @@ class SincronizadorNuvem {
   }
 
   /// Um envio por vez; o que chegar durante o voo sai logo depois, com o estado mais novo.
+  /// O laço é PRESO à conta e à geração em que nasceu (revisão extra): um envio que ficou em voo depois de "Sair" nunca
+  /// continua na conta que entrou em seguida (subiria o save local dela antes de a nuvem dela ser lida).
   Future<void> _bombear() {
-    if (!_pronto || _pausado || _uid == null) return Future.value();
+    final uid = _uid;
+    if (!_pronto || _pausado || uid == null) return Future.value();
     final atual = _emVoo;
-    if (atual != null) {
+    if (atual != null && _emVooGer == _geracao) {
       _deNovo = true;
       return atual;
     }
-    final f = _laco();
+    final ger = _geracao;
+    final f = _laco(uid, ger);
     _emVoo = f;
+    _emVooGer = ger;
     return f.whenComplete(() {
       if (identical(_emVoo, f)) _emVoo = null;
     });
   }
 
-  Future<void> _laco() async {
+  int _emVooGer = -1;
+  bool _vivo(int ger) => ger == _geracao && _pronto && !_pausado;
+
+  Future<void> _laco(String uid, int ger) async {
     do {
       _deNovo = false;
-      final ok = await _empurrar();
+      final ok = await _empurrar(uid, ger);
       if (!ok) {
-        _agendarReenvio();
+        if (ger == _geracao) _agendarReenvio();
         return;
       }
-    } while (_deNovo && !_pausado && _uid != null);
+    } while (_deNovo && _vivo(ger));
   }
 
-  /// `empurrarNuvem`: sobe o save e as extras do herói ATIVO. Devolve false se falhou.
-  Future<bool> _empurrar() async {
-    final uid = _uid;
-    if (uid == null) return true;
+  /// `empurrarNuvem`: sobe o save e as extras do herói ATIVO da conta [uid]. Devolve false se falhou.
+  Future<bool> _empurrar(String uid, int ger) async {
+    if (!_vivo(ger)) return true;
     final pj = _ativo(uid);
     final data = _arm.ler(chaveSave(uid: uid, personagem: pj));
     if (!saveComecado(data)) return true; // SEGURO: nunca sobe um save vazio (o original subia `data: ''`)
@@ -266,6 +273,7 @@ class SincronizadorNuvem {
     _reenvios = 0;
     if (seq == _seq) await _arm.remover(chaveSujo(uid)); // nada mudou durante o envio: a nuvem está igual ao aparelho
     await _arm.gravar(chaveSincronizado(uid), '$em');
+    await _arm.gravar(chaveBaseNuvem(uid), '$em');
     _rastrear(_historico(uid, data!, extras)); // sem esperar: não atrasa nem derruba o envio principal
     return true;
   }
@@ -323,9 +331,11 @@ class SincronizadorNuvem {
     final mesmo = alvo == ativo;
     final sujo = _sujo(uid);
     final jaSinc = _arm.ler(chaveSincronizado(uid)) != null;
+    final carimbo = '${doc?.atualizadoEm ?? ''}';
+    final base = _arm.ler(chaveBaseNuvem(uid)); // null = aparelho de antes da base: comportamento antigo (regra 1)
     final kAlvo = chaveSave(uid: uid, personagem: alvo);
     final local = _arm.ler(kAlvo);
-    final dec = decidirNuvem(sujo: sujo && mesmo, jaSincronizou: jaSinc, local: local, nuvem: doc?.data);
+    final dec = decidirNuvem(sujo: sujo && mesmo, jaSincronizou: jaSinc, nuvemMudou: base != null && base != carimbo, local: local, nuvem: doc?.data);
     final gravs = <Future<void>>[];
     var puxou = false, subir = false, sujar = false;
     switch (dec.acao) {
@@ -362,6 +372,7 @@ class SincronizadorNuvem {
       subir = true;
     }
     gravs.add(_arm.gravar(chaveSincronizado(uid), _ms()));
+    gravs.add(_arm.gravar(chaveBaseNuvem(uid), carimbo));
     _pronto = true;
     _tentativas = 0;
     if (puxou && segundoPlano) aoPuxarEmSegundoPlano?.call();

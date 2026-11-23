@@ -20,8 +20,9 @@ Future<void> main() async {
   RepositorioNuvem? nuvem;
   try {
     final repo = RepositorioNuvemFirestore();
-    // excluir conta apaga também saves/{uid} e o histórico (antes de apagar o login, que é quem dá a permissão)
-    conta = await ServicoContaFirebase.iniciar(apagarNuvem: repo.apagarTudo);
+    // excluir conta apaga também saves/{uid} e o histórico (antes de apagar o login, que é quem dá a permissão);
+    // com teto de tempo: sem rede o batch não termina e a folha de excluir ficaria presa
+    conta = await ServicoContaFirebase.iniciar(apagarNuvem: apagarNuvemComLimite(repo));
     RepositorioNuvemFirestore.desligarCacheOffline();
     nuvem = repo;
   } catch (_) {

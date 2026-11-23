@@ -62,6 +62,11 @@ String chaveHistNuvem(String uid) => 'questlog.histNuvem.v1.uid.$uid';
 /// Sem ele a conta "nunca sincronizou aqui" e a regra usa a proteção de progresso (ver [decidirNuvem]).
 String chaveSincronizado(String uid) => 'questlog.nuvemSync.v1.uid.$uid';
 
+/// SÓ DO FLUTTER: o `atualizadoEm` de `saves/{uid}` na última vez que este aparelho leu ou gravou a nuvem (texto vazio =
+/// sem documento/sem carimbo). Se a nuvem lida tiver outro, alguém gravou depois (ver `nuvemMudou` em [decidirNuvem]).
+/// Compara o valor exato (não relógios), então não depende do relógio de nenhum aparelho.
+String chaveBaseNuvem(String uid) => 'questlog.nuvemBase.v1.uid.$uid';
+
 /// Lista de heróis da conta e herói ativo (as mesmas chaves do original e do EstadoJogo).
 String chavePersonagensConta(String uid) => 'questlog.personagens.v1.uid.$uid';
 String chavePersonagemAtivoConta(String uid) => 'questlog.personagemAtivo.v1.uid.$uid';
@@ -232,10 +237,16 @@ class DecisaoNuvem {
 ///     b. tLocal e tNuvem ≠ 0 e tLocal > tNuvem + 2 s → EMPURRAR, cópia da nuvem no histórico (HTML).
 ///     c. tLocal ≠ 0 e tNuvem == 0 → SEGURO: EMPURRAR (save da nuvem sem carimbo é de versão antiga; HTML puxaria).
 ///     d. senão → PUXAR, backup do local (HTML).
-DecisaoNuvem decidirNuvem({required bool sujo, required bool jaSincronizou, required String? local, required String? nuvem}) {
+///
+///  [nuvemMudou] (revisão extra): o `atualizadoEm` da nuvem NÃO é o da última vez que este aparelho leu/gravou a nuvem
+///  (outro aparelho ou o app HTML gravou depois). Com "sujo" isso é CONFLITO: a alteração local foi feita em cima de um
+///  save que a nuvem já tinha deixado para trás (ex.: abrir com a nuvem lenta, passar dos 3 s e tocar no save velho).
+///  Aí a regra 1 não vale: decide como 5a (mais XP) e depois pelo carimbo; o perdedor vai para backup/histórico.
+DecisaoNuvem decidirNuvem({required bool sujo, required bool jaSincronizou, bool nuvemMudou = false, required String? local, required String? nuvem}) {
   final localOk = saveComecado(local);
   final nuvemOk = saveComecado(nuvem);
-  if (sujo && jaSincronizou) {
+  final conflito = sujo && jaSincronizou && nuvemMudou;
+  if (sujo && jaSincronizou && !conflito) {
     if (!localOk) {
       return nuvemOk
           ? DecisaoNuvem(AcaoNuvem.puxar, '1-sujo-local-vazio', backupLocal: local != null && local.isNotEmpty)
@@ -248,7 +259,7 @@ DecisaoNuvem decidirNuvem({required bool sujo, required bool jaSincronizou, requ
   }
   if (!localOk) return DecisaoNuvem(AcaoNuvem.puxar, '3-local-vazio', backupLocal: local != null && local.isNotEmpty);
   if (local == nuvem) return const DecisaoNuvem(AcaoNuvem.puxar, '4-igual');
-  if (!jaSincronizou) {
+  if (!jaSincronizou || conflito) {
     final xl = xpDoSave(local), xn = xpDoSave(nuvem);
     if (xl > xn) return const DecisaoNuvem(AcaoNuvem.empurrar, '5a-mais-xp-local', nuvemNoHistorico: true);
     if (xn > xl) return const DecisaoNuvem(AcaoNuvem.puxar, '5a-mais-xp-nuvem', backupLocal: true);
